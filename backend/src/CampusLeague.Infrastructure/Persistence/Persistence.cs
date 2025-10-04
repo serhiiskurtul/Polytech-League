@@ -10,7 +10,7 @@ public static class Persistence
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(
                 configuration.GetConnectionString("DefaultConnection"),
-                x => x.MigrationsAssembly("WebServer.Infrastructure")
+                x => x.MigrationsAssembly("CampusLeague.Infrastructure")
             ));
 
         return services;

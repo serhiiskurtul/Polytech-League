@@ -2,6 +2,8 @@ using CampusLeague.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using EntityFramework.Exceptions.PostgreSQL;
 using CampusLeague.Domain.Entities.Chess;
+using CampusLeague.Persistence.DbConfiguration;
+using CampusLeague.Persistence.DbConfiguration.ChessConfigurations;
 
 namespace CampusLeague.Persistence.Database;
 
@@ -22,11 +24,27 @@ public class ApplicationDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresEnum<UserRole>();
-        modelBuilder.HasPostgresEnum<GameResult>();
+        modelBuilder.HasPostgresEnum<ChessGameResult>();
         modelBuilder.HasPostgresEnum<CompetitionLevel>();
         modelBuilder.HasPostgresEnum<ChessSystem>();
 
+        modelBuilder.Entity<Person>().UseTptMappingStrategy();
+        modelBuilder.Entity<Event>().UseTptMappingStrategy();
+
+        //General configurations
         modelBuilder.ApplyConfiguration(new UserConfiguration());
+        modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
+        modelBuilder.ApplyConfiguration(new PersonConfiguration());
+        modelBuilder.ApplyConfiguration(new EventConfiguration());
+        modelBuilder.ApplyConfiguration(new EventPhotosConfiguration());
+
+        // Chess configurations
+        modelBuilder.ApplyConfiguration(new PlayerConfiguration());
+        modelBuilder.ApplyConfiguration(new ChessPlayerConfiguration());
+        modelBuilder.ApplyConfiguration(new ChessRefereeConfiguration());
+        modelBuilder.ApplyConfiguration(new ChessEventConfiguration());
+        modelBuilder.ApplyConfiguration(new ChessEventParticipantConfiguration());
+        modelBuilder.ApplyConfiguration(new ChessGameConfiguration());
 
         base.OnModelCreating(modelBuilder);
     }

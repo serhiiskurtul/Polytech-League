@@ -9,5 +9,5 @@ public class ChessEventParticipant
     public required ChessPlayer Player { get; set; }
 
     public double Points { get; set; }
-    public int Rank { get; set; } // місце
+    public int Rank { get; set; } //місце
 }

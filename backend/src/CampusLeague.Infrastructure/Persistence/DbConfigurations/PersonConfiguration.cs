@@ -1,0 +1,31 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using CampusLeague.Domain.Entities;
+
+namespace CampusLeague.Persistence.DbConfiguration;
+
+public class PersonConfiguration : IEntityTypeConfiguration<Person>
+{
+    public void Configure(EntityTypeBuilder<Person> builder)
+    {
+        builder.ToTable("persons");
+
+        builder.Property(x => x.Id).HasColumnName("id");
+
+        builder.Property(x => x.FirstName)
+            .HasColumnName("first_name")
+            .IsRequired();
+
+        builder.Property(x => x.LastName)
+            .HasColumnName("last_name")
+            .IsRequired();
+
+        builder.Property(x => x.Birthday)
+            .HasColumnName("birthday")
+            .IsRequired();
+
+        builder.Property(x => x.PhotoUrl)
+            .HasColumnName("photo_url")
+            .IsRequired();
+    }
+}
