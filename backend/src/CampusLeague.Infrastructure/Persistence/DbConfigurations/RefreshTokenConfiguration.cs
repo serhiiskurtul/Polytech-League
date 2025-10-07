@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using CampusLeague.Domain.Entities;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace CampusLeague.Persistence.DbConfiguration;
+namespace CampusLeague.Infrastructure.Persistence.DbConfiguration;
 
 public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
 {

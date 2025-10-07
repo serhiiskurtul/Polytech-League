@@ -2,10 +2,10 @@ using CampusLeague.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using EntityFramework.Exceptions.PostgreSQL;
 using CampusLeague.Domain.Entities.Chess;
-using CampusLeague.Persistence.DbConfiguration;
-using CampusLeague.Persistence.DbConfiguration.ChessConfigurations;
+using CampusLeague.Infrastructure.Persistence.DbConfiguration;
+using CampusLeague.Infrastructure.Persistence.DbConfiguration.ChessConfigurations;
 
-namespace CampusLeague.Persistence.Database;
+namespace CampusLeague.Infrastructure.Persistence.Database;
 
 public class ApplicationDbContext : DbContext
 {

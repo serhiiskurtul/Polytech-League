@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using CampusLeague.Domain.Entities;
 
-namespace CampusLeague.Persistence.DbConfiguration;
+namespace CampusLeague.Infrastructure.Persistence.DbConfiguration;
 
 public class EventPhotosConfiguration : IEntityTypeConfiguration<EventPhotos>
 {

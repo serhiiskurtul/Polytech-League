@@ -2,7 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 
-namespace CampusLeague.Persistence.Database;
+namespace CampusLeague.Infrastructure.Persistence.Database;
 public static class Persistence
 {
     public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)

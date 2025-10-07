@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using CampusLeague.Domain.Entities.Chess;
 
-namespace CampusLeague.Persistence.DbConfiguration.ChessConfigurations;
+namespace CampusLeague.Infrastructure.Persistence.DbConfiguration.ChessConfigurations;
 
 public class ChessPlayerConfiguration : IEntityTypeConfiguration<ChessPlayer>
 {
