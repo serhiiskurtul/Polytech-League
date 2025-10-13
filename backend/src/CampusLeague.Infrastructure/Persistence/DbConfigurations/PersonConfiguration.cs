@@ -20,7 +20,7 @@ public class PersonConfiguration : IEntityTypeConfiguration<Person>
             .HasColumnName("last_name")
             .IsRequired();
 
-        builder.Property(x => x.Birthday)
+        builder.Property(x => x.BirthDate)
             .HasColumnName("birthday")
             .IsRequired();
 

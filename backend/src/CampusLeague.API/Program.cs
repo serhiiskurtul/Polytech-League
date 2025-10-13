@@ -1,4 +1,4 @@
-using CampusLeague.Persistence.Database;
+using CampusLeague.Infrastructure.Persistence.Database;
 
 var builder = WebApplication.CreateBuilder(args);
 

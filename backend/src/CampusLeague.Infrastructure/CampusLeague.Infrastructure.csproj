@@ -17,7 +17,6 @@
 	</ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CampusLeague.Application\CampusLeague.Application.csproj" />
     <ProjectReference Include="..\CampusLeague.Domain\CampusLeague.Domain.csproj" />
   </ItemGroup>
 
