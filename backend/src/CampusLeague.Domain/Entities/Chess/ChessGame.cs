@@ -4,7 +4,7 @@ public class ChessGame
 {
     public long Id { get; set; }
     public long TournamentId { get; set; }
-    public required ChessEvent Tournament { get; set; }
+    public ChessEvent? Tournament { get; set; }
 
     public long WhitePlayerId { get; set; }
     public long BlackPlayerId { get; set; }

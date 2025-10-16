@@ -21,25 +21,6 @@ public static class FilterExtensions
             constantExpression = Expression.AndAlso(constantExpression, binaryExpression);
         }
 
-        if (filterParams.MinPrice is not null)
-        {
-            MemberExpression memberExpressionMinPrice = Expression.Property(parameterExpression, "MinPrice");
-            Expression constantExpressionMinPrice = Expression.Constant(filterParams.MinPrice);
-            BinaryExpression binaryExpression = Expression.GreaterThanOrEqual(memberExpressionMinPrice, constantExpressionMinPrice);
-
-            constantExpression = Expression.AndAlso(constantExpression, binaryExpression);
-        }
-
-        if (filterParams.MaxPrice is not null)
-        {
-            MemberExpression memberExpressionMaxPrice = Expression.Property(parameterExpression, "MaxPrice");
-            Expression constantExpressionMaxPrice = Expression.Constant(filterParams.MaxPrice);
-            BinaryExpression binaryExpression = Expression.LessThanOrEqual(memberExpressionMaxPrice, constantExpressionMaxPrice); 
-
-            constantExpression = Expression.AndAlso(constantExpression, binaryExpression);
-        }
-
-    
         var expression = Expression.Lambda<Func<TEntity, bool>>(constantExpression, parameterExpression);
 
         return query.Where(expression);
