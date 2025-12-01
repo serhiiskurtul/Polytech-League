@@ -26,7 +26,6 @@
     <ProjectReference Include="..\CampusLeague.Application\CampusLeague.Application.csproj" />
     <ProjectReference Include="..\CampusLeague.Domain\CampusLeague.Domain.csproj" />
     <ProjectReference Include="..\CampusLeague.Infrastructure\CampusLeague.Infrastructure.csproj" />
-    <ProjectReference Include="..\CampusLeague.Persistence\CampusLeague.Persistence.csproj" />
   </ItemGroup>
 
   <ItemGroup>
