@@ -15,7 +15,7 @@ header {
 }
 
 /* Container (align with MUI max-width behavior) */
-.container {
+.container-header {
   display: flex;
   align-items: center;
   gap: var(--spacing);

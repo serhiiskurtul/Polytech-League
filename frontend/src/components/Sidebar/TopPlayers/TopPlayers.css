@@ -1,0 +1,41 @@
+@import "../../../globals.css";
+
+/* Топ гравці */
+.leader-list{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+}
+
+.player{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.avatar{
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    background:#eef6ff;
+    color:var(--primary-color);
+    padding:6px 10px;
+    font-weight:600;
+}
+
+.pill{
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:600;
+}
+
+
+.pill-success{
+    background:#e8f5e8;
+    color:#2e7d32;
+}

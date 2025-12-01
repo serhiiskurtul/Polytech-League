@@ -9,8 +9,26 @@ body {
     background-color: #F8FAFC;
 }
 
-main {
+.container {
     max-width: 1200px;
-    margin: 2rem auto auto 0rem;
-    padding: 0 1.5rem;
+    width: 100%;
+}
+
+
+.Layout {
+    display: flex;
+    margin-top: 20px;
+    gap: 24px;
+}
+
+
+/* Основний контент — 60% */
+.Layout > :first-child {
+    flex: 0 0 70%;
+    margin-left: 24px;
+}
+
+/* Sidebar — 40% */
+.Layout > :last-child {
+    flex: 0 0 30%;
 }

@@ -27,10 +27,6 @@
     margin-bottom: 0;
 }
 
-.match-item:hover {
-    background:#eef6ff;
-}
-
 .match-item:last-child {
     padding-bottom: 8px;
 }

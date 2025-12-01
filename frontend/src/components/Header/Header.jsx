@@ -3,7 +3,7 @@ import './Header.css';
 export default function Header() {
   return (
     <header>
-      <div className="container topbar">
+      <div className="container-header">
         <div className="logo-icon">
           <div className="field">
             <div className="center-circle"></div>

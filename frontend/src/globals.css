@@ -23,12 +23,9 @@
     box-shadow: var(--shadow);
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    margin-bottom: 20px;
 }
 
-.header-row
-{
+.header-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -42,4 +39,12 @@
     border-radius:var(--radius);
     padding-left:16px;
     padding-right: 16px;
+}
+
+h3{
+    color: var(--text);
+    font-size: 19px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 28px;
 }
