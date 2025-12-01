@@ -1,0 +1,36 @@
+.match {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid var(--primary-color);
+    height: 54px;
+    gap: 10px;
+}
+
+
+.team {
+    font-size: 14px;
+    font-weight: 400;
+    text-align: center;
+}
+
+
+.score {
+    font-weight: 700;
+    font-size: 18px;
+    text-align: center;
+}
+
+.match-item {
+    margin-bottom: 0;
+}
+
+.match-item:hover {
+    background:#eef6ff;
+}
+
+.match-item:last-child {
+    padding-bottom: 8px;
+}

@@ -70,6 +70,11 @@ a:hover {
   }
 }
 
+@media (max-width: 700px) {
+  .logo-text {
+    display: none;
+  }
+}
 
 /* Logo icon styles */
 .logo-icon {
@@ -80,6 +85,7 @@ a:hover {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-left: 8px;
 }
 
 .field {

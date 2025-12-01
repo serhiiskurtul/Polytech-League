@@ -1,7 +1,7 @@
 /* Vars */
 :root {
   --spacing: 8px;
-  --text: #263238;
+  --text: rgb(30, 36, 42);
   --border-radius: 10px;
   --primary-color: #0066cc;
   --text-primary: #0066cc;
@@ -12,4 +12,34 @@
   --nav-font-family: Roboto,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;;
   --primary-dark: #0f4a85;
   --muted:#6b7280;
+  --card:#ffffff;
+  --radius:12px; 
+  --shadow: 0 6px 18px rgba(15, 20, 30, 0.06);
+}
+
+.card {
+    background: #FFF;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.header-row
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 16px;
+    padding-top: 16px;
+    padding-right: 16px;
+}
+
+.card-item {
+    background:var(--card);
+    border-radius:var(--radius);
+    padding-left:16px;
+    padding-right: 16px;
 }

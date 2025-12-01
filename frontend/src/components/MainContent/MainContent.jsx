@@ -1,4 +1,5 @@
 import Announcement from './Announcement/Announcement';
+import LastMatch from './LastMatch/LastMatch';
 import './MainContent.css';
 
 const announcements = [
@@ -16,10 +17,24 @@ const announcements = [
   }
 ];
 
+const lastmatches = [
+  {
+    firstOpponent: "Університет А",
+    secondOpponent: "Коледж Б",
+    result: "2 — 1",
+  },
+  {
+    firstOpponent: "Кафедра IТ",
+    secondOpponent: "Коледж С",
+    result: "0 — 0",
+  }
+];
+
 export default function MainContent() {
   return (
     <main>
       <Announcement items={announcements} />
+      <LastMatch items={lastmatches}/>
     </main>
   );
 }

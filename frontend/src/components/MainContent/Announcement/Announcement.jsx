@@ -3,8 +3,11 @@ import './Announcement.css';
 
 export default function Announcement({ items }) {
   return (
-    <div className="announcement-wrapper">
-      <h3>Анонси</h3>
+    <section className="card">
+        <div className="header-row">
+            <h3>Анонси</h3>
+            <small className="pill">Останні</small>
+        </div>
       {items.map((item, index) => (
         <AnnouncementItem
           key={index}
@@ -14,7 +17,7 @@ export default function Announcement({ items }) {
           time={item.time}
         />
       ))}
-    </div>
+    </section>
   );
 }
 

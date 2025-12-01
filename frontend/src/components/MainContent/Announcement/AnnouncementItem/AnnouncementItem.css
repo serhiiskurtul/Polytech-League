@@ -7,14 +7,14 @@
 }
 
 .announcement-bar {
-  width: 6px;
-  height: 44px;
+  width: 5px;
+  height: 55px;
   background: linear-gradient(180deg, var(--primary-color), var(--primary-dark));
   border-radius: 6px;
 }
 
 .announcement-content {
-    margin-left: 16px;
+    margin-left: 13px;
     display: flex;
     flex-direction: column;
     justify-content: center;
