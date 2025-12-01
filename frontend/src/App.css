@@ -5,7 +5,7 @@
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--nav-font-family);
     background-color: #F8FAFC;
 }
 

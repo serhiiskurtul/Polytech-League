@@ -1,0 +1,23 @@
+@import "../../../globals.css";
+
+.announcement-wrapper {
+    background: #FFF;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px 0 rgba(15, 20, 30, 0.06);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* відступ між Item */
+}
+
+h3
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    color: var(--text);
+}
+
+
