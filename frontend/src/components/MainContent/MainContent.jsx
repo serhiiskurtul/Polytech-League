@@ -1,6 +1,5 @@
 import Announcement from './Announcement/Announcement';
 import LastMatch from './LastMatch/LastMatch';
-import './MainContent.css';
 
 const announcements = [
   {
@@ -14,6 +13,12 @@ const announcements = [
     date: "01.07.2025",
     location: "Стадіон Центральний",
     time: "8:00"
+  },
+  {
+    title: "Чемпіонат коледжу з шахів (швейцарка)",
+    date: "18.12.2025",
+    location: "Актова зала",
+    time: "11:00"
   }
 ];
 

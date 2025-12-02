@@ -15,6 +15,8 @@
   --card:#ffffff;
   --radius:12px; 
   --shadow: 0 6px 18px rgba(15, 20, 30, 0.06);
+  --primary-orange: #ff8a00;
+  --secondary-orange: #ffb74d;
 }
 
 .card {
@@ -23,6 +25,12 @@
     box-shadow: var(--shadow);
     display: flex;
     flex-direction: column;
+    gap: 5px;
+    padding-bottom: 16px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    margin-bottom: 16px;
 }
 
 .header-row {
@@ -47,4 +55,5 @@ h3{
     font-style: normal;
     font-weight: 600;
     line-height: 28px;
+    margin-bottom: 15px;
 }

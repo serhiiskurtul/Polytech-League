@@ -1,7 +1,7 @@
-import './Sidebar.css';
 import TopPlayers from './TopPlayers/TopPlayers.jsx';
+import CurrentEvents from './CurrentEvents/CurrentEvents.jsx';
 
-const items = [
+const TopPlayersList = [
   {
     avatar: 'АІ',
     name: 'Іванов Артем',
@@ -39,10 +39,25 @@ const items = [
   },
 ];
 
+// Поточні події - події, які 
+// були протягом минулого тижня, 
+// сьогодні будуть або найближчим часом (7 днів)
+const CurrentEventsList = [
+  {
+    title: "Весняний турнір з футболу",
+    date: "15.04.2025",
+  },
+  {
+    title: "Обласні змагання з волейболу",
+    date: "22.05.2025",
+  }
+];
+
 export default function Sidebar() {
   return (
     <div className="sidebar">
-      <TopPlayers items={items} />
+      <TopPlayers items={TopPlayersList} />
+      <CurrentEvents items={CurrentEventsList} />
     </div>
   );
 }
