@@ -1,5 +1,6 @@
 import TopPlayers from './TopPlayers/TopPlayers.jsx';
 import CurrentEvents from './CurrentEvents/CurrentEvents.jsx';
+import GlobalStatisticSeson from './GlobalStatisticSeson/GlobalStatisticSeson.jsx';
 
 const TopPlayersList = [
   {
@@ -53,11 +54,22 @@ const CurrentEventsList = [
   }
 ];
 
+const GlobalStatisticSesonList = {
+  activePlayers: 428,
+  tournaments: 18,
+  matchesPlayed: 1247
+}
+
 export default function Sidebar() {
   return (
     <div className="sidebar">
       <TopPlayers items={TopPlayersList} />
       <CurrentEvents items={CurrentEventsList} />
+      <GlobalStatisticSeson 
+        activePlayers={GlobalStatisticSesonList.activePlayers} 
+        tournaments={GlobalStatisticSesonList.tournaments} 
+        matchesPlayed={GlobalStatisticSesonList.matchesPlayed} 
+      />
     </div>
   );
 }
