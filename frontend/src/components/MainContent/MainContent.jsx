@@ -27,11 +27,22 @@ const lastmatches = [
     firstOpponent: "Університет А",
     secondOpponent: "Коледж Б",
     result: "2 — 1",
+    sportName: "Футбол",
+    typeColor: "isSuccess"
   },
   {
     firstOpponent: "Кафедра IТ",
     secondOpponent: "Коледж С",
-    result: "0 — 0",
+    result: "0 — 1",
+    sportName: "Волейбол",
+    typeColor: "isFail"
+  },
+  {
+    firstOpponent: "Університет D",
+    secondOpponent: "Коледж A",
+    result: "0 - 0",
+    sportName: "Шахи",
+    typeColor: "isDraw"
   }
 ];
 

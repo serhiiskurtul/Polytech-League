@@ -1,3 +1,5 @@
+@import "../../../../globals.css";
+
 .match {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
@@ -29,4 +31,45 @@
 
 .match-item:last-child {
     padding-bottom: 8px;
+}
+
+.sportName {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.match-info{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.isSuccess{
+    border-color:rgba(0,200,83,0.2);
+    background: var(--success);
+}
+
+.isSuccess:hover {
+    background: rgba(0, 200, 83, 0.116);
+}
+
+.isFail{
+    border-color:rgba(255,82,82,0.2);
+    background: var(--fail);
+}
+
+.isFail:hover {
+    background: rgba(255, 82, 82, 0.116);
+}
+
+.isDraw{
+    border-color:rgba(97,97,97,0.2);
+    background: var(--draw);
+}
+
+.isDraw:hover {
+    background: rgba(97, 97, 97, 0.116);
 }

@@ -2,7 +2,7 @@ import './TopPlayersItem.css';
 
 export default function TopPlayersItem({ avatar, name, achievement, sport, grade }) {
   return (
-    <div className="topplayers card-item" style = {{paddingBottom: '16px'}}>
+    <div className="topplayers card-item standard-hover-animation" style = {{paddingBottom: '16px'}}>
         <div className="player">
             <div className="avatar">{avatar}</div>
             <div className="player-info">
