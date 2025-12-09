@@ -76,6 +76,16 @@ a:hover {
   }
 }
 
+.logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.logo-link:hover {
+    background-color: transparent;
+}
+
 /* Logo icon styles */
 .logo-icon {
     width: 48px;

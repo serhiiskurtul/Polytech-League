@@ -22,7 +22,6 @@
   --success:#00c85301;
   --draw: #6b728001;
   /*--border: #333333;*/
-  
 }
 
 .card {
@@ -39,6 +38,7 @@
     border-radius:18px;
     box-shadow:var(--shadow);
     transition:.3s;
+    /*border: 1px solid #333333;*/
 }
 
 .header-row {
