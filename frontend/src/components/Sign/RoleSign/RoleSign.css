@@ -1,0 +1,55 @@
+@import "../../../globals.css";
+
+.input-group {
+  margin-bottom: 24px;
+  text-align: left;
+  position: relative;
+}
+
+.input-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.custom-select {
+  width: 100%;
+  padding: 16px 18px;
+  background: var(--card);
+  border: 2px solid #e0e0e0;
+  border-radius: 14px;
+  font-size: 16px;
+  color: var(--text);
+  transition: border 0.3s, box-shadow 0.3s;
+  font-family: var(--nav-font-family);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8.5l-4-4h8z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 18px center;
+}
+
+.custom-select:focus {
+  outline: none;
+  border-color: #2196f3;
+  box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.15);
+}
+
+.custom-select.input-error {
+  border-color: #e74c3c;
+}
+
+.custom-select.input-error:focus {
+  box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.15);
+}
+
+.error-message {
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  color: #e74c3c;
+  font-size: 13px;
+  font-weight: 500;
+}

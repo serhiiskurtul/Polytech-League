@@ -40,7 +40,7 @@ const lastmatches = [
   {
     firstOpponent: "Університет D",
     secondOpponent: "Коледж A",
-    result: "0 - 0",
+    result: "0 — 0",
     sportName: "Шахи",
     typeColor: "isDraw"
   }

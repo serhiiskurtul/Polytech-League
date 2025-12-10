@@ -1,17 +1,13 @@
 import { Routes, Route, Link } from "react-router-dom";
 import './Header.css';
+import Logo from "../Logo/Logo.jsx";
 
 export default function Header() {
   return (
     <header>
       <Link to="/" className="logo-link">
         <div className="container-header">
-          <div className="logo-icon">
-            <div className="field">
-              <div className="center-circle"></div>
-              <div className="center-line"></div>
-            </div>
-          </div>
+          <Logo/>
           <div className="logo-text">Campus League</div>
         </div>
       </Link>

@@ -19,12 +19,6 @@
 }
 
 
-.score {
-    font-weight: 700;
-    font-size: 18px;
-    text-align: center;
-}
-
 .match-item {
     margin-bottom: 0;
 }
@@ -39,6 +33,12 @@
     gap: 4px;
     color: var(--muted);
     font-size: 12px;
+}
+
+.result {
+    font-size: 16px;
+    text-align: center;
+    font-family: var(--stat-number-font-family);
 }
 
 .match-info{
