@@ -6,6 +6,7 @@ import Sidebar from '../../components/Sidebar/Sidebar.jsx'
 import Login from '../Login/Login.jsx';
 import { Routes, Route, useLocation } from 'react-router-dom'
 import Signup from '../Sign up/Signup.jsx';
+import NotFound from '../404/404.jsx';
 
 export default function App() {
   const location = useLocation();
