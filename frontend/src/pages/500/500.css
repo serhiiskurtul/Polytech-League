@@ -1,0 +1,33 @@
+@import "../../globals.css";
+
+.btn-500{
+    background:var(--primary-color);
+    color:#fff;
+    padding:10px 14px;
+    border-radius:8px;
+    border:none;
+    cursor:pointer;
+    margin-top:12px;
+    font-family: var(--nav-font-family);
+}
+
+.card-500{
+    background:#fff;
+    padding:28px;
+    border-radius:12px;
+    box-shadow:12px 6px 18px rgba(15,20,30,0.06);
+    text-align:center;
+    gap: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.spacer-500{
+    margin:0;
+    background:#f5f7fb;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height:100vh;
+    color:var(--text);
+}

@@ -7,6 +7,8 @@ import Login from '../Login/Login.jsx';
 import { Routes, Route, useLocation } from 'react-router-dom'
 import Signup from '../Sign up/Signup.jsx';
 import NotFound from '../404/404.jsx';
+import InternalServerError from '../500/500.jsx';
+import Calendar from '../../components/Calendar/Calendar.jsx';
 
 export default function App() {
   const location = useLocation();
@@ -39,7 +41,7 @@ export default function App() {
         {/* Інші сторінки */}
         {!hideLayout && (
           <>
-            <Route path="/match" element={<div>Календар матчів</div>} />
+            <Route path="/calendar" element={<Calendar />} />
             <Route path="/profile" element={<div>Профіль користувача</div>} />
             <Route path="/teams" element={<div>Список команд</div>} />
             <Route path="/ratings" element={<div>Рейтинги гравців</div>} />
