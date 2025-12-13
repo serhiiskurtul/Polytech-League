@@ -1,0 +1,88 @@
+.tournament-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--primary-color);
+  background: white;
+  gap: 16px;
+  transition: all 0.2s ease;
+}
+
+.tournament-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  background-color: rgba(255, 255, 255, 0.575);
+}
+
+.tournament-info {
+  flex: 1;
+}
+
+.tournament-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+
+.tournament-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tournament-details {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.status {
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.status-ongoing {
+  background: rgba(0, 200, 83, 0.15);
+  color: #008a3e;
+}
+
+.status-upcoming {
+  background: rgba(0, 123, 255, 0.15);
+  color: var(--primary-color);
+}
+
+.status-finished {
+  background: rgba(97, 97, 97, 0.15);
+  color: #4b5563;
+}
+
+.tournament-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.view-btn {
+  background: var(--primary-color);
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+  font-family: var(--nav-font-family);
+}
+
+.view-btn:hover {
+  background: #1565c0;
+}
+
+.view-link {
+  text-decoration: none;
+}

@@ -1,0 +1,74 @@
+@import "src/globals.css";
+
+
+.card:last-child
+{
+    padding-bottom: 16px;
+}
+
+.tournaments-main {
+  flex: 0 0 70%;
+  margin-left: 24px;
+}
+
+.header-row-tournaments {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.tournaments-sidebar {
+  flex: 0 0 30%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tournament-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 8px 0 0 0;
+}
+
+.sidebar-text {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 8px 0 0 0;
+}
+
+.create-btn {
+  margin-top: 16px;
+  background: var(--primary-color);
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  width: 100%;
+  transition: background 0.2s;
+}
+
+.create-btn:hover {
+  background: #1565c0;
+}
+
+.filter-input {
+  margin-top: 12px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e0e7ff;
+  font-size: 14px;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}

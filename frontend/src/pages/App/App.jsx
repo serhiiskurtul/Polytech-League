@@ -9,6 +9,7 @@ import Signup from '../Sign up/Signup.jsx';
 import NotFound from '../404/404.jsx';
 import InternalServerError from '../500/500.jsx';
 import Calendar from '../../components/Calendar/Calendar.jsx';
+import Tournaments from '../Tournaments/Tournaments.jsx';
 
 export default function App() {
   const location = useLocation();
@@ -42,6 +43,7 @@ export default function App() {
         {!hideLayout && (
           <>
             <Route path="/calendar" element={<Calendar />} />
+            <Route path="/tournaments" element={<Tournaments />} />
             <Route path="/profile" element={<div>Профіль користувача</div>} />
             <Route path="/teams" element={<div>Список команд</div>} />
             <Route path="/ratings" element={<div>Рейтинги гравців</div>} />

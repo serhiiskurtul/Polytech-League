@@ -12,7 +12,7 @@ export default function Header() {
       <nav>
         <ul>
           <li><Link to="/calendar">Календар</Link></li>
-          <li><Link to="/profile">Турніри</Link></li>
+          <li><Link to="/tournaments">Турніри</Link></li>
           <li><Link to="/teams">Команди</Link></li>
           <li><Link to="/ratings">Рейтинги</Link></li>
         </ul>
