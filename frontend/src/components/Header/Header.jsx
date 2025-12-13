@@ -1,6 +1,6 @@
 import { Routes, Route, Link } from "react-router-dom";
 import './Header.css';
-import Logo from "../Logo/Logo.jsx";
+import Logo from "../UI/Logo/Logo.jsx";
 
 export default function Header() {
   return (

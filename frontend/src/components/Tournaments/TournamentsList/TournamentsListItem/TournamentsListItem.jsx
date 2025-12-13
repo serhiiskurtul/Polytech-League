@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import './TournamentsListItem.css';
+import SimpleButton from '../../../UI/SimpleButton/SimpleButton';
 
 export default function TournamentItem({ title, teams, status, id, date }) {
   const statusConfig = {
@@ -21,9 +22,7 @@ export default function TournamentItem({ title, teams, status, id, date }) {
           </div>
         </div>
 
-        <div className="tournament-actions">
-          <span className="view-btn">Переглянути</span>
-        </div>
+        <SimpleButton to={`/tournament/${id}`} text="Переглянути" fullWidth />
       </section>
     </Link>
   );

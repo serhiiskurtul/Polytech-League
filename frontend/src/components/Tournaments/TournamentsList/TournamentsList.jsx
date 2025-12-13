@@ -1,10 +1,10 @@
 import './TournamentsList.css';
-import TournamentItem from '../TournamentsListItem/TournamentsListItem';
+import TournamentItem from './TournamentsListItem/TournamentsListItem';
 
 export default function TournamentsList({ tournaments }) {
   return (
     <section className="card">
-        <div className="header-row header-row-tournaments">
+        <div className="header-row header-row-tournaments-list">
             <h3>Турніри</h3>
             <p className="pill">Список турнірів</p>
         </div>

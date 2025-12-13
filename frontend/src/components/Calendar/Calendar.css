@@ -1,34 +1,31 @@
 @import "src/globals.css";
 
-/* Контейнер, який центрує картку по горизонталі */
+
 .calendar-container {
   display: flex;
   justify-content: center;
-  padding: 20px 16px; /* відступи зверху/знизу та з боків */
+  padding: 20px 16px;
   width: 100%;
   align-items: center;
   min-height: calc(100vh - 140px); /* враховуючи хедер і футер */
 }
 
-/* Сама картка з календарем — обмежуємо максимальну ширину */
 .calendar-card {
   padding: 24px;
   gap: 20px;
   width: 100%;
-  max-width: 1000px; /* максимальна ширина — можна змінити */
+  max-width: 1000px; 
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
-/* Список подій */
 .calendar-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-/* Одна подія */
 .calendar-item {
   display: grid;
   grid-template-columns: 100px 1fr 120px;
@@ -47,7 +44,6 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* Решта стилів (дата, час, інформація, результат) — залишаються без змін */
 .date-time {
   display: flex;
   flex-direction: column;

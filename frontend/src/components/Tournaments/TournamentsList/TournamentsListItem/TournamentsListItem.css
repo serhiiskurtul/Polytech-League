@@ -61,28 +61,3 @@
   color: #4b5563;
 }
 
-.tournament-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.view-btn {
-  background: var(--primary-color);
-  color: white;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: background 0.2s;
-  font-family: var(--nav-font-family);
-}
-
-.view-btn:hover {
-  background: #1565c0;
-}
-
-.view-link {
-  text-decoration: none;
-}

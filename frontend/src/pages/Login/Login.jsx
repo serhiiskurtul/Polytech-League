@@ -4,9 +4,9 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
-import InputSign from '../../components/Sign/InputSign/InputSign';
-import ButtonSign from '../../components/Sign/ButtonSign/ButtonSign';
-import Logo from '../../components/Logo/Logo';
+import InputSign from '../../components/UI/InputSign/InputSign';
+import ButtonSign from '../../components/UI/ButtonSign/ButtonSign';
+import Logo from '../../components/UI/Logo/Logo';
 
 // Схема валідації з Yup
 const loginSchema = yup.object({

@@ -1,4 +1,6 @@
 import TournamentsList from '../../components/Tournaments/TournamentsList/TournamentsList';
+import CreateTournaments from '../../components/Tournaments/TournamentsSidebar/CreateTournament/CreateTournament';
+import TournamentFilter from '../../components/Tournaments/TournamentsSidebar/TournamentFilter/TournamentFilter';
 
 const tournaments = [
   { id: 1, title: 'Осінній Кубок 2025', teams: 8, status: 'ongoing', date: '15.10.2025 — 20.12.2025' },
@@ -17,24 +19,8 @@ export default function Tournaments() {
 
         {/* Сайдбар — праворуч */}
         <aside className="tournaments-sidebar">
-          <div className="card">
-            <h3>Створити турнір</h3>
-            <p className="sidebar-text">
-              Адміністратори можуть швидко додавати нові турніри
-            </p>
-            <button className="create-btn" onClick={() => alert('Створити турнір (mock)')}>
-              Створити
-            </button>
-          </div>
-
-          <div className="card" style={{ marginTop: '16px' }}>
-            <h3>Фільтри</h3>
-            <input
-              type="text"
-              placeholder="Вид спорту"
-              className="filter-input"
-            />
-          </div>
+          <CreateTournaments />
+          <TournamentFilter />
         </aside>
       </div>
     </div>

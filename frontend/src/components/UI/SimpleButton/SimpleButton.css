@@ -1,0 +1,27 @@
+.view-btn {
+  background: var(--primary-color);
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: var(--nav-font-family);
+  transition: background 0.2s ease;
+  text-align: center;
+}
+
+.view-btn:hover {
+  background: #1565c0;
+}
+
+.full-width {
+  width: 100%;
+  display: block;
+}
+
+.view-link {
+  text-decoration: none;
+  display: block; 
+}
