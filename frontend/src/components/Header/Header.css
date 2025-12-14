@@ -43,6 +43,17 @@ nav ul a {
   line-height: 20px;
 }
 
+nav ul a:hover {
+  background:#eef6ff;
+  color: var(--primary-color);
+}
+
+.logo-link:hover {
+  background-color: transparent;
+  color: var(--text-primary);
+}
+
+
 .logo-text {
   font-size: 1.20rem;
   font-weight: 750;
@@ -50,9 +61,8 @@ nav ul a {
   margin-left: 10px;
 }
 
-a:hover {
-  background:#eef6ff;
-  color:var(--primary-color);
+a {
+  text-decoration: none;
 }
 
 /* Mobile-friendly (optional) */

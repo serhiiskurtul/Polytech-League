@@ -1,11 +1,8 @@
-@import "../../../globals.css";
 
-/* Статистика */
 .stats {
     display:grid;
     grid-template-columns:repeat(2,1fr);
     gap:16px;
-    margin-top:20px;
 }
 
 .stat {
@@ -20,4 +17,11 @@
     font-weight: 700;
     color:var(--primary-color);
     font-family: var(--nav-font-family);
+}
+
+.header-row-global-stats-sidebar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 16px;
 }

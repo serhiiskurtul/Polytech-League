@@ -38,7 +38,6 @@
 
     border-radius:18px;
     box-shadow:var(--shadow);
-    transition:.3s;
     /*border: 1px solid #333333;*/
 }
 
@@ -47,40 +46,36 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 18px;
+    margin-top: 16px;
 }
 
 .pill {
-  background:#eef6ff;
-  color:var(--primary-color);
-  padding:6px 10px;
+  padding:6px 12px;
   border-radius:20px;
-  font-weight:600;
   font-size:12px;
-  line-height: 1;
-  display: flex;
-  align-items: center;
+  font-weight:600;
+  display:inline-flex;
+  align-items:center;
 }
+
 
 .card-item {
     background:var(--card);
     border-radius:var(--radius);
-    padding-left:16px;
-    padding-right: 16px;
 }
 
 .standard-hover-animation:hover {
-    transform:translateY(-1px);
-    box-shadow: var(--shadow);
-    transition: .3s;
+    transform:translateY(-2px);
+    transition: .1s;
+    box-shadow: 0 10px 24px rgba(0,0,0,.08);
     cursor: pointer;
 }
 
-
 h3{
-    color: var(--text);
-    font-size: 19px;
-    font-style: normal;
-    font-weight: 600;
+  color: var(--text);
+  font-size: 19px;
+  font-style: normal;
+  font-weight: 600;
 }
 
 .header-row h3 {

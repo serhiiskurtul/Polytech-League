@@ -1,9 +1,9 @@
-@import "src/globals.css";
 
 .announcement {
   display: flex;
   align-items: center;
   font-family: var(--nav-font-family);
+  padding: 16px;
 }
 
 .announcement-bar {

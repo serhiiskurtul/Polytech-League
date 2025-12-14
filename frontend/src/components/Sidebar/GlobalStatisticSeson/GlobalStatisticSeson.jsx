@@ -3,8 +3,10 @@ import './GlobalStatisticSeson.css';
 export default function GlobalStatisticSeson({ activePlayers, tournaments, matchesPlayed }) {
   return (
     <div className="card">
-        <div className="header-row"><h3 style = {{marginBottom: "1px"}}>Статистика сезону</h3></div>
-            <div className="stats">
+        <div>
+            <h3 className='header-row-global-stats-sidebar'>Статистика сезону</h3>
+        </div>
+        <div className="stats">
             <div className="stat">
                 <div className="stat-num">428</div>
                 <div>активних гравців</div>

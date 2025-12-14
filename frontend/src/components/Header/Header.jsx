@@ -7,7 +7,9 @@ export default function Header() {
     <header>
       <div className="container-header">
         <Logo />
-        <div className="logo-text">Campus League</div>
+        <Link to="/" className="logo-link">
+          <div className="logo-text">Campus League</div>
+        </Link>
       </div>
       <nav>
         <ul>

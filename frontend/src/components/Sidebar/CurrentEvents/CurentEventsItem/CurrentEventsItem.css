@@ -5,16 +5,28 @@
     justify-content: center;
 }
 
-
 .bar {
   width: 4px;
   height: 50px;
-  background: linear-gradient(180deg,var(--secondary-orange),var(--primary-orange));
+  background: linear-gradient(
+    180deg,
+    var(--secondary-orange),
+    var(--primary-orange)
+  );
   border-radius: 6px;
 }
+
 
 .event {
   display: flex;
   align-items: center;
+  font-family: var(--nav-font-family);
+}
+
+.currentevents {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 16px;
   font-family: var(--nav-font-family);
 }

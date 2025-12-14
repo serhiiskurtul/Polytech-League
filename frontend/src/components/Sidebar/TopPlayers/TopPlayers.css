@@ -1,6 +1,4 @@
-@import "../../../globals.css";
 
-/* Топ гравці */
 .leader-list{
     display:flex;
     flex-direction:column;
@@ -24,13 +22,6 @@
     background:#eef6ff;
     color:var(--primary-color);
     padding:6px 10px;
-    font-weight:600;
-}
-
-.pill{
-    padding:6px 12px;
-    border-radius:20px;
-    font-size:12px;
     font-weight:600;
 }
 

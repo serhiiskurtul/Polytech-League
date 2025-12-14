@@ -1,6 +1,3 @@
-@import "src/globals.css";
-
-
 .calendar-container {
   display: flex;
   justify-content: center;
