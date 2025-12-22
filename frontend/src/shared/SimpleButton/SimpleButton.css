@@ -1,0 +1,30 @@
+.view-btn {
+  background: var(--primary-color);
+  color: white;
+  padding: 8px 16px; /* не дуже широке */
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: var(--nav-font-family);
+  transition: background 0.2s ease;
+  text-align: center;
+  display: inline-block; /* щоб кнопка займала тільки свій контент */
+  text-decoration: none;
+  min-width: 100px; /* опційно, щоб не була занадто маленькою */
+}
+
+.view-btn:hover {
+  background: #1565c0;
+}
+
+.full-width {
+  width: 100%; /* використовуй тільки якщо треба на всю ширину */
+  display: block;
+}
+
+.view-link {
+  text-decoration: none;
+  display: inline-block; /* щоб кнопка не займала весь лінк */
+}

@@ -1,33 +1,20 @@
+
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    font-family: var(--nav-font-family);
-    background-color: #F8FAFC;
+  width: 100%;
+  min-height: 100%;
+  font-family: var(--nav-font-family);
+  background-color: #F8FAFC;
 }
 
-.container {
-    max-width: 1200px;
-    width: 100%;
+.page-wrapper {
+  width: 100%;
+  min-height: 100vh;
+  padding: 20px;
 }
 
-.Layout {
-    display: flex;
-    margin-top: 20px;
-    gap: 24px;
-}
-
-
-/* Основний контент — 60% */
-.Layout > :first-child {
-    flex: 0 0 70%;
-    margin-left: 24px;
-}
-
-/* Sidebar — 40% */
-.Layout > :last-child {
-    flex: 0 0 30%;
-}

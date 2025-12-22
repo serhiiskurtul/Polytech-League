@@ -1,15 +1,12 @@
 import './App.css'
-import Header from "../../components/Header/Header.jsx";
-import Footer from '../../components/Footer/Footer.jsx'
-import MainContent from '../../components/MainContent/MainContent.jsx'
-import Sidebar from '../../components/Sidebar/Sidebar.jsx'
-import Login from '../Login/Login.jsx';
+import Header from '../../widgets/header/Header.jsx';
+import Footer from '../../widgets/footer/Footer.jsx';
+import Login from '../LoginPage/Login.jsx';
 import { Routes, Route, useLocation } from 'react-router-dom'
-import Signup from '../Sign up/Signup.jsx';
-import NotFound from '../404/404.jsx';
-import InternalServerError from '../500/500.jsx';
-import Calendar from '../../components/Calendar/Calendar.jsx';
-import Tournaments from '../Tournaments/Tournaments.jsx';
+import Signup from '../SignupPage/Signup.jsx';
+import CalendarPage from '../CalendarPage/CalendarPage.jsx';
+import Tournaments from '../TournamentsPage/TournamentsPage.jsx';
+import HomePage from '../HomePage/HomePage.jsx';
 
 export default function App() {
   const location = useLocation();
@@ -25,11 +22,8 @@ export default function App() {
           <Route
             path="/"
             element={
-              <div className="container">
-                <div className="Layout">
-                  <MainContent />
-                  <Sidebar />
-                </div>
+              <div className="page-wrapper">
+                <HomePage />
               </div>
             }
           />
@@ -42,8 +36,15 @@ export default function App() {
         {/* Інші сторінки */}
         {!hideLayout && (
           <>
-            <Route path="/calendar" element={<Calendar />} />
-            <Route path="/tournaments" element={<Tournaments />} />
+            <Route path="/calendar" element={<CalendarPage />} />
+            <Route 
+              path="/tournamentsPage" 
+              element={
+                <div className="page-wrapper">
+                  <Tournaments />
+                </div>
+              }
+            />
             <Route path="/profile" element={<div>Профіль користувача</div>} />
             <Route path="/teams" element={<div>Список команд</div>} />
             <Route path="/ratings" element={<div>Рейтинги гравців</div>} />
