@@ -1,0 +1,24 @@
+.btnPrimary {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    background: var(--primary-color);
+    color: white;
+    font-size: 17px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: .3s;
+    margin-top: 10px;
+}
+
+.btnPrimary:hover {
+    transform: translateY(-2px);
+}
+
+.btnPrimary:disabled {
+    background: var(--muted);
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.7;
+}

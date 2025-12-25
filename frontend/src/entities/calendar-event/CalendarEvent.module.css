@@ -1,0 +1,120 @@
+.calendarItem {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  padding: 16px 20px;
+  border-radius: 14px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+
+  transition: background-color 0.2s ease;
+}
+
+/* Стани події */
+.upcoming {
+  border-left: 4px solid var(--primary-color);
+}
+
+.finished {
+  border-left: 4px solid var(--muted);
+}
+
+/* Ліва частина — дата і час */
+.dateTime {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 70px;
+}
+
+.date {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.time {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* Центральна частина — інформація */
+.eventInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sportName {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary-color);
+  text-transform: uppercase;
+}
+
+.eventTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.opponent {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.location {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* Права частина — результат */
+.result {
+  min-width: 80px;
+  text-align: center;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--hover-bg);
+  color: var(--text);
+}
+
+/* Outcome */
+.outcome-win {
+  background: var(--success);
+  color: #0f5132;
+}
+
+.outcome-loss {
+  background: var(--fail);
+  color: #842029;
+}
+
+.outcome-draw {
+  background: var(--draw);
+  color: #374151;
+}
+
+/* Адаптив */
+@media (max-width: 768px) {
+  .calendarItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .dateTime {
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .result {
+    align-self: flex-end;
+  }
+}

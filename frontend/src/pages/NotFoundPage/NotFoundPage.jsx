@@ -1,18 +1,17 @@
-import './NotFoundPage.css';
+import styles from './NotFoundPage.module.css';
 import { useNavigate } from "react-router-dom";
 
 export default function NotFound() {
-
   const navigate = useNavigate();
 
   return (
-    <div className="spacer-404">
-      <div className="card-404">
-        <h1 style={{ margin: 0 }}>404</h1>
-        <p style={{ color: "var(--muted)" }}>Сторінку не знайдено</p>
+    <div className={styles.spacer}>
+      <div className={styles.card}>
+        <h1 className={styles.code}>404</h1>
+        <p className={styles.subtitle}>Сторінку не знайдено</p>
 
-        <button 
-          className="btn-404" 
+        <button
+          className={styles.button}
           onClick={() => navigate('/')}
         >
           На головну

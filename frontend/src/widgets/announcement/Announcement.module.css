@@ -1,0 +1,23 @@
+.announcementSection {
+  padding-bottom: 16px;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.pill {
+  background: #eef6ff;
+  color: var(--primary-color);
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+#h3-announcements {
+  padding-left: 16px;
+}

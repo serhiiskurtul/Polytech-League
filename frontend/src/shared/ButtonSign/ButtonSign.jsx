@@ -1,9 +1,9 @@
-import './ButtonSign.css';
+import styles from './ButtonSign.module.css';
 
 export default function ButtonSign({ children, onClick, type = "button", disabled = false }) {
   return (
     <button 
-      className="btn-primary" 
+      className={styles.btnPrimary} 
       onClick={onClick}
       type={type}
       disabled={disabled}

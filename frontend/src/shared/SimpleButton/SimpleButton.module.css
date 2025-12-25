@@ -1,0 +1,30 @@
+.viewBtn {
+  background: var(--primary-color);
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: var(--nav-font-family);
+  transition: background 0.2s ease;
+  text-align: center;
+  display: inline-block;
+  text-decoration: none;
+  min-width: 100px;
+}
+
+.viewBtn:hover {
+  background: #1565c0;
+}
+
+.fullWidth {
+  width: 100%;
+  display: block;
+}
+
+.viewLink {
+  text-decoration: none;
+  display: inline-block;
+}

@@ -1,4 +1,4 @@
-import './Calendar.css';
+import './Calendar.module.css';
 import CalendarEvent from "../../entities/calendar-event/CalendarEvent.jsx";
 
 const events = [

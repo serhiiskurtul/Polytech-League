@@ -1,4 +1,4 @@
-import './CurrentEvents.css';
+import './CurrentEvents.module.css';
 import CurrentEventsItem from '../../entities/current-events-item/CurrentEventsItem.jsx';
 
 export default function CurrentEvents({ items }) {

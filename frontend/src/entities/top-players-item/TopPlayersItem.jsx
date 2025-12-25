@@ -1,16 +1,22 @@
-import './TopPlayersItem.css';
+import styles from './TopPlayersItem.module.css';
 
-export default function TopPlayersItem({ avatar, name, achievement, sport, grade }) {
+export default function TopPlayersItem({
+  avatar,
+  name,
+  achievement,
+  sport,
+  grade,
+}) {
   return (
-    <div className="topplayers card-item standard-hover-animation">
-      <div className="avatar">{avatar}</div>
-      <div className="player-info">
-        <strong className="player-name">{name}</strong>
-        <small style={{ color: "var(--muted)" }}>
+    <div className={`card-item standard-hover-animation ${styles.topPlayers}`}>
+      <div className={styles.avatar}>{avatar}</div>
+
+      <div className={styles.playerInfo}>
+        <strong className={styles.playerName}>{name}</strong>
+        <small style={{ color: 'var(--muted)' }}>
           {achievement} • {sport} • {grade}
         </small>
       </div>
     </div>
-
   );
 }

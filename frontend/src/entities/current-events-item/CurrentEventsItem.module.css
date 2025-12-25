@@ -1,0 +1,33 @@
+.currentEvents {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 16px;
+  font-family: var(--nav-font-family);
+}
+
+.bar {
+  width: 4px;
+  height: 50px;
+  background: linear-gradient(
+    180deg,
+    var(--secondary-orange),
+    var(--primary-orange)
+  );
+  border-radius: 6px;
+}
+
+.eventInfo {
+  margin-left: 13px;  
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.playerName {
+  font-weight: 700;
+}
+
+.date {
+  color: var(--muted);
+}

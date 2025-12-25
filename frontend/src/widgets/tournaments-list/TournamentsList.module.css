@@ -1,0 +1,42 @@
+.card {
+  padding: 24px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.card:last-child {
+  padding-bottom: 16px;
+}
+
+.tournamentList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* Додаткові стилі, якщо потрібні для sidebar/main */
+.tournamentsMain {
+  flex: 0 0 70%;
+  margin-left: 24px;
+}
+
+.headerRowTournamentsList {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.tournamentsSidebar {
+  flex: 0 0 30%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.subtitle,
+.sidebarText {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 8px 0 0 0;
+}

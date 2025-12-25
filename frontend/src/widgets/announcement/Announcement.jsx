@@ -1,9 +1,10 @@
 import AnnouncementItem from '../../entities/announcement-item/AnnouncementItem';
-import './Announcement.css';
+import styles from './Announcement.module.css';
+import BaseCard from '../../shared/BaseCard/BaseCard';
 
 export default function Announcement({ items }) {
   return (
-    <section className="card">
+    <BaseCard className={styles.announcementSection}>
         <div className="header-row">
             <h3 id="h3-announcements">Анонси</h3>
             <small className="pill">Останні</small>
@@ -17,7 +18,7 @@ export default function Announcement({ items }) {
             time={item.time}
           />
         ))}
-    </section>
+    </BaseCard>
   );
 }
 

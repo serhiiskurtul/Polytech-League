@@ -1,4 +1,4 @@
-import './HomePage.css';
+import styles from './HomePage.module.css';
 import Announcement from '../../widgets/announcement/Announcement.jsx';
 import LastMatch from '../../widgets/last-match/LastMatch.jsx';
 import TopPlayers from '../../widgets/top-players/TopPlayers.jsx';
@@ -108,20 +108,22 @@ const GlobalStatisticSesonList = {
   matchesPlayed: 1247
 }
 
+
 export default function HomePage() {
   return (
-    <div className="home-page">
-      <main>
+    <div className={styles.homePage}>
+      <main className={styles.main}>
         <Announcement items={announcements} />
-        <LastMatch items={lastmatches}/>
+        <LastMatch items={lastmatches} />
       </main>
-      <aside className="sidebar">
+
+      <aside className={styles.sidebar}>
         <TopPlayers items={TopPlayersList} />
         <CurrentEvents items={CurrentEventsList} />
-        <GlobalStatisticSeson 
-          activePlayers={GlobalStatisticSesonList.activePlayers} 
-          tournaments={GlobalStatisticSesonList.tournaments} 
-          matchesPlayed={GlobalStatisticSesonList.matchesPlayed} 
+        <GlobalStatisticSeson
+          activePlayers={GlobalStatisticSesonList.activePlayers}
+          tournaments={GlobalStatisticSesonList.tournaments}
+          matchesPlayed={GlobalStatisticSesonList.matchesPlayed}
         />
       </aside>
     </div>

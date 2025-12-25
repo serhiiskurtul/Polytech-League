@@ -1,4 +1,4 @@
-.tournament-item {
+.tournamentItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -10,30 +10,29 @@
   transition: all 0.2s ease;
 }
 
-.tournament-item:hover {
+.tournamentItem:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
   background-color: rgba(255, 255, 255, 0.575);
 }
 
-.tournament-info {
+.tournamentInfo {
   flex: 1;
 }
 
-.tournament-link {
+.tournamentLink {
   text-decoration: none;
   color: inherit;
   display: block;
 }
 
-
-.tournament-title {
+.tournamentTitle {
   font-size: 16px;
   font-weight: 600;
   color: var(--text-primary);
 }
 
-.tournament-details {
+.tournamentDetails {
   margin-top: 6px;
   font-size: 13px;
   color: var(--muted);
@@ -46,18 +45,17 @@
   font-size: 12px;
 }
 
-.status-ongoing {
+.statusOngoing {
   background: rgba(0, 200, 83, 0.15);
   color: #008a3e;
 }
 
-.status-upcoming {
+.statusUpcoming {
   background: rgba(0, 123, 255, 0.15);
   color: var(--primary-color);
 }
 
-.status-finished {
+.statusFinished {
   background: rgba(97, 97, 97, 0.15);
   color: #4b5563;
 }
-

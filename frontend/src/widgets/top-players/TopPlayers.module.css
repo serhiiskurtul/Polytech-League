@@ -1,0 +1,29 @@
+.card {
+  padding: 24px;
+  gap: 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.pillSuccess {
+  background: #e8f5e8;
+  color: #2e7d32;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.leaderList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

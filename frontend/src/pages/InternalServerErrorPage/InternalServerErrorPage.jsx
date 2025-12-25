@@ -1,18 +1,16 @@
-import './InternalServerErrorPage.css';
-import { useNavigate } from "react-router-dom";
+import styles from './InternalServerErrorPage.module.css';
 
 export default function InternalServerError() {
-
-  const navigate = useNavigate();
-
   return (
-    <div className="spacer-500">
-      <div className="card-500">
+    <div className={styles.spacer500}>
+      <div className={styles.card500}>
         <h1 style={{ margin: 0 }}>500</h1>
-        <p style={{ color: "var(--muted)" }}>Внутрішня помилка сервера</p>
+        <p style={{ color: "var(--muted)" }}>
+          Внутрішня помилка сервера
+        </p>
 
-        <button 
-          className="btn-500" 
+        <button
+          className={styles.btn500}
           onClick={() => location.reload()}
         >
           Оновити сторінку

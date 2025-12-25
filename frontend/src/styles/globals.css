@@ -1,3 +1,26 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* BASE */
+body {
+  font-family: var(--nav-font-family);
+  background-color: #F8FAFC;
+  color: #1e242a;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
 /* Vars */
 :root {
   --spacing: 8px;

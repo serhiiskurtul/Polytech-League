@@ -1,29 +1,29 @@
-import './GlobalStatisticSeson.css';
+import styles from './GlobalStatisticSeson.module.css';
 
-export default function GlobalStatisticSeson({ activePlayers, tournaments, matchesPlayed }) {
+export default function GlobalStatisticSeson({
+  activePlayers = 428,
+  tournaments = 18,
+  matchesPlayed = 1247,
+  sportsCount = 8,
+}) {
+  const stats = [
+    { value: activePlayers, label: 'активних гравців' },
+    { value: tournaments, label: 'турнірів' },
+    { value: matchesPlayed, label: 'зіграно матчів' },
+    { value: sportsCount, label: 'видів спорту' },
+  ];
+
   return (
-    <div className="card">
-        <div>
-            <h3 className='header-row-global-stats-sidebar'>Статистика сезону</h3>
-        </div>
-        <div className="stats">
-            <div className="stat">
-                <div className="stat-num">428</div>
-                <div>активних гравців</div>
-            </div>
-            <div className="stat">
-                <div className="stat-num">18</div>
-                <div>турнірів</div>
-            </div>
-            <div className="stat">
-                <div className="stat-num">1 247</div>
-                <div>зіграно матчів</div>
-            </div>
-            <div className="stat">
-                <div className="stat-num">8</div>
-                <div>видів спорту</div>
-            </div>
-        </div>
+    <div className={styles.card}>
+      <h3 className={styles.header}>Статистика сезону</h3>
+      <div className={styles.stats}>
+        {stats.map((stat, index) => (
+          <div key={index} className={styles.stat}>
+            <div className={styles.statNum}>{stat.value.toLocaleString()}</div>
+            <div>{stat.label}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

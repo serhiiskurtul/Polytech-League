@@ -1,4 +1,4 @@
-import './InputSign.css';
+import styles from './InputSign.module.css';
 
 export default function InputSign({
   labelInput,
@@ -9,19 +9,19 @@ export default function InputSign({
   ...rest
 }) {
   return (
-    <div className="input-group">
-      <label className="input-label">{labelInput}</label>
+    <div className={styles.inputGroup}>
+      <label className={styles.inputLabel}>{labelInput}</label>
       
       <input
         type={type}
         placeholder={placeholder}
-        className={`custom-input ${error ? 'input-error' : ''}`}
+        className={`${styles.customInput} ${error ? styles.inputError : ''}`}
         {...register}
         {...rest}
       />
 
       {error && (
-        <span className="error-message">{error}</span>
+        <span className={styles.errorMessage}>{error}</span>
       )}
     </div>
   );

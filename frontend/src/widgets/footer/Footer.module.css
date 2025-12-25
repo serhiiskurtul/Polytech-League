@@ -1,0 +1,15 @@
+.footer {
+  margin-top: 80px;
+  padding: 40px 0;
+  background: var(--card);
+  border-top: 1px solid var(--divider-color);
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}

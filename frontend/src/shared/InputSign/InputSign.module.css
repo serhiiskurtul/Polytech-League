@@ -1,12 +1,10 @@
-
-
-.input-group {
+.inputGroup {
   margin-bottom: 24px;
   text-align: left;
   position: relative;
 }
 
-.input-label {
+.inputLabel {
   display: block;
   margin-bottom: 8px;
   font-size: 14px;
@@ -14,7 +12,7 @@
   color: var(--text-secondary);
 }
 
-.custom-input {
+.customInput {
   width: 100%;
   padding: 16px 18px;
   background: var(--card);
@@ -26,21 +24,21 @@
   font-family: var(--nav-font-family);
 }
 
-.custom-input:focus {
+.customInput:focus {
   outline: none;
   border-color: #2196f3;
   box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.15);
 }
 
-.custom-input.input-error {
+.inputError {
   border-color: #e74c3c;
 }
 
-.custom-input.input-error:focus {
+.inputError:focus {
   box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.15);
 }
 
-.error-message {
+.errorMessage {
   position: absolute;
   bottom: -20px;
   left: 0;

@@ -1,4 +1,4 @@
-.home-page {
+.homePage {
   display: flex;
   gap: 24px;
   padding: 20px;
@@ -6,17 +6,17 @@
   box-sizing: border-box;
 }
 
-/* Main — 70% ширини */
-.home-page main {
-  flex: 0 0 70%; 
+/* Main — 70% */
+.main {
+  flex: 0 0 70%;
   max-width: 70%;
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-/* Sidebar — 30% ширини */
-.home-page aside.sidebar {
+/* Sidebar — 30% */
+.sidebar {
   max-width: 30%;
   display: flex;
   flex-direction: column;
@@ -24,13 +24,14 @@
 }
 
 @media (max-width: 992px) {
-  .home-page {
+  .homePage {
     flex-direction: column;
     padding: 16px;
   }
 
-  .home-page main,
-  .home-page aside.sidebar {
+  .main,
+  .sidebar {
     flex: 1 1 100%;
+    max-width: 100%;
   }
 }

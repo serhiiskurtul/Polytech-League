@@ -1,16 +1,17 @@
-import './AnnouncementItem.css';
+import styles from './AnnouncementItem.module.css';
 
 export default function AnnouncementItem({ title, date, location, time }) {
   return (
-    <div className="announcement card-item standard-hover-animation">
-      <div className="announcement-bar"></div>
-      <div className="announcement-content">
-        <strong className="announcement-title">{title}</strong>
-        <div className="announcement-details">
+    <div className={`${styles.announcement} card-item standard-hover-animation`}>
+      <div className={styles.announcementBar}></div>
+
+      <div className={styles.announcementContent}>
+        <strong className={styles.announcementTitle}>{title}</strong>
+
+        <div className={styles.announcementDetails}>
           {date} — {location} • Початок {time}
         </div>
       </div>
     </div>
-
   );
 }

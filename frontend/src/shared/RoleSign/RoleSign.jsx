@@ -1,4 +1,4 @@
-import './RoleSign.css';
+import styles from './RoleSign.module.css';
 
 export default function RoleSign({
   labelInput = 'Роль',
@@ -7,11 +7,11 @@ export default function RoleSign({
   error,
 }) {
   return (
-    <div className="input-group">
-      <label className="input-label">{labelInput}</label>
+    <div className={styles.inputGroup}>
+      <label className={styles.inputLabel}>{labelInput}</label>
 
       <select
-        className={`custom-select ${error ? 'input-error' : ''}`}
+        className={`${styles.customSelect} ${error ? styles.inputError : ''}`}
         {...register}
         defaultValue=""
       >
@@ -25,7 +25,7 @@ export default function RoleSign({
         ))}
       </select>
 
-      {error && <span className="error-message">{error}</span>}
+      {error && <span className={styles.errorMessage}>{error}</span>}
     </div>
   );
 }

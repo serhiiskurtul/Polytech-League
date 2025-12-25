@@ -1,5 +1,4 @@
 import LastMatchItem from '../../entities/last-match-item/LastMatchItem';
-import './LastMatch.css';
 
 export default function LastMatch({ items }) {
   return (

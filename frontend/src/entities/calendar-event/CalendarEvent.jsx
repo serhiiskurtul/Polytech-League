@@ -1,4 +1,4 @@
-import './CalendarEvent.css';
+import styles from './CalendarEvent.module.css';
 
 export default function CalendarEvent({
   date,
@@ -11,27 +11,31 @@ export default function CalendarEvent({
   result,
   outcome,
 }) {
-  const statusClass = status === "upcoming" ? "upcoming" : "finished";
-  const outcomeClass = outcome ? `outcome-${outcome}` : "";
+  const statusClass =
+    status === 'upcoming' ? styles.upcoming : styles.finished;
+
+  const outcomeClass = outcome ? styles[`outcome-${outcome}`] : '';
 
   return (
-    <section className={`calendar-item ${statusClass} ${outcomeClass} standard-hover-animation`}>
-      <div className="date-time">
-        <div className="date">{date}</div>
-        <div className="time">{time}</div>
+    <section
+      className={`${styles.calendarItem} ${statusClass} ${outcomeClass} standard-hover-animation`}
+    >
+      <div className={styles.dateTime}>
+        <div className={styles.date}>{date}</div>
+        <div className={styles.time}>{time}</div>
       </div>
 
-      <div className="event-info">
-        <div className="sport-name">{sport}</div>
-        <div className="event-title">{title}</div>
-        <div className="opponent">
-          {status === "upcoming" ? "Проти" : "Проти"} {opponent}
+      <div className={styles.eventInfo}>
+        <div className={styles.sportName}>{sport}</div>
+        <div className={styles.eventTitle}>{title}</div>
+        <div className={styles.opponent}>
+          {status === 'upcoming' ? 'Проти' : 'Проти'} {opponent}
         </div>
-        <div className="location">{location}</div>
+        <div className={styles.location}>{location}</div>
       </div>
 
-      <div className={`result ${outcomeClass}`}>
-        {status === "finished" ? (result || "—") : "Скоро"}
+      <div className={`${styles.result} ${outcomeClass}`}>
+        {status === 'finished' ? (result || '—') : 'Скоро'}
       </div>
     </section>
   );

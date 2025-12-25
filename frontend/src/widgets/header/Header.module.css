@@ -1,7 +1,5 @@
-
-
 /* Header */
-header {
+.header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -14,15 +12,15 @@ header {
   max-height: 65px;
 }
 
-/* Container (align with MUI max-width behavior) */
-.container-header {
+/* Container */
+.containerHeader {
   display: flex;
   align-items: center;
   gap: var(--spacing);
 }
 
 /* Main nav */
-nav ul {
+.navList {
   display: flex;
   list-style: none;
   margin: 0;
@@ -30,7 +28,7 @@ nav ul {
   align-items: center;
 }
 
-nav ul a {
+.navLink {
   text-decoration: none;
   padding: 6px 18px;
   border-radius: var(--border-radius);
@@ -38,78 +36,67 @@ nav ul a {
   color: #656E76;
   font-family: var(--nav-font-family);
   font-size: 16px;
-  font-style: normal;
   font-weight: 500;
   line-height: 20px;
 }
 
-nav ul a:hover {
-  background:#eef6ff;
+.navLink:hover {
+  background: #eef6ff;
   color: var(--primary-color);
 }
 
-.logo-link:hover {
+.logoLink {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.logoLink:hover {
   background-color: transparent;
   color: var(--text-primary);
 }
 
-
-.logo-text {
+.logoText {
   font-size: 1.20rem;
   font-weight: 750;
   color: var(--text-primary);
   margin-left: 10px;
 }
 
-a {
-  text-decoration: none;
-}
-
-/* Mobile-friendly (optional) */
+/* Mobile */
 @media (max-width: 900px) {
-  header {
+  .header {
     padding: var(--spacing) calc(var(--spacing) * 2);
   }
 
-  nav:last-of-type {
-    display: none; /* Or collapse into menu button */
+  .navSecondary {
+    display: none;
   }
 
-  nav:first-of-type ul {
+  .navPrimary .navList {
     gap: var(--spacing);
   }
 }
 
 @media (max-width: 700px) {
-  .logo-text {
+  .logoText {
     display: none;
   }
 }
 
-.logo-link {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-}
-
-.logo-link:hover {
-    background-color: transparent;
-}
-
-/* Dark mode styles for logo */
+/* Dark mode */
 :root {
-    --logo-bg: #3B82F6;
-    --logo-stroke: white;
+  --logo-bg: #3B82F6;
+  --logo-stroke: white;
 }
 
-.dark .logo-icon {
-    background-color: var(--logo-bg);
+.dark .logoIcon {
+  background-color: var(--logo-bg);
 }
 
 .dark .field,
-.dark .center-circle,
-.dark .center-line {
-    border-color: var(--logo-stroke);
-    background-color: var(--logo-stroke);
+.dark .centerCircle,
+.dark .centerLine {
+  border-color: var(--logo-stroke);
+  background-color: var(--logo-stroke);
 }
-

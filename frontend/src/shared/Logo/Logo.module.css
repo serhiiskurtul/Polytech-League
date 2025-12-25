@@ -1,15 +1,15 @@
-.logo-link {
+.logoLink {
     display: flex;
     align-items: center;
     text-decoration: none;
 }
 
-.logo-link:hover {
+.logoLink:hover {
     background-color: transparent;
 }
 
 /* Logo icon styles */
-.logo-icon {
+.logoIcon {
     width: 48px;
     height: 48px;
     background-color: var(--text-primary); /* Синій колір з вашої палітри */
@@ -30,7 +30,7 @@
     justify-content: center;
 }
 
-.center-circle {
+.centerCircle {
     width: 6px;
     height: 6px;
     border: 2px solid white;
@@ -41,7 +41,7 @@
     transform: translate(-50%, -50%);
 }
 
-.center-line {
+.centerLine {
     width: 2px;
     height: 100%;
     background-color: white;

@@ -1,15 +1,14 @@
-import './CurrentEventsItem.css';
+import styles from './CurrentEventsItem.module.css';
 
 export default function CurrentEventsItem({ title, date }) {
   return (
-    <div className="currentevents card-item standard-hover-animation">
-      <div className="bar"></div>
+    <div className={`${styles.currentEvents} card-item standard-hover-animation`}>
+      <div className={styles.bar}></div>
 
-      <div className="event-info">
-        <strong className="player-name">{title}</strong>
-        <small style={{ color: "var(--muted)" }}>{date}</small>
+      <div className={styles.eventInfo}>
+        <strong className={styles.playerName}>{title}</strong>
+        <small className={styles.date}>{date}</small>
       </div>
     </div>
   );
 }
-
