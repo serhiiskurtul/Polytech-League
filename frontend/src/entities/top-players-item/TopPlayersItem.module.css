@@ -5,11 +5,21 @@
   padding: 16px;
 }
 
+
 .avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  color: var(--primary-color);
+  background: #eef6ff;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  flex-shrink: 0;
 }
+
 
 .playerInfo {
   display: flex;

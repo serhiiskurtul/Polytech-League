@@ -5,9 +5,9 @@ import BaseCard from '../../shared/BaseCard/BaseCard';
 export default function Announcement({ items }) {
   return (
     <BaseCard className={styles.announcementSection}>
-        <div className="header-row">
-            <h3 id="h3-announcements">Анонси</h3>
-            <small className="pill">Останні</small>
+        <div className={styles.headerRow}>
+            <h3 className={styles.h3Announcements}>Анонси</h3>
+            <small className={styles.pill}>Останні</small>
         </div>
         {items.map((item, index) => (
           <AnnouncementItem

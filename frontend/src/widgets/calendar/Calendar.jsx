@@ -1,4 +1,4 @@
-import './Calendar.module.css';
+import styles from './Calendar.module.css';
 import CalendarEvent from "../../entities/calendar-event/CalendarEvent.jsx";
 
 const events = [
@@ -64,15 +64,16 @@ const events = [
   },
 ];
 
+
 export default function Calendar() {
   return (
-    <div className="calendar-container">
-      <div className="card calendar-card">
+    <div className={styles.calendarContainer}>
+      <div className={`card ${styles.calendarCard}`}>
         <div className="header-row">
           <h3>Календар подій</h3>
         </div>
 
-        <div className="calendar-list">
+        <div className={styles.calendarList}>
           {events.map((event, index) => (
             <CalendarEvent
               key={index}

@@ -1,13 +1,13 @@
-.calendar-container {
+.calendarContainer {
   display: flex;
   justify-content: center;
   padding: 20px 16px;
   width: 100%;
   align-items: center;
-  min-height: calc(100vh - 140px); /* враховуючи хедер і футер */
+  min-height: calc(100vh - 140px);
 }
 
-.calendar-card {
+.calendarCard {
   padding: 24px;
   gap: 20px;
   width: 100%;
@@ -17,7 +17,7 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
-.calendar-list {
+.calendarList {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -96,33 +96,33 @@
   color: var(--text);
 }
 
-.outcome-win{
-    border-color:rgba(0,200,83,0.2);
-    background: var(--success);
-    color: rgb(7, 164, 72);
+.outcome-win {
+  border-color: rgba(0,200,83,0.2);
+  background: var(--success);
+  color: rgb(7, 164, 72);
 }
 
 .outcome-win:hover {
-    background: rgba(0, 200, 83, 0.116);
+  background: rgba(0, 200, 83, 0.116);
 }
 
-.outcome-loss{
-    border-color:rgba(255,82,82,0.2);
-    background: var(--fail);
-    color: rgb(244, 67, 54);
+.outcome-loss {
+  border-color: rgba(255,82,82,0.2);
+  background: var(--fail);
+  color: rgb(244, 67, 54);
 }
 
 .outcome-loss:hover {
-    background: rgba(255, 82, 82, 0.116);
+  background: rgba(255, 82, 82, 0.116);
 }
 
-.outcome-draw{
-    border-color:rgba(97,97,97,0.2);
-    background: var(--draw);
+.outcome-draw {
+  border-color: rgba(97,97,97,0.2);
+  background: var(--draw);
 }
 
 .outcome-draw:hover {
-    background: rgba(97, 97, 97, 0.116);
+  background: rgba(97, 97, 97, 0.116);
 }
 
 .upcoming {

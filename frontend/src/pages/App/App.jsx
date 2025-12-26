@@ -7,6 +7,7 @@ import Signup from '../SignupPage/Signup.jsx';
 import CalendarPage from '../CalendarPage/CalendarPage.jsx';
 import Tournaments from '../TournamentsPage/TournamentsPage.jsx';
 import HomePage from '../HomePage/HomePage.jsx';
+import EmailVerification from '../EmailVerificationPage/EmailVerificationPage.jsx';
 
 export default function App() {
   const location = useLocation();
@@ -50,6 +51,7 @@ export default function App() {
             <Route path="/ratings" element={<div>Рейтинги гравців</div>} />
             <Route path="/notifications" element={<div>Сповіщення користувача</div>} />
             <Route path="/theme" element={<div>Налаштування теми</div>} />
+            <Route path="/email-verification" element={<EmailVerification />} />
           </>
         )}
       </Routes>
