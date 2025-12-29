@@ -1,54 +1,11 @@
 import styles from './HomePage.module.css';
-import Announcement from '../../widgets/announcement/Announcement.jsx';
-import LastMatch from '../../widgets/last-match/LastMatch.jsx';
-import TopPlayers from '../../widgets/top-players/TopPlayers.jsx';
-import CurrentEvents from '../../widgets/current-events/CurrentEvents.jsx';
-import GlobalStatisticSeson from '../../widgets/global-statistic-seson/GlobalStatisticSeson.jsx';
+import TopPlayersCompact from '../../widgets/top-players-compact/TopPlayersCompact.jsx';
+import SeasonStats from '../../widgets/season-stats/SeasonStats.jsx';
+import HeroSection from '../../widgets/hero-section/HeroSection.jsx';
+import TournamentCalendar from '../../widgets/tournament-calendar/TournamentCalendar.jsx';
+import RecentMatches from '../../widgets/recent-matches/RecentMatches.jsx';
+import QuickActions from '../../widgets/quick-actions/QuickActions.jsx';
 
-const announcements = [
-  {
-    title: "Фінал між «Університет А» та «Коледж Б»",
-    date: "01.11.2025",
-    location: "Стадіон Центральний",
-    time: "18:00"
-  },
-  {
-    title: "Фінал між «Університет C» та «Коледж B»",
-    date: "01.07.2025",
-    location: "Стадіон Центральний",
-    time: "8:00"
-  },
-  {
-    title: "Чемпіонат коледжу з шахів (швейцарка)",
-    date: "18.12.2025",
-    location: "Актова зала",
-    time: "11:00"
-  }
-];
-
-const lastmatches = [
-  {
-    firstOpponent: "Університет А",
-    secondOpponent: "Коледж Б",
-    result: "2 — 1",
-    sportName: "Футбол",
-    typeColor: "isSuccess"
-  },
-  {
-    firstOpponent: "Кафедра IТ",
-    secondOpponent: "Коледж С",
-    result: "0 — 1",
-    sportName: "Волейбол",
-    typeColor: "isFail"
-  },
-  {
-    firstOpponent: "Університет D",
-    secondOpponent: "Коледж A",
-    result: "0 — 0",
-    sportName: "Шахи",
-    typeColor: "isDraw"
-  }
-];
 
 const TopPlayersList = [
   {
@@ -111,21 +68,20 @@ const GlobalStatisticSesonList = {
 
 export default function HomePage() {
   return (
-    <div className={styles.homePage}>
-      <main className={styles.main}>
-        <Announcement items={announcements} />
-        <LastMatch items={lastmatches} />
-      </main>
+    <>
+      <HeroSection />
+      <div className={styles.homePage}> 
+        <main className={styles.main}>
+          <TournamentCalendar />
+          <RecentMatches />
+        </main>
 
-      <aside className={styles.sidebar}>
-        <TopPlayers items={TopPlayersList} />
-        <CurrentEvents items={CurrentEventsList} />
-        <GlobalStatisticSeson
-          activePlayers={GlobalStatisticSesonList.activePlayers}
-          tournaments={GlobalStatisticSesonList.tournaments}
-          matchesPlayed={GlobalStatisticSesonList.matchesPlayed}
-        />
-      </aside>
-    </div>
+        <aside className={styles.sidebar}>
+          <QuickActions />
+          <TopPlayersCompact />
+          <SeasonStats />
+        </aside>
+      </div>
+    </>
   );
 }

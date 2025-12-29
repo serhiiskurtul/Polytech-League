@@ -5,28 +5,62 @@ import Logo from "../../shared/Logo/Logo.jsx";
 export default function Header() {
   return (
     <header className={styles.header}>
-      <div className={styles.containerHeader}>
-        <Logo />
-        <Link to="/" className={styles.logoLink}>
-          <div className={styles.logoText}>Campus League</div>
-        </Link>
+      <div className={styles.container}>
+        <div className={styles.logoContainer}>
+          <Logo />
+          <Link to="/" className={styles.logoLink}>
+            <span className={styles.logoText}>Campus League</span>
+          </Link>
+        </div>
+
+        <nav className={styles.navPrimary}>
+          <ul className={styles.navList}>
+            <li>
+              <Link to="/" className={`${styles.navLink} ${styles.active}`}>
+                <i className={`fas fa-home ${styles.navIcon}`}></i>
+                Головна
+              </Link>
+            </li>
+            <li>
+              <Link to="/calendar" className={styles.navLink}>
+                <i className={`fas fa-calendar-alt ${styles.navIcon}`}></i>
+                Календар
+              </Link>
+            </li>
+            <li>
+              <Link to="/tournamentsPage" className={styles.navLink}>
+                <i className={`fas fa-trophy ${styles.navIcon}`}></i>
+                Турніри
+              </Link>
+            </li>
+            <li>
+              <Link to="/ratings" className={styles.navLink}>
+                <i className={`fas fa-chart-line ${styles.navIcon}`}></i>
+                Рейтинги
+              </Link>
+            </li>
+            <li>
+              <Link to="/teams" className={styles.navLink}>
+                <i className={`fas fa-users ${styles.navIcon}`}></i>
+                Команди
+              </Link>
+            </li>
+          </ul>
+        </nav>
+
+        <div className={styles.userActions}>
+          <button className={styles.notificationBtn}>
+            <i className="fas fa-bell"></i>
+            <span className={styles.notificationBadge}></span>
+          </button>
+  
+          
+          <div className={styles.userProfile}>
+            <div className={styles.userAvatar}>АІ</div>
+            <span className={styles.userName}>Артем І.</span>
+          </div>
+        </div>
       </div>
-
-      <nav className={styles.navPrimary}>
-        <ul className={styles.navList}>
-          <li><Link to="/calendar" className={styles.navLink}>Календар</Link></li>
-          <li><Link to="/tournamentsPage" className={styles.navLink}>Турніри</Link></li>
-          <li><Link to="/teams" className={styles.navLink}>Команди</Link></li>
-          <li><Link to="/ratings" className={styles.navLink}>Рейтинги</Link></li>
-        </ul>
-      </nav>
-
-      <nav className={styles.navSecondary}>
-        <ul className={styles.navList}>
-          <li><Link to="/notifications" className={styles.navLink}>Сповіщення</Link></li>
-          <li><Link to="/login" className={styles.navLink}>Увійти</Link></li>
-        </ul>
-      </nav>
     </header>
   );
-}
+};

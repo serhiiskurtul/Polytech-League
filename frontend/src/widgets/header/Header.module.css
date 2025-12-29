@@ -1,102 +1,227 @@
 /* Header */
 .header {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.9);
+  transition: all 0.3s ease;
+}
+
+.dark .header {
+  background-color: rgba(30, 41, 59, 0.9);
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--spacing) calc(var(--spacing) * 2);
-  background-color: var(--bg-paper);
-  border-bottom: 1px solid var(--divider-color);
-  position: sticky;
-  top: 0;
-  height: 65px;
-  max-height: 65px;
+  height: 70px;
 }
 
-/* Container */
-.containerHeader {
+/* Логотип */
+.logoContainer {
   display: flex;
   align-items: center;
-  gap: var(--spacing);
+  gap: 14px;
 }
 
-/* Main nav */
+.logoLink {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.logoText {
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--primary);
+  transition: color 0.2s ease;
+}
+
+.logoText:hover {
+  color: var(--primary);
+  opacity: 0.9;
+}
+
+/* Основна навігація */
+.navPrimary {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
 .navList {
   display: flex;
   list-style: none;
   margin: 0;
   padding: 0;
-  align-items: center;
+  gap: 4px;
 }
 
 .navLink {
+  color: var(--muted);
   text-decoration: none;
-  padding: 6px 18px;
-  border-radius: var(--border-radius);
-  transition: background-color 200ms ease, color 200ms ease;
-  color: #656E76;
-  font-family: var(--nav-font-family);
-  font-size: 16px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
   font-weight: 500;
-  line-height: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
 }
 
 .navLink:hover {
-  background: #eef6ff;
-  color: var(--primary-color);
+  background: var(--primary-light);
+  color: var(--primary);
 }
 
-.logoLink {
+.navLink.active {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.navLink.active::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background: var(--primary);
+  border-radius: 50%;
+}
+
+.navIcon {
+  font-size: 14px;
+}
+
+/* Дії користувача */
+.userActions {
   display: flex;
   align-items: center;
-  text-decoration: none;
+  gap: 16px;
 }
 
-.logoLink:hover {
-  background-color: transparent;
-  color: var(--text-primary);
+.notificationBtn {
+  position: relative;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.logoText {
-  font-size: 1.20rem;
-  font-weight: 750;
-  color: var(--text-primary);
-  margin-left: 10px;
+.notificationBtn:hover {
+  background: var(--primary-light);
+  color: var(--primary);
 }
 
-/* Mobile */
-@media (max-width: 900px) {
-  .header {
-    padding: var(--spacing) calc(var(--spacing) * 2);
-  }
+/* Індикатор сповіщень - червона точка біля іконки сповіщення */
+.notificationBadge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  border: 2px solid var(--card);
+}
 
-  .navSecondary {
+
+/* Профіль користувача */
+.userProfile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.userProfile:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.userAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: white;
+  background: linear-gradient(135deg, #0066cc, #0052a3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.userName {
+  font-size: 14px;
+}
+
+/* Адаптивність */
+@media (max-width: 1024px) {
+  .navPrimary {
     display: none;
   }
-
-  .navPrimary .navList {
-    gap: var(--spacing);
+  
+  .container {
+    justify-content: space-between;
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+  
+  .logoText {
+    font-size: 22px;
+  }
+  
+  .userName {
+    display: none;
+  }
+  
+  .userProfile {
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
   .logoText {
     display: none;
   }
-}
-
-/* Dark mode */
-:root {
-  --logo-bg: #3B82F6;
-  --logo-stroke: white;
-}
-
-.dark .logoIcon {
-  background-color: var(--logo-bg);
-}
-
-.dark .field,
-.dark .centerCircle,
-.dark .centerLine {
-  border-color: var(--logo-stroke);
-  background-color: var(--logo-stroke);
+  
+  .themeToggle {
+    width: 46px;
+    height: 24px;
+  }
+  
+  .themeToggleSlider {
+    width: 20px;
+    height: 20px;
+  }
 }

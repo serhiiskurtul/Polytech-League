@@ -1,15 +1,381 @@
 .footer {
-  margin-top: 80px;
-  padding: 40px 0;
   background: var(--card);
-  border-top: 1px solid var(--divider-color);
-  text-align: center;
+  border-top: 1px solid var(--border);
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Верхня частина футера */
+.footerTop {
+  padding: 60px 0 40px;
+}
+
+.footerGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+}
+
+/* Логотип у футері */
+.footerLogo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.field {
+  width: 32px;
+  height: 20px;
+  border: 2.5px solid white;
+  border-radius: 4px;
+  position: relative;
+}
+
+.logoText {
+  font-weight: 700;
+  font-size: 26px;
+  color: var(--primary);
+}
+
+.footerDescription {
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 30px;
+  font-size: 15px;
+}
+
+/* Форма розсилки */
+.newsletter {
+  margin-top: 24px;
+}
+
+.newsletterTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.newsletterForm {
+  display: flex;
+  gap: 8px;
+}
+
+.newsletterInput {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.newsletterInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+.newsletterButton {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.newsletterButton:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3);
+}
+
+/* Заголовки колонок */
+.footerTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 20px;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.footerTitle::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: var(--primary);
+  border-radius: 2px;
+}
+
+/* Списки посилань */
+.footerLinks {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footerLink {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.footerLink:hover {
+  color: var(--primary);
+  transform: translateX(4px);
+}
+
+.linkIcon {
+  font-size: 10px;
+  color: var(--primary);
+  opacity: 0.7;
+}
+
+/* Види спорту */
+.sportsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.sportTag {
+  background: var(--primary-light);
+  color: var(--primary);
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.sportTag:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Контактна інформація */
+.contactInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   color: var(--muted);
   font-size: 14px;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 16px;
+.contactItem i {
+  color: var(--primary);
+  width: 20px;
+}
+
+.contactButton {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.contactButton:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3);
+}
+
+/* Соціальні мережі */
+.socialLinks {
+  margin-top: 20px;
+}
+
+.socialTitle {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.socialIcons {
+  display: flex;
+  gap: 12px;
+}
+
+.socialIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 18px;
+}
+
+.socialIcon:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Нижня частина футера */
+.footerBottom {
+  background: var(--bg);
+  padding: 24px 0;
+  border-top: 1px solid var(--border);
+}
+
+.bottomContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.copyright {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.bottomLinks {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.bottomLink {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.bottomLink:hover {
+  color: var(--primary);
+}
+
+.separator {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.scrollTop {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.scrollTop:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3);
+}
+
+/* Адаптивність */
+@media (max-width: 1024px) {
+  .footerGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .footerTop {
+    padding: 40px 0 30px;
+  }
+  
+  .footerGrid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .bottomContent {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+  
+  .bottomLinks {
+    justify-content: center;
+  }
+  
+  .sportsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 16px;
+  }
+  
+  .sportsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .newsletterForm {
+    flex-direction: column;
+  }
+  
+  .newsletterButton {
+    width: 100%;
+    height: 44px;
+  }
 }

@@ -1,0 +1,127 @@
+.heroSection {
+  margin-bottom: 40px;
+}
+
+.heroCard {
+  background: linear-gradient(135deg, #0066cc, #0052a3);
+  border-radius: 16px;
+  padding: 40px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 102, 204, 0.25);
+}
+
+.heroCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 300px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transform: translate(100px, -100px);
+}
+
+.heroTitle {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
+  line-height: 1.2;
+}
+
+.heroDescription {
+  font-size: 18px;
+  opacity: 0.9;
+  max-width: 600px;
+  margin-bottom: 32px;
+  position: relative;
+  z-index: 1;
+  line-height: 1.6;
+}
+
+.heroStats {
+  display: flex;
+  gap: 32px;
+  position: relative;
+  z-index: 1;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.statValue {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.statLabel {
+  font-size: 14px;
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+/* Анімація появи */
+.heroCard {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Адаптивність */
+@media (max-width: 768px) {
+  .heroCard {
+    padding: 30px 24px;
+  }
+  
+  .heroTitle {
+    font-size: 28px;
+  }
+  
+  .heroDescription {
+    font-size: 16px;
+  }
+  
+  .heroStats {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .statValue {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .heroCard {
+    padding: 24px 20px;
+  }
+  
+  .heroTitle {
+    font-size: 24px;
+  }
+  
+  .heroDescription {
+    font-size: 15px;
+  }
+  
+  .heroStats {
+    gap: 16px;
+  }
+}

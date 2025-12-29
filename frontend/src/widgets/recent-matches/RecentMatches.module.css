@@ -1,0 +1,536 @@
+.recentMatches {
+  margin-bottom: 30px;
+}
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.cardHeader {
+  margin-bottom: 24px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.cardTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.cardIcon {
+  color: var(--primary);
+}
+
+.badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.badgePrimary {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+/* Фільтри видів спорту */
+.sportFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.sportFilter {
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: var(--primary-light);
+  border: 2px solid transparent;
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.sportFilter:hover {
+  background: rgba(0, 102, 204, 0.2);
+  transform: translateY(-2px);
+}
+
+.sportFilter.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* Список матчів */
+.matchesList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Картка матчу */
+.matchCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.matchCard:hover {
+  border-color: var(--primary);
+  transform: translateX(4px);
+  box-shadow: 0 8px 25px rgba(0, 102, 204, 0.1);
+}
+
+.matchCard.expanded {
+  border-color: var(--primary);
+  box-shadow: 0 10px 30px rgba(0, 102, 204, 0.15);
+}
+
+.matchCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--primary);
+  border-radius: 4px 0 0 4px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.matchCard:hover::before {
+  opacity: 1;
+}
+
+.matchHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.matchSport {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sportIcon {
+  color: var(--primary);
+  font-size: 12px;
+}
+
+.statusBadge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.statusCompleted {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--success);
+}
+
+.statusLive {
+  background: rgba(244, 63, 94, 0.12);
+  color: var(--accent);
+}
+
+/* Контент матчу */
+.matchContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.teamsContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.teamInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.teamLogo {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: white;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.teamName {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.scoreContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.score {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text);
+  min-width: 40px;
+  text-align: center;
+}
+
+.score.winner {
+  color: var(--success);
+}
+
+.scoreDivider {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.matchMeta {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.metaItem i {
+  color: var(--primary);
+  font-size: 12px;
+}
+
+.today {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.yesterday {
+  color: var(--warning);
+  font-weight: 600;
+}
+
+/* Деталі матчу */
+.matchDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.matchWinner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.matchWinner i {
+  color: var(--warning);
+}
+
+.matchDescription {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.detailsButton {
+  background: transparent;
+  border: 2px solid var(--primary-light);
+  color: var(--primary);
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  align-self: flex-start;
+  font-size: 14px;
+}
+
+.detailsButton:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
+}
+
+/* Розширені деталі */
+.expandedDetails {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.statistics h4 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.statItem {
+  background: var(--primary-light);
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.statValues {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.actionButton {
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.reportButton {
+  background: var(--primary);
+  color: white;
+}
+
+.reportButton:hover {
+  background: #0052a3;
+  transform: translateY(-2px);
+}
+
+.photosButton {
+  background: var(--success);
+  color: white;
+}
+
+.photosButton:hover {
+  background: #0da271;
+  transform: translateY(-2px);
+}
+
+.videoButton {
+  background: var(--accent);
+  color: white;
+}
+
+.videoButton:hover {
+  background: #e11d48;
+  transform: translateY(-2px);
+}
+
+/* Кнопка перегляду всіх матчів */
+.viewAllContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.viewAllButton {
+  padding: 12px 24px;
+  border-radius: 14px;
+  background: var(--primary);
+  border: none;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  font-size: 15px;
+}
+
+.viewAllButton:hover {
+  background: #0052a3;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3);
+}
+
+/* Анімація появи */
+.matchCard {
+  animation: fadeInUp 0.5s ease-out;
+  animation-fill-mode: both;
+}
+
+.matchCard:nth-child(1) { animation-delay: 0.1s; }
+.matchCard:nth-child(2) { animation-delay: 0.2s; }
+.matchCard:nth-child(3) { animation-delay: 0.3s; }
+.matchCard:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Адаптивність */
+@media (max-width: 768px) {
+  .teamsContainer {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .teamInfo {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .scoreContainer {
+    order: 3;
+    margin-top: 10px;
+  }
+  
+  .sportFilters {
+    overflow-x: auto;
+    padding-bottom: 10px;
+  }
+  
+  .sportFilter {
+    white-space: nowrap;
+  }
+  
+  .actions {
+    flex-direction: column;
+  }
+  
+  .actionButton {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 20px;
+  }
+  
+  .matchCard {
+    padding: 16px;
+  }
+  
+  .teamLogo {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+  
+  .score {
+    font-size: 28px;
+  }
+  
+  .matchMeta {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

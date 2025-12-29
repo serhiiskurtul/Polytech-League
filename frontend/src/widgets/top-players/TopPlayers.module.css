@@ -1,29 +1,595 @@
-.card {
-  padding: 24px;
-  gap: 16px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+
+.topPlayers {
+  margin-bottom: 30px;
 }
 
-.headerRow {
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.cardHeader {
+  margin-bottom: 24px;
+}
+
+.headerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.cardTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.cardIcon {
+  color: var(--warning);
+}
+
+.badge {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badgePrimary {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+/* Фільтри */
+.filtersContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  gap: 20px;
 }
 
-.pillSuccess {
-  background: #e8f5e8;
-  color: #2e7d32;
-  padding: 4px 12px;
+.sportFilters, .timeFilters {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.sportFilter, .timeFilter {
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: var(--primary-light);
+  border: 2px solid transparent;
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.sportFilter:hover, .timeFilter:hover {
+  background: rgba(0, 102, 204, 0.2);
+  transform: translateY(-2px);
+}
+
+.sportFilter.active, .timeFilter.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* Заголовок таблиці */
+.leaderboardHeader {
+  background: var(--primary-light);
   border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
+  padding: 16px 20px;
+  margin-bottom: 12px;
 }
 
-.leaderList {
+.headerRow {
+  display: grid;
+  grid-template-columns: 50px 1fr 120px 120px 1fr 100px 60px;
+  gap: 20px;
+  align-items: center;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 14px;
+}
+
+/* Список гравців */
+.playersList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.playerCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.playerCard:hover {
+  border-color: var(--primary);
+  transform: translateX(4px);
+  box-shadow: 0 8px 25px rgba(0, 102, 204, 0.1);
+}
+
+.playerCard.expanded {
+  border-color: var(--primary);
+  box-shadow: 0 10px 30px rgba(0, 102, 204, 0.15);
+}
+
+.playerRow {
+  display: grid;
+  grid-template-columns: 50px 1fr 120px 120px 1fr 100px 60px;
+  gap: 20px;
+  align-items: center;
+}
+
+/* Колонки */
+.rankColumn, .playerColumn, .sportColumn, 
+.ratingColumn, .statsColumn, .winRateColumn, 
+.actionsColumn {
+  display: flex;
+  align-items: center;
+}
+
+/* Ранг */
+.rankBadge {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: white;
+  font-size: 16px;
+  position: relative;
+}
+
+.trendUp, .trendDown {
+  position: absolute;
+  font-size: 10px;
+  bottom: -2px;
+  right: -2px;
+}
+
+.trendUp {
+  color: var(--success);
+}
+
+.trendDown {
+  color: var(--accent);
+}
+
+/* Інформація про гравця */
+.playerInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.playerAvatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.playerDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.playerName {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 16px;
+}
+
+.playerTeam {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.playerTeam i {
+  font-size: 11px;
+}
+
+/* Вид спорту */
+.sportBadge {
+  padding: 8px 12px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.sportIcon {
+  font-size: 12px;
+}
+
+/* Рейтинг */
+.ratingValue {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ratingChange {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.positive {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--success);
+}
+
+.negative {
+  background: rgba(244, 63, 94, 0.12);
+  color: var(--accent);
+}
+
+/* Статистика */
+.statsText {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* Відсоток перемог */
+.winRateContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.winRateValue {
+  font-weight: 700;
+  color: var(--text);
+  font-size: 16px;
+  min-width: 40px;
+}
+
+.winRateBar {
+  flex: 1;
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.winRateFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--success), #34d399);
+  border-radius: 4px;
+  transition: width 1s ease;
+}
+
+/* Кнопка деталей */
+.detailsButton {
+  background: transparent;
+  border: 2px solid var(--primary-light);
+  color: var(--primary);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.detailsButton:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  transform: rotate(180deg);
+}
+
+/* Розширені деталі */
+.expandedDetails {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.playerExpandedContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.achievementsSection h4 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.achievementsSection h4 i {
+  color: var(--warning);
+}
+
+.achievementsList {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.achievement {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--primary-light);
+  border-radius: 12px;
+  color: var(--primary);
+  font-size: 14px;
+}
+
+.achievement i {
+  color: var(--warning);
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 16px;
+}
+
+.statCard {
+  background: var(--bg);
+  padding: 16px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.statValue {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.playerActions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.actionButton {
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  flex: 1;
+  min-width: 160px;
+  justify-content: center;
+}
+
+.profileButton {
+  background: var(--primary);
+  color: white;
+}
+
+.profileButton:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3);
+}
+
+.statsButton {
+  background: var(--success);
+  color: white;
+}
+
+.statsButton:hover {
+  background: #0da271;
+  transform: translateY(-2px);
+}
+
+.compareButton {
+  background: var(--accent);
+  color: white;
+}
+
+.compareButton:hover {
+  background: #e11d48;
+  transform: translateY(-2px);
+}
+
+/* Кнопки внизу */
+.viewAllContainer {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.viewAllButton, .fullRatingButton {
+  padding: 12px 24px;
+  border-radius: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  font-size: 15px;
+  flex: 1;
+}
+
+.viewAllButton {
+  background: var(--primary);
+  color: white;
+}
+
+.viewAllButton:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3);
+}
+
+.fullRatingButton {
+  background: transparent;
+  border: 2px solid var(--primary);
+  color: var(--primary);
+}
+
+.fullRatingButton:hover {
+  background: var(--primary-light);
+  transform: translateY(-2px);
+}
+
+/* Адаптивність */
+@media (max-width: 1200px) {
+  .playerRow, .headerRow {
+    grid-template-columns: 50px 1fr 100px 100px 1fr 80px 50px;
+    gap: 15px;
+  }
+}
+
+@media (max-width: 992px) {
+  .playerRow, .headerRow {
+    grid-template-columns: 40px 1fr 90px 90px 1fr 70px 40px;
+    gap: 12px;
+  }
+  
+  .filtersContainer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 768px) {
+  .playerRow, .headerRow {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  
+  .leaderboardHeader {
+    display: none;
+  }
+  
+  .playerCard {
+    padding: 16px;
+  }
+  
+  .playerInfo {
+    gap: 12px;
+  }
+  
+  .playerAvatar {
+    width: 48px;
+    height: 48px;
+    font-size: 18px;
+  }
+  
+  .statsText {
+    font-size: 13px;
+  }
+  
+  .actionButton {
+    min-width: 100%;
+  }
+  
+  .viewAllContainer {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 20px;
+  }
+  
+  .sportFilters, .timeFilters {
+    overflow-x: auto;
+    padding-bottom: 10px;
+  }
+  
+  .sportFilter, .timeFilter {
+    white-space: nowrap;
+  }
 }

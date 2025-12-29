@@ -1,0 +1,263 @@
+.topPlayersCompact {
+  margin-bottom: 20px;
+}
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.cardTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.cardIcon {
+  color: var(--warning);
+}
+
+/* Вибір виду спорту */
+.sportSelector {
+  display: flex;
+  gap: 6px;
+}
+
+.sportButton {
+  background: var(--primary-light);
+  color: var(--primary);
+  border: none;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  padding: 0;
+}
+
+.sportButton:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.sportButton.active {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.2);
+}
+
+/* Список гравців */
+.playersList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.playerItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--primary-light);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.playerItem:hover {
+  background: var(--primary);
+  transform: translateX(4px);
+  color: white;
+}
+
+.playerItem:hover .playerName,
+.playerItem:hover .playerTeam,
+.playerItem:hover .ratingValue {
+  color: white;
+}
+
+.playerItem:hover .playerAvatar {
+  background: white;
+  color: var(--primary);
+}
+
+/* Ранг гравця */
+.playerRank {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.rankNumber {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--muted);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.topRank {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+}
+
+.trendIcon {
+  font-size: 10px;
+}
+
+/* Аватарка */
+.playerAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* Інформація про гравця */
+.playerInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.playerName {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 14px;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playerSport {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.playerTeam {
+  font-size: 12px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Рейтинг */
+.playerRating {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.ratingValue {
+  font-weight: 700;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.ratingChange {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.positive {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--success);
+}
+
+.negative {
+  background: rgba(244, 63, 94, 0.12);
+  color: var(--accent);
+}
+
+/* Кнопка перегляду детального рейтингу */
+.seeMoreContainer {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.seeMoreButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  background: var(--primary);
+  color: white;
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.seeMoreButton:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3);
+}
+
+/* Адаптивність */
+@media (max-width: 480px) {
+  .card {
+    padding: 16px;
+  }
+  
+  .playerItem {
+    padding: 10px;
+  }
+  
+  .playerAvatar {
+    width: 36px;
+    height: 36px;
+    font-size: 12px;
+  }
+  
+  .playerName {
+    font-size: 13px;
+  }
+}

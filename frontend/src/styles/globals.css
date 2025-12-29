@@ -48,6 +48,36 @@ ul {
   /*--border: #333333;*/
 }
 
+:root {
+  --primary: #0066cc;
+  --primary-color: #0066cc;
+  --primary-light: rgba(0, 102, 204, 0.12);
+  --accent: #f43f5e;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #1e293b;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --radius: 16px;
+  --shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+}
+
+.dark {
+  --primary: #3b82f6;
+  --primary-light: rgba(59, 130, 246, 0.12);
+  --accent: #fb7185;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --border: #334155;
+  --shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
 .card {
     background: #FFF;
     display: flex;
