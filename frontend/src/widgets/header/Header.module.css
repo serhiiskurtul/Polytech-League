@@ -82,23 +82,6 @@
   color: var(--primary);
 }
 
-.navLink.active {
-  background: var(--primary-light);
-  color: var(--primary);
-}
-
-.navLink.active::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 4px;
-  height: 4px;
-  background: var(--primary);
-  border-radius: 50%;
-}
-
 .navIcon {
   font-size: 14px;
 }

@@ -30,14 +30,12 @@ const Footer = () => {
     e.preventDefault();
     const email = e.target.email.value;
     console.log('Підписка на розсилку:', email);
-    // Тут можна додати запит на сервер
     alert('Дякуємо за підписку на розсилку!');
     e.target.reset();
   };
 
   const handleContactClick = () => {
     console.log('Контакти');
-    // Тут можна додати логіку для контактної форми
   };
 
   return (
@@ -45,7 +43,6 @@ const Footer = () => {
       <div className={styles.footerTop}>
         <div className={styles.container}>
           <div className={styles.footerGrid}>
-            {/* Колонка 1: Про платформу */}
             <div className={styles.footerColumn}>
               <div className={styles.footerLogo}>
                 <Logo />
@@ -56,7 +53,6 @@ const Footer = () => {
                 Організація турнірів, ведення статистики та спілкування спортивної спільноти.
               </p>
               
-              {/* Форма розсилки */}
               <div className={styles.newsletter}>
                 <h4 className={styles.newsletterTitle}>Слідкуйте за оновленнями</h4>
                 <form className={styles.newsletterForm} onSubmit={handleNewsletterSubmit}>
@@ -74,7 +70,6 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Колонка 2: Швидкі посилання */}
             <div className={styles.footerColumn}>
               <h4 className={styles.footerTitle}>Швидкий доступ</h4>
               <ul className={styles.footerLinks}>
@@ -89,7 +84,6 @@ const Footer = () => {
               </ul>
             </div>
 
-            {/* Колонка 3: Види спорту */}
             <div className={styles.footerColumn}>
               <h4 className={styles.footerTitle}>Спортивні дисципліни</h4>
               <div className={styles.sportsGrid}>
@@ -102,13 +96,12 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Колонка 4: Контакти та соцмережі */}
             <div className={styles.footerColumn}>
               <h4 className={styles.footerTitle}>Зв'яжіться з нами</h4>
               <div className={styles.contactInfo}>
                 <div className={styles.contactItem}>
                   <i className="fas fa-envelope"></i>
-                  <span>support@unileague.com</span>
+                  <span>support@campusleague.com</span>
                 </div>
                 <div className={styles.contactItem}>
                   <i className="fas fa-phone"></i>
@@ -116,7 +109,7 @@ const Footer = () => {
                 </div>
                 <div className={styles.contactItem}>
                   <i className="fas fa-map-marker-alt"></i>
-                  <span>Київ, вул. Студентська, 1</span>
+                  <span>Чернівці, вул. Каспрука, 2</span>
                 </div>
               </div>
               
@@ -150,7 +143,6 @@ const Footer = () => {
   );
 };
 
-// Допоміжна функція для отримання іконок спорту
 const getSportIcon = (sport) => {
   const icons = {
     'Футзал': '⚽',
