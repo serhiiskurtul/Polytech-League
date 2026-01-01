@@ -11,6 +11,7 @@ import EmailVerification from '../EmailVerificationPage/EmailVerificationPage.js
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import PlayersRatingPage from '../PlayersRatingPage/PlayersRatingPage.jsx';
 import ProfilePage from '../ProfilePage/ProfilePage.jsx';
+import NotificationsPage from '../NotificationsPage/NotificationsPage.jsx';
 
 export default function App() {
   const location = useLocation();
@@ -51,7 +52,7 @@ export default function App() {
             />
             <Route path="/teams" element={<div>Список команд</div>} />
             <Route path="/ratings" element={<PlayersRatingPage />} />
-            <Route path="/notifications" element={<div>Сповіщення користувача</div>} />
+            <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/email-verification" element={<EmailVerification />} />
           </>

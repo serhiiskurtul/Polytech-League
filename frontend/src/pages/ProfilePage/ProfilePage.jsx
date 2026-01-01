@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import ProfileHeader from '../../widgets/ProfileHeader/ProfileHeader';
-import ProfileStats from '../../widgets/ProfileStats/ProfileStats';
-import UserTeams from '../../widgets/UserTeams/UserTeams';
-import UserAchievements from '../../widgets/UserAchievements/UserAchievements';
-import RecentActivity from '../../widgets/RecentActivity/RecentActivity';
-import SidebarActions from '../../widgets/SidebarActions/SidebarActions';
+import ProfileHeader from '../../widgets/profile-widgets/profile-header/ProfileHeader.jsx';
+import ProfileStats from '../../widgets/profile-widgets/profile-stats/ProfileStats.jsx';
+import UserTeams from '../../widgets/profile-widgets/user-teams/UserTeams.jsx';
+import UserAchievements from '../../widgets/profile-widgets/user-achievements/UserAchievements.jsx';
+import SidebarActions from '../../widgets/profile-widgets/sidebar-actions/SidebarActions.jsx';
+import RecentActivity from '../../widgets/profile-widgets/recent-activity/RecentActivity.jsx';
 import styles from './ProfilePage.module.css';
 
 const ProfilePage = () => {
