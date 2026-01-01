@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import TournamentCard from './TournamentCard';
 import TournamentFilters from './TournamentFilters';
 import TournamentStats from './TournamentStats';
+import { Link } from 'react-router-dom';
 import './Tournaments.css';
 
 const Tournaments = () => {
@@ -251,7 +252,9 @@ const Tournaments = () => {
         </div>
         
         <button className="btn btn-primary create-tournament-btn">
-          <i className="fas fa-plus-circle"></i> Створити турнір
+          <Link to="/create-tournament">
+            <i className="fas fa-plus-circle"></i> Створити турнір
+          </Link> 
         </button>
       </div>
 

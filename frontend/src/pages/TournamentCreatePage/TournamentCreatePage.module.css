@@ -1,0 +1,781 @@
+.tournamentCreatePage {
+  background: var(--bg);
+  color: var(--text);
+  transition: all 0.3s ease;
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: 32px 0 64px;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Заголовок сторінки */
+.pageHeader {
+  margin-bottom: 40px;
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.pageTitle {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0;
+}
+
+.pageTitle i {
+  color: var(--primary);
+}
+
+.previewBtn {
+  padding: 12px 24px;
+  border-radius: 10px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.previewBtn:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.pageSubtitle {
+  color: var(--muted);
+  font-size: 16px;
+  margin: 0;
+}
+
+/* Основний контент */
+.contentWrapper {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 40px;
+}
+
+@media (max-width: 1200px) {
+  .contentWrapper {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Форма */
+.formSection {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border);
+}
+
+.tournamentForm {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* Блоки форми */
+.formBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid var(--border);
+}
+
+.formBlock:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.blockTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+}
+
+.blockTitle i {
+  color: var(--primary);
+}
+
+/* Сітка форми */
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 768px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Групи форми */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.formLabel {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.formLabel i {
+  color: var(--primary);
+  width: 20px;
+}
+
+/* Поля вводу */
+.formInput,
+.formSelect,
+.formTextarea,
+.numberInput {
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.formInput:focus,
+.formSelect:focus,
+.formTextarea:focus,
+.numberInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.formTextarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* Групи вибору */
+.sportsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .sportsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.sportOption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.sportOption:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.sportOption.selected {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.radioInput {
+  display: none;
+}
+
+.sportIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--primary-light);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  transition: all 0.3s ease;
+}
+
+.sportOption.selected .sportIcon {
+  background: var(--primary);
+  color: white;
+}
+
+.sportName {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Діапазон команд */
+.rangeGroup {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.rangeInput {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.rangeLabel {
+  font-size: 14px;
+  color: var(--muted);
+  min-width: 40px;
+}
+
+.rangeSeparator {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.rangeHint {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+/* Бейдж тривалості */
+.durationBadge {
+  display: inline-block;
+  padding: 6px 12px;
+  background: var(--success);
+  color: white;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+/* Категорії */
+.categoriesGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.categoryBtn {
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.categoryBtn:hover {
+  border-color: var(--primary);
+}
+
+.categoryBtn.selected {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* Опції вибору */
+.optionsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.optionLabel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.optionLabel:hover {
+  background: var(--primary-light);
+}
+
+.optionText {
+  font-size: 14px;
+}
+
+/* Група чекбоксів */
+.checkboxGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.checkboxInput {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  cursor: pointer;
+}
+
+.checkboxText {
+  font-size: 14px;
+}
+
+/* Завантаження зображення */
+.imageUpload {
+  margin-top: 8px;
+}
+
+.uploadLabel {
+  display: block;
+  cursor: pointer;
+}
+
+.uploadInput {
+  display: none;
+}
+
+.uploadArea {
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.uploadArea:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.uploadArea i {
+  font-size: 48px;
+  color: var(--primary);
+  margin-bottom: 16px;
+}
+
+.uploadArea p {
+  margin: 0 0 8px 0;
+  font-weight: 500;
+}
+
+.uploadArea span {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.imagePreview {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid var(--border);
+}
+
+.imagePreview img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.removeImage {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.removeImage:hover {
+  transform: scale(1.1);
+}
+
+/* Примітка про внесок */
+.feeNote {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+/* Кнопки дій */
+.formActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding-top: 40px;
+  border-top: 1px solid var(--border);
+}
+
+.testDataBtn {
+  padding: 12px 24px;
+  border-radius: 10px;
+  background: var(--warning);
+  color: white;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.testDataBtn:hover {
+  background: #d97706;
+  transform: translateY(-2px);
+}
+
+.submitActions {
+  display: flex;
+  gap: 16px;
+}
+
+.cancelBtn {
+  padding: 12px 24px;
+  border-radius: 10px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cancelBtn:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.submitBtn {
+  padding: 12px 32px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: #2563eb;
+  transform: translateY(-2px);
+}
+
+.submitBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Панель попереднього перегляду */
+.previewSection {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.previewCard,
+.statsCard {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border);
+}
+
+.previewTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 24px 0;
+}
+
+.previewTitle i {
+  color: var(--primary);
+}
+
+/* Вміст попереднього перегляду */
+.previewContent {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.previewHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.previewSport {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.previewSport i {
+  font-size: 24px;
+}
+
+.previewName {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.previewDates {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dateItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 10px;
+  background: var(--primary-light);
+}
+
+.dateItem i {
+  font-size: 20px;
+  color: var(--primary);
+}
+
+.dateLabel {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.dateValue {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.previewDetails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.detailItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.previewDescription {
+  padding: 16px;
+  border-radius: 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+.previewDescription p {
+  margin: 0;
+  color: var(--text);
+}
+
+.previewCategories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.categoryTag {
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: var(--success);
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.emptyPreview {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+}
+
+.emptyPreview i {
+  font-size: 48px;
+  margin-bottom: 16px;
+  color: var(--border);
+}
+
+.emptyPreview p {
+  margin: 0;
+}
+
+/* Статистика */
+.statsTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 20px 0;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.statItem {
+  text-align: center;
+}
+
+.statValue {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* Адаптивність */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+  
+  .formSection {
+    padding: 24px;
+  }
+  
+  .formActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .submitActions {
+    width: 100%;
+  }
+  
+  .cancelBtn,
+  .submitBtn {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .statsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .pageTitle {
+    font-size: 24px;
+  }
+  
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .sportsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .rangeGroup {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .rangeSeparator {
+    text-align: center;
+  }
+}
