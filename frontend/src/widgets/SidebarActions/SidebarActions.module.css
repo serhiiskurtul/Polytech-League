@@ -1,3 +1,38 @@
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.cardTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.cardTitle i {
+  color: var(--primary);
+}
+
 .quickActions {
   display: flex;
   flex-direction: column;
@@ -17,10 +52,39 @@
   align-items: center;
   gap: 12px;
   text-align: left;
+  font-size: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.actionBtn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--primary);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .actionBtn:hover {
-  background: var(--primary);
-  color: white;
   transform: translateX(4px);
+}
+
+.actionBtn:hover::before {
+  opacity: 1;
+}
+
+.actionBtn i,
+.actionBtn span {
+  position: relative;
+  z-index: 1;
+  transition: color 0.3s ease;
+}
+
+.actionBtn:hover i,
+.actionBtn:hover span {
+  color: white;
 }

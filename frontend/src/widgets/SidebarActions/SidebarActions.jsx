@@ -11,7 +11,7 @@ const SidebarActions = ({ onActionClick }) => {
   ];
 
   return (
-    <div className={`${styles.sidebarActions} ${styles.card}`}>
+    <section className={styles.card}>
       <div className={styles.cardHeader}>
         <h2 className={styles.cardTitle}><i className="fas fa-bolt"></i> Швидкі дії</h2>
       </div>
@@ -24,11 +24,11 @@ const SidebarActions = ({ onActionClick }) => {
             onClick={() => onActionClick(action.text)}
           >
             <i className={action.icon}></i>
-            {action.text}
+            <span>{action.text}</span>
           </button>
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 

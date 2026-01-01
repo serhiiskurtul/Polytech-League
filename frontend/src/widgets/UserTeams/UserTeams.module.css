@@ -1,3 +1,38 @@
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.cardTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.cardTitle i {
+  color: var(--primary);
+}
+
 .teamsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -20,11 +55,18 @@
 .teamCard:hover {
   transform: translateY(-4px);
   background: var(--primary);
-  color: white;
+}
+
+.teamCard:hover .teamLogo {
+  background: white;
+  color: var(--primary);
 }
 
 .teamCard:hover .teamName,
-.teamCard:hover .teamSport,
+.teamCard:hover .teamSport {
+  color: white;
+}
+
 .teamCard:hover .teamRoleCaptain,
 .teamCard:hover .teamRoleMember {
   color: white;
@@ -41,6 +83,7 @@
   color: white;
   font-size: 32px;
   font-weight: 700;
+  transition: all 0.3s ease;
 }
 
 .teamName {
@@ -70,5 +113,11 @@
 @media (max-width: 768px) {
   .teamsGrid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .teamsGrid {
+    grid-template-columns: 1fr;
   }
 }

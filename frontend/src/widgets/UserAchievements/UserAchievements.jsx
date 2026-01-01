@@ -3,7 +3,7 @@ import styles from './UserAchievements.module.css';
 
 const UserAchievements = ({ achievements }) => {
   return (
-    <div className={`${styles.userAchievements} ${styles.card}`}>
+    <section className={styles.card}>
       <div className={styles.cardHeader}>
         <h2 className={styles.cardTitle}><i className="fas fa-trophy"></i> Досягнення</h2>
       </div>
@@ -19,7 +19,7 @@ const UserAchievements = ({ achievements }) => {
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 

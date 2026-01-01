@@ -3,7 +3,7 @@ import styles from './ProfileStats.module.css';
 
 const ProfileStats = ({ stats }) => {
   return (
-    <div className={`${styles.profileStats} ${styles.card}`}>
+    <section className={styles.card}>
       <div className={styles.cardHeader}>
         <h2 className={styles.cardTitle}><i className="fas fa-chart-bar"></i> Статистика</h2>
       </div>
@@ -26,7 +26,7 @@ const ProfileStats = ({ stats }) => {
           <div className={styles.statLabel}>Забитих голів</div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

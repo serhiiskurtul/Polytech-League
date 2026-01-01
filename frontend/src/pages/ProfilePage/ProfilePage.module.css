@@ -58,6 +58,10 @@
   .container {
     padding: 0 16px;
   }
+  
+  .profilePage {
+    padding: 20px 0 40px;
+  }
 }
 
 /* CSS змінні */

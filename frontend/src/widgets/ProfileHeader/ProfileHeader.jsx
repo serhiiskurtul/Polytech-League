@@ -21,7 +21,11 @@ const ProfileHeader = ({ userData, onEdit, onAvatarUpload }) => {
               <h1 className={styles.profileName}>{userData.name}</h1>
               <div className={styles.profileBadges}>
                 {userData.badges.map((badge, index) => (
-                  <span key={index} className={`${styles.badge} ${styles[`badge${index % 3 === 0 ? 'Primary' : index % 3 === 1 ? 'Success' : 'Accent'}`]}`}>
+                  <span key={index} className={`${styles.badge} ${
+                    index === 0 ? styles.badgePrimary : 
+                    index === 1 ? styles.badgeSuccess : 
+                    styles.badgeAccent
+                  }`}>
                     {badge}
                   </span>
                 ))}

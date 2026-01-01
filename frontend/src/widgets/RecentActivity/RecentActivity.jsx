@@ -5,7 +5,7 @@ const RecentActivity = ({ activities, activityChart }) => {
   const maxValue = Math.max(...activityChart.map(item => item.value));
   
   return (
-    <div className={`${styles.recentActivity} ${styles.card}`}>
+    <section className={styles.card}>
       <div className={styles.cardHeader}>
         <h2 className={styles.cardTitle}><i className="fas fa-history"></i> Остання активність</h2>
       </div>
@@ -41,7 +41,7 @@ const RecentActivity = ({ activities, activityChart }) => {
           <i className="fas fa-info-circle"></i> Найактивніший день - четвер
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

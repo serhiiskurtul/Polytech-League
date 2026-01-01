@@ -3,7 +3,7 @@ import styles from './UserTeams.module.css';
 
 const UserTeams = ({ teams, onTeamClick }) => {
   return (
-    <div className={`${styles.userTeams} ${styles.card}`}>
+    <section className={styles.card}>
       <div className={styles.cardHeader}>
         <h2 className={styles.cardTitle}><i className="fas fa-users"></i> Мої команди</h2>
       </div>
@@ -24,7 +24,7 @@ const UserTeams = ({ teams, onTeamClick }) => {
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 

@@ -13,6 +13,8 @@
   gap: 40px;
   position: relative;
   overflow: hidden;
+  animation: fadeInUp 0.6s ease forwards;
+  opacity: 0;
 }
 
 .profileHeaderCard::before {
@@ -82,6 +84,7 @@
 .avatarUpload:hover {
   background: var(--primary);
   color: white;
+  transform: translateY(-2px);
 }
 
 .profileInfo {
@@ -142,14 +145,14 @@
   color: var(--primary);
 }
 
-.badgeAccent {
-  background: rgba(244, 63, 94, 0.12);
-  color: var(--accent);
-}
-
 .badgeSuccess {
   background: rgba(16, 185, 129, 0.12);
   color: var(--success);
+}
+
+.badgeAccent {
+  background: rgba(244, 63, 94, 0.12);
+  color: var(--accent);
 }
 
 .profileBio {
@@ -182,6 +185,17 @@
 .detailValue {
   font-size: 18px;
   font-weight: 600;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 768px) {

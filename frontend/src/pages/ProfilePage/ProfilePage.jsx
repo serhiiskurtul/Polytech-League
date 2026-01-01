@@ -3,12 +3,12 @@ import ProfileHeader from '../../widgets/ProfileHeader/ProfileHeader';
 import ProfileStats from '../../widgets/ProfileStats/ProfileStats';
 import UserTeams from '../../widgets/UserTeams/UserTeams';
 import UserAchievements from '../../widgets/UserAchievements/UserAchievements';
-import SidebarActions from '../../widgets/SidebarActions/SidebarActions';
 import RecentActivity from '../../widgets/RecentActivity/RecentActivity';
+import SidebarActions from '../../widgets/SidebarActions/SidebarActions';
 import styles from './ProfilePage.module.css';
 
 const ProfilePage = () => {
-  const [userData, setUserData] = useState({
+  const [userData] = useState({
     name: 'Артем Іванов',
     studentId: 'IT-31-2022',
     faculty: 'Інформаційних технологій',
@@ -20,34 +20,34 @@ const ProfilePage = () => {
     badges: ['Капітан', 'Активний', 'ТОП-5']
   });
 
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     matchesPlayed: 42,
     wins: 28,
     eloRating: 2184,
     goalsScored: 15
   });
 
-  const [teams, setTeams] = useState([
+  const [teams] = useState([
     { id: 1, logo: 'ІТ', name: 'ІТ-31', sport: 'Футзал', role: 'Капітан' },
     { id: 2, logo: 'ШХ', name: 'Шаховий клуб', sport: 'Шахи', role: 'Учасник' },
     { id: 3, logo: 'НТ', name: 'Настільний теніс', sport: 'Теніс', role: 'Учасник' }
   ]);
 
-  const [achievements, setAchievements] = useState([
+  const [achievements] = useState([
     { id: 1, icon: 'fas fa-chess-queen', name: 'Чемпіон з шахів', year: '2024' },
     { id: 2, icon: 'fas fa-futbol', name: 'Кращий бомбардир', year: '2023' },
     { id: 3, icon: 'fas fa-medal', name: 'ТОП-3 теніс', year: '2024' },
     { id: 4, icon: 'fas fa-star', name: 'Активний учасник', year: '2023' }
   ]);
 
-  const [activities, setActivities] = useState([
+  const [activities] = useState([
     { id: 1, icon: 'fas fa-futbol', title: 'Перемога у матчі з футзалу', time: 'Сьогодні, 15:30' },
     { id: 2, icon: 'fas fa-chess-board', title: 'Нова перемога у шахах', time: 'Вчора, 19:15' },
     { id: 3, icon: 'fas fa-user-plus', title: 'Приєднався до команди з тенісу', time: '2 дні тому' },
     { id: 4, icon: 'fas fa-trophy', title: 'Отримав досягнення "Активний учасник"', time: '3 дні тому' }
   ]);
 
-  const [activityChart, setActivityChart] = useState([
+  const [activityChart] = useState([
     { day: 'Пн', value: 40 },
     { day: 'Вт', value: 70 },
     { day: 'Ср', value: 90 },
@@ -56,6 +56,8 @@ const ProfilePage = () => {
     { day: 'Сб', value: 60 },
     { day: 'Нд', value: 30 }
   ]);
+
+  const [isVisible, setIsVisible] = useState(false);
 
   const handleEditProfile = () => {
     alert('Редагування профілю - в розробці');
@@ -73,18 +75,39 @@ const ProfilePage = () => {
     alert(`Функція "${actionName}" буде доступна найближчим часом!`);
   };
 
+  // Анімація появи при завантаженні
   useEffect(() => {
-    // Імітація завантаження даних з API
-    const timer = setTimeout(() => {
-      // В реальному додатку тут буде запит до API
-      console.log('Дані профілю завантажено');
-    }, 500);
+    setIsVisible(true);
+    
+    // Додаємо анімацію для карток при скролі
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add(styles.visible);
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      }
+    );
 
-    return () => clearTimeout(timer);
+    // Спостерігаємо за всіма картками
+    const cards = document.querySelectorAll(`.${styles.card}`);
+    cards.forEach(card => {
+      card.classList.add(styles.fadeIn);
+      observer.observe(card);
+    });
+
+    return () => {
+      cards.forEach(card => observer.unobserve(card));
+    };
   }, []);
 
   return (
-    <div className={styles.profilePage}>
+    <div className={`${styles.profilePage} ${isVisible ? styles.visible : ''}`}>
       <div className={styles.container}>
         {/* Шапка профілю */}
         <ProfileHeader 

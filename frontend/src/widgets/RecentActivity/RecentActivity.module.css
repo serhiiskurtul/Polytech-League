@@ -1,3 +1,38 @@
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.cardTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.cardTitle i {
+  color: var(--primary);
+}
+
 .activityList {
   display: flex;
   flex-direction: column;
@@ -12,6 +47,22 @@
   padding: 16px;
   border-radius: 10px;
   background: var(--primary-light);
+  transition: all 0.3s ease;
+}
+
+.activityItem:hover {
+  transform: translateX(4px);
+  background: var(--primary);
+}
+
+.activityItem:hover .activityIcon {
+  background: white;
+  color: var(--primary);
+}
+
+.activityItem:hover .activityTitle,
+.activityItem:hover .activityTime {
+  color: white;
 }
 
 .activityIcon {
@@ -24,6 +75,8 @@
   justify-content: center;
   color: white;
   font-size: 20px;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .activityContent {
@@ -33,21 +86,27 @@
 .activityTitle {
   font-weight: 600;
   margin-bottom: 4px;
+  color: var(--text);
+  transition: color 0.3s ease;
 }
 
 .activityTime {
   font-size: 14px;
   color: var(--muted);
+  transition: color 0.3s ease;
 }
 
 .activityChart {
   margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
 }
 
 .chartTitle {
   font-weight: 600;
   margin-bottom: 16px;
   color: var(--text);
+  font-size: 16px;
 }
 
 .chartBars {
@@ -66,11 +125,23 @@
 }
 
 .chartBar {
-  background: var(--primary);
+  background: linear-gradient(to top, var(--primary), #60a5fa);
   width: 100%;
   border-radius: 6px;
   min-height: 10px;
   transition: height 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.chartBar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.2), transparent);
 }
 
 .chartLabel {
@@ -83,4 +154,12 @@
   text-align: center;
   color: var(--muted);
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.chartInfo i {
+  color: var(--primary);
 }
