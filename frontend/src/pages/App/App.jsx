@@ -10,6 +10,7 @@ import HomePage from '../HomePage/HomePage.jsx';
 import EmailVerification from '../EmailVerificationPage/EmailVerificationPage.jsx';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import PlayersRatingPage from '../PlayersRatingPage/PlayersRatingPage.jsx';
+import ProfilePage from '../ProfilePage/ProfilePage.jsx';
 
 export default function App() {
   const location = useLocation();
@@ -48,11 +49,10 @@ export default function App() {
                 </div>
               }
             />
-            <Route path="/profile" element={<div>Профіль користувача</div>} />
             <Route path="/teams" element={<div>Список команд</div>} />
             <Route path="/ratings" element={<PlayersRatingPage />} />
             <Route path="/notifications" element={<div>Сповіщення користувача</div>} />
-            <Route path="/theme" element={<div>Налаштування теми</div>} />
+            <Route path="/profile" element={<ProfilePage />} />
             <Route path="/email-verification" element={<EmailVerification />} />
           </>
         )}

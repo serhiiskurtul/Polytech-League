@@ -1,0 +1,74 @@
+.teamsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.teamCard {
+  padding: 20px;
+  border-radius: 10px;
+  background: var(--primary-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.teamCard:hover {
+  transform: translateY(-4px);
+  background: var(--primary);
+  color: white;
+}
+
+.teamCard:hover .teamName,
+.teamCard:hover .teamSport,
+.teamCard:hover .teamRoleCaptain,
+.teamCard:hover .teamRoleMember {
+  color: white;
+}
+
+.teamLogo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.teamName {
+  font-weight: 600;
+  color: var(--text);
+  transition: color 0.3s ease;
+}
+
+.teamSport {
+  font-size: 14px;
+  color: var(--muted);
+  transition: color 0.3s ease;
+}
+
+.teamRoleCaptain {
+  font-size: 12px;
+  color: var(--primary);
+  transition: color 0.3s ease;
+}
+
+.teamRoleMember {
+  font-size: 12px;
+  color: var(--muted);
+  transition: color 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .teamsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}

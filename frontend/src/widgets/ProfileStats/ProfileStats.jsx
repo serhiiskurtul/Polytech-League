@@ -1,0 +1,33 @@
+import React from 'react';
+import styles from './ProfileStats.module.css';
+
+const ProfileStats = ({ stats }) => {
+  return (
+    <div className={`${styles.profileStats} ${styles.card}`}>
+      <div className={styles.cardHeader}>
+        <h2 className={styles.cardTitle}><i className="fas fa-chart-bar"></i> Статистика</h2>
+      </div>
+      
+      <div className={styles.statsGrid}>
+        <div className={styles.statCard}>
+          <div className={styles.statValue}>{stats.matchesPlayed}</div>
+          <div className={styles.statLabel}>Зіграних матчів</div>
+        </div>
+        <div className={styles.statCard}>
+          <div className={styles.statValue}>{stats.wins}</div>
+          <div className={styles.statLabel}>Перемог</div>
+        </div>
+        <div className={styles.statCard}>
+          <div className={styles.statValue}>{stats.eloRating}</div>
+          <div className={styles.statLabel}>Рейтинг Elo (шахи)</div>
+        </div>
+        <div className={styles.statCard}>
+          <div className={styles.statValue}>{stats.goalsScored}</div>
+          <div className={styles.statLabel}>Забитих голів</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ProfileStats;

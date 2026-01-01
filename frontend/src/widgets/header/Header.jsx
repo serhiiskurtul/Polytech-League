@@ -39,12 +39,6 @@ export default function Header() {
                 Рейтинги
               </Link>
             </li>
-            <li>
-              <Link to="/teams" className={styles.navLink}>
-                <i className={`fas fa-users ${styles.navIcon}`}></i>
-                Команди
-              </Link>
-            </li>
           </ul>
         </nav>
 

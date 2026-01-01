@@ -1,0 +1,214 @@
+.profileHeader {
+  margin-bottom: 40px;
+}
+
+.profileHeaderCard {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.profileHeaderCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200px;
+  height: 200px;
+  background: linear-gradient(135deg, var(--primary) 0%, rgba(59, 130, 246, 0.1) 100%);
+  border-radius: 50%;
+  transform: translate(100px, -100px);
+}
+
+.profileAvatarSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.profileAvatar {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 60px;
+  font-weight: 700;
+  box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3);
+  border: 6px solid var(--card);
+  position: relative;
+  overflow: hidden;
+}
+
+.avatarStatus {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  background: var(--success);
+  border-radius: 50%;
+  border: 3px solid var(--card);
+}
+
+.avatarUpload {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border-radius: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  font-size: 14px;
+}
+
+.avatarUpload:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.profileInfo {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.profileNameRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.profileName {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.editProfileBtn {
+  padding: 10px 24px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editProfileBtn:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2);
+}
+
+.profileBadges {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.badgePrimary {
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--primary);
+}
+
+.badgeAccent {
+  background: rgba(244, 63, 94, 0.12);
+  color: var(--accent);
+}
+
+.badgeSuccess {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--success);
+}
+
+.profileBio {
+  color: var(--muted);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.profileDetails {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.detailItem {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detailLabel {
+  font-size: 14px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detailValue {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .profileHeaderCard {
+    flex-direction: column;
+    text-align: center;
+    padding: 30px 24px;
+  }
+  
+  .profileNameRow {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .profileDetails {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .profileAvatar {
+    width: 120px;
+    height: 120px;
+    font-size: 40px;
+  }
+  
+  .profileName {
+    font-size: 28px;
+  }
+}
