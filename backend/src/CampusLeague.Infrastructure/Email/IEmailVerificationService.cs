@@ -4,5 +4,5 @@ public interface IEmailVerificationService
 {
     string GenerateVerificationCode();
 
-    Task VerifyAsync(string code, string email);
+    Task<bool> VerifyAsync(string code, string email);
 }

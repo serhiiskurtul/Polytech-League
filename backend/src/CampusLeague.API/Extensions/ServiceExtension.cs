@@ -23,6 +23,7 @@ public static class ServiceExtension
         services.AddScoped<IChessPlayerService, ChessPlayerService>();
         services.AddScoped<IChessGameService, ChessGameService>();
         services.AddScoped<IEmailVerificationService, EmailVerificationService>();
+        services.AddScoped<IEmailSender, EmailSender>();
         services.AddSingleton<IRedisService, RedisService>();
 
         return services;

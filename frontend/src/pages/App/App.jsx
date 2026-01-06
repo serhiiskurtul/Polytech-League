@@ -16,7 +16,9 @@ import TournamentCreatePage from '../TournamentCreatePage/TournamentCreatePage.j
 
 export default function App() {
   const location = useLocation();
-  const hideLayout = location.pathname === "/login" || location.pathname === "/signup"; // тут вирішуємо, чи ховати Header/Footer
+  const hideLayout = location.pathname === "/login" || 
+                     location.pathname === "/signup" || 
+                     location.pathname === "/email-verification";
 
   return (
     <>
@@ -35,9 +37,10 @@ export default function App() {
           />
         )}
 
-        {/* Логін та реєстрація — без хедера і футера */}
+        {/* Логін, реєстрація та верифікація — без хедера і футера */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/email-verification" element={<EmailVerification />} />
 
         {/* Інші сторінки */}
         {!hideLayout && (
@@ -55,7 +58,6 @@ export default function App() {
             <Route path="/ratings" element={<PlayersRatingPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/email-verification" element={<EmailVerification />} />
             <Route path="/create-tournament" element={<TournamentCreatePage />} />
           </>
         )}
@@ -63,5 +65,5 @@ export default function App() {
 
       {!hideLayout && <Footer />}
     </>
-  )
+  );
 }

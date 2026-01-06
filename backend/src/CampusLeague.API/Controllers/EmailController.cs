@@ -8,16 +8,20 @@ using Microsoft.AspNetCore.Mvc;
 [Route("email")]
 public class EmailController(
     IEmailVerificationService emailVerificationService,
-    EmailSender emailSender,
+    IEmailSender emailSender,
     IRedisService redisService) : Controller
 {
     [AllowAnonymous]
     [HttpPost("verify")]
     public async Task<IActionResult> Verify(
-        [FromBody] EmailVerificationRequest emailVerificationRequest)
+        [FromBody] EmailVerificationRequest request)
     {
-        await emailVerificationService.VerifyAsync(
-            emailVerificationRequest.Code, emailVerificationRequest.Email);
+        var success = await emailVerificationService.VerifyAsync(
+            request.Code, request.Email
+        );
+
+        if (!success)
+            return BadRequest("Invalid verification code");
 
         return Ok();
     }
@@ -25,15 +29,18 @@ public class EmailController(
     [AllowAnonymous]
     [HttpPost("send-verification-email")]
     public async Task<IActionResult> SendVerificationEmail(
-        [FromBody] string email, CancellationToken cancellationToken)
+        [FromBody] SendEmailRequest request, CancellationToken cancellationToken)
     {
         var code = emailVerificationService.GenerateVerificationCode();
-
+        
         await emailSender.SendEmailAsync(
-            email, "Підтвердження пошти", $"Ваш код для підтвердження: {code}", cancellationToken);
+            request.Email, 
+            "Підтвердження пошти", 
+            $"Ваш код для підтвердження: {code}", 
+            cancellationToken);
 
         await redisService.SetDataAsync<string>(
-            "email_verification_code_" + email, code, TimeSpan.FromMinutes(10));
+            "email_verification_code_" + request.Email, code, TimeSpan.FromMinutes(10));
 
         return Ok();
     }
