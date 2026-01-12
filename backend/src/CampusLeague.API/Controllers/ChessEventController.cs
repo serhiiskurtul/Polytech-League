@@ -53,7 +53,7 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
         return Ok(response);
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     [HttpPost]
     public async Task<IActionResult> Create(
         [FromBody] ChessEventRequest request,
@@ -67,7 +67,7 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
         return Created();
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     [HttpPut("{id:long}")]
     public async Task<IActionResult> Update(
         [FromRoute] long id,
@@ -83,7 +83,7 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
         return NoContent();
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> Delete([FromRoute] long id, CancellationToken cancellationToken)
     {

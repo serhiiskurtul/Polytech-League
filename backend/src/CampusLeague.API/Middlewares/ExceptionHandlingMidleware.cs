@@ -1,4 +1,5 @@
 using System.Security.Authentication;
+using System.Text.Json;
 using CampusLeague.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -88,6 +89,7 @@ public class ExceptionHandlingMiddleware(RequestDelegate _next, ILogger<Exceptio
         response.ContentType = "application/problem+json";
         response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
 
-        await response.WriteAsJsonAsync(problemDetails);
+        var json = JsonSerializer.Serialize(problemDetails);
+        await context.Response.WriteAsync(json);
     }
 }

@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.RateLimiting;
 public class UsersController(
     IUserService userService) : Controller
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetAll(
         [FromQuery] FilterParams? filterParams,
@@ -30,7 +30,7 @@ public class UsersController(
         return Ok(response);
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     [HttpGet("with-deleted")]
     public async Task<IActionResult> GetAllWithDeleted(
         [FromRoute] SortParams? sortParams, CancellationToken cancellationToken)
@@ -40,7 +40,7 @@ public class UsersController(
         return Ok(usersResponse);
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(
         [FromRoute] long id, CancellationToken cancellationToken)
@@ -62,7 +62,7 @@ public class UsersController(
         return Created();
     }
 
-    [Authorize(Roles = "Customer")]
+    [Authorize(Policy = "Customer")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(
         [FromRoute] long id, [FromBody] UserRequest userRequest, CancellationToken cancellationToken)
@@ -72,7 +72,7 @@ public class UsersController(
         return NoContent();
     }
 
-    [Authorize(Roles = "CustomerOrAdmin")]
+    [Authorize(Policy = "CustomerOrAdmin")]
     [HttpDelete("soft-delete/{id}")]
     public async Task<IActionResult> SoftDelete(
         [FromRoute] long id, CancellationToken cancellationToken)
@@ -81,7 +81,7 @@ public class UsersController(
         return NoContent();
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "Admin")]
     [HttpDelete("hard-delete/{id}")]
     public async Task<IActionResult> HardDelete(
         [FromRoute] long id, CancellationToken cancellationToken)

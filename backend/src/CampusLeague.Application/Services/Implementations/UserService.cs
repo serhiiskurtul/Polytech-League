@@ -89,10 +89,12 @@ public class UserService : AbstractEntityService<User>, IUserService
     {
         _logger.LogInformation("Soft deleting user with id {Id}", id);
 
-        var user = await _dbcontext.Set<User>().FindAsync(id, cancellationToken);
+        var user = await _dbcontext.Set<User>()
+            .FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted, cancellationToken);
+
         if (user is null)
         {
-            _logger.LogWarning("User {Id} not found for soft delete", id);
+            _logger.LogWarning("User {Id} not found or already deleted", id);
             throw new EntityNotFoundException(nameof(User), id);
         }
 
@@ -101,6 +103,7 @@ public class UserService : AbstractEntityService<User>, IUserService
 
         _logger.LogInformation("User {Id} marked as deleted", id);
     }
+
 
     protected override void UpdateValues(User oldEntity, User newEntity)
     {

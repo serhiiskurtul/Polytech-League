@@ -39,8 +39,17 @@ public static class AuthenticationExtensions
 
         services.AddAuthorization(options =>
         {
-            options.AddPolicy("Admin", builder => builder.RequireClaim("Admin"));
-            options.AddPolicy("User", builder => builder.RequireClaim("User"));
+            options.AddPolicy("Admin", p =>
+                p.RequireClaim("Admin"));
+
+            options.AddPolicy("User", p =>
+                p.RequireClaim("User"));
+
+            options.AddPolicy("AdminOrUser", p =>
+                p.RequireAssertion(ctx =>
+                    ctx.User.HasClaim(c => c.Type == "Admin") ||
+                    ctx.User.HasClaim(c => c.Type == "User")));
         });
+
     }
 }

@@ -24,16 +24,22 @@ public class RefreshTokenService
     {
         _logger.LogDebug("Fetching active refresh token for userId {UserId}", userId);
 
-        var token = await _dbcontext.Set<RefreshToken>()
+        var tokens = await _dbcontext.Set<RefreshToken>()
             .AsNoTracking()
-            .Where(rt => rt.UserId == userId && rt.IsActive)
-            .OrderByDescending(rt => rt.ExpiresAt)
-            .FirstOrDefaultAsync(cancellationToken);
+            .Where(rt => rt.UserId == userId && !rt.IsRevoked) 
+            .ToListAsync(cancellationToken); 
 
-        if (token is null) _logger.LogWarning("No active refresh token found for userId {UserId}", userId);
+        var token = tokens
+            .Where(rt => rt.IsActive)
+            .OrderByDescending(rt => rt.ExpiresAt)
+            .FirstOrDefault();
+
+        if (token is null)
+            _logger.LogWarning("No active refresh token found for userId {UserId}", userId);
 
         return token;
     }
+
 
     public async Task<RefreshToken> GetByRefreshTokenAsync(string token, CancellationToken cancellationToken = default)
     {
