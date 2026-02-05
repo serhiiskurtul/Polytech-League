@@ -16,7 +16,7 @@ public class EmailController(
     public async Task<IActionResult> Verify(
         [FromBody] EmailVerificationRequest request)
     {
-        var success = await emailVerificationService.VerifyAsync(
+        var success = await emailVerificationService.VerifyAndConfirmEmailAsync(
             request.Code, request.Email
         );
 

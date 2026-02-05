@@ -13,6 +13,7 @@ import PlayersRatingPage from '../PlayersRatingPage/PlayersRatingPage.jsx';
 import ProfilePage from '../ProfilePage/ProfilePage.jsx';
 import NotificationsPage from '../NotificationsPage/NotificationsPage.jsx';
 import TournamentCreatePage from '../TournamentCreatePage/TournamentCreatePage.jsx';
+import ProtectedRoute from '../../auth/ProtectedRoute.jsx';
 
 export default function App() {
   const location = useLocation();
@@ -30,9 +31,11 @@ export default function App() {
           <Route
             path="/"
             element={
-              <div className="page-wrapper">
-                <HomePage />
-              </div>
+              <ProtectedRoute>
+                <div className="page-wrapper">
+                  <HomePage />
+                </div>
+              </ProtectedRoute>
             }
           />
         )}
@@ -45,20 +48,43 @@ export default function App() {
         {/* Інші сторінки */}
         {!hideLayout && (
           <>
-            <Route path="/calendar" element={<CalendarPage />} />
+            <Route 
+              path="/calendar" 
+                element={
+                  <ProtectedRoute>
+                    <CalendarPage />
+                  </ProtectedRoute>
+                } 
+            />
             <Route 
               path="/tournaments-page" 
               element={
-                <div className="page-wrapper">
-                  <Tournaments />
-                </div>
+                <ProtectedRoute>
+                  <div className="page-wrapper">
+                    <Tournaments />
+                  </div>
+                </ProtectedRoute>
               }
             />
             <Route path="/teams" element={<div>Список команд</div>} />
             <Route path="/ratings" element={<PlayersRatingPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/create-tournament" element={<TournamentCreatePage />} />
+            <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+
+            <Route 
+              path="/create-tournament" 
+              element={
+              <ProtectedRoute>
+                <TournamentCreatePage />
+              </ProtectedRoute>} 
+            />
           </>
         )}
       </Routes>

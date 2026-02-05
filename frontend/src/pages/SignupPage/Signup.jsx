@@ -157,7 +157,6 @@ export default function Signup() {
 
   const onSubmit = async (data) => {
     try {
-      console.log('Початок реєстрації...');
       
       const userData = {
         firstName: data.firstName.trim(),
@@ -166,32 +165,14 @@ export default function Signup() {
         email: data.email.trim(),
         password: data.password,
       };
-
-      console.log('Створення користувача...');
       
-      // 1. Реєстрація користувача
       await registerUser(userData);
-      
-      console.log('Користувач створений успішно!');
-      
-      // 2. Відправка email з кодом підтвердження
-      console.log('Відправка верифікаційного email...');
       await sendVerificationEmail(data.email);
       
-      console.log('Email відправлено успішно!');
       
-      // 3. Збереження email
       localStorage.setItem('emailToVerify', data.email);
       sessionStorage.setItem('pendingEmailVerification', data.email);
       sessionStorage.setItem('userFirstName', data.firstName);
-      
-      console.log('Email збережено в localStorage');
-      
-      
-      console.log('Показуємо toast повідомлення');
-      
-      // 4. Перехід на сторінку підтвердження
-      console.log('Навігація на /email-verification...');
       
       navigate('/email-verification', {
         state: { 
@@ -200,8 +181,6 @@ export default function Signup() {
         },
         replace: true
       });
-      
-      console.log('Навігація викликана');
       
     } catch (error) {
       console.error('Повна помилка реєстрації:', error);

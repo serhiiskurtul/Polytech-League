@@ -1,41 +1,60 @@
 import styles from './Login.module.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import { useAuth } from '../../auth/AuthContext.jsx';
+import { login as loginApi } from "../../api/auth.api.js";
+import { api } from "../../api/api.js";
 
 import InputSign from "../../shared/InputSign/InputSign.jsx";
 import ButtonSign from '../../shared/ButtonSign/ButtonSign.jsx';
 import Logo from '../../shared/Logo/Logo.jsx';
 
-// Схема валідації з Yup
+// Yup schema
 const loginSchema = yup.object({
   email: yup
     .string()
     .required('Email є обов’язковим')
-    .email('Введіть коректний email')
-    .matches(/@gmail\.com$/, 'Email повинен закінчуватися на @gmail.com'),
+    .email('Введіть коректний email'),
   password: yup
     .string()
     .required('Пароль є обов’язковим')
-    .min(8, 'Пароль має містити щонайменше 8 символів')
-    .max(50, 'Пароль занадто довгий'),
+    .min(8, 'Пароль має містити щонайменше 8 символів'),
 });
 
 export default function Login() {
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting },
+    setError,
   } = useForm({
     resolver: yupResolver(loginSchema),
-    mode: 'onChange',
   });
 
-  const onSubmit = (data) => {
-    console.log('Дані форми:', data);
-    alert('Успішний логін! (демо)');
+  const { login } = useAuth();
+
+  const onSubmit = async (data) => {
+    try {
+      await loginApi(data.email, data.password);
+    } catch (error) {
+      setError("email", { message: "Невірний email або пароль" });
+      return;
+    }
+
+    try {
+      const me = await api.get("/users/me");
+      console.log("Logged in user:", me.data);
+      login(me.data);
+      navigate("/");
+    } catch (error) {
+      setError("email", { message: "Не вдалося отримати сесію" });
+    }
   };
+
 
   return (
     <main className={styles.loginContainer}>
@@ -46,14 +65,14 @@ export default function Login() {
 
         <h1>Вітаємо назад!</h1>
         <div className={styles.subtitle}>
-          Увійдіть до свого акаунту коледжу
+          Увійдіть до свого акаунту
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <InputSign
             labelInput="Email"
             type="email"
-            placeholder="student@college.edu.ua"
+            placeholder="student@gmail.com"
             register={register('email')}
             error={errors.email?.message}
           />

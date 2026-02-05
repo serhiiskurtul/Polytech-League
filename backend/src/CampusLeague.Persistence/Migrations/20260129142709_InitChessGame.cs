@@ -4,10 +4,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace CampusLeague.Infrastructure.Migrations
+namespace CampusLeague.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitChessGame : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,7 +16,7 @@ namespace CampusLeague.Infrastructure.Migrations
                 .Annotation("Npgsql:Enum:chess_game_result", "white_win,black_win,draw")
                 .Annotation("Npgsql:Enum:chess_system", "swiss,round_robin,knockout")
                 .Annotation("Npgsql:Enum:competition_level", "college_group,regional,national")
-                .Annotation("Npgsql:Enum:user_role", "user,admin");
+                .Annotation("Npgsql:Enum:user_role", "user,admin,none");
 
             migrationBuilder.CreateTable(
                 name: "events",
@@ -222,8 +222,6 @@ namespace CampusLeague.Infrastructure.Migrations
                     tournament_id = table.Column<long>(type: "bigint", nullable: false),
                     white_player_id = table.Column<long>(type: "bigint", nullable: false),
                     black_player_id = table.Column<long>(type: "bigint", nullable: false),
-                    WhitePlayerId1 = table.Column<long>(type: "bigint", nullable: true),
-                    BlackPlayerId1 = table.Column<long>(type: "bigint", nullable: true),
                     result = table.Column<int>(type: "integer", nullable: false),
                     round = table.Column<int>(type: "integer", nullable: false),
                     board = table.Column<int>(type: "integer", nullable: false),
@@ -233,21 +231,17 @@ namespace CampusLeague.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_chess_games", x => x.id);
                     table.ForeignKey(
+                        name: "FK_chess_games_chess_events_ChessEventId",
+                        column: x => x.ChessEventId,
+                        principalTable: "chess_events",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_chess_games_chess_events_tournament_id",
                         column: x => x.tournament_id,
                         principalTable: "chess_events",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_chess_games_chess_players_BlackPlayerId1",
-                        column: x => x.BlackPlayerId1,
-                        principalTable: "chess_players",
-                        principalColumn: "id");
-                    table.ForeignKey(
-                        name: "FK_chess_games_chess_players_WhitePlayerId1",
-                        column: x => x.WhitePlayerId1,
-                        principalTable: "chess_players",
-                        principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_chess_games_chess_players_black_player_id",
                         column: x => x.black_player_id,
@@ -288,9 +282,9 @@ namespace CampusLeague.Infrastructure.Migrations
                 column: "black_player_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_chess_games_BlackPlayerId1",
+                name: "IX_chess_games_ChessEventId",
                 table: "chess_games",
-                column: "BlackPlayerId1");
+                column: "ChessEventId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_chess_games_result",
@@ -321,11 +315,6 @@ namespace CampusLeague.Infrastructure.Migrations
                 name: "IX_chess_games_white_player_id",
                 table: "chess_games",
                 column: "white_player_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_chess_games_WhitePlayerId1",
-                table: "chess_games",
-                column: "WhitePlayerId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_chess_players_fide_id",

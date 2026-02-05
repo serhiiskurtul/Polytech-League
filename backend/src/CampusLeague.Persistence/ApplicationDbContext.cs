@@ -5,9 +5,9 @@ using CampusLeague.Domain.Entities.Chess;
 using CampusLeague.Infrastructure.Persistence.DbConfiguration;
 using CampusLeague.Infrastructure.Persistence.DbConfiguration.ChessConfigurations;
 
-namespace CampusLeague.Infrastructure.Persistence.Database;
+namespace CampusLeague.Persistence.Database;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext : DbContext   
 {
     public ApplicationDbContext() { } //used for Service Tests
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }

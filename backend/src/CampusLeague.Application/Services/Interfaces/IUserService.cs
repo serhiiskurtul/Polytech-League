@@ -11,5 +11,7 @@ public interface IUserService : IAbstractEntityService<User>
     Task<User> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
 
     Task SoftDeleteAsync(long id, CancellationToken cancellationToken = default);
+
+    Task ConfirmEmailAsync(string email, CancellationToken cancellationToken = default);
 }
 

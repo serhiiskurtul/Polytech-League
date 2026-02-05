@@ -23,12 +23,11 @@ public class CampusLeagueWebApplicationFactory :
 {
     private static readonly int _portNumber = 5432;
     private readonly PostgreSqlContainer _dbContainer;
-    private readonly UserRole _authRole;
 
-    public CampusLeagueWebApplicationFactory(UserRole authRole = UserRole.Admin)
+    public UserRole AuthRole { get; private set; } = UserRole.Admin;
+
+    public CampusLeagueWebApplicationFactory()
     {
-        _authRole = authRole;
-
         _dbContainer = new PostgreSqlBuilder()
             .WithImage("postgres:16.4")
             .WithDatabase("CampusLeague_db")
@@ -37,9 +36,12 @@ public class CampusLeagueWebApplicationFactory :
             .WithPassword("1234")
             .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(_portNumber))
             .Build();
+    }
 
-        // Ensure the container is started before using it
-        _dbContainer.StartAsync().GetAwaiter().GetResult();
+    public CampusLeagueWebApplicationFactory WithRole(UserRole role)
+    {
+        AuthRole = role;
+        return this;
     }
 
 
@@ -102,10 +104,11 @@ public class CampusLeagueWebApplicationFactory :
             {
                 options.UseNpgsql(_dbContainer.GetConnectionString());
             });
-            
-            services.Configure<MockAuthenticationHandlerOptions>(options => options.AuthRole = _authRole);
-            services.AddAuthentication("User")
-                .AddScheme<MockAuthenticationHandlerOptions, TestAuthHandler>("User", options => { });
+
+            services.Configure<MockAuthenticationHandlerOptions>(options => options.AuthRole = AuthRole);
+            services.Configure<MockAuthenticationHandlerOptions>(
+                options => options.AuthRole = AuthRole);
+
         });
     }
 

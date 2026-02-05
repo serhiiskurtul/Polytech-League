@@ -7,7 +7,7 @@ using CampusLeague.Application.Services.Interfaces;
 using CampusLeague.Domain.Params;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using CampusLeague.Infrastructure.Persistence.Database;
+using CampusLeague.Persistence.Database;
 
 namespace CampusLeague.Application.Services.Implementations;
 
@@ -104,6 +104,30 @@ public class UserService : AbstractEntityService<User>, IUserService
         _logger.LogInformation("User {Id} marked as deleted", id);
     }
 
+    public async Task ConfirmEmailAsync(string email, CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Confirming email for {Email}", email);
+
+        var user = await _dbcontext.Set<User>()
+            .FirstOrDefaultAsync(u => u.Email == email && !u.IsDeleted, cancellationToken);
+
+        if (user is null)
+        {
+            _logger.LogWarning("User with email {Email} not found for email confirmation", email);
+            throw new EntityNotFoundException("User not found with email: " + email);
+        }
+
+        if (user.isEmailConfirmed)
+        {
+            _logger.LogInformation("Email {Email} already confirmed for user {Id}", email, user.Id);
+            return;
+        }
+
+        user.isEmailConfirmed = true;
+        await _dbcontext.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Email {Email} successfully confirmed for user {Id}", email, user.Id);
+    }
 
     protected override void UpdateValues(User oldEntity, User newEntity)
     {

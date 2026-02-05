@@ -1,7 +1,7 @@
-using CampusLeague.Infrastructure.Persistence.Database;
 using CampusLeague.Domain.Entities.Chess;
 using Microsoft.Extensions.Logging;
 using CampusLeague.Application.Services.Interfaces.Chess;
+using CampusLeague.Persistence.Database;
 
 namespace CampusLeague.Application.Services.Implementations.Chess;
 

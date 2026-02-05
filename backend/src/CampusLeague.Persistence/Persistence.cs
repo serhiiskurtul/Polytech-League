@@ -1,3 +1,4 @@
+using CampusLeague.Persistence.Database;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +11,7 @@ public static class Persistence
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(
                 configuration.GetConnectionString("DefaultConnection"),
-                x => x.MigrationsAssembly("CampusLeague.Infrastructure")
+                x => x.MigrationsAssembly("CampusLeague.Persistence")
             ));
 
         return services;

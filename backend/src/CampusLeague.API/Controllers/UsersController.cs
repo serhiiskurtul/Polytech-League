@@ -4,6 +4,8 @@ using CampusLeague.Domain.Params;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using CampusLeague.Application.Extensions;
+
 
 
 [ApiController]
@@ -50,6 +52,19 @@ public class UsersController(
         return Ok(usersResponse);
     }
 
+    [Authorize(Policy = "AdminOrUser")]
+    [HttpGet("me")]
+    public async Task<IActionResult> Me(CancellationToken cancellationToken)
+    {
+        var userId = User.GetUserId();
+
+        var user = await userService.GetByIdAsync(userId, cancellationToken);
+
+        return Ok(user.ToResponse());
+    }
+
+
+
     [EnableRateLimiting("fixed")]
     [AllowAnonymous]
     [HttpPost]
@@ -62,7 +77,7 @@ public class UsersController(
         return Created();
     }
 
-    [Authorize(Policy = "Customer")]
+    [Authorize(Policy = "User")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(
         [FromRoute] long id, [FromBody] UserRequest userRequest, CancellationToken cancellationToken)

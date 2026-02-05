@@ -1,9 +1,9 @@
 using CampusLeague.Domain.Entities;
 using CampusLeague.Domain.Exceptions;
 using CampusLeague.Application.Services.Interfaces;
-using CampusLeague.Infrastructure.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using CampusLeague.Persistence.Database;
 
 namespace CampusLeague.Application.Services.Implementations;
 

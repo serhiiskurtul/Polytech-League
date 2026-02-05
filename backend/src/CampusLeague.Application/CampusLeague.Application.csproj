@@ -12,12 +12,12 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.4" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CampusLeague.Infrastructure\CampusLeague.Infrastructure.csproj" />
     <ProjectReference Include="..\CampusLeague.Domain\CampusLeague.Domain.csproj" />
+    <ProjectReference Include="..\CampusLeague.Persistence\CampusLeague.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

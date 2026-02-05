@@ -2,13 +2,21 @@ using Xunit;
 
 namespace CampusLeague.Tests.IntegrationTests
 {
-    public class IntegrationTestBase : IClassFixture<CampusLeagueWebApplicationFactory>
+    public abstract class IntegrationTestBase 
+        : IClassFixture<CampusLeagueWebApplicationFactory>
     {
-        protected readonly HttpClient httpClient;
+        protected HttpClient httpClient;
+        protected readonly CampusLeagueWebApplicationFactory Factory;
 
-        public IntegrationTestBase(CampusLeagueWebApplicationFactory factory)
+        protected IntegrationTestBase(CampusLeagueWebApplicationFactory factory)
         {
+            Factory = factory;
             httpClient = factory.CreateClient();
+        }
+
+        protected void RecreateClient()
+        {
+            httpClient = Factory.CreateClient();
         }
     }
 }

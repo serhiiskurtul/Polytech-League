@@ -1,4 +1,4 @@
-using CampusLeague.Infrastructure.Persistence.Database;
+using CampusLeague.Persistence.Database;
 using CampusLeague.Domain.Entities.Chess;
 using Microsoft.Extensions.Logging;
 using CampusLeague.Application.Services.Interfaces.Chess;

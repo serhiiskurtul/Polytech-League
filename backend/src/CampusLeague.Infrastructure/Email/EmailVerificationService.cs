@@ -1,9 +1,11 @@
 using System.Security.Cryptography;
+using CampusLeague.Application.Services.Interfaces;
 using CampusLeague.Infrastructure.Redis;
 
 namespace CampusLeague.Infrastructure.Email;
 
-public class EmailVerificationService(IRedisService redisService) : IEmailVerificationService
+public class EmailVerificationService(
+    IRedisService redisService, IUserService userService) : IEmailVerificationService
 {
     public string GenerateVerificationCode()
     {
@@ -23,5 +25,14 @@ public class EmailVerificationService(IRedisService redisService) : IEmailVerifi
         return true;
     }
 
+    public async Task<bool> VerifyAndConfirmEmailAsync(string code, string email, CancellationToken cancellationToken = default)
+    {
+        var isValid = await VerifyAsync(code, email);
 
+        if (!isValid) return false;
+
+        // Підтверджуємо email у базі
+        await userService.ConfirmEmailAsync(email, cancellationToken);
+        return true;
+    }
 }

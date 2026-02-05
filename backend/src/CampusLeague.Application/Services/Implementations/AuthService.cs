@@ -4,7 +4,7 @@ using CampusLeague.Application.JWT;
 using CampusLeague.Application.Security;
 using CampusLeague.Application.Services.Interfaces;
 using CampusLeague.Domain.Entities;
-using CampusLeague.Infrastructure.Persistence.Database;
+using CampusLeague.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace CampusLeague.Application.Services.Implementations;
