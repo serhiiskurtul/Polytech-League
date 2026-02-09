@@ -47,7 +47,7 @@ export default function Login() {
       const userData = meResponse.data;
 
       // 3. Зберігаємо користувача в контексті
-      login(userData);  // ← це правильний виклик з useAuth()
+      login(userData);
 
       navigate("/");
     } catch (error) {

@@ -71,12 +71,12 @@ const QuickActions = () => {
       </div>
 
       <div className={styles.actionsGrid}>
-        {actions.map((action) => (
+        {actions.map((action, index) => (
           <button
             key={action.id}
-            className={styles.actionButton}
+            className={`${styles.actionButton} ${styles.fadeInUp}`}
+            style={{ animationDelay: `${index * 0.1}s`,'--action-color': action.color }} // затримка для кожної картки
             onClick={() => handleActionClick(action.path)}
-            style={{ '--action-color': action.color }}
           >
             <div 
               className={styles.actionIcon}
@@ -95,7 +95,7 @@ const QuickActions = () => {
             </div>
           </button>
         ))}
-        </div>
+      </div>
     </div>
   );
 };

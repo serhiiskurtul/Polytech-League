@@ -7,9 +7,7 @@ using CampusLeague.Application.Security;
 using CampusLeague.Domain.Entities;
 using CampusLeague.Domain.Exceptions;
 using System.Security.Authentication;
-using System.Threading.Tasks;
-using System.Linq;
-using CampusLeague.Infrastructure.Persistence.Database;
+using CampusLeague.Persistence.Database;
 
 namespace CampusLeague.Tests.Services
 {

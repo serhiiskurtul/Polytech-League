@@ -130,6 +130,25 @@
   transform: translateX(4px);
 }
 
+/* Анімація появи */
+.fadeInUp {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+/* Затримка анімації для кожної картки (вже додано через inline style) */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Додатково: ще компактніше на дуже вузьких екранах */
 @media (max-width: 640px) {
   .quickActions {
