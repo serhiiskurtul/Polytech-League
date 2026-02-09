@@ -26,32 +26,26 @@ public class JwtService: IJwtService
 
     public string GenerateAccessToken(User user)
     {
-        //Payload
-        Claim[] claims =
-        [
-            new("userId", user.Id.ToString()),
-            new(ClaimTypes.Role, user.Role.ToString())
-        ];
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),   
+            new Claim(ClaimTypes.Role, user.Role.ToString()),
+            new Claim("email", user.Email ?? ""),
+            new Claim("name", $"{user.FirstName} {user.LastName}".Trim())
+        };
 
-        //Signature
-        var signingCredentials = new SigningCredentials
-        (
-            new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_options.SecretKey)),
-                    SecurityAlgorithms.HmacSha256
-        );
+        var signingCredentials = new SigningCredentials(
+            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SecretKey)),
+            SecurityAlgorithms.HmacSha256);
 
-        //Generate token
         var token = new JwtSecurityToken(
             issuer: _options.Issuer,
             audience: _options.Audience,
             claims: claims,
-            signingCredentials: signingCredentials,
-            expires: DateTime.UtcNow.AddHours(_options.ExpiresHours)
-        );
+            expires: DateTime.UtcNow.AddHours(_options.ExpiresHours),
+            signingCredentials: signingCredentials);
 
-        var tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
-        return tokenValue;
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
     
     public RefreshToken GenerateRefreshToken(long userId, int expireDays = 7)

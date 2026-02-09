@@ -14,16 +14,14 @@ public class AuthController(IAuthService authService) : Controller
     {
         var tokens = await authService.AuthenticateAsync(authRequest);
 
-        Response.Cookies.Append(
-            "access_token",
-            tokens.AccessToken,
-            new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = false,              // false тільки локально без https
-                SameSite = SameSiteMode.Lax,
-                Expires = DateTimeOffset.UtcNow.AddHours(1)
-            });
+        Response.Cookies.Append("access_token", tokens.AccessToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = false,              // OK для localhost
+            SameSite = SameSiteMode.Lax, // Lax дозволяє передачу в GET після POST
+            Expires = DateTimeOffset.UtcNow.AddHours(1),
+            Path = "/"
+        });
 
         Response.Cookies.Append(
             "refresh_token",

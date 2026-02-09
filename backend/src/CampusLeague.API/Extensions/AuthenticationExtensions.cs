@@ -38,15 +38,12 @@ public static class AuthenticationExtensions
             {
                 OnMessageReceived = context =>
                 {
-                    // 1. Спочатку пробуємо дістати токен з куки
-                    var accessToken = context.Request.Cookies["access_token"];
-
-                    // 2. Якщо куки немає, JwtBearer автоматично спробує знайти Header "Authorization: Bearer ..."
-                    if (!string.IsNullOrEmpty(accessToken))
+                    var cookieToken = context.Request.Cookies["access_token"];
+                    Console.WriteLine($"[JWT] Cookie access_token: {(cookieToken != null ? "FOUND" : "MISSING")}");
+                    if (!string.IsNullOrEmpty(cookieToken))
                     {
-                        context.Token = accessToken;
+                        context.Token = cookieToken;
                     }
-                    
                     return Task.CompletedTask;
                 },
                 OnAuthenticationFailed = context =>

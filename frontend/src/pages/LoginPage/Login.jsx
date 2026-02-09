@@ -39,22 +39,26 @@ export default function Login() {
 
   const onSubmit = async (data) => {
     try {
+      // 1. Логін — сервер ставить кукі
       await loginApi(data.email, data.password);
-    } catch (error) {
-      setError("email", { message: "Невірний email або пароль" });
-      return;
-    }
 
-    try {
-      const me = await api.get("/users/me");
-      console.log("Logged in user:", me.data);
-      login(me.data);
+      // 2. Запитуємо /users/me — браузер повинен автоматично передати кукі
+      const meResponse = await api.get("/users/me");
+      const userData = meResponse.data;
+
+      // 3. Зберігаємо користувача в контексті
+      login(userData);  // ← це правильний виклик з useAuth()
+
       navigate("/");
     } catch (error) {
-      setError("email", { message: "Не вдалося отримати сесію" });
+      console.error("Login error:", error);
+      if (error.response?.status === 401) {
+        setError("root", { message: "Невірний email або пароль" });
+      } else {
+        setError("root", { message: "Щось пішло не так. Спробуйте пізніше" });
+      }
     }
   };
-
 
   return (
     <main className={styles.loginContainer}>
