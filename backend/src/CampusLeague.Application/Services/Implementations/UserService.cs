@@ -69,7 +69,6 @@ public class UserService : AbstractEntityService<User>, IUserService
 
         var findUser = await _dbcontext.Set<User>().FirstOrDefaultAsync(
             u => u.Email == user.Email &&
-            u.Email == user.Email &&
             !u.IsDeleted, cancellationToken);
 
         if (findUser != null)

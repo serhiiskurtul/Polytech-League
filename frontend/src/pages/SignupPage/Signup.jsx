@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styles from './Signup.module.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -25,13 +26,13 @@ const signupSchema = yup.object({
 
   email: yup
     .string()
-    .required('Email є обовязковим')
+    .required('Email є обовʼязковим')
     .email('Введіть коректний email')
     .max(100, 'Максимум 100 символів'),
 
   password: yup
     .string()
-    .required('Пароль є обовязковим')
+    .required('Пароль є обовʼязковим')
     .min(8, 'Пароль має містити щонайменше 8 символів')
     .max(50, 'Пароль занадто довгий')
     .matches(
@@ -47,6 +48,7 @@ const signupSchema = yup.object({
 
 export default function Signup() {
   const navigate = useNavigate();
+  const [serverError, setServerError] = useState(null);
 
   const {
     register,
@@ -72,33 +74,29 @@ export default function Signup() {
       });
 
       console.log('Статус відповіді:', response.status);
-      
+
       if (!response.ok) {
-        let errorMessage = `Помилка: ${response.status}`;
-        
+        let serverMessage = `Помилка сервера: ${response.status}`;
+
         try {
           const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
+          // беремо найточніше поле з Problem Details
+          serverMessage =
+            errorData.detail ||
+            errorData.message ||
+            errorData.title ||
+            serverMessage;
+
           console.log('Помилка від сервера:', errorData);
         } catch (e) {
-          console.log('Не вдалося розпарсити помилку');
+          console.log('Не вдалося розпарсити помилку як JSON');
         }
-        
-        throw new Error(errorMessage);
+
+        throw new Error(serverMessage);
       }
 
-      // Для Created статусу може не бути тіла
-      if (response.status === 201) {
-        return { success: true };
-      }
-      
-      try {
-        return await response.json();
-      } catch (e) {
-        return { success: true };
-      }
+      return { success: true };
     } catch (error) {
-      console.error('Помилка запиту:', error);
       throw error;
     }
   };
@@ -106,7 +104,7 @@ export default function Signup() {
   const sendVerificationEmail = async (email) => {
     try {
       console.log('Відправка верифікаційного email на:', email);
-      
+
       const response = await fetch(`${API_URL}/email/send-verification-email`, {
         method: 'POST',
         headers: {
@@ -116,32 +114,20 @@ export default function Signup() {
       });
 
       console.log('Статус відповіді email:', response.status);
-      
+
       if (!response.ok) {
         let errorMessage = `Помилка відправки email: ${response.status}`;
-        
+
         try {
           const text = await response.text();
-          if (text) {
-            errorMessage += ` - ${text}`;
-          }
-        } catch (е) {
-          console.log('Не вдалося розпарсити помилку email');
+          if (text) errorMessage += ` - ${text}`;
+        } catch {
+          // ігноруємо
         }
-        
+
         throw new Error(errorMessage);
       }
 
-      if (response.status === 204 || response.headers.get('content-length') === '0') {
-        console.log('Email відправлено успішно (порожня відповідь)');
-        return { success: true };
-      }
-
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        return await response.json();
-      }
-      
       return { success: true };
     } catch (error) {
       console.error('Помилка відправки email:', error);
@@ -150,34 +136,41 @@ export default function Signup() {
   };
 
   const onSubmit = async (data) => {
+    setServerError(null); // очищаємо попередню помилку
+
     try {
-      
       const userData = {
         firstName: data.firstName.trim(),
         lastName: data.lastName.trim(),
         email: data.email.trim(),
         password: data.password,
       };
-      
+
       await registerUser(userData);
       await sendVerificationEmail(data.email);
-      
-      
+
       localStorage.setItem('emailToVerify', data.email);
       sessionStorage.setItem('pendingEmailVerification', data.email);
       sessionStorage.setItem('userFirstName', data.firstName);
-      
+
       navigate('/email-verification', {
-        state: { 
-          email: data.email,
-          firstName: data.firstName 
-        },
-        replace: true
+        state: { email: data.email, firstName: data.firstName },
+        replace: true,
       });
-      
     } catch (error) {
       console.error('Повна помилка реєстрації:', error);
-      
+
+      let message = 'Щось пішло не так. Спробуйте ще раз або зверніться до підтримки.';
+
+      const errText = error.message?.toLowerCase() || '';
+
+      if (errText.includes('already exist') || errText.includes('існує') || errText.includes('користувач з такою')) {
+        message = 'Користувач з такою email-адресою вже зареєстрований.';
+      } else if (errText.includes('401') || errText.includes('unauthorized')) {
+        message = 'Помилка авторизації. Можливо, проблема на сервері.';
+      }
+
+      setServerError(message);
     }
   };
 
@@ -193,6 +186,19 @@ export default function Signup() {
           Приєднуйся до спортивного життя коледжу
         </div>
 
+        {serverError && (
+          <div className={styles.serverErrorMessage}>
+            {serverError}
+            {serverError.includes('вже зареєстрований') && (
+              <div className={styles.errorExtra}>
+                <Link to="/login" className={styles.loginLink}>
+                  Увійти в існуючий акаунт →
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
+
         {Object.keys(errors).length > 0 && (
           <div className={styles.errorSummary}>
             <h3>Будь ласка, виправте помилки:</h3>
@@ -201,7 +207,9 @@ export default function Signup() {
               {errors.lastName?.message && <li>{errors.lastName.message}</li>}
               {errors.email?.message && <li>{errors.email.message}</li>}
               {errors.password?.message && <li>{errors.password.message}</li>}
-              {errors.confirmPassword?.message && <li>{errors.confirmPassword.message}</li>}
+              {errors.confirmPassword?.message && (
+                <li>{errors.confirmPassword.message}</li>
+              )}
             </ul>
           </div>
         )}
@@ -248,12 +256,12 @@ export default function Signup() {
             type="password"
             placeholder="••••••••"
             register={register('confirmPassword')}
-            error={errors.confConfirmPassword?.message}
+            error={errors.confirmPassword?.message}
             disabled={isSubmitting}
           />
 
-          <ButtonSign 
-            type="submit" 
+          <ButtonSign
+            type="submit"
             disabled={isSubmitting}
             loading={isSubmitting}
           >
