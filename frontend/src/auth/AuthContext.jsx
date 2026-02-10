@@ -7,14 +7,13 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  //перевірка авторизації при завантаженні сайту
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const response = await api.get("/users/me"); 
+        const response = await api.get("/users/me");
         setUser(response.data);
-      } catch {
-        setUser(null);
+      } catch (error) {
+        setUser(null); // гість — user = null
       } finally {
         setLoading(false);
       }
@@ -34,8 +33,10 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const isAuthenticated = !!user; // true — залогінений, false — гість
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );

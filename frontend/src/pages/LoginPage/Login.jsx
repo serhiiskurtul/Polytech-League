@@ -39,23 +39,24 @@ export default function Login() {
 
   const onSubmit = async (data) => {
     try {
-      // 1. Логін — сервер ставить кукі
+      // Логін — сервер ставить кукі
       await loginApi(data.email, data.password);
 
-      // 2. Запитуємо /users/me — браузер повинен автоматично передати кукі
+      // Запитуємо дані користувача
       const meResponse = await api.get("/users/me");
       const userData = meResponse.data;
 
-      // 3. Зберігаємо користувача в контексті
+      // Зберігаємо в контексті
       login(userData);
 
+      // Перенаправляємо на головну
       navigate("/");
     } catch (error) {
       console.error("Login error:", error);
       if (error.response?.status === 401) {
         setError("root", { message: "Невірний email або пароль" });
       } else {
-        setError("root", { message: "Щось пішло не так. Спробуйте пізніше" });
+        setError("root", { message: "Щось пішло не так" });
       }
     }
   };

@@ -2,13 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
-using System.Threading.Tasks;
-using System.Linq;
-using System;
 using CampusLeague.Application.Services.Implementations;
 using CampusLeague.Domain.Entities;
 using CampusLeague.Domain.Exceptions;
-using CampusLeague.Infrastructure.Persistence.Database;
 
 namespace CampusLeague.Tests.Services
 {

@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using CampusLeague.Domain.Entities;
 
 namespace CampusLeague.Application.Dto;
@@ -7,9 +6,6 @@ public class UserRequest
 {
     public required string FirstName { get; set; }
     public required string LastName { get; set; }
-    
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public UserRole Role { get; set; }
     public string? Email { get; set; }
     public required string Password { get; set; }
 }
@@ -41,7 +37,6 @@ public static class UserDtoExtension
         {
             FirstName = userRequest.FirstName,
             LastName = userRequest.LastName,
-            Role = userRequest.Role,
             Email = string.IsNullOrWhiteSpace(userRequest.Email) ? null : userRequest.Email,
             CreatedAt = DateTime.UtcNow,
             Password = userRequest.Password

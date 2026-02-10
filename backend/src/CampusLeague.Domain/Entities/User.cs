@@ -16,6 +16,5 @@ public class User
 public enum UserRole
 {
     User,
-    Admin,
-    None // for unauthenticated users
+    Admin
 }

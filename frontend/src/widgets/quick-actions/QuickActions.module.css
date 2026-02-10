@@ -5,7 +5,13 @@
   border: 1px solid #e2e8f0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   height: fit-content;
+  transition: all 0.3s ease;
   /* Важливо для sidebar — не розтягуємо зайво */
+}
+
+.quickActions:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
 .header {

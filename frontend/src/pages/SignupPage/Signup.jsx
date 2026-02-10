@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import InputSign from '../../shared/InputSign/InputSign.jsx';
-import RoleSign from '../../shared/RoleSign/RoleSign.jsx';
 import ButtonSign from '../../shared/ButtonSign/ButtonSign.jsx';
 import Logo from '../../shared/Logo/Logo.jsx';
 
@@ -23,11 +22,6 @@ const signupSchema = yup.object({
     .required("Прізвище є обов'язковим")
     .min(2, 'Мінімум 2 символи')
     .max(50, 'Максимум 50 символів'),
-
-  role: yup
-    .string()
-    .required('Оберіть роль')
-    .oneOf(['User', 'Admin'], 'Невірна роль'),
 
   email: yup
     .string()
@@ -161,7 +155,6 @@ export default function Signup() {
       const userData = {
         firstName: data.firstName.trim(),
         lastName: data.lastName.trim(),
-        role: data.role,
         email: data.email.trim(),
         password: data.password,
       };
@@ -209,7 +202,6 @@ export default function Signup() {
               {errors.email?.message && <li>{errors.email.message}</li>}
               {errors.password?.message && <li>{errors.password.message}</li>}
               {errors.confirmPassword?.message && <li>{errors.confirmPassword.message}</li>}
-              {errors.role?.message && <li>{errors.role.message}</li>}
             </ul>
           </div>
         )}
@@ -230,17 +222,6 @@ export default function Signup() {
             placeholder="Шевченко"
             register={register('lastName')}
             error={errors.lastName?.message}
-            disabled={isSubmitting}
-          />
-
-          <RoleSign
-            labelInput="Роль"
-            options={[
-              { value: 'User', label: 'Студент / Гравець' },
-              { value: 'Admin', label: 'Адміністратор' },
-            ]}
-            register={register('role')}
-            error={errors.role?.message}
             disabled={isSubmitting}
           />
 

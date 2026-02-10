@@ -25,68 +25,94 @@ export default function App() {
     <>
       {!hideLayout && <Header />}
 
-      <Routes>
+      <Routes>    
         {/* Головна */}
-        {!hideLayout && (
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <div className="page-wrapper">
-                  <HomePage />
-                </div>
-              </ProtectedRoute>
-            }
-          />
-        )}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute requireAuth={false}>
+              <div className="page-wrapper">
+                <HomePage />
+              </div>
+            </ProtectedRoute>
+          }
+        />
 
-        {/* Логін, реєстрація та верифікація — без хедера і футера */}
+        {/* Календар */}
+        <Route 
+          path="/calendar" 
+          element={
+            <ProtectedRoute requireAuth={false}>
+              <CalendarPage />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Турніри */}
+        <Route 
+          path="/tournaments-page" 
+          element={
+            <ProtectedRoute requireAuth={false}>
+              <div className="page-wrapper">
+                <Tournaments />
+              </div>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Рейтинги */}
+        <Route 
+          path="/ratings" 
+          element={
+            <ProtectedRoute requireAuth={false}>
+              <PlayersRatingPage />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Команди */}
+        <Route 
+          path="/teams" 
+          element={
+            <ProtectedRoute requireAuth={false}>
+              <div>Список команд</div>
+            </ProtectedRoute>
+          } 
+        />
+        
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/email-verification" element={<EmailVerification />} />
+        
+        {/* Профіль */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute requireAuth={true}>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
 
-        {/* Інші сторінки */}
-        {!hideLayout && (
-          <>
-            <Route 
-              path="/calendar" 
-                element={
-                  <ProtectedRoute>
-                    <CalendarPage />
-                  </ProtectedRoute>
-                } 
-            />
-            <Route 
-              path="/tournaments-page" 
-              element={
-                <ProtectedRoute>
-                  <div className="page-wrapper">
-                    <Tournaments />
-                  </div>
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/teams" element={<div>Список команд</div>} />
-            <Route path="/ratings" element={<PlayersRatingPage />} />
-            <Route path="/notifications" element={<NotificationsPage />} />
-            <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute>
-                    <ProfilePage />
-                  </ProtectedRoute>
-                }
-              />
+        {/* Сповіщення */}
+        <Route 
+          path="/notifications" 
+          element={
+            <ProtectedRoute requireAuth={true}>
+              <NotificationsPage />
+            </ProtectedRoute>
+          } 
+        />
 
-            <Route 
-              path="/create-tournament" 
-              element={
-              <ProtectedRoute>
-                <TournamentCreatePage />
-              </ProtectedRoute>} 
-            />
-          </>
-        )}
+        {/* Створення турніру */}
+        <Route 
+          path="/create-tournament" 
+          element={
+            <ProtectedRoute requireAuth={true}>
+              <TournamentCreatePage />
+            </ProtectedRoute>
+          } 
+        />
       </Routes>
 
       {!hideLayout && <Footer />}
