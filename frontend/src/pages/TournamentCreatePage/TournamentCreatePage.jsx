@@ -21,17 +21,12 @@ const TournamentCreatePage = () => {
     isPublic: true,
     requireApproval: false,
     categories: [],
-    ageGroup: 'all',
-    level: 'all'
   });
 
   const [categories, setCategories] = useState([
     'Чоловіки',
     'Жінки',
-    'Змішані',
-    'Студенти',
-    'Школярі',
-    'Ветерани'
+    'Змішані'
   ]);
 
     const [availableSports, setAvailableSports] = useState([
@@ -52,23 +47,6 @@ const TournamentCreatePage = () => {
     { id: 'round_robin', name: 'Кругова система', description: 'Всі грають з усіма' },
     { id: 'swiss', name: 'Швейцарська система', description: 'Для шахів та шашок' },
     { id: 'groups_playoff', name: 'Груповий етап + плей-офф', description: 'Найпопулярніший формат' }
-  ]);
-
-  const [ageGroups, setAgeGroups] = useState([
-    { id: 'all', name: 'Всі вікові групи' },
-    { id: 'under18', name: 'До 18 років' },
-    { id: '18_25', name: '18-25 років' },
-    { id: '26_35', name: '26-35 років' },
-    { id: '36_plus', name: '36+ років' },
-    { id: 'students', name: 'Студенти' }
-  ]);
-
-  const [levels, setLevels] = useState([
-    { id: 'all', name: 'Всі рівні' },
-    { id: 'beginner', name: 'Початківці' },
-    { id: 'amateur', name: 'Аматори' },
-    { id: 'professional', name: 'Професіонали' },
-    { id: 'elite', name: 'Елітний рівень' }
   ]);
 
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -176,8 +154,6 @@ const TournamentCreatePage = () => {
         isPublic: true,
         requireApproval: false,
         categories: [],
-        ageGroup: 'all',
-        level: 'all'
       });
       setSelectedCategories([]);
       setPreviewImage(null);
@@ -211,8 +187,6 @@ const TournamentCreatePage = () => {
       isPublic: true,
       requireApproval: true,
       categories: [],
-      ageGroup: 'students',
-      level: 'amateur'
     });
     
     setSelectedCategories(['Чоловіки', 'Студенти']);
@@ -337,10 +311,10 @@ const TournamentCreatePage = () => {
                     </select>
                   </div>
 
-                  {/* Кількість команд */}
+                  {/* Кількість команд/учасників */}
                   <div className={styles.formGroup}>
                     <label className={styles.formLabel}>
-                      <i className="fas fa-users"></i> Кількість команд
+                      <i className="fas fa-users"></i> Кількість команд/учасників
                     </label>
                     <div className={styles.rangeGroup}>
                       <div className={styles.rangeInput}>
@@ -370,7 +344,7 @@ const TournamentCreatePage = () => {
                       </div>
                     </div>
                     <div className={styles.rangeHint}>
-                      Оптимально: 8, 16, 32 команди для олімпійської системи
+                      Оптимально: 8, 16, 32 для олімпійської системи
                     </div>
                   </div>
 
@@ -504,50 +478,6 @@ const TournamentCreatePage = () => {
                             <i className="fas fa-check"></i>
                           )}
                         </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Вікова група */}
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel}>
-                      <i className="fas fa-user-clock"></i> Вікова група
-                    </label>
-                    <div className={styles.optionsGrid}>
-                      {ageGroups.map(group => (
-                        <label key={group.id} className={styles.optionLabel}>
-                          <input
-                            type="radio"
-                            name="ageGroup"
-                            value={group.id}
-                            checked={formData.ageGroup === group.id}
-                            onChange={handleInputChange}
-                            className={styles.radioInput}
-                          />
-                          <span className={styles.optionText}>{group.name}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Рівень підготовки */}
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel}>
-                      <i className="fas fa-chart-line"></i> Рівень підготовки
-                    </label>
-                    <div className={styles.optionsGrid}>
-                      {levels.map(level => (
-                        <label key={level.id} className={styles.optionLabel}>
-                          <input
-                            type="radio"
-                            name="level"
-                            value={level.id}
-                            checked={formData.level === level.id}
-                            onChange={handleInputChange}
-                            className={styles.radioInput}
-                          />
-                          <span className={styles.optionText}>{level.name}</span>
-                        </label>
                       ))}
                     </div>
                   </div>
