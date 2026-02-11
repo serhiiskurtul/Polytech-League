@@ -7,6 +7,8 @@ public class ChessEvent : Event
     public required ChessSystem System { get; set; }
     public ICollection<ChessGame>? Games { get; set; }
     public ICollection<ChessEventParticipant>? Players { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedAt { get; set; }
 }
 
 public enum ChessSystem

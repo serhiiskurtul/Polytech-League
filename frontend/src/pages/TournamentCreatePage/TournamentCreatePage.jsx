@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import styles from './TournamentCreatePage.module.css';
 
 const TournamentCreatePage = () => {
+  const navigate = useNavigate();
+
   // Стан форми
   const [formData, setFormData] = useState({
     name: '',
-    sport: 'football',
-    type: 'single_elimination',
+    sport: '', // За замовчуванням шахи
+    type: 'Swiss',
     description: '',
-    maxTeams: 8,
+    maxTeams: 32,
     minTeams: 2,
     registrationDeadline: '',
     startDate: '',
@@ -17,10 +21,15 @@ const TournamentCreatePage = () => {
     venue: '',
     rules: '',
     prizes: '',
-    entryFee: 0,
     isPublic: true,
     requireApproval: false,
     categories: [],
+    // Шахові специфічні поля
+    date: '',
+    timeControl: '10+5',
+    system: 'Swiss',
+    participantsCount: 32,
+    refereeIds: [],
   });
 
   const [categories, setCategories] = useState([
@@ -29,17 +38,17 @@ const TournamentCreatePage = () => {
     'Змішані'
   ]);
 
-    const [availableSports, setAvailableSports] = useState([
-        { id: 'table_tennis', name: 'Настільний теніс', icon: 'fas fa-table-tennis' },
-        { id: 'armwrestling', name: 'Армреслінг', icon: 'fas fa-hand-rock' },
-        { id: 'futsal', name: 'Футзал', icon: 'fas fa-futbol' },
-        { id: 'volleyball', name: 'Волейбол', icon: 'fas fa-volleyball-ball' },
-        { id: 'beach_volleyball', name: 'Пляжний волейбол', icon: 'fas fa-sun' },
-        { id: 'basketball', name: 'Баскетбол', icon: 'fas fa-basketball-ball' },
-        { id: 'badminton', name: 'Бадмінтон', icon: 'fas fa-feather-alt' },
-        { id: 'chess', name: 'Шахи', icon: 'fas fa-chess' },
-        { id: 'checkers', name: 'Шашки', icon: 'fas fa-th-large' }
-    ]);
+  const [availableSports, setAvailableSports] = useState([
+    { id: 'table_tennis', name: 'Настільний теніс', icon: 'fas fa-table-tennis' },
+    { id: 'armwrestling', name: 'Армреслінг', icon: 'fas fa-hand-rock' },
+    { id: 'futsal', name: 'Футзал', icon: 'fas fa-futbol' },
+    { id: 'volleyball', name: 'Волейбол', icon: 'fas fa-volleyball-ball' },
+    { id: 'beach_volleyball', name: 'Пляжний волейбол', icon: 'fas fa-sun' },
+    { id: 'basketball', name: 'Баскетбол', icon: 'fas fa-basketball-ball' },
+    { id: 'badminton', name: 'Бадмінтон', icon: 'fas fa-feather-alt' },
+    { id: 'chess', name: 'Шахи', icon: 'fas fa-chess' },
+    { id: 'checkers', name: 'Шашки', icon: 'fas fa-th-large' }
+  ]);
 
   const [tournamentTypes, setTournamentTypes] = useState([
     { id: 'single_elimination', name: 'Олімпійська система', description: 'Програєш - вилітаєш' },
@@ -49,9 +58,15 @@ const TournamentCreatePage = () => {
     { id: 'groups_playoff', name: 'Груповий етап + плей-офф', description: 'Найпопулярніший формат' }
   ]);
 
+  // Шахові специфічні типи (для system)
+  const chessSystems = [
+    { id: 'Swiss', name: 'Швейцарська система', description: 'Для шахів та шашок' },
+    { id: 'RoundRobin', name: 'Кругова система', description: 'Всі грають з усіма' },
+    { id: 'Knockout', name: 'Олімпійська система', description: 'Програєш - вилітаєш' },
+  ];
+
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [previewImage, setPreviewImage] = useState(null);
 
   // Обробник зміни полів форми
   const handleInputChange = (e) => {
@@ -79,18 +94,6 @@ const TournamentCreatePage = () => {
     }
   };
 
-  // Обробник завантаження зображення
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   // Валідація форми
   const validateForm = () => {
     const errors = [];
@@ -104,6 +107,12 @@ const TournamentCreatePage = () => {
       errors.push('Термін реєстрації не може бути пізніше дати початку');
     }
     if (selectedCategories.length === 0) errors.push('Оберіть хоча б одну категорію');
+
+    // Додаткова валідація для шахів
+    if (formData.sport === 'chess') {
+      if (!formData.timeControl.trim()) errors.push('Контроль часу обов\'язковий для шахів');
+      if (formData.participantsCount < 2) errors.push('Кількість учасників повинна бути щонайменше 2');
+    }
     
     return errors;
   };
@@ -117,50 +126,44 @@ const TournamentCreatePage = () => {
       alert(`Помилки валідації:\n${errors.join('\n')}`);
       return;
     }
+
+    if (formData.sport !== 'chess') {
+      alert('Наразі створення змагань доступне тільки для шахів. Підтримка інших видів спорту буде додана пізніше.');
+      return;
+    }
     
     setIsSubmitting(true);
     
-    // Імітація запиту до API
-    setTimeout(() => {
-      const tournamentData = {
-        ...formData,
-        categories: selectedCategories,
-        createdAt: new Date().toISOString(),
-        createdBy: 'Адміністратор',
-        status: 'pending',
-        participants: 0
-      };
-      
-      console.log('Турнір створено:', tournamentData);
-      alert('Турнір успішно створено!');
-      setIsSubmitting(false);
-      
-      // Скидання форми
-      setFormData({
-        name: '',
-        sport: 'football',
-        type: 'single_elimination',
-        description: '',
-        maxTeams: 8,
-        minTeams: 2,
-        registrationDeadline: '',
-        startDate: '',
-        endDate: '',
-        location: '',
-        venue: '',
-        rules: '',
-        prizes: '',
-        entryFee: 0,
-        isPublic: true,
-        requireApproval: false,
-        categories: [],
+    // Формуємо payload для ChessEvent
+    const payload = {
+      name: formData.name.trim(),
+      date: formData.startDate ? new Date(formData.startDate).toISOString() : null,
+      location: formData.location.trim(),
+      description: formData.description.trim(),
+      timeControl: formData.timeControl,
+      system: formData.system,
+      participantsCount: Number(formData.participantsCount) || formData.maxTeams,
+      refereeIds: formData.refereeIds || [],
+    };
+    
+    try {
+      const res = await axios.post('http://localhost:5000/chess-events', payload, {
+        headers: { 'Content-Type': 'application/json' }
       });
-      setSelectedCategories([]);
-      setPreviewImage(null);
-    }, 1500);
+      
+      if (res.status === 201 || res.status === 200) {
+        alert('Шахове змагання успішно створено!');
+        navigate('/tournaments');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Помилка створення змагання: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  // Заповнення тестовими датами
+  // Заповнення тестовими даними
   const fillTestData = () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -170,26 +173,31 @@ const TournamentCreatePage = () => {
     twoWeeks.setDate(twoWeeks.getDate() + 14);
     
     setFormData({
-      name: 'Чемпіонат коледжу з футзалу 2024',
-      sport: 'football',
-      type: 'groups_playoff',
+      name: 'Чемпіонат коледжу з шахів 2024',
+      sport: 'chess',
+      type: 'swiss',
       description: 'Щорічний чемпіонат серед студентських команд. Гра за кубок декана та цінні призи.',
-      maxTeams: 16,
+      maxTeams: 32,
       minTeams: 4,
       registrationDeadline: tomorrow.toISOString().split('T')[0],
       startDate: nextWeek.toISOString().split('T')[0],
       endDate: twoWeeks.toISOString().split('T')[0],
-      location: 'Спортивний комплекс "Університетський"',
-      venue: 'Зал №3',
-      rules: '1. Команда складається з 5 гравців та 3 запасних\n2. Тривалість матчу - 2 тайми по 20 хвилин\n3. Заборонена груба гра\n4. Рішення судді остаточні',
-      prizes: '1 місце - 5000 грн та кубок\n2 місце - 3000 грн\n3 місце - 1500 грн\nНайкращий бомбардир - 1000 грн',
-      entryFee: 500,
+      location: 'Бібліотека, зал №4',
+      venue: 'Зал №4',
+      rules: '1. Швейцарська система\n2. Контроль часу: 15+10\n3. Заборонені підказки\n4. Рішення судді остаточні',
+      prizes: '1 місце - 2000 грн\n2 місце - 1000 грн\n3 місце - 500 грн',
       isPublic: true,
       requireApproval: true,
       categories: [],
+      // Шахові поля
+      date: nextWeek.toISOString().split('T')[0],
+      timeControl: '15+10',
+      system: 'Swiss',
+      participantsCount: 32,
+      refereeIds: [],
     });
     
-    setSelectedCategories(['Чоловіки', 'Студенти']);
+    setSelectedCategories(['Чоловіки', 'Змішані']);
   };
 
   // Розрахунок тривалості турніру
@@ -219,7 +227,7 @@ const TournamentCreatePage = () => {
         <div className={styles.pageHeader}>
           <div className={styles.headerContent}>
             <h1 className={styles.pageTitle}>
-              <i className="fas fa-plus-circle"></i> Створення турніру
+              <i className="fas fa-plus-circle"></i> Створення змагання
             </h1>
             <button 
               className={styles.previewBtn}
@@ -229,7 +237,7 @@ const TournamentCreatePage = () => {
             </button>
           </div>
           <p className={styles.pageSubtitle}>
-            Заповніть форму для створення нового турніру. Всі поля позначені * є обов'язковими.
+            Заповніть форму для створення нового змагання. Всі поля позначені * є обов'язковими. Наразі підтримуються тільки шахи.
           </p>
         </div>
 
@@ -248,7 +256,7 @@ const TournamentCreatePage = () => {
                   {/* Назва турніру */}
                   <div className={styles.formGroup}>
                     <label className={styles.formLabel}>
-                      <i className="fas fa-trophy"></i> Назва турніру *
+                      <i className="fas fa-trophy"></i> Назва змагання *
                     </label>
                     <input
                       type="text"
@@ -256,7 +264,7 @@ const TournamentCreatePage = () => {
                       value={formData.name}
                       onChange={handleInputChange}
                       className={styles.formInput}
-                      placeholder="Наприклад: Чемпіонат коледжу з футзалу 2024"
+                      placeholder="Наприклад: Чемпіонат коледжу з шахів 2024"
                       required
                     />
                   </div>
@@ -294,16 +302,16 @@ const TournamentCreatePage = () => {
                   {/* Формат турніру */}
                   <div className={styles.formGroup}>
                     <label className={styles.formLabel}>
-                      <i className="fas fa-chess-board"></i> Формат турніру *
+                      <i className="fas fa-chess-board"></i> Формат змагання *
                     </label>
                     <select
-                      name="type"
-                      value={formData.type}
+                      name={formData.sport === 'chess' ? 'system' : 'type'}
+                      value={formData.sport === 'chess' ? formData.system : formData.type}
                       onChange={handleInputChange}
                       className={styles.formSelect}
                       required
                     >
-                      {tournamentTypes.map(type => (
+                      {(formData.sport === 'chess' ? chessSystems : tournamentTypes).map(type => (
                         <option key={type.id} value={type.id}>
                           {type.name} - {type.description}
                         </option>
@@ -334,8 +342,8 @@ const TournamentCreatePage = () => {
                         <span className={styles.rangeLabel}>Макс:</span>
                         <input
                           type="number"
-                          name="maxTeams"
-                          value={formData.maxTeams}
+                          name={formData.sport === 'chess' ? 'participantsCount' : 'maxTeams'}
+                          value={formData.sport === 'chess' ? formData.participantsCount : formData.maxTeams}
                           onChange={handleInputChange}
                           className={styles.numberInput}
                           min={formData.minTeams}
@@ -348,17 +356,38 @@ const TournamentCreatePage = () => {
                     </div>
                   </div>
 
+                  {/* Шахові специфічні поля */}
+                  {formData.sport === 'chess' && (
+                    <>
+                      {/* Контроль часу */}
+                      <div className={styles.formGroup}>
+                        <label className={styles.formLabel}>
+                          <i className="fas fa-clock"></i> Контроль часу *
+                        </label>
+                        <input
+                          type="text"
+                          name="timeControl"
+                          value={formData.timeControl}
+                          onChange={handleInputChange}
+                          className={styles.formInput}
+                          placeholder="Наприклад: 10+5 або Classical"
+                          required
+                        />
+                      </div>
+                    </>
+                  )}
+
                   {/* Опис */}
                   <div className={styles.formGroup}>
                     <label className={styles.formLabel}>
-                      <i className="fas fa-align-left"></i> Опис турніру *
+                      <i className="fas fa-align-left"></i> Опис змагання *
                     </label>
                     <textarea
                       name="description"
                       value={formData.description}
                       onChange={handleInputChange}
                       className={styles.formTextarea}
-                      placeholder="Детальний опис турніру, його цілей та особливостей..."
+                      placeholder="Детальний опис змагання, його цілей та особливостей..."
                       rows="4"
                       required
                     />
@@ -380,8 +409,9 @@ const TournamentCreatePage = () => {
                     </label>
                     <input
                       type="date"
+                      name="registrationDeadline"
                       value={formData.registrationDeadline}
-                      onChange={(e) => handleDateChange('registrationDeadline', e.target.value)}
+                      onChange={handleInputChange}
                       className={styles.formInput}
                       required
                     />
@@ -394,8 +424,9 @@ const TournamentCreatePage = () => {
                     </label>
                     <input
                       type="date"
+                      name="startDate"
                       value={formData.startDate}
-                      onChange={(e) => handleDateChange('startDate', e.target.value)}
+                      onChange={handleInputChange}
                       className={styles.formInput}
                       required
                     />
@@ -408,8 +439,9 @@ const TournamentCreatePage = () => {
                     </label>
                     <input
                       type="date"
+                      name="endDate"
                       value={formData.endDate}
-                      onChange={(e) => handleDateChange('endDate', e.target.value)}
+                      onChange={handleInputChange}
                       className={styles.formInput}
                     />
                     {formData.startDate && formData.endDate && (
@@ -494,7 +526,7 @@ const TournamentCreatePage = () => {
                   {/* Правила */}
                   <div className={styles.formGroup}>
                     <label className={styles.formLabel}>
-                      <i className="fas fa-book"></i> Правила турніру
+                      <i className="fas fa-book"></i> Правила змагання
                     </label>
                     <textarea
                       name="rules"
@@ -521,27 +553,6 @@ const TournamentCreatePage = () => {
                     />
                   </div>
 
-                  {/* Вступний внесок */}
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel}>
-                      <i className="fas fa-money-bill-wave"></i> Вступний внесок (грн)
-                    </label>
-                    <input
-                      type="number"
-                      name="entryFee"
-                      value={formData.entryFee}
-                      onChange={handleInputChange}
-                      className={styles.formInput}
-                      min="0"
-                      step="50"
-                    />
-                    {formData.entryFee > 0 && (
-                      <div className={styles.feeNote}>
-                        Збір буде відображатися при реєстрації
-                      </div>
-                    )}
-                  </div>
-
                   {/* Налаштування видимості */}
                   <div className={styles.formGroup}>
                     <label className={styles.formLabel}>
@@ -556,7 +567,7 @@ const TournamentCreatePage = () => {
                           onChange={handleInputChange}
                           className={styles.checkboxInput}
                         />
-                        <span className={styles.checkboxText}>Публічний турнір</span>
+                        <span className={styles.checkboxText}>Публічне змагання</span>
                       </label>
                       <label className={styles.checkboxLabel}>
                         <input
@@ -568,41 +579,6 @@ const TournamentCreatePage = () => {
                         />
                         <span className={styles.checkboxText}>Модерація заявок</span>
                       </label>
-                    </div>
-                  </div>
-
-                  {/* Завантаження зображення */}
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel}>
-                      <i className="fas fa-image"></i> Зображення турніру
-                    </label>
-                    <div className={styles.imageUpload}>
-                      {previewImage ? (
-                        <div className={styles.imagePreview}>
-                          <img src={previewImage} alt="Попередній перегляд" />
-                          <button
-                            type="button"
-                            className={styles.removeImage}
-                            onClick={() => setPreviewImage(null)}
-                          >
-                            <i className="fas fa-times"></i>
-                          </button>
-                        </div>
-                      ) : (
-                        <label className={styles.uploadLabel}>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageUpload}
-                            className={styles.uploadInput}
-                          />
-                          <div className={styles.uploadArea}>
-                            <i className="fas fa-cloud-upload-alt"></i>
-                            <p>Перетягніть зображення або клацніть для вибору</p>
-                            <span>Рекомендовано: 1200×600 px, JPG/PNG</span>
-                          </div>
-                        </label>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -637,7 +613,7 @@ const TournamentCreatePage = () => {
                       </>
                     ) : (
                       <>
-                        <i className="fas fa-check"></i> Створити турнір
+                        <i className="fas fa-check"></i> Створити змагання
                       </>
                     )}
                   </button>
@@ -693,7 +669,7 @@ const TournamentCreatePage = () => {
                     <div className={styles.previewDetails}>
                       <div className={styles.detailItem}>
                         <i className="fas fa-users"></i>
-                        <span>{formData.minTeams}-{formData.maxTeams} команд</span>
+                        <span>{formData.minTeams}-{formData.maxTeams} команд/учасників</span>
                       </div>
                       <div className={styles.detailItem}>
                         <i className="fas fa-chess-board"></i>
@@ -701,12 +677,6 @@ const TournamentCreatePage = () => {
                           {tournamentTypes.find(t => t.id === formData.type)?.name || 'Формат'}
                         </span>
                       </div>
-                      {formData.entryFee > 0 && (
-                        <div className={styles.detailItem}>
-                          <i className="fas fa-money-bill-wave"></i>
-                          <span>{formData.entryFee} грн</span>
-                        </div>
-                      )}
                     </div>
 
                     {/* Опис */}
@@ -763,4 +733,4 @@ const TournamentCreatePage = () => {
   );
 };
 
-export default TournamentCreatePage;
+export default TournamentCreatePage;  
