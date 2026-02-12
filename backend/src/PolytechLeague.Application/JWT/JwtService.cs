@@ -34,7 +34,7 @@ public class JwtService: IJwtService
             Subject = new ClaimsIdentity(new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", user.Role.ToString()),
+                new Claim(ClaimTypes.Role, user.Role.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
                 new Claim("name", $"{user.FirstName} {user.LastName}".Trim())
             }),

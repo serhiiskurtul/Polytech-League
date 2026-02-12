@@ -39,11 +39,9 @@ export default function Login() {
 
   const onSubmit = async (data) => {
     try {
-      await loginApi(data.email, data.password);  // просто робимо POST /login
+      await loginApi(data.email, data.password); 
 
-      // НЕ потрібно зберігати токен — він прийшов у cookie
-
-      const meResponse = await api.get("/users/me");
+      const meResponse = await api.get("/users/me");  
       login(meResponse.data);
       navigate("/");
     } catch (error) {
