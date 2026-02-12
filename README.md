@@ -1,1 +1,1 @@
-# Campus-League
+# Polytech-League
