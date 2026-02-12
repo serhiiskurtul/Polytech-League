@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36518.9
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolytechLeague.API", "PolytechLeague.API.csproj", "{3E647366-FBB8-5D84-A2F9-5315881A5EF4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolytechLeague.Application", "..\PolytechLeague.Application\PolytechLeague.Application.csproj", "{C0BD07EB-934E-C4A0-C2E3-1584877579CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolytechLeague.Domain", "..\PolytechLeague.Domain\PolytechLeague.Domain.csproj", "{506AD12E-2964-DD25-31BE-15CD9BA3C82A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolytechLeague.Infrastructure", "..\PolytechLeague.Infrastructure\PolytechLeague.Infrastructure.csproj", "{890AB11F-E3DE-5198-359F-CFEDF178CDEA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolytechLeague.Tests", "..\PolytechLeague.Tests\PolytechLeague.Tests.csproj", "{3B7B7397-68A1-9584-73A8-7912307EEDEC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolytechLeague.Persistence", "..\PolytechLeague.Persistence\PolytechLeague.Persistence.csproj", "{0B806D52-767E-1A42-AF91-DD221F85E155}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3E647366-FBB8-5D84-A2F9-5315881A5EF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E647366-FBB8-5D84-A2F9-5315881A5EF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E647366-FBB8-5D84-A2F9-5315881A5EF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E647366-FBB8-5D84-A2F9-5315881A5EF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0BD07EB-934E-C4A0-C2E3-1584877579CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0BD07EB-934E-C4A0-C2E3-1584877579CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0BD07EB-934E-C4A0-C2E3-1584877579CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0BD07EB-934E-C4A0-C2E3-1584877579CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{506AD12E-2964-DD25-31BE-15CD9BA3C82A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{506AD12E-2964-DD25-31BE-15CD9BA3C82A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{506AD12E-2964-DD25-31BE-15CD9BA3C82A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{506AD12E-2964-DD25-31BE-15CD9BA3C82A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{890AB11F-E3DE-5198-359F-CFEDF178CDEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{890AB11F-E3DE-5198-359F-CFEDF178CDEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{890AB11F-E3DE-5198-359F-CFEDF178CDEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{890AB11F-E3DE-5198-359F-CFEDF178CDEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B7B7397-68A1-9584-73A8-7912307EEDEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B7B7397-68A1-9584-73A8-7912307EEDEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B7B7397-68A1-9584-73A8-7912307EEDEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B7B7397-68A1-9584-73A8-7912307EEDEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B806D52-767E-1A42-AF91-DD221F85E155}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B806D52-767E-1A42-AF91-DD221F85E155}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B806D52-767E-1A42-AF91-DD221F85E155}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B806D52-767E-1A42-AF91-DD221F85E155}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {73E7F254-884A-458D-84F8-202DBF5F37AD}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,27 @@
+using PolytechLeague.Domain.Entities.Chess;
+using Microsoft.Extensions.Logging;
+using PolytechLeague.Application.Services.Interfaces.Chess;
+using PolytechLeague.Persistence.Database;
+
+namespace PolytechLeague.Application.Services.Implementations.Chess;
+
+public class ChessPlayerService(
+    ApplicationDbContext _dbcontext,
+    ILogger<AbstractEntityService<ChessPlayer>> _logger
+) :
+    AbstractEntityService<ChessPlayer>(_dbcontext, _logger),
+    IChessPlayerService
+{
+    protected override void UpdateValues(ChessPlayer oldEntity, ChessPlayer newEntity)
+    {
+        oldEntity.FirstName = newEntity.FirstName;
+        oldEntity.LastName = newEntity.LastName;
+        oldEntity.BirthDate = newEntity.BirthDate;
+        oldEntity.PhotoUrl = newEntity.PhotoUrl;
+        oldEntity.City = newEntity.City;
+        oldEntity.Group = newEntity.Group;
+        oldEntity.RatingELO = newEntity.RatingELO;
+        oldEntity.FideId = newEntity.FideId;
+        oldEntity.Title = newEntity.Title;
+    }
+}

@@ -9,7 +9,7 @@ export default function Header() {
         <div className={styles.logoContainer}>
           <Logo />
           <Link to="/" className={styles.logoLink}>
-            <span className={styles.logoText}>Campus League</span>
+            <span className={styles.logoText}>Polytech League</span>
           </Link>
         </div>
 

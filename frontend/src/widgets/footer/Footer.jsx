@@ -46,7 +46,7 @@ const Footer = () => {
             <div className={styles.footerColumn}>
               <div className={styles.footerLogo}>
                 <Logo />
-                <span className={styles.logoText}>Campus League</span>
+                <span className={styles.logoText}>Polytech League</span>
               </div>
               <p className={styles.footerDescription}>
                 Спортивна платформа для студентів та викладачів Чернівецького політехнічного фахового коледжу. 
@@ -101,7 +101,7 @@ const Footer = () => {
               <div className={styles.contactInfo}>
                 <div className={styles.contactItem}>
                   <i className="fas fa-envelope"></i>
-                  <span>support@campusleague.com</span>
+                  <span>support@PolytechLeague.com</span>
                 </div>
                 <div className={styles.contactItem}>
                   <i className="fas fa-phone"></i>

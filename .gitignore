@@ -412,5 +412,5 @@ src/WebServer.API/appsettings.json
 *.yml
 docker/.env
 /src/.vscode
-/backend/src/CampusLeague.API/.idea
+/backend/src/PolytechLeague.API/.idea
 /design
