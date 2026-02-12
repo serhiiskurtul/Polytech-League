@@ -1,4 +1,4 @@
-import { api } from './api';
+import api from "./axiosInstance";
 
 export const login = async (email, password) => {
   const response = await api.post('/login', {

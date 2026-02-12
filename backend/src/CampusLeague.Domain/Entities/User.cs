@@ -15,6 +15,6 @@ public class User
 
 public enum UserRole
 {
-    User,
-    Admin
+    User = 0,
+    Admin = 1
 }

@@ -36,12 +36,13 @@ public static class AuthenticationExtensions
 
             options.Events = new JwtBearerEvents
             {
-                OnMessageReceived = context =>
-                {
+                OnMessageReceived = context => {
+                    // Якщо токен вже є в заголовку Authorization, нічого не робимо
+                    if (!string.IsNullOrEmpty(context.Token)) return Task.CompletedTask;
+
+                    // Якщо в заголовку немає, шукаємо в куках
                     var cookieToken = context.Request.Cookies["access_token"];
-                    Console.WriteLine($"[JWT] Cookie access_token: {(cookieToken != null ? "FOUND" : "MISSING")}");
-                    if (!string.IsNullOrEmpty(cookieToken))
-                    {
+                    if (!string.IsNullOrEmpty(cookieToken)) {
                         context.Token = cookieToken;
                     }
                     return Task.CompletedTask;

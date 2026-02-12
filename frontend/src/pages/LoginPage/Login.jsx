@@ -5,7 +5,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { login as loginApi } from "../../api/auth.api.js";
-import { api } from "../../api/api.js";
+import api from "../../api/axiosInstance.js";
 
 import InputSign from "../../shared/InputSign/InputSign.jsx";
 import ButtonSign from '../../shared/ButtonSign/ButtonSign.jsx';
@@ -39,17 +39,12 @@ export default function Login() {
 
   const onSubmit = async (data) => {
     try {
-      // Логін — сервер ставить кукі
-      await loginApi(data.email, data.password);
+      await loginApi(data.email, data.password);  // просто робимо POST /login
 
-      // Запитуємо дані користувача
+      // НЕ потрібно зберігати токен — він прийшов у cookie
+
       const meResponse = await api.get("/users/me");
-      const userData = meResponse.data;
-
-      // Зберігаємо в контексті
-      login(userData);
-
-      // Перенаправляємо на головну
+      login(meResponse.data);
       navigate("/");
     } catch (error) {
       console.error("Login error:", error);

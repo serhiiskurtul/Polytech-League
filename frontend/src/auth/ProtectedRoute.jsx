@@ -1,29 +1,20 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 
 export default function ProtectedRoute({ children, requireAuth = true }) {
   const { user, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
-    return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        fontSize: '18px'
-      }}>
-        Завантаження...
-      </div>
-    );
+    return <div style={{ /* твій стиль завантаження */ }}>Завантаження...</div>;
   }
 
-  if (!requireAuth) {
-    return children;
+  if (requireAuth && !user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
+  if (!requireAuth && user && location.pathname === '/login') {
+    return <Navigate to="/" replace />;
   }
 
   return children;

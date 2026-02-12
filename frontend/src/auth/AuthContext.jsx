@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { api } from "../api/api";
 
 const AuthContext = createContext(null);
 
@@ -30,6 +29,8 @@ export function AuthProvider({ children }) {
     try {
       await api.post("/logout");
     } catch {}
+    
+    localStorage.removeItem('token');
     setUser(null);
   };
 

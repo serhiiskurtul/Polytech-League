@@ -26,26 +26,28 @@ public class JwtService: IJwtService
 
     public string GenerateAccessToken(User user)
     {
-        var claims = new List<Claim>
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.UTF8.GetBytes(_options.SecretKey);
+
+        var tokenDescriptor = new SecurityTokenDescriptor
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),   
-            new Claim(ClaimTypes.Role, user.Role.ToString()),
-            new Claim("email", user.Email ?? ""),
-            new Claim("name", $"{user.FirstName} {user.LastName}".Trim())
+            Subject = new ClaimsIdentity(new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", user.Role.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
+                new Claim("name", $"{user.FirstName} {user.LastName}".Trim())
+            }),
+            Expires = DateTime.UtcNow.AddHours(_options.ExpiresHours),
+            Issuer = _options.Issuer,
+            Audience = _options.Audience,
+            SigningCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(key), 
+                SecurityAlgorithms.HmacSha256Signature)
         };
 
-        var signingCredentials = new SigningCredentials(
-            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SecretKey)),
-            SecurityAlgorithms.HmacSha256);
-
-        var token = new JwtSecurityToken(
-            issuer: _options.Issuer,
-            audience: _options.Audience,
-            claims: claims,
-            expires: DateTime.UtcNow.AddHours(_options.ExpiresHours),
-            signingCredentials: signingCredentials);
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return tokenHandler.WriteToken(token);
     }
     
     public RefreshToken GenerateRefreshToken(long userId, int expireDays = 7)

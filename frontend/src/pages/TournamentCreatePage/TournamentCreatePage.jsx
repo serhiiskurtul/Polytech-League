@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../api/axiosInstance.js';
 import { useNavigate } from 'react-router-dom';
 import styles from './TournamentCreatePage.module.css';
 
@@ -144,23 +144,21 @@ const TournamentCreatePage = () => {
       system: formData.system,
       participantsCount: Number(formData.participantsCount) || formData.maxTeams,
       refereeIds: formData.refereeIds || [],
+      level: "CollegeGroup",
     };
     
     try {
-      const res = await axios.post('http://localhost:5000/chess-events', payload, {
-        headers: { 'Content-Type': 'application/json' }
-      });
-      
-      if (res.status === 201 || res.status === 200) {
-        alert('Шахове змагання успішно створено!');
-        navigate('/tournaments');
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Помилка створення змагання: ' + (err.response?.data?.message || err.message));
-    } finally {
-      setIsSubmitting(false);
+    // Не потрібно вручну додавати заголовки (headers) бо у нас є перехоплювач запитів в axiosInstance, який автоматично додає токен авторизації
+    const res = await api.post('/chess-events', payload); 
+    
+    if (res.status === 201 || res.status === 200) {
+      alert('Шахове змагання успішно створено!');
+      navigate('/tournaments');
     }
+  } catch (err) {
+    console.error(err);
+    alert('Помилка: ' + (err.response?.data?.message || err.message));
+  }
   };
 
   // Заповнення тестовими даними
@@ -514,6 +512,22 @@ const TournamentCreatePage = () => {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Рівень змагання */}
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Рівень змагання *</label>
+                <select
+                  name="level"
+                  value={formData.level || "CollegeGroup"}
+                  onChange={handleInputChange}
+                  className={styles.formSelect}
+                  required
+                >
+                  <option value="CollegeGroup">Міжгрупові (коледж)</option>
+                  <option value="Regional">Регіональні</option>
+                  <option value="National">Всеукраїнські</option>
+                </select>
               </div>
 
               {/* Деталі турніру */}
