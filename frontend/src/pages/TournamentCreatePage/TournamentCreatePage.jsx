@@ -148,17 +148,20 @@ const TournamentCreatePage = () => {
     };
     
     try {
-    // Не потрібно вручну додавати заголовки (headers) бо у нас є перехоплювач запитів в axiosInstance, який автоматично додає токен авторизації
-    const res = await api.post('/chess-events', payload); 
-    
-    if (res.status === 201 || res.status === 200) {
-      alert('Шахове змагання успішно створено!');
-      navigate('/tournaments');
+      const res = await api.post('/chess-events', payload);
+
+      if (res.status >= 200 && res.status < 300) {  
+        alert('Шахове змагання успішно створено!');
+        navigate('/tournaments-page');
+      } else {
+        throw new Error(`Unexpected status: ${res.status}`);
+      }
+      } catch (err) {
+        console.error('Помилка створення турніру:', err);
+        alert('Помилка: ' + (err.response?.data?.message || err.message || 'Щось пішло не так'));
+      } finally {
+        setIsSubmitting(false);
     }
-  } catch (err) {
-    console.error(err);
-    alert('Помилка: ' + (err.response?.data?.message || err.message));
-  }
   };
 
   // Заповнення тестовими даними
