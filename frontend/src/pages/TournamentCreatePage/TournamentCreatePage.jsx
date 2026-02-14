@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../../api/axiosInstance.js';
 import { useNavigate } from 'react-router-dom';
 import styles from './TournamentCreatePage.module.css';
+import toast from 'react-hot-toast';
 
 const TournamentCreatePage = () => {
   const navigate = useNavigate();
@@ -144,14 +145,19 @@ const TournamentCreatePage = () => {
       system: formData.system,
       participantsCount: Number(formData.participantsCount) || formData.maxTeams,
       refereeIds: formData.refereeIds || [],
-      level: "CollegeGroup",
+      level: formData.level || 'CollegeGroup',
     };
     
     try {
       const res = await api.post('/chess-events', payload);
 
       if (res.status >= 200 && res.status < 300) {  
-        alert('Шахове змагання успішно створено!');
+        toast.success('Шахове змагання успішно створено!', {
+          duration: 4000,
+          style: {
+            border: '1px solid #10b981',
+          },
+        });
         navigate('/tournaments-page');
       } else {
         throw new Error(`Unexpected status: ${res.status}`);

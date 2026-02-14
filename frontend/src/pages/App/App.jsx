@@ -14,6 +14,7 @@ import ProfilePage from '../ProfilePage/ProfilePage.jsx';
 import NotificationsPage from '../NotificationsPage/NotificationsPage.jsx';
 import TournamentCreatePage from '../TournamentCreatePage/TournamentCreatePage.jsx';
 import ProtectedRoute from '../../auth/ProtectedRoute.jsx';
+import { Toaster } from 'react-hot-toast';
 
 export default function App() {
   const location = useLocation();
@@ -23,6 +24,26 @@ export default function App() {
 
   return (
     <>
+      <Toaster 
+          position="top-center"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              borderRadius: '10px',
+              background: '#333',
+              color: '#fff',
+              padding: '16px 24px',
+              fontSize: '16px',
+            },
+            success: {
+              iconTheme: {
+                primary: '#10b981',
+                secondary: '#fff',
+              },
+            },
+          }}
+        />
+
       {!hideLayout && <Header />}
 
       <Routes>    
