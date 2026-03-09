@@ -1,0 +1,11 @@
+/* Бейдж тривалості */
+.durationBadge {
+  display: inline-block;
+  padding: 6px 12px;
+  background: var(--success);
+  color: white;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 8px;
+}

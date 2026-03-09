@@ -1,0 +1,147 @@
+.previewCard {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border);
+}
+
+.previewTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 24px 0;
+}
+
+.previewTitle i {
+  color: var(--primary);
+}
+
+/* Вміст попереднього перегляду */
+.previewContent {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.previewHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.previewSport {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.previewSport i {
+  font-size: 24px;
+}
+
+.previewName {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.previewDates {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dateItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 10px;
+  background: var(--primary-light);
+}
+
+.dateItem i {
+  font-size: 20px;
+  color: var(--primary);
+}
+
+.dateLabel {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.dateValue {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.previewDetails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.detailItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.previewDescription {
+  padding: 16px;
+  border-radius: 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+.previewDescription p {
+  margin: 0;
+  color: var(--text);
+}
+
+.previewCategories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.categoryTag {
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: var(--success);
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.emptyPreview {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+}
+
+.emptyPreview i {
+  font-size: 48px;
+  margin-bottom: 16px;
+  color: var(--border);
+}
+
+.emptyPreview p {
+  margin: 0;
+}

@@ -1,0 +1,31 @@
+/* Категорії */
+.categoriesGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.categoryBtn {
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.categoryBtn:hover {
+  border-color: var(--primary);
+}
+
+.categoryBtn.selected {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
