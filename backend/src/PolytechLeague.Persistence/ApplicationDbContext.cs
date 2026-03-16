@@ -23,10 +23,11 @@ public class ApplicationDbContext : DbContext
     public DbSet<ChessGame> ChessGames { get; set; }
     public DbSet<ChessPlayer> ChessPlayers { get; set; }
     public DbSet<ChessReferee> ChessReferees { get; set; }
-    public DbSet<CheckersEvent> CheckersEvents { get; set; }
     public DbSet<CheckersGame> CheckersGames { get; set; }
+    public DbSet<CheckersPlayer> CheckersPlayers { get; set; }
     public DbSet<CheckersEventParticipant> CheckersEventParticipants { get; set; }
     public DbSet<CheckersReferee> CheckersReferees { get; set; }
+    public DbSet<CheckersEvent> CheckersEvents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -56,6 +57,7 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new ChessGameConfiguration());
 
         // Checkers configurations
+        modelBuilder.ApplyConfiguration(new CheckersPlayerConfiguration());
         modelBuilder.ApplyConfiguration(new CheckersRefereeConfiguration());
         modelBuilder.ApplyConfiguration(new CheckersEventConfiguration());
         modelBuilder.ApplyConfiguration(new CheckersEventParticipantConfiguration());

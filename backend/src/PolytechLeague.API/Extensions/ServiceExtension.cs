@@ -25,6 +25,7 @@ public static class ServiceExtension
         services.AddScoped<IChessPlayerService, ChessPlayerService>();
         services.AddScoped<IChessGameService, ChessGameService>();
         services.AddScoped<ICheckersEventService, CheckersEventService>();
+        services.AddScoped<ICheckersPlayerService, CheckersPlayerService>();
         services.AddScoped<ICheckersGameService, CheckersGameService>();
         services.AddScoped<IEmailVerificationService, EmailVerificationService>();
         services.AddScoped<IEmailSender, EmailSender>();

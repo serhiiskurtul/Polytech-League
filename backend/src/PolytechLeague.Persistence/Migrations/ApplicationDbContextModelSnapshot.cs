@@ -524,6 +524,25 @@ namespace PolytechLeague.Persistence.Migrations
                     b.ToTable("players", (string)null);
                 });
 
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersPlayer", b =>
+                {
+                    b.HasBaseType("PolytechLeague.Domain.Entities.Player");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer")
+                        .HasColumnName("rating");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("title");
+
+                    b.HasIndex("Rating")
+                        .HasDatabaseName("IX_checkers_players_rating");
+
+                    b.ToTable("checkers_players", (string)null);
+                });
+
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Chess.ChessPlayer", b =>
                 {
                     b.HasBaseType("PolytechLeague.Domain.Entities.Player");
@@ -702,6 +721,15 @@ namespace PolytechLeague.Persistence.Migrations
                     b.HasOne("PolytechLeague.Domain.Entities.Person", null)
                         .WithOne()
                         .HasForeignKey("PolytechLeague.Domain.Entities.Player", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersPlayer", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", null)
+                        .WithOne()
+                        .HasForeignKey("PolytechLeague.Domain.Entities.Checkers.CheckersPlayer", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
