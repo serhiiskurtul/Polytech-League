@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Footer.module.css';
-import Logo from '../../shared/Logo/Logo';
+import Logo from '../../shared/ui/Logo/Logo';
 
 const Footer = () => {
 
@@ -49,17 +49,17 @@ const Footer = () => {
                 <span className={styles.logoText}>Polytech League</span>
               </div>
               <p className={styles.footerDescription}>
-                Спортивна платформа для студентів та викладачів Чернівецького політехнічного фахового коледжу. 
+                Спортивна платформа для студентів та викладачів Чернівецького політехнічного фахового коледжу.
                 Організація турнірів, ведення статистики та спілкування спортивної спільноти.
               </p>
-              
+
               <div className={styles.newsletter}>
                 <h4 className={styles.newsletterTitle}>Слідкуйте за оновленнями</h4>
                 <form className={styles.newsletterForm} onSubmit={handleNewsletterSubmit}>
-                  <input 
-                    type="email" 
+                  <input
+                    type="email"
                     name="email"
-                    placeholder="Ваш email" 
+                    placeholder="Ваш email"
                     className={styles.newsletterInput}
                     required
                   />
@@ -112,20 +112,20 @@ const Footer = () => {
                   <span>Чернівці, вул. Каспрука, 2</span>
                 </div>
               </div>
-              
+
               <button className={styles.contactButton} onClick={handleContactClick}>
                 <i className="fas fa-comment-dots"></i>
                 Написати нам
               </button>
-              
+
               <div className={styles.socialLinks}>
                 <h5 className={styles.socialTitle}>Ми в соцмережах:</h5>
                 <div className={styles.socialIcons}>
                   {socialLinks.map((social, index) => (
-                    <a 
+                    <a
                       key={index}
-                      href={social.url} 
-                      target="_blank" 
+                      href={social.url}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className={styles.socialIcon}
                       title={social.name}

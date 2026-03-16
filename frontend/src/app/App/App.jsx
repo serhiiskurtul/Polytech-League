@@ -1,19 +1,19 @@
 import './App.css'
 import Header from '../../widgets/header/Header.jsx';
 import Footer from '../../widgets/footer/Footer.jsx';
-import Login from '../LoginPage/Login.jsx';
+import Login from '../../pages/LoginPage/Login.jsx';
 import { Routes, Route, useLocation } from 'react-router-dom'
-import Signup from '../SignupPage/Signup.jsx';
-import CalendarPage from '../CalendarPage/CalendarPage.jsx';
-import Tournaments from '../TournamentsPage/TournamentsPage.jsx';
-import HomePage from '../HomePage/HomePage.jsx';
-import EmailVerification from '../EmailVerificationPage/EmailVerificationPage.jsx';
+import Signup from '../../pages/SignupPage/Signup.jsx';
+import CalendarPage from '../../pages/CalendarPage/CalendarPage.jsx';
+import Tournaments from '../../pages/TournamentsPage/TournamentsPage.jsx';
+import HomePage from '../../pages/HomePage/HomePage.jsx';
+import EmailVerification from '../../pages/EmailVerificationPage/EmailVerificationPage.jsx';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import PlayersRatingPage from '../PlayersRatingPage/PlayersRatingPage.jsx';
-import ProfilePage from '../ProfilePage/ProfilePage.jsx';
-import NotificationsPage from '../NotificationsPage/NotificationsPage.jsx';
-import TournamentCreatePage from '../TournamentCreatePage/TournamentCreatePage.jsx';
-import ProtectedRoute from '../../auth/ProtectedRoute.jsx';
+import PlayersRatingPage from '../../pages/PlayersRatingPage/PlayersRatingPage.jsx';
+import ProfilePage from '../../pages/ProfilePage/ProfilePage.jsx';
+import NotificationsPage from '../../pages/NotificationsPage/NotificationsPage.jsx';
+import TournamentCreatePage from '../../pages/TournamentCreatePage/TournamentCreatePage.jsx';
+import ProtectedRoute from '../providers/ProtectedRoute.jsx';
 import { Toaster } from 'react-hot-toast';
 
 export default function App() {

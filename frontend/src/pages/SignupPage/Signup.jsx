@@ -4,9 +4,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import InputSign from '../../shared/InputSign/InputSign.jsx';
-import ButtonSign from '../../shared/ButtonSign/ButtonSign.jsx';
-import Logo from '../../shared/Logo/Logo.jsx';
+import InputSign from '../../shared/ui/InputSign/InputSign.jsx';
+import ButtonSign from '../../shared/ui/ButtonSign/ButtonSign.jsx';
+import Logo from '../../shared/ui/Logo/Logo.jsx';
 
 const API_URL = 'http://localhost:5000';
 

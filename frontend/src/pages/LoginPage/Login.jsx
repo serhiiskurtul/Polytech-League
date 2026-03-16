@@ -3,13 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { useAuth } from '../../auth/AuthContext.jsx';
-import { login as loginApi } from "../../api/auth.api.js";
-import api from "../../api/axiosInstance.js";
+import { useAuth } from '../../app/providers/AuthContext.jsx';
+import { login as loginApi } from "../../shared/api/auth.api.js";
+import api from "../../shared/api/axiosInstance.js";
 
-import InputSign from "../../shared/InputSign/InputSign.jsx";
-import ButtonSign from '../../shared/ButtonSign/ButtonSign.jsx';
-import Logo from '../../shared/Logo/Logo.jsx';
+import InputSign from "../../shared/ui/InputSign/InputSign.jsx";
+import ButtonSign from '../../shared/ui/ButtonSign/ButtonSign.jsx';
+import Logo from '../../shared/ui/Logo/Logo.jsx';
 
 // Yup schema
 const loginSchema = yup.object({
@@ -39,9 +39,9 @@ export default function Login() {
 
   const onSubmit = async (data) => {
     try {
-      await loginApi(data.email, data.password); 
+      await loginApi(data.email, data.password);
 
-      const meResponse = await api.get("/users/me");  
+      const meResponse = await api.get("/users/me");
       login(meResponse.data);
       navigate("/");
     } catch (error) {

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import styles from './Header.module.css';
-import Logo from "../../shared/Logo/Logo.jsx";
+import Logo from "../../shared/ui/Logo/Logo.jsx";
 
 export default function Header() {
   return (
@@ -47,8 +47,8 @@ export default function Header() {
             <i className="fas fa-bell"></i>
             <span className={styles.notificationBadge}></span>
           </button>
-  
-          
+
+
           <div className={styles.userProfile}>
             <div className={styles.userAvatar}>АІ</div>
             <span className={styles.userName}>Артем І.</span>

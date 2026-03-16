@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import api from '../../../api/axiosInstance.js';
+import api from '../../../shared/api/axiosInstance.js';
 
 export const useTournamentForm = () => {
   const navigate = useNavigate();
@@ -60,7 +60,7 @@ export const useTournamentForm = () => {
 
   const validateForm = () => {
     const errors = [];
-    
+
     if (!formData.name.trim()) errors.push('Назва турніру обов\'язкова');
     if (!formData.description.trim()) errors.push('Опис турніру обов\'язковий');
     if (!formData.startDate) errors.push('Дата початку обов\'язкова');
@@ -75,13 +75,13 @@ export const useTournamentForm = () => {
       if (!formData.timeControl.trim()) errors.push('Контроль часу обов\'язковий для шахів');
       if (formData.participantsCount < 2) errors.push('Кількість учасників повинна бути щонайменше 2');
     }
-    
+
     return errors;
   };
 
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
-    
+
     const errors = validateForm();
     if (errors.length > 0) {
       alert(`Помилки валідації:\n${errors.join('\n')}`);
@@ -92,9 +92,9 @@ export const useTournamentForm = () => {
       alert('Наразі створення змагань доступне тільки для шахів. Підтримка інших видів спорту буде додана пізніше.');
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     const payload = {
       name: formData.name.trim(),
       date: formData.startDate ? new Date(formData.startDate).toISOString() : null,
@@ -106,11 +106,11 @@ export const useTournamentForm = () => {
       refereeIds: formData.refereeIds || [],
       level: formData.level || 'CollegeGroup',
     };
-    
+
     try {
       const res = await api.post('/chess-events', payload);
 
-      if (res.status >= 200 && res.status < 300) {  
+      if (res.status >= 200 && res.status < 300) {
         toast.success('Шахове змагання успішно створено!', {
           duration: 4000,
           style: {
@@ -136,7 +136,7 @@ export const useTournamentForm = () => {
     nextWeek.setDate(nextWeek.getDate() + 7);
     const twoWeeks = new Date();
     twoWeeks.setDate(twoWeeks.getDate() + 14);
-    
+
     setFormData({
       name: 'Чемпіонат коледжу з шахів 2024',
       sport: 'chess',
@@ -162,7 +162,7 @@ export const useTournamentForm = () => {
       refereeIds: [],
       level: 'CollegeGroup'
     });
-    
+
     setSelectedCategories(['Чоловіки', 'Змішані']);
   };
 

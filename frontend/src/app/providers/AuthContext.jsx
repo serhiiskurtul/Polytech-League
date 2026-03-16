@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import api from "../../shared/api/axiosInstance.js";
 
 const AuthContext = createContext(null);
 
@@ -28,8 +29,8 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     try {
       await api.post("/logout");
-    } catch {}
-    
+    } catch { }
+
     localStorage.removeItem('token');
     setUser(null);
   };
