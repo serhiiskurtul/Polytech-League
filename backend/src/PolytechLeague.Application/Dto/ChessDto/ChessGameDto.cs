@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using PolytechLeague.Domain.Entities.Chess;
+using PolytechLeague.Domain.Entities.Shared;
 
 namespace PolytechLeague.Application.Dto.ChessDto;
 
@@ -12,7 +13,7 @@ public class ChessGameDto
     public long BlackPlayerId { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public ChessGameResult Result { get; set; }
+    public GameResult Result { get; set; }
 
     public int Round { get; set; }
     public int Board { get; set; }

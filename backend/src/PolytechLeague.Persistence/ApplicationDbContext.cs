@@ -4,6 +4,9 @@ using EntityFramework.Exceptions.PostgreSQL;
 using PolytechLeague.Domain.Entities.Chess;
 using PolytechLeague.Infrastructure.Persistence.DbConfiguration;
 using PolytechLeague.Infrastructure.Persistence.DbConfiguration.ChessConfigurations;
+using PolytechLeague.Domain.Entities.Shared;
+using PolytechLeague.Domain.Entities.Checkers;
+using PolytechLeague.Infrastructure.Persistence.DbConfiguration.CheckersConfigurations;
 
 namespace PolytechLeague.Persistence.Database;
 
@@ -20,13 +23,19 @@ public class ApplicationDbContext : DbContext
     public DbSet<ChessGame> ChessGames { get; set; }
     public DbSet<ChessPlayer> ChessPlayers { get; set; }
     public DbSet<ChessReferee> ChessReferees { get; set; }
+    public DbSet<CheckersEvent> CheckersEvents { get; set; }
+    public DbSet<CheckersGame> CheckersGames { get; set; }
+    public DbSet<CheckersEventParticipant> CheckersEventParticipants { get; set; }
+    public DbSet<CheckersReferee> CheckersReferees { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresEnum<UserRole>();
-        modelBuilder.HasPostgresEnum<ChessGameResult>();
+        modelBuilder.HasPostgresEnum<GameResult>();
         modelBuilder.HasPostgresEnum<CompetitionLevel>();
         modelBuilder.HasPostgresEnum<ChessSystem>();
+        modelBuilder.HasPostgresEnum<CheckersSystem>();
+        modelBuilder.HasPostgresEnum<CheckersVariant>();
 
         modelBuilder.Entity<Person>().UseTptMappingStrategy();
         modelBuilder.Entity<Event>().UseTptMappingStrategy();
@@ -45,6 +54,12 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new ChessEventConfiguration());
         modelBuilder.ApplyConfiguration(new ChessEventParticipantConfiguration());
         modelBuilder.ApplyConfiguration(new ChessGameConfiguration());
+
+        // Checkers configurations
+        modelBuilder.ApplyConfiguration(new CheckersRefereeConfiguration());
+        modelBuilder.ApplyConfiguration(new CheckersEventConfiguration());
+        modelBuilder.ApplyConfiguration(new CheckersEventParticipantConfiguration());
+        modelBuilder.ApplyConfiguration(new CheckersGameConfiguration());
 
         base.OnModelCreating(modelBuilder);
     }

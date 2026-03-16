@@ -8,6 +8,6 @@ public class ChessEventParticipant
     public long PlayerId { get; set; }
     public ChessPlayer? Player { get; set; }
 
-    public double Points { get; set; }
+    public double Points { get; set; } = 0;
     public int Rank { get; set; } //місце
 }

@@ -20,11 +20,114 @@ namespace PolytechLeague.Persistence.Migrations
                 .HasAnnotation("ProductVersion", "9.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "chess_game_result", new[] { "white_win", "black_win", "draw" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "checkers_system", new[] { "swiss", "round_robin", "knockout" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "checkers_variant", new[] { "russian", "international", "english" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "chess_system", new[] { "swiss", "round_robin", "knockout" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "competition_level", new[] { "college_group", "regional", "national" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "game_result", new[] { "white_win", "black_win", "draw" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "user_role", new[] { "user", "admin" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersEventParticipant", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("CheckersEventId")
+                        .HasColumnType("bigint");
+
+                    b.Property<double>("PointsEarned")
+                        .HasColumnType("double precision")
+                        .HasColumnName("points_earned");
+
+                    b.Property<int>("StartingRating")
+                        .HasColumnType("integer")
+                        .HasColumnName("starting_rating");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CheckersEventId")
+                        .HasDatabaseName("IX_checkers_event_participants_event_id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_checkers_event_participants_user_id");
+
+                    b.HasIndex("CheckersEventId", "PointsEarned")
+                        .HasDatabaseName("IX_checkers_event_participants_event_points");
+
+                    b.HasIndex("CheckersEventId", "UserId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_checkers_event_participants_event_user");
+
+                    b.ToTable("checkers_event_participants", (string)null);
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersGame", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("BlackPlayerId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("black_player_id");
+
+                    b.Property<long>("CheckersEventId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("checkers_event_id");
+
+                    b.Property<DateTime?>("FinishedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("finished_at");
+
+                    b.Property<int>("Result")
+                        .HasColumnType("integer")
+                        .HasColumnName("result");
+
+                    b.Property<int>("RoundNumber")
+                        .HasColumnType("integer")
+                        .HasColumnName("round_number");
+
+                    b.Property<DateTime>("ScheduledAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("scheduled_at");
+
+                    b.Property<long>("WhitePlayerId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("white_player_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BlackPlayerId");
+
+                    b.HasIndex("CheckersEventId")
+                        .HasDatabaseName("IX_checkers_games_event_id");
+
+                    b.HasIndex("Result")
+                        .HasDatabaseName("IX_checkers_games_result");
+
+                    b.HasIndex("WhitePlayerId");
+
+                    b.HasIndex("CheckersEventId", "BlackPlayerId")
+                        .HasDatabaseName("IX_checkers_games_event_black");
+
+                    b.HasIndex("CheckersEventId", "RoundNumber")
+                        .HasDatabaseName("IX_checkers_games_event_round");
+
+                    b.HasIndex("CheckersEventId", "WhitePlayerId")
+                        .HasDatabaseName("IX_checkers_games_event_white");
+
+                    b.ToTable("checkers_games", (string)null);
+                });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Chess.ChessEventParticipant", b =>
                 {
@@ -325,6 +428,42 @@ namespace PolytechLeague.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersEvent", b =>
+                {
+                    b.HasBaseType("PolytechLeague.Domain.Entities.Event");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ParticipantsCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("participants_count");
+
+                    b.Property<int>("System")
+                        .HasColumnType("integer")
+                        .HasColumnName("system");
+
+                    b.Property<string>("TimeControl")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("time_control");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Variant")
+                        .HasColumnType("integer")
+                        .HasColumnName("variant");
+
+                    b.HasIndex("System")
+                        .HasDatabaseName("IX_checkers_events_system");
+
+                    b.HasIndex("Variant")
+                        .HasDatabaseName("IX_checkers_events_variant");
+
+                    b.ToTable("checkers_events", (string)null);
+                });
+
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Chess.ChessEvent", b =>
                 {
                     b.HasBaseType("PolytechLeague.Domain.Entities.Event");
@@ -352,6 +491,13 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasDatabaseName("IX_chess_events_system");
 
                     b.ToTable("chess_events", (string)null);
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersReferee", b =>
+                {
+                    b.HasBaseType("PolytechLeague.Domain.Entities.Person");
+
+                    b.ToTable("checkers_referees", (string)null);
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Chess.ChessReferee", b =>
@@ -404,6 +550,52 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasDatabaseName("IX_chess_players_rating_elo");
 
                     b.ToTable("chess_players", (string)null);
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersEventParticipant", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Checkers.CheckersEvent", "Event")
+                        .WithMany("Players")
+                        .HasForeignKey("CheckersEventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersGame", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Checkers.CheckersEventParticipant", "BlackPlayer")
+                        .WithMany()
+                        .HasForeignKey("BlackPlayerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Checkers.CheckersEvent", "Event")
+                        .WithMany("Games")
+                        .HasForeignKey("CheckersEventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Checkers.CheckersEventParticipant", "WhitePlayer")
+                        .WithMany()
+                        .HasForeignKey("WhitePlayerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("BlackPlayer");
+
+                    b.Navigation("Event");
+
+                    b.Navigation("WhitePlayer");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Chess.ChessEventParticipant", b =>
@@ -469,11 +661,29 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Navigation("Event");
                 });
 
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersEvent", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Event", null)
+                        .WithOne()
+                        .HasForeignKey("PolytechLeague.Domain.Entities.Checkers.CheckersEvent", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Chess.ChessEvent", b =>
                 {
                     b.HasOne("PolytechLeague.Domain.Entities.Event", null)
                         .WithOne()
                         .HasForeignKey("PolytechLeague.Domain.Entities.Chess.ChessEvent", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersReferee", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Person", null)
+                        .WithOne()
+                        .HasForeignKey("PolytechLeague.Domain.Entities.Checkers.CheckersReferee", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -508,6 +718,13 @@ namespace PolytechLeague.Persistence.Migrations
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Event", b =>
                 {
                     b.Navigation("Photos");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersEvent", b =>
+                {
+                    b.Navigation("Games");
+
+                    b.Navigation("Players");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Chess.ChessEvent", b =>
