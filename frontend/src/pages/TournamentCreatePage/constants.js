@@ -29,3 +29,15 @@ export const CHESS_SYSTEMS = [
   { id: 'RoundRobin', name: 'Кругова система', description: 'Всі грають з усіма' },
   { id: 'Knockout', name: 'Олімпійська система', description: 'Програєш - вилітаєш' },
 ];
+
+export const CHECKERS_SYSTEMS = [
+  { id: 'Swiss', name: 'Швейцарська система', description: 'Для шахів та шашок' },
+  { id: 'RoundRobin', name: 'Кругова система', description: 'Всі грають з усіма' },
+  { id: 'Knockout', name: 'Олімпійська система', description: 'Програєш - вилітаєш' },
+];
+
+export const CHECKERS_VARIANTS = [
+  { id: 'Russian', name: 'Російські (64 клітинки)' },
+  { id: 'International', name: 'Міжнародні (100 клітинок)' },
+  { id: 'English', name: 'Англійські (64 клітинки)' }
+];

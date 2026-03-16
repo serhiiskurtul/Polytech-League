@@ -1,6 +1,7 @@
 import React from 'react';
 import shared from '../../TournamentCreatePage.module.css';
 import styles from './SettingsSection.module.css';
+import { CHECKERS_VARIANTS } from '../../constants';
 
 const SettingsSection = ({ formData, handleInputChange }) => {
   return (
@@ -20,6 +21,28 @@ const SettingsSection = ({ formData, handleInputChange }) => {
           <option value="National">Всеукраїнські</option>
         </select>
       </div>
+
+      {/* Варіант шашок (тільки якщо вибрано шашки) */}
+      {formData.sport === 'checkers' && (
+        <div className={shared.formGroup}>
+          <label className={shared.formLabel}>
+            <i className="fas fa-th-large"></i> Варіант шашок *
+          </label>
+          <select
+            name="variant"
+            value={formData.variant || "International"}
+            onChange={handleInputChange}
+            className={shared.formSelect}
+            required
+          >
+            {CHECKERS_VARIANTS.map(variant => (
+              <option key={variant.id} value={variant.id}>
+                {variant.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* Деталі турніру */}
       <div className={shared.formBlock}>

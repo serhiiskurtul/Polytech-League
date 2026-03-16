@@ -23,10 +23,11 @@ export const useTournamentForm = () => {
     isPublic: true,
     requireApproval: false,
     categories: [],
-    // Шахові специфічні поля
+    // Шахові / шашкові специфічні поля
     date: '',
     timeControl: '10+5',
     system: 'Swiss',
+    variant: 'International', // Для шашок
     participantsCount: 32,
     refereeIds: [],
     level: 'CollegeGroup'
@@ -71,8 +72,8 @@ export const useTournamentForm = () => {
     }
     if (selectedCategories.length === 0) errors.push('Оберіть хоча б одну категорію');
 
-    if (formData.sport === 'chess') {
-      if (!formData.timeControl.trim()) errors.push('Контроль часу обов\'язковий для шахів');
+    if (['chess', 'checkers'].includes(formData.sport)) {
+      if (!formData.timeControl.trim()) errors.push(`Контроль часу обов'язковий для ${formData.sport === 'chess' ? 'шахів' : 'шашок'}`);
       if (formData.participantsCount < 2) errors.push('Кількість учасників повинна бути щонайменше 2');
     }
 
@@ -88,8 +89,8 @@ export const useTournamentForm = () => {
       return;
     }
 
-    if (formData.sport !== 'chess') {
-      alert('Наразі створення змагань доступне тільки для шахів. Підтримка інших видів спорту буде додана пізніше.');
+    if (!['chess', 'checkers'].includes(formData.sport)) {
+      alert('Наразі створення змагань доступне тільки для шахів та шашок. Підтримка інших видів спорту буде додана пізніше.');
       return;
     }
 
@@ -107,11 +108,17 @@ export const useTournamentForm = () => {
       level: formData.level || 'CollegeGroup',
     };
 
+    if (formData.sport === 'checkers') {
+        payload.variant = formData.variant;
+    }
+
+    const endpoint = formData.sport === 'checkers' ? '/checkers-events' : '/chess-events';
+
     try {
-      const res = await api.post('/chess-events', payload);
+      const res = await api.post(endpoint, payload);
 
       if (res.status >= 200 && res.status < 300) {
-        toast.success('Шахове змагання успішно створено!', {
+        toast.success('Змагання успішно створено!', {
           duration: 4000,
           style: {
             border: '1px solid #10b981',
@@ -154,10 +161,11 @@ export const useTournamentForm = () => {
       isPublic: true,
       requireApproval: true,
       categories: ['Чоловіки', 'Змішані'],
-      // Шахові поля
+      // Шахові / шашкові поля
       date: nextWeek.toISOString().split('T')[0],
       timeControl: '15+10',
       system: 'Swiss',
+      variant: 'International',
       participantsCount: 32,
       refereeIds: [],
       level: 'CollegeGroup'

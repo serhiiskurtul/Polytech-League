@@ -1,7 +1,7 @@
 import React from 'react';
 import shared from '../../TournamentCreatePage.module.css';
 import styles from './BasicInfoSection.module.css';
-import { AVAILABLE_SPORTS, TOURNAMENT_TYPES, CHESS_SYSTEMS } from '../../constants';
+import { AVAILABLE_SPORTS, TOURNAMENT_TYPES, CHESS_SYSTEMS, CHECKERS_SYSTEMS } from '../../constants';
 
 const BasicInfoSection = ({ formData, handleInputChange }) => {
   return (
@@ -57,23 +57,28 @@ const BasicInfoSection = ({ formData, handleInputChange }) => {
           </div>
         </div>
 
-        {/* Формат турніру */}
         <div className={shared.formGroup}>
           <label className={shared.formLabel}>
             <i className="fas fa-chess-board"></i> Формат змагання *
           </label>
           <select
-            name={formData.sport === 'chess' ? 'system' : 'type'}
-            value={formData.sport === 'chess' ? formData.system : formData.type}
+            name={['chess', 'checkers'].includes(formData.sport) ? 'system' : 'type'}
+            value={['chess', 'checkers'].includes(formData.sport) ? formData.system : formData.type}
             onChange={handleInputChange}
             className={shared.formSelect}
             required
           >
-            {(formData.sport === 'chess' ? CHESS_SYSTEMS : TOURNAMENT_TYPES).map(type => (
-              <option key={type.id} value={type.id}>
-                {type.name} - {type.description}
-              </option>
-            ))}
+            {formData.sport === 'chess' 
+              ? CHESS_SYSTEMS.map(type => (
+                  <option key={type.id} value={type.id}>{type.name} - {type.description}</option>
+                ))
+              : formData.sport === 'checkers'
+                ? CHECKERS_SYSTEMS.map(type => (
+                    <option key={type.id} value={type.id}>{type.name} - {type.description}</option>
+                  ))
+                : TOURNAMENT_TYPES.map(type => (
+                    <option key={type.id} value={type.id}>{type.name} - {type.description}</option>
+                  ))}
           </select>
         </div>
 
@@ -100,8 +105,8 @@ const BasicInfoSection = ({ formData, handleInputChange }) => {
               <span className={styles.rangeLabel}>Макс:</span>
               <input
                 type="number"
-                name={formData.sport === 'chess' ? 'participantsCount' : 'maxTeams'}
-                value={formData.sport === 'chess' ? formData.participantsCount : formData.maxTeams}
+                name={['chess', 'checkers'].includes(formData.sport) ? 'participantsCount' : 'maxTeams'}
+                value={['chess', 'checkers'].includes(formData.sport) ? formData.participantsCount : formData.maxTeams}
                 onChange={handleInputChange}
                 className={shared.numberInput}
                 min={formData.minTeams}
@@ -114,8 +119,8 @@ const BasicInfoSection = ({ formData, handleInputChange }) => {
           </div>
         </div>
 
-        {/* Шахові специфічні поля */}
-        {formData.sport === 'chess' && (
+        {/* Шахові / шашкові специфічні поля */}
+        {['chess', 'checkers'].includes(formData.sport) && (
           <>
             <div className={shared.formGroup}>
               <label className={shared.formLabel}>
