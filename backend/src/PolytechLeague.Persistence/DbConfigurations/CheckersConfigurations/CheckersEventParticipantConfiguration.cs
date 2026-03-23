@@ -2,10 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PolytechLeague.Domain.Entities.Checkers;
 
-namespace PolytechLeague.Infrastructure.Persistence.DbConfiguration.CheckersConfigurations;
+namespace PolytechLeague.Persistence.DbConfigurations.CheckersConfigurations;
 
 public class CheckersEventParticipantConfiguration : IEntityTypeConfiguration<CheckersEventParticipant>
-{
+{   
     public void Configure(EntityTypeBuilder<CheckersEventParticipant> builder)
     {
         builder.ToTable("checkers_event_participants");

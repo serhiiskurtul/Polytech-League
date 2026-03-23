@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PolytechLeague.Domain.Entities;
 
-namespace PolytechLeague.Infrastructure.Persistence.DbConfiguration;
+namespace PolytechLeague.Persistence.DbConfigurations;
 
 public class PersonConfiguration : IEntityTypeConfiguration<Person>
 {

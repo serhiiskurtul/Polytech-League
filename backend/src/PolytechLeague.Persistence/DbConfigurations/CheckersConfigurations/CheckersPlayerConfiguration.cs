@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PolytechLeague.Domain.Entities.Checkers;
 
-namespace PolytechLeague.Infrastructure.Persistence.DbConfiguration.CheckersConfigurations;
+namespace PolytechLeague.Persistence.DbConfigurations.CheckersConfigurations;
 
 public class CheckersPlayerConfiguration : IEntityTypeConfiguration<CheckersPlayer>
 {

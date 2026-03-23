@@ -6,7 +6,7 @@ using PolytechLeague.Infrastructure.Redis;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace PolytechLeague.API.Controllers;
+namespace PolytechLeague.API.Controllers.TableTennis;
 
 [ApiController]
 [Route("table-tennis-events")]

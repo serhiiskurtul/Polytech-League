@@ -6,12 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using PolytechLeague.Application.Extensions;
 
-
+namespace PolytechLeague.API.Controllers.Account;
 
 [ApiController]
 [Route("users")]
-public class UsersController(
-    IUserService userService) : Controller
+public class UsersController(IUserService userService) : Controller
 {
     [Authorize(Policy = "Admin")]
     [HttpGet]
@@ -23,11 +22,9 @@ public class UsersController(
     {
         var users = await userService.GetPageAsync(filterParams, sortParams, pageParams, cancellationToken);
 
-        var response = new PageResult<UserResponse>
-        (
+        var response = new PageResult<UserResponse>(
             data: users.Data.Select(d => d.ToResponse()).ToList(),
-            totalCount: users.TotalCount
-        );
+            totalCount: users.TotalCount);
 
         return Ok(response);
     }
@@ -48,8 +45,7 @@ public class UsersController(
         [FromRoute] long id, CancellationToken cancellationToken)
     {
         var users = await userService.GetByIdAsync(id, cancellationToken);
-        var usersResponse = users.ToResponse();
-        return Ok(usersResponse);
+        return Ok(users.ToResponse());
     }
 
     [Authorize(Policy = "AdminOrUser")]
@@ -57,13 +53,9 @@ public class UsersController(
     public async Task<IActionResult> Me(CancellationToken cancellationToken)
     {
         var userId = User.GetUserId();
-
         var user = await userService.GetByIdAsync(userId, cancellationToken);
-
         return Ok(user.ToResponse());
     }
-
-
 
     [EnableRateLimiting("fixed")]
     [AllowAnonymous]
@@ -73,7 +65,6 @@ public class UsersController(
     {
         var user = userRequest.FromRequest();
         await userService.CreateAsync(user, cancellationToken);
-    
         return Created();
     }
 

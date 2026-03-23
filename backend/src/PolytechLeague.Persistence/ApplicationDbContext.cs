@@ -2,14 +2,17 @@ using PolytechLeague.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using EntityFramework.Exceptions.PostgreSQL;
 using PolytechLeague.Domain.Entities.Chess;
-using PolytechLeague.Infrastructure.Persistence.DbConfiguration;
-using PolytechLeague.Infrastructure.Persistence.DbConfiguration.ChessConfigurations;
+using PolytechLeague.Persistence.DbConfigurations;
+using PolytechLeague.Persistence.DbConfigurations.ChessConfigurations;
 using PolytechLeague.Domain.Entities.Shared;
 using PolytechLeague.Domain.Entities.Checkers;
-using PolytechLeague.Infrastructure.Persistence.DbConfiguration.CheckersConfigurations;
+using PolytechLeague.Persistence.DbConfigurations.CheckersConfigurations;
 using PolytechLeague.Domain.Entities.TableTennis;
 using PolytechLeague.Domain.Entities.TableTennis.Enums;
-using PolytechLeague.Infrastructure.Persistence.DbConfiguration.TableTennisConfigurations;
+using PolytechLeague.Domain.Entities.Armwrestling;
+using PolytechLeague.Domain.Entities.Armwrestling.Enums;
+using PolytechLeague.Persistence.DbConfigurations.TableTennisConfigurations;
+using PolytechLeague.Persistence.DbConfigurations.ArmwrestlingConfigurations;
 
 namespace PolytechLeague.Persistence.Database;
 
@@ -37,17 +40,25 @@ public class ApplicationDbContext : DbContext
     public DbSet<TableTennisMatch> TableTennisMatches { get; set; }
     public DbSet<TableTennisSet> TableTennisSets { get; set; }
 
+    // Armwrestling
+    public DbSet<ArmwrestlingPlayer> ArmwrestlingPlayers { get; set; }
+    public DbSet<ArmwrestlingEvent> ArmwrestlingEvents { get; set; }
+    public DbSet<ArmwrestlingMatch> ArmwrestlingMatches { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasPostgresEnum<UserRole>();
-        modelBuilder.HasPostgresEnum<GameResult>();
-        modelBuilder.HasPostgresEnum<CompetitionLevel>();
-        modelBuilder.HasPostgresEnum<ChessSystem>();
-        modelBuilder.HasPostgresEnum<CheckersSystem>();
-        modelBuilder.HasPostgresEnum<CheckersVariant>();
-        modelBuilder.HasPostgresEnum<TableTennisHand>();
-        modelBuilder.HasPostgresEnum<TableTennisTournamentType>();
-        modelBuilder.HasPostgresEnum<TableTennisCategory>();
+        modelBuilder.HasPostgresEnum<UserRole>()
+            .HasPostgresEnum<GameResult>()
+            .HasPostgresEnum<CompetitionLevel>()
+            .HasPostgresEnum<ChessSystem>()
+            .HasPostgresEnum<CheckersSystem>()
+            .HasPostgresEnum<CheckersVariant>()
+            .HasPostgresEnum<TableTennisHand>()
+            .HasPostgresEnum<TableTennisTournamentType>()
+            .HasPostgresEnum<TableTennisCategory>()
+            .HasPostgresEnum<ArmwrestlingHand>()
+            .HasPostgresEnum<ArmwrestlingCategory>()
+            .HasPostgresEnum<ArmwrestlingWeightClass>();
 
         modelBuilder.Entity<Person>().UseTptMappingStrategy();
         modelBuilder.Entity<Event>().UseTptMappingStrategy();
@@ -60,7 +71,6 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new EventPhotosConfiguration());
 
         // Chess configurations
-        modelBuilder.ApplyConfiguration(new PlayerConfiguration());
         modelBuilder.ApplyConfiguration(new ChessPlayerConfiguration());
         modelBuilder.ApplyConfiguration(new ChessRefereeConfiguration());
         modelBuilder.ApplyConfiguration(new ChessEventConfiguration());
@@ -80,6 +90,11 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new TableTennisEventParticipantConfiguration());
         modelBuilder.ApplyConfiguration(new TableTennisMatchConfiguration());
         modelBuilder.ApplyConfiguration(new TableTennisSetConfiguration());
+
+        // Armwrestling configurations
+        modelBuilder.ApplyConfiguration(new ArmwrestlingPlayerConfiguration());
+        modelBuilder.ApplyConfiguration(new ArmwrestlingEventConfiguration());
+        modelBuilder.ApplyConfiguration(new ArmwrestlingMatchConfiguration());
 
         base.OnModelCreating(modelBuilder);
     }

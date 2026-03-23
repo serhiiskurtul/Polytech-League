@@ -1,0 +1,74 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using PolytechLeague.Application.Dto.ArmwrestlingDto;
+using PolytechLeague.Application.Services.Interfaces.Armwrestling;
+using PolytechLeague.Infrastructure.Redis;
+
+namespace PolytechLeague.API.Controllers.Armwrestling;
+
+[ApiController]
+[Route("armwrestling-events")]
+public class ArmwrestlingEventsController(
+    IArmwrestlingEventService armEventService,
+    IRedisService redisService) : ControllerBase
+{
+    [HttpGet]
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    {
+        var cached = await redisService.GetDataAsync<IEnumerable<ArmwrestlingEventResponse>>("arm_events_all");
+        if (cached != null) return Ok(cached);
+
+        var entities = await armEventService.GetAllAsync(cancellationToken: cancellationToken);
+        var response = entities.Select(e => e.ToResponse()).ToList();
+
+        await redisService.SetDataAsync("arm_events_all", response, TimeSpan.FromMinutes(60), "arm_events_group");
+        return Ok(response);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(long id, CancellationToken cancellationToken)
+    {
+        var entity = await armEventService.GetByIdAsync(id, cancellationToken);
+        return Ok(entity.ToResponse());
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost]
+    public async Task<IActionResult> Create(
+        [FromBody] ArmwrestlingEventRequest request,
+        CancellationToken cancellationToken)
+    {
+        var entity = request.FromRequest();
+        await armEventService.CreateAsync(entity, cancellationToken);
+
+        await redisService.RemoveGroupAsync("arm_events_group");
+
+        return Created();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(
+        long id,
+        [FromBody] ArmwrestlingEventRequest request,
+        CancellationToken cancellationToken)
+    {
+        var entity = request.FromRequest();
+        await armEventService.UpdateAsync(id, entity, cancellationToken);
+
+        await redisService.RemoveGroupAsync("arm_events_group");
+
+        return NoContent();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(long id, CancellationToken cancellationToken)
+    {
+        await armEventService.DeleteAsync(id, cancellationToken);
+
+        await redisService.RemoveGroupAsync("arm_events_group");
+
+        return NoContent();
+    }
+}

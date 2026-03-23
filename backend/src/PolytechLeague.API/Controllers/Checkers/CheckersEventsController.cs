@@ -5,6 +5,8 @@ using PolytechLeague.Infrastructure.Redis;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+namespace PolytechLeague.API.Controllers.Checkers;
+
 [ApiController]
 [Route("checkers-events")]
 public class CheckersEventsController(ICheckersEventService checkersEventService, IRedisService redisService) : Controller

@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PolytechLeague.Domain.Entities.TableTennis;
 
-namespace PolytechLeague.Infrastructure.Persistence.DbConfiguration.TableTennisConfigurations;
+namespace PolytechLeague.Persistence.DbConfigurations.TableTennisConfigurations;
 
 public class TableTennisMatchConfiguration : IEntityTypeConfiguration<TableTennisMatch>
 {

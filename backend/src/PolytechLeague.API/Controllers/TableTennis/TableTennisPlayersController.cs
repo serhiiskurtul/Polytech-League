@@ -5,11 +5,11 @@ using PolytechLeague.Domain.Entities.TableTennis;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace PolytechLeague.API.Controllers;
+namespace PolytechLeague.API.Controllers.TableTennis;
 
 [ApiController]
-[Route("table-tennis-matches")]
-public class TableTennisMatchesController(ITableTennisMatchService ttMatchService) : Controller
+[Route("table-tennis-players")]
+public class TableTennisPlayersController(ITableTennisPlayerService ttPlayerService) : Controller
 {
     [AllowAnonymous]
     [HttpGet]
@@ -19,10 +19,10 @@ public class TableTennisMatchesController(ITableTennisMatchService ttMatchServic
         [FromQuery] PageParams? pageParams,
         CancellationToken cancellationToken)
     {
-        var result = await ttMatchService.GetPageAsync(filterParams, sortParams, pageParams, cancellationToken);
+        var result = await ttPlayerService.GetPageAsync(filterParams, sortParams, pageParams, cancellationToken);
 
-        var response = new PageResult<TableTennisMatchResponse>(
-            result.Data.Select(m => m.ToResponse()).ToList(),
+        var response = new PageResult<TableTennisPlayerResponse>(
+            result.Data.Select(p => p.ToResponse()).ToList(),
             result.TotalCount);
 
         return Ok(response);
@@ -32,18 +32,18 @@ public class TableTennisMatchesController(ITableTennisMatchService ttMatchServic
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById([FromRoute] long id, CancellationToken cancellationToken)
     {
-        var entity = await ttMatchService.GetByIdAsync(id, cancellationToken);
+        var entity = await ttPlayerService.GetByIdAsync(id, cancellationToken);
         return Ok(entity.ToResponse());
     }
 
     [Authorize(Policy = "Admin")]
     [HttpPost]
     public async Task<IActionResult> Create(
-        [FromBody] TableTennisMatchRequest request,
+        [FromBody] TableTennisPlayerRequest request,
         CancellationToken cancellationToken)
     {
         var entity = request.FromRequest();
-        await ttMatchService.CreateAsync(entity, cancellationToken);
+        await ttPlayerService.CreateAsync(entity, cancellationToken);
         return Created();
     }
 
@@ -51,11 +51,11 @@ public class TableTennisMatchesController(ITableTennisMatchService ttMatchServic
     [HttpPut("{id:long}")]
     public async Task<IActionResult> Update(
         [FromRoute] long id,
-        [FromBody] TableTennisMatchRequest request,
+        [FromBody] TableTennisPlayerRequest request,
         CancellationToken cancellationToken)
     {
         var entity = request.FromRequest();
-        await ttMatchService.UpdateAsync(id, entity, cancellationToken);
+        await ttPlayerService.UpdateAsync(id, entity, cancellationToken);
         return NoContent();
     }
 
@@ -63,7 +63,7 @@ public class TableTennisMatchesController(ITableTennisMatchService ttMatchServic
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> Delete([FromRoute] long id, CancellationToken cancellationToken)
     {
-        await ttMatchService.DeleteAsync(id, cancellationToken);
+        await ttPlayerService.DeleteAsync(id, cancellationToken);
         return NoContent();
     }
 }

@@ -5,6 +5,8 @@ using PolytechLeague.Infrastructure.Redis;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+namespace PolytechLeague.API.Controllers.Chess;
+
 [ApiController]
 [Route("chess-events")]
 public class ChessEventsController(IChessEventService chessEventService, IRedisService redisService) : Controller

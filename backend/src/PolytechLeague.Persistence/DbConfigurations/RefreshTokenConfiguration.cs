@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PolytechLeague.Domain.Entities;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace PolytechLeague.Infrastructure.Persistence.DbConfiguration;
+namespace PolytechLeague.Persistence.DbConfigurations;
 
 public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
 {

@@ -4,6 +4,8 @@ using PolytechLeague.Infrastructure.Redis;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+namespace PolytechLeague.API.Controllers.Common;
+
 [ApiController]
 [Route("email")]
 public class EmailController(
@@ -13,12 +15,10 @@ public class EmailController(
 {
     [AllowAnonymous]
     [HttpPost("verify")]
-    public async Task<IActionResult> Verify(
-        [FromBody] EmailVerificationRequest request)
+    public async Task<IActionResult> Verify([FromBody] EmailVerificationRequest request)
     {
         var success = await emailVerificationService.VerifyAndConfirmEmailAsync(
-            request.Code, request.Email
-        );
+            request.Code, request.Email);
 
         if (!success)
             return BadRequest("Invalid verification code");
@@ -32,11 +32,11 @@ public class EmailController(
         [FromBody] SendEmailRequest request, CancellationToken cancellationToken)
     {
         var code = emailVerificationService.GenerateVerificationCode();
-        
+
         await emailSender.SendEmailAsync(
-            request.Email, 
-            "Підтвердження пошти", 
-            $"Ваш код для підтвердження: {code}", 
+            request.Email,
+            "Підтвердження пошти",
+            $"Ваш код для підтвердження: {code}",
             cancellationToken);
 
         await redisService.SetDataAsync<string>(

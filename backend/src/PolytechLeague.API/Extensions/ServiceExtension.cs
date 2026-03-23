@@ -8,6 +8,8 @@ using PolytechLeague.Application.Services.Implementations.Checkers;
 using PolytechLeague.Application.Services.Interfaces.Checkers;
 using PolytechLeague.Application.Services.Implementations.TableTennis;
 using PolytechLeague.Application.Services.Interfaces.TableTennis;
+using PolytechLeague.Application.Services.Implementations.Armwrestling;
+using PolytechLeague.Application.Services.Interfaces.Armwrestling;
 using PolytechLeague.Infrastructure.Email;
 using PolytechLeague.Infrastructure.Redis;
 using StackExchange.Redis;
@@ -33,6 +35,9 @@ public static class ServiceExtension
         services.AddScoped<ITableTennisPlayerService, TableTennisPlayerService>();
         services.AddScoped<ITableTennisMatchService, TableTennisMatchService>();
         services.AddScoped<ITableTennisSetService, TableTennisSetService>();
+        services.AddScoped<IArmwrestlingPlayerService, ArmwrestlingPlayerService>();
+        services.AddScoped<IArmwrestlingEventService, ArmwrestlingEventService>();
+        services.AddScoped<IArmwrestlingMatchService, ArmwrestlingMatchService>();
         services.AddScoped<IEmailVerificationService, EmailVerificationService>();
         services.AddScoped<IEmailSender, EmailSender>();
         services.AddSingleton<IRedisService, RedisService>();

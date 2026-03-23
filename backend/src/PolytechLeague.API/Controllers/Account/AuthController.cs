@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
+namespace PolytechLeague.API.Controllers.Account;
+
 [ApiController]
 public class AuthController(IAuthService authService) : Controller
 {
@@ -17,8 +19,8 @@ public class AuthController(IAuthService authService) : Controller
         Response.Cookies.Append("access_token", tokens.AccessToken, new CookieOptions
         {
             HttpOnly = true,
-            Secure = false,              // OK для localhost
-            SameSite = SameSiteMode.Lax, // Lax дозволяє передачу в GET після POST
+            Secure = false,
+            SameSite = SameSiteMode.Lax,
             Expires = DateTimeOffset.UtcNow.AddHours(1),
             Path = "/"
         });
@@ -55,5 +57,4 @@ public class AuthController(IAuthService authService) : Controller
 
         return NoContent();
     }
-
 }

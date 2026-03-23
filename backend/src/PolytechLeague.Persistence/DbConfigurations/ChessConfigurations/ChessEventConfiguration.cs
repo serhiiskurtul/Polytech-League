@@ -2,7 +2,7 @@ using PolytechLeague.Domain.Entities.Chess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace PolytechLeague.Infrastructure.Persistence.DbConfiguration.ChessConfigurations;
+namespace PolytechLeague.Persistence.DbConfigurations.ChessConfigurations;
 
 public class ChessEventConfiguration : IEntityTypeConfiguration<ChessEvent>
 {
