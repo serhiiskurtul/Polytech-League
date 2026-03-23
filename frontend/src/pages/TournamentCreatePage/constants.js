@@ -41,3 +41,15 @@ export const CHECKERS_VARIANTS = [
   { id: 'International', name: 'Міжнародні (100 клітинок)' },
   { id: 'English', name: 'Англійські (64 клітинки)' }
 ];
+
+export const TABLE_TENNIS_TOURNAMENT_TYPES = [
+  { id: 'SingleElimination', name: 'Олімпійська система', description: 'Програєш - вилітаєш' },
+  { id: 'DoubleElimination', name: 'Подвійна олімпійська система (є другий шанс)', description: 'Друга спроба при поразці' },
+  { id: 'RoundRobin', name: 'Кругова система', description: 'Всі грають з усіма' }
+];
+
+export const TABLE_TENNIS_CATEGORIES = [
+  { id: 'Men', name: 'Чоловіки' },
+  { id: 'Women', name: 'Жінки' },
+  { id: 'Mixed', name: 'Змішані' }
+];

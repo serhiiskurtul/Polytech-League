@@ -30,7 +30,10 @@ export const useTournamentForm = () => {
     variant: 'International', // Для шашок
     participantsCount: 32,
     refereeIds: [],
-    level: 'CollegeGroup'
+    level: 'CollegeGroup',
+    // Настільний теніс специфічні поля
+    tournamentType: 'SingleElimination',
+    category: 'Men'
   });
 
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -72,9 +75,11 @@ export const useTournamentForm = () => {
     }
     if (selectedCategories.length === 0) errors.push('Оберіть хоча б одну категорію');
 
-    if (['chess', 'checkers'].includes(formData.sport)) {
-      if (!formData.timeControl.trim()) errors.push(`Контроль часу обов'язковий для ${formData.sport === 'chess' ? 'шахів' : 'шашок'}`);
-      if (formData.participantsCount < 2) errors.push('Кількість учасників повинна бути щонайменше 2');
+    if (['chess', 'checkers', 'table_tennis'].includes(formData.sport)) {
+      if (formData.sport !== 'table_tennis' && !formData.timeControl.trim()) {
+          errors.push(`Контроль часу обов'язковий для ${formData.sport === 'chess' ? 'шахів' : 'шашок'}`);
+      }
+      if (formData.participantsCount < 2 && formData.sport !== 'table_tennis') errors.push('Кількість учасників повинна бути щонайменше 2');
     }
 
     return errors;
@@ -89,8 +94,8 @@ export const useTournamentForm = () => {
       return;
     }
 
-    if (!['chess', 'checkers'].includes(formData.sport)) {
-      alert('Наразі створення змагань доступне тільки для шахів та шашок. Підтримка інших видів спорту буде додана пізніше.');
+    if (!['chess', 'checkers', 'table_tennis'].includes(formData.sport)) {
+      alert('Наразі створення змагань доступне тільки для шахів, шашок та настільного тенісу. Підтримка інших видів спорту буде додана пізніше.');
       return;
     }
 
@@ -112,7 +117,20 @@ export const useTournamentForm = () => {
         payload.variant = formData.variant;
     }
 
-    const endpoint = formData.sport === 'checkers' ? '/checkers-events' : '/chess-events';
+    if (formData.sport === 'table_tennis') {
+        payload.tournamentType = formData.tournamentType;
+        payload.category = formData.category;
+        delete payload.timeControl;
+        delete payload.system;
+        delete payload.participantsCount;
+    }
+
+    const endpointMap = {
+        'chess': '/chess-events',
+        'checkers': '/checkers-events',
+        'table_tennis': '/table-tennis-events'
+    };
+    const endpoint = endpointMap[formData.sport];
 
     try {
       const res = await api.post(endpoint, payload);
@@ -168,7 +186,9 @@ export const useTournamentForm = () => {
       variant: 'International',
       participantsCount: 32,
       refereeIds: [],
-      level: 'CollegeGroup'
+      level: 'CollegeGroup',
+      tournamentType: 'SingleElimination',
+      category: 'Men'
     });
 
     setSelectedCategories(['Чоловіки', 'Змішані']);

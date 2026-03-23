@@ -1,13 +1,17 @@
 import React from 'react';
 import shared from '../../TournamentCreatePage.module.css';
 import styles from './PreviewSection.module.css';
-import { AVAILABLE_SPORTS, TOURNAMENT_TYPES, CHESS_SYSTEMS } from '../../constants';
+import { AVAILABLE_SPORTS, TOURNAMENT_TYPES, CHESS_SYSTEMS, CHECKERS_SYSTEMS, TABLE_TENNIS_TOURNAMENT_TYPES } from '../../constants';
 
 const PreviewSection = ({ formData, selectedCategories }) => {
   const getFormatName = () => {
-    if (formData.sport === 'chess') {
-      const system = CHESS_SYSTEMS.find(t => t.id === formData.system);
+    if (['chess', 'checkers'].includes(formData.sport)) {
+      const systems = formData.sport === 'chess' ? CHESS_SYSTEMS : CHECKERS_SYSTEMS;
+      const system = systems.find(t => t.id === formData.system);
       return system ? system.name : formData.system;
+    } else if (formData.sport === 'table_tennis') {
+      const type = TABLE_TENNIS_TOURNAMENT_TYPES.find(t => t.id === formData.tournamentType);
+      return type ? type.name : formData.tournamentType;
     } else {
       const type = TOURNAMENT_TYPES.find(t => t.id === formData.type);
       return type ? type.name : formData.type;
@@ -60,7 +64,7 @@ const PreviewSection = ({ formData, selectedCategories }) => {
             <div className={styles.previewDetails}>
               <div className={styles.detailItem}>
                 <i className="fas fa-users"></i>
-                <span>{formData.minTeams}-{formData.sport === 'chess' ? formData.participantsCount : formData.maxTeams} команд/учасників</span>
+                <span>{formData.minTeams}-{['chess', 'checkers'].includes(formData.sport) ? formData.participantsCount : formData.maxTeams} команд/учасників</span>
               </div>
               <div className={styles.detailItem}>
                 <i className="fas fa-chess-board"></i>

@@ -12,6 +12,8 @@ public class CheckersEventParticipantConfiguration : IEntityTypeConfiguration<Ch
 
         builder.HasKey(x => x.Id);
 
+        builder.HasQueryFilter(p => !p.User.IsDeleted);
+
         builder.HasIndex(x => x.CheckersEventId).HasDatabaseName("IX_checkers_event_participants_event_id");
         builder.HasIndex(x => x.UserId).HasDatabaseName("IX_checkers_event_participants_user_id");
         builder.HasIndex(x => new { x.CheckersEventId, x.UserId }).HasDatabaseName("IX_checkers_event_participants_event_user").IsUnique();

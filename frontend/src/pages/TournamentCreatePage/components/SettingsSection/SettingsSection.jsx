@@ -1,7 +1,7 @@
 import React from 'react';
 import shared from '../../TournamentCreatePage.module.css';
 import styles from './SettingsSection.module.css';
-import { CHECKERS_VARIANTS } from '../../constants';
+import { CHECKERS_VARIANTS, TABLE_TENNIS_TOURNAMENT_TYPES, TABLE_TENNIS_CATEGORIES } from '../../constants';
 
 const SettingsSection = ({ formData, handleInputChange }) => {
   return (
@@ -42,6 +42,30 @@ const SettingsSection = ({ formData, handleInputChange }) => {
             ))}
           </select>
         </div>
+      )}
+
+      {/* Налаштування настільного тенісу */}
+      {formData.sport === 'table_tennis' && (
+        <>
+          <div className={shared.formGroup}>
+            <label className={shared.formLabel}>
+              <i className="fas fa-users"></i> Категорія *
+            </label>
+            <select
+              name="category"
+              value={formData.category || "Men"}
+              onChange={handleInputChange}
+              className={shared.formSelect}
+              required
+            >
+              {TABLE_TENNIS_CATEGORIES.map(cat => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </>
       )}
 
       {/* Деталі турніру */}

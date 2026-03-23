@@ -1,7 +1,7 @@
 import React from 'react';
 import shared from '../../TournamentCreatePage.module.css';
 import styles from './BasicInfoSection.module.css';
-import { AVAILABLE_SPORTS, TOURNAMENT_TYPES, CHESS_SYSTEMS, CHECKERS_SYSTEMS } from '../../constants';
+import { AVAILABLE_SPORTS, TOURNAMENT_TYPES, CHESS_SYSTEMS, CHECKERS_SYSTEMS, TABLE_TENNIS_TOURNAMENT_TYPES } from '../../constants';
 
 const BasicInfoSection = ({ formData, handleInputChange }) => {
   return (
@@ -62,8 +62,8 @@ const BasicInfoSection = ({ formData, handleInputChange }) => {
             <i className="fas fa-chess-board"></i> Формат змагання *
           </label>
           <select
-            name={['chess', 'checkers'].includes(formData.sport) ? 'system' : 'type'}
-            value={['chess', 'checkers'].includes(formData.sport) ? formData.system : formData.type}
+            name={['chess', 'checkers'].includes(formData.sport) ? 'system' : formData.sport === 'table_tennis' ? 'tournamentType' : 'type'}
+            value={['chess', 'checkers'].includes(formData.sport) ? formData.system : formData.sport === 'table_tennis' ? formData.tournamentType : formData.type}
             onChange={handleInputChange}
             className={shared.formSelect}
             required
@@ -76,9 +76,13 @@ const BasicInfoSection = ({ formData, handleInputChange }) => {
                 ? CHECKERS_SYSTEMS.map(type => (
                     <option key={type.id} value={type.id}>{type.name} - {type.description}</option>
                   ))
-                : TOURNAMENT_TYPES.map(type => (
-                    <option key={type.id} value={type.id}>{type.name} - {type.description}</option>
-                  ))}
+                : formData.sport === 'table_tennis'
+                  ? TABLE_TENNIS_TOURNAMENT_TYPES.map(type => (
+                      <option key={type.id} value={type.id}>{type.name} - {type.description}</option>
+                    ))
+                  : TOURNAMENT_TYPES.map(type => (
+                      <option key={type.id} value={type.id}>{type.name} - {type.description}</option>
+                    ))}
           </select>
         </div>
 
@@ -110,7 +114,7 @@ const BasicInfoSection = ({ formData, handleInputChange }) => {
                 onChange={handleInputChange}
                 className={shared.numberInput}
                 min={formData.minTeams}
-                max="128"
+                max={formData.sport === 'table_tennis' ? "256" : "128"}
               />
             </div>
           </div>
