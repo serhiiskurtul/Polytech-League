@@ -7,6 +7,9 @@ using PolytechLeague.Infrastructure.Persistence.DbConfiguration.ChessConfigurati
 using PolytechLeague.Domain.Entities.Shared;
 using PolytechLeague.Domain.Entities.Checkers;
 using PolytechLeague.Infrastructure.Persistence.DbConfiguration.CheckersConfigurations;
+using PolytechLeague.Domain.Entities.TableTennis;
+using PolytechLeague.Domain.Entities.TableTennis.Enums;
+using PolytechLeague.Infrastructure.Persistence.DbConfiguration.TableTennisConfigurations;
 
 namespace PolytechLeague.Persistence.Database;
 
@@ -28,6 +31,11 @@ public class ApplicationDbContext : DbContext
     public DbSet<CheckersEventParticipant> CheckersEventParticipants { get; set; }
     public DbSet<CheckersReferee> CheckersReferees { get; set; }
     public DbSet<CheckersEvent> CheckersEvents { get; set; }
+    public DbSet<TableTennisPlayer> TableTennisPlayers { get; set; }
+    public DbSet<TableTennisEvent> TableTennisEvents { get; set; }
+    public DbSet<TableTennisEventParticipant> TableTennisEventParticipants { get; set; }
+    public DbSet<TableTennisMatch> TableTennisMatches { get; set; }
+    public DbSet<TableTennisSet> TableTennisSets { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -37,6 +45,9 @@ public class ApplicationDbContext : DbContext
         modelBuilder.HasPostgresEnum<ChessSystem>();
         modelBuilder.HasPostgresEnum<CheckersSystem>();
         modelBuilder.HasPostgresEnum<CheckersVariant>();
+        modelBuilder.HasPostgresEnum<TableTennisHand>();
+        modelBuilder.HasPostgresEnum<TableTennisTournamentType>();
+        modelBuilder.HasPostgresEnum<TableTennisCategory>();
 
         modelBuilder.Entity<Person>().UseTptMappingStrategy();
         modelBuilder.Entity<Event>().UseTptMappingStrategy();
@@ -62,6 +73,13 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new CheckersEventConfiguration());
         modelBuilder.ApplyConfiguration(new CheckersEventParticipantConfiguration());
         modelBuilder.ApplyConfiguration(new CheckersGameConfiguration());
+
+        // Table Tennis configurations
+        modelBuilder.ApplyConfiguration(new TableTennisPlayerConfiguration());
+        modelBuilder.ApplyConfiguration(new TableTennisEventConfiguration());
+        modelBuilder.ApplyConfiguration(new TableTennisEventParticipantConfiguration());
+        modelBuilder.ApplyConfiguration(new TableTennisMatchConfiguration());
+        modelBuilder.ApplyConfiguration(new TableTennisSetConfiguration());
 
         base.OnModelCreating(modelBuilder);
     }
