@@ -57,9 +57,11 @@ const BasicInfoSection = ({ formData, handleInputChange }) => {
           </div>
         </div>
 
+        {/* Формат змагань (не для армреслінгу) */}
+        {formData.sport !== 'armwrestling' && (
         <div className={shared.formGroup}>
           <label className={shared.formLabel}>
-            <i className="fas fa-chess-board"></i> Формат змагання *
+            <i className="fas fa-chess-board"></i> Формат змагань *
           </label>
           <select
             name={['chess', 'checkers'].includes(formData.sport) ? 'system' : formData.sport === 'table_tennis' ? 'tournamentType' : 'type'}
@@ -85,8 +87,10 @@ const BasicInfoSection = ({ formData, handleInputChange }) => {
                     ))}
           </select>
         </div>
+        )}
 
-        {/* Кількість команд/учасників */}
+        {/* Кількість учасників (не для армреслінгу) */}
+        {formData.sport !== 'armwrestling' && (
         <div className={shared.formGroup}>
           <label className={shared.formLabel}>
             <i className="fas fa-users"></i> Кількість команд/учасників
@@ -122,6 +126,7 @@ const BasicInfoSection = ({ formData, handleInputChange }) => {
             Оптимально: 8, 16, 32 для олімпійської системи
           </div>
         </div>
+        )}
 
         {/* Шахові / шашкові специфічні поля */}
         {['chess', 'checkers'].includes(formData.sport) && (

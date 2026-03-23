@@ -33,7 +33,11 @@ export const useTournamentForm = () => {
     level: 'CollegeGroup',
     // Настільний теніс специфічні поля
     tournamentType: 'SingleElimination',
-    category: 'Men'
+    category: 'Men',
+    // Армреслінг специфічні поля
+    armHand: 'Right',
+    armWeightClass: 'Under80kg',
+    armCategory: 'Men'
   });
 
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -94,8 +98,8 @@ export const useTournamentForm = () => {
       return;
     }
 
-    if (!['chess', 'checkers', 'table_tennis'].includes(formData.sport)) {
-      alert('Наразі створення змагань доступне тільки для шахів, шашок та настільного тенісу. Підтримка інших видів спорту буде додана пізніше.');
+    if (!['chess', 'checkers', 'table_tennis', 'armwrestling'].includes(formData.sport)) {
+      alert('Наразі створення змагань доступне тільки для шахів, шашок, настільного тенісу та армреслінгу. Підтримка інших видів спорту буде додана пізніше.');
       return;
     }
 
@@ -125,10 +129,20 @@ export const useTournamentForm = () => {
         delete payload.participantsCount;
     }
 
+    if (formData.sport === 'armwrestling') {
+        payload.hand = formData.armHand;
+        payload.weightClass = formData.armWeightClass;
+        payload.category = formData.armCategory;
+        delete payload.timeControl;
+        delete payload.system;
+        delete payload.participantsCount;
+    }
+
     const endpointMap = {
         'chess': '/chess-events',
         'checkers': '/checkers-events',
-        'table_tennis': '/table-tennis-events'
+        'table_tennis': '/table-tennis-events',
+        'armwrestling': '/armwrestling-events'
     };
     const endpoint = endpointMap[formData.sport];
 
@@ -188,7 +202,10 @@ export const useTournamentForm = () => {
       refereeIds: [],
       level: 'CollegeGroup',
       tournamentType: 'SingleElimination',
-      category: 'Men'
+      category: 'Men',
+      armHand: 'Right',
+      armWeightClass: 'Under80kg',
+      armCategory: 'Men'
     });
 
     setSelectedCategories(['Чоловіки', 'Змішані']);

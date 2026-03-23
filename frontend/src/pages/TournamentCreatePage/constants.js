@@ -53,3 +53,24 @@ export const TABLE_TENNIS_CATEGORIES = [
   { id: 'Women', name: 'Жінки' },
   { id: 'Mixed', name: 'Змішані' }
 ];
+
+export const ARMWRESTLING_WEIGHT_CLASSES = [
+  { id: 'Under60kg', name: 'До 60 кг' },
+  { id: 'Under70kg', name: 'До 70 кг' },
+  { id: 'Under80kg', name: 'До 80 кг' },
+  { id: 'Under90kg', name: 'До 90 кг' },
+  { id: 'Under100kg', name: 'До 100 кг' },
+  { id: 'Plus100kg', name: '100+ кг' }
+];
+
+export const ARMWRESTLING_HANDS = [
+  { id: 'Right', name: 'Права рука' },
+  { id: 'Left', name: 'Ліва рука' },
+  { id: 'Both', name: 'Обидві руки' }
+];
+
+export const ARMWRESTLING_CATEGORIES = [
+  { id: 'Men', name: 'Чоловіки' },
+  { id: 'Women', name: 'Жінки' },
+  { id: 'Open', name: 'Відкрита' }
+];

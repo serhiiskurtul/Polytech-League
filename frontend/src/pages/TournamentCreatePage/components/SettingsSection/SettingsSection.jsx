@@ -1,7 +1,7 @@
 import React from 'react';
 import shared from '../../TournamentCreatePage.module.css';
 import styles from './SettingsSection.module.css';
-import { CHECKERS_VARIANTS, TABLE_TENNIS_TOURNAMENT_TYPES, TABLE_TENNIS_CATEGORIES } from '../../constants';
+import { CHECKERS_VARIANTS, TABLE_TENNIS_TOURNAMENT_TYPES, TABLE_TENNIS_CATEGORIES, ARMWRESTLING_HANDS, ARMWRESTLING_WEIGHT_CLASSES, ARMWRESTLING_CATEGORIES } from '../../constants';
 
 const SettingsSection = ({ formData, handleInputChange }) => {
   return (
@@ -62,6 +62,62 @@ const SettingsSection = ({ formData, handleInputChange }) => {
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
                 </option>
+              ))}
+            </select>
+          </div>
+        </>
+      )}
+
+      {/* Налаштування армреслінгу */}
+      {formData.sport === 'armwrestling' && (
+        <>
+          <div className={shared.formGroup}>
+            <label className={shared.formLabel}>
+              <i className="fas fa-hand-paper"></i> Рука *
+            </label>
+            <select
+              name="armHand"
+              value={formData.armHand || 'Right'}
+              onChange={handleInputChange}
+              className={shared.formSelect}
+              required
+            >
+              {ARMWRESTLING_HANDS.map(h => (
+                <option key={h.id} value={h.id}>{h.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className={shared.formGroup}>
+            <label className={shared.formLabel}>
+              <i className="fas fa-weight-hanging"></i> Вагова категорія *
+            </label>
+            <select
+              name="armWeightClass"
+              value={formData.armWeightClass || 'Under80kg'}
+              onChange={handleInputChange}
+              className={shared.formSelect}
+              required
+            >
+              {ARMWRESTLING_WEIGHT_CLASSES.map(wc => (
+                <option key={wc.id} value={wc.id}>{wc.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className={shared.formGroup}>
+            <label className={shared.formLabel}>
+              <i className="fas fa-users"></i> Категорія учасників *
+            </label>
+            <select
+              name="armCategory"
+              value={formData.armCategory || 'Men'}
+              onChange={handleInputChange}
+              className={shared.formSelect}
+              required
+            >
+              {ARMWRESTLING_CATEGORIES.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
             </select>
           </div>

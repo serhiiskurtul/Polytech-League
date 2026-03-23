@@ -1,7 +1,7 @@
 import React from 'react';
 import shared from '../../TournamentCreatePage.module.css';
 import styles from './PreviewSection.module.css';
-import { AVAILABLE_SPORTS, TOURNAMENT_TYPES, CHESS_SYSTEMS, CHECKERS_SYSTEMS, TABLE_TENNIS_TOURNAMENT_TYPES } from '../../constants';
+import { AVAILABLE_SPORTS, TOURNAMENT_TYPES, CHESS_SYSTEMS, CHECKERS_SYSTEMS, TABLE_TENNIS_TOURNAMENT_TYPES, ARMWRESTLING_HANDS, ARMWRESTLING_WEIGHT_CLASSES, ARMWRESTLING_CATEGORIES } from '../../constants';
 
 const PreviewSection = ({ formData, selectedCategories }) => {
   const getFormatName = () => {
@@ -12,6 +12,10 @@ const PreviewSection = ({ formData, selectedCategories }) => {
     } else if (formData.sport === 'table_tennis') {
       const type = TABLE_TENNIS_TOURNAMENT_TYPES.find(t => t.id === formData.tournamentType);
       return type ? type.name : formData.tournamentType;
+    } else if (formData.sport === 'armwrestling') {
+      const hand = ARMWRESTLING_HANDS.find(h => h.id === formData.armHand);
+      const wc = ARMWRESTLING_WEIGHT_CLASSES.find(w => w.id === formData.armWeightClass);
+      return `${hand?.name || ''} · ${wc?.name || ''}`;
     } else {
       const type = TOURNAMENT_TYPES.find(t => t.id === formData.type);
       return type ? type.name : formData.type;
@@ -64,7 +68,10 @@ const PreviewSection = ({ formData, selectedCategories }) => {
             <div className={styles.previewDetails}>
               <div className={styles.detailItem}>
                 <i className="fas fa-users"></i>
-                <span>{formData.minTeams}-{['chess', 'checkers'].includes(formData.sport) ? formData.participantsCount : formData.maxTeams} команд/учасників</span>
+                {formData.sport === 'armwrestling'
+                  ? <span>{ARMWRESTLING_CATEGORIES.find(c => c.id === formData.armCategory)?.name || formData.armCategory}</span>
+                  : <span>{formData.minTeams}-{['chess', 'checkers'].includes(formData.sport) ? formData.participantsCount : formData.maxTeams} команд/учасників</span>
+                }
               </div>
               <div className={styles.detailItem}>
                 <i className="fas fa-chess-board"></i>
