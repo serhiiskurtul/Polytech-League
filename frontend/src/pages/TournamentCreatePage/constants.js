@@ -59,8 +59,7 @@ export const ARMWRESTLING_WEIGHT_CLASSES = [
   { id: 'Under70kg', name: 'До 70 кг' },
   { id: 'Under80kg', name: 'До 80 кг' },
   { id: 'Under90kg', name: 'До 90 кг' },
-  { id: 'Under100kg', name: 'До 100 кг' },
-  { id: 'Plus100kg', name: '100+ кг' }
+  { id: 'Plus90kg', name: '90+ кг' }
 ];
 
 export const ARMWRESTLING_HANDS = [
