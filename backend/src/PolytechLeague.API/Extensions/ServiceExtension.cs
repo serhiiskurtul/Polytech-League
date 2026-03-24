@@ -12,6 +12,8 @@ using PolytechLeague.Application.Services.Implementations.Armwrestling;
 using PolytechLeague.Application.Services.Interfaces.Armwrestling;
 using PolytechLeague.Application.Services.Implementations.Futsal;
 using PolytechLeague.Application.Services.Interfaces.Futsal;
+using PolytechLeague.Application.Services.Implementations.Basketball3x3;
+using PolytechLeague.Application.Services.Interfaces.Basketball3x3;
 using PolytechLeague.Infrastructure.Email;
 using PolytechLeague.Infrastructure.Redis;
 using StackExchange.Redis;
@@ -47,6 +49,10 @@ public static class ServiceExtension
         services.AddScoped<IEmailVerificationService, EmailVerificationService>();
         services.AddScoped<IEmailSender, EmailSender>();
         services.AddSingleton<IRedisService, RedisService>();
+        services.AddScoped<IBasketball3x3PlayerService, Basketball3x3PlayerService>();
+        services.AddScoped<IBasketball3x3TeamService, Basketball3x3TeamService>();
+        services.AddScoped<IBasketball3x3EventService, Basketball3x3EventService>();
+        services.AddScoped<IBasketball3x3MatchService, Basketball3x3MatchService>();
 
         return services;
     }
