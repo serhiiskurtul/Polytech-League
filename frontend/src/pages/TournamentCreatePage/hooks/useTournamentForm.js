@@ -98,8 +98,8 @@ export const useTournamentForm = () => {
       return;
     }
 
-    if (!['chess', 'checkers', 'table_tennis', 'armwrestling'].includes(formData.sport)) {
-      alert('Наразі створення змагань доступне тільки для шахів, шашок, настільного тенісу та армреслінгу. Підтримка інших видів спорту буде додана пізніше.');
+    if (!['chess', 'checkers', 'table_tennis', 'armwrestling', 'futsal'].includes(formData.sport)) {
+      alert('Наразі створення змагань доступне тільки для шахів, шашок, настільного тенісу, армреслінгу та футзалу. Підтримка інших видів спорту буде додана пізніше.');
       return;
     }
 
@@ -138,11 +138,26 @@ export const useTournamentForm = () => {
         delete payload.participantsCount;
     }
 
+    if (formData.sport === 'futsal') {
+        const typeMapping = {
+            'single_elimination': 'SingleElimination',
+            'double_elimination': 'DoubleElimination',
+            'round_robin': 'RoundRobin',
+            'swiss': 'Swiss',
+            'groups_playoff': 'GroupsPlayoff'
+        };
+        payload.tournamentType = typeMapping[formData.type] || 'SingleElimination';
+        delete payload.timeControl;
+        delete payload.system;
+        delete payload.participantsCount;
+    }
+
     const endpointMap = {
         'chess': '/chess-events',
         'checkers': '/checkers-events',
         'table_tennis': '/table-tennis-events',
-        'armwrestling': '/armwrestling-events'
+        'armwrestling': '/armwrestling-events',
+        'futsal': '/futsal-events'
     };
     const endpoint = endpointMap[formData.sport];
 

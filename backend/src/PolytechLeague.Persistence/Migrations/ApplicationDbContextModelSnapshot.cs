@@ -759,6 +759,9 @@ namespace PolytechLeague.Persistence.Migrations
                 {
                     b.HasBaseType("PolytechLeague.Domain.Entities.Event");
 
+                    b.Property<int>("TournamentType")
+                        .HasColumnType("integer");
+
                     b.ToTable("futsal_events", (string)null);
                 });
 

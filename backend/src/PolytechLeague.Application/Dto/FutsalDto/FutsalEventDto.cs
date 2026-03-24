@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Entities.Futsal;
+using PolytechLeague.Domain.Entities.Futsal.Enums;
 
 namespace PolytechLeague.Application.Dto.FutsalDto;
 
@@ -13,6 +14,9 @@ public class FutsalEventRequest
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required CompetitionLevel Level { get; set; }
+    
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public required FutsalTournamentType TournamentType { get; set; }
     
     public required string Description { get; set; }
 }
@@ -28,6 +32,10 @@ public class FutsalEventResponse
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required CompetitionLevel Level { get; set; }
+    
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public required FutsalTournamentType TournamentType { get; set; }
+
     public required string Description { get; set; }
     
     public ICollection<FutsalMatchResponse>? Matches { get; set; }
@@ -44,6 +52,7 @@ public static class FutsalEventDtoExtensions
             Location = request.Location,
             RefereeIds = request.RefereeIds,
             Level = request.Level,
+            TournamentType = request.TournamentType,
             Description = request.Description
         };
     }
@@ -59,6 +68,7 @@ public static class FutsalEventDtoExtensions
             Photos = entity.Photos?.Select(p => p.ToDto()).ToList(),
             RefereeIds = entity.RefereeIds,
             Level = entity.Level,
+            TournamentType = entity.TournamentType,
             Description = entity.Description,
             Matches = entity.Matches?.Select(m => m.ToResponse()).ToList()
         };
