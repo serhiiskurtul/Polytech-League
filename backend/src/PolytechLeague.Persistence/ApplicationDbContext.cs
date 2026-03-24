@@ -16,6 +16,9 @@ using PolytechLeague.Persistence.DbConfigurations.ArmwrestlingConfigurations;
 using PolytechLeague.Domain.Entities.Futsal;
 using PolytechLeague.Domain.Entities.Futsal.Enums;
 using PolytechLeague.Persistence.DbConfigurations.FutsalConfigurations;
+using PolytechLeague.Domain.Entities.Basketball3x3;
+using PolytechLeague.Domain.Entities.Basketball3x3.Enums;
+using PolytechLeague.Persistence.DbConfigurations.Basketball3x3Configurations;
 
 namespace PolytechLeague.Persistence.Database;
 
@@ -54,6 +57,12 @@ public class ApplicationDbContext : DbContext
     public DbSet<FutsalEvent> FutsalEvents { get; set; }
     public DbSet<FutsalMatch> FutsalMatches { get; set; }
 
+    // Basketball 3x3
+    public DbSet<Basketball3x3Team> Basketball3x3Teams { get; set; }
+    public DbSet<Basketball3x3Player> Basketball3x3Players { get; set; }
+    public DbSet<Basketball3x3Event> Basketball3x3Events { get; set; }
+    public DbSet<Basketball3x3Match> Basketball3x3Matches { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresEnum<UserRole>()
@@ -68,7 +77,8 @@ public class ApplicationDbContext : DbContext
             .HasPostgresEnum<ArmwrestlingHand>()
             .HasPostgresEnum<ArmwrestlingCategory>()
             .HasPostgresEnum<ArmwrestlingWeightClass>()
-            .HasPostgresEnum<FutsalPosition>();
+            .HasPostgresEnum<FutsalPosition>()
+            .HasPostgresEnum<Basketball3x3TournamentType>();
 
         modelBuilder.Entity<Person>().UseTptMappingStrategy();
         modelBuilder.Entity<Event>().UseTptMappingStrategy();
@@ -111,6 +121,12 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new FutsalPlayerConfiguration());
         modelBuilder.ApplyConfiguration(new FutsalEventConfiguration());
         modelBuilder.ApplyConfiguration(new FutsalMatchConfiguration());
+
+        // Basketball 3x3 configurations
+        modelBuilder.ApplyConfiguration(new Basketball3x3TeamConfiguration());
+        modelBuilder.ApplyConfiguration(new Basketball3x3PlayerConfiguration());
+        modelBuilder.ApplyConfiguration(new Basketball3x3EventConfiguration());
+        modelBuilder.ApplyConfiguration(new Basketball3x3MatchConfiguration());
 
         base.OnModelCreating(modelBuilder);
     }
