@@ -3,13 +3,24 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../../../shared/api/axiosInstance.js';
 
+/** Єдине джерело правди: які види спорту відправляються на API (ключ = formData.sport). */
+const TOURNAMENT_CREATE_ENDPOINTS = {
+  chess: '/chess-events',
+  checkers: '/checkers-events',
+  table_tennis: '/table-tennis-events',
+  armwrestling: '/armwrestling-events',
+  futsal: '/futsal-events',
+  basketball3x3: '/basketball3x3-events',
+  volleyball: '/volleyball-events',
+};
+
 export const useTournamentForm = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: '',
     sport: '',
-    type: 'Swiss',
+    type: 'groups_playoff',
     description: '',
     maxTeams: 32,
     minTeams: 2,
@@ -69,6 +80,7 @@ export const useTournamentForm = () => {
   const validateForm = () => {
     const errors = [];
 
+    if (!formData.sport) errors.push('Оберіть вид спорту');
     if (!formData.name.trim()) errors.push('Назва турніру обов\'язкова');
     if (!formData.description.trim()) errors.push('Опис турніру обов\'язковий');
     if (!formData.startDate) errors.push('Дата початку обов\'язкова');
@@ -98,8 +110,11 @@ export const useTournamentForm = () => {
       return;
     }
 
-    if (!['chess', 'checkers', 'table_tennis', 'armwrestling', 'futsal', 'basketball3x3'].includes(formData.sport)) {
-      alert('Наразі створення змагань доступне тільки для шахів, шашок, настільного тенісу, армреслінгу, футзалу та баскетболу 3x3. Підтримка інших видів спорту буде додана пізніше.');
+    const endpoint = TOURNAMENT_CREATE_ENDPOINTS[formData.sport];
+    if (!endpoint) {
+      alert(
+        'Цей вид спорту ще не підключено до API. Доступні: шахи, шашки, настільний теніс, армреслінг, футзал, баскетбол 3×3, волейбол.'
+      );
       return;
     }
 
@@ -166,15 +181,19 @@ export const useTournamentForm = () => {
         delete payload.participantsCount;
     }
 
-    const endpointMap = {
-        'chess': '/chess-events',
-        'checkers': '/checkers-events',
-        'table_tennis': '/table-tennis-events',
-        'armwrestling': '/armwrestling-events',
-        'futsal': '/futsal-events',
-        'basketball3x3': '/basketball3x3-events'
-    };
-    const endpoint = endpointMap[formData.sport];
+    if (formData.sport === 'volleyball') {
+        const typeMapping = {
+            'single_elimination': 'SingleElimination',
+            'double_elimination': 'DoubleElimination',
+            'round_robin': 'RoundRobin',
+            'swiss': 'Swiss',
+            'groups_playoff': 'GroupsPlayoff'
+        };
+        payload.tournamentType = typeMapping[formData.type] || 'SingleElimination';
+        delete payload.timeControl;
+        delete payload.system;
+        delete payload.participantsCount;
+    }
 
     try {
       const res = await api.post(endpoint, payload);
@@ -207,19 +226,19 @@ export const useTournamentForm = () => {
     twoWeeks.setDate(twoWeeks.getDate() + 14);
 
     setFormData({
-      name: 'Autumn Basketball 3x3 Challenge',
-      sport: 'basketball3x3',
+      name: 'Весняний турнір з волейболу Polytech',
+      sport: 'volleyball',
       type: 'groups_playoff',
-      description: 'The biggest 3x3 tournament of the season! Join us for a weekend of intense streetball action.',
+      description: 'Командний турнір з класичного волейболу. Реєстрація команд, ігрові сети та фінальні фінали.',
       maxTeams: 16,
       minTeams: 4,
       registrationDeadline: tomorrow.toISOString().split('T')[0],
       startDate: nextWeek.toISOString().split('T')[0],
       endDate: twoWeeks.toISOString().split('T')[0],
-      location: 'Central Park Courts',
+      location: 'Спорткомплекс Polytech, зал волейболу',
       venue: 'Main Court A',
-      rules: '1. FIBA 3x3 Rules apply\n2. 10 minute games or 21 points\n3. 12-second shot clock',
-      prizes: '1st: $500 + Trophy\n2nd: $200\n3rd: Streetball Gear',
+      rules: '1. Правила FIVB\n2. До 5 сетів, партія до 25\n3. Ліберо за реєстрацією',
+      prizes: '1 місце — кубок, 2–3 — медалі та дипломи',
       isPublic: true,
       requireApproval: true,
       categories: ['Чоловіки'],
