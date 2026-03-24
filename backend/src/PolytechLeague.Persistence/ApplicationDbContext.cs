@@ -22,6 +22,9 @@ using PolytechLeague.Persistence.DbConfigurations.Basketball3x3Configurations;
 using PolytechLeague.Domain.Entities.Volleyball;
 using PolytechLeague.Domain.Entities.Volleyball.Enums;
 using PolytechLeague.Persistence.DbConfigurations.VolleyballConfigurations;
+using PolytechLeague.Domain.Entities.BeachVolleyball;
+using PolytechLeague.Domain.Entities.BeachVolleyball.Enums;
+using PolytechLeague.Persistence.DbConfigurations.BeachVolleyballConfigurations;
 
 namespace PolytechLeague.Persistence.Database;
 
@@ -73,6 +76,13 @@ public class ApplicationDbContext : DbContext
     public DbSet<VolleyballMatch> VolleyballMatches { get; set; }
     public DbSet<VolleyballSet> VolleyballSets { get; set; }
 
+    // Beach volleyball
+    public DbSet<BeachVolleyballTeam> BeachVolleyballTeams { get; set; }
+    public DbSet<BeachVolleyballPlayer> BeachVolleyballPlayers { get; set; }
+    public DbSet<BeachVolleyballEvent> BeachVolleyballEvents { get; set; }
+    public DbSet<BeachVolleyballMatch> BeachVolleyballMatches { get; set; }
+    public DbSet<BeachVolleyballSet> BeachVolleyballSets { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresEnum<UserRole>()
@@ -90,7 +100,8 @@ public class ApplicationDbContext : DbContext
             .HasPostgresEnum<FutsalPosition>()
             .HasPostgresEnum<Basketball3x3TournamentType>()
             .HasPostgresEnum<VolleyballTournamentType>()
-            .HasPostgresEnum<VolleyballPosition>();
+            .HasPostgresEnum<VolleyballPosition>()
+            .HasPostgresEnum<BeachVolleyballTournamentType>();
 
         modelBuilder.Entity<Person>().UseTptMappingStrategy();
         modelBuilder.Entity<Event>().UseTptMappingStrategy();
@@ -146,6 +157,13 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new VolleyballEventConfiguration());
         modelBuilder.ApplyConfiguration(new VolleyballMatchConfiguration());
         modelBuilder.ApplyConfiguration(new VolleyballSetConfiguration());
+
+        // Beach volleyball
+        modelBuilder.ApplyConfiguration(new BeachVolleyballTeamConfiguration());
+        modelBuilder.ApplyConfiguration(new BeachVolleyballPlayerConfiguration());
+        modelBuilder.ApplyConfiguration(new BeachVolleyballEventConfiguration());
+        modelBuilder.ApplyConfiguration(new BeachVolleyballMatchConfiguration());
+        modelBuilder.ApplyConfiguration(new BeachVolleyballSetConfiguration());
 
         base.OnModelCreating(modelBuilder);
     }

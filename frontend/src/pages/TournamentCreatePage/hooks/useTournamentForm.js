@@ -12,6 +12,7 @@ const TOURNAMENT_CREATE_ENDPOINTS = {
   futsal: '/futsal-events',
   basketball3x3: '/basketball3x3-events',
   volleyball: '/volleyball-events',
+  beach_volleyball: '/beach-volleyball-events',
 };
 
 export const useTournamentForm = () => {
@@ -113,7 +114,7 @@ export const useTournamentForm = () => {
     const endpoint = TOURNAMENT_CREATE_ENDPOINTS[formData.sport];
     if (!endpoint) {
       alert(
-        'Цей вид спорту ще не підключено до API. Доступні: шахи, шашки, настільний теніс, армреслінг, футзал, баскетбол 3×3, волейбол.'
+        'Цей вид спорту ще не підключено до API. Доступні: шахи, шашки, настільний теніс, армреслінг, футзал, баскетбол 3×3, волейбол, пляжний волейбол.'
       );
       return;
     }
@@ -181,7 +182,7 @@ export const useTournamentForm = () => {
         delete payload.participantsCount;
     }
 
-    if (formData.sport === 'volleyball') {
+    if (formData.sport === 'volleyball' || formData.sport === 'beach_volleyball') {
         const typeMapping = {
             'single_elimination': 'SingleElimination',
             'double_elimination': 'DoubleElimination',
