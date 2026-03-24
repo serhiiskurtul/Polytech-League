@@ -13,6 +13,9 @@ using PolytechLeague.Domain.Entities.Armwrestling;
 using PolytechLeague.Domain.Entities.Armwrestling.Enums;
 using PolytechLeague.Persistence.DbConfigurations.TableTennisConfigurations;
 using PolytechLeague.Persistence.DbConfigurations.ArmwrestlingConfigurations;
+using PolytechLeague.Domain.Entities.Futsal;
+using PolytechLeague.Domain.Entities.Futsal.Enums;
+using PolytechLeague.Persistence.DbConfigurations.FutsalConfigurations;
 
 namespace PolytechLeague.Persistence.Database;
 
@@ -45,6 +48,12 @@ public class ApplicationDbContext : DbContext
     public DbSet<ArmwrestlingEvent> ArmwrestlingEvents { get; set; }
     public DbSet<ArmwrestlingMatch> ArmwrestlingMatches { get; set; }
 
+    // Futsal
+    public DbSet<FutsalTeam> FutsalTeams { get; set; }
+    public DbSet<FutsalPlayer> FutsalPlayers { get; set; }
+    public DbSet<FutsalEvent> FutsalEvents { get; set; }
+    public DbSet<FutsalMatch> FutsalMatches { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresEnum<UserRole>()
@@ -58,7 +67,8 @@ public class ApplicationDbContext : DbContext
             .HasPostgresEnum<TableTennisCategory>()
             .HasPostgresEnum<ArmwrestlingHand>()
             .HasPostgresEnum<ArmwrestlingCategory>()
-            .HasPostgresEnum<ArmwrestlingWeightClass>();
+            .HasPostgresEnum<ArmwrestlingWeightClass>()
+            .HasPostgresEnum<FutsalPosition>();
 
         modelBuilder.Entity<Person>().UseTptMappingStrategy();
         modelBuilder.Entity<Event>().UseTptMappingStrategy();
@@ -95,6 +105,12 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new ArmwrestlingPlayerConfiguration());
         modelBuilder.ApplyConfiguration(new ArmwrestlingEventConfiguration());
         modelBuilder.ApplyConfiguration(new ArmwrestlingMatchConfiguration());
+
+        // Futsal configurations
+        modelBuilder.ApplyConfiguration(new FutsalTeamConfiguration());
+        modelBuilder.ApplyConfiguration(new FutsalPlayerConfiguration());
+        modelBuilder.ApplyConfiguration(new FutsalEventConfiguration());
+        modelBuilder.ApplyConfiguration(new FutsalMatchConfiguration());
 
         base.OnModelCreating(modelBuilder);
     }
