@@ -1,7 +1,7 @@
 import React from 'react';
 import shared from '../../TournamentCreatePage.module.css';
 import styles from './PreviewSection.module.css';
-import { AVAILABLE_SPORTS, TOURNAMENT_TYPES, CHESS_SYSTEMS, CHECKERS_SYSTEMS, TABLE_TENNIS_TOURNAMENT_TYPES, ARMWRESTLING_HANDS, ARMWRESTLING_WEIGHT_CLASSES, ARMWRESTLING_CATEGORIES } from '../../constants';
+import { AVAILABLE_SPORTS, TOURNAMENT_TYPES, CHESS_SYSTEMS, CHECKERS_SYSTEMS, TABLE_TENNIS_TOURNAMENT_TYPES, BASKETBALL3X3_TOURNAMENT_TYPES, ARMWRESTLING_HANDS, ARMWRESTLING_WEIGHT_CLASSES, ARMWRESTLING_CATEGORIES } from '../../constants';
 
 const PreviewSection = ({ formData, selectedCategories }) => {
   const getFormatName = () => {
@@ -16,6 +16,9 @@ const PreviewSection = ({ formData, selectedCategories }) => {
       const hand = ARMWRESTLING_HANDS.find(h => h.id === formData.armHand);
       const wc = ARMWRESTLING_WEIGHT_CLASSES.find(w => w.id === formData.armWeightClass);
       return `${hand?.name || ''} · ${wc?.name || ''}`;
+    } else if (formData.sport === 'basketball3x3') {
+      const type = BASKETBALL3X3_TOURNAMENT_TYPES.find(t => t.id === formData.type);
+      return type ? type.name : formData.type;
     } else {
       const type = TOURNAMENT_TYPES.find(t => t.id === formData.type);
       return type ? type.name : formData.type;

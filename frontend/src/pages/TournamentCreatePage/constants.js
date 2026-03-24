@@ -10,7 +10,7 @@ export const AVAILABLE_SPORTS = [
   { id: 'futsal', name: 'Футзал', icon: 'fas fa-futbol' },
   { id: 'volleyball', name: 'Волейбол', icon: 'fas fa-volleyball-ball' },
   { id: 'beach_volleyball', name: 'Пляжний волейбол', icon: 'fas fa-sun' },
-  { id: 'basketball', name: 'Баскетбол', icon: 'fas fa-basketball-ball' },
+  { id: 'basketball3x3', name: 'Баскетбол 3x3', icon: 'fas fa-basketball-ball' },
   { id: 'badminton', name: 'Бадмінтон', icon: 'fas fa-feather-alt' },
   { id: 'chess', name: 'Шахи', icon: 'fas fa-chess' },
   { id: 'checkers', name: 'Шашки', icon: 'fas fa-th-large' }
@@ -72,4 +72,11 @@ export const ARMWRESTLING_CATEGORIES = [
   { id: 'Men', name: 'Чоловіки' },
   { id: 'Women', name: 'Жінки' },
   { id: 'Open', name: 'Відкрита' }
+];
+
+export const BASKETBALL3X3_TOURNAMENT_TYPES = [
+  { id: 'single_elimination', name: 'Олімпійська система', description: 'Програєш - вилітаєш' },
+  { id: 'double_elimination', name: 'Подвійна олімпійська система (є другий шанс)', description: 'Друга спроба при поразці' },
+  { id: 'round_robin', name: 'Кругова система', description: 'Всі грають з усіма' },
+  { id: 'groups_playoff', name: 'Груповий етап + плей-офф', description: 'Найпопулярніший формат' }
 ];

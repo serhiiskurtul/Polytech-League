@@ -98,8 +98,8 @@ export const useTournamentForm = () => {
       return;
     }
 
-    if (!['chess', 'checkers', 'table_tennis', 'armwrestling', 'futsal'].includes(formData.sport)) {
-      alert('Наразі створення змагань доступне тільки для шахів, шашок, настільного тенісу, армреслінгу та футзалу. Підтримка інших видів спорту буде додана пізніше.');
+    if (!['chess', 'checkers', 'table_tennis', 'armwrestling', 'futsal', 'basketball3x3'].includes(formData.sport)) {
+      alert('Наразі створення змагань доступне тільки для шахів, шашок, настільного тенісу, армреслінгу, футзалу та баскетболу 3x3. Підтримка інших видів спорту буде додана пізніше.');
       return;
     }
 
@@ -152,12 +152,27 @@ export const useTournamentForm = () => {
         delete payload.participantsCount;
     }
 
+    if (formData.sport === 'basketball3x3') {
+        const typeMapping = {
+            'single_elimination': 'SingleElimination',
+            'double_elimination': 'DoubleElimination',
+            'round_robin': 'RoundRobin',
+            'swiss': 'Swiss',
+            'groups_playoff': 'GroupsPlayoff'
+        };
+        payload.tournamentType = typeMapping[formData.type] || 'SingleElimination';
+        delete payload.timeControl;
+        delete payload.system;
+        delete payload.participantsCount;
+    }
+
     const endpointMap = {
         'chess': '/chess-events',
         'checkers': '/checkers-events',
         'table_tennis': '/table-tennis-events',
         'armwrestling': '/armwrestling-events',
-        'futsal': '/futsal-events'
+        'futsal': '/futsal-events',
+        'basketball3x3': '/basketball3x3-events'
     };
     const endpoint = endpointMap[formData.sport];
 
@@ -192,22 +207,22 @@ export const useTournamentForm = () => {
     twoWeeks.setDate(twoWeeks.getDate() + 14);
 
     setFormData({
-      name: 'Чемпіонат коледжу з шахів 2024',
-      sport: 'chess',
-      type: 'swiss',
-      description: 'Щорічний чемпіонат серед студентських команд. Гра за кубок декана та цінні призи.',
-      maxTeams: 32,
+      name: 'Autumn Basketball 3x3 Challenge',
+      sport: 'basketball3x3',
+      type: 'groups_playoff',
+      description: 'The biggest 3x3 tournament of the season! Join us for a weekend of intense streetball action.',
+      maxTeams: 16,
       minTeams: 4,
       registrationDeadline: tomorrow.toISOString().split('T')[0],
       startDate: nextWeek.toISOString().split('T')[0],
       endDate: twoWeeks.toISOString().split('T')[0],
-      location: 'Бібліотека, зал №4',
-      venue: 'Зал №4',
-      rules: '1. Швейцарська система\n2. Контроль часу: 15+10\n3. Заборонені підказки\n4. Рішення судді остаточні',
-      prizes: '1 місце - 2000 грн\n2 місце - 1000 грн\n3 місце - 500 грн',
+      location: 'Central Park Courts',
+      venue: 'Main Court A',
+      rules: '1. FIBA 3x3 Rules apply\n2. 10 minute games or 21 points\n3. 12-second shot clock',
+      prizes: '1st: $500 + Trophy\n2nd: $200\n3rd: Streetball Gear',
       isPublic: true,
       requireApproval: true,
-      categories: ['Чоловіки', 'Змішані'],
+      categories: ['Чоловіки'],
       // Шахові / шашкові поля
       date: nextWeek.toISOString().split('T')[0],
       timeControl: '15+10',

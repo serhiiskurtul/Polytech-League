@@ -1,7 +1,7 @@
 import React from 'react';
 import shared from '../../TournamentCreatePage.module.css';
 import styles from './BasicInfoSection.module.css';
-import { AVAILABLE_SPORTS, TOURNAMENT_TYPES, CHESS_SYSTEMS, CHECKERS_SYSTEMS, TABLE_TENNIS_TOURNAMENT_TYPES } from '../../constants';
+import { AVAILABLE_SPORTS, TOURNAMENT_TYPES, CHESS_SYSTEMS, CHECKERS_SYSTEMS, TABLE_TENNIS_TOURNAMENT_TYPES, BASKETBALL3X3_TOURNAMENT_TYPES } from '../../constants';
 
 const BasicInfoSection = ({ formData, handleInputChange }) => {
   return (
@@ -82,9 +82,13 @@ const BasicInfoSection = ({ formData, handleInputChange }) => {
                   ? TABLE_TENNIS_TOURNAMENT_TYPES.map(type => (
                       <option key={type.id} value={type.id}>{type.name} - {type.description}</option>
                     ))
-                  : TOURNAMENT_TYPES.map(type => (
-                      <option key={type.id} value={type.id}>{type.name} - {type.description}</option>
-                    ))}
+                  : formData.sport === 'basketball3x3'
+                    ? BASKETBALL3X3_TOURNAMENT_TYPES.map(type => (
+                        <option key={type.id} value={type.id}>{type.name} - {type.description}</option>
+                      ))
+                    : TOURNAMENT_TYPES.map(type => (
+                        <option key={type.id} value={type.id}>{type.name} - {type.description}</option>
+                      ))}
           </select>
         </div>
         )}
