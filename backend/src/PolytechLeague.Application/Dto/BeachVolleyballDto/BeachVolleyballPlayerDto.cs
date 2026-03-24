@@ -13,10 +13,6 @@ public class BeachVolleyballPlayerRequest
     public required string City { get; set; }
     public required string Group { get; set; }
     public long? TeamId { get; set; }
-
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public BeachVolleyballPosition Position { get; set; }
-
     public int? ShirtNumber { get; set; }
 }
 
@@ -31,10 +27,6 @@ public class BeachVolleyballPlayerResponse
     public required string Group { get; set; }
     public long? TeamId { get; set; }
     public BeachVolleyballTeamResponse? Team { get; set; }
-
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public BeachVolleyballPosition Position { get; set; }
-
     public int? ShirtNumber { get; set; }
 }
 
@@ -51,7 +43,6 @@ public static class BeachVolleyballPlayerDtoExtensions
             City = request.City,
             Group = request.Group,
             TeamId = request.TeamId,
-            Position = request.Position,
             ShirtNumber = request.ShirtNumber
         };
     }
@@ -69,7 +60,6 @@ public static class BeachVolleyballPlayerDtoExtensions
             Group = entity.Group,
             TeamId = entity.TeamId,
             Team = entity.Team?.ToResponse(),
-            Position = entity.Position,
             ShirtNumber = entity.ShirtNumber
         };
     }

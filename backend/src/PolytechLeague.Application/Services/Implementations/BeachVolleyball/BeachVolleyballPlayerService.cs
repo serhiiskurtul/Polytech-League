@@ -22,7 +22,6 @@ public class BeachVolleyballPlayerService(
         oldEntity.Group = newEntity.Group;
 
         oldEntity.TeamId = newEntity.TeamId;
-        oldEntity.Position = newEntity.Position;
         oldEntity.ShirtNumber = newEntity.ShirtNumber;
     }
 }

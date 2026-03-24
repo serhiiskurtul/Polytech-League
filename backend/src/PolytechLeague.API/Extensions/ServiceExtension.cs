@@ -16,8 +16,10 @@ using PolytechLeague.Application.Services.Implementations.Basketball3x3;
 using PolytechLeague.Application.Services.Interfaces.Basketball3x3;
 using PolytechLeague.Application.Services.Implementations.Volleyball;
 using PolytechLeague.Application.Services.Interfaces.Volleyball;
-using PolytechLeague.Application.Services.Implementations.BeachVolleyball;
 using PolytechLeague.Application.Services.Interfaces.BeachVolleyball;
+using PolytechLeague.Application.Services.Implementations.Badminton;
+using PolytechLeague.Application.Services.Interfaces.Badminton;
+using PolytechLeague.Application.Services.Implementations.BeachVolleyball;
 using PolytechLeague.Infrastructure.Email;
 using PolytechLeague.Infrastructure.Redis;
 using StackExchange.Redis;
@@ -67,6 +69,12 @@ public static class ServiceExtension
         services.AddScoped<IBeachVolleyballEventService, BeachVolleyballEventService>();
         services.AddScoped<IBeachVolleyballMatchService, BeachVolleyballMatchService>();
         services.AddScoped<IBeachVolleyballSetService, BeachVolleyballSetService>();
+
+        // Badminton
+        services.AddScoped<IBadmintonPlayerService, BadmintonPlayerService>();
+        services.AddScoped<IBadmintonEventService, BadmintonEventService>();
+        services.AddScoped<IBadmintonMatchService, BadmintonMatchService>();
+        services.AddScoped<IBadmintonParticipantService, BadmintonParticipantService>();
 
         return services;
     }

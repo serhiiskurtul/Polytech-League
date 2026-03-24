@@ -80,3 +80,10 @@ export const BASKETBALL3X3_TOURNAMENT_TYPES = [
   { id: 'round_robin', name: 'Кругова система', description: 'Всі грають з усіма' },
   { id: 'groups_playoff', name: 'Груповий етап + плей-офф', description: 'Найпопулярніший формат' }
 ];
+
+export const BADMINTON_TOURNAMENT_TYPES = [
+  { id: 'single_elimination', name: 'Олімпійська система', description: 'Програєш - вилітаєш' },
+  { id: 'double_elimination', name: 'Подвійна олімпійська система (є другий шанс)', description: 'Друга спроба при поразці' },
+  { id: 'round_robin', name: 'Кругова система', description: 'Всі грають з усіма' },
+  { id: 'groups_playoff', name: 'Груповий етап + плей-офф', description: 'Найпопулярніший формат' }
+];

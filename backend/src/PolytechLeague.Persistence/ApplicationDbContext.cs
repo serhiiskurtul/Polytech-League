@@ -22,8 +22,11 @@ using PolytechLeague.Persistence.DbConfigurations.Basketball3x3Configurations;
 using PolytechLeague.Domain.Entities.Volleyball;
 using PolytechLeague.Domain.Entities.Volleyball.Enums;
 using PolytechLeague.Persistence.DbConfigurations.VolleyballConfigurations;
-using PolytechLeague.Domain.Entities.BeachVolleyball;
 using PolytechLeague.Domain.Entities.BeachVolleyball.Enums;
+using PolytechLeague.Domain.Entities.Badminton;
+using PolytechLeague.Domain.Entities.Badminton.Enums;
+using PolytechLeague.Persistence.DbConfigurations.BadmintonConfigurations;
+using PolytechLeague.Domain.Entities.BeachVolleyball;
 using PolytechLeague.Persistence.DbConfigurations.BeachVolleyballConfigurations;
 
 namespace PolytechLeague.Persistence.Database;
@@ -83,6 +86,13 @@ public class ApplicationDbContext : DbContext
     public DbSet<BeachVolleyballMatch> BeachVolleyballMatches { get; set; }
     public DbSet<BeachVolleyballSet> BeachVolleyballSets { get; set; }
 
+    // Badminton
+    public DbSet<BadmintonPlayer> BadmintonPlayers { get; set; }
+    public DbSet<BadmintonEvent> BadmintonEvents { get; set; }
+    public DbSet<BadmintonEventParticipant> BadmintonEventParticipants { get; set; }
+    public DbSet<BadmintonMatch> BadmintonMatches { get; set; }
+    public DbSet<BadmintonSet> BadmintonSets { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresEnum<UserRole>()
@@ -101,7 +111,8 @@ public class ApplicationDbContext : DbContext
             .HasPostgresEnum<Basketball3x3TournamentType>()
             .HasPostgresEnum<VolleyballTournamentType>()
             .HasPostgresEnum<VolleyballPosition>()
-            .HasPostgresEnum<BeachVolleyballTournamentType>();
+            .HasPostgresEnum<BeachVolleyballTournamentType>()
+            .HasPostgresEnum<BadmintonTournamentType>();
 
         modelBuilder.Entity<Person>().UseTptMappingStrategy();
         modelBuilder.Entity<Event>().UseTptMappingStrategy();
@@ -164,6 +175,13 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new BeachVolleyballEventConfiguration());
         modelBuilder.ApplyConfiguration(new BeachVolleyballMatchConfiguration());
         modelBuilder.ApplyConfiguration(new BeachVolleyballSetConfiguration());
+
+        // Badminton configurations
+        modelBuilder.ApplyConfiguration(new BadmintonPlayerConfiguration());
+        modelBuilder.ApplyConfiguration(new BadmintonEventConfiguration());
+        modelBuilder.ApplyConfiguration(new BadmintonEventParticipantConfiguration());
+        modelBuilder.ApplyConfiguration(new BadmintonMatchConfiguration());
+        modelBuilder.ApplyConfiguration(new BadmintonSetConfiguration());
 
         base.OnModelCreating(modelBuilder);
     }

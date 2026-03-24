@@ -13,6 +13,7 @@ const TOURNAMENT_CREATE_ENDPOINTS = {
   basketball3x3: '/basketball3x3-events',
   volleyball: '/volleyball-events',
   beach_volleyball: '/beach-volleyball-events',
+  badminton: '/badminton-events',
 };
 
 export const useTournamentForm = () => {
@@ -94,7 +95,7 @@ export const useTournamentForm = () => {
 
     if (['chess', 'checkers', 'table_tennis'].includes(formData.sport)) {
       if (formData.sport !== 'table_tennis' && !formData.timeControl.trim()) {
-          errors.push(`Контроль часу обов'язковий для ${formData.sport === 'chess' ? 'шахів' : 'шашок'}`);
+        errors.push(`Контроль часу обов'язковий для ${formData.sport === 'chess' ? 'шахів' : 'шашок'}`);
       }
       if (formData.participantsCount < 2 && formData.sport !== 'table_tennis') errors.push('Кількість учасників повинна бути щонайменше 2');
     }
@@ -112,12 +113,6 @@ export const useTournamentForm = () => {
     }
 
     const endpoint = TOURNAMENT_CREATE_ENDPOINTS[formData.sport];
-    if (!endpoint) {
-      alert(
-        'Цей вид спорту ще не підключено до API. Доступні: шахи, шашки, настільний теніс, армреслінг, футзал, баскетбол 3×3, волейбол, пляжний волейбол.'
-      );
-      return;
-    }
 
     setIsSubmitting(true);
 
@@ -134,66 +129,80 @@ export const useTournamentForm = () => {
     };
 
     if (formData.sport === 'checkers') {
-        payload.variant = formData.variant;
+      payload.variant = formData.variant;
     }
 
     if (formData.sport === 'table_tennis') {
-        payload.tournamentType = formData.tournamentType;
-        payload.category = formData.category;
-        delete payload.timeControl;
-        delete payload.system;
-        delete payload.participantsCount;
+      payload.tournamentType = formData.tournamentType;
+      payload.category = formData.category;
+      delete payload.timeControl;
+      delete payload.system;
+      delete payload.participantsCount;
     }
 
     if (formData.sport === 'armwrestling') {
-        payload.hand = formData.armHand;
-        payload.weightClass = formData.armWeightClass;
-        payload.category = formData.armCategory;
-        delete payload.timeControl;
-        delete payload.system;
-        delete payload.participantsCount;
+      payload.hand = formData.armHand;
+      payload.weightClass = formData.armWeightClass;
+      payload.category = formData.armCategory;
+      delete payload.timeControl;
+      delete payload.system;
+      delete payload.participantsCount;
     }
 
     if (formData.sport === 'futsal') {
-        const typeMapping = {
-            'single_elimination': 'SingleElimination',
-            'double_elimination': 'DoubleElimination',
-            'round_robin': 'RoundRobin',
-            'swiss': 'Swiss',
-            'groups_playoff': 'GroupsPlayoff'
-        };
-        payload.tournamentType = typeMapping[formData.type] || 'SingleElimination';
-        delete payload.timeControl;
-        delete payload.system;
-        delete payload.participantsCount;
+      const typeMapping = {
+        'single_elimination': 'SingleElimination',
+        'double_elimination': 'DoubleElimination',
+        'round_robin': 'RoundRobin',
+        'swiss': 'Swiss',
+        'groups_playoff': 'GroupsPlayoff'
+      };
+      payload.tournamentType = typeMapping[formData.type] || 'SingleElimination';
+      delete payload.timeControl;
+      delete payload.system;
+      delete payload.participantsCount;
     }
 
     if (formData.sport === 'basketball3x3') {
-        const typeMapping = {
-            'single_elimination': 'SingleElimination',
-            'double_elimination': 'DoubleElimination',
-            'round_robin': 'RoundRobin',
-            'swiss': 'Swiss',
-            'groups_playoff': 'GroupsPlayoff'
-        };
-        payload.tournamentType = typeMapping[formData.type] || 'SingleElimination';
-        delete payload.timeControl;
-        delete payload.system;
-        delete payload.participantsCount;
+      const typeMapping = {
+        'single_elimination': 'SingleElimination',
+        'double_elimination': 'DoubleElimination',
+        'round_robin': 'RoundRobin',
+        'swiss': 'Swiss',
+        'groups_playoff': 'GroupsPlayoff'
+      };
+      payload.tournamentType = typeMapping[formData.type] || 'SingleElimination';
+      delete payload.timeControl;
+      delete payload.system;
+      delete payload.participantsCount;
     }
 
     if (formData.sport === 'volleyball' || formData.sport === 'beach_volleyball') {
-        const typeMapping = {
-            'single_elimination': 'SingleElimination',
-            'double_elimination': 'DoubleElimination',
-            'round_robin': 'RoundRobin',
-            'swiss': 'Swiss',
-            'groups_playoff': 'GroupsPlayoff'
-        };
-        payload.tournamentType = typeMapping[formData.type] || 'SingleElimination';
-        delete payload.timeControl;
-        delete payload.system;
-        delete payload.participantsCount;
+      const typeMapping = {
+        'single_elimination': 'SingleElimination',
+        'double_elimination': 'DoubleElimination',
+        'round_robin': 'RoundRobin',
+        'swiss': 'Swiss',
+        'groups_playoff': 'GroupsPlayoff'
+      };
+      payload.tournamentType = typeMapping[formData.type] || 'SingleElimination';
+      delete payload.timeControl;
+      delete payload.system;
+      delete payload.participantsCount;
+    }
+
+    if (formData.sport === 'badminton') {
+      const typeMapping = {
+        'single_elimination': 'SingleElimination',
+        'double_elimination': 'DoubleElimination',
+        'round_robin': 'RoundRobin',
+        'swiss': 'Swiss',
+        'groups_playoff': 'GroupsPlayoff'
+      };
+      payload.tournamentType = typeMapping[formData.type] || 'SingleElimination';
+      delete payload.timeControl;
+      delete payload.system;
+      delete payload.participantsCount;
     }
 
     try {
