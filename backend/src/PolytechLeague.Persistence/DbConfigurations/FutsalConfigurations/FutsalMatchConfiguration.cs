@@ -8,6 +8,8 @@ public class FutsalMatchConfiguration : IEntityTypeConfiguration<FutsalMatch>
 {
     public void Configure(EntityTypeBuilder<FutsalMatch> builder)
     {
+        builder.ToTable("futsal_matches");
+        
         builder.HasKey(m => m.Id);
         
         builder.HasOne(m => m.HomeTeam)

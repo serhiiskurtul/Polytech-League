@@ -8,6 +8,8 @@ public class FutsalPlayerConfiguration : IEntityTypeConfiguration<FutsalPlayer>
 {
     public void Configure(EntityTypeBuilder<FutsalPlayer> builder)
     {
+        builder.ToTable("futsal_players");
+        
         builder.HasOne(p => p.Team)
             .WithMany(t => t.Players)
             .HasForeignKey(p => p.TeamId)

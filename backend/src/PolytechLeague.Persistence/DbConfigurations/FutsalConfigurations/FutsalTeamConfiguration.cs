@@ -8,6 +8,8 @@ public class FutsalTeamConfiguration : IEntityTypeConfiguration<FutsalTeam>
 {
     public void Configure(EntityTypeBuilder<FutsalTeam> builder)
     {
+        builder.ToTable("futsal_teams");
+        
         builder.HasKey(t => t.Id);
         
         builder.Property(t => t.Name).IsRequired().HasMaxLength(200);
