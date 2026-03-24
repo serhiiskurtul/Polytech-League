@@ -19,6 +19,9 @@ using PolytechLeague.Persistence.DbConfigurations.FutsalConfigurations;
 using PolytechLeague.Domain.Entities.Basketball3x3;
 using PolytechLeague.Domain.Entities.Basketball3x3.Enums;
 using PolytechLeague.Persistence.DbConfigurations.Basketball3x3Configurations;
+using PolytechLeague.Domain.Entities.Volleyball;
+using PolytechLeague.Domain.Entities.Volleyball.Enums;
+using PolytechLeague.Persistence.DbConfigurations.VolleyballConfigurations;
 
 namespace PolytechLeague.Persistence.Database;
 
@@ -63,6 +66,13 @@ public class ApplicationDbContext : DbContext
     public DbSet<Basketball3x3Event> Basketball3x3Events { get; set; }
     public DbSet<Basketball3x3Match> Basketball3x3Matches { get; set; }
 
+    // Volleyball
+    public DbSet<VolleyballTeam> VolleyballTeams { get; set; }
+    public DbSet<VolleyballPlayer> VolleyballPlayers { get; set; }
+    public DbSet<VolleyballEvent> VolleyballEvents { get; set; }
+    public DbSet<VolleyballMatch> VolleyballMatches { get; set; }
+    public DbSet<VolleyballSet> VolleyballSets { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresEnum<UserRole>()
@@ -78,7 +88,9 @@ public class ApplicationDbContext : DbContext
             .HasPostgresEnum<ArmwrestlingCategory>()
             .HasPostgresEnum<ArmwrestlingWeightClass>()
             .HasPostgresEnum<FutsalPosition>()
-            .HasPostgresEnum<Basketball3x3TournamentType>();
+            .HasPostgresEnum<Basketball3x3TournamentType>()
+            .HasPostgresEnum<VolleyballTournamentType>()
+            .HasPostgresEnum<VolleyballPosition>();
 
         modelBuilder.Entity<Person>().UseTptMappingStrategy();
         modelBuilder.Entity<Event>().UseTptMappingStrategy();
@@ -127,6 +139,13 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new Basketball3x3PlayerConfiguration());
         modelBuilder.ApplyConfiguration(new Basketball3x3EventConfiguration());
         modelBuilder.ApplyConfiguration(new Basketball3x3MatchConfiguration());
+
+        // Volleyball
+        modelBuilder.ApplyConfiguration(new VolleyballTeamConfiguration());
+        modelBuilder.ApplyConfiguration(new VolleyballPlayerConfiguration());
+        modelBuilder.ApplyConfiguration(new VolleyballEventConfiguration());
+        modelBuilder.ApplyConfiguration(new VolleyballMatchConfiguration());
+        modelBuilder.ApplyConfiguration(new VolleyballSetConfiguration());
 
         base.OnModelCreating(modelBuilder);
     }
