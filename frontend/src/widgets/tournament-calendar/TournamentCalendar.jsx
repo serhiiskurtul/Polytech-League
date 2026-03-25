@@ -148,11 +148,12 @@ const getSportIcon = (sport) => {
   const icons = {
     'Шахи': 'fa-chess',
     'Волейбол': 'fa-volleyball-ball',
+    'Пляжний волейбол': 'fa-umbrella-beach',
     'Футзал': 'fa-futbol',
-    'Баскетбол': 'fa-basketball-ball',
+    'Баскетбол 3х3': 'fa-basketball-ball',
     'Настільний теніс': 'fa-table-tennis',
-    'Бадмінтон': 'fa-table-tennis',
-    'Армреслінг': 'fa-hand-fist',
+    'Бадмінтон': 'fa-feather-alt',
+    'Армреслінг': 'fa-fist-raised',
     'Шашки': 'fa-chess-board'
   };
   return icons[sport] || 'fa-trophy';

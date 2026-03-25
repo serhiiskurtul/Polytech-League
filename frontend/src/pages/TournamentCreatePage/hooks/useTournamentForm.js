@@ -10,9 +10,9 @@ const TOURNAMENT_CREATE_ENDPOINTS = {
   table_tennis: '/table-tennis-events',
   armwrestling: '/armwrestling-events',
   futsal: '/futsal-events',
-  basketball3x3: '/basketball3x3-events',
+  'basketball-3x3': '/basketball3x3-events',
   volleyball: '/volleyball-events',
-  beach_volleyball: '/beach-volleyball-events',
+  'beach-volleyball': '/beach-volleyball-events',
   badminton: '/badminton-events',
 };
 
@@ -163,7 +163,7 @@ export const useTournamentForm = () => {
       delete payload.participantsCount;
     }
 
-    if (formData.sport === 'basketball3x3') {
+    if (formData.sport === 'basketball-3x3') {
       const typeMapping = {
         'single_elimination': 'SingleElimination',
         'double_elimination': 'DoubleElimination',
@@ -177,7 +177,7 @@ export const useTournamentForm = () => {
       delete payload.participantsCount;
     }
 
-    if (formData.sport === 'volleyball' || formData.sport === 'beach_volleyball') {
+    if (formData.sport === 'volleyball' || formData.sport === 'beach-volleyball') {
       const typeMapping = {
         'single_elimination': 'SingleElimination',
         'double_elimination': 'DoubleElimination',

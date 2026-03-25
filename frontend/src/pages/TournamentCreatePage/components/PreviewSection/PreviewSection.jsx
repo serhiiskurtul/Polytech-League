@@ -16,7 +16,7 @@ const PreviewSection = ({ formData, selectedCategories }) => {
       const hand = ARMWRESTLING_HANDS.find(h => h.id === formData.armHand);
       const wc = ARMWRESTLING_WEIGHT_CLASSES.find(w => w.id === formData.armWeightClass);
       return `${hand?.name || ''} · ${wc?.name || ''}`;
-    } else if (formData.sport === 'basketball3x3') {
+    } else if (formData.sport === 'basketball-3x3') {
       const type = BASKETBALL3X3_TOURNAMENT_TYPES.find(t => t.id === formData.type);
       return type ? type.name : formData.type;
     } else if (formData.sport === 'badminton') {

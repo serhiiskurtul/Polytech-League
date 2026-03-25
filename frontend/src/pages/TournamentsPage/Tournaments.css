@@ -251,6 +251,12 @@
   background: var(--primary-light);
 }
 
+.sport-filter-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
 /* Контейнер турнірів */
 .tournaments-container {
   margin-bottom: 32px;

@@ -5,15 +5,15 @@ export const CATEGORIES = [
 ];
 
 export const AVAILABLE_SPORTS = [
-  { id: 'table_tennis', name: 'Настільний теніс', icon: 'fas fa-table-tennis' },
-  { id: 'armwrestling', name: 'Армреслінг', icon: 'fas fa-hand-rock' },
   { id: 'futsal', name: 'Футзал', icon: 'fas fa-futbol' },
+  { id: 'basketball-3x3', name: 'Баскетбол 3x3', icon: 'fas fa-basketball-ball' },
   { id: 'volleyball', name: 'Волейбол', icon: 'fas fa-volleyball-ball' },
-  { id: 'beach_volleyball', name: 'Пляжний волейбол', icon: 'fas fa-sun' },
-  { id: 'basketball3x3', name: 'Баскетбол 3x3', icon: 'fas fa-basketball-ball' },
-  { id: 'badminton', name: 'Бадмінтон', icon: 'fas fa-feather-alt' },
   { id: 'chess', name: 'Шахи', icon: 'fas fa-chess' },
-  { id: 'checkers', name: 'Шашки', icon: 'fas fa-th-large' }
+  { id: 'checkers', name: 'Шашки', icon: 'fas fa-chess-board' },
+  { id: 'beach-volleyball', name: 'Пляжний волейбол', icon: 'fas fa-umbrella-beach' },
+  { id: 'badminton', name: 'Бадмінтон', icon: 'fas fa-feather-alt' },
+  { id: 'armwrestling', name: 'Армреслінг', icon: 'fas fa-fist-raised' },
+  { id: 'table_tennis', name: 'Настільний теніс', icon: 'fas fa-table-tennis' }
 ];
 
 export const TOURNAMENT_TYPES = [

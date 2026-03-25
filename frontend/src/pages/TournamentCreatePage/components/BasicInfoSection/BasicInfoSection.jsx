@@ -82,7 +82,7 @@ const BasicInfoSection = ({ formData, handleInputChange }) => {
                   ? TABLE_TENNIS_TOURNAMENT_TYPES.map(type => (
                       <option key={type.id} value={type.id}>{type.name} - {type.description}</option>
                     ))
-                    : formData.sport === 'basketball3x3'
+                    : formData.sport === 'basketball-3x3'
                       ? BASKETBALL3X3_TOURNAMENT_TYPES.map(type => (
                           <option key={type.id} value={type.id}>{type.name} - {type.description}</option>
                         ))

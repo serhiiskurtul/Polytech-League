@@ -1,6 +1,6 @@
 import React from 'react';
 
-const TournamentFilters = ({ activeFilter, onFilterChange }) => {
+const TournamentFilters = ({ activeStatus, activeSport, onStatusChange, onSportChange }) => {
   const filters = [
     { id: 'all', label: 'Всі турніри', icon: 'fas fa-trophy', count: 0 },
     { id: 'ongoing', label: 'Тривають', icon: 'fas fa-play-circle', color: '#10b981' },
@@ -9,11 +9,14 @@ const TournamentFilters = ({ activeFilter, onFilterChange }) => {
   ];
 
   const sports = [
-    { id: 'football', label: 'Футзал', icon: 'fas fa-futbol' },
-    { id: 'basketball', label: 'Баскетбол', icon: 'fas fa-basketball-ball' },
+    { id: 'futsal', label: 'Футзал', icon: 'fas fa-futbol' },
+    { id: 'basketball-3x3', label: 'Баскетбол 3х3', icon: 'fas fa-basketball-ball' },
     { id: 'volleyball', label: 'Волейбол', icon: 'fas fa-volleyball-ball' },
     { id: 'chess', label: 'Шахи', icon: 'fas fa-chess' },
-    { id: 'table-tennis', label: 'Настільний теніс', icon: 'fas fa-table-tennis' }
+    { id: 'checkers', label: 'Шашки', icon: 'fas fa-chess-board' },
+    { id: 'beach-volleyball', label: 'Пляжний волейбол', icon: 'fas fa-umbrella-beach' },
+    { id: 'badminton', label: 'Бадмінтон', icon: 'fas fa-feather-alt' },
+    { id: 'armwrestling', label: 'Армреслінг', icon: 'fas fa-fist-raised' }
   ];
 
   return (
@@ -24,8 +27,8 @@ const TournamentFilters = ({ activeFilter, onFilterChange }) => {
           {filters.map(filter => (
             <button
               key={filter.id}
-              className={`filter-btn ${activeFilter === filter.id ? 'active' : ''}`}
-              onClick={() => onFilterChange(filter.id)}
+              className={`filter-btn ${activeStatus === filter.id ? 'active' : ''}`}
+              onClick={() => onStatusChange(filter.id)}
               style={filter.color ? { '--filter-color': filter.color } : {}}
             >
               <i className={filter.icon}></i>
@@ -41,8 +44,8 @@ const TournamentFilters = ({ activeFilter, onFilterChange }) => {
           {sports.map(sport => (
             <button
               key={sport.id}
-              className="sport-filter-btn"
-              onClick={() => onFilterChange(sport.id)}
+              className={`sport-filter-btn ${activeSport === sport.id ? 'active' : ''}`}
+              onClick={() => onSportChange(sport.id)}
             >
               <i className={sport.icon}></i>
               {sport.label}

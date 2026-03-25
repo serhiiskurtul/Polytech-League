@@ -53,8 +53,8 @@ public class TournamentService : ITournamentService
     {
         return e switch
         {
-            FutsalEvent => "football",
-            Basketball3x3Event => "basketball",
+            FutsalEvent => "futsal",
+            Basketball3x3Event => "basketball-3x3",
             VolleyballEvent => "volleyball",
             BeachVolleyballEvent => "beach-volleyball",
             ChessEvent => "chess",

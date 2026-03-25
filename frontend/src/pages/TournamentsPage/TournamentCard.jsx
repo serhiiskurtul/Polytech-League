@@ -3,13 +3,15 @@ import React from 'react';
 const TournamentCard = ({ tournament, viewMode, onRegister }) => {
   // Іконки для видів спорту
   const sportIcons = {
-    'football': 'fas fa-futbol',
-    'basketball': 'fas fa-basketball-ball',
+    'futsal': 'fas fa-futbol',
+    'basketball-3x3': 'fas fa-basketball-ball',
     'volleyball': 'fas fa-volleyball-ball',
     'chess': 'fas fa-chess',
+    'checkers': 'fas fa-chess-board',
     'table-tennis': 'fas fa-table-tennis',
     'badminton': 'fas fa-feather-alt',
-    'armwrestling': 'fas fa-hand-fist'
+    'armwrestling': 'fas fa-fist-raised',
+    'beach-volleyball': 'fas fa-umbrella-beach'
   };
 
   // Кольори для статусів
@@ -28,13 +30,15 @@ const TournamentCard = ({ tournament, viewMode, onRegister }) => {
 
   // Назви видів спорту
   const sportNames = {
-    'football': 'Футзал',
-    'basketball': 'Баскетбол',
+    'futsal': 'Футзал',
+    'basketball-3x3': 'Баскетбол 3х3',
     'volleyball': 'Волейбол',
     'chess': 'Шахи',
+    'checkers': 'Шашки',
     'table-tennis': 'Настільний теніс',
     'badminton': 'Бадмінтон',
-    'armwrestling': 'Армреслінг'
+    'armwrestling': 'Армреслінг',
+    'beach-volleyball': 'Пляжний волейбол'
   };
 
   // Форматування дати

@@ -10,7 +10,8 @@ import './Tournaments.css';
 const Tournaments = () => {
   const [tournaments, setTournaments] = useState([]);
   const [filteredTournaments, setFilteredTournaments] = useState([]);
-  const [activeFilter, setActiveFilter] = useState('all');
+  const [activeStatus, setActiveStatus] = useState('all');
+  const [activeSport, setActiveSport] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('date');
   const [viewMode, setViewMode] = useState('grid');
@@ -41,8 +42,13 @@ const Tournaments = () => {
     let result = [...tournaments];
 
     // Фільтрація за статусом
-    if (activeFilter !== 'all') {
-      result = result.filter(tournament => tournament.status === activeFilter);
+    if (activeStatus !== 'all') {
+      result = result.filter(tournament => tournament.status === activeStatus);
+    }
+
+    // Фільтрація за видом спорту
+    if (activeSport !== 'all') {
+      result = result.filter(tournament => tournament.sport === activeSport);
     }
 
     // Фільтрація за пошуком
@@ -71,11 +77,16 @@ const Tournaments = () => {
     });
 
     setFilteredTournaments(result);
-  }, [tournaments, activeFilter, searchQuery, sortBy]);
+  }, [tournaments, activeStatus, activeSport, searchQuery, sortBy]);
 
-  // Обробка зміни фільтра
-  const handleFilterChange = (filter) => {
-    setActiveFilter(filter);
+  // Обробка зміни статусу
+  const handleStatusChange = (status) => {
+    setActiveStatus(status);
+  };
+
+  // Обробка зміни виду спорту
+  const handleSportChange = (sport) => {
+    setActiveSport(prev => prev === sport ? 'all' : sport);
   };
 
   // Обробка пошуку
@@ -184,8 +195,10 @@ const Tournaments = () => {
 
       {/* Фільтри */}
       <TournamentFilters
-        activeFilter={activeFilter}
-        onFilterChange={handleFilterChange}
+        activeStatus={activeStatus}
+        activeSport={activeSport}
+        onStatusChange={handleStatusChange}
+        onSportChange={handleSportChange}
       />
 
       {/* Список турнірів */}
