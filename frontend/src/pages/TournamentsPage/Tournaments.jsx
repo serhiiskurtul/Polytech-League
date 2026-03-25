@@ -3,7 +3,9 @@ import TournamentCard from './TournamentCard';
 import TournamentFilters from './TournamentFilters';
 import TournamentStats from './TournamentStats';
 import { Link } from 'react-router-dom';
+import { getTournaments } from '../../shared/api/tournaments.api';
 import './Tournaments.css';
+
 
 const Tournaments = () => {
   const [tournaments, setTournaments] = useState([]);
@@ -15,148 +17,24 @@ const Tournaments = () => {
 
   // Ініціалізація даних турнірів
   useEffect(() => {
-    const tournamentsData = [
-      {
-        id: 1,
-        title: 'Чемпіонат коледжу з футзалу 2025/26',
-        sport: 'football',
-        status: 'ongoing',
-        date: '15.12.2025 - 20.01.2026',
-        location: 'Спортивний зал №1',
-        description: 'Щорічний чемпіонат коледжу з футзалу. Участь беруть 16 команд з різних факультетів.',
-        participants: 16,
-        teams: 16,
-        prize: 'Кубок декана та грошовий приз',
-        organizer: 'Спортвідділ',
-        registrationEnd: '10.12.2025',
-        currentRound: 'Груповий етап',
-        registered: true,
-        featured: true
-      },
-      {
-        id: 2,
-        title: 'Кубок декана: баскетбол',
-        sport: 'basketball',
-        status: 'upcoming',
-        date: '18.12.2025 - 22.12.2025',
-        location: 'Спортивний зал №2',
-        description: 'Відкритий кубок з баскетболу. Формат: 5х5, чоловіки та жінки окремо.',
-        participants: 48,
-        teams: 12,
-        prize: 'Медалі та сертифікати',
-        organizer: 'Факультет інформаційних технологій',
-        registrationEnd: '15.12.2025',
-        currentRound: 'Реєстрація',
-        registered: false,
-        featured: true
-      },
-      {
-        id: 3,
-        title: 'Волейбольний турнір пам\'яті проф. Іванова',
-        sport: 'volleyball',
-        status: 'ongoing',
-        date: '10.12.2025 - 28.12.2025',
-        location: 'Спортивний зал №1',
-        description: 'Традиційний турнір пам\'яті видатного викладача. Змішані команди 6х6.',
-        participants: 72,
-        teams: 12,
-        prize: 'Перехідний кубок',
-        organizer: 'Асоціація випускників',
-        registrationEnd: '05.12.2025',
-        currentRound: 'Чвертьфінали',
-        registered: true,
-        featured: false
-      },
-      {
-        id: 4,
-        title: 'Шаховий чемпіонат коледжу',
-        sport: 'chess',
-        status: 'upcoming',
-        date: '20.12.2025',
-        location: 'Бібліотека, зал №4',
-        description: 'Індивідуальний чемпіонат з шахів за швейцарською системою. 9 турів.',
-        participants: 32,
-        teams: 0,
-        prize: 'Грошовий приз + рейтинг Elo',
-        organizer: 'Шаховий клуб',
-        registrationEnd: '18.12.2025',
-        currentRound: 'Реєстрація',
-        registered: false,
-        featured: false
-      },
-      {
-        id: 5,
-        title: 'Турнір з настільного тенісу',
-        sport: 'table-tennis',
-        status: 'upcoming',
-        date: '18.12.2025',
-        location: 'Спортивний зал №3',
-        description: 'Відкритий турнір з настільного тенісу. Одиночний та парний розряди.',
-        participants: 24,
-        teams: 0,
-        prize: 'Подарункові сертифікати',
-        organizer: 'Студентська рада',
-        registrationEnd: '16.12.2025',
-        currentRound: 'Реєстрація',
-        registered: true,
-        featured: false
-      },
-      {
-        id: 6,
-        title: 'Новорічний турнір з бадмінтону',
-        sport: 'badminton',
-        status: 'upcoming',
-        date: '27.12.2025',
-        location: 'Спортивний зал №3',
-        description: 'Новорічний турнір з бадмінтону. Одиночний та змішаний парний розряди.',
-        participants: 20,
-        teams: 0,
-        prize: 'Новорічні подарунки',
-        organizer: 'Спортклуб',
-        registrationEnd: '25.12.2025',
-        currentRound: 'Реєстрація',
-        registered: false,
-        featured: false
-      },
-      {
-        id: 7,
-        title: 'Турнір з армреслінгу',
-        sport: 'armwrestling',
-        status: 'completed',
-        date: '05.12.2025',
-        location: 'Актовий зал',
-        description: 'Турнір з армреслінгу серед студентів. Вагові категорії: до 70кг, до 85кг, понад 85кг.',
-        participants: 18,
-        teams: 0,
-        prize: 'Медалі та сертифікати',
-        organizer: 'Спортвідділ',
-        registrationEnd: '01.12.2025',
-        currentRound: 'Завершено',
-        registered: false,
-        featured: false
-      },
-      {
-        id: 8,
-        title: 'Футзал: Кубок весни',
-        sport: 'football',
-        status: 'upcoming',
-        date: '15.01.2026 - 30.01.2026',
-        location: 'Спортивний зал №1',
-        description: 'Традиційний кубок весни з футзалу. Формат: груповий етап + плей-оф.',
-        participants: 64,
-        teams: 16,
-        prize: 'Кубок та медалі',
-        organizer: 'Студентська рада',
-        registrationEnd: '10.01.2026',
-        currentRound: 'Анонсовано',
-        registered: false,
-        featured: true
+    const fetchTournaments = async () => {
+      try {
+        const data = await getTournaments();
+        if (data && data.length > 0) {
+          setTournaments(data);
+          setFilteredTournaments(data);
+        } else {
+          setTournaments([]);
+          setFilteredTournaments([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch tournaments:", error);
       }
-    ];
+    };
 
-    setTournaments(tournamentsData);
-    setFilteredTournaments(tournamentsData);
+    fetchTournaments();
   }, []);
+
 
   // Фільтрація та сортування турнірів
   useEffect(() => {
@@ -170,7 +48,7 @@ const Tournaments = () => {
     // Фільтрація за пошуком
     if (searchQuery.trim() !== '') {
       const query = searchQuery.toLowerCase();
-      result = result.filter(tournament => 
+      result = result.filter(tournament =>
         tournament.title.toLowerCase().includes(query) ||
         tournament.description.toLowerCase().includes(query) ||
         tournament.sport.toLowerCase().includes(query)
@@ -181,8 +59,8 @@ const Tournaments = () => {
     result.sort((a, b) => {
       switch (sortBy) {
         case 'date':
-          return new Date(a.date.split(' - ')[0].split('.').reverse().join('-')) - 
-                 new Date(b.date.split(' - ')[0].split('.').reverse().join('-'));
+          return new Date(a.date.split(' - ')[0].split('.').reverse().join('-')) -
+            new Date(b.date.split(' - ')[0].split('.').reverse().join('-'));
         case 'participants':
           return b.participants - a.participants;
         case 'title':
@@ -217,9 +95,9 @@ const Tournaments = () => {
 
   // Реєстрація на турнір
   const handleRegister = (tournamentId) => {
-    setTournaments(prev => prev.map(tournament => 
-      tournament.id === tournamentId 
-        ? { ...tournament, registered: !tournament.registered } 
+    setTournaments(prev => prev.map(tournament =>
+      tournament.id === tournamentId
+        ? { ...tournament, registered: !tournament.registered }
         : tournament
     ));
   };
@@ -250,11 +128,11 @@ const Tournaments = () => {
           <h1 className="page-title">Турніри</h1>
           <p className="page-subtitle">Усі спортивні змагання та турніри коледжу</p>
         </div>
-        
+
         <button className="btn btn-primary create-tournament-btn">
           <Link to="/create-tournament">
             <i className="fas fa-plus-circle"></i> Створити турнір
-          </Link> 
+          </Link>
         </button>
       </div>
 
@@ -275,8 +153,8 @@ const Tournaments = () => {
         </div>
 
         <div className="controls-right">
-          <select 
-            value={sortBy} 
+          <select
+            value={sortBy}
             onChange={handleSortChange}
             className="sort-select"
           >
@@ -286,14 +164,14 @@ const Tournaments = () => {
           </select>
 
           <div className="view-toggle">
-            <button 
+            <button
               className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
               onClick={() => handleViewModeChange('grid')}
               title="Сітка"
             >
               <i className="fas fa-th-large"></i>
             </button>
-            <button 
+            <button
               className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
               onClick={() => handleViewModeChange('list')}
               title="Список"
@@ -305,7 +183,7 @@ const Tournaments = () => {
       </div>
 
       {/* Фільтри */}
-      <TournamentFilters 
+      <TournamentFilters
         activeFilter={activeFilter}
         onFilterChange={handleFilterChange}
       />
