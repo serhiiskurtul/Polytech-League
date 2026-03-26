@@ -13,48 +13,52 @@ import { Tournament } from '../../shared/types/tournament.types';
 // I'll define a local interface that matches the usage in Tournaments.jsx
 
 interface TournamentUI extends Tournament {
-  title: string;
-  sport: string;
-  participants: number;
-  featured?: boolean;
-  currentRound?: string;
   progress?: number;
-  date: string; // The UI expects a date string like "15.04.2025 - 20.04.2025"
+  currentRound?: string;
 }
 
 const Tournaments = () => {
   const navigate = useNavigate();
   const [tournaments, setTournaments] = useState<TournamentUI[]>([]);
-  const [filteredTournaments, setFilteredTournaments] = useState<TournamentUI[]>([]);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    pageSize: 6,
+    totalCount: 0,
+    totalPages: 0
+  });
   const [activeStatus, setActiveStatus] = useState('all');
   const [activeSport, setActiveSport] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('date');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [isLoading, setIsLoading] = useState(false);
 
   // Ініціалізація даних турнірів
+  const fetchTournamentsData = async (page: number) => {
+    setIsLoading(true);
+    try {
+      const response = await getTournaments(page, pagination.pageSize);
+      setTournaments(response.items as TournamentUI[]);
+      setPagination(prev => ({
+        ...prev,
+        page: response.page,
+        totalCount: response.totalCount,
+        totalPages: response.totalPages
+      }));
+    } catch (error) {
+      console.error("Failed to fetch tournaments:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchTournaments = async () => {
-      try {
-        const data = await getTournaments() as any[]; // Cast to any for now to allow mapping
-        if (data && data.length > 0) {
-          setTournaments(data);
-          setFilteredTournaments(data);
-        } else {
-          setTournaments([]);
-          setFilteredTournaments([]);
-        }
-      } catch (error) {
-        console.error("Failed to fetch tournaments:", error);
-      }
-    };
+    fetchTournamentsData(pagination.page);
+  }, [pagination.page]);
 
-    fetchTournaments();
-  }, []);
-
-
-  // Фільтрація та сортування турнірів
-  useEffect(() => {
+  // Фільтрація та сортування турнірів (тепер працює над отриманими даними)
+  // В ідеалі це має бути на бекенді, але поки що залишимо так для сумісності з існуючим кодом
+  const getFilteredTournaments = () => {
     let result = [...tournaments];
 
     // Фільтрація за статусом
@@ -81,8 +85,8 @@ const Tournaments = () => {
     result.sort((a, b) => {
       switch (sortBy) {
         case 'date':
-          return new Date(a.date.split(' - ')[0].split('.').reverse().join('-')).getTime() -
-            new Date(b.date.split(' - ')[0].split('.').reverse().join('-')).getTime();
+          return new Date(a.date.split('.').reverse().join('-')).getTime() -
+            new Date(b.date.split('.').reverse().join('-')).getTime();
         case 'participants':
           return b.participants - a.participants;
         case 'title':
@@ -92,8 +96,10 @@ const Tournaments = () => {
       }
     });
 
-    setFilteredTournaments(result);
-  }, [tournaments, activeStatus, activeSport, searchQuery, sortBy]);
+    return result;
+  };
+
+  const filteredTournaments = getFilteredTournaments();
 
   // Обробка зміни статусу
   const handleStatusChange = (status: string) => {
@@ -115,9 +121,17 @@ const Tournaments = () => {
     setSortBy(e.target.value);
   };
 
+  // Обробка перемикання сторінок
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= pagination.totalPages) {
+      setPagination(prev => ({ ...prev, page: newPage }));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const stats = {
-    total: tournaments.length,
-    ongoing: tournaments.filter(t => t.status === 'ongoing').length,
+    total: pagination.totalCount,
+    ongoing: tournaments.filter(t => t.status === 'ongoing').length, // Це лише для поточної сторінки, в ідеалі теж з бекенду
     upcoming: tournaments.filter(t => t.status === 'upcoming').length,
     totalParticipants: tournaments.reduce((acc, t) => acc + t.participants, 0),
     registeredCount: 0 // Mock value
@@ -210,6 +224,32 @@ const Tournaments = () => {
           </div>
         )}
       </div>
+
+      {pagination.totalPages > 1 && (
+        <div className="pagination">
+          <button 
+            className="pagination-btn"
+            disabled={pagination.page === 1}
+            onClick={() => handlePageChange(pagination.page - 1)}
+            title="Попередня"
+          >
+            <i className="fas fa-chevron-left"></i>
+          </button>
+          
+          <div className="pagination-info">
+            Сторінка {pagination.page} з {pagination.totalPages}
+          </div>
+          
+          <button 
+            className="pagination-btn"
+            disabled={pagination.page === pagination.totalPages}
+            onClick={() => handlePageChange(pagination.page + 1)}
+            title="Наступна"
+          >
+            <i className="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      )}
     </div>
   );
 };

@@ -16,9 +16,9 @@ public class TournamentsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TournamentDto>>> GetAllTournaments()
+    public async Task<ActionResult<PagedResponse<TournamentDto>>> GetAllTournaments(int page = 1, int pageSize = 10)
     {
-        var tournaments = await _tournamentService.GetAllTournamentsAsync();
+        var tournaments = await _tournamentService.GetAllTournamentsAsync(page, pageSize);
         return Ok(tournaments);
     }
 }

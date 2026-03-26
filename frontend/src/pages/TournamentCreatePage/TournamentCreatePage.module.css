@@ -201,6 +201,79 @@
   font-weight: 500;
 }
 
+/* Чекбокси */
+.checkboxGroup {
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.checkboxGroup:focus-within,
+.checkboxGroup:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  cursor: pointer;
+}
+
+.checkboxWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.hiddenCheckbox {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.customCheckbox {
+  width: 24px;
+  height: 24px;
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: transparent;
+}
+
+.hiddenCheckbox:checked + .customCheckbox {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.checkboxText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.checkboxTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.checkboxDesc {
+  font-size: 13px;
+  color: var(--muted);
+}
+
 .uploadArea span {
   font-size: 14px;
   color: var(--muted);

@@ -4,5 +4,5 @@ namespace PolytechLeague.Application.Services.Interfaces;
 
 public interface ITournamentService
 {
-    Task<IEnumerable<TournamentDto>> GetAllTournamentsAsync();
+    Task<PagedResponse<TournamentDto>> GetAllTournamentsAsync(int page = 1, int pageSize = 10);
 }

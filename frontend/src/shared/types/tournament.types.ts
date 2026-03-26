@@ -1,11 +1,20 @@
 export interface Tournament {
   id: string;
-  name: string;
+  title: string;
   description?: string;
-  sportType: string;
-  startDate: string;
-  endDate?: string;
+  sport: string;
+  date: string;
   location?: string;
   status: 'upcoming' | 'ongoing' | 'completed';
-  // Add other fields as per your backend TournamentDto
+  participants: number;
+  teams: number;
+  featured?: boolean;
+}
+
+export interface PagedResponse<T> {
+  items: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
 }

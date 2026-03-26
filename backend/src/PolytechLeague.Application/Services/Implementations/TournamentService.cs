@@ -23,13 +23,20 @@ public class TournamentService : ITournamentService
         _context = context;
     }
 
-    public async Task<IEnumerable<TournamentDto>> GetAllTournamentsAsync()
+    public async Task<PagedResponse<TournamentDto>> GetAllTournamentsAsync(int page = 1, int pageSize = 10)
     {
-        var events = await _context.Set<PolytechLeague.Domain.Entities.Event>()
-            .Include(e => e.Photos)
+        var query = _context.Set<PolytechLeague.Domain.Entities.Event>()
+            .Include(e => e.Photos);
+
+        var totalCount = await query.CountAsync();
+
+        var events = await query
+            .OrderByDescending(e => e.Date)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
 
-        return events.Select(e => new TournamentDto
+        var items = events.Select(e => new TournamentDto
         {
             Id = e.Id,
             Title = e.Name,
@@ -47,6 +54,14 @@ public class TournamentService : ITournamentService
             Registered = false,
             Featured = false
         });
+
+        return new PagedResponse<TournamentDto>
+        {
+            Items = items,
+            TotalCount = totalCount,
+            Page = page,
+            PageSize = pageSize
+        };
     }
 
     private string GetSportName(PolytechLeague.Domain.Entities.Event e)
