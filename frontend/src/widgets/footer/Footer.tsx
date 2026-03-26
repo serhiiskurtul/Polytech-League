@@ -36,8 +36,19 @@ const Footer = () => {
   };
 
   const getSportIcon = (sport: string) => {
-    // Basic implementation as it was missing in the original file but used
-    return <i className="fas fa-running" style={{ marginRight: '8px' }}></i>;
+    const icons: Record<string, string> = {
+      'Футзал': 'fas fa-futbol',
+      'Баскетбол': 'fas fa-basketball-ball',
+      'Волейбол': 'fas fa-volleyball-ball',
+      'Шахи': 'fas fa-chess',
+      'Шашки': 'fas fa-chess-board',
+      'Настільний теніс': 'fas fa-table-tennis',
+      'Бадмінтон': 'fas fa-feather-alt',
+      'Армреслінг': 'fas fa-fist-raised',
+      'Пляжний волейбол': 'fas fa-umbrella-beach'
+    };
+    const iconClass = icons[sport] || 'fas fa-trophy';
+    return <i className={iconClass} style={{ marginRight: '8px' }}></i>;
   };
 
   return (

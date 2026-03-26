@@ -82,19 +82,19 @@ const TopPlayersCompact = () => {
 
   const getSportIcon = (sport: string) => {
     const icons: Record<string, string> = {
-      'Футзал': '⚽',
-      'Баскетбол': '🏀',
-      'Волейбол': '🏐',
-      'Шахи': '♟️',
-      'Настільний теніс': '🏓'
+      'Футзал': 'fas fa-futbol',
+      'Баскетбол': 'fas fa-basketball-ball',
+      'Волейбол': 'fas fa-volleyball-ball',
+      'Шахи': 'fas fa-chess',
+      'Настільний теніс': 'fas fa-table-tennis'
     };
-    return icons[sport] || '🏆';
+    return icons[sport] || 'fas fa-trophy';
   };
 
   const getTrendIcon = (trend: 'up' | 'down') => {
-    if (trend === 'up') return '📈';
-    if (trend === 'down') return '📉';
-    return '➡️';
+    if (trend === 'up') return 'fas fa-caret-up';
+    if (trend === 'down') return 'fas fa-caret-down';
+    return 'fas fa-minus';
   };
 
   return (
@@ -114,7 +114,7 @@ const TopPlayersCompact = () => {
                 onClick={() => setSelectedSport(sport)}
                 title={sport}
               >
-                {sport === 'Всі' ? '👥' : getSportIcon(sport)}
+                {sport === 'Всі' ? <i className="fas fa-users"></i> : <i className={getSportIcon(sport)}></i>}
               </button>
             ))}
           </div>
@@ -136,10 +136,12 @@ const TopPlayersCompact = () => {
               <div className={styles.playerRating}>
                 <div className={styles.ratingValue}>
                   {player.rating}
-                  <span className={styles.ratingIcon}>{getSportIcon(player.sport)}</span>
+                  <span className={styles.ratingIcon}>
+                    <i className={getSportIcon(player.sport)}></i>
+                  </span>
                 </div>
                 <div className={`${styles.ratingChange} ${player.trend === 'up' ? styles.positive : styles.negative}`}>
-                  {getTrendIcon(player.trend)} {player.ratingChange}
+                  <i className={getTrendIcon(player.trend)}></i> {player.ratingChange}
                 </div>
               </div>
             </div>
