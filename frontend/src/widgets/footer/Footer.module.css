@@ -282,6 +282,8 @@
 .copyright {
   color: var(--muted);
   font-size: 14px;
+  text-align: center;
+  width: 100%;
 }
 
 .bottomLinks {

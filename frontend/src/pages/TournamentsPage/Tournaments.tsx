@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import TournamentCard from './TournamentCard';
 import TournamentFilters from './TournamentFilters';
 import TournamentStats from './TournamentStats';
@@ -22,6 +23,7 @@ interface TournamentUI extends Tournament {
 }
 
 const Tournaments = () => {
+  const navigate = useNavigate();
   const [tournaments, setTournaments] = useState<TournamentUI[]>([]);
   const [filteredTournaments, setFilteredTournaments] = useState<TournamentUI[]>([]);
   const [activeStatus, setActiveStatus] = useState('all');
@@ -122,92 +124,91 @@ const Tournaments = () => {
   };
 
   return (
-    <div className="tournaments-container">
-      <div className="tournaments-header">
-        <div className="header-content">
-          <h1>Турніри</h1>
-          <p>Беріть участь у змаганнях та перемагайте</p>
+    <div className="tournaments-page">
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Турніри</h1>
+          <p className="page-subtitle">Беріть участь у змаганнях та перемагайте</p>
         </div>
+        <button 
+          className="btn btn-primary create-tournament-btn"
+          onClick={() => navigate('/create-tournament')}
+        >
+          <i className="fas fa-plus"></i> Створити турнір
+        </button>
       </div>
 
       <TournamentStats stats={stats} />
 
-      <div className="tournaments-main">
-        <aside className="tournaments-sidebar">
-          <TournamentFilters 
-            activeStatus={activeStatus}
-            activeSport={activeSport}
-            onStatusChange={handleStatusChange}
-            onSportChange={handleSportChange}
+      <TournamentFilters 
+        activeStatus={activeStatus}
+        activeSport={activeSport}
+        onStatusChange={handleStatusChange}
+        onSportChange={handleSportChange}
+      />
+
+      <div className="tournaments-controls">
+        <div className="search-container">
+          <i className="fas fa-search"></i>
+          <input 
+            type="text" 
+            className="search-input"
+            placeholder="Пошук за назвою або описом..." 
+            value={searchQuery}
+            onChange={handleSearch}
           />
-        </aside>
+        </div>
 
-        <main className="tournaments-content">
-          <div className="content-toolbar">
-            <div className="search-box">
-              <i className="fas fa-search"></i>
-              <input 
-                type="text" 
-                placeholder="Пошук за назвою або описом..." 
-                value={searchQuery}
-                onChange={handleSearch}
-              />
-            </div>
+        <div className="controls-right">
+          <select className="sort-select" value={sortBy} onChange={handleSortChange}>
+            <option value="date">За датою</option>
+            <option value="participants">За учасниками</option>
+            <option value="title">За назвою</option>
+          </select>
 
-            <div className="toolbar-actions">
-              <div className="sort-box">
-                <label>Сортувати:</label>
-                <select value={sortBy} onChange={handleSortChange}>
-                  <option value="date">За датою</option>
-                  <option value="participants">За учасниками</option>
-                  <option value="title">За назвою</option>
-                </select>
-              </div>
-
-              <div className="view-toggle">
-                <button 
-                  className={`toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                  onClick={() => setViewMode('grid')}
-                  title="Сітка"
-                >
-                  <i className="fas fa-th-large"></i>
-                </button>
-                <button 
-                  className={`toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
-                  onClick={() => setViewMode('list')}
-                  title="Список"
-                >
-                  <i className="fas fa-list"></i>
-                </button>
-              </div>
-            </div>
+          <div className="view-toggle">
+            <button 
+              className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
+              onClick={() => setViewMode('grid')}
+              title="Сітка"
+            >
+              <i className="fas fa-th-large"></i>
+            </button>
+            <button 
+              className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
+              onClick={() => setViewMode('list')}
+              title="Список"
+            >
+              <i className="fas fa-list"></i>
+            </button>
           </div>
+        </div>
+      </div>
 
-          <div className={`tournaments-${viewMode}`}>
-            {filteredTournaments.length > 0 ? (
-              filteredTournaments.map(tournament => (
-                <TournamentCard 
-                  key={tournament.id} 
-                  tournament={tournament} 
-                  viewMode={viewMode}
-                  onRegister={() => alert(`Реєстрація на турнір "${tournament.title}"`)}
-                />
-              ))
-            ) : (
-              <div className="no-results">
-                <i className="fas fa-search"></i>
-                <p>Нічого не знайдено за вашим запитом</p>
-                <button onClick={() => {
-                  setActiveStatus('all');
-                  setActiveSport('all');
-                  setSearchQuery('');
-                }}>
-                  Скинути всі фільтри
-                </button>
-              </div>
-            )}
+      <div className={`tournaments-container ${viewMode}`}>
+        {filteredTournaments.length > 0 ? (
+          filteredTournaments.map(tournament => (
+            <TournamentCard 
+              key={tournament.id} 
+              tournament={tournament} 
+              viewMode={viewMode}
+              onRegister={() => alert(`Реєстрація на турнір "${tournament.title}"`)}
+            />
+          ))
+        ) : (
+          <div className="no-results">
+            <i className="fas fa-search"></i>
+            <h3>Нічого не знайдено</h3>
+            <p>Спробуйте змінити параметри пошуку або фільтри</p>
+            <button className="btn btn-primary" onClick={() => {
+              setActiveStatus('all');
+              setActiveSport('all');
+              setSearchQuery('');
+            }}>
+              Скинути всі фільтри
+            </button>
           </div>
-        </main>
+        )}
       </div>
     </div>
   );

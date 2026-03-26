@@ -21,9 +21,9 @@ interface TournamentFiltersProps {
 
 const TournamentFilters = ({ activeStatus, activeSport, onStatusChange, onSportChange }: TournamentFiltersProps) => {
   const filters: Filter[] = [
-    { id: 'all', label: 'Всі турніри', icon: 'fas fa-trophy', count: 0 },
+    { id: 'all', label: 'Всі турніри', icon: 'fas fa-trophy' },
     { id: 'ongoing', label: 'Тривають', icon: 'fas fa-play-circle', color: '#10b981' },
-    { id: 'upcoming', label: 'Майбутні', icon: 'fas fa-clock', color: '#f59e0b' },
+    { id: 'upcoming', label: 'Майбутні', icon: 'fas fa-clock',color: '#f59e0b' },
     { id: 'completed', label: 'Завершені', icon: 'fas fa-check-circle', color: '#64748b' }
   ];
 
@@ -41,33 +41,48 @@ const TournamentFilters = ({ activeStatus, activeSport, onStatusChange, onSportC
   return (
     <div className="tournament-filters">
       <div className="filter-section">
-        <h4 className="filter-section-title">Статус турнірів</h4>
-        <div className="filter-buttons">
+        <h3 className="filter-title">Статус</h3>
+        <div className="filter-group">
           {filters.map(filter => (
             <button
               key={filter.id}
               className={`filter-btn ${activeStatus === filter.id ? 'active' : ''}`}
               onClick={() => onStatusChange(filter.id)}
-              style={filter.color ? { '--filter-color': filter.color } as React.CSSProperties : {}}
             >
-              <i className={filter.icon}></i>
-              {filter.label}
+              <div className="filter-btn-content">
+                <i className={filter.icon}></i>
+                <span>{filter.label}</span>
+              </div>
+              {filter.count !== undefined && (
+                <span className="filter-count">{filter.count}</span>
+              )}
             </button>
           ))}
         </div>
       </div>
 
       <div className="filter-section">
-        <h4 className="filter-section-title">Види спорту</h4>
-        <div className="sport-filters">
+        <h3 className="filter-title">Вид спорту</h3>
+        <div className="filter-group">
+          <button 
+            className={`filter-btn ${activeSport === 'all' ? 'active' : ''}`}
+            onClick={() => onSportChange('all')}
+          >
+            <div className="filter-btn-content">
+              <i className="fas fa-filter"></i>
+              <span>Всі види</span>
+            </div>
+          </button>
           {sports.map(sport => (
             <button
               key={sport.id}
-              className={`sport-filter-btn ${activeSport === sport.id ? 'active' : ''}`}
+              className={`filter-btn ${activeSport === sport.id ? 'active' : ''}`}
               onClick={() => onSportChange(sport.id)}
             >
-              <i className={sport.icon}></i>
-              {sport.label}
+              <div className="filter-btn-content">
+                <i className={sport.icon}></i>
+                <span>{sport.label}</span>
+              </div>
             </button>
           ))}
         </div>

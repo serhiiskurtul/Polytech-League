@@ -106,15 +106,6 @@ const PreviewSection = ({ formData, selectedCategories }: PreviewSectionProps) =
                 <p>{formData.description.substring(0, 150)}{formData.description.length > 150 ? '...' : ''}</p>
               </div>
             )}
-
-            {/* Категорії */}
-            {selectedCategories.length > 0 && (
-              <div className={styles.previewCategories}>
-                {selectedCategories.map(cat => (
-                  <span key={cat} className={styles.categoryTag}>{cat}</span>
-                ))}
-              </div>
-            )}
           </>
         ) : (
           <div className={styles.previewEmpty}>

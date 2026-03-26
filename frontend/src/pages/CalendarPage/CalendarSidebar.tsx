@@ -64,112 +64,126 @@ const CalendarSidebar = ({ selectedDate, monthNames, events, sportNames }: Calen
     alert('Подія додана до вашого особистого календаря!');
   };
 
+  const getSportClass = (sport: string) => {
+    const classes: Record<string, string> = {
+      'football': 'event-football',
+      'basketball': 'event-basketball',
+      'volleyball': 'event-volleyball',
+      'chess': 'event-chess',
+      'table-tennis': 'event-table-tennis'
+    };
+    return classes[sport] || '';
+  };
+
   return (
-    <div className="calendar-sidebar">
-      <div className="day-details">
-        <div className="selected-day">
+    <div className="day-details">
+      <div className="selected-day-header">
+        <div className="selected-day-title">
           <i className="far fa-calendar-alt"></i>
           <span>
-            {selectedDate.getDate()} {monthNames[selectedDate.getMonth()]} {selectedDate.getFullYear()}, {selectedDayName}
+            {selectedDate.getDate()} {monthNames[selectedDate.getMonth()]} {selectedDate.getFullYear()}
           </span>
         </div>
-        
-        <div className="events-list">
-          {events.length === 0 ? (
-            <div className="no-events">
-              <i className="far fa-calendar-times"></i>
-              <h3>Немає подій</h3>
-              <p>На цей день не заплановано жодних подій</p>
-            </div>
-          ) : (
-            events.map(event => (
-              <div key={event.id} className="event-card" onClick={() => handleViewEventDetails(event)}>
-                <div className="event-header">
-                  <div>
-                    <div className="event-title">{event.title}</div>
-                    <div 
-                      className="event-sport-badge"
-                      style={{ 
-                        background: getSportBackground(event.sport), 
-                        color: getSportColor(event.sport) 
-                      }}
-                    >
-                      {sportNames[event.sport]}
-                    </div>
-                  </div>
-                  <div className="event-time-display">{event.time}</div>
+        <div className="page-subtitle">{selectedDayName}</div>
+      </div>
+      
+      <div className="events-list">
+        {events.length === 0 ? (
+          <div className="no-events">
+            <i className="far fa-calendar-times"></i>
+            <h3>Подій немає</h3>
+            <p>На цей день нічого не заплановано</p>
+          </div>
+        ) : (
+          events.map(event => (
+            <div key={event.id} className="event-card" onClick={() => handleViewEventDetails(event)}>
+              <div className="event-card-header">
+                <div className={`event-card-sport ${getSportClass(event.sport)}`}>
+                  {sportNames[event.sport]}
                 </div>
-                
-                <p className="event-description">{event.description}</p>
-                
-                <div className="event-details">
-                  <div className="event-detail">
-                    <i className="fas fa-map-marker-alt"></i>
-                    <span>{event.location}</span>
-                  </div>
-                </div>
+                <div className="event-card-time">{event.time}</div>
               </div>
-            ))
-          )}
-        </div>
+              
+              <div className="event-card-title">{event.title}</div>
+              
+              <div className="event-card-location">
+                <i className="fas fa-map-marker-alt"></i>
+                <span>{event.location}</span>
+              </div>
+
+              <div className="event-card-actions">
+                <button className="btn btn-primary" onClick={(e) => {
+                  e.stopPropagation();
+                  handleRegisterForEvent(event.id);
+                }}>
+                  Реєстрація
+                </button>
+                <button className="btn btn-secondary" onClick={(e) => {
+                  e.stopPropagation();
+                  handleViewEventDetails(event);
+                }}>
+                  Деталі
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {modalEvent && (
-        <div className="event-modal-overlay" onClick={handleCloseModal}>
-          <div className="event-modal" onClick={e => e.stopPropagation()}>
-            <button className="close-modal" onClick={handleCloseModal}>&times;</button>
-            
-            <div className="modal-header">
-              <div className="modal-sport-icon" style={{ color: getSportColor(modalEvent.sport) }}>
-                <i className={sportIcons[modalEvent.sport]}></i>
+        <div className="modal-overlay" onClick={handleCloseModal}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-banner" style={{ background: getSportColor(modalEvent.sport) }}>
+              <div className="modal-header-info">
+                <div className="modal-header-sport">
+                  <i className={sportIcons[modalEvent.sport]}></i> {sportNames[modalEvent.sport]}
+                </div>
+                <h2>{modalEvent.title}</h2>
               </div>
-              <h2 className="modal-title">{modalEvent.title}</h2>
+              <button className="modal-close" onClick={handleCloseModal} style={{ color: 'white' }}>&times;</button>
             </div>
             
             <div className="modal-body">
-              <div className="modal-info-grid">
-                <div className="info-item">
+              <div className="modal-info-section">
+                <div className="modal-info-item">
                   <i className="far fa-calendar-alt"></i>
-                  <div>
-                    <div className="info-label">Дата</div>
+                  <div className="info-text">
+                    <div className="label">Дата</div>
                     <div className="info-value">{modalEvent.day} {monthNames[modalEvent.month]} {modalEvent.year}</div>
                   </div>
                 </div>
-                <div className="info-item">
+                <div className="modal-info-item">
                   <i className="far fa-clock"></i>
-                  <div>
-                    <div className="info-label">Час</div>
+                  <div className="info-text">
+                    <div className="label">Час</div>
                     <div className="info-value">{modalEvent.time}</div>
                   </div>
                 </div>
-                <div className="info-item">
+                <div className="modal-info-item">
                   <i className="fas fa-map-marker-alt"></i>
-                  <div>
-                    <div className="info-label">Локація</div>
+                  <div className="info-text">
+                    <div className="label">Локація</div>
                     <div className="info-value">{modalEvent.location}</div>
                   </div>
                 </div>
-                <div className="info-item">
-                  <i className="fas fa-tag"></i>
-                  <div>
-                    <div className="info-label">Вид спорту</div>
+                <div className="modal-info-item">
+                  <i className="fas fa-trophy"></i>
+                  <div className="info-text">
+                    <div className="label">Дисципліна</div>
                     <div className="info-value">{sportNames[modalEvent.sport]}</div>
                   </div>
                 </div>
               </div>
               
-              <div className="modal-description">
+              <div className="modal-description-box">
                 <h3>Про подію</h3>
                 <p>{modalEvent.description}</p>
               </div>
             </div>
             
             <div className="modal-footer">
-              <button className="btn-add-calendar" onClick={() => handleAddToCalendar(modalEvent.id)}>
-                <i className="far fa-calendar-plus"></i> В календар
-              </button>
-              <button className="btn-register-event" onClick={() => handleRegisterForEvent(modalEvent.id)}>
-                Зареєструватись
+              <button className="btn btn-primary" style={{ width: '100%' }} onClick={() => handleRegisterForEvent(modalEvent.id)}>
+                Зареєструватись на подію
               </button>
             </div>
           </div>

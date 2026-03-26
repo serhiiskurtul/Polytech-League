@@ -5,7 +5,7 @@ import Logo from '../../shared/ui/Logo/Logo';
 const Footer = () => {
 
   const sports = [
-    'Футзал', 'Баскетбол', 'Волейбол', 'Шахи', 'Шашки',
+    'Футзал', 'Баскетбол 3х3', 'Волейбол', 'Пляжний волейбол', 'Шахи', 'Шашки',
     'Настільний теніс', 'Бадмінтон', 'Армреслінг'
   ];
 
@@ -38,7 +38,7 @@ const Footer = () => {
   const getSportIcon = (sport: string) => {
     const icons: Record<string, string> = {
       'Футзал': 'fas fa-futbol',
-      'Баскетбол': 'fas fa-basketball-ball',
+      'Баскетбол 3х3': 'fas fa-basketball-ball',
       'Волейбол': 'fas fa-volleyball-ball',
       'Шахи': 'fas fa-chess',
       'Шашки': 'fas fa-chess-board',

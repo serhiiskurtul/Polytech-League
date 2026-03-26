@@ -122,13 +122,13 @@ const TournamentCard = ({ tournament, viewMode, onRegister }: TournamentCardProp
 
         <div className="tournament-actions">
           <button 
-            className="btn-register" 
+            className="btn btn-primary" 
             onClick={() => onRegister(tournament.id)}
             disabled={tournament.status === 'completed'}
           >
             {tournament.status === 'completed' ? 'Завершено' : 'Зареєструватись'}
           </button>
-          <button className="btn-details">Деталі</button>
+          <button className="btn btn-outline">Деталі</button>
         </div>
       </div>
     );
@@ -137,45 +137,63 @@ const TournamentCard = ({ tournament, viewMode, onRegister }: TournamentCardProp
   // Картка в режимі списку
   return (
     <div className={`tournament-card list ${tournament.featured ? 'featured' : ''}`}>
-      <div className="tournament-sport-icon">
-        <i className={sportIcons[tournament.sport] || 'fas fa-trophy'}></i>
-      </div>
-      
-      <div className="tournament-main-info">
-        <div className="title-row">
-          <h3 className="tournament-title">{tournament.title}</h3>
-          <div 
-            className="tournament-status"
-            style={{ backgroundColor: `${statusColors[tournament.status]}20`, color: statusColors[tournament.status] }}
-          >
-            {statusLabels[tournament.status] || tournament.status}
-          </div>
+      <div className="list-main">
+        <div className="list-sport">
+          <i className={sportIcons[tournament.sport] || 'fas fa-trophy'}></i>
         </div>
         
-        <div className="details-row">
-          <div className="detail-item">
-            <i className="far fa-calendar"></i>
-            <span>{formatDate(tournament.date)}</span>
+        <div className="list-content">
+          <div className="list-header">
+            <h3 className="tournament-title">{tournament.title}</h3>
+            <div className="list-meta">
+              <span className="tournament-sport-name">
+                {sportNames[tournament.sport] || tournament.sport}
+              </span>
+              <span className="tournament-location">
+                <i className="fas fa-map-marker-alt"></i> {tournament.location}
+              </span>
+            </div>
           </div>
-          <div className="detail-item">
-            <i className="fas fa-map-marker-alt"></i>
-            <span>{tournament.location}</span>
-          </div>
-          <div className="detail-item">
-            <i className="fas fa-users"></i>
-            <span>{tournament.participants} учасників</span>
+          
+          <div className="list-details">
+            <div className="detail-item">
+              <i className="far fa-calendar"></i>
+              <span>{formatDate(tournament.date)}</span>
+            </div>
+            <div className="detail-item">
+              <i className="fas fa-users"></i>
+              <span>{tournament.participants} учасників</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="tournament-list-actions">
-        <button 
-          className="btn-register" 
-          onClick={() => onRegister(tournament.id)}
-          disabled={tournament.status === 'completed'}
-        >
-          {tournament.status === 'completed' ? 'Завершено' : 'Реєстрація'}
-        </button>
+      <div className="list-sidebar">
+        <div className="list-progress">
+          <div 
+            className="tournament-status"
+            style={{ backgroundColor: `${statusColors[tournament.status]}20`, color: statusColors[tournament.status], display: 'inline-block', marginBottom: '12px' }}
+          >
+            {statusLabels[tournament.status] || tournament.status}
+          </div>
+          <div className="progress-bar">
+            <div 
+              className="progress-fill"
+              style={{ width: `${tournament.progress || 0}%` }}
+            ></div>
+          </div>
+        </div>
+
+        <div className="list-actions">
+          <button 
+            className="btn btn-primary" 
+            onClick={() => onRegister(tournament.id)}
+            disabled={tournament.status === 'completed'}
+          >
+            {tournament.status === 'completed' ? 'Завершено' : 'Реєстрація'}
+          </button>
+          <button className="btn btn-outline">Деталі</button>
+        </div>
       </div>
     </div>
   );

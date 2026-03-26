@@ -115,21 +115,21 @@ const CalendarGrid = ({
   const days = getCalendarDays();
 
   return (
-    <div className="calendar-grid-container">
-      <div className="day-names">
+    <div className="calendar-container">
+      <div className="calendar-weekdays">
         {dayNames.map(day => (
-          <div key={day} className="day-name">{day}</div>
+          <div key={day} className="weekday">{day}</div>
         ))}
       </div>
       
-      <div className="days-grid">
+      <div className="calendar-grid">
         {days.map((day, index) => {
           const dayEvents = day.isCurrentMonth ? getEventsForDay(day.number) : [];
           
           return (
             <div 
               key={index} 
-              className={`day-cell ${!day.isCurrentMonth ? 'other-month' : ''} 
+              className={`calendar-day ${!day.isCurrentMonth ? 'empty' : ''} 
                          ${day.isToday ? 'today' : ''} 
                          ${day.isSelected ? 'selected' : ''} 
                          ${day.isWeekend ? 'weekend' : ''}`}
@@ -137,19 +137,19 @@ const CalendarGrid = ({
             >
               <span className="day-number">{day.number}</span>
               
-              <div className="day-events-dots">
-                {dayEvents.slice(0, 3).map(event => (
+              <div className="day-events">
+                {dayEvents.map(event => (
                   <div 
                     key={event.id} 
-                    className={`event-dot event-${event.sport}`}
+                    className={`calendar-event event-${event.sport}`}
                     title={event.title}
                   >
-                    <i className={sportIcons[event.sport]}></i>
+                    <div className="event-sport">
+                      <i className={sportIcons[event.sport]}></i>
+                      <span>{event.time}</span>
+                    </div>
                   </div>
                 ))}
-                {dayEvents.length > 3 && (
-                  <div className="more-events">+{dayEvents.length - 3}</div>
-                )}
               </div>
             </div>
           );

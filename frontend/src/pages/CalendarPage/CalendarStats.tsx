@@ -1,7 +1,5 @@
 interface Stats {
   totalEvents: number;
-  footballEvents: number;
-  basketballEvents: number;
   daysWithEvents: number;
 }
 
@@ -13,20 +11,22 @@ const CalendarStats = ({ stats }: CalendarStatsProps) => {
   return (
     <div className="calendar-stats">
       <div className="stat-card">
-        <div className="stat-value">{stats.totalEvents}</div>
-        <div className="stat-label">Подій у цьому місяці</div>
+        <div className="stat-icon">
+          <i className="fas fa-calendar-check"></i>
+        </div>
+        <div className="stat-info">
+          <div className="stat-value">{stats.totalEvents}</div>
+          <div className="stat-label">Подій у місяці</div>
+        </div>
       </div>
       <div className="stat-card">
-        <div className="stat-value">{stats.footballEvents}</div>
-        <div className="stat-label">Матчі з футзалу</div>
-      </div>
-      <div className="stat-card">
-        <div className="stat-value">{stats.basketballEvents}</div>
-        <div className="stat-label">Матчі з баскетболу</div>
-      </div>
-      <div className="stat-card">
-        <div className="stat-value">{stats.daysWithEvents}</div>
-        <div className="stat-label">Днів з подіями</div>
+        <div className="stat-icon">
+          <i className="fas fa-calendar-day"></i>
+        </div>
+        <div className="stat-info">
+          <div className="stat-value">{stats.daysWithEvents}</div>
+          <div className="stat-label">Днів з подіями</div>
+        </div>
       </div>
     </div>
   );

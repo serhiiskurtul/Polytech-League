@@ -123,6 +123,7 @@ export const useTournamentForm = () => {
     if (!formData.description.trim()) errors.push('Опис турніру обов\'язковий');
     if (!formData.startDate) errors.push('Дата початку обов\'язкова');
     if (!formData.registrationDeadline) errors.push('Термін реєстрації обов\'язковий');
+    if (!formData.location.trim()) errors.push('Локація обов\'язкова');
     if (formData.maxTeams < formData.minTeams) errors.push('Максимальна кількість команд не може бути меншою за мінімальну');
     if (new Date(formData.registrationDeadline) > new Date(formData.startDate)) {
       errors.push('Термін реєстрації не може бути пізніше дати початку');
@@ -146,12 +147,57 @@ export const useTournamentForm = () => {
       const endpoint = TOURNAMENT_CREATE_ENDPOINTS[formData.sport];
       if (!endpoint) throw new Error('Невідомий вид спорту');
 
-      await api.post(endpoint, formData);
+      // Базовий об'єкт, який спільний для всіх типів івентів у бекенді
+      const basePayload = {
+        name: formData.name,
+        date: formData.startDate, // На бекенді поле називається Date
+        location: formData.location,
+        description: formData.description,
+        refereeIds: formData.refereeIds || [],
+        level: formData.level,
+      };
+
+      let payload: any = { ...basePayload };
+
+      // Додаємо специфічні поля залежно від виду спорту
+      switch (formData.sport) {
+        case 'futsal':
+        case 'basketball-3x3':
+        case 'volleyball':
+        case 'beach-volleyball':
+        case 'badminton':
+          payload.tournamentType = formData.tournamentType;
+          break;
+
+        case 'chess':
+        case 'checkers':
+          payload.timeControl = formData.timeControl;
+          payload.participantsCount = formData.participantsCount;
+          payload.system = formData.system;
+          if (formData.sport === 'checkers') {
+            payload.variant = formData.variant;
+          }
+          break;
+
+        case 'table_tennis':
+          payload.tournamentType = formData.tournamentType;
+          payload.category = formData.category;
+          break;
+
+        case 'armwrestling':
+          payload.hand = formData.armHand;
+          payload.weightClass = formData.armWeightClass;
+          payload.category = formData.armCategory;
+          break;
+      }
+
+      await api.post(endpoint, payload);
       toast.success('Турнір успішно створено!');
       navigate('/tournaments-page');
     } catch (error: any) {
       console.error('Submit error:', error);
-      toast.error(error.response?.data?.message || 'Помилка при створенні турніру');
+      const errorMessage = error.response?.data?.message || error.response?.data?.title || 'Помилка при створенні турніру';
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -174,7 +220,7 @@ export const useTournamentForm = () => {
       maxTeams: 16,
       minTeams: 4
     }));
-    setSelectedCategories(['men', 'students']);
+    setSelectedCategories([]);
   };
 
   const calculateDuration = () => {

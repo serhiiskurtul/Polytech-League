@@ -22,7 +22,6 @@ const Calendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [activeSportFilter, setActiveSportFilter] = useState('all');
-  const [calendarView, setCalendarView] = useState('month');
   const [events, setEvents] = useState<CalendarEventData[]>([]);
 
   // Ініціалізація даних подій
@@ -95,52 +94,43 @@ const Calendar = () => {
     setActiveSportFilter(sport);
   };
 
-  // Обробка зміни виду календаря
-  const handleViewChange = (view: string) => {
-    setCalendarView(view);
-  };
-
   // Отримати статистику для поточного місяця
   const getMonthStats = () => {
     const monthEvents = getEventsForCurrentMonth();
-    const footballEvents = monthEvents.filter(event => event.sport === 'football').length;
-    const basketballEvents = monthEvents.filter(event => event.sport === 'basketball').length;
     
     // Рахуємо дні з подіями
     const daysWithEvents = [...new Set(monthEvents.map(event => event.day))].length;
 
     return {
       totalEvents: monthEvents.length,
-      footballEvents,
-      basketballEvents,
       daysWithEvents
     };
   };
 
   return (
-    <div className="calendar-page-container">
-      <div className="calendar-main-header">
-        <h1>Календар спортивних подій</h1>
-        <p>Слідкуйте за розкладом матчів та турнірів коледжу</p>
+    <div className="calendar-page">
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Календар спортивних подій</h1>
+          <p className="page-subtitle">Слідкуйте за розкладом матчів та турнірів коледжу</p>
+        </div>
       </div>
 
       <CalendarStats stats={getMonthStats()} />
 
       <div className="calendar-layout">
-        <div className="calendar-main-section">
-          <CalendarControls 
-            currentDate={currentDate}
-            monthNames={monthNames}
-            onMonthChange={handleMonthChange}
-            calendarView={calendarView}
-            onViewChange={handleViewChange}
-          />
-          
+        <div className="calendar-main-content">
           <CalendarFilters 
             activeFilter={activeSportFilter}
             onFilterChange={handleFilterChange}
           />
 
+          <CalendarControls 
+            currentDate={currentDate}
+            monthNames={monthNames}
+            onMonthChange={handleMonthChange}
+          />
+          
           <CalendarGrid 
             currentDate={currentDate}
             selectedDate={selectedDate}
@@ -150,14 +140,12 @@ const Calendar = () => {
           />
         </div>
 
-        <aside className="calendar-sidebar-section">
-          <CalendarSidebar 
-            selectedDate={selectedDate}
-            monthNames={monthNames}
-            events={getEventsForSelectedDay()}
-            sportNames={sportNames}
-          />
-        </aside>
+        <CalendarSidebar 
+          selectedDate={selectedDate}
+          monthNames={monthNames}
+          events={getEventsForSelectedDay()}
+          sportNames={sportNames}
+        />
       </div>
     </div>
   );
