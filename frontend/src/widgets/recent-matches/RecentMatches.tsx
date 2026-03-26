@@ -15,6 +15,11 @@ interface Match {
   details: string;
   team1Color: string;
   team2Color: string;
+  stats?: {
+    label: string;
+    val1: string | number;
+    val2: string | number;
+  }[];
 }
 
 const RecentMatches = () => {
@@ -32,7 +37,12 @@ const RecentMatches = () => {
       winner: 'ІТ-31',
       details: 'Чвертьфінал чемпіонату коледжу',
       team1Color: 'var(--primary)',
-      team2Color: 'var(--accent)'
+      team2Color: 'var(--accent)',
+      stats: [
+        { label: 'Володіння', val1: '55%', val2: '45%' },
+        { label: 'Удари', val1: 12, val2: 8 },
+        { label: 'Фоли', val1: 4, val2: 6 }
+      ]
     },
     {
       id: 2,
@@ -47,7 +57,11 @@ const RecentMatches = () => {
       winner: 'МК-41',
       details: 'Груповий етап',
       team1Color: 'var(--success)',
-      team2Color: 'var(--warning)'
+      team2Color: 'var(--warning)',
+      stats: [
+        { label: 'Підбори', val1: 24, val2: 20 },
+        { label: 'Перехоплення', val1: 8, val2: 5 }
+      ]
     },
     {
       id: 3,
@@ -62,7 +76,12 @@ const RecentMatches = () => {
       winner: 'ФІ-21',
       details: 'Півфінал кубка декана',
       team1Color: '#8b5cf6',
-      team2Color: '#f59e0b'
+      team2Color: '#f59e0b',
+      stats: [
+        { label: 'Ейси', val1: 12, val2: 7 },
+        { label: 'Блоки', val1: 15, val2: 11 },
+        { label: 'Помилки', val1: 8, val2: 14 }
+      ]
     },
     {
       id: 4,
@@ -77,14 +96,30 @@ const RecentMatches = () => {
       winner: 'А.Іванов',
       details: 'Чвертьфінал особистого заліку',
       team1Color: 'var(--primary)',
-      team2Color: '#10b981'
+      team2Color: '#10b981',
+      stats: [
+        { label: 'Віннери', val1: 42, val2: 38 },
+        { label: 'Помилки', val1: 12, val2: 15 },
+        { label: 'Подачі', val1: 25, val2: 24 }
+      ]
     }
   ]);
 
   const [selectedSport, setSelectedSport] = useState('Всі');
   const [expandedMatch, setExpandedMatch] = useState<number | null>(null);
 
-  const sports = ['Всі', 'Футзал', 'Баскетбол', 'Волейбол', 'Настільний теніс', 'Шахи'];
+  const sports = [
+    'Всі', 
+    'Футзал', 
+    'Баскетбол', 
+    'Волейбол', 
+    'Настільний теніс', 
+    'Шахи', 
+    'Шашки', 
+    'Пляжний волейбол', 
+    'Бадмінтон', 
+    'Армреслінг'
+  ];
 
   const filteredMatches = selectedSport === 'Всі' 
     ? matches 
@@ -116,15 +151,21 @@ const RecentMatches = () => {
   };
 
   const getSportEmoji = (sport: string) => {
-    const emojis: Record<string, string> = {
-      'Футзал': '⚽',
-      'Баскетбол': '🏀',
-      'Волейбол': '🏐',
-      'Настільний теніс': '🏓',
-      'Шахи': '♟️',
-      'Всі': '👥'
+    const icons: Record<string, string> = {
+      'Футзал': 'fas fa-futbol',
+      'Баскетбол': 'fas fa-basketball-ball',
+      'Баскетбол 3х3': 'fas fa-basketball-ball',
+      'Волейбол': 'fas fa-volleyball-ball',
+      'Настільний теніс': 'fas fa-table-tennis',
+      'Шахи': 'fas fa-chess',
+      'Шашки': 'fas fa-chess-board',
+      'Пляжний волейбол': 'fas fa-umbrella-beach',
+      'Бадмінтон': 'fas fa-feather-alt',
+      'Армреслінг': 'fas fa-fist-raised',
+      'Всі': 'fas fa-filter'
     };
-    return emojis[sport] || '🏆';
+    const iconClass = icons[sport] || 'fas fa-trophy';
+    return <i className={iconClass}></i>;
   };
 
   return (
@@ -151,7 +192,7 @@ const RecentMatches = () => {
                   setSelectedSport(sport);
                 }}
               >
-                <span>{getSportEmoji(sport)}</span>
+                {getSportEmoji(sport)}
                 {sport}
               </button>
             ))}
@@ -172,6 +213,7 @@ const RecentMatches = () => {
                     {match.sport}
                   </div>
                   <div className={`${styles.statusBadge} ${match.status === 'Завершено' ? styles.statusCompleted : styles.statusLive}`}>
+                    <i className={`fas ${match.status === 'Завершено' ? 'fa-check-circle' : 'fa-clock'}`}></i>
                     {match.status}
                   </div>
                 </div>
@@ -202,27 +244,81 @@ const RecentMatches = () => {
                       <span className={styles.teamName} style={{ textAlign: 'right' }}>{match.team2}</span>
                     </div>
                   </div>
-                </div>
 
-                <div className={styles.matchMeta}>
-                  <div className={styles.metaItem}>
-                    <i className="far fa-clock"></i>
-                    {formatDate(match.date)}
+                  <div className={styles.matchMeta}>
+                    <div className={styles.metaItem}>
+                      <i className="far fa-calendar-alt"></i>
+                      {formatDate(match.date)}
+                    </div>
+                    <div className={styles.metaItem}>
+                      <i className="fas fa-map-marker-alt"></i>
+                      {match.location}
+                    </div>
                   </div>
-                  <div className={styles.metaItem}>
-                    <i className="fas fa-map-marker-alt"></i>
-                    {match.location}
-                  </div>
+
+                  <button 
+                    className={styles.detailsButton}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleMatchDetails(match.id);
+                    }}
+                  >
+                    <i className={`fas ${expandedMatch === match.id ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
+                    {expandedMatch === match.id ? 'Приховати деталі' : 'Детальніше'}
+                  </button>
                 </div>
 
                 {expandedMatch === match.id && (
-                  <div className={styles.matchDetails}>
-                    <div className={styles.matchDescription}>
-                      <strong>Турнір/Етап:</strong> {match.details}
+                  <div className={styles.expandedDetails} onClick={(e) => e.stopPropagation()}>
+                    <div className={styles.matchDetails}>
+                      <div className={styles.matchDescription}>
+                        <strong>Турнір/Етап:</strong> {match.details}
+                      </div>
+                      <div className={styles.matchWinner}>
+                        <i className="fas fa-crown"></i>
+                        <span>Переможець: <strong>{match.winner}</strong></span>
+                      </div>
                     </div>
-                    <div className={styles.matchWinner}>
-                      <i className="fas fa-crown"></i>
-                      <span>Переможець: <strong>{match.winner}</strong></span>
+
+                    {match.stats && (
+                      <div className={styles.statistics}>
+                        <h4>Статистика матчу</h4>
+                        <div className={styles.statsGrid}>
+                          {match.stats.map((stat, index) => (
+                            <div key={index} className={styles.statItem}>
+                              <div className={styles.statLabel}>{stat.label}</div>
+                              <div className={styles.statValues}>
+                                <span>{stat.val1}</span>
+                                <span>{stat.val2}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className={styles.actions}>
+                      <button 
+                        className={`${styles.actionButton} ${styles.reportButton}`}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <i className="fas fa-file-alt"></i>
+                        Звіт
+                      </button>
+                      <button 
+                        className={`${styles.actionButton} ${styles.photosButton}`}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <i className="fas fa-camera"></i>
+                        Фото
+                      </button>
+                      <button 
+                        className={`${styles.actionButton} ${styles.videoButton}`}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <i className="fas fa-video"></i>
+                        Відео
+                      </button>
                     </div>
                   </div>
                 )}
@@ -231,6 +327,13 @@ const RecentMatches = () => {
           ) : (
             <div className={styles.noMatches}>Поки немає результатів для цієї дисципліни</div>
           )}
+        </div>
+
+        <div className={styles.viewAllContainer}>
+          <button className={styles.viewAllButton}>
+            Переглянути всі матчі
+            <i className="fas fa-arrow-right"></i>
+          </button>
         </div>
       </div>
     </section>
