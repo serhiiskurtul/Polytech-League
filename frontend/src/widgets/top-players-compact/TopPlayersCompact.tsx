@@ -1,13 +1,24 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import styles from './TopPlayersCompact.module.css';
+
+interface Player {
+  id: number;
+  rank: number;
+  name: string;
+  initials: string;
+  sport: string;
+  rating: number;
+  ratingChange: string;
+  team: string;
+  trend: 'up' | 'down';
+}
 
 const TopPlayersCompact = () => {
   const [selectedSport, setSelectedSport] = useState('Всі');
 
   const sports = ['Всі', 'Футзал', 'Баскетбол', 'Волейбол'];
 
-  const players = [
+  const players: Player[] = [
     {
       id: 1,
       rank: 1,
@@ -69,8 +80,8 @@ const TopPlayersCompact = () => {
     ? players.slice(0, 3) // Показуємо тільки топ-3 для компактного вигляду
     : players.filter(player => player.sport === selectedSport).slice(0, 3);
 
-  const getSportIcon = (sport) => {
-    const icons = {
+  const getSportIcon = (sport: string) => {
+    const icons: Record<string, string> = {
       'Футзал': '⚽',
       'Баскетбол': '🏀',
       'Волейбол': '🏐',
@@ -80,7 +91,7 @@ const TopPlayersCompact = () => {
     return icons[sport] || '🏆';
   };
 
-  const getTrendIcon = (trend) => {
+  const getTrendIcon = (trend: 'up' | 'down') => {
     if (trend === 'up') return '📈';
     if (trend === 'down') return '📉';
     return '➡️';
@@ -99,11 +110,10 @@ const TopPlayersCompact = () => {
             {sports.map((sport) => (
               <button
                 key={sport}
-                className={`${styles.sportButton} ${selectedSport === sport ? styles.active : ''}`}
+                className={`${styles.sportBtn} ${selectedSport === sport ? styles.active : ''}`}
                 onClick={() => setSelectedSport(sport)}
-                title={sport}
               >
-                {sport === 'Всі' ? '★' : getSportIcon(sport)}
+                {sport}
               </button>
             ))}
           </div>
@@ -112,48 +122,28 @@ const TopPlayersCompact = () => {
         <div className={styles.playersList}>
           {filteredPlayers.map((player) => (
             <div key={player.id} className={styles.playerItem}>
-              <div className={styles.playerRank}>
-                <div className={`${styles.rankNumber} ${player.rank <= 3 ? styles.topRank : ''}`}>
-                  {player.rank}
-                </div>
-                <div className={styles.trendIcon}>
-                  {getTrendIcon(player.trend)}
-                </div>
-              </div>
-
-              <div className={styles.playerAvatar}>
-                {player.initials}
-              </div>
-
+              <div className={styles.playerRank}>{player.rank}</div>
+              <div className={styles.playerAvatar}>{player.initials}</div>
               <div className={styles.playerInfo}>
-                <div className={styles.playerName}>
-                  {player.name}
-                  <span className={styles.playerSport}>
-                    {getSportIcon(player.sport)}
-                  </span>
-                </div>
-                <div className={styles.playerTeam}>
-                  {player.team}
-                </div>
+                <div className={styles.playerName}>{player.name}</div>
+                <div className={styles.playerTeam}>{player.team}</div>
               </div>
-
-              <div className={styles.playerRating}>
-                <div className={styles.ratingValue}>
-                  {player.rating}
+              <div className={styles.playerStats}>
+                <div className={styles.playerRating}>
+                  {getSportIcon(player.sport)} {player.rating}
                 </div>
-                <div className={`${styles.ratingChange} ${player.ratingChange.startsWith('+') ? styles.positive : styles.negative}`}>
-                  {player.ratingChange}
+                <div className={`${styles.playerTrend} ${styles[player.trend]}`}>
+                  {getTrendIcon(player.trend)} {player.ratingChange}
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        <div className={styles.seeMoreContainer}>
-          <Link to="/ratings" className={styles.seeMoreButton}>
-            <i className="fas fa-chart-line"></i>
-            Детальний рейтинг
-          </Link>
+        <div className={styles.cardFooter}>
+          <button className={styles.viewAllBtn}>
+            Переглянути весь рейтинг
+          </button>
         </div>
       </div>
     </section>

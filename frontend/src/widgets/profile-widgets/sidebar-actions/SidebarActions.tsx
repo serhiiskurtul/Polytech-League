@@ -1,7 +1,10 @@
-import React from 'react';
 import styles from './SidebarActions.module.css';
 
-const SidebarActions = ({ onActionClick }) => {
+interface SidebarActionsProps {
+  onActionClick: (text: string) => void;
+}
+
+const SidebarActions = ({ onActionClick }: SidebarActionsProps) => {
   const actions = [
     { icon: 'fas fa-plus', text: 'Створити команду' },
     { icon: 'fas fa-calendar-plus', text: 'Записатись на турнір' },

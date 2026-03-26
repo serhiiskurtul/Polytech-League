@@ -1,8 +1,15 @@
-import React from 'react';
 import styles from './SeasonStats.module.css';
 
+interface Stats {
+  totalMatches: number;
+  activeTournaments: number;
+  registeredPlayers: number;
+  progress: number;
+  topSport: string;
+}
+
 const SeasonStats= () => {
-  const stats = {
+  const stats: Stats = {
     totalMatches: 156,
     activeTournaments: 8,
     registeredPlayers: 324,

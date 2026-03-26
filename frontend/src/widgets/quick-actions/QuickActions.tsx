@@ -1,11 +1,19 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './QuickActions.module.css';
+
+interface QuickAction {
+  id: number;
+  icon: string;
+  title: string;
+  description: string;
+  color: string;
+  path: string;
+}
 
 const QuickActions = () => {
   const navigate = useNavigate();
 
-  const actions = [
+  const actions: QuickAction[] = [
     {
       id: 1,
       icon: 'fa-plus',
@@ -56,7 +64,7 @@ const QuickActions = () => {
     }
   ];
 
-  const handleActionClick = (path) => {
+  const handleActionClick = (path: string) => {
     navigate(path);
   };
 
@@ -75,7 +83,11 @@ const QuickActions = () => {
           <button
             key={action.id}
             className={`${styles.actionButton} ${styles.fadeInUp}`}
-            style={{ animationDelay: `${index * 0.1}s`,'--action-color': action.color }} // затримка для кожної картки
+            style={{ 
+              animationDelay: `${index * 0.1}s`,
+              // @ts-ignore
+              '--action-color': action.color 
+            }}
             onClick={() => handleActionClick(action.path)}
           >
             <div 

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import styles from './Header.module.css';
-import Logo from "../../shared/ui/Logo/Logo.jsx";
+import Logo from "../../shared/ui/Logo/Logo";
 
 export default function Header() {
   return (
@@ -57,4 +57,4 @@ export default function Header() {
       </div>
     </header>
   );
-};
+}

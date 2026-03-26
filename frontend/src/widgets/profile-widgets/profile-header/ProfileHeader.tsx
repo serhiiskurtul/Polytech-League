@@ -1,7 +1,24 @@
-import React from 'react';
 import styles from './ProfileHeader.module.css';
 
-const ProfileHeader = ({ userData, onEdit, onAvatarUpload }) => {
+interface UserData {
+  name: string;
+  badges: string[];
+  bio: string;
+  studentId: string;
+  faculty: string;
+  email: string;
+  phone: string;
+  city: string;
+  joinDate: string;
+}
+
+interface ProfileHeaderProps {
+  userData: UserData;
+  onEdit?: () => void;
+  onAvatarUpload?: () => void;
+}
+
+const ProfileHeader = ({ userData, onEdit, onAvatarUpload }: ProfileHeaderProps) => {
   return (
     <div className={styles.profileHeader}>
       <div className={styles.profileHeaderCard}>

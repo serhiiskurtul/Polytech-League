@@ -1,12 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './CountdownTimer.module.css';
 
-const CountdownTimer = ({ initialSeconds = 60, onTimerComplete }) => {
+interface CountdownTimerProps {
+  initialSeconds?: number;
+  onTimerComplete?: () => void;
+}
+
+const CountdownTimer = ({ initialSeconds = 60, onTimerComplete }: CountdownTimerProps) => {
   const [seconds, setSeconds] = useState(initialSeconds);
   const [isActive, setIsActive] = useState(true);
 
   useEffect(() => {
-    let interval = null;
+    let interval: ReturnType<typeof setInterval> | null = null;
     
     if (isActive && seconds > 0) {
       interval = setInterval(() => {
@@ -26,10 +31,10 @@ const CountdownTimer = ({ initialSeconds = 60, onTimerComplete }) => {
     };
   }, [isActive, seconds, onTimerComplete]);
 
-  const formatTime = (secs) => {
+  const formatTime = (secs: number) => {
     const minutes = Math.floor(secs / 60);
-    const seconds = secs % 60;
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    const remainingSeconds = secs % 60;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
   return (

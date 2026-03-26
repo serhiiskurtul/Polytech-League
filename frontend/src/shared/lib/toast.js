@@ -1,4 +1,3 @@
-// utils/toast.js
 export const showToast = {
   success: (message) => {
     alert(`✅ ${message}`);

@@ -1,4 +1,12 @@
+import { InputHTMLAttributes } from 'react';
 import styles from './InputSign.module.css';
+import { UseFormRegisterReturn } from 'react-hook-form';
+
+interface InputSignProps extends InputHTMLAttributes<HTMLInputElement> {
+  labelInput: string;
+  register?: UseFormRegisterReturn;
+  error?: string;
+}
 
 export default function InputSign({
   labelInput,
@@ -7,7 +15,7 @@ export default function InputSign({
   register,
   error,
   ...rest
-}) {
+}: InputSignProps) {
   return (
     <div className={styles.inputGroup}>
       <label className={styles.inputLabel}>{labelInput}</label>
@@ -16,7 +24,7 @@ export default function InputSign({
         type={type}
         placeholder={placeholder}
         className={`${styles.customInput} ${error ? styles.inputError : ''}`}
-        {...register}
+        {...(register || {})}
         {...rest}
       />
 

@@ -1,7 +1,17 @@
-import React from 'react';
 import styles from './UserAchievements.module.css';
 
-const UserAchievements = ({ achievements }) => {
+interface Achievement {
+  id: string | number;
+  icon: string;
+  name: string;
+  year: string | number;
+}
+
+interface UserAchievementsProps {
+  achievements: Achievement[];
+}
+
+const UserAchievements = ({ achievements }: UserAchievementsProps) => {
   return (
     <section className={styles.card}>
       <div className={styles.cardHeader}>

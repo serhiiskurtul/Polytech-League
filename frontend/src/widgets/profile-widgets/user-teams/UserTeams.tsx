@@ -1,7 +1,19 @@
-import React from 'react';
 import styles from './UserTeams.module.css';
 
-const UserTeams = ({ teams, onTeamClick }) => {
+interface Team {
+  id: string | number;
+  logo: string;
+  name: string;
+  sport: string;
+  role: string;
+}
+
+interface UserTeamsProps {
+  teams: Team[];
+  onTeamClick: (name: string) => void;
+}
+
+const UserTeams = ({ teams, onTeamClick }: UserTeamsProps) => {
   return (
     <section className={styles.card}>
       <div className={styles.cardHeader}>

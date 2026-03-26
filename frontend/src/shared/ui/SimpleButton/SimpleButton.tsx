@@ -1,7 +1,22 @@
 import { Link } from 'react-router-dom';
 import styles from './SimpleButton.module.css';
+import { ButtonHTMLAttributes } from 'react';
 
-export default function SimpleButton({ to, text, onClick, fullWidth = false, insideLink = false, ...props }) {
+interface SimpleButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  to?: string;
+  text: string;
+  fullWidth?: boolean;
+  insideLink?: boolean;
+}
+
+export default function SimpleButton({ 
+  to, 
+  text, 
+  onClick, 
+  fullWidth = false, 
+  insideLink = false, 
+  ...props 
+}: SimpleButtonProps) {
   const className = `${styles.viewBtn} ${fullWidth ? styles.fullWidth : ''}`;
 
   const buttonContent = (

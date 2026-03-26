@@ -1,12 +1,18 @@
-import React from 'react';
 import styles from './VerificationButton.module.css';
+import { ButtonHTMLAttributes } from 'react';
 
-const VerificationButton = ({ onClick, disabled, isLoading, isVerified }) => {
+interface VerificationButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  isLoading?: boolean;
+  isVerified?: boolean;
+}
+
+const VerificationButton = ({ onClick, disabled, isLoading, isVerified, ...props }: VerificationButtonProps) => {
   return (
     <button
       className={`${styles.btn} ${isVerified ? styles.btnSuccess : ''}`}
       onClick={onClick}
       disabled={disabled}
+      {...props}
     >
       {isLoading ? 'Перевірка...' : 
        isVerified ? 'Підтверджено!' : 

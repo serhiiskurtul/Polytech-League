@@ -1,7 +1,19 @@
 import styles from './TournamentsList.module.css';
-import TournamentItem from "../../entities/tournaments-list-item/TournamentsListItem.jsx";
+import TournamentItem from "../../entities/tournament/TournamentsListItem";
 
-export default function TournamentsList({ tournaments }) {
+interface Tournament {
+  id: string;
+  title: string;
+  teams: number;
+  status: 'ongoing' | 'upcoming' | 'finished';
+  date: string;
+}
+
+interface TournamentsListProps {
+  tournaments: Tournament[];
+}
+
+export default function TournamentsList({ tournaments }: TournamentsListProps) {
   return (
     <section className={styles.card}>
       <h3>Список Турнірів</h3>

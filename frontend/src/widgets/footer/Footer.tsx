@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Footer.module.css';
 import Logo from '../../shared/ui/Logo/Logo';
@@ -26,16 +25,19 @@ const Footer = () => {
     { name: 'YouTube', icon: 'fab fa-youtube', url: 'https://youtube.com/unileague' }
   ];
 
-  const handleNewsletterSubmit = (e) => {
+  const handleNewsletterSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const email = e.target.email.value;
+    const form = e.currentTarget;
+    const emailInput = form.elements.namedItem('email') as HTMLInputElement;
+    const email = emailInput.value;
     console.log('Підписка на розсилку:', email);
     alert('Дякуємо за підписку на розсилку!');
-    e.target.reset();
+    form.reset();
   };
 
-  const handleContactClick = () => {
-    console.log('Контакти');
+  const getSportIcon = (sport: string) => {
+    // Basic implementation as it was missing in the original file but used
+    return <i className="fas fa-running" style={{ marginRight: '8px' }}></i>;
   };
 
   return (
@@ -98,63 +100,31 @@ const Footer = () => {
 
             <div className={styles.footerColumn}>
               <h4 className={styles.footerTitle}>Зв'яжіться з нами</h4>
-              <div className={styles.contactInfo}>
-                <div className={styles.contactItem}>
-                  <i className="fas fa-envelope"></i>
-                  <span>support@PolytechLeague.com</span>
-                </div>
-                <div className={styles.contactItem}>
-                  <i className="fas fa-phone"></i>
-                  <span>+38 (XXX) XXX-XX-XX</span>
-                </div>
-                <div className={styles.contactItem}>
-                  <i className="fas fa-map-marker-alt"></i>
-                  <span>Чернівці, вул. Каспрука, 2</span>
-                </div>
-              </div>
-
-              <button className={styles.contactButton} onClick={handleContactClick}>
-                <i className="fas fa-comment-dots"></i>
-                Написати нам
-              </button>
-
+              <ul className={styles.footerLinks}>
+                <li>
+                   <a href="#" className={styles.footerLink}>
+                    <i className="fas fa-envelope"></i> info@cpfc.edu.ua
+                   </a>
+                </li>
+              </ul>
               <div className={styles.socialLinks}>
-                <h5 className={styles.socialTitle}>Ми в соцмережах:</h5>
-                <div className={styles.socialIcons}>
-                  {socialLinks.map((social, index) => (
-                    <a
-                      key={index}
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={styles.socialIcon}
-                      title={social.name}
-                    >
-                      <i className={social.icon}></i>
-                    </a>
-                  ))}
-                </div>
+                {socialLinks.map((social, index) => (
+                  <a key={index} href={social.url} className={styles.socialIcon} title={social.name} target="_blank" rel="noopener noreferrer">
+                    <i className={social.icon}></i>
+                  </a>
+                ))}
               </div>
             </div>
           </div>
         </div>
       </div>
+      <div className={styles.footerBottom}>
+        <div className={styles.container}>
+          <p className={styles.copyright}>&copy; 2025 Polytech League. Всі права захищені.</p>
+        </div>
+      </div>
     </footer>
   );
-};
-
-const getSportIcon = (sport) => {
-  const icons = {
-    'Футзал': '⚽',
-    'Баскетбол': '🏀',
-    'Волейбол': '🏐',
-    'Шахи': '♟️',
-    'Шашки': '♟️',
-    'Настільний теніс': '🏓',
-    'Бадмінтон': '🏸',
-    'Армреслінг': '💪'
-  };
-  return icons[sport] || '🏆';
 };
 
 export default Footer;

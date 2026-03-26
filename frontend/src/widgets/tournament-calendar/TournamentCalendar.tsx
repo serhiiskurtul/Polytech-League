@@ -1,9 +1,20 @@
-import React from 'react';
-import styles from './TournamentCalendar.module.css';
+ import styles from './TournamentCalendar.module.css';
+
+interface Tournament {
+  id: number;
+  sport: string;
+  name: string;
+  date: string;
+  location: string;
+  tags: string[];
+  participants: number;
+  status: string;
+  color: string;
+}
 
 const TournamentCalendar = () => {
   // Дані турнірів
-  const tournaments = [
+  const tournaments: Tournament[] = [
     {
       id: 1,
       sport: 'Шахи',
@@ -50,15 +61,34 @@ const TournamentCalendar = () => {
     }
   ];
 
-  const handleRegister = (tournamentId) => {
+  const handleRegister = (tournamentId: number) => {
     console.log(`Реєстрація на турнір ${tournamentId}`);
     // Тут можна додати логіку реєстрації
     alert(`Ви зареєструвались на турнір!`);
   };
 
-  const handleDetails = (tournamentId) => {
+  const handleDetails = (tournamentId: number) => {
     console.log(`Деталі турніру ${tournamentId}`);
     // Тут можна додати перехід на сторінку турніру
+  };
+
+  const getSportIcon = (sport: string) => {
+    const icons: Record<string, string> = {
+      'Шахи': 'fa-chess',
+      'Волейбол': 'fa-volleyball-ball',
+      'Футзал': 'fa-futbol',
+      'Настільний теніс': 'fa-table-tennis'
+    };
+    return icons[sport] || 'fa-trophy';
+  };
+
+  const getStatusClass = (status: string) => {
+    const classes: Record<string, string> = {
+      'Реєстрація': styles.statusRegistration,
+      'У процесі': styles.statusOngoing,
+      'Скоро': styles.statusSoon
+    };
+    return classes[status] || '';
   };
 
   return (
@@ -76,7 +106,7 @@ const TournamentCalendar = () => {
         
         <div className={styles.calendarGrid}>
           {tournaments.map((tournament) => (
-            <div key={tournament.id} className={styles.tournamentCard}>
+            <div key={tournament.id} className={tournament.status === 'У процесі' ? `${styles.tournamentCard} ${styles.active}` : styles.tournamentCard}>
               <div className={styles.tournamentHeader}>
                 <div className={styles.tournamentSport} style={{ color: tournament.color }}>
                   <i className={`fas ${getSportIcon(tournament.sport)} ${styles.sportIcon}`}></i>
@@ -99,74 +129,37 @@ const TournamentCalendar = () => {
                   <span>{tournament.location}</span>
                 </div>
                 <div className={styles.detailItem}>
-                  <i className="fas fa-users"></i>
-                  <span>{tournament.participants} учасників</span>
+                   <i className="fas fa-users"></i>
+                   <span>{tournament.participants} учасників</span>
                 </div>
               </div>
-              
-              <div className={styles.tagsContainer}>
+
+              <div className={styles.tournamentTags}>
                 {tournament.tags.map((tag, index) => (
-                  <span key={index} className={styles.sportTag}>
-                    {tag}
-                  </span>
+                  <span key={index} className={styles.tag}>{tag}</span>
                 ))}
               </div>
-              
+
               <div className={styles.tournamentActions}>
                 <button 
-                  className={`${styles.actionButton} ${styles.registerButton}`}
+                  className={styles.registerBtn}
                   onClick={() => handleRegister(tournament.id)}
                 >
-                  <i className="fas fa-user-plus"></i>
-                  Зареєструватись
+                  Реєстрація
                 </button>
                 <button 
-                  className={`${styles.actionButton} ${styles.detailsButton}`}
+                  className={styles.detailsBtn}
                   onClick={() => handleDetails(tournament.id)}
                 >
-                  <i className="fas fa-info-circle"></i>
                   Деталі
                 </button>
               </div>
             </div>
           ))}
         </div>
-        
-        <div className={styles.viewAllContainer}>
-          <button className={styles.viewAllButton}>
-            <i className="fas fa-calendar-alt"></i>
-            Переглянути весь календар
-          </button>
-        </div>
       </div>
     </section>
   );
-};
-
-// Допоміжні функції
-const getSportIcon = (sport) => {
-  const icons = {
-    'Шахи': 'fa-chess',
-    'Волейбол': 'fa-volleyball-ball',
-    'Пляжний волейбол': 'fa-umbrella-beach',
-    'Футзал': 'fa-futbol',
-    'Баскетбол 3х3': 'fa-basketball-ball',
-    'Настільний теніс': 'fa-table-tennis',
-    'Бадмінтон': 'fa-feather-alt',
-    'Армреслінг': 'fa-fist-raised',
-    'Шашки': 'fa-chess-board'
-  };
-  return icons[sport] || 'fa-trophy';
-};
-
-const getStatusClass = (status) => {
-  const classes = {
-    'Реєстрація': styles.statusOpen,
-    'У процесі': styles.statusLive,
-    'Скоро': styles.statusUpcoming,
-    'Завершено': styles.statusEnded
-  };
-  return classes[status] || styles.statusDefault;
 };
 
 export default TournamentCalendar;

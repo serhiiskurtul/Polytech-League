@@ -1,7 +1,23 @@
-import React from 'react';
 import styles from './RecentActivity.module.css';
 
-const RecentActivity = ({ activities, activityChart }) => {
+interface Activity {
+  id: string | number;
+  icon: string;
+  title: string;
+  time: string;
+}
+
+interface ActivityChartItem {
+  day: string;
+  value: number;
+}
+
+interface RecentActivityProps {
+  activities: Activity[];
+  activityChart: ActivityChartItem[];
+}
+
+const RecentActivity = ({ activities, activityChart }: RecentActivityProps) => {
   const maxValue = Math.max(...activityChart.map(item => item.value));
   
   return (

@@ -1,5 +1,5 @@
 import styles from './CreateTournament.module.css';
-import SimpleButton from '../../shared/SimpleButton/SimpleButton.jsx';
+import SimpleButton from '../../shared/ui/SimpleButton/SimpleButton';
 
 export default function CreateTournament() {
   return (

@@ -1,7 +1,17 @@
-import React from 'react';
 import styles from './ProfileStats.module.css';
 
-const ProfileStats = ({ stats }) => {
+interface Stats {
+  matchesPlayed: number;
+  wins: number;
+  eloRating: number;
+  goalsScored: number;
+}
+
+interface ProfileStatsProps {
+  stats: Stats;
+}
+
+const ProfileStats = ({ stats }: ProfileStatsProps) => {
   return (
     <section className={styles.card}>
       <div className={styles.cardHeader}>
