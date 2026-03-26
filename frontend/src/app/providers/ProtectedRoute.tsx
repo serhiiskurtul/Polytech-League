@@ -1,7 +1,13 @@
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from './AuthContext.jsx';
+import { useAuth } from './AuthContext';
+import { ReactNode } from 'react';
 
-export default function ProtectedRoute({ children, requireAuth = true }) {
+interface ProtectedRouteProps {
+  children: ReactNode;
+  requireAuth?: boolean;
+}
+
+export default function ProtectedRoute({ children, requireAuth = true }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
   const location = useLocation();
 
@@ -17,5 +23,5 @@ export default function ProtectedRoute({ children, requireAuth = true }) {
     return <Navigate to="/" replace />;
   }
 
-  return children;
+  return <>{children}</>;
 }

@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 const api = axios.create({
   baseURL: 'http://localhost:5000',
@@ -7,7 +7,7 @@ const api = axios.create({
 
 api.interceptors.response.use(
   response => response,
-  error => {
+  (error: AxiosError) => {
     if (error.response?.status === 401 || error.response?.status === 403) {
       console.warn('Не авторизовано або заборонено');
     }
