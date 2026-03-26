@@ -135,26 +135,35 @@ const TournamentCalendar = () => {
 
               <div className={styles.tagsContainer}>
                 {tournament.tags.map((tag, index) => (
-                  <span key={index} className={styles.tag}>{tag}</span>
+                  <span key={index} className={styles.sportTag}>{tag}</span>
                 ))}
               </div>
 
               <div className={styles.tournamentActions}>
                 <button 
-                  className={styles.registerBtn}
+                  className={`${styles.actionButton} ${styles.registerButton}`}
                   onClick={() => handleRegister(tournament.id)}
                 >
+                  <i className="fas fa-user-plus"></i>
                   Реєстрація
                 </button>
                 <button 
-                  className={styles.detailsBtn}
+                  className={`${styles.actionButton} ${styles.detailsButton}`}
                   onClick={() => handleDetails(tournament.id)}
                 >
+                  <i className="fas fa-info-circle"></i>
                   Деталі
                 </button>
               </div>
             </div>
           ))}
+        </div>
+
+        <div className={styles.viewAllContainer}>
+          <button className={styles.viewAllButton}>
+            Весь календар
+            <i className="fas fa-arrow-right"></i>
+          </button>
         </div>
       </div>
     </section>

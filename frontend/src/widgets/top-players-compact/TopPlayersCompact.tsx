@@ -112,8 +112,9 @@ const TopPlayersCompact = () => {
                 key={sport}
                 className={`${styles.sportButton} ${selectedSport === sport ? styles.active : ''}`}
                 onClick={() => setSelectedSport(sport)}
+                title={sport}
               >
-                {sport}
+                {sport === 'Всі' ? '👥' : getSportIcon(sport)}
               </button>
             ))}
           </div>
@@ -122,18 +123,22 @@ const TopPlayersCompact = () => {
         <div className={styles.playersList}>
           {filteredPlayers.map((player) => (
             <div key={player.id} className={styles.playerItem}>
-              <div className={styles.playerRank}>{player.rank}</div>
+              <div className={styles.playerRank}>
+                <div className={`${styles.rankNumber} ${player.rank <= 3 ? styles.topRank : ''}`}>
+                  {player.rank}
+                </div>
+              </div>
               <div className={styles.playerAvatar}>{player.initials}</div>
               <div className={styles.playerInfo}>
                 <div className={styles.playerName}>{player.name}</div>
                 <div className={styles.playerTeam}>{player.team}</div>
               </div>
-              <div className={styles.playerStats}>
-                <div className={styles.playerRating}>
+              <div className={styles.playerRating}>
+                <div className={styles.ratingValue}>
+                  {player.rating}
                   <span className={styles.ratingIcon}>{getSportIcon(player.sport)}</span>
-                  <span className={styles.ratingValue}>{player.rating}</span>
                 </div>
-                <div className={`${styles.playerTrend} ${styles[player.trend]}`}>
+                <div className={`${styles.ratingChange} ${player.trend === 'up' ? styles.positive : styles.negative}`}>
                   {getTrendIcon(player.trend)} {player.ratingChange}
                 </div>
               </div>
@@ -141,9 +146,10 @@ const TopPlayersCompact = () => {
           ))}
         </div>
 
-        <div className={styles.cardFooter}>
-          <button className={styles.viewAllBtn}>
+        <div className={styles.seeMoreContainer}>
+          <button className={styles.seeMoreButton}>
             Переглянути весь рейтинг
+            <i className="fas fa-arrow-right"></i>
           </button>
         </div>
       </div>

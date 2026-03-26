@@ -298,6 +298,16 @@
   line-height: 1.5;
 }
 
+.noMatches {
+  padding: 40px;
+  text-align: center;
+  color: var(--muted);
+  background: var(--primary-light);
+  border-radius: 12px;
+  font-style: italic;
+  margin-top: 20px;
+}
+
 .detailsButton {
   background: transparent;
   border: 2px solid var(--primary-light);

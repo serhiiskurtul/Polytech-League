@@ -108,11 +108,13 @@ const Footer = () => {
                 </li>
               </ul>
               <div className={styles.socialLinks}>
-                {socialLinks.map((social, index) => (
-                  <a key={index} href={social.url} className={styles.socialIcon} title={social.name} target="_blank" rel="noopener noreferrer">
-                    <i className={social.icon}></i>
-                  </a>
-                ))}
+                <div className={styles.socialIcons}>
+                  {socialLinks.map((social, index) => (
+                    <a key={index} href={social.url} className={styles.socialIcon} title={social.name} target="_blank" rel="noopener noreferrer">
+                      <i className={social.icon}></i>
+                    </a>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

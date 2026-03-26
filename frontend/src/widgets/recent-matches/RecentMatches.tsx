@@ -115,6 +115,18 @@ const RecentMatches = () => {
     return icons[sport] || 'fa-trophy';
   };
 
+  const getSportEmoji = (sport: string) => {
+    const emojis: Record<string, string> = {
+      'Футзал': '⚽',
+      'Баскетбол': '🏀',
+      'Волейбол': '🏐',
+      'Настільний теніс': '🏓',
+      'Шахи': '♟️',
+      'Всі': '👥'
+    };
+    return emojis[sport] || '🏆';
+  };
+
   return (
     <section className={styles.recentMatches}>
       <div className={styles.card}>
@@ -139,6 +151,7 @@ const RecentMatches = () => {
                   setSelectedSport(sport);
                 }}
               >
+                <span>{getSportEmoji(sport)}</span>
                 {sport}
               </button>
             ))}
@@ -166,20 +179,24 @@ const RecentMatches = () => {
                 <div className={styles.matchContent}>
                   <div className={styles.teamsContainer}>
                     <div className={styles.teamInfo}>
-                      <div className={styles.teamAvatar} style={{ backgroundColor: match.team1Color }}>
+                      <div className={styles.teamLogo} style={{ backgroundColor: match.team1Color }}>
                         {match.team1.substring(0, 2).toUpperCase()}
                       </div>
                       <span className={styles.teamName}>{match.team1}</span>
                     </div>
                     
                     <div className={styles.scoreContainer}>
-                      <div className={styles.scoreValue}>{match.score1}</div>
+                      <div className={`${styles.score} ${match.score1 > match.score2 ? styles.winner : ''}`}>
+                        {match.score1}
+                      </div>
                       <div className={styles.scoreDivider}>:</div>
-                      <div className={styles.scoreValue}>{match.score2}</div>
+                      <div className={`${styles.score} ${match.score2 > match.score1 ? styles.winner : ''}`}>
+                        {match.score2}
+                      </div>
                     </div>
                     
                     <div className={styles.teamInfo} style={{ flexDirection: 'row-reverse' }}>
-                      <div className={styles.teamAvatar} style={{ backgroundColor: match.team2Color }}>
+                      <div className={styles.teamLogo} style={{ backgroundColor: match.team2Color }}>
                         {match.team2.substring(0, 2).toUpperCase()}
                       </div>
                       <span className={styles.teamName} style={{ textAlign: 'right' }}>{match.team2}</span>
@@ -187,12 +204,12 @@ const RecentMatches = () => {
                   </div>
                 </div>
 
-                <div className={styles.matchFooter}>
-                  <div className={styles.matchDate}>
+                <div className={styles.matchMeta}>
+                  <div className={styles.metaItem}>
                     <i className="far fa-clock"></i>
                     {formatDate(match.date)}
                   </div>
-                  <div className={styles.matchLocation}>
+                  <div className={styles.metaItem}>
                     <i className="fas fa-map-marker-alt"></i>
                     {match.location}
                   </div>
@@ -200,15 +217,12 @@ const RecentMatches = () => {
 
                 {expandedMatch === match.id && (
                   <div className={styles.matchDetails}>
-                    <div className={styles.detailsGrid}>
-                      <div className={styles.detailItem}>
-                        <div className={styles.detailLabel}>Турнір/Етап</div>
-                        <div className={styles.detailValue}>{match.details}</div>
-                      </div>
-                      <div className={styles.winnerSection}>
-                        <i className="fas fa-crown"></i>
-                        <span>Переможець: <strong>{match.winner}</strong></span>
-                      </div>
+                    <div className={styles.matchDescription}>
+                      <strong>Турнір/Етап:</strong> {match.details}
+                    </div>
+                    <div className={styles.matchWinner}>
+                      <i className="fas fa-crown"></i>
+                      <span>Переможець: <strong>{match.winner}</strong></span>
                     </div>
                   </div>
                 )}
