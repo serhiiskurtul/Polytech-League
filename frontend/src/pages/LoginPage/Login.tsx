@@ -3,13 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { useAuth } from '../../app/providers/AuthContext.jsx';
-import { login as loginApi } from "../../shared/api/auth.api.js";
-import api from "../../shared/api/axiosInstance.js";
+import { useAuth } from '../../app/providers/AuthContext';
+import { login as loginApi } from "../../shared/api/auth.api";
+import api from "../../shared/api/axiosInstance";
 
-import InputSign from "../../shared/ui/InputSign/InputSign.jsx";
-import ButtonSign from '../../shared/ui/ButtonSign/ButtonSign.jsx';
-import Logo from '../../shared/ui/Logo/Logo.jsx';
+import InputSign from "../../shared/ui/InputSign/InputSign";
+import ButtonSign from '../../shared/ui/ButtonSign/ButtonSign';
+import Logo from '../../shared/ui/Logo/Logo';
 
 // Yup schema
 const loginSchema = yup.object({
@@ -21,7 +21,9 @@ const loginSchema = yup.object({
     .string()
     .required('Пароль є обов’язковим')
     .min(8, 'Пароль має містити щонайменше 8 символів'),
-});
+}).required();
+
+type LoginFormInputs = yup.InferType<typeof loginSchema>;
 
 export default function Login() {
   const navigate = useNavigate();
@@ -31,20 +33,20 @@ export default function Login() {
     handleSubmit,
     formState: { errors, isSubmitting },
     setError,
-  } = useForm({
+  } = useForm<LoginFormInputs>({
     resolver: yupResolver(loginSchema),
   });
 
   const { login } = useAuth();
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: LoginFormInputs) => {
     try {
-      await loginApi(data.email, data.password);
+      await loginApi({ email: data.email, password: data.password });
 
       const meResponse = await api.get("/users/me");
       login(meResponse.data);
       navigate("/");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
       if (error.response?.status === 401) {
         setError("root", { message: "Невірний email або пароль" });
@@ -67,6 +69,8 @@ export default function Login() {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          {errors.root && <div className={styles.errorMessage}>{errors.root.message}</div>}
+          
           <InputSign
             labelInput="Email"
             type="email"

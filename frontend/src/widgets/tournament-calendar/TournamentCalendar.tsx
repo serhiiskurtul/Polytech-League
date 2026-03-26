@@ -1,4 +1,4 @@
- import styles from './TournamentCalendar.module.css';
+import styles from './TournamentCalendar.module.css';
 
 interface Tournament {
   id: number;
@@ -63,13 +63,11 @@ const TournamentCalendar = () => {
 
   const handleRegister = (tournamentId: number) => {
     console.log(`Реєстрація на турнір ${tournamentId}`);
-    // Тут можна додати логіку реєстрації
     alert(`Ви зареєструвались на турнір!`);
   };
 
   const handleDetails = (tournamentId: number) => {
     console.log(`Деталі турніру ${tournamentId}`);
-    // Тут можна додати перехід на сторінку турніру
   };
 
   const getSportIcon = (sport: string) => {
@@ -84,11 +82,12 @@ const TournamentCalendar = () => {
 
   const getStatusClass = (status: string) => {
     const classes: Record<string, string> = {
-      'Реєстрація': styles.statusRegistration,
-      'У процесі': styles.statusOngoing,
-      'Скоро': styles.statusSoon
+      'Реєстрація': styles.statusOpen,
+      'У процесі': styles.statusLive,
+      'Скоро': styles.statusUpcoming,
+      'Завершено': styles.statusEnded
     };
-    return classes[status] || '';
+    return classes[status] || styles.statusDefault;
   };
 
   return (
@@ -106,7 +105,7 @@ const TournamentCalendar = () => {
         
         <div className={styles.calendarGrid}>
           {tournaments.map((tournament) => (
-            <div key={tournament.id} className={tournament.status === 'У процесі' ? `${styles.tournamentCard} ${styles.active}` : styles.tournamentCard}>
+            <div key={tournament.id} className={styles.tournamentCard}>
               <div className={styles.tournamentHeader}>
                 <div className={styles.tournamentSport} style={{ color: tournament.color }}>
                   <i className={`fas ${getSportIcon(tournament.sport)} ${styles.sportIcon}`}></i>
@@ -134,7 +133,7 @@ const TournamentCalendar = () => {
                 </div>
               </div>
 
-              <div className={styles.tournamentTags}>
+              <div className={styles.tagsContainer}>
                 {tournament.tags.map((tag, index) => (
                   <span key={index} className={styles.tag}>{tag}</span>
                 ))}

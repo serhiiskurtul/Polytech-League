@@ -117,88 +117,107 @@ const RecentMatches = () => {
 
   return (
     <section className={styles.recentMatches}>
-      <div className={styles.header}>
-        <h2 className={styles.title}>
-          <i className="fas fa-history"></i>
-          Останні результати
-        </h2>
-        
-        <div className={styles.sportFilter}>
-          {sports.map(sport => (
-            <button
-              key={sport}
-              className={`${styles.filterBtn} ${selectedSport === sport ? styles.active : ''}`}
-              onClick={() => setSelectedSport(sport)}
-            >
-              {sport}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className={styles.matchesGrid}>
-        {filteredMatches.length > 0 ? (
-          filteredMatches.map(match => (
-            <div 
-              key={match.id} 
-              className={`${styles.matchCard} ${expandedMatch === match.id ? styles.expanded : ''}`}
-              onClick={() => toggleMatchDetails(match.id)}
-            >
-              <div className={styles.matchSport}>
-                <i className={`fas ${getSportIcon(match.sport)}`}></i>
-                {match.sport}
-              </div>
-              
-              <div className={styles.matchTeams}>
-                <div className={styles.team}>
-                  <div className={styles.teamInfo}>
-                    <div className={styles.teamAvatar} style={{ backgroundColor: match.team1Color }}>
-                      {match.team1.substring(0, 2).toUpperCase()}
-                    </div>
-                    <span className={styles.teamName}>{match.team1}</span>
-                  </div>
-                  <div className={styles.score}>{match.score1}</div>
-                </div>
-                
-                <div className={styles.divider}>VS</div>
-                
-                <div className={styles.team}>
-                  <div className={styles.score}>{match.score2}</div>
-                  <div className={styles.teamInfo}>
-                    <span className={styles.teamName}>{match.team2}</span>
-                    <div className={styles.teamAvatar} style={{ backgroundColor: match.team2Color }}>
-                      {match.team2.substring(0, 2).toUpperCase()}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className={styles.matchFooter}>
-                <div className={styles.matchDate}>{formatDate(match.date)}</div>
-                <div className={styles.matchStatus}>{match.status}</div>
-              </div>
-
-              {expandedMatch === match.id && (
-                <div className={styles.matchDetails}>
-                  <div className={styles.detailItem}>
-                    <i className="fas fa-map-marker-alt"></i>
-                    <span>{match.location}</span>
-                  </div>
-                  <div className={styles.detailItem}>
-                    <i className="fas fa-info-circle"></i>
-                    <span>{match.details}</span>
-                  </div>
-                  <div className={styles.winnerInfo}>
-                    <i className="fas fa-crown"></i>
-                    <span>Переможець: <strong>{match.winner}</strong></span>
-                  </div>
-                </div>
-              )}
+      <div className={styles.card}>
+        <div className={styles.cardHeader}>
+          <div className={styles.headerLeft}>
+            <h2 className={styles.cardTitle}>
+              <i className={`fas fa-history ${styles.cardIcon}`}></i>
+              Останні результати
+            </h2>
+            <div className={`${styles.badge} ${styles.badgePrimary}`}>
+              {filteredMatches.length} матчів
             </div>
-          ))
-        ) : (
-          <div className={styles.noMatches}>Поки немає результатів для цієї дисципліни</div>
-        )}
+          </div>
+          
+          <div className={styles.sportFilters}>
+            {sports.map(sport => (
+              <button
+                key={sport}
+                className={`${styles.sportFilter} ${selectedSport === sport ? styles.active : ''}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedSport(sport);
+                }}
+              >
+                {sport}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className={styles.matchesList}>
+          {filteredMatches.length > 0 ? (
+            filteredMatches.map(match => (
+              <div 
+                key={match.id} 
+                className={`${styles.matchCard} ${expandedMatch === match.id ? styles.expanded : ''}`}
+                onClick={() => toggleMatchDetails(match.id)}
+              >
+                <div className={styles.matchHeader}>
+                  <div className={styles.matchSport}>
+                    <i className={`fas ${getSportIcon(match.sport)} ${styles.sportIcon}`}></i>
+                    {match.sport}
+                  </div>
+                  <div className={`${styles.statusBadge} ${match.status === 'Завершено' ? styles.statusCompleted : styles.statusLive}`}>
+                    {match.status}
+                  </div>
+                </div>
+                
+                <div className={styles.matchContent}>
+                  <div className={styles.teamsContainer}>
+                    <div className={styles.teamInfo}>
+                      <div className={styles.teamAvatar} style={{ backgroundColor: match.team1Color }}>
+                        {match.team1.substring(0, 2).toUpperCase()}
+                      </div>
+                      <span className={styles.teamName}>{match.team1}</span>
+                    </div>
+                    
+                    <div className={styles.scoreContainer}>
+                      <div className={styles.scoreValue}>{match.score1}</div>
+                      <div className={styles.scoreDivider}>:</div>
+                      <div className={styles.scoreValue}>{match.score2}</div>
+                    </div>
+                    
+                    <div className={styles.teamInfo} style={{ flexDirection: 'row-reverse' }}>
+                      <div className={styles.teamAvatar} style={{ backgroundColor: match.team2Color }}>
+                        {match.team2.substring(0, 2).toUpperCase()}
+                      </div>
+                      <span className={styles.teamName} style={{ textAlign: 'right' }}>{match.team2}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.matchFooter}>
+                  <div className={styles.matchDate}>
+                    <i className="far fa-clock"></i>
+                    {formatDate(match.date)}
+                  </div>
+                  <div className={styles.matchLocation}>
+                    <i className="fas fa-map-marker-alt"></i>
+                    {match.location}
+                  </div>
+                </div>
+
+                {expandedMatch === match.id && (
+                  <div className={styles.matchDetails}>
+                    <div className={styles.detailsGrid}>
+                      <div className={styles.detailItem}>
+                        <div className={styles.detailLabel}>Турнір/Етап</div>
+                        <div className={styles.detailValue}>{match.details}</div>
+                      </div>
+                      <div className={styles.winnerSection}>
+                        <i className="fas fa-crown"></i>
+                        <span>Переможець: <strong>{match.winner}</strong></span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))
+          ) : (
+            <div className={styles.noMatches}>Поки немає результатів для цієї дисципліни</div>
+          )}
+        </div>
       </div>
     </section>
   );

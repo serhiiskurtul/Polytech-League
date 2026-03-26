@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import CalendarGrid from './CalendarGrid';
 import CalendarSidebar from './CalendarSidebar';
 import CalendarStats from './CalendarStats';
@@ -6,16 +6,28 @@ import CalendarControls from './CalendarControls';
 import CalendarFilters from './CalendarFilters';
 import './Calendar.css';
 
+export interface CalendarEventData {
+  id: number;
+  day: number;
+  month: number;
+  year: number;
+  sport: string;
+  title: string;
+  time: string;
+  location: string;
+  description: string;
+}
+
 const Calendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [activeSportFilter, setActiveSportFilter] = useState('all');
   const [calendarView, setCalendarView] = useState('month');
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState<CalendarEventData[]>([]);
 
   // Ініціалізація даних подій
   useEffect(() => {
-    const eventsData = [
+    const eventsData: CalendarEventData[] = [
       { id: 1, day: 15, month: 11, year: 2025, sport: 'football', title: 'Чемпіонат коледжу з футзалу', time: '14:00', location: 'Спортивний зал №1', description: 'Чвертьфінальний матч між командами ІТ-31 та ЕК-22' },
       { id: 2, day: 15, month: 11, year: 2025, sport: 'table-tennis', title: 'Турнір з настільного тенісу', time: '16:30', location: 'Спортивний зал №3', description: 'Груповий етап турніру' },
       { id: 3, day: 18, month: 11, year: 2025, sport: 'basketball', title: 'Кубок декана: баскетбол', time: '15:00', location: 'Спортивний зал №2', description: 'Півфінальні матчі' },
@@ -35,7 +47,7 @@ const Calendar = () => {
   ];
 
   // Назви видів спорту
-  const sportNames = {
+  const sportNames: Record<string, string> = {
     'football': 'Футзал',
     'basketball': 'Баскетбол',
     'volleyball': 'Волейбол',
@@ -61,7 +73,7 @@ const Calendar = () => {
   };
 
   // Обробка зміни місяця
-  const handleMonthChange = (direction) => {
+  const handleMonthChange = (direction: 'prev' | 'next') => {
     setCurrentDate(prevDate => {
       const newDate = new Date(prevDate);
       if (direction === 'prev') {
@@ -74,17 +86,17 @@ const Calendar = () => {
   };
 
   // Обробка вибору дня
-  const handleDaySelect = (day, month, year) => {
+  const handleDaySelect = (day: number, month: number, year: number) => {
     setSelectedDate(new Date(year, month, day));
   };
 
   // Обробка зміни фільтра
-  const handleFilterChange = (sport) => {
+  const handleFilterChange = (sport: string) => {
     setActiveSportFilter(sport);
   };
 
   // Обробка зміни виду календаря
-  const handleViewChange = (view) => {
+  const handleViewChange = (view: string) => {
     setCalendarView(view);
   };
 
@@ -93,7 +105,6 @@ const Calendar = () => {
     const monthEvents = getEventsForCurrentMonth();
     const footballEvents = monthEvents.filter(event => event.sport === 'football').length;
     const basketballEvents = monthEvents.filter(event => event.sport === 'basketball').length;
-    const volleyballEvents = monthEvents.filter(event => event.sport === 'volleyball').length;
     
     // Рахуємо дні з подіями
     const daysWithEvents = [...new Set(monthEvents.map(event => event.day))].length;
@@ -102,56 +113,52 @@ const Calendar = () => {
       totalEvents: monthEvents.length,
       footballEvents,
       basketballEvents,
-      volleyballEvents,
       daysWithEvents
     };
   };
 
   return (
-    <div className="calendar-page">
-      {/* Заголовок сторінки */}
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Календар подій</h1>
-          <p className="page-subtitle">Слідкуйте за розкладом турнірів та матчів</p>
-        </div>
-        
-        <CalendarControls 
-          currentDate={currentDate}
-          monthNames={monthNames}
-          onMonthChange={handleMonthChange}
-          calendarView={calendarView}
-          onViewChange={handleViewChange}
-        />
+    <div className="calendar-page-container">
+      <div className="calendar-main-header">
+        <h1>Календар спортивних подій</h1>
+        <p>Слідкуйте за розкладом матчів та турнірів коледжу</p>
       </div>
 
-      {/* Фільтри */}
-      <CalendarFilters 
-        activeFilter={activeSportFilter}
-        onFilterChange={handleFilterChange}
-      />
-
-      <div className="calendar-sidebar">
-        {/* Основний календар */}
-        <CalendarGrid 
-          currentDate={currentDate}
-          selectedDate={selectedDate}
-          events={events}
-          activeSportFilter={activeSportFilter}
-          onDaySelect={handleDaySelect}
-        />
-
-        {/* Деталі вибраного дня */}
-        <CalendarSidebar 
-          selectedDate={selectedDate}
-          monthNames={monthNames}
-          events={getEventsForSelectedDay()}
-          sportNames={sportNames}
-        />
-      </div>
-
-      {/* Статистика */}
       <CalendarStats stats={getMonthStats()} />
+
+      <div className="calendar-layout">
+        <div className="calendar-main-section">
+          <CalendarControls 
+            currentDate={currentDate}
+            monthNames={monthNames}
+            onMonthChange={handleMonthChange}
+            calendarView={calendarView}
+            onViewChange={handleViewChange}
+          />
+          
+          <CalendarFilters 
+            activeFilter={activeSportFilter}
+            onFilterChange={handleFilterChange}
+          />
+
+          <CalendarGrid 
+            currentDate={currentDate}
+            selectedDate={selectedDate}
+            events={events}
+            activeSportFilter={activeSportFilter}
+            onDaySelect={handleDaySelect}
+          />
+        </div>
+
+        <aside className="calendar-sidebar-section">
+          <CalendarSidebar 
+            selectedDate={selectedDate}
+            monthNames={monthNames}
+            events={getEventsForSelectedDay()}
+            sportNames={sportNames}
+          />
+        </aside>
+      </div>
     </div>
   );
 };

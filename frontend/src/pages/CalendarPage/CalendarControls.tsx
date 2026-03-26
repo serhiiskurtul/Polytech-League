@@ -1,4 +1,10 @@
-import React from 'react';
+interface CalendarControlsProps {
+  currentDate: Date;
+  monthNames: string[];
+  onMonthChange: (direction: 'prev' | 'next') => void;
+  calendarView: string;
+  onViewChange: (view: string) => void;
+}
 
 const CalendarControls = ({ 
   currentDate, 
@@ -6,7 +12,7 @@ const CalendarControls = ({
   onMonthChange, 
   calendarView, 
   onViewChange 
-}) => {
+}: CalendarControlsProps) => {
   const currentMonth = currentDate.getMonth();
   const currentYear = currentDate.getFullYear();
 

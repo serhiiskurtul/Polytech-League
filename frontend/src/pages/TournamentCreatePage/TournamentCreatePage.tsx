@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './TournamentCreatePage.module.css';
 import { useTournamentForm } from './hooks/useTournamentForm';
 

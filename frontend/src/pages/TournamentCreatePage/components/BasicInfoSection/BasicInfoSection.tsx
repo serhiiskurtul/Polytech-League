@@ -1,9 +1,23 @@
-import React from 'react';
 import shared from '../../TournamentCreatePage.module.css';
 import styles from './BasicInfoSection.module.css';
-import { AVAILABLE_SPORTS, TOURNAMENT_TYPES, CHESS_SYSTEMS, CHECKERS_SYSTEMS, TABLE_TENNIS_TOURNAMENT_TYPES, BASKETBALL3X3_TOURNAMENT_TYPES, BADMINTON_TOURNAMENT_TYPES } from '../../constants';
+import { 
+  AVAILABLE_SPORTS, 
+  TOURNAMENT_TYPES, 
+  CHESS_SYSTEMS, 
+  CHECKERS_SYSTEMS, 
+  TABLE_TENNIS_TOURNAMENT_TYPES, 
+  BASKETBALL3X3_TOURNAMENT_TYPES, 
+  BADMINTON_TOURNAMENT_TYPES 
+} from '../../constants';
+import { TournamentFormData } from '../../hooks/useTournamentForm';
+import { ChangeEvent } from 'react';
 
-const BasicInfoSection = ({ formData, handleInputChange }) => {
+interface BasicInfoSectionProps {
+  formData: TournamentFormData;
+  handleInputChange: (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
+}
+
+const BasicInfoSection = ({ formData, handleInputChange }: BasicInfoSectionProps) => {
   return (
     <div className={shared.formBlock}>
       <h3 className={shared.blockTitle}>
@@ -97,65 +111,6 @@ const BasicInfoSection = ({ formData, handleInputChange }) => {
         </div>
         )}
 
-        {/* Кількість учасників (не для армреслінгу) */}
-        {formData.sport !== 'armwrestling' && (
-        <div className={shared.formGroup}>
-          <label className={shared.formLabel}>
-            <i className="fas fa-users"></i> Кількість команд/учасників
-          </label>
-          <div className={styles.rangeGroup}>
-            <div className={styles.rangeInput}>
-              <span className={styles.rangeLabel}>Мін:</span>
-              <input
-                type="number"
-                name="minTeams"
-                value={formData.minTeams}
-                onChange={handleInputChange}
-                className={shared.numberInput}
-                min="2"
-                max="64"
-              />
-            </div>
-            <div className={styles.rangeSeparator}>-</div>
-            <div className={styles.rangeInput}>
-              <span className={styles.rangeLabel}>Макс:</span>
-              <input
-                type="number"
-                name={['chess', 'checkers'].includes(formData.sport) ? 'participantsCount' : 'maxTeams'}
-                value={['chess', 'checkers'].includes(formData.sport) ? formData.participantsCount : formData.maxTeams}
-                onChange={handleInputChange}
-                className={shared.numberInput}
-                min={formData.minTeams}
-                max={formData.sport === 'table_tennis' ? "256" : "128"}
-              />
-            </div>
-          </div>
-          <div className={styles.rangeHint}>
-            Оптимально: 8, 16, 32 для олімпійської системи
-          </div>
-        </div>
-        )}
-
-        {/* Шахові / шашкові специфічні поля */}
-        {['chess', 'checkers'].includes(formData.sport) && (
-          <>
-            <div className={shared.formGroup}>
-              <label className={shared.formLabel}>
-                <i className="fas fa-clock"></i> Контроль часу *
-              </label>
-              <input
-                type="text"
-                name="timeControl"
-                value={formData.timeControl}
-                onChange={handleInputChange}
-                className={shared.formInput}
-                placeholder="Наприклад: 10+5 або Classical"
-                required
-              />
-            </div>
-          </>
-        )}
-
         {/* Опис */}
         <div className={shared.formGroup}>
           <label className={shared.formLabel}>
@@ -166,8 +121,8 @@ const BasicInfoSection = ({ formData, handleInputChange }) => {
             value={formData.description}
             onChange={handleInputChange}
             className={shared.formTextarea}
-            placeholder="Детальний опис змагання, його цілей та особливостей..."
-            rows="4"
+            placeholder="Розкажіть про формат, учасників та важливі деталі..."
+            rows={4}
             required
           />
         </div>

@@ -1,9 +1,20 @@
-import React from 'react';
 import shared from '../../TournamentCreatePage.module.css';
-import styles from './SettingsSection.module.css';
-import { CHECKERS_VARIANTS, TABLE_TENNIS_TOURNAMENT_TYPES, TABLE_TENNIS_CATEGORIES, ARMWRESTLING_HANDS, ARMWRESTLING_WEIGHT_CLASSES, ARMWRESTLING_CATEGORIES } from '../../constants';
+import { 
+  CHECKERS_VARIANTS, 
+  TABLE_TENNIS_CATEGORIES, 
+  ARMWRESTLING_HANDS, 
+  ARMWRESTLING_WEIGHT_CLASSES, 
+  ARMWRESTLING_CATEGORIES 
+} from '../../constants';
+import { TournamentFormData } from '../../hooks/useTournamentForm';
+import { ChangeEvent } from 'react';
 
-const SettingsSection = ({ formData, handleInputChange }) => {
+interface SettingsSectionProps {
+  formData: TournamentFormData;
+  handleInputChange: (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
+}
+
+const SettingsSection = ({ formData, handleInputChange }: SettingsSectionProps) => {
   return (
     <>
       {/* Рівень змагання */}
@@ -99,15 +110,15 @@ const SettingsSection = ({ formData, handleInputChange }) => {
               className={shared.formSelect}
               required
             >
-              {ARMWRESTLING_WEIGHT_CLASSES.map(wc => (
-                <option key={wc.id} value={wc.id}>{wc.name}</option>
+              {ARMWRESTLING_WEIGHT_CLASSES.map(w => (
+                <option key={w.id} value={w.id}>{w.name}</option>
               ))}
             </select>
           </div>
 
           <div className={shared.formGroup}>
             <label className={shared.formLabel}>
-              <i className="fas fa-users"></i> Категорія учасників *
+              <i className="fas fa-users"></i> Категорія *
             </label>
             <select
               name="armCategory"
@@ -116,78 +127,41 @@ const SettingsSection = ({ formData, handleInputChange }) => {
               className={shared.formSelect}
               required
             >
-              {ARMWRESTLING_CATEGORIES.map(cat => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              {ARMWRESTLING_CATEGORIES.map(c => (
+                <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </select>
           </div>
         </>
       )}
 
-      {/* Деталі турніру */}
+      {/* Налаштування видимості */}
       <div className={shared.formBlock}>
         <h3 className={shared.blockTitle}>
-          <i className="fas fa-cog"></i> Деталі та налаштування
+          <i className="fas fa-cog"></i> Налаштування доступу
         </h3>
-        
         <div className={shared.formGrid}>
-          {/* Правила */}
-          <div className={shared.formGroup}>
-            <label className={shared.formLabel}>
-              <i className="fas fa-book"></i> Правила змагання
+          <div className={shared.checkboxGroup}>
+            <label className={shared.checkboxLabel}>
+              <input
+                type="checkbox"
+                name="isPublic"
+                checked={formData.isPublic}
+                onChange={handleInputChange}
+              />
+              Публічне змагання (видиме всім)
             </label>
-            <textarea
-              name="rules"
-              value={formData.rules}
-              onChange={handleInputChange}
-              className={shared.formTextarea}
-              placeholder="Основні правила та регламент..."
-              rows="4"
-            />
           </div>
-
-          {/* Призи */}
-          <div className={shared.formGroup}>
-            <label className={shared.formLabel}>
-              <i className="fas fa-gift"></i> Призи та нагороди
+          <div className={shared.checkboxGroup}>
+            <label className={shared.checkboxLabel}>
+              <input
+                type="checkbox"
+                name="requireApproval"
+                checked={formData.requireApproval}
+                onChange={handleInputChange}
+              />
+              Підтвердження реєстрації організатором
             </label>
-            <textarea
-              name="prizes"
-              value={formData.prizes}
-              onChange={handleInputChange}
-              className={shared.formTextarea}
-              placeholder="Опишіть призовий фонд..."
-              rows="4"
-            />
-          </div>
-
-          {/* Налаштування видимості */}
-          <div className={shared.formGroup}>
-            <label className={shared.formLabel}>
-              <i className="fas fa-eye"></i> Видимість
-            </label>
-            <div className={styles.checkboxGroup}>
-              <label className={styles.checkboxLabel}>
-                <input
-                  type="checkbox"
-                  name="isPublic"
-                  checked={formData.isPublic}
-                  onChange={handleInputChange}
-                  className={styles.checkboxInput}
-                />
-                <span className={styles.checkboxText}>Публічне змагання</span>
-              </label>
-              <label className={styles.checkboxLabel}>
-                <input
-                  type="checkbox"
-                  name="requireApproval"
-                  checked={formData.requireApproval}
-                  onChange={handleInputChange}
-                  className={styles.checkboxInput}
-                />
-                <span className={styles.checkboxText}>Модерація заявок</span>
-              </label>
-            </div>
           </div>
         </div>
       </div>

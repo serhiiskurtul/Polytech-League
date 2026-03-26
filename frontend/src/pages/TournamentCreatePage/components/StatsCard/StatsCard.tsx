@@ -1,8 +1,13 @@
-import React from 'react';
-import shared from '../../TournamentCreatePage.module.css';
-import styles from './StatsCard.module.css';
+ import styles from './StatsCard.module.css';
+import { TournamentFormData } from '../../hooks/useTournamentForm';
 
-const StatsCard = ({ formData, selectedCategories, calculateDuration }) => {
+interface StatsCardProps {
+  formData: TournamentFormData;
+  selectedCategories: string[];
+  calculateDuration: () => number;
+}
+
+const StatsCard = ({ formData, selectedCategories, calculateDuration }: StatsCardProps) => {
   return (
     <div className={styles.statsCard}>
       <h4 className={styles.statsTitle}>Статистика заповнення</h4>

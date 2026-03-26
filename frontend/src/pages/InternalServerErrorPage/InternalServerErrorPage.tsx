@@ -11,7 +11,7 @@ export default function InternalServerError() {
 
         <button
           className={styles.btn500}
-          onClick={() => location.reload()}
+          onClick={() => window.location.reload()}
         >
           Оновити сторінку
         </button>

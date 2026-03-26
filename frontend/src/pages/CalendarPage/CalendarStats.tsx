@@ -1,6 +1,15 @@
-import React from 'react';
+interface Stats {
+  totalEvents: number;
+  footballEvents: number;
+  basketballEvents: number;
+  daysWithEvents: number;
+}
 
-const CalendarStats = ({ stats }) => {
+interface CalendarStatsProps {
+  stats: Stats;
+}
+
+const CalendarStats = ({ stats }: CalendarStatsProps) => {
   return (
     <div className="calendar-stats">
       <div className="stat-card">

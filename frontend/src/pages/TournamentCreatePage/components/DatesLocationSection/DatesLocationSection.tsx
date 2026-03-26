@@ -1,8 +1,15 @@
-import React from 'react';
 import shared from '../../TournamentCreatePage.module.css';
 import styles from './DatesLocationSection.module.css';
+import { TournamentFormData } from '../../hooks/useTournamentForm';
+import { ChangeEvent } from 'react';
 
-const DatesLocationSection = ({ formData, handleInputChange, calculateDuration }) => {
+interface DatesLocationSectionProps {
+  formData: TournamentFormData;
+  handleInputChange: (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
+  calculateDuration: () => number;
+}
+
+const DatesLocationSection = ({ formData, handleInputChange, calculateDuration }: DatesLocationSectionProps) => {
   return (
     <div className={shared.formBlock}>
       <h3 className={shared.blockTitle}>

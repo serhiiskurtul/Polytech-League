@@ -1,5 +1,4 @@
-import Tournaments from './Tournaments.jsx';
-
+import Tournaments from './Tournaments';
 
 export default function TournamentsPage() {
   return (

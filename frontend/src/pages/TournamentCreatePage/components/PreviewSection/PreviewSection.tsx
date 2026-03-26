@@ -1,9 +1,24 @@
-import React from 'react';
-import shared from '../../TournamentCreatePage.module.css';
 import styles from './PreviewSection.module.css';
-import { AVAILABLE_SPORTS, TOURNAMENT_TYPES, CHESS_SYSTEMS, CHECKERS_SYSTEMS, TABLE_TENNIS_TOURNAMENT_TYPES, BASKETBALL3X3_TOURNAMENT_TYPES, ARMWRESTLING_HANDS, ARMWRESTLING_WEIGHT_CLASSES, ARMWRESTLING_CATEGORIES, BADMINTON_TOURNAMENT_TYPES } from '../../constants';
+import { 
+  AVAILABLE_SPORTS, 
+  TOURNAMENT_TYPES, 
+  CHESS_SYSTEMS, 
+  CHECKERS_SYSTEMS, 
+  TABLE_TENNIS_TOURNAMENT_TYPES, 
+  BASKETBALL3X3_TOURNAMENT_TYPES, 
+  ARMWRESTLING_HANDS, 
+  ARMWRESTLING_WEIGHT_CLASSES, 
+  ARMWRESTLING_CATEGORIES, 
+  BADMINTON_TOURNAMENT_TYPES 
+} from '../../constants';
+import { TournamentFormData } from '../../hooks/useTournamentForm';
 
-const PreviewSection = ({ formData, selectedCategories }) => {
+interface PreviewSectionProps {
+  formData: TournamentFormData;
+  selectedCategories: string[];
+}
+
+const PreviewSection = ({ formData, selectedCategories }: PreviewSectionProps) => {
   const getFormatName = () => {
     if (['chess', 'checkers'].includes(formData.sport)) {
       const systems = formData.sport === 'chess' ? CHESS_SYSTEMS : CHECKERS_SYSTEMS;
@@ -102,8 +117,8 @@ const PreviewSection = ({ formData, selectedCategories }) => {
             )}
           </>
         ) : (
-          <div className={styles.emptyPreview}>
-            <i className="fas fa-info-circle"></i>
+          <div className={styles.previewEmpty}>
+            <i className="fas fa-edit"></i>
             <p>Заповніть форму, щоб побачити попередній перегляд</p>
           </div>
         )}

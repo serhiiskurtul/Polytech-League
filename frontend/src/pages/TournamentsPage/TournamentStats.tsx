@@ -1,6 +1,16 @@
-import React from 'react';
+interface Stats {
+  total: number;
+  ongoing: number;
+  upcoming: number;
+  totalParticipants: number;
+  registeredCount: number;
+}
 
-const TournamentStats = ({ stats }) => {
+interface TournamentStatsProps {
+  stats: Stats;
+}
+
+const TournamentStats = ({ stats }: TournamentStatsProps) => {
   return (
     <div className="tournament-stats">
       <div className="stat-card">

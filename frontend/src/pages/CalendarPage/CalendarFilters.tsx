@@ -1,7 +1,16 @@
-import React from 'react';
+interface Filter {
+  id: string;
+  label: string;
+  icon: string;
+}
 
-const CalendarFilters = ({ activeFilter, onFilterChange }) => {
-  const filters = [
+interface CalendarFiltersProps {
+  activeFilter: string;
+  onFilterChange: (sport: string) => void;
+}
+
+const CalendarFilters = ({ activeFilter, onFilterChange }: CalendarFiltersProps) => {
+  const filters: Filter[] = [
     { id: 'all', label: 'Всі види спорту', icon: 'fas fa-filter' },
     { id: 'football', label: 'Футзал', icon: 'fas fa-futbol' },
     { id: 'basketball', label: 'Баскетбол', icon: 'fas fa-basketball-ball' },

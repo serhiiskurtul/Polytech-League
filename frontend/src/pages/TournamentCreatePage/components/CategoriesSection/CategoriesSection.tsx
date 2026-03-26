@@ -1,9 +1,13 @@
-import React from 'react';
 import shared from '../../TournamentCreatePage.module.css';
 import styles from './CategoriesSection.module.css';
 import { CATEGORIES } from '../../constants';
 
-const CategoriesSection = ({ selectedCategories, handleCategoryToggle }) => {
+interface CategoriesSectionProps {
+  selectedCategories: string[];
+  handleCategoryToggle: (category: string) => void;
+}
+
+const CategoriesSection = ({ selectedCategories, handleCategoryToggle }: CategoriesSectionProps) => {
   return (
     <div className={shared.formBlock}>
       <h3 className={shared.blockTitle}>

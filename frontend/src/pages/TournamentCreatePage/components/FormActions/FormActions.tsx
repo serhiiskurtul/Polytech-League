@@ -1,8 +1,11 @@
-import React from 'react';
-import shared from '../../TournamentCreatePage.module.css';
 import styles from './FormActions.module.css';
 
-const FormActions = ({ isSubmitting, fillTestData }) => {
+interface FormActionsProps {
+  isSubmitting: boolean;
+  fillTestData: () => void;
+}
+
+const FormActions = ({ isSubmitting, fillTestData }: FormActionsProps) => {
   return (
     <div className={styles.formActions}>
       <button

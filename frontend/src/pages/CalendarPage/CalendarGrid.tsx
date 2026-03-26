@@ -1,4 +1,20 @@
-import React from 'react';
+import { CalendarEventData } from './Calendar';
+
+interface CalendarGridProps {
+  currentDate: Date;
+  selectedDate: Date;
+  events: CalendarEventData[];
+  activeSportFilter: string;
+  onDaySelect: (day: number, month: number, year: number) => void;
+}
+
+interface CalendarDay {
+  number: number;
+  isCurrentMonth: boolean;
+  isToday: boolean;
+  isSelected: boolean;
+  isWeekend: boolean;
+}
 
 const CalendarGrid = ({ 
   currentDate, 
@@ -6,14 +22,14 @@ const CalendarGrid = ({
   events, 
   activeSportFilter, 
   onDaySelect 
-}) => {
+}: CalendarGridProps) => {
   const currentMonth = currentDate.getMonth();
   const currentYear = currentDate.getFullYear();
   
-  const dayNames = ['Понеділок', 'Вівторок', 'Середа', 'Четвер', 'П\'ятниця', 'Субота', 'Неділя'];
+  const dayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'];
   
   // Іконки для видів спорту
-  const sportIcons = {
+  const sportIcons: Record<string, string> = {
     'football': 'fas fa-futbol',
     'basketball': 'fas fa-basketball-ball',
     'volleyball': 'fas fa-volleyball-ball',
@@ -21,17 +37,8 @@ const CalendarGrid = ({
     'table-tennis': 'fas fa-table-tennis'
   };
 
-  // Кольори для видів спорту
-  const sportColors = {
-    'football': 'event-football',
-    'basketball': 'event-basketball',
-    'volleyball': 'event-volleyball',
-    'chess': 'event-chess',
-    'table-tennis': 'event-table-tennis'
-  };
-
   // Отримати події для дня
-  const getEventsForDay = (dayNumber) => {
+  const getEventsForDay = (dayNumber: number) => {
     return events.filter(event => 
       event.day === dayNumber && 
       event.month === currentMonth && 
@@ -52,7 +59,7 @@ const CalendarGrid = ({
     const prevMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
     const daysInMonth = lastDay.getDate();
     
-    const days = [];
+    const days: CalendarDay[] = [];
     
     // Дні попереднього місяця
     for (let i = 0; i < firstDayIndex; i++) {
@@ -105,60 +112,48 @@ const CalendarGrid = ({
     return days;
   };
 
-  const calendarDays = getCalendarDays();
+  const days = getCalendarDays();
 
   return (
-    <div className="calendar-container">
-      <div className="calendar-weekdays">
-        {dayNames.map(dayName => (
-          <div key={dayName} className="weekday">{dayName}</div>
+    <div className="calendar-grid-container">
+      <div className="day-names">
+        {dayNames.map(day => (
+          <div key={day} className="day-name">{day}</div>
         ))}
       </div>
       
-      <div className="calendar-grid">
-        {calendarDays.map((day, index) => (
-          <div
-            key={index}
-            className={`calendar-day ${!day.isCurrentMonth ? 'empty' : ''} ${day.isToday ? 'today' : ''} ${day.isSelected ? 'selected' : ''} ${day.isWeekend ? 'weekend' : ''}`}
-            onClick={() => {
-              if (day.isCurrentMonth) {
-                onDaySelect(day.number, currentMonth, currentYear);
-              }
-            }}
-          >
-            {day.isCurrentMonth && (
-              <>
-                <div className="day-number">{day.number}</div>
-                <div className="day-events">
-                  {getEventsForDay(day.number)
-                    .slice(0, 3)
-                    .map(event => (
-                      <div
-                        key={event.id}
-                        className={`calendar-event ${sportColors[event.sport]}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          alert(`Деталі події:\n\n${event.title}\n\nЧас: ${event.time}\nМісце: ${event.location}\n\n${event.description}`);
-                        }}
-                      >
-                        <div className="event-sport">
-                          <i className={sportIcons[event.sport]}></i>
-                          {event.title.substring(0, 15)}{event.title.length > 15 ? '...' : ''}
-                        </div>
-                        <div className="event-time">{event.time}</div>
-                      </div>
-                    ))}
-                  
-                  {getEventsForDay(day.number).length > 3 && (
-                    <div className="calendar-event more-events">
-                      +{getEventsForDay(day.number).length - 3} ще
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
-        ))}
+      <div className="days-grid">
+        {days.map((day, index) => {
+          const dayEvents = day.isCurrentMonth ? getEventsForDay(day.number) : [];
+          
+          return (
+            <div 
+              key={index} 
+              className={`day-cell ${!day.isCurrentMonth ? 'other-month' : ''} 
+                         ${day.isToday ? 'today' : ''} 
+                         ${day.isSelected ? 'selected' : ''} 
+                         ${day.isWeekend ? 'weekend' : ''}`}
+              onClick={() => day.isCurrentMonth && onDaySelect(day.number, currentMonth, currentYear)}
+            >
+              <span className="day-number">{day.number}</span>
+              
+              <div className="day-events-dots">
+                {dayEvents.slice(0, 3).map(event => (
+                  <div 
+                    key={event.id} 
+                    className={`event-dot event-${event.sport}`}
+                    title={event.title}
+                  >
+                    <i className={sportIcons[event.sport]}></i>
+                  </div>
+                ))}
+                {dayEvents.length > 3 && (
+                  <div className="more-events">+{dayEvents.length - 3}</div>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

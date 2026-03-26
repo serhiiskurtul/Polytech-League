@@ -110,7 +110,7 @@ const TopPlayersCompact = () => {
             {sports.map((sport) => (
               <button
                 key={sport}
-                className={`${styles.sportBtn} ${selectedSport === sport ? styles.active : ''}`}
+                className={`${styles.sportButton} ${selectedSport === sport ? styles.active : ''}`}
                 onClick={() => setSelectedSport(sport)}
               >
                 {sport}
@@ -130,7 +130,8 @@ const TopPlayersCompact = () => {
               </div>
               <div className={styles.playerStats}>
                 <div className={styles.playerRating}>
-                  {getSportIcon(player.sport)} {player.rating}
+                  <span className={styles.ratingIcon}>{getSportIcon(player.sport)}</span>
+                  <span className={styles.ratingValue}>{player.rating}</span>
                 </div>
                 <div className={`${styles.playerTrend} ${styles[player.trend]}`}>
                   {getTrendIcon(player.trend)} {player.ratingChange}
