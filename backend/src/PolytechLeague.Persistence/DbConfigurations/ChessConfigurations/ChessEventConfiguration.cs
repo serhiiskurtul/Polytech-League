@@ -23,15 +23,5 @@ public class ChessEventConfiguration : IEntityTypeConfiguration<ChessEvent>
         builder.Property(x => x.System)
             .HasColumnName("system")
             .IsRequired();
-
-        builder.HasMany(x => x.Games)
-            .WithOne()
-            .HasForeignKey("ChessEventId")
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasMany(x => x.Players)
-            .WithOne()
-            .HasForeignKey("ChessEventId")
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

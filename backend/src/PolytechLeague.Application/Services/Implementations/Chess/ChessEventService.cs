@@ -47,6 +47,11 @@ public class ChessEventService(
 
     public async Task AddParticipantAsync(long eventId, PolytechLeague.Application.Dto.ChessDto.ChessEventParticipantDto dto, CancellationToken cancellationToken = default)
     {
+        var exists = await _dbcontext.Set<ChessEventParticipant>()
+            .AnyAsync(p => p.TournamentId == eventId && p.PlayerId == dto.PlayerId, cancellationToken);
+
+        if (exists) return;
+
         var participant = new ChessEventParticipant
         {
             TournamentId = eventId,

@@ -55,23 +55,19 @@ public class ChessGameConfiguration : IEntityTypeConfiguration<ChessGame>
             .IsRequired();
 
         // ---------- Relationships ----------
-
-        // Tournament → Games
-        builder.HasOne(g => g.Tournament)
-            .WithMany()
-            .HasForeignKey(g => g.TournamentId)
+        builder.HasOne(x => x.Tournament)
+            .WithMany(x => x.Games)
+            .HasForeignKey(x => x.TournamentId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // White player
-        builder.HasOne(g => g.WhitePlayer)
+        builder.HasOne(x => x.WhitePlayer)
             .WithMany()
-            .HasForeignKey(g => g.WhitePlayerId)
+            .HasForeignKey(x => x.WhitePlayerId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Black player
-        builder.HasOne(g => g.BlackPlayer)
+        builder.HasOne(x => x.BlackPlayer)
             .WithMany()
-            .HasForeignKey(g => g.BlackPlayerId)
+            .HasForeignKey(x => x.BlackPlayerId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

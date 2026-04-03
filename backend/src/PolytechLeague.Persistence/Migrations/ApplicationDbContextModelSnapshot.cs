@@ -443,9 +443,6 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<long>("PlayerId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("ChessEventId")
-                        .HasColumnType("bigint");
-
                     b.Property<double>("Points")
                         .HasColumnType("double precision")
                         .HasColumnName("points");
@@ -485,9 +482,6 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("board");
 
-                    b.Property<long>("ChessEventId")
-                        .HasColumnType("bigint");
-
                     b.Property<int>("Result")
                         .HasColumnType("integer")
                         .HasColumnName("result");
@@ -507,8 +501,6 @@ namespace PolytechLeague.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BlackPlayerId");
-
-                    b.HasIndex("ChessEventId");
 
                     b.HasIndex("Result")
                         .HasDatabaseName("IX_chess_games_result");
@@ -1676,14 +1668,8 @@ namespace PolytechLeague.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("PolytechLeague.Domain.Entities.Chess.ChessEvent", null)
-                        .WithMany("Games")
-                        .HasForeignKey("ChessEventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("PolytechLeague.Domain.Entities.Chess.ChessEvent", "Tournament")
-                        .WithMany()
+                        .WithMany("Games")
                         .HasForeignKey("TournamentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
