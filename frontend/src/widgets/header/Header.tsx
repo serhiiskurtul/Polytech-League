@@ -28,7 +28,7 @@ export default function Header() {
               </Link>
             </li>
             <li>
-              <Link to="/tournaments-page" className={styles.navLink}>
+              <Link to="/tournaments" className={styles.navLink}>
                 <i className={`fas fa-trophy ${styles.navIcon}`}></i>
                 Турніри
               </Link>

@@ -6,6 +6,7 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import Signup from '../../pages/SignupPage/Signup';
 import CalendarPage from '../../pages/CalendarPage/CalendarPage';
 import Tournaments from '../../pages/TournamentsPage/TournamentsPage';
+import TournamentViewPage from '../../pages/TournamentViewPage/TournamentViewPage';
 import HomePage from '../../pages/HomePage/HomePage';
 import EmailVerification from '../../pages/EmailVerificationPage/EmailVerificationPage';
 import '@fortawesome/fontawesome-free/css/all.min.css';
@@ -71,11 +72,22 @@ export default function App() {
 
         {/* Турніри */}
         <Route 
-          path="/tournaments-page" 
+          path="/tournaments" 
           element={
             <ProtectedRoute requireAuth={false}>
               <div className="page-wrapper">
                 <Tournaments />
+              </div>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route 
+          path="/tournaments/:id" 
+          element={
+            <ProtectedRoute requireAuth={false}>
+              <div className="page-wrapper">
+                <TournamentViewPage />
               </div>
             </ProtectedRoute>
           }

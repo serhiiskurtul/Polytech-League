@@ -16,9 +16,10 @@ interface TournamentCardProps {
   tournament: TournamentUI;
   viewMode: 'grid' | 'list';
   onRegister: (id: string) => void;
+  onDetails: (id: string) => void;
 }
 
-const TournamentCard = ({ tournament, viewMode, onRegister }: TournamentCardProps) => {
+const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: TournamentCardProps) => {
   // Іконки для видів спорту
   const sportIcons: Record<string, string> = {
     'futsal': 'fas fa-futbol',
@@ -71,7 +72,11 @@ const TournamentCard = ({ tournament, viewMode, onRegister }: TournamentCardProp
   // Картка в режимі сітки
   if (viewMode === 'grid') {
     return (
-      <div className={`tournament-card grid ${tournament.featured ? 'featured' : ''}`}>
+      <div 
+        className={`tournament-card grid ${tournament.featured ? 'featured' : ''}`}
+        onClick={() => onDetails(tournament.id)}
+        style={{ cursor: 'pointer' }}
+      >
         {tournament.featured && (
           <div className="featured-badge">
             <i className="fas fa-star"></i> Рекомендовано
@@ -123,12 +128,17 @@ const TournamentCard = ({ tournament, viewMode, onRegister }: TournamentCardProp
         <div className="tournament-actions">
           <button 
             className="btn btn-primary" 
-            onClick={() => onRegister(tournament.id)}
+            onClick={(e) => { e.stopPropagation(); onRegister(tournament.id); }}
             disabled={tournament.status === 'completed'}
           >
             {tournament.status === 'completed' ? 'Завершено' : 'Зареєструватись'}
           </button>
-          <button className="btn btn-outline">Деталі</button>
+          <button 
+            className="btn btn-outline" 
+            onClick={() => onDetails(tournament.id)}
+          >
+            Деталі
+          </button>
         </div>
       </div>
     );
@@ -136,7 +146,11 @@ const TournamentCard = ({ tournament, viewMode, onRegister }: TournamentCardProp
 
   // Картка в режимі списку
   return (
-    <div className={`tournament-card list ${tournament.featured ? 'featured' : ''}`}>
+    <div 
+      className={`tournament-card list ${tournament.featured ? 'featured' : ''}`}
+      onClick={() => onDetails(tournament.id)}
+      style={{ cursor: 'pointer' }}
+    >
       <div className="list-main">
         <div className="list-sport">
           <i className={sportIcons[tournament.sport] || 'fas fa-trophy'}></i>
@@ -187,12 +201,17 @@ const TournamentCard = ({ tournament, viewMode, onRegister }: TournamentCardProp
         <div className="list-actions">
           <button 
             className="btn btn-primary" 
-            onClick={() => onRegister(tournament.id)}
+            onClick={(e) => { e.stopPropagation(); onRegister(tournament.id); }}
             disabled={tournament.status === 'completed'}
           >
             {tournament.status === 'completed' ? 'Завершено' : 'Реєстрація'}
           </button>
-          <button className="btn btn-outline">Деталі</button>
+          <button 
+            className="btn btn-outline"
+            onClick={(e) => { e.stopPropagation(); onDetails(tournament.id); }}
+          >
+            Деталі
+          </button>
         </div>
       </div>
     </div>

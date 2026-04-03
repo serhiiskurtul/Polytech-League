@@ -64,6 +64,34 @@ public class TournamentService : ITournamentService
         };
     }
 
+    public async Task<TournamentDto?> GetTournamentByIdAsync(long id)
+    {
+        var e = await _context.Set<PolytechLeague.Domain.Entities.Event>()
+            .Include(e => e.Photos)
+            .FirstOrDefaultAsync(e => e.Id == id);
+
+        if (e == null) return null;
+
+        return new TournamentDto
+        {
+            Id = e.Id,
+            Title = e.Name,
+            Sport = GetSportName(e),
+            Status = GetStatus(e.Date),
+            Date = e.Date.ToString("dd.MM.yyyy"),
+            Location = e.Location,
+            Description = e.Description,
+            Participants = 0, // Need to implement counting
+            Teams = 0, // Need to implement counting
+            Prize = "Призи та кубки",
+            Organizer = "Спортвідділ",
+            RegistrationEnd = e.Date.AddDays(-5).ToString("dd.MM.yyyy"),
+            CurrentRound = GetStatus(e.Date) == "ongoing" ? "В процесі" : "Реєстрація",
+            Registered = false,
+            Featured = false
+        };
+    }
+
     private string GetSportName(PolytechLeague.Domain.Entities.Event e)
     {
         return e switch

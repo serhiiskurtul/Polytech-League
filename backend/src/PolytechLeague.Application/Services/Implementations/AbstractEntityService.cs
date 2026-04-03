@@ -22,7 +22,7 @@ public abstract class AbstractEntityService<TEntity>(
 
         var entities = await _dbcontext.Set<TEntity>()
             .AsNoTracking()
-            .Filter(filterParams!)
+            .Filter(filterParams)
             .Sort(sortParams)
             .ToListAsync(cancellationToken);
 
@@ -41,7 +41,7 @@ public abstract class AbstractEntityService<TEntity>(
 
         var entities = await _dbcontext.Set<TEntity>()
             .AsNoTracking()
-            .Filter(filterParams!)
+            .Filter(filterParams)
             .Sort(sortParams)
             .Page(pageParams, cancellationToken);
 

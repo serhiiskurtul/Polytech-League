@@ -23,8 +23,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const response = await api.get("/users/me");
         setUser(response.data);
-      } catch (error) {
-        setUser(null); // гість — user = null
+      } catch (error: any) {
+        if (error.response?.status !== 401) {
+          console.error(error);
+        }
+        setUser(null);
       } finally {
         setLoading(false);
       }

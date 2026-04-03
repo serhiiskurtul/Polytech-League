@@ -1314,7 +1314,6 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("FideId")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("fide_id");
 
@@ -1327,7 +1326,6 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnName("rating_elo");
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("title");
 

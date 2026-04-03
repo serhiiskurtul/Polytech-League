@@ -1,0 +1,500 @@
+:root {
+  --primary: #3b82f6;
+  --primary-dark: #2563eb;
+  --primary-light: #eff6ff;
+  --success: #10b981;
+  --success-light: #d1fae5;
+  --warning: #f59e0b;
+  --warning-light: #fef3c7;
+  --danger: #ef4444;
+  --danger-light: #fee2e2;
+  --text: #1f2937;
+  --text-light: #6b7280;
+  --bg: #f9fafb;
+  --card: #ffffff;
+  --border: #e5e7eb;
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
+.tournamentViewPage {
+  min-height: 100vh;
+  padding: 32px 0 64px;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Шапка турніру */
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  margin-bottom: 24px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.backButton:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateX(-4px);
+}
+
+.headerContent {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 32px;
+  margin-bottom: 32px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+}
+
+@media (max-width: 768px) {
+  .headerContent {
+      grid-template-columns: 1fr;
+  }
+}
+
+.tournamentBadges {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.levelBadge {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.levelCollege {
+  background: var(--success-light);
+  color: var(--success);
+}
+
+.levelRegional {
+  background: var(--warning-light);
+  color: var(--warning);
+}
+
+.levelNational {
+  background: var(--danger-light);
+  color: var(--danger);
+}
+
+.levelUniversity {
+  background: var(--primary-light);
+  color: var(--primary);  
+}
+
+.levelInterUniversity {
+  background: #f3e8ff;
+  color: #9333ea;
+}
+
+.systemBadge {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--primary-light);
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tournamentName {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: var(--text);
+}
+
+@media (max-width: 768px) {
+  .tournamentName {
+      font-size: 24px;
+  }
+}
+
+.tournamentMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-light);
+  font-size: 15px;
+}
+
+.metaItem i {
+  color: var(--primary);
+  width: 20px;
+}
+
+.tournamentImage {
+  width: 200px;
+  height: 200px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tournamentImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tournamentImage i {
+  font-size: 64px;
+  color: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .tournamentImage {
+      width: 100%;
+      height: 200px;
+  }
+}
+
+/* Інформаційна картка */
+.infoCard {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 32px;
+  margin-bottom: 32px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.infoCard h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text);
+}
+
+.infoCard h2 i {
+  color: var(--primary);
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.infoSection {
+  padding: 20px;
+  background: var(--bg);
+  border-radius: 16px;
+}
+
+.infoSection h3 {
+  font-size: 18px;
+  margin-bottom: 16px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.infoSection h3 i {
+  color: var(--primary);
+}
+
+.infoSection p, .infoSection ul {
+  color: var(--text-light);
+  line-height: 1.6;
+}
+
+.infoSection ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.infoSection li {
+  margin-bottom: 8px;
+}
+
+.refereeList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.refereeItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  background: var(--card);
+  border-radius: 10px;
+}
+
+.refereeAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.refereeAvatar i {
+  color: var(--primary);
+}
+
+/* Вкладки */
+.tabsContainer {
+  background: var(--card);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.tabsHeader {
+  display: flex;
+  gap: 4px;
+  padding: 16px 24px 0 24px;
+  background: var(--bg);
+  border-bottom: 2px solid var(--border);
+  overflow-x: auto;
+}
+
+.tabButton {
+  padding: 12px 24px;
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-light);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 10px 10px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.tabButton:hover {
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
+.tabButton.active {
+  color: var(--primary);
+  border-bottom: 3px solid var(--primary);
+  background: var(--card);
+}
+
+.tabContent {
+  padding: 24px;
+}
+
+/* Таблиці */
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.dataTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dataTable thead {
+  background: var(--bg);
+  border-bottom: 2px solid var(--border);
+}
+
+.dataTable th {
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.dataTable td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-light);
+}
+
+.dataTable tbody tr:hover {
+  background: var(--primary-light);
+}
+
+/* Статистичні картки */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.statCard {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  transition: transform 0.3s ease;
+}
+
+.statCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.statIcon {
+  width: 60px;
+  height: 60px;
+  background: var(--primary-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.statIcon i {
+  font-size: 28px;
+  color: var(--primary);
+}
+
+.statValue {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.statLabel {
+  color: var(--text-light);
+  font-size: 14px;
+}
+
+/* Бейджи результатів */
+.resultBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.resultWhiteWin {
+  background: var(--success-light);
+  color: var(--success);
+}
+
+.resultBlackWin {
+  background: var(--danger-light);
+  color: var(--danger);
+}
+
+.resultDraw {
+  background: var(--warning-light);
+  color: var(--warning);
+}
+.resultNotPlayed {
+  background: var(--bg);
+  color: var(--text-light);
+}
+
+/* Loaders/Errors */
+.loadingContainer, .errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 40px;
+  text-align: center;
+  color: var(--text);
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 5px solid var(--border);
+  border-top: 5px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 24px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .container {
+      padding: 0 16px;
+  }
+  
+  .tournamentViewPage {
+      padding: 16px 0 32px;
+  }
+  
+  .headerContent {
+      padding: 20px;
+  }
+  
+  .infoCard {
+      padding: 20px;
+  }
+  
+  .tabButton {
+      padding: 10px 16px;
+      font-size: 14px;
+  }
+  
+  .statsGrid {
+      grid-template-columns: 1fr;
+  }
+  
+  .dataTable th,
+  .dataTable td {
+      padding: 12px;
+      font-size: 14px;
+  }
+}

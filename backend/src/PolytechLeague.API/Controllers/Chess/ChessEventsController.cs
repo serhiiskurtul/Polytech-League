@@ -96,4 +96,23 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
 
         return NoContent();
     }
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{eventId:long}/participants")]
+    public async Task<IActionResult> AddParticipant([FromRoute] long eventId, [FromBody] ChessEventParticipantDto request, CancellationToken cancellationToken)
+    {
+        await chessEventService.AddParticipantAsync(eventId, request, cancellationToken);
+        await redisService.RemoveDataAsync($"chess_event_{eventId}");
+        await redisService.RemoveGroupAsync("chess_events_all");
+        return Ok();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpDelete("{eventId:long}/participants/{playerId:long}")]
+    public async Task<IActionResult> RemoveParticipant([FromRoute] long eventId, [FromRoute] long playerId, CancellationToken cancellationToken)
+    {
+        await chessEventService.RemoveParticipantAsync(eventId, playerId, cancellationToken);
+        await redisService.RemoveDataAsync($"chess_event_{eventId}");
+        await redisService.RemoveGroupAsync("chess_events_all");
+        return NoContent();
+    }
 }

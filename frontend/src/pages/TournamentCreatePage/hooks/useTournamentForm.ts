@@ -193,7 +193,7 @@ export const useTournamentForm = () => {
 
       await api.post(endpoint, payload);
       toast.success('Турнір успішно створено!');
-      navigate('/tournaments-page');
+      navigate('/tournaments');
     } catch (error: any) {
       console.error('Submit error:', error);
       const errorMessage = error.response?.data?.message || error.response?.data?.title || 'Помилка при створенні турніру';

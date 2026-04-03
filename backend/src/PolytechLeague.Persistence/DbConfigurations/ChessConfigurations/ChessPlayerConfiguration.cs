@@ -21,10 +21,10 @@ public class ChessPlayerConfiguration : IEntityTypeConfiguration<ChessPlayer>
 
         builder.Property(x => x.FideId)
             .HasColumnName("fide_id")
-            .IsRequired();
+            .IsRequired(false);
 
         builder.Property(x => x.Title)
             .HasColumnName("title")
-            .IsRequired();
+            .IsRequired(false);
     }
 }

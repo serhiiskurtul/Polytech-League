@@ -137,20 +137,25 @@ const Tournaments = () => {
     registeredCount: 0 // Mock value
   };
 
+  const handleRegister = (id: string) => {
+    alert(`Реєстрація на турнір з ID: ${id}`);
+  };
+
+  const handleDetails = (id: string) => {
+    navigate(`/tournaments/${id}`);
+  };
+
   return (
-    <div className="tournaments-page">
-      <div className="page-header">
-        <div>
+    <div className="tournaments-page container">
+      <header className="page-header">
+        <div className="header-left">
           <h1 className="page-title">Турніри</h1>
-          <p className="page-subtitle">Беріть участь у змаганнях та перемагайте</p>
+          <p className="page-subtitle">Відкривайте нові можливості та змагайтесь за першість</p>
         </div>
-        <button 
-          className="btn btn-primary create-tournament-btn"
-          onClick={() => navigate('/create-tournament')}
-        >
-          <i className="fas fa-plus"></i> Створити турнір
+        <button className="btn btn-primary create-tournament-btn" onClick={() => navigate('/create-tournament')}>
+          <i className="fas fa-plus"></i> Створити
         </button>
-      </div>
+      </header>
 
       <TournamentStats stats={stats} />
 
@@ -163,10 +168,10 @@ const Tournaments = () => {
 
       <div className="tournaments-controls">
         <div className="search-container">
-          <i className="fas fa-search"></i>
+          <i className="fas fa-search search-icon"></i>
           <input 
             type="text" 
-            className="search-input"
+            className="search-input" 
             placeholder="Пошук за назвою або описом..." 
             value={searchQuery}
             onChange={handleSearch}
@@ -206,7 +211,8 @@ const Tournaments = () => {
               key={tournament.id} 
               tournament={tournament} 
               viewMode={viewMode}
-              onRegister={() => alert(`Реєстрація на турнір "${tournament.title}"`)}
+              onRegister={() => handleRegister(tournament.id)}
+              onDetails={() => handleDetails(tournament.id)}
             />
           ))
         ) : (

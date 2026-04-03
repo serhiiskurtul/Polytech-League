@@ -48,12 +48,16 @@ public class UsersController(IUserService userService) : Controller
         return Ok(users.ToResponse());
     }
 
-    [Authorize(Policy = "AdminOrUser")]
+    [AllowAnonymous]
     [HttpGet("me")]
     public async Task<IActionResult> Me(CancellationToken cancellationToken)
     {
+        if (!User.Identity?.IsAuthenticated ?? true)
+            return Ok(null);
+
         var userId = User.GetUserId();
         var user = await userService.GetByIdAsync(userId, cancellationToken);
+
         return Ok(user.ToResponse());
     }
 
