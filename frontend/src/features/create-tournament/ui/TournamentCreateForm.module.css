@@ -1,0 +1,34 @@
+/* Основний контент */
+.contentWrapper {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 40px;
+}
+
+@media (max-width: 1200px) {
+  .contentWrapper {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Форма */
+.formSection {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border);
+}
+
+.tournamentForm {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* Панель попереднього перегляду */
+.previewSection {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}

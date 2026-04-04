@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import styles from './Footer.module.css';
-import Logo from '../../shared/ui/Logo/Logo';
+import { Logo } from '@/shared/ui';
 
 const Footer = () => {
 

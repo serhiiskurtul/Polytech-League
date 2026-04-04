@@ -1,12 +1,13 @@
-import shared from '../../TournamentCreatePage.module.css';
+import shared from '../form.module.css';
+import styles from './SettingsSection.module.css';
 import { 
   CHECKERS_VARIANTS, 
   TABLE_TENNIS_CATEGORIES, 
   ARMWRESTLING_HANDS, 
   ARMWRESTLING_WEIGHT_CLASSES, 
   ARMWRESTLING_CATEGORIES 
-} from '../../constants';
-import { TournamentFormData } from '../../hooks/useTournamentForm';
+} from '../../model/constants';
+import { TournamentFormData } from '../../model/useTournamentForm';
 import { ChangeEvent } from 'react';
 
 interface SettingsSectionProps {

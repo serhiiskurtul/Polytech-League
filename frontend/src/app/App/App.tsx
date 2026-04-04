@@ -1,19 +1,19 @@
 import './App.css'
-import Header from '../../widgets/header/Header';
-import Footer from '../../widgets/footer/Footer';
-import Login from '../../pages/LoginPage/Login';
+import { Header } from '@/widgets/header';
+import { Footer } from '@/widgets/footer';
+import { LoginPage } from '@/pages/LoginPage';
 import { Routes, Route, useLocation } from 'react-router-dom'
-import Signup from '../../pages/SignupPage/Signup';
-import CalendarPage from '../../pages/CalendarPage/CalendarPage';
-import Tournaments from '../../pages/TournamentsPage/TournamentsPage';
-import TournamentViewPage from '../../pages/TournamentViewPage/TournamentViewPage';
-import HomePage from '../../pages/HomePage/HomePage';
-import EmailVerification from '../../pages/EmailVerificationPage/EmailVerificationPage';
+import { SignupPage } from '@/pages/SignupPage';
+import { CalendarPage } from '@/pages/CalendarPage';
+import { TournamentsPage } from '@/pages/TournamentsPage';
+import { TournamentViewPage } from '@/pages/TournamentViewPage';
+import { HomePage } from '@/pages/HomePage';
+import { EmailVerificationPage } from '@/pages/EmailVerificationPage';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import PlayersRatingPage from '../../pages/PlayersRatingPage/PlayersRatingPage';
-import ProfilePage from '../../pages/ProfilePage/ProfilePage';
-import NotificationsPage from '../../pages/NotificationsPage/NotificationsPage';
-import TournamentCreatePage from '../../pages/TournamentCreatePage/TournamentCreatePage';
+import { PlayersRatingPage } from '@/pages/PlayersRatingPage';
+import { ProfilePage } from '@/pages/ProfilePage';
+import { NotificationsPage } from '@/pages/NotificationsPage';
+import { TournamentCreatePage } from '@/pages/TournamentCreatePage';
 import ProtectedRoute from '../providers/ProtectedRoute';
 import { Toaster } from 'react-hot-toast';
 
@@ -76,7 +76,7 @@ export default function App() {
           element={
             <ProtectedRoute requireAuth={false}>
               <div className="page-wrapper">
-                <Tournaments />
+                <TournamentsPage />
               </div>
             </ProtectedRoute>
           }
@@ -113,9 +113,9 @@ export default function App() {
           } 
         />
         
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/email-verification" element={<EmailVerification />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/email-verification" element={<EmailVerificationPage />} />
         
         {/* Профіль */}
         <Route

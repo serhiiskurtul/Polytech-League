@@ -1,4 +1,4 @@
-import shared from '../../TournamentCreatePage.module.css';
+import shared from '../form.module.css';
 import styles from './BasicInfoSection.module.css';
 import { 
   AVAILABLE_SPORTS, 
@@ -8,8 +8,8 @@ import {
   TABLE_TENNIS_TOURNAMENT_TYPES, 
   BASKETBALL3X3_TOURNAMENT_TYPES, 
   BADMINTON_TOURNAMENT_TYPES 
-} from '../../constants';
-import { TournamentFormData } from '../../hooks/useTournamentForm';
+} from '../../model/constants';
+import { TournamentFormData } from '../../model/useTournamentForm';
 import { ChangeEvent } from 'react';
 
 interface BasicInfoSectionProps {

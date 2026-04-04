@@ -1,5 +1,7 @@
- import styles from './StatsCard.module.css';
-import { TournamentFormData } from '../../hooks/useTournamentForm';
+import shared from '../form.module.css';
+import styles from './StatsCard.module.css';
+import { CATEGORIES } from '../../model/constants';
+import { TournamentFormData } from '../../model/useTournamentForm';
 
 interface StatsCardProps {
   formData: TournamentFormData;

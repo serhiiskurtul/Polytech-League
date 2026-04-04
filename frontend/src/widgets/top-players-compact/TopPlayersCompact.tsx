@@ -1,17 +1,6 @@
 import { useState } from 'react';
 import styles from './TopPlayersCompact.module.css';
-
-interface Player {
-  id: number;
-  rank: number;
-  name: string;
-  initials: string;
-  sport: string;
-  rating: number;
-  ratingChange: string;
-  team: string;
-  trend: 'up' | 'down';
-}
+import { Player } from '@/entities/player';
 
 const TopPlayersCompact = () => {
   const [selectedSport, setSelectedSport] = useState('Всі');

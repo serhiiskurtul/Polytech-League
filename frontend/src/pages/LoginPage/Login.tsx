@@ -3,13 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { useAuth } from '../../app/providers/AuthContext';
-import { login as loginApi } from "../../shared/api/auth.api";
-import api from "../../shared/api/axiosInstance";
-
-import InputSign from "../../shared/ui/InputSign/InputSign";
-import ButtonSign from '../../shared/ui/ButtonSign/ButtonSign';
-import Logo from '../../shared/ui/Logo/Logo';
+import { login as loginApi, axiosInstance as api } from "@/shared/api";
+import { InputSign, ButtonSign, Logo } from "@/shared/ui";
+import { useAuth } from "@/app/providers/AuthContext";
 
 // Yup schema
 const loginSchema = yup.object({

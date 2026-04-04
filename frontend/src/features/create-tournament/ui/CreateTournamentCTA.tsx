@@ -1,7 +1,7 @@
-import styles from './CreateTournament.module.css';
-import SimpleButton from '../../shared/ui/SimpleButton/SimpleButton';
+import styles from '../CreateTournament.module.css';
+import { SimpleButton } from '@/shared/ui';
 
-export default function CreateTournament() {
+export default function CreateTournamentCTA() {
   return (
     <div className="card">
       <div className={`header-row ${styles.headerRowCreateTournament}`}>

@@ -1,5 +1,5 @@
 import styles from './TournamentsList.module.css';
-import TournamentItem from "../../entities/tournament/TournamentsListItem";
+import { TournamentsListItem } from "@/entities/tournament";
 
 interface Tournament {
   id: string;
@@ -20,7 +20,7 @@ export default function TournamentsList({ tournaments }: TournamentsListProps) {
 
       <div className={styles.tournamentList}>
         {tournaments.map((t) => (
-          <TournamentItem
+          <TournamentsListItem
             key={t.id}
             title={t.title}
             teams={t.teams}

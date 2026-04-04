@@ -1,5 +1,5 @@
 import styles from './TournamentFilter.module.css';
-import FilterInput from '../../shared/ui/FilterInput/FilterInput';
+import { FilterInput } from '@/shared/ui';
 
 export default function TournamentFilter() {
   return (

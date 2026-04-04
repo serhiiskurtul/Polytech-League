@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import TournamentCard from './TournamentCard';
 import TournamentFilters from './TournamentFilters';
 import TournamentStats from './TournamentStats';
-import { getTournaments } from '../../shared/api/tournaments.api';
+import { getTournaments } from '@/shared/api';
 import './Tournaments.css';
-import { Tournament } from '../../shared/types/tournament.types';
+import { Tournament } from '@/shared/types/tournament.types';
 
 // Extend the base Tournament type with UI-specific fields if needed, 
 // or use the base type if it's sufficient.

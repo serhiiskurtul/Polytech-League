@@ -1,6 +1,6 @@
-import shared from '../../TournamentCreatePage.module.css';
+import shared from '../form.module.css';
 import styles from './DatesLocationSection.module.css';
-import { TournamentFormData } from '../../hooks/useTournamentForm';
+import { TournamentFormData } from '../../model/useTournamentForm';
 import { ChangeEvent } from 'react';
 
 interface DatesLocationSectionProps {

@@ -1,10 +1,10 @@
 import styles from './HomePage.module.css';
-import TopPlayersCompact from '../../widgets/top-players-compact/TopPlayersCompact';
-import SeasonStats from '../../widgets/season-stats/SeasonStats';
-import HeroSection from '../../widgets/hero-section/HeroSection';
-import TournamentCalendar from '../../widgets/tournament-calendar/TournamentCalendar';
-import RecentMatches from '../../widgets/recent-matches/RecentMatches';
-import QuickActions from '../../widgets/quick-actions/QuickActions';
+import { TopPlayersCompact } from '@/widgets/top-players-compact';
+import { SeasonStats } from '@/widgets/season-stats';
+import { HeroSection } from '@/widgets/hero-section';
+import { TournamentCalendar } from '@/widgets/tournament-calendar';
+import { RecentMatches } from '@/widgets/recent-matches';
+import { QuickActions } from '@/widgets/quick-actions';
 
 export default function HomePage() {
   return (

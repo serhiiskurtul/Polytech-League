@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getTournamentById } from '../../shared/api/tournaments.api';
-import { getChessEventById, createChessPlayer, addParticipantToEvent, createChessGame, getAllChessPlayers } from '../../shared/api/chess.api';
-import { Tournament } from '../../shared/types/tournament.types';
-import { ChessEventResponse, ChessPlayerDto, ChessGameDto, GameResult } from '../../shared/types/chess.types';
+import { getTournamentById, getChessEventById, createChessPlayer, addParticipantToEvent, createChessGame, getAllChessPlayers } from '@/shared/api';
+import { Tournament } from '@/shared/types/tournament.types';
+import { ChessEventResponse, ChessPlayerDto, ChessGameDto, GameResult } from '@/shared/types/chess.types';
 import styles from './TournamentViewPage.module.css';
 
 const TournamentViewPage = () => {

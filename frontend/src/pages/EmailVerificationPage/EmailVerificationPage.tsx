@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import CodeInput from "../../shared/ui/CodeInput/CodeInput";
-import VerificationButton from "../../shared/ui/VerificationButton/VerificationButton";
-import CountdownTimer from "../../shared/ui/CountdownTimer/CountdownTimer";
-import { showToast } from '../../shared/lib/toast';
+import { CodeInput, VerificationButton, CountdownTimer } from "@/shared/ui";
+import { showToast } from '@/shared/lib/toast';
 import styles from './EmailVerificationPage.module.css';
 
 const API_URL = 'http://localhost:5000';

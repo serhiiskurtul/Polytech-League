@@ -1,6 +1,6 @@
-import shared from '../../TournamentCreatePage.module.css';
+import shared from '../form.module.css';
 import styles from './CategoriesSection.module.css';
-import { CATEGORIES } from '../../constants';
+import { CATEGORIES } from '../../model/constants';
 
 interface CategoriesSectionProps {
   selectedCategories: string[];

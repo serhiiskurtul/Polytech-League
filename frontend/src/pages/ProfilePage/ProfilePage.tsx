@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import ProfileHeader from '../../widgets/profile-widgets/profile-header/ProfileHeader';
-import ProfileStats from '../../widgets/profile-widgets/profile-stats/ProfileStats';
-import UserTeams from '../../widgets/profile-widgets/user-teams/UserTeams';
-import UserAchievements from '../../widgets/profile-widgets/user-achievements/UserAchievements';
-import SidebarActions from '../../widgets/profile-widgets/sidebar-actions/SidebarActions';
-import RecentActivity from '../../widgets/profile-widgets/recent-activity/RecentActivity';
+import { 
+  ProfileHeader, 
+  ProfileStats, 
+  UserTeams, 
+  UserAchievements, 
+  SidebarActions, 
+  RecentActivity 
+} from '@/widgets/profile-widgets';
 import styles from './ProfilePage.module.css';
 
 interface UserData {

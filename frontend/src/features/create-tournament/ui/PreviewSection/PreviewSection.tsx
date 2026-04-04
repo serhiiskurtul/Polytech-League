@@ -1,3 +1,4 @@
+import shared from '../form.module.css';
 import styles from './PreviewSection.module.css';
 import { 
   AVAILABLE_SPORTS, 
@@ -10,8 +11,8 @@ import {
   ARMWRESTLING_WEIGHT_CLASSES, 
   ARMWRESTLING_CATEGORIES, 
   BADMINTON_TOURNAMENT_TYPES 
-} from '../../constants';
-import { TournamentFormData } from '../../hooks/useTournamentForm';
+} from '../../model/constants';
+import { TournamentFormData } from '../../model/useTournamentForm';
 
 interface PreviewSectionProps {
   formData: TournamentFormData;
