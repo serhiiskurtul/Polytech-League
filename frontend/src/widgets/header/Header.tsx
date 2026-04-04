@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import styles from './Header.module.css';
-import Logo from "../../shared/ui/Logo/Logo";
+import { Logo } from "@/shared/ui";
 
 export default function Header() {
   return (
