@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '@/app/providers/AuthContext';
 import { 
   getTournamentById, 
   getChessEventById, 
@@ -17,6 +18,7 @@ import styles from './TournamentViewPage.module.css';
 const TournamentViewPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [tournament, setTournament] = useState<Tournament | null>(null);
   const [chessDetails, setChessDetails] = useState<ChessEventResponse | null>(null);
   const [allChessPlayers, setAllChessPlayers] = useState<ChessPlayerDto[]>([]);
@@ -24,8 +26,8 @@ const TournamentViewPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Admin access mocked (e.g. true for demonstration, in reality use global Auth context)
-  const [isAdmin, setIsAdmin] = useState(true);
+  // Admin access check (0 = User, 1 = Admin)
+  const isAdmin = user?.role === 1 || user?.role === '1' || user?.role === 'Admin';
 
   // Search Results type
   type SearchResult = {
