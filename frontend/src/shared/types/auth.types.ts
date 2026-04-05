@@ -6,10 +6,11 @@ export interface LoginCredentials {
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
-  user: {
-    id: string;
+  user?: {
+    id: number;
+    firstName: string;
+    lastName: string;
     email: string;
-    name: string;
-    role: string;
+    role: number | string;
   };
 }
