@@ -23,10 +23,49 @@ public class TournamentService : ITournamentService
         _context = context;
     }
 
-    public async Task<PagedResponse<TournamentDto>> GetAllTournamentsAsync(int page = 1, int pageSize = 10)
+    public async Task<PagedResponse<TournamentDto>> GetAllTournamentsAsync(
+        int page = 1, 
+        int pageSize = 10,
+        string? status = null,
+        string? sport = null)
     {
         var query = _context.Set<PolytechLeague.Domain.Entities.Event>()
-            .Include(e => e.Photos);
+            .Include(e => e.Photos)
+            .AsQueryable();
+
+        // Server-side filtering by sport
+        if (!string.IsNullOrEmpty(sport) && sport != "all")
+        {
+            query = query.Where(e =>
+                (sport == "futsal" && e is FutsalEvent) ||
+                (sport == "basketball-3x3" && e is Basketball3x3Event) ||
+                (sport == "volleyball" && e is VolleyballEvent) ||
+                (sport == "chess" && e is ChessEvent) ||
+                (sport == "checkers" && e is CheckersEvent) ||
+                (sport == "table-tennis" && e is TableTennisEvent) ||
+                (sport == "armwrestling" && e is ArmwrestlingEvent) ||
+                (sport == "badminton" && e is BadmintonEvent) ||
+                (sport == "beach-volleyball" && e is BeachVolleyballEvent)
+            );
+        }
+
+        // Server-side filtering by status (based on date logic)
+        if (!string.IsNullOrEmpty(status) && status != "all")
+        {
+            var today = DateTime.UtcNow.Date;
+            if (status == "upcoming")
+            {
+                query = query.Where(e => e.Date > today);
+            }
+            else if (status == "ongoing")
+            {
+                query = query.Where(e => e.Date == today);
+            }
+            else if (status == "completed")
+            {
+                query = query.Where(e => e.Date < today);
+            }
+        }
 
         var totalCount = await query.CountAsync();
 
@@ -42,14 +81,14 @@ public class TournamentService : ITournamentService
             Title = e.Name,
             Sport = GetSportName(e),
             Status = GetStatus(e.Date),
-            Date = e.Date.ToString("dd.MM.yyyy"), // Simple format for now
+            Date = e.Date.ToString("dd.MM.yyyy"),
             Location = e.Location,
             Description = e.Description,
-            Participants = 0, // Need to implement counting for each type
-            Teams = 0, // Need to implement counting for each type
-            Prize = "Призи та кубки", // Placeholder
-            Organizer = "Спортвідділ", // Placeholder
-            RegistrationEnd = e.Date.AddDays(-5).ToString("dd.MM.yyyy"), // Placeholder
+            Participants = 0,
+            Teams = 0,
+            Prize = "Призи та кубки",
+            Organizer = "Спортвідділ",
+            RegistrationEnd = e.Date.AddDays(-5).ToString("dd.MM.yyyy"),
             CurrentRound = GetStatus(e.Date) == "ongoing" ? "В процесі" : "Реєстрація",
             Registered = false,
             Featured = false

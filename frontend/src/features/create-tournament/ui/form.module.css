@@ -88,3 +88,91 @@
   resize: vertical;
   min-height: 120px;
 }
+
+/* Чекбокси */
+.checkboxGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  cursor: pointer;
+  padding: 16px;
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  transition: all 0.3s ease;
+  background: var(--bg);
+}
+
+.checkboxLabel:hover {
+  border-color: var(--primary);
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.checkboxWrapper {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.hiddenCheckbox {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.customCheckbox {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 24px;
+  width: 24px;
+  background-color: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hiddenCheckbox:checked ~ .customCheckbox {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.customCheckbox i {
+  color: white;
+  font-size: 12px;
+  display: none;
+}
+
+.hiddenCheckbox:checked ~ .customCheckbox i {
+  display: block;
+}
+
+.checkboxText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.checkboxTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.checkboxDesc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+

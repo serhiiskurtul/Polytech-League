@@ -27,7 +27,7 @@ const TournamentViewPage = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Admin access check (0 = User, 1 = Admin)
-  const isAdmin = user?.role === 1 || user?.role === '1' || user?.role === 'Admin';
+  const isAdmin = user?.role === '1' || user?.role === 'Admin';
 
   // Search Results type
   type SearchResult = {

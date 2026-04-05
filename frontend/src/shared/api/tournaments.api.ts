@@ -1,10 +1,20 @@
 import api from './axiosInstance';
 import { Tournament, PagedResponse } from '../types/tournament.types';
 
-export const getTournaments = async (page: number = 1, pageSize: number = 10): Promise<PagedResponse<Tournament>> => {
+export const getTournaments = async (
+    page: number = 1, 
+    pageSize: number = 10,
+    status?: string,
+    sport?: string
+): Promise<PagedResponse<Tournament>> => {
     try {
         const response = await api.get<PagedResponse<Tournament>>('/api/tournaments', {
-            params: { page, pageSize }
+            params: { 
+                page, 
+                pageSize,
+                status: status !== 'all' ? status : undefined,
+                sport: sport !== 'all' ? sport : undefined
+            }
         });
         return response.data;
     } catch (error) {

@@ -33,43 +33,10 @@ const Tournaments = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Ініціалізація даних турнірів
-  const fetchTournamentsData = async (page: number) => {
-    setIsLoading(true);
-    try {
-      const response = await getTournaments(page, pagination.pageSize);
-      setTournaments(response.items as TournamentUI[]);
-      setPagination(prev => ({
-        ...prev,
-        page: response.page,
-        totalCount: response.totalCount,
-        totalPages: response.totalPages
-      }));
-    } catch (error) {
-      console.error("Failed to fetch tournaments:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchTournamentsData(pagination.page);
-  }, [pagination.page]);
-
   // Фільтрація та сортування турнірів (тепер працює над отриманими даними)
   // В ідеалі це має бути на бекенді, але поки що залишимо так для сумісності з існуючим кодом
   const getFilteredTournaments = () => {
     let result = [...tournaments];
-
-    // Фільтрація за статусом
-    if (activeStatus !== 'all') {
-      result = result.filter(tournament => tournament.status === activeStatus);
-    }
-
-    // Фільтрація за видом спорту
-    if (activeSport !== 'all') {
-      result = result.filter(tournament => tournament.sport === activeSport);
-    }
 
     // Фільтрація за пошуком
     if (searchQuery.trim() !== '') {
@@ -104,21 +71,54 @@ const Tournaments = () => {
   // Обробка зміни статусу
   const handleStatusChange = (status: string) => {
     setActiveStatus(status);
+    setPagination(prev => ({ ...prev, page: 1 }));
   };
 
   // Обробка зміни виду спорту
   const handleSportChange = (sport: string) => {
     setActiveSport(prev => prev === sport ? 'all' : sport);
+    setPagination(prev => ({ ...prev, page: 1 }));
   };
 
   // Обробка пошуку
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
+    setPagination(prev => ({ ...prev, page: 1 }));
   };
 
   // Обробка зміни сортування
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSortBy(e.target.value);
+  };
+
+  // Ініціалізація даних турнірів
+  const fetchTournamentsData = async (page: number) => {
+    setIsLoading(true);
+    try {
+      const response = await getTournaments(page, pagination.pageSize, activeStatus, activeSport);
+      setTournaments(response.items as TournamentUI[]);
+      setPagination(prev => ({
+        ...prev,
+        page: response.page,
+        totalCount: response.totalCount,
+        totalPages: response.totalPages
+      }));
+    } catch (error) {
+      console.error("Failed to fetch tournaments:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTournamentsData(pagination.page);
+  }, [pagination.page, activeStatus, activeSport]);
+
+  const handleResetFilters = () => {
+    setActiveStatus('all');
+    setActiveSport('all');
+    setSearchQuery('');
+    setPagination(prev => ({ ...prev, page: 1 }));
   };
 
   // Обробка перемикання сторінок
@@ -179,6 +179,12 @@ const Tournaments = () => {
         </div>
 
         <div className="controls-right">
+          {(activeStatus !== 'all' || activeSport !== 'all' || searchQuery !== '') && (
+            <button className="btn btn-outline reset-filters-btn" onClick={handleResetFilters}>
+              <i className="fas fa-times"></i> Скинути
+            </button>
+          )}
+          
           <select className="sort-select" value={sortBy} onChange={handleSortChange}>
             <option value="date">За датою</option>
             <option value="participants">За учасниками</option>
@@ -220,11 +226,7 @@ const Tournaments = () => {
             <i className="fas fa-search"></i>
             <h3>Нічого не знайдено</h3>
             <p>Спробуйте змінити параметри пошуку або фільтри</p>
-            <button className="btn btn-primary" onClick={() => {
-              setActiveStatus('all');
-              setActiveSport('all');
-              setSearchQuery('');
-            }}>
+            <button className="btn btn-primary" onClick={handleResetFilters}>
               Скинути всі фільтри
             </button>
           </div>

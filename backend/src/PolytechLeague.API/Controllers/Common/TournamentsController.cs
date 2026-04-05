@@ -16,9 +16,13 @@ public class TournamentsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<PagedResponse<TournamentDto>>> GetAllTournaments(int page = 1, int pageSize = 10)
+    public async Task<ActionResult<PagedResponse<TournamentDto>>> GetAllTournaments(
+        int page = 1, 
+        int pageSize = 10,
+        string? status = null,
+        string? sport = null)
     {
-        var tournaments = await _tournamentService.GetAllTournamentsAsync(page, pageSize);
+        var tournaments = await _tournamentService.GetAllTournamentsAsync(page, pageSize, status, sport);
         return Ok(tournaments);
     }
 
