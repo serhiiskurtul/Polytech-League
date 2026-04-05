@@ -25,6 +25,41 @@ public static class FilterExtensions
 
                 constantExpression = Expression.AndAlso(constantExpression, binaryExpression);
             }
+            else
+            {
+                // Fallback for entities without 'Name' property, like 'User'
+                // Search in FirstName, LastName, or Email
+                var firstNameProp = typeof(TEntity).GetProperty("FirstName");
+                var lastNameProp = typeof(TEntity).GetProperty("LastName");
+                var emailProp = typeof(TEntity).GetProperty("Email");
+
+                Expression orExpression = Expression.Constant(false);
+                var filterValue = Expression.Constant(filterParams.Name);
+
+                if (firstNameProp != null)
+                {
+                    var prop = Expression.Property(parameterExpression, firstNameProp);
+                    var contains = typeof(string).GetMethod("Contains", new[] { typeof(string) });
+                    var call = Expression.Call(prop, contains, filterValue);
+                    orExpression = Expression.OrElse(orExpression, call);
+                }
+                if (lastNameProp != null)
+                {
+                    var prop = Expression.Property(parameterExpression, lastNameProp);
+                    var contains = typeof(string).GetMethod("Contains", new[] { typeof(string) });
+                    var call = Expression.Call(prop, contains, filterValue);
+                    orExpression = Expression.OrElse(orExpression, call);
+                }
+                if (emailProp != null)
+                {
+                    var prop = Expression.Property(parameterExpression, emailProp);
+                    var contains = typeof(string).GetMethod("Contains", new[] { typeof(string) });
+                    var call = Expression.Call(prop, contains, filterValue);
+                    orExpression = Expression.OrElse(orExpression, call);
+                }
+
+                constantExpression = Expression.AndAlso(constantExpression, orExpression);
+            }
         }
 
         var expression = Expression.Lambda<Func<TEntity, bool>>(constantExpression, parameterExpression);

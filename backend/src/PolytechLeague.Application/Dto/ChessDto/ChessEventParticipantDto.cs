@@ -5,6 +5,7 @@ namespace PolytechLeague.Application.Dto.ChessDto;
 public class ChessEventParticipantDto
 {
     public long Id { get; set; }
+    public long? UserId { get; set; }
     public long ChessEventId { get; set; }
     public long PlayerId { get; set; }
     public string? PlayerName { get; set; }
@@ -22,6 +23,7 @@ public static class ChessEventParticipantDtoExtensions
         return new ChessEventParticipantDto
         {
             Id = participant.PlayerId, // Using PlayerId as unique id for frontend key
+            UserId = participant.Player?.UserId,
             ChessEventId = participant.TournamentId,
             PlayerId = participant.PlayerId,
             PlayerName = participant.Player != null ? $"{participant.Player.FirstName} {participant.Player.LastName}" : null,

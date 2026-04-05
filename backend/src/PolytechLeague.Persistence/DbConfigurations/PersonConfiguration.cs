@@ -12,6 +12,12 @@ public class PersonConfiguration : IEntityTypeConfiguration<Person>
 
         builder.Property(x => x.Id).HasColumnName("id");
 
+        builder.Property(x => x.UserId).HasColumnName("user_id");
+        builder.HasOne(x => x.User)
+            .WithMany()
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         builder.Property(x => x.FirstName)
             .HasColumnName("first_name")
             .IsRequired();

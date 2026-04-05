@@ -10,6 +10,7 @@ export type PiecesColor = "White" | "Black" | "NotDefined";
 
 export interface ChessEventParticipantResponse {
   id: number;
+  userId?: number | null;
   chessEventId: number;
   playerId: number;
   playerName: string;
@@ -25,8 +26,10 @@ export interface ChessGameResponse {
   chessEventId: number;
   roundNumber: number;
   whitePlayerId: number | null;
+  whiteUserId?: number | null;
   whitePlayerName: string | null;
   blackPlayerId: number | null;
+  blackUserId?: number | null;
   blackPlayerName: string | null;
   result: GameResult;
   whiteColor: PiecesColor;
@@ -51,6 +54,7 @@ export interface ChessEventResponse {
 
 export interface ChessPlayerDto {
     id?: number;
+    userId?: number | null;
     firstName: string;
     lastName: string;
     group: string;

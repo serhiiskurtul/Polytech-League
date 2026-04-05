@@ -1,6 +1,15 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { getTournamentById, getChessEventById, createChessPlayer, addParticipantToEvent, createChessGame, getAllChessPlayers } from '@/shared/api';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { 
+  getTournamentById, 
+  getChessEventById, 
+  createChessPlayer, 
+  addParticipantToEvent, 
+  createChessGame, 
+  getAllChessPlayers,
+  searchUsers,
+  UserResponse
+} from '@/shared/api';
 import { Tournament } from '@/shared/types/tournament.types';
 import { ChessEventResponse, ChessPlayerDto, ChessGameDto, GameResult } from '@/shared/types/chess.types';
 import styles from './TournamentViewPage.module.css';
@@ -18,9 +27,33 @@ const TournamentViewPage = () => {
   // Admin access mocked (e.g. true for demonstration, in reality use global Auth context)
   const [isAdmin, setIsAdmin] = useState(true);
 
+  // Search Results type
+  type SearchResult = {
+    type: 'player' | 'user';
+    id: number;
+    userId?: number | null;
+    firstName: string;
+    lastName: string;
+    email?: string;
+    group?: string;
+    rating?: number;
+  };
+
   // Admin Form States
-  const [newPlayer, setNewPlayer] = useState({ firstName: '', lastName: '', group: '', city: 'Київ', ratingELO: 1500, fideId: '', title: '' });
-  const [selectedExistingPlayerId, setSelectedExistingPlayerId] = useState<string>('');
+  const [newPlayer, setNewPlayer] = useState({ 
+    firstName: '', 
+    lastName: '', 
+    group: '', 
+    city: 'Київ', 
+    ratingELO: 1500, 
+    fideId: '', 
+    title: '',
+    userId: null as number | null,
+    existingPlayerId: null as number | null
+  });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   const [newGame, setNewGame] = useState({ whitePlayerId: '', blackPlayerId: '', result: 'NotPlayed', round: 1 });
 
   const fetchTournament = async () => {
@@ -54,57 +87,124 @@ const TournamentViewPage = () => {
     fetchTournament();
   }, [id]);
 
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(async () => {
+      if (searchQuery.length >= 2) {
+        setIsSearching(true);
+        try {
+          // 1. Search in existing ChessPlayers (local search for now, as we have allChessPlayers)
+          const playerResults: SearchResult[] = allChessPlayers
+            .filter(p => 
+              (p.firstName + ' ' + p.lastName).toLowerCase().includes(searchQuery.toLowerCase()) ||
+              p.group?.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+            .map(p => ({
+              type: 'player',
+              id: p.id!,
+              userId: p.userId,
+              firstName: p.firstName,
+              lastName: p.lastName,
+              group: p.group,
+              rating: p.ratingELO
+            }));
+
+          // 2. Search in Users (remote search)
+          const users = await searchUsers(searchQuery);
+          
+          // Filter out users who are already in playerResults (to avoid duplicates)
+          const userResults: SearchResult[] = users
+            .filter(u => !playerResults.some(pr => pr.userId === u.id))
+            .map(u => ({
+              type: 'user',
+              id: u.id,
+              userId: u.id,
+              firstName: u.firstName,
+              lastName: u.lastName,
+              email: u.email
+            }));
+
+          setSearchResults([...playerResults, ...userResults]);
+        } catch (err) {
+          console.error('Search failed:', err);
+        } finally {
+          setIsSearching(false);
+        }
+      } else {
+        setSearchResults([]);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery, allChessPlayers]);
+
+  const handleSelectResult = (result: SearchResult) => {
+    if (result.type === 'player') {
+      setNewPlayer({
+        ...newPlayer,
+        firstName: result.firstName,
+        lastName: result.lastName,
+        group: result.group || '',
+        ratingELO: result.rating || 1500,
+        userId: result.userId || null,
+        existingPlayerId: result.id
+      });
+    } else {
+      setNewPlayer({
+        ...newPlayer,
+        firstName: result.firstName,
+        lastName: result.lastName,
+        userId: result.userId || null,
+        existingPlayerId: null
+      });
+    }
+    setSearchResults([]);
+    setSearchQuery('');
+  };
+
   const handleAddPlayer = async () => {
     if (!newPlayer.firstName || !newPlayer.lastName || !newPlayer.group) {
         alert("Заповніть ім'я, прізвище та групу користувача!");
         return;
     }
     try {
-      const { ...playerData } = newPlayer;
-      const playerPayload: ChessPlayerDto = { 
-        ...playerData,
-        fideId: newPlayer.fideId.trim() || null,
-        title: newPlayer.title.trim() || null
-      };
-      const created = await createChessPlayer(playerPayload);
-      if (created.id) {
-         // Create participant binding
-         await addParticipantToEvent(id!, { playerId: created.id, points: 0, rank: 0 });
-         alert("Гравець успішно створений та доданий до турніру!");
-         setNewPlayer({ firstName: '', lastName: '', group: '', city: 'Київ', ratingELO: 1500, fideId: '', title: '' });
-         fetchTournament(); // Refresh
+      let playerId = newPlayer.existingPlayerId;
+
+      if (!playerId) {
+        // Check if player is already in the tournament (by userId)
+        if (newPlayer.userId && chessDetails?.players.some(p => p.userId === newPlayer.userId)) {
+          alert("Цей користувач вже бере участь у турнірі!");
+          return;
+        }
+
+        const playerPayload: ChessPlayerDto = { 
+          firstName: newPlayer.firstName,
+          lastName: newPlayer.lastName,
+          group: newPlayer.group,
+          city: newPlayer.city,
+          ratingELO: newPlayer.ratingELO,
+          userId: newPlayer.userId,
+          fideId: newPlayer.fideId.trim() || null,
+          title: newPlayer.title.trim() || null
+        };
+        const created = await createChessPlayer(playerPayload);
+        playerId = created.id!;
+      } else {
+        // Check if player is already in the tournament
+        const isAlreadyParticipant = chessDetails?.players.some(p => p.playerId === playerId);
+        if (isAlreadyParticipant) {
+          alert("Цей гравець вже бере участь у турнірі!");
+          return;
+        }
       }
+
+      // Create participant binding
+      await addParticipantToEvent(id!, { playerId: playerId, points: 0, rank: 0 });
+      alert("Учасник успішно доданий до турніру!");
+      setNewPlayer({ firstName: '', lastName: '', group: '', city: 'Київ', ratingELO: 1500, fideId: '', title: '', userId: null, existingPlayerId: null });
+      fetchTournament(); // Refresh
     } catch (err) {
       console.error(err);
       alert("Помилка при додаванні учасника");
-    }
-  };
-
-  const handleAddExistingPlayer = async () => {
-    if (!selectedExistingPlayerId) {
-      alert("Оберіть гравця зі списку!");
-      return;
-    }
-    
-    // Check if player is already in the tournament
-    const isAlreadyParticipant = chessDetails?.players.some(p => p.playerId === Number(selectedExistingPlayerId));
-    if (isAlreadyParticipant) {
-      alert("Цей гравець вже бере участь у турнірі!");
-      return;
-    }
-
-    try {
-      await addParticipantToEvent(id!, { 
-        playerId: Number(selectedExistingPlayerId), 
-        points: 0, 
-        rank: 0 
-      });
-      alert("Гравець успішно доданий до турніру!");
-      setSelectedExistingPlayerId('');
-      fetchTournament();
-    } catch (err) {
-      console.error(err);
-      alert("Помилка при додаванні існуючого учасника");
     }
   };
 
@@ -338,7 +438,13 @@ const TournamentViewPage = () => {
                           <tr key={p.id}>
                             <td>{idx + 1}</td>
                             <td>
-                              <strong>{p.playerName}</strong>
+                              {p.userId ? (
+                                <Link to={`/profile/${p.userId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
+                                  {p.playerName}
+                                </Link>
+                              ) : (
+                                <strong>{p.playerName}</strong>
+                              )}
                             </td>
                             <td>{p.rating}</td>
                             <td><strong>{p.points}</strong></td>
@@ -402,8 +508,24 @@ const TournamentViewPage = () => {
                             <tr key={game.id}>
                               <td>{game.roundNumber}</td>
                               <td>{idx + 1}</td>
-                              <td>{game.whitePlayerName || '—'}</td>
-                              <td>{game.blackPlayerName || '—'}</td>
+                              <td>
+                                {game.whiteUserId ? (
+                                  <Link to={`/profile/${game.whiteUserId}`} style={{ color: '#3b82f6', textDecoration: 'none' }}>
+                                    {game.whitePlayerName}
+                                  </Link>
+                                ) : (
+                                  game.whitePlayerName || '—'
+                                )}
+                              </td>
+                              <td>
+                                {game.blackUserId ? (
+                                  <Link to={`/profile/${game.blackUserId}`} style={{ color: '#3b82f6', textDecoration: 'none' }}>
+                                    {game.blackPlayerName}
+                                  </Link>
+                                ) : (
+                                  game.blackPlayerName || '—'
+                                )}
+                              </td>
                               <td>
                                 {game.result === 'WhiteWin' ? (
                                   <span className={`${styles.resultBadge} ${styles.resultWhiteWin}`}>
@@ -438,43 +560,99 @@ const TournamentViewPage = () => {
                 <div className={styles.tabContent}>
                   {isAdmin && (
                     <div style={{ background: '#f5f5f5', padding: '24px', borderRadius: '12px', marginBottom: '24px' }}>
-                      <div style={{ marginBottom: '24px', borderBottom: '1px solid #ddd', paddingBottom: '16px' }}>
-                        <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#111' }}>[Admin] Додати Існуючого Гравця</h3>
-                        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                          <select 
-                            value={selectedExistingPlayerId} 
-                            onChange={(e) => setSelectedExistingPlayerId(e.target.value)}
-                            style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', flex: 1 }}
-                          >
-                            <option value="">-- Оберіть гравця зі списку --</option>
-                            {allChessPlayers
-                              .filter(ap => !chessDetails?.players.some(p => p.playerId === ap.id))
-                              .map(player => (
-                                <option key={player.id} value={player.id}>
-                                  {player.firstName} {player.lastName} ({player.group}) - ELO: {player.ratingELO}
-                                </option>
-                              ))
-                            }
-                          </select>
-                          <button 
-                            onClick={handleAddExistingPlayer}
-                            style={{ padding: '8px 24px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
-                          >
-                            Додати до турніру
-                          </button>
-                        </div>
+                      <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#111' }}>[Admin] Додати учасника</h3>
+                      
+                      <div style={{ marginBottom: '20px', position: 'relative' }}>
+                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Пошук гравця або користувача:</label>
+                        <input 
+                          type="text" 
+                          placeholder="Введіть ім'я, прізвище або email для пошуку в базі..." 
+                          value={searchQuery} 
+                          onChange={(e) => setSearchQuery(e.target.value)} 
+                          style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #ccc' }}
+                        />
+                        {isSearching && <div style={{ marginTop: '8px' }}>Пошук...</div>}
+                        {searchResults.length > 0 && (
+                          <div style={{ 
+                            position: 'absolute', 
+                            top: '100%', 
+                            left: 0, 
+                            right: 0, 
+                            background: '#fff', 
+                            border: '1px solid #ccc', 
+                            borderRadius: '6px', 
+                            zIndex: 10,
+                            maxHeight: '200px',
+                            overflowY: 'auto',
+                            boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                          }}>
+                            {searchResults.map((result, idx) => (
+                              <div 
+                                key={`${result.type}-${result.id}-${idx}`} 
+                                onClick={() => handleSelectResult(result)}
+                                style={{ padding: '10px', cursor: 'pointer', borderBottom: '1px solid #eee' }}
+                                onMouseOver={(e) => (e.currentTarget.style.background = '#f0f0f0')}
+                                onMouseOut={(e) => (e.currentTarget.style.background = '#fff')}
+                              >
+                                <span style={{ 
+                                  fontSize: '10px', 
+                                  background: result.type === 'player' ? '#10b981' : '#3b82f6', 
+                                  color: '#fff', 
+                                  padding: '2px 6px', 
+                                  borderRadius: '4px',
+                                  marginRight: '8px',
+                                  textTransform: 'uppercase'
+                                }}>
+                                  {result.type === 'player' ? 'Гравець' : 'Користувач'}
+                                </span>
+                                <strong>{result.firstName} {result.lastName}</strong> 
+                                {result.email && <span style={{ color: '#666', marginLeft: '8px' }}>({result.email})</span>}
+                                {result.group && <span style={{ color: '#666', marginLeft: '8px' }}>[{result.group}]</span>}
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
 
-                      <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#111' }}>[Admin] Створити та Зареєструвати Нового Гравця</h3>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '16px' }}>
-                        <input type="text" placeholder="Ім'я" value={newPlayer.firstName} onChange={(e) => setNewPlayer({...newPlayer, firstName: e.target.value})} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}/>
-                        <input type="text" placeholder="Прізвище" value={newPlayer.lastName} onChange={(e) => setNewPlayer({...newPlayer, lastName: e.target.value})} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}/>
-                        <input type="text" placeholder="Група (напр. КН-31)" value={newPlayer.group} onChange={(e) => setNewPlayer({...newPlayer, group: e.target.value})} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}/>
-                        <input type="number" placeholder="Рейтинг ELO" value={newPlayer.ratingELO} onChange={(e) => setNewPlayer({...newPlayer, ratingELO: parseInt(e.target.value) || 1500})} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}/>
-                        <input type="text" placeholder="FIDE ID (опціонально)" value={newPlayer.fideId} onChange={(e) => setNewPlayer({...newPlayer, fideId: e.target.value})} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}/>
-                        <input type="text" placeholder="Звання (напр. CM, FM, IM, GM) (опціонально)" value={newPlayer.title} onChange={(e) => setNewPlayer({...newPlayer, title: e.target.value})} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}/>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <label style={{ marginBottom: '4px', fontSize: '12px' }}>Ім'я</label>
+                          <input type="text" placeholder="Ім'я" value={newPlayer.firstName} onChange={(e) => setNewPlayer({...newPlayer, firstName: e.target.value})} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}/>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <label style={{ marginBottom: '4px', fontSize: '12px' }}>Прізвище</label>
+                          <input type="text" placeholder="Прізвище" value={newPlayer.lastName} onChange={(e) => setNewPlayer({...newPlayer, lastName: e.target.value})} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}/>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <label style={{ marginBottom: '4px', fontSize: '12px' }}>Група (напр. КН-31)</label>
+                          <input type="text" placeholder="Група (напр. КН-31)" value={newPlayer.group} onChange={(e) => setNewPlayer({...newPlayer, group: e.target.value})} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}/>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <label style={{ marginBottom: '4px', fontSize: '12px' }}>Рейтинг ELO</label>
+                          <input type="number" placeholder="Рейтинг ELO" value={newPlayer.ratingELO} onChange={(e) => setNewPlayer({...newPlayer, ratingELO: parseInt(e.target.value) || 1500})} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}/>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <label style={{ marginBottom: '4px', fontSize: '12px' }}>FIDE ID (опціонально)</label>
+                          <input type="text" placeholder="FIDE ID (опціонально)" value={newPlayer.fideId} onChange={(e) => setNewPlayer({...newPlayer, fideId: e.target.value})} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}/>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <label style={{ marginBottom: '4px', fontSize: '12px' }}>Звання (напр. CM, FM, IM, GM) (опціонально)</label>
+                          <input type="text" placeholder="Звання (напр. CM, FM, IM, GM) (опціонально)" value={newPlayer.title} onChange={(e) => setNewPlayer({...newPlayer, title: e.target.value})} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}/>
+                        </div>
                       </div>
-                      <button onClick={handleAddPlayer} style={{ padding: '10px 24px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Створити та Додати</button>
+                      <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                        <button onClick={handleAddPlayer} style={{ padding: '10px 24px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
+                          {newPlayer.existingPlayerId ? 'Додати існуючого гравця' : newPlayer.userId ? 'Створити профіль гравця та додати' : 'Створити гостя та додати'}
+                        </button>
+                        {(newPlayer.userId || newPlayer.existingPlayerId) && (
+                          <button 
+                            onClick={() => setNewPlayer({...newPlayer, userId: null, existingPlayerId: null, firstName: '', lastName: '', group: ''})} 
+                            style={{ padding: '10px 24px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+                          >
+                            Скинути вибір
+                          </button>
+                        )}
+                      </div>
                     </div>
                   )}
 
@@ -484,6 +662,7 @@ const TournamentViewPage = () => {
                         <tr>
                           <th>№</th>
                           <th>Учасник</th>
+                          <th>Очки</th>
                           <th>Рейтинг ELO</th>
                         </tr>
                       </thead>
@@ -491,11 +670,20 @@ const TournamentViewPage = () => {
                         {sortedPlayers.length > 0 ? sortedPlayers.map((p, idx) => (
                           <tr key={p.id}>
                             <td>{idx + 1}</td>
-                            <td>{p.playerName}</td>
+                            <td>
+                              {p.userId ? (
+                                <Link to={`/profile/${p.userId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
+                                  {p.playerName}
+                                </Link>
+                              ) : (
+                                p.playerName
+                              )}
+                            </td>
+                            <td>{p.points}</td>
                             <td>{p.rating}</td>
                           </tr>
                         )) : (
-                          <tr><td colSpan={3}>Учасники не знайдені</td></tr>
+                          <tr><td colSpan={4}>Учасники не знайдені</td></tr>
                         )}
                       </tbody>
                     </table>

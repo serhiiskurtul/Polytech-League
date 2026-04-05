@@ -687,7 +687,13 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("photo_url");
 
+                    b.Property<long?>("UserId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("user_id");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("persons", (string)null);
 
@@ -1730,6 +1736,16 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Navigation("HomeTeam");
 
                     b.Navigation("WinnerTeam");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Person", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.TableTennis.TableTennisEventParticipant", b =>

@@ -5,6 +5,7 @@ namespace PolytechLeague.Application.Dto.ChessDto;
 public class ChessPlayerDto
 {
     public long? Id { get; set; }
+    public long? UserId { get; set; }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public string? Group { get; set; }
@@ -21,6 +22,7 @@ public static class ChessPlayerDtoExtensions
         return new ChessPlayerDto
         {
             Id = player.Id,
+            UserId = player.UserId,
             FirstName = player.FirstName,
             LastName = player.LastName,
             Group = player.Group,
@@ -36,6 +38,7 @@ public static class ChessPlayerDtoExtensions
         var player = new ChessPlayer()
         {
             Id = dto.Id ?? 0,
+            UserId = dto.UserId,
             FirstName = dto.FirstName ?? string.Empty,
             LastName = dto.LastName ?? string.Empty,
             Group = dto.Group ?? string.Empty,

@@ -10,8 +10,10 @@ public class ChessGameDto
     public long TournamentId { get; set; }
 
     public long WhitePlayerId { get; set; }
+    public long? WhiteUserId { get; set; }
     public string? WhitePlayerName { get; set; }
     public long BlackPlayerId { get; set; }
+    public long? BlackUserId { get; set; }
     public string? BlackPlayerName { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -31,8 +33,10 @@ public static class ChessGameDtoExtensions
             Id = game.Id,
             TournamentId = game.TournamentId,
             WhitePlayerId = game.WhitePlayerId,
+            WhiteUserId = game.WhitePlayer?.UserId,
             WhitePlayerName = game.WhitePlayer != null ? $"{game.WhitePlayer.FirstName} {game.WhitePlayer.LastName}".Trim() : null,
             BlackPlayerId = game.BlackPlayerId,
+            BlackUserId = game.BlackPlayer?.UserId,
             BlackPlayerName = game.BlackPlayer != null ? $"{game.BlackPlayer.FirstName} {game.BlackPlayer.LastName}".Trim() : null,
             Result = game.Result,
             Round = game.Round,
