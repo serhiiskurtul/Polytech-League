@@ -379,6 +379,9 @@ const TournamentViewPage = () => {
   const badgeObj = getLevelBadgeParams(chessDetails?.level);
   const playedGames = chessDetails?.games?.filter(g => g.result !== 'NotPlayed').length || 0;
   const totalRounds = chessDetails?.games?.reduce((acc, game) => Math.max(acc, game.round), 0) || 0;
+  const actualParticipants = tournament.sport === 'chess' 
+    ? (chessDetails?.players?.length || 0) 
+    : (tournament.participants || 0);
 
   const filteredGames = chessDetails?.games ? [...chessDetails.games].filter(g => {
     if (gameFilters.round && g.round.toString() !== gameFilters.round) return false;
@@ -426,7 +429,7 @@ const TournamentViewPage = () => {
               </div>
               <div className={styles.metaItem}>
                 <i className="fas fa-users"></i>
-                <span>{tournament.participants} учасників</span>
+                <span>{actualParticipants} учасників</span>
               </div>
               {chessDetails?.timeControl && (
                 <div className={styles.metaItem}>
@@ -493,7 +496,7 @@ const TournamentViewPage = () => {
               </div>
               <div className={styles.statCard}>
                 <div className={styles.statIcon}><i className="fas fa-users"></i></div>
-                <div className={styles.statValue}>{tournament.participants || '-'}</div>
+                <div className={styles.statValue}>{actualParticipants}</div>
                 <div className={styles.statLabel}>Учасників</div>
               </div>
               <div className={styles.statCard}>
