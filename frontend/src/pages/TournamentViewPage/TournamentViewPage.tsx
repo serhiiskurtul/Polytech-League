@@ -74,6 +74,15 @@ const TournamentViewPage = () => {
   };
 
   const handleSaveEdit = async (gameId: number) => {
+    if (!editingGameData.whitePlayerId || !editingGameData.blackPlayerId) {
+        alert("Оберіть обох супротивників!");
+        return;
+    }
+    if (editingGameData.whitePlayerId === editingGameData.blackPlayerId) {
+        alert("Гравець не може грати сам проти себе!");
+        return;
+    }
+
     try {
       const payload: ChessGameDto = {
         tournamentId: Number(id),
@@ -250,8 +259,12 @@ const TournamentViewPage = () => {
   };
 
   const handleAddGame = async () => {
-    if (!newGame.whitePlayerId && !newGame.blackPlayerId) {
-        alert("Супротивники не обрані!");
+    if (!newGame.whitePlayerId || !newGame.blackPlayerId) {
+        alert("Оберіть обох супротивників!");
+        return;
+    }
+    if (newGame.whitePlayerId === newGame.blackPlayerId) {
+        alert("Гравець не може грати сам проти себе!");
         return;
     }
     try {
