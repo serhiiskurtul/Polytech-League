@@ -138,6 +138,19 @@ const TournamentViewPage = () => {
     }
   };
 
+  const handleRemoveParticipant = async (playerId: number, playerName: string) => {
+    if (window.confirm(`Ви впевнені, що хочете видалити учасника "${playerName}" з турніру?`)) {
+      try {
+        await removeParticipantFromEvent(id!, playerId);
+        alert("Учасника видалено з турніру!");
+        fetchTournament();
+      } catch (err) {
+        console.error(err);
+        alert("Помилка при видаленні учасника");
+      }
+    }
+  };
+
   const fetchTournament = async () => {
     if (!id) return;
     setIsLoading(true);
@@ -580,7 +593,8 @@ const TournamentViewPage = () => {
                                 <td><strong>{p.points}</strong></td>
                                 <td>{p.buchholz}</td>
                                 {isAdmin && <td>
-                                  <button onClick={() => handleEditParticipantClick(p)} style={{ padding: '4px 8px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><i className="fas fa-edit"></i></button>
+                                  <button onClick={() => handleEditParticipantClick(p)} style={{ padding: '4px 8px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }} title="Редагувати"><i className="fas fa-edit"></i></button>
+                                  <button onClick={() => handleRemoveParticipant(p.playerId, p.playerName)} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Видалити"><i className="fas fa-trash"></i></button>
                                 </td>}
                               </>
                             )}
@@ -888,6 +902,7 @@ const TournamentViewPage = () => {
                           <th>Рейтинг ELO</th>
                           <th>Титул</th>
                           <th>FIDE ID</th>
+                          {isAdmin && <th>Дії</th>}
                         </tr>
                       </thead>
                       <tbody>
@@ -910,9 +925,16 @@ const TournamentViewPage = () => {
                               ) : '—'}
                             </td>
                             <td>{p.fideId || '—'}</td>
+                            {isAdmin && (
+                              <td>
+                                <button onClick={() => handleRemoveParticipant(p.playerId, p.playerName)} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Видалити">
+                                  <i className="fas fa-trash"></i>
+                                </button>
+                              </td>
+                            )}
                           </tr>
                         )) : (
-                          <tr><td colSpan={5}>Учасники не знайдені</td></tr>
+                          <tr><td colSpan={isAdmin ? 6 : 5}>Учасники не знайдені</td></tr>
                         )}
                       </tbody>
                     </table>
