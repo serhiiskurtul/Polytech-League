@@ -48,11 +48,27 @@ export interface ChessEventResponse {
   refereeIds: number[];
   level: CompetitionLevel;
   description: string;
-  timeControl: string;
-  participantsCount: number;
   system: ChessSystem;
   games: ChessGameResponse[];
   players: ChessEventParticipantResponse[];
+  rules?: string;
+  prizes?: string;
+  headRefereeName?: string;
+}
+
+export interface ChessEventRequest {
+  name: string;
+  date: string;
+  location: string;
+  refereeIds: number[];
+  level: CompetitionLevel;
+  description: string;
+  timeControl: string;
+  participantsCount: number;
+  system: ChessSystem;
+  rules?: string;
+  prizes?: string;
+  headRefereeName?: string;
 }
 
 export interface ChessPlayerDto {

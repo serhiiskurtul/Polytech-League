@@ -10,6 +10,9 @@ public abstract class Event
     public required ICollection<long> RefereeIds { get; set; }
     public required CompetitionLevel Level { get; set; }
     public required string Description { get; set; }
+    public string? Rules { get; set; }
+    public string? Prizes { get; set; }
+    public string? HeadRefereeName { get; set; }
 }
 
 public enum CompetitionLevel

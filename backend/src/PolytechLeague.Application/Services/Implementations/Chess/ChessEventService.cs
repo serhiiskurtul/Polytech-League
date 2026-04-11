@@ -23,6 +23,10 @@ public class ChessEventService(
         oldEntity.Level = newEntity.Level;
         oldEntity.TimeControl = newEntity.TimeControl;
         oldEntity.System = newEntity.System;
+        oldEntity.Rules = newEntity.Rules;
+        oldEntity.Prizes = newEntity.Prizes;
+        oldEntity.HeadRefereeName = newEntity.HeadRefereeName;
+        oldEntity.RefereeIds = newEntity.RefereeIds;
     }
 
     public override async Task<ChessEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)
@@ -84,6 +88,28 @@ public class ChessEventService(
         if (participant != null)
         {
             _dbcontext.Set<ChessEventParticipant>().Remove(participant);
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+        }
+    }
+
+    public async Task AddPhotoAsync(long eventId, string url, CancellationToken cancellationToken = default)
+    {
+        var photo = new PolytechLeague.Domain.Entities.EventPhotos
+        {
+            EventId = eventId,
+            Url = url
+        };
+        _dbcontext.Set<PolytechLeague.Domain.Entities.EventPhotos>().Add(photo);
+        await _dbcontext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task RemovePhotoAsync(long eventId, long photoId, CancellationToken cancellationToken = default)
+    {
+        var photo = await _dbcontext.Set<PolytechLeague.Domain.Entities.EventPhotos>()
+            .FirstOrDefaultAsync(p => p.Id == photoId && p.EventId == eventId, cancellationToken);
+        if (photo != null)
+        {
+            _dbcontext.Set<PolytechLeague.Domain.Entities.EventPhotos>().Remove(photo);
             await _dbcontext.SaveChangesAsync(cancellationToken);
         }
     }

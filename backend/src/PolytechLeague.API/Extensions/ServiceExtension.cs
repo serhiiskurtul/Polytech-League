@@ -76,6 +76,7 @@ public static class ServiceExtension
         services.AddScoped<IBadmintonMatchService, BadmintonMatchService>();
         services.AddScoped<IBadmintonParticipantService, BadmintonParticipantService>();
         services.AddScoped<ITournamentService, TournamentService>();
+        services.AddScoped<IFileService, FileService>();
 
         return services;
     }

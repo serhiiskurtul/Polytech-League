@@ -1,5 +1,5 @@
 import api from './axiosInstance';
-import { ChessEventResponse, ChessPlayerDto, ChessEventParticipantDto, ChessGameDto } from '../types/chess.types';
+import { ChessEventResponse, ChessPlayerDto, ChessEventParticipantDto, ChessGameDto, ChessEventRequest } from '../types/chess.types';
 
 export const getChessEventById = async (id: number | string): Promise<ChessEventResponse> => {
     try {
@@ -9,6 +9,25 @@ export const getChessEventById = async (id: number | string): Promise<ChessEvent
         console.error(`Помилка при отриманні шахового турніру з id ${id}:`, error);
         throw error;
     }
+};
+
+export const updateChessEvent = async (id: number | string, data: ChessEventRequest): Promise<void> => {
+    await api.put(`/chess-events/${id}`, data);
+};
+
+export const uploadTournamentPhoto = async (id: number | string, file: File): Promise<{ url: string }> => {
+    const formData = new FormData();
+    formData.append('photo', file);
+    const response = await api.post<{ url: string }>(`/chess-events/${id}/photos`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+    return response.data;
+};
+
+export const deleteTournamentPhoto = async (eventId: number | string, photoId: number | string): Promise<void> => {
+    await api.delete(`/chess-events/${eventId}/photos/${photoId}`);
 };
 
 export const createChessPlayer = async (data: ChessPlayerDto): Promise<ChessPlayerDto> => {

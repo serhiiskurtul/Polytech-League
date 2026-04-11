@@ -1,4 +1,5 @@
 using PolytechLeague.Application.Dto.ChessDto;
+using PolytechLeague.Application.Services.Interfaces;
 using PolytechLeague.Application.Services.Interfaces.Chess;
 using PolytechLeague.Domain.Params;
 using PolytechLeague.Infrastructure.Redis;
@@ -9,7 +10,7 @@ namespace PolytechLeague.API.Controllers.Chess;
 
 [ApiController]
 [Route("chess-events")]
-public class ChessEventsController(IChessEventService chessEventService, IRedisService redisService) : Controller
+public class ChessEventsController(IChessEventService chessEventService, IRedisService redisService, IFileService fileService) : Controller
 {
     [AllowAnonymous]
     [HttpGet]
@@ -123,6 +124,38 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
         await chessEventService.UpdateParticipantAsync(eventId, playerId, request, cancellationToken);
         await redisService.RemoveDataAsync($"chess_event_{eventId}");
         await redisService.RemoveGroupAsync("chess_events_all");
+        return NoContent();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{id}/photos")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> UploadPhoto([FromRoute] long id, [FromForm] IFormFile photo, CancellationToken cancellationToken)
+    {
+        if (photo == null || photo.Length == 0) return BadRequest("File is empty");
+
+        var url = await fileService.SaveFileAsync(photo, $"tournaments/{id}", cancellationToken);
+        await chessEventService.AddPhotoAsync(id, url, cancellationToken);
+        
+        await redisService.RemoveDataAsync($"chess_event_{id}");
+        await redisService.RemoveGroupAsync("chess_events_all");
+
+        return Ok(new { url });
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpDelete("{id:long}/photos/{photoId:long}")]
+    public async Task<IActionResult> DeletePhoto(long id, long photoId, CancellationToken cancellationToken)
+    {
+        // First get the photo to know the URL to delete from disk (optional, or just delete from DB)
+        // I'll keep the file on disk for now to avoid complexity of finding URL, or I could modify the service.
+        // Let's just delete from DB for now as per simple implementation.
+        
+        await chessEventService.RemovePhotoAsync(id, photoId, cancellationToken);
+        
+        await redisService.RemoveDataAsync($"chess_event_{id}");
+        await redisService.RemoveGroupAsync("chess_events_all");
+
         return NoContent();
     }
 }

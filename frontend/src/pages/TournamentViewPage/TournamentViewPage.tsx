@@ -10,12 +10,25 @@ import {
   updateParticipantInEvent,
   createChessGame,
   updateChessGame,
+  updateChessEvent,
+  uploadTournamentPhoto,
+  deleteTournamentPhoto,
   getAllChessPlayers,
   searchUsers,
   UserResponse
 } from '@/shared/api';
 import { Tournament } from '@/shared/types/tournament.types';
-import { ChessEventResponse, ChessPlayerDto, ChessGameDto, GameResult, ChessGameResponse, ChessEventParticipantResponse, ChessEventParticipantDto } from '@/shared/types/chess.types';
+import { 
+  ChessEventResponse, 
+  ChessPlayerDto, 
+  ChessGameDto, 
+  GameResult, 
+  ChessGameResponse, 
+  ChessEventParticipantResponse, 
+  ChessEventParticipantDto, 
+  ChessEventRequest 
+} from '@/shared/types/chess.types';
+import { BASE_URL } from '@/shared/api/axiosInstance';
 import styles from './TournamentViewPage.module.css';
 
 const TournamentViewPage = () => {
@@ -67,6 +80,105 @@ const TournamentViewPage = () => {
   const [editingParticipantId, setEditingParticipantId] = useState<number | null>(null);
   const [editingParticipantData, setEditingParticipantData] = useState<{ points: number; rank: number }>({ points: 0, rank: 0 });
   const [gameFilters, setGameFilters] = useState({ round: '', board: '', participant: '', result: '' });
+
+  const [isEditingTournament, setIsEditingTournament] = useState(false);
+  const [editTournamentData, setEditTournamentData] = useState<ChessEventRequest>({
+    name: '',
+    date: '',
+    location: '',
+    refereeIds: [],
+    level: 'CollegeGroup',
+    description: '',
+    timeControl: '',
+    participantsCount: 0,
+    system: 'Swiss',
+    rules: '',
+    prizes: '',
+    headRefereeName: ''
+  });
+
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleEditTournament = () => {
+    if (chessDetails) {
+      // Use the actual backend date which is likely ISO string
+      let dateValue = '';
+      if (chessDetails.date) {
+        try {
+          dateValue = new Date(chessDetails.date).toISOString().split('T')[0];
+        } catch (e) {
+          dateValue = chessDetails.date.split(' ')[0];
+        }
+      }
+
+      setEditTournamentData({
+        name: tournament?.title || chessDetails.name,
+        date: dateValue,
+        location: tournament?.location || chessDetails.location,
+        refereeIds: chessDetails.refereeIds || [],
+        level: chessDetails.level || 'CollegeGroup',
+        description: tournament?.description || chessDetails.description,
+        timeControl: chessDetails.timeControl || '',
+        participantsCount: chessDetails.participantsCount || 0,
+        system: chessDetails.system || 'Swiss',
+        rules: chessDetails.rules || '',
+        prizes: chessDetails.prizes || '',
+        headRefereeName: chessDetails.headRefereeName || ''
+      });
+      setIsEditingTournament(true);
+    }
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement> | React.DragEvent) => {
+    let file: File | undefined;
+    
+    if ('files' in e.target && e.target.files) {
+      file = e.target.files[0];
+    } else if ('dataTransfer' in e && e.dataTransfer.files) {
+        e.preventDefault();
+      file = e.dataTransfer.files[0];
+    }
+
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+      await uploadTournamentPhoto(id!, file);
+      fetchTournament();
+    } catch (err) {
+      console.error(err);
+      alert("Помилка при завантаженні фото");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleDeletePhoto = async (photoId: number) => {
+    if (!window.confirm("Ви дійсно хочете видалити це фото?")) return;
+    try {
+      await deleteTournamentPhoto(id!, photoId);
+      fetchTournament();
+    } catch (err) {
+      console.error(err);
+      alert("Помилка при видаленні фото");
+    }
+  };
+
+  const handleSaveTournament = async () => {
+    try {
+      if (!editTournamentData.name || !editTournamentData.date) {
+        alert("Назва та дата обов'язкові!");
+        return;
+      }
+      await updateChessEvent(id!, editTournamentData);
+      alert("Дані турніру успішно оновлено!");
+      setIsEditingTournament(false);
+      fetchTournament();
+    } catch (err) {
+      console.error(err);
+      alert("Помилка при оновленні турніру");
+    }
+  };
 
   const handleEditClick = (game: ChessGameResponse) => {
     setEditingGameId(game.id);
@@ -376,6 +488,12 @@ const TournamentViewPage = () => {
     }
   };
 
+  const getImageUrl = (url: string) => {
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    return `${BASE_URL}${url}`;
+  };
+
   const badgeObj = getLevelBadgeParams(chessDetails?.level);
   const playedGames = chessDetails?.games?.filter(g => g.result !== 'NotPlayed').length || 0;
   const totalRounds = chessDetails?.games?.reduce((acc, game) => Math.max(acc, game.round), 0) || 0;
@@ -399,9 +517,16 @@ const TournamentViewPage = () => {
   return (
     <div className={styles.tournamentViewPage}>
       <div className={styles.container}>
-        <button className={styles.backButton} onClick={() => navigate('/tournaments')}>
-          <i className="fas fa-arrow-left"></i> Назад
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <button className={styles.backButton} onClick={() => navigate('/tournaments')}>
+            <i className="fas fa-arrow-left"></i> Назад
+          </button>
+          {isAdmin && (
+            <button onClick={handleEditTournament} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: '#3b82f6', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+              <i className="fas fa-edit"></i> Редагувати турнір
+            </button>
+          )}
+        </div>
 
         <div className={styles.headerContent}>
           <div>
@@ -440,7 +565,11 @@ const TournamentViewPage = () => {
             </div>
           </div>
           <div className={styles.tournamentImage}>
-            <i className="fas fa-chess-queen"></i>
+            {chessDetails?.photos && chessDetails.photos.length > 0 ? (
+              <img src={getImageUrl(chessDetails.photos[0].url)} alt={tournament.title} />
+            ) : (
+              <i className="fas fa-chess-queen"></i>
+            )}
           </div>
         </div>
 
@@ -453,20 +582,21 @@ const TournamentViewPage = () => {
             </div>
             <div className={styles.infoSection}>
               <h3><i className="fas fa-trophy"></i> Призи</h3>
-              <p>
-                🥇 1 місце - Кубок та медаль<br />
-                🥈 2 місце - Медаль<br />
-                🥉 3 місце - Медаль<br />
-                Спеціальні призи від організаторів
+              <p style={{ whiteSpace: 'pre-line' }}>
+                {chessDetails?.prizes || 'Призи будуть оголошені пізніше.'}
               </p>
             </div>
             <div className={styles.infoSection}>
               <h3><i className="fas fa-gavel"></i> Правила</h3>
-              <p>
-                • {getSystemLabel(chessDetails?.system)}<br />
-                • Контроль часу: {chessDetails?.timeControl || 'Не вказано'}<br />
-                • Заборонені підказки та мобільні телефони<br />
-                • Рішення судді остаточні
+              <p style={{ whiteSpace: 'pre-line' }}>
+                {chessDetails?.rules ? chessDetails.rules : (
+                  <>
+                    • {getSystemLabel(chessDetails?.system)}<br />
+                    • Контроль часу: {chessDetails?.timeControl || 'Не вказано'}<br />
+                    • Заборонені підказки та мобільні телефони<br />
+                    • Рішення судді остаточні
+                  </>
+                )}
               </p>
             </div>
             <div className={styles.infoSection}>
@@ -474,11 +604,11 @@ const TournamentViewPage = () => {
               <div className={styles.refereeList}>
                 <div className={styles.refereeItem}>
                   <div className={styles.refereeAvatar}>
-                    <i className="fas fa-user"></i>
+                    <i className="fas fa-user-tie"></i>
                   </div>
                   <div>
-                    <strong>Головний суддя</strong><br />
-                    <small>Призначено організатором</small>
+                    <strong>{chessDetails?.headRefereeName || 'Головний суддя'}</strong><br />
+                    <small>{chessDetails?.headRefereeName ? 'Офіційний суддя турніру' : 'Призначається організатором'}</small>
                   </div>
                 </div>
               </div>
@@ -966,6 +1096,107 @@ const TournamentViewPage = () => {
           </>
         )}
       </div>
+
+      {isEditingTournament && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <div className={styles.modalHeader}>
+              <h2 style={{ margin: 0, fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <i className="fas fa-edit" style={{ color: '#3b82f6' }}></i>
+                Редагувати турнір
+              </h2>
+              <button onClick={() => setIsEditingTournament(false)} className={styles.closeButton}>&times;</button>
+            </div>
+            <div className={styles.modalBody}>
+              <div className={styles.editFormGrid}>
+                <div className={styles.formGroup}>
+                  <label>Назва турніру</label>
+                  <input type="text" value={editTournamentData.name} onChange={(e) => setEditTournamentData({ ...editTournamentData, name: e.target.value })} />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Дата проведення</label>
+                  <input type="date" value={editTournamentData.date} onChange={(e) => setEditTournamentData({ ...editTournamentData, date: e.target.value })} />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Локація</label>
+                  <input type="text" value={editTournamentData.location} onChange={(e) => setEditTournamentData({ ...editTournamentData, location: e.target.value })} />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Рівень змагань</label>
+                  <select value={editTournamentData.level} onChange={(e) => setEditTournamentData({ ...editTournamentData, level: e.target.value as CompetitionLevel })}>
+                    <option value="CollegeGroup">Міжгрупові (коледж)</option>
+                    <option value="Regional">Обласні</option>
+                    <option value="National">Всеукраїнські</option>
+                  </select>
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Система проведення</label>
+                  <select value={editTournamentData.system} onChange={(e) => setEditTournamentData({ ...editTournamentData, system: e.target.value as ChessSystem })}>
+                    <option value="Swiss">Швейцарська система</option>
+                    <option value="RoundRobin">Кругова система</option>
+                    <option value="Knockout">Олімпійська система</option>
+                  </select>
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Контроль часу</label>
+                  <input type="text" placeholder="напр. 10хв + 5с" value={editTournamentData.timeControl} onChange={(e) => setEditTournamentData({ ...editTournamentData, timeControl: e.target.value })} />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Головний суддя</label>
+                  <input type="text" placeholder="ПІБ судді" value={editTournamentData.headRefereeName} onChange={(e) => setEditTournamentData({ ...editTournamentData, headRefereeName: e.target.value })} />
+                </div>
+                <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                  <label>Опис турніру</label>
+                  <textarea rows={3} value={editTournamentData.description} onChange={(e) => setEditTournamentData({ ...editTournamentData, description: e.target.value })} />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Правила</label>
+                  <textarea rows={5} placeholder="Введіть правила турніру..." value={editTournamentData.rules} onChange={(e) => setEditTournamentData({ ...editTournamentData, rules: e.target.value })} />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Призи</label>
+                  <textarea rows={5} placeholder="Опишіть призовий фонд..." value={editTournamentData.prizes} onChange={(e) => setEditTournamentData({ ...editTournamentData, prizes: e.target.value })} />
+                </div>
+
+                <div className={styles.photoManagementSection} style={{ gridColumn: '1 / -1' }}>
+                  <label><i className="fas fa-images"></i> Фотографії турніру</label>
+                  
+                  <div className={styles.photoUploadArea}
+                       onDragOver={(e) => e.preventDefault()}
+                       onDrop={handlePhotoUpload}>
+                    {isUploading ? (
+                      <div className={styles.uploadSpinner}><i className="fas fa-circle-notch fa-spin"></i> Завантаження...</div>
+                    ) : (
+                      <div className={styles.uploadPlaceholder}>
+                        <i className="fas fa-cloud-upload-alt"></i>
+                        <p>Перетягніть фото сюди або <span>виберіть файл</span></p>
+                        <input type="file" accept="image/*" onChange={handlePhotoUpload} className={styles.fileInput} />
+                      </div>
+                    )}
+                  </div>
+
+                  {chessDetails?.photos && chessDetails.photos.length > 0 && (
+                    <div className={styles.currentPhotosGrid}>
+                      {chessDetails.photos.map(photo => (
+                        <div key={photo.id} className={styles.photoPreviewCard}>
+                          <img src={getImageUrl(photo.url)} alt="Tournament" />
+                          <button onClick={() => handleDeletePhoto(photo.id)} className={styles.deletePhotoBtn}>
+                            <i className="fas fa-times"></i>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className={styles.modalFooter}>
+              <button onClick={() => setIsEditingTournament(false)} className={styles.cancelBtn}>Скасувати</button>
+              <button onClick={handleSaveTournament} className={styles.saveBtn}>Зберегти зміни</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

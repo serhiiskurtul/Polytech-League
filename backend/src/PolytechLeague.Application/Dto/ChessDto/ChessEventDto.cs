@@ -20,6 +20,10 @@ public class ChessEventRequest
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required ChessSystem System { get; set; }
+    
+    public string? Rules { get; set; }
+    public string? Prizes { get; set; }
+    public string? HeadRefereeName { get; set; }
 }
 
 public class ChessEventResponse
@@ -41,6 +45,10 @@ public class ChessEventResponse
     public required ChessSystem System { get; set; }
     public required ICollection<ChessGameDto> Games { get; set; }
     public required ICollection<ChessEventParticipantDto> Players { get; set; }
+    
+    public string? Rules { get; set; }
+    public string? Prizes { get; set; }
+    public string? HeadRefereeName { get; set; }
 }
 
 public static class ChessEventDtoExtension
@@ -58,7 +66,9 @@ public static class ChessEventDtoExtension
             TimeControl = chessEventRequest.TimeControl,
             ParticipantsCount = chessEventRequest.ParticipantsCount,
             System = chessEventRequest.System,
-
+            Rules = chessEventRequest.Rules,
+            Prizes = chessEventRequest.Prizes,
+            HeadRefereeName = chessEventRequest.HeadRefereeName
         };
     }
 
@@ -78,7 +88,10 @@ public static class ChessEventDtoExtension
             ParticipantsCount = chessEvent.ParticipantsCount,
             System = chessEvent.System,
             Games = chessEvent.Games?.Select(g => g.ToDto()).ToList() ?? [],
-        Players = chessEvent.Players?.Select(p => p.ToDto()).ToList() ?? []
+            Players = chessEvent.Players?.Select(p => p.ToDto()).ToList() ?? [],
+            Rules = chessEvent.Rules,
+            Prizes = chessEvent.Prizes,
+            HeadRefereeName = chessEvent.HeadRefereeName
         };
     }
 

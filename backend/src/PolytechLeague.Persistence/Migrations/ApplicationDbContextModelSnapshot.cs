@@ -540,6 +540,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("description");
 
+                    b.Property<string>("HeadRefereeName")
+                        .HasColumnType("text");
+
                     b.Property<int>("Level")
                         .HasColumnType("integer")
                         .HasColumnName("level");
@@ -554,10 +557,16 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
+                    b.Property<string>("Prizes")
+                        .HasColumnType("text");
+
                     b.PrimitiveCollection<long[]>("RefereeIds")
                         .IsRequired()
                         .HasColumnType("bigint[]")
                         .HasColumnName("referee_ids");
+
+                    b.Property<string>("Rules")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
