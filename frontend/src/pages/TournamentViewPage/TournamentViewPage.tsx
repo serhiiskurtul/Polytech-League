@@ -1,21 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthContext';
-import { 
-  getTournamentById, 
-  getChessEventById, 
-  createChessPlayer, 
-  addParticipantToEvent, 
+import {
+  getTournamentById,
+  getChessEventById,
+  createChessPlayer,
+  addParticipantToEvent,
   removeParticipantFromEvent,
   updateParticipantInEvent,
-  createChessGame, 
+  createChessGame,
   updateChessGame,
   getAllChessPlayers,
   searchUsers,
   UserResponse
 } from '@/shared/api';
 import { Tournament } from '@/shared/types/tournament.types';
-import { ChessEventResponse, ChessPlayerDto, ChessGameDto, GameResult, ChessGameResponse } from '@/shared/types/chess.types';
+import { ChessEventResponse, ChessPlayerDto, ChessGameDto, GameResult, ChessGameResponse, ChessEventParticipantResponse, ChessEventParticipantDto } from '@/shared/types/chess.types';
 import styles from './TournamentViewPage.module.css';
 
 const TournamentViewPage = () => {
@@ -45,13 +45,13 @@ const TournamentViewPage = () => {
   };
 
   // Admin Form States
-  const [newPlayer, setNewPlayer] = useState({ 
-    firstName: '', 
-    lastName: '', 
-    group: '', 
-    city: 'Київ', 
-    ratingELO: 1500, 
-    fideId: '', 
+  const [newPlayer, setNewPlayer] = useState({
+    firstName: '',
+    lastName: '',
+    group: '',
+    city: 'Київ',
+    ratingELO: 1500,
+    fideId: '',
     title: '',
     userId: null as number | null,
     existingPlayerId: null as number | null
@@ -66,15 +66,16 @@ const TournamentViewPage = () => {
 
   const [editingParticipantId, setEditingParticipantId] = useState<number | null>(null);
   const [editingParticipantData, setEditingParticipantData] = useState<{ points: number; rank: number }>({ points: 0, rank: 0 });
+  const [gameFilters, setGameFilters] = useState({ round: '', board: '', participant: '', result: '' });
 
   const handleEditClick = (game: ChessGameResponse) => {
     setEditingGameId(game.id);
-    setEditingGameData({ 
-        round: game.round || 1, 
-        board: game.board || 1,
-        result: game.result,
-        whitePlayerId: game.whitePlayerId ? game.whitePlayerId.toString() : '',
-        blackPlayerId: game.blackPlayerId ? game.blackPlayerId.toString() : ''
+    setEditingGameData({
+      round: game.round || 1,
+      board: game.board || 1,
+      result: game.result,
+      whitePlayerId: game.whitePlayerId ? game.whitePlayerId.toString() : '',
+      blackPlayerId: game.blackPlayerId ? game.blackPlayerId.toString() : ''
     });
   };
 
@@ -85,12 +86,12 @@ const TournamentViewPage = () => {
 
   const handleSaveEdit = async (gameId: number) => {
     if (!editingGameData.whitePlayerId || !editingGameData.blackPlayerId) {
-        alert("Оберіть обох супротивників!");
-        return;
+      alert("Оберіть обох супротивників!");
+      return;
     }
     if (editingGameData.whitePlayerId === editingGameData.blackPlayerId) {
-        alert("Гравець не може грати сам проти себе!");
-        return;
+      alert("Гравець не може грати сам проти себе!");
+      return;
     }
 
     try {
@@ -122,16 +123,12 @@ const TournamentViewPage = () => {
 
   const handleSaveParticipantEdit = async (playerId: number) => {
     try {
-      const payload = {
+      const payload: ChessEventParticipantDto = {
         playerId,
-        chessEventId: Number(id),
         points: editingParticipantData.points,
         rank: editingParticipantData.rank,
-        buchholz: 0,
-        sonnebornBerger: 0,
-        rating: 0,
       };
-      await updateParticipantInEvent(id!, playerId, payload as any);
+      await updateParticipantInEvent(id!, playerId, payload);
       alert("Дані учасника оновлено!");
       setEditingParticipantId(null);
       fetchTournament();
@@ -147,7 +144,7 @@ const TournamentViewPage = () => {
     try {
       const data = await getTournamentById(id);
       setTournament(data);
-      
+
       if (data.sport === 'chess') {
         try {
           const [chessData, playersData] = await Promise.all([
@@ -179,7 +176,7 @@ const TournamentViewPage = () => {
         try {
           // 1. Search in existing ChessPlayers (local search for now, as we have allChessPlayers)
           const playerResults: SearchResult[] = allChessPlayers
-            .filter(p => 
+            .filter(p =>
               (p.firstName + ' ' + p.lastName).toLowerCase().includes(searchQuery.toLowerCase()) ||
               p.group?.toLowerCase().includes(searchQuery.toLowerCase())
             )
@@ -195,7 +192,7 @@ const TournamentViewPage = () => {
 
           // 2. Search in Users (remote search)
           const users = await searchUsers(searchQuery);
-          
+
           // Filter out users who are already in playerResults (to avoid duplicates)
           const userResults: SearchResult[] = users
             .filter(u => !playerResults.some(pr => pr.userId === u.id))
@@ -248,8 +245,8 @@ const TournamentViewPage = () => {
 
   const handleAddPlayer = async () => {
     if (!newPlayer.firstName || !newPlayer.lastName || !newPlayer.group) {
-        alert("Заповніть ім'я, прізвище та групу користувача!");
-        return;
+      alert("Заповніть ім'я, прізвище та групу користувача!");
+      return;
     }
     try {
       let playerId = newPlayer.existingPlayerId;
@@ -261,7 +258,7 @@ const TournamentViewPage = () => {
           return;
         }
 
-        const playerPayload: ChessPlayerDto = { 
+        const playerPayload: ChessPlayerDto = {
           firstName: newPlayer.firstName,
           lastName: newPlayer.lastName,
           group: newPlayer.group,
@@ -295,12 +292,12 @@ const TournamentViewPage = () => {
 
   const handleAddGame = async () => {
     if (!newGame.whitePlayerId || !newGame.blackPlayerId) {
-        alert("Оберіть обох супротивників!");
-        return;
+      alert("Оберіть обох супротивників!");
+      return;
     }
     if (newGame.whitePlayerId === newGame.blackPlayerId) {
-        alert("Гравець не може грати сам проти себе!");
-        return;
+      alert("Гравець не може грати сам проти себе!");
+      return;
     }
     try {
       const payload: ChessGameDto = {
@@ -347,7 +344,7 @@ const TournamentViewPage = () => {
     if (a.rank || b.rank) return (a.rank || 999) - (b.rank || 999);
     return b.buchholz - a.buchholz;
   }) || [];
-  
+
   const getLevelBadgeParams = (level?: string) => {
     switch (level) {
       case 'CollegeGroup': return { label: 'Міжгрупові (коледж)', className: styles.levelCollege };
@@ -369,6 +366,19 @@ const TournamentViewPage = () => {
   const badgeObj = getLevelBadgeParams(chessDetails?.level);
   const playedGames = chessDetails?.games?.filter(g => g.result !== 'NotPlayed').length || 0;
   const totalRounds = chessDetails?.games?.reduce((acc, game) => Math.max(acc, game.round), 0) || 0;
+
+  const filteredGames = chessDetails?.games ? [...chessDetails.games].filter(g => {
+    if (gameFilters.round && g.round.toString() !== gameFilters.round) return false;
+    if (gameFilters.board && g.board?.toString() !== gameFilters.board) return false;
+    if (gameFilters.participant) {
+      const q = gameFilters.participant.toLowerCase();
+      if (!g.whitePlayerName?.toLowerCase().includes(q) && !g.blackPlayerName?.toLowerCase().includes(q)) {
+        return false;
+      }
+    }
+    if (gameFilters.result && g.result !== gameFilters.result) return false;
+    return true;
+  }).sort((a, b) => (a.round === b.round ? a.board - b.board : a.round - b.round)) : [];
 
   return (
     <div className={styles.tournamentViewPage}>
@@ -428,18 +438,18 @@ const TournamentViewPage = () => {
             <div className={styles.infoSection}>
               <h3><i className="fas fa-trophy"></i> Призи</h3>
               <p>
-                🥇 1 місце - Кубок та медаль<br/>
-                🥈 2 місце - Медаль<br/>
-                🥉 3 місце - Медаль<br/>
+                🥇 1 місце - Кубок та медаль<br />
+                🥈 2 місце - Медаль<br />
+                🥉 3 місце - Медаль<br />
                 Спеціальні призи від організаторів
               </p>
             </div>
             <div className={styles.infoSection}>
               <h3><i className="fas fa-gavel"></i> Правила</h3>
               <p>
-                • {getSystemLabel(chessDetails?.system)}<br/>
-                • Контроль часу: {chessDetails?.timeControl || 'Не вказано'}<br/>
-                • Заборонені підказки та мобільні телефони<br/>
+                • {getSystemLabel(chessDetails?.system)}<br />
+                • Контроль часу: {chessDetails?.timeControl || 'Не вказано'}<br />
+                • Заборонені підказки та мобільні телефони<br />
                 • Рішення судді остаточні
               </p>
             </div>
@@ -451,7 +461,7 @@ const TournamentViewPage = () => {
                     <i className="fas fa-user"></i>
                   </div>
                   <div>
-                    <strong>Головний суддя</strong><br/>
+                    <strong>Головний суддя</strong><br />
                     <small>Призначено організатором</small>
                   </div>
                 </div>
@@ -487,25 +497,25 @@ const TournamentViewPage = () => {
 
             <div className={styles.tabsContainer}>
               <div className={styles.tabsHeader}>
-                <button 
+                <button
                   className={`${styles.tabButton} ${activeTab === 'standings' ? styles.active : ''}`}
                   onClick={() => setActiveTab('standings')}
                 >
                   <i className="fas fa-chart-simple"></i> Турнірна таблиця
                 </button>
-                <button 
+                <button
                   className={`${styles.tabButton} ${activeTab === 'games' ? styles.active : ''}`}
                   onClick={() => setActiveTab('games')}
                 >
                   <i className="fas fa-chess-board"></i> Всі партії
                 </button>
-                <button 
+                <button
                   className={`${styles.tabButton} ${activeTab === 'participants' ? styles.active : ''}`}
                   onClick={() => setActiveTab('participants')}
                 >
                   <i className="fas fa-users"></i> Учасники
                 </button>
-                <button 
+                <button
                   className={`${styles.tabButton} ${activeTab === 'schedule' ? styles.active : ''}`}
                   onClick={() => setActiveTab('schedule')}
                 >
@@ -531,48 +541,48 @@ const TournamentViewPage = () => {
                         {sortedPlayers.length > 0 ? sortedPlayers.map((p, idx) => (
                           <tr key={p.id}>
                             {editingParticipantId === p.playerId ? (
-                               <>
-                                 <td>
-                                    <input type="number" value={editingParticipantData.rank} onChange={(e) => setEditingParticipantData({...editingParticipantData, rank: parseInt(e.target.value) || 0})} style={{width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc'}} />
-                                 </td>
-                                 <td>
-                                    {p.userId ? (
-                                      <Link to={`/profile/${p.userId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
-                                        {p.playerName}
-                                      </Link>
-                                    ) : (
-                                      <span style={{ fontWeight: 'bold' }}>{p.playerName}</span>
-                                    )}
-                                 </td>
-                                 <td>{p.rating}</td>
-                                 <td>
-                                    <input type="number" step="0.5" value={editingParticipantData.points} onChange={(e) => setEditingParticipantData({...editingParticipantData, points: parseFloat(e.target.value) || 0})} style={{width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc'}} />
-                                 </td>
-                                 <td>{p.buchholz}</td>
-                                 <td>
-                                     <button onClick={() => handleSaveParticipantEdit(p.playerId)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }}><i className="fas fa-check"></i></button>
-                                     <button onClick={handleCancelParticipantEdit} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><i className="fas fa-times"></i></button>
-                                 </td>
-                               </>
+                              <>
+                                <td>
+                                  <input type="number" value={editingParticipantData.rank} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, rank: parseInt(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
+                                </td>
+                                <td>
+                                  {p.userId ? (
+                                    <Link to={`/profile/${p.userId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
+                                      {p.playerName}
+                                    </Link>
+                                  ) : (
+                                    <span style={{ fontWeight: 'bold' }}>{p.playerName}</span>
+                                  )}
+                                </td>
+                                <td>{p.rating}</td>
+                                <td>
+                                  <input type="number" step="0.5" value={editingParticipantData.points} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, points: parseFloat(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
+                                </td>
+                                <td>{p.buchholz}</td>
+                                <td>
+                                  <button onClick={() => handleSaveParticipantEdit(p.playerId)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }}><i className="fas fa-check"></i></button>
+                                  <button onClick={handleCancelParticipantEdit} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><i className="fas fa-times"></i></button>
+                                </td>
+                              </>
                             ) : (
-                               <>
-                                 <td>{p.rank || idx + 1}</td>
-                                 <td>
-                                   {p.userId ? (
-                                     <Link to={`/profile/${p.userId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
-                                       {p.playerName}
-                                     </Link>
-                                   ) : (
-                                     <strong>{p.playerName}</strong>
-                                   )}
-                                 </td>
-                                 <td>{p.rating}</td>
-                                 <td><strong>{p.points}</strong></td>
-                                 <td>{p.buchholz}</td>
-                                 {isAdmin && <td>
-                                     <button onClick={() => handleEditParticipantClick(p)} style={{ padding: '4px 8px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><i className="fas fa-edit"></i></button>
-                                 </td>}
-                               </>
+                              <>
+                                <td>{p.rank || idx + 1}</td>
+                                <td>
+                                  {p.userId ? (
+                                    <Link to={`/profile/${p.userId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
+                                      {p.playerName}
+                                    </Link>
+                                  ) : (
+                                    <strong>{p.playerName}</strong>
+                                  )}
+                                </td>
+                                <td>{p.rating}</td>
+                                <td><strong>{p.points}</strong></td>
+                                <td>{p.buchholz}</td>
+                                {isAdmin && <td>
+                                  <button onClick={() => handleEditParticipantClick(p)} style={{ padding: '4px 8px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><i className="fas fa-edit"></i></button>
+                                </td>}
+                              </>
                             )}
                           </tr>
                         )) : (
@@ -587,34 +597,66 @@ const TournamentViewPage = () => {
               {activeTab === 'games' && (
                 <div className={styles.tabContent}>
                   {isAdmin && (
-                     <div style={{ background: '#f5f5f5', padding: '16px', borderRadius: '12px', marginBottom: '24px' }}>
-                       <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#111' }}>[Admin] Додати партію (результат)</h3>
-                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
-                         <input type="number" min="1" placeholder="Тур" title="Номер туру" value={newGame.round} onChange={(e) => setNewGame({...newGame, round: parseInt(e.target.value) || 1})} style={{ width: '60px', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}/>
-                         <input type="number" min="1" placeholder="Дошка" title="Номер дошки" value={newGame.board} onChange={(e) => setNewGame({...newGame, board: parseInt(e.target.value) || 1})} style={{ width: '60px', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}/>
-                         
-                         <select value={newGame.whitePlayerId} onChange={(e) => setNewGame({...newGame, whitePlayerId: e.target.value})} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}>
-                           <option value="">-- Білі --</option>
-                           {sortedPlayers.map(p => <option key={`w${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
-                         </select>
-                         
-                         <strong style={{ margin: '0 8px' }}> - </strong>
+                    <div style={{ background: '#f5f5f5', padding: '16px', borderRadius: '12px', marginBottom: '24px' }}>
+                      <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#111' }}>[Admin] Додати партію (результат)</h3>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
+                        <input type="number" min="1" placeholder="Тур" title="Номер туру" value={newGame.round} onChange={(e) => setNewGame({ ...newGame, round: parseInt(e.target.value) || 1 })} style={{ width: '60px', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
+                        <input type="number" min="1" placeholder="Дошка" title="Номер дошки" value={newGame.board} onChange={(e) => setNewGame({ ...newGame, board: parseInt(e.target.value) || 1 })} style={{ width: '60px', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
 
-                         <select value={newGame.blackPlayerId} onChange={(e) => setNewGame({...newGame, blackPlayerId: e.target.value})} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}>
-                           <option value="">-- Чорні --</option>
-                           {sortedPlayers.map(p => <option key={`b${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
-                         </select>
+                        <select value={newGame.whitePlayerId} onChange={(e) => setNewGame({ ...newGame, whitePlayerId: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}>
+                          <option value="">-- Білі --</option>
+                          {sortedPlayers.map(p => <option key={`w${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
+                        </select>
 
-                         <select value={newGame.result} onChange={(e) => setNewGame({...newGame, result: e.target.value})} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}>
-                           <option value="WhiteWin">Перемога Білих (1-0)</option>
-                           <option value="BlackWin">Перемога Чорних (0-1)</option>
-                           <option value="Draw">Нічия (½-½)</option>
-                         </select>
-                         
-                         <button onClick={handleAddGame} style={{ padding: '8px 16px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>Зберегти</button>
-                       </div>
-                     </div>
+                        <strong style={{ margin: '0 8px' }}> - </strong>
+
+                        <select value={newGame.blackPlayerId} onChange={(e) => setNewGame({ ...newGame, blackPlayerId: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}>
+                          <option value="">-- Чорні --</option>
+                          {sortedPlayers.map(p => <option key={`b${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
+                        </select>
+
+                        <select value={newGame.result} onChange={(e) => setNewGame({ ...newGame, result: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}>
+                          <option value="WhiteWin">Перемога Білих (1-0)</option>
+                          <option value="BlackWin">Перемога Чорних (0-1)</option>
+                          <option value="Draw">Нічия (½-½)</option>
+                        </select>
+
+                        <button onClick={handleAddGame} style={{ padding: '8px 16px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>Зберегти</button>
+                      </div>
+                    </div>
                   )}
+
+                  <div style={{ display: 'flex', gap: '16px', marginBottom: '16px', flexWrap: 'wrap', padding: '16px', background: '#f9fafb', borderRadius: '12px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <label style={{ fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>Тур</label>
+                      <input type="number" placeholder="Усі" value={gameFilters.round} onChange={(e) => setGameFilters({ ...gameFilters, round: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', width: '80px' }} />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <label style={{ fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>Дошка</label>
+                      <input type="number" placeholder="Усі" value={gameFilters.board} onChange={(e) => setGameFilters({ ...gameFilters, board: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', width: '80px' }} />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <label style={{ fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>Учасник (ім'я)</label>
+                      <input type="text" placeholder="Пошук..." value={gameFilters.participant} onChange={(e) => setGameFilters({ ...gameFilters, participant: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', minWidth: '200px' }} />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <label style={{ fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>Результат</label>
+                      <select value={gameFilters.result} onChange={(e) => setGameFilters({ ...gameFilters, result: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}>
+                        <option value="">Усі результати</option>
+                        <option value="WhiteWin">Перемога Білих (1-0)</option>
+                        <option value="BlackWin">Перемога Чорних (0-1)</option>
+                        <option value="Draw">Нічия (½-½)</option>
+                      </select>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+                      <button 
+                        onClick={() => setGameFilters({ round: '', board: '', participant: '', result: '' })} 
+                        style={{ padding: '8px 16px', background: '#6b7280', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+                      >
+                        Скинути
+                      </button>
+                    </div>
+                  </div>
 
                   <div className={styles.tableWrapper}>
                     <table className={styles.dataTable}>
@@ -629,43 +671,43 @@ const TournamentViewPage = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {chessDetails?.games && chessDetails.games.length > 0 ? (
-                          [...chessDetails.games].sort((a,b) => (a.round === b.round ? a.board - b.board : a.round - b.round)).map((game, idx) => (
+                        {filteredGames.length > 0 ? (
+                          filteredGames.map((game, idx) => (
                             <tr key={game.id}>
                               {editingGameId === game.id ? (
                                 <>
                                   <td>
-                                    <input 
-                                      type="number" 
-                                      min="1" 
-                                      value={editingGameData.round} 
-                                      onChange={(e) => setEditingGameData({...editingGameData, round: parseInt(e.target.value) || 1})}
-                                      style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} 
+                                    <input
+                                      type="number"
+                                      min="1"
+                                      value={editingGameData.round}
+                                      onChange={(e) => setEditingGameData({ ...editingGameData, round: parseInt(e.target.value) || 1 })}
+                                      style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}
                                     />
                                   </td>
                                   <td>
-                                    <input 
-                                      type="number" 
-                                      min="1" 
-                                      value={editingGameData.board} 
-                                      onChange={(e) => setEditingGameData({...editingGameData, board: parseInt(e.target.value) || 1})}
-                                      style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} 
+                                    <input
+                                      type="number"
+                                      min="1"
+                                      value={editingGameData.board}
+                                      onChange={(e) => setEditingGameData({ ...editingGameData, board: parseInt(e.target.value) || 1 })}
+                                      style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}
                                     />
                                   </td>
                                   <td>
-                                     <select value={editingGameData.whitePlayerId} onChange={(e) => setEditingGameData({...editingGameData, whitePlayerId: e.target.value})} style={{ padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}>
-                                       <option value="">-- Білі --</option>
-                                       {sortedPlayers.map(p => <option key={`w${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
-                                     </select>
+                                    <select value={editingGameData.whitePlayerId} onChange={(e) => setEditingGameData({ ...editingGameData, whitePlayerId: e.target.value })} style={{ padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}>
+                                      <option value="">-- Білі --</option>
+                                      {sortedPlayers.map(p => <option key={`w${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
+                                    </select>
                                   </td>
                                   <td>
-                                     <select value={editingGameData.blackPlayerId} onChange={(e) => setEditingGameData({...editingGameData, blackPlayerId: e.target.value})} style={{ padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}>
-                                       <option value="">-- Чорні --</option>
-                                       {sortedPlayers.map(p => <option key={`b${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
-                                     </select>
+                                    <select value={editingGameData.blackPlayerId} onChange={(e) => setEditingGameData({ ...editingGameData, blackPlayerId: e.target.value })} style={{ padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}>
+                                      <option value="">-- Чорні --</option>
+                                      {sortedPlayers.map(p => <option key={`b${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
+                                    </select>
                                   </td>
                                   <td>
-                                    <select value={editingGameData.result} onChange={(e) => setEditingGameData({...editingGameData, result: e.target.value})} style={{ padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}>
+                                    <select value={editingGameData.result} onChange={(e) => setEditingGameData({ ...editingGameData, result: e.target.value })} style={{ padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}>
                                       <option value="WhiteWin">Перемога Білих (1-0)</option>
                                       <option value="BlackWin">Перемога Чорних (0-1)</option>
                                       <option value="Draw">Нічия (½-½)</option>
@@ -729,7 +771,7 @@ const TournamentViewPage = () => {
                             </tr>
                           ))
                         ) : (
-                          <tr><td colSpan={isAdmin ? 6 : 5}>Матчі ще не сформовані</td></tr>
+                          <tr><td colSpan={isAdmin ? 6 : 5} style={{ textAlign: 'center', padding: '24px', color: '#666' }}>Партії не знайдені за вказаними фільтрами</td></tr>
                         )}
                       </tbody>
                     </table>
@@ -742,51 +784,51 @@ const TournamentViewPage = () => {
                   {isAdmin && (
                     <div style={{ background: '#f5f5f5', padding: '24px', borderRadius: '12px', marginBottom: '24px' }}>
                       <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#111' }}>[Admin] Додати учасника</h3>
-                      
+
                       <div style={{ marginBottom: '20px', position: 'relative' }}>
                         <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Пошук гравця або користувача:</label>
-                        <input 
-                          type="text" 
-                          placeholder="Введіть ім'я, прізвище або email для пошуку в базі..." 
-                          value={searchQuery} 
-                          onChange={(e) => setSearchQuery(e.target.value)} 
+                        <input
+                          type="text"
+                          placeholder="Введіть ім'я, прізвище або email для пошуку в базі..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
                           style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #ccc' }}
                         />
                         {isSearching && <div style={{ marginTop: '8px' }}>Пошук...</div>}
                         {searchResults.length > 0 && (
-                          <div style={{ 
-                            position: 'absolute', 
-                            top: '100%', 
-                            left: 0, 
-                            right: 0, 
-                            background: '#fff', 
-                            border: '1px solid #ccc', 
-                            borderRadius: '6px', 
+                          <div style={{
+                            position: 'absolute',
+                            top: '100%',
+                            left: 0,
+                            right: 0,
+                            background: '#fff',
+                            border: '1px solid #ccc',
+                            borderRadius: '6px',
                             zIndex: 10,
                             maxHeight: '200px',
                             overflowY: 'auto',
                             boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
                           }}>
                             {searchResults.map((result, idx) => (
-                              <div 
-                                key={`${result.type}-${result.id}-${idx}`} 
+                              <div
+                                key={`${result.type}-${result.id}-${idx}`}
                                 onClick={() => handleSelectResult(result)}
                                 style={{ padding: '10px', cursor: 'pointer', borderBottom: '1px solid #eee' }}
                                 onMouseOver={(e) => (e.currentTarget.style.background = '#f0f0f0')}
                                 onMouseOut={(e) => (e.currentTarget.style.background = '#fff')}
                               >
-                                <span style={{ 
-                                  fontSize: '10px', 
-                                  background: result.type === 'player' ? '#10b981' : '#3b82f6', 
-                                  color: '#fff', 
-                                  padding: '2px 6px', 
+                                <span style={{
+                                  fontSize: '10px',
+                                  background: result.type === 'player' ? '#10b981' : '#3b82f6',
+                                  color: '#fff',
+                                  padding: '2px 6px',
                                   borderRadius: '4px',
                                   marginRight: '8px',
                                   textTransform: 'uppercase'
                                 }}>
                                   {result.type === 'player' ? 'Гравець' : 'Користувач'}
                                 </span>
-                                <strong>{result.firstName} {result.lastName}</strong> 
+                                <strong>{result.firstName} {result.lastName}</strong>
                                 {result.email && <span style={{ color: '#666', marginLeft: '8px' }}>({result.email})</span>}
                                 {result.group && <span style={{ color: '#666', marginLeft: '8px' }}>[{result.group}]</span>}
                               </div>
@@ -798,27 +840,27 @@ const TournamentViewPage = () => {
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '16px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                           <label style={{ marginBottom: '4px', fontSize: '12px' }}>Ім'я</label>
-                          <input type="text" placeholder="Ім'я" value={newPlayer.firstName} onChange={(e) => setNewPlayer({...newPlayer, firstName: e.target.value})} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}/>
+                          <input type="text" placeholder="Ім'я" value={newPlayer.firstName} onChange={(e) => setNewPlayer({ ...newPlayer, firstName: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                           <label style={{ marginBottom: '4px', fontSize: '12px' }}>Прізвище</label>
-                          <input type="text" placeholder="Прізвище" value={newPlayer.lastName} onChange={(e) => setNewPlayer({...newPlayer, lastName: e.target.value})} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}/>
+                          <input type="text" placeholder="Прізвище" value={newPlayer.lastName} onChange={(e) => setNewPlayer({ ...newPlayer, lastName: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                           <label style={{ marginBottom: '4px', fontSize: '12px' }}>Група (напр. КН-31)</label>
-                          <input type="text" placeholder="Група (напр. КН-31)" value={newPlayer.group} onChange={(e) => setNewPlayer({...newPlayer, group: e.target.value})} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}/>
+                          <input type="text" placeholder="Група (напр. КН-31)" value={newPlayer.group} onChange={(e) => setNewPlayer({ ...newPlayer, group: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                           <label style={{ marginBottom: '4px', fontSize: '12px' }}>Рейтинг ELO</label>
-                          <input type="number" placeholder="Рейтинг ELO" value={newPlayer.ratingELO} onChange={(e) => setNewPlayer({...newPlayer, ratingELO: parseInt(e.target.value) || 1500})} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}/>
+                          <input type="number" placeholder="Рейтинг ELO" value={newPlayer.ratingELO} onChange={(e) => setNewPlayer({ ...newPlayer, ratingELO: parseInt(e.target.value) || 1500 })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                           <label style={{ marginBottom: '4px', fontSize: '12px' }}>FIDE ID (опціонально)</label>
-                          <input type="text" placeholder="FIDE ID (опціонально)" value={newPlayer.fideId} onChange={(e) => setNewPlayer({...newPlayer, fideId: e.target.value})} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}/>
+                          <input type="text" placeholder="FIDE ID (опціонально)" value={newPlayer.fideId} onChange={(e) => setNewPlayer({ ...newPlayer, fideId: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                           <label style={{ marginBottom: '4px', fontSize: '12px' }}>Звання (напр. CM, FM, IM, GM) (опціонально)</label>
-                          <input type="text" placeholder="Звання (напр. CM, FM, IM, GM) (опціонально)" value={newPlayer.title} onChange={(e) => setNewPlayer({...newPlayer, title: e.target.value})} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}/>
+                          <input type="text" placeholder="Звання (напр. CM, FM, IM, GM) (опціонально)" value={newPlayer.title} onChange={(e) => setNewPlayer({ ...newPlayer, title: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
                         </div>
                       </div>
                       <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
@@ -826,8 +868,8 @@ const TournamentViewPage = () => {
                           {newPlayer.existingPlayerId ? 'Додати існуючого гравця' : newPlayer.userId ? 'Створити профіль гравця та додати' : 'Створити гостя та додати'}
                         </button>
                         {(newPlayer.userId || newPlayer.existingPlayerId) && (
-                          <button 
-                            onClick={() => setNewPlayer({...newPlayer, userId: null, existingPlayerId: null, firstName: '', lastName: '', group: ''})} 
+                          <button
+                            onClick={() => setNewPlayer({ ...newPlayer, userId: null, existingPlayerId: null, firstName: '', lastName: '', group: '' })}
                             style={{ padding: '10px 24px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
                           >
                             Скинути вибір
@@ -884,11 +926,11 @@ const TournamentViewPage = () => {
                     <div className={styles.infoSection}>
                       <h3><i className="fas fa-calendar-day"></i> Розклад</h3>
                       <p>Турнір проводиться згідно із розкладом, вказаним організаторами під час реєстрації або під час відкриття.</p>
-                      <br/>
+                      <br />
                       <p>
-                        <strong>Примірний розклад:</strong><br/>
-                        <strong>10:00</strong> - Реєстрація учасників<br/>
-                        <strong>11:00</strong> - Жеребкування та відкриття<br/>
+                        <strong>Примірний розклад:</strong><br />
+                        <strong>10:00</strong> - Реєстрація учасників<br />
+                        <strong>11:00</strong> - Жеребкування та відкриття<br />
                         <strong>Далі:</strong> за календарем турів
                       </p>
                     </div>
