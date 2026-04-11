@@ -24,6 +24,7 @@ public class ChessEventRequest
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
     public string? HeadRefereeName { get; set; }
+    public string? Schedule { get; set; }
 }
 
 public class ChessEventResponse
@@ -49,6 +50,7 @@ public class ChessEventResponse
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
     public string? HeadRefereeName { get; set; }
+    public string? Schedule { get; set; }
 }
 
 public static class ChessEventDtoExtension
@@ -68,7 +70,8 @@ public static class ChessEventDtoExtension
             System = chessEventRequest.System,
             Rules = chessEventRequest.Rules,
             Prizes = chessEventRequest.Prizes,
-            HeadRefereeName = chessEventRequest.HeadRefereeName
+            HeadRefereeName = chessEventRequest.HeadRefereeName,
+            Schedule = chessEventRequest.Schedule
         };
     }
 
@@ -91,7 +94,8 @@ public static class ChessEventDtoExtension
             Players = chessEvent.Players?.Select(p => p.ToDto()).ToList() ?? [],
             Rules = chessEvent.Rules,
             Prizes = chessEvent.Prizes,
-            HeadRefereeName = chessEvent.HeadRefereeName
+            HeadRefereeName = chessEvent.HeadRefereeName,
+            Schedule = chessEvent.Schedule
         };
     }
 

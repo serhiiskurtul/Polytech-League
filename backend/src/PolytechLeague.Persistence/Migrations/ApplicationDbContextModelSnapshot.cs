@@ -568,6 +568,9 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<string>("Rules")
                         .HasColumnType("text");
 
+                    b.Property<string>("Schedule")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Date")

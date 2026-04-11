@@ -54,6 +54,7 @@ export interface ChessEventResponse {
   rules?: string;
   prizes?: string;
   headRefereeName?: string;
+  schedule?: string;
 }
 
 export interface ChessEventRequest {
@@ -69,6 +70,7 @@ export interface ChessEventRequest {
   rules?: string;
   prizes?: string;
   headRefereeName?: string;
+  schedule?: string;
 }
 
 export interface ChessPlayerDto {

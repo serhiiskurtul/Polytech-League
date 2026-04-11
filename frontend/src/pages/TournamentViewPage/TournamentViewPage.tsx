@@ -94,7 +94,8 @@ const TournamentViewPage = () => {
     system: 'Swiss',
     rules: '',
     prizes: '',
-    headRefereeName: ''
+    headRefereeName: '',
+    schedule: ''
   });
 
   const [isUploading, setIsUploading] = useState(false);
@@ -123,7 +124,8 @@ const TournamentViewPage = () => {
         system: chessDetails.system || 'Swiss',
         rules: chessDetails.rules || '',
         prizes: chessDetails.prizes || '',
-        headRefereeName: chessDetails.headRefereeName || ''
+        headRefereeName: chessDetails.headRefereeName || '',
+        schedule: chessDetails.schedule || ''
       });
       setIsEditingTournament(true);
     }
@@ -1080,14 +1082,20 @@ const TournamentViewPage = () => {
                   <div className={styles.infoGrid}>
                     <div className={styles.infoSection}>
                       <h3><i className="fas fa-calendar-day"></i> Розклад</h3>
-                      <p>Турнір проводиться згідно із розкладом, вказаним організаторами під час реєстрації або під час відкриття.</p>
-                      <br />
-                      <p>
-                        <strong>Примірний розклад:</strong><br />
-                        <strong>10:00</strong> - Реєстрація учасників<br />
-                        <strong>11:00</strong> - Жеребкування та відкриття<br />
-                        <strong>Далі:</strong> за календарем турів
-                      </p>
+                      {chessDetails?.schedule ? (
+                        <p style={{ whiteSpace: 'pre-line' }}>{chessDetails.schedule}</p>
+                      ) : (
+                        <>
+                          <p>Турнір проводиться згідно із розкладом, вказаним організаторами під час реєстрації або під час відкриття.</p>
+                          <br />
+                          <p>
+                            <strong>Примірний розклад:</strong><br />
+                            <strong>10:00</strong> - Реєстрація учасників<br />
+                            <strong>11:00</strong> - Жеребкування та відкриття<br />
+                            <strong>Далі:</strong> за календарем турів
+                          </p>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1156,6 +1164,10 @@ const TournamentViewPage = () => {
                 <div className={styles.formGroup}>
                   <label>Призи</label>
                   <textarea rows={5} placeholder="Опишіть призовий фонд..." value={editTournamentData.prizes} onChange={(e) => setEditTournamentData({ ...editTournamentData, prizes: e.target.value })} />
+                </div>
+                <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                  <label>Розклад турніру</label>
+                  <textarea rows={5} placeholder="Введіть детальний розклад (кожен пункт з нового рядка)..." value={editTournamentData.schedule} onChange={(e) => setEditTournamentData({ ...editTournamentData, schedule: e.target.value })} />
                 </div>
 
                 <div className={styles.photoManagementSection} style={{ gridColumn: '1 / -1' }}>

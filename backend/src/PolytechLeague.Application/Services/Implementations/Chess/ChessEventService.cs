@@ -27,6 +27,7 @@ public class ChessEventService(
         oldEntity.Prizes = newEntity.Prizes;
         oldEntity.HeadRefereeName = newEntity.HeadRefereeName;
         oldEntity.RefereeIds = newEntity.RefereeIds;
+        oldEntity.Schedule = newEntity.Schedule;
     }
 
     public override async Task<ChessEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)
