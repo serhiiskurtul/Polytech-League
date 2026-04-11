@@ -681,7 +681,6 @@ const TournamentViewPage = () => {
                           <th>Учасник</th>
                           <th>Рейтинг</th>
                           <th>Очки</th>
-                          <th>Бухгольц</th>
                           {isAdmin && <th>Дії</th>}
                         </tr>
                       </thead>
@@ -706,7 +705,6 @@ const TournamentViewPage = () => {
                                 <td>
                                   <input type="number" step="0.5" value={editingParticipantData.points} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, points: parseFloat(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
                                 </td>
-                                <td>{p.buchholz}</td>
                                 <td>
                                   <button onClick={() => handleSaveParticipantEdit(p.playerId)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }}><i className="fas fa-check"></i></button>
                                   <button onClick={handleCancelParticipantEdit} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><i className="fas fa-times"></i></button>
@@ -726,7 +724,6 @@ const TournamentViewPage = () => {
                                 </td>
                                 <td>{p.rating}</td>
                                 <td><strong>{p.points}</strong></td>
-                                <td>{p.buchholz}</td>
                                 {isAdmin && <td>
                                   <button onClick={() => handleEditParticipantClick(p)} style={{ padding: '4px 8px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }} title="Редагувати"><i className="fas fa-edit"></i></button>
                                   <button onClick={() => handleRemoveParticipant(p.playerId, p.playerName)} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Видалити"><i className="fas fa-trash"></i></button>

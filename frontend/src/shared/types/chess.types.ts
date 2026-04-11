@@ -48,6 +48,8 @@ export interface ChessEventResponse {
   refereeIds: number[];
   level: CompetitionLevel;
   description: string;
+  timeControl: string;
+  participantsCount: number;
   system: ChessSystem;
   games: ChessGameResponse[];
   players: ChessEventParticipantResponse[];
