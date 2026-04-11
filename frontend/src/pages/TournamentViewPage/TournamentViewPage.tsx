@@ -774,6 +774,8 @@ const TournamentViewPage = () => {
                           <th>Учасник</th>
                           <th>Очки</th>
                           <th>Рейтинг ELO</th>
+                          <th>Титул</th>
+                          <th>FIDE ID</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -791,9 +793,15 @@ const TournamentViewPage = () => {
                             </td>
                             <td>{p.points}</td>
                             <td>{p.rating}</td>
+                            <td>
+                              {p.title ? (
+                                <span className={styles.systemBadge} style={{ fontWeight: 'bold' }}>{p.title}</span>
+                              ) : '—'}
+                            </td>
+                            <td>{p.fideId || '—'}</td>
                           </tr>
                         )) : (
-                          <tr><td colSpan={4}>Учасники не знайдені</td></tr>
+                          <tr><td colSpan={6}>Учасники не знайдені</td></tr>
                         )}
                       </tbody>
                     </table>

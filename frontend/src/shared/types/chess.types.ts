@@ -19,6 +19,8 @@ export interface ChessEventParticipantResponse {
   sonnebornBerger: number;
   rating: number;
   rank: number;
+  fideId?: string | null;
+  title?: string | null;
 }
 
 export interface ChessGameResponse {

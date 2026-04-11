@@ -14,6 +14,8 @@ public class ChessEventParticipantDto
     public int Rank { get; set; }
     public double Buchholz { get; set; }
     public double SonnebornBerger { get; set; }
+    public string? FideId { get; set; }
+    public string? Title { get; set; }
 }
 
 public static class ChessEventParticipantDtoExtensions
@@ -31,7 +33,9 @@ public static class ChessEventParticipantDtoExtensions
             Points = participant.Points,
             Rank = participant.Rank,
             Buchholz = 0,
-            SonnebornBerger = 0
+            SonnebornBerger = 0,
+            FideId = participant.Player?.FideId,
+            Title = participant.Player?.Title
         };
     }
 
