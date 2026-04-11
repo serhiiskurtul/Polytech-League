@@ -115,4 +115,14 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
         await redisService.RemoveGroupAsync("chess_events_all");
         return NoContent();
     }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPut("{eventId:long}/participants/{playerId:long}")]
+    public async Task<IActionResult> UpdateParticipant([FromRoute] long eventId, [FromRoute] long playerId, [FromBody] ChessEventParticipantDto request, CancellationToken cancellationToken)
+    {
+        await chessEventService.UpdateParticipantAsync(eventId, playerId, request, cancellationToken);
+        await redisService.RemoveDataAsync($"chess_event_{eventId}");
+        await redisService.RemoveGroupAsync("chess_events_all");
+        return NoContent();
+    }
 }

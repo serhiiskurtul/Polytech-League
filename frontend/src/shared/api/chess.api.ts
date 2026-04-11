@@ -34,6 +34,10 @@ export const removeParticipantFromEvent = async (eventId: number | string, playe
     await api.delete(`/chess-events/${eventId}/participants/${playerId}`);
 };
 
+export const updateParticipantInEvent = async (eventId: number | string, playerId: number | string, data: ChessEventParticipantDto): Promise<void> => {
+    await api.put(`/chess-events/${eventId}/participants/${playerId}`, data);
+};
+
 export const createChessGame = async (data: ChessGameDto): Promise<void> => {
     await api.post('/chess-games', data);
 };

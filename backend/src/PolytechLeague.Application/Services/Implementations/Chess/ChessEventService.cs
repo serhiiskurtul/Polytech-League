@@ -63,6 +63,20 @@ public class ChessEventService(
         await _dbcontext.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task UpdateParticipantAsync(long eventId, long playerId, PolytechLeague.Application.Dto.ChessDto.ChessEventParticipantDto dto, CancellationToken cancellationToken = default)
+    {
+        var participant = await _dbcontext.Set<ChessEventParticipant>()
+            .FirstOrDefaultAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
+        if (participant != null)
+        {
+            participant.Points = dto.Points;
+            participant.Rank = dto.Rank;
+            // Removed Buchholz and SonnebornBerger from Entity since they are not mapped
+            _dbcontext.Set<ChessEventParticipant>().Update(participant);
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+        }
+    }
+
     public async Task RemoveParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken = default)
     {
         var participant = await _dbcontext.Set<ChessEventParticipant>()

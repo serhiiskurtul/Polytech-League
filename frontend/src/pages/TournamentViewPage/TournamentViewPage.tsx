@@ -6,6 +6,8 @@ import {
   getChessEventById, 
   createChessPlayer, 
   addParticipantToEvent, 
+  removeParticipantFromEvent,
+  updateParticipantInEvent,
   createChessGame, 
   updateChessGame,
   getAllChessPlayers,
@@ -62,6 +64,9 @@ const TournamentViewPage = () => {
   const [editingGameId, setEditingGameId] = useState<number | null>(null);
   const [editingGameData, setEditingGameData] = useState<{ round: number; board: number; result: string; whitePlayerId: string; blackPlayerId: string }>({ round: 1, board: 1, result: 'WhiteWin', whitePlayerId: '', blackPlayerId: '' });
 
+  const [editingParticipantId, setEditingParticipantId] = useState<number | null>(null);
+  const [editingParticipantData, setEditingParticipantData] = useState<{ points: number; rank: number }>({ points: 0, rank: 0 });
+
   const handleEditClick = (game: ChessGameResponse) => {
     setEditingGameId(game.id);
     setEditingGameData({ 
@@ -71,6 +76,11 @@ const TournamentViewPage = () => {
         whitePlayerId: game.whitePlayerId ? game.whitePlayerId.toString() : '',
         blackPlayerId: game.blackPlayerId ? game.blackPlayerId.toString() : ''
     });
+  };
+
+  const handleEditParticipantClick = (p: ChessEventParticipantResponse) => {
+    setEditingParticipantId(p.playerId);
+    setEditingParticipantData({ points: p.points, rank: p.rank });
   };
 
   const handleSaveEdit = async (gameId: number) => {
@@ -104,6 +114,31 @@ const TournamentViewPage = () => {
 
   const handleCancelEdit = () => {
     setEditingGameId(null);
+  };
+
+  const handleCancelParticipantEdit = () => {
+    setEditingParticipantId(null);
+  };
+
+  const handleSaveParticipantEdit = async (playerId: number) => {
+    try {
+      const payload = {
+        playerId,
+        chessEventId: Number(id),
+        points: editingParticipantData.points,
+        rank: editingParticipantData.rank,
+        buchholz: 0,
+        sonnebornBerger: 0,
+        rating: 0,
+      };
+      await updateParticipantInEvent(id!, playerId, payload as any);
+      alert("Дані учасника оновлено!");
+      setEditingParticipantId(null);
+      fetchTournament();
+    } catch (err) {
+      console.error(err);
+      alert("Помилка при оновленні учасника");
+    }
   };
 
   const fetchTournament = async () => {
@@ -307,7 +342,11 @@ const TournamentViewPage = () => {
     );
   }
 
-  const sortedPlayers = chessDetails?.players?.sort((a, b) => b.points - a.points || b.buchholz - a.buchholz) || [];
+  const sortedPlayers = chessDetails?.players?.sort((a, b) => {
+    if (b.points !== a.points) return b.points - a.points;
+    if (a.rank || b.rank) return (a.rank || 999) - (b.rank || 999);
+    return b.buchholz - a.buchholz;
+  }) || [];
   
   const getLevelBadgeParams = (level?: string) => {
     switch (level) {
@@ -485,24 +524,56 @@ const TournamentViewPage = () => {
                           <th>Рейтинг</th>
                           <th>Очки</th>
                           <th>Бухгольц</th>
+                          {isAdmin && <th>Дії</th>}
                         </tr>
                       </thead>
                       <tbody>
                         {sortedPlayers.length > 0 ? sortedPlayers.map((p, idx) => (
                           <tr key={p.id}>
-                            <td>{idx + 1}</td>
-                            <td>
-                              {p.userId ? (
-                                <Link to={`/profile/${p.userId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
-                                  {p.playerName}
-                                </Link>
-                              ) : (
-                                <strong>{p.playerName}</strong>
-                              )}
-                            </td>
-                            <td>{p.rating}</td>
-                            <td><strong>{p.points}</strong></td>
-                            <td>{p.buchholz}</td>
+                            {editingParticipantId === p.playerId ? (
+                               <>
+                                 <td>
+                                    <input type="number" value={editingParticipantData.rank} onChange={(e) => setEditingParticipantData({...editingParticipantData, rank: parseInt(e.target.value) || 0})} style={{width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc'}} />
+                                 </td>
+                                 <td>
+                                    {p.userId ? (
+                                      <Link to={`/profile/${p.userId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
+                                        {p.playerName}
+                                      </Link>
+                                    ) : (
+                                      <span style={{ fontWeight: 'bold' }}>{p.playerName}</span>
+                                    )}
+                                 </td>
+                                 <td>{p.rating}</td>
+                                 <td>
+                                    <input type="number" step="0.5" value={editingParticipantData.points} onChange={(e) => setEditingParticipantData({...editingParticipantData, points: parseFloat(e.target.value) || 0})} style={{width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc'}} />
+                                 </td>
+                                 <td>{p.buchholz}</td>
+                                 <td>
+                                     <button onClick={() => handleSaveParticipantEdit(p.playerId)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }}><i className="fas fa-check"></i></button>
+                                     <button onClick={handleCancelParticipantEdit} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><i className="fas fa-times"></i></button>
+                                 </td>
+                               </>
+                            ) : (
+                               <>
+                                 <td>{p.rank || idx + 1}</td>
+                                 <td>
+                                   {p.userId ? (
+                                     <Link to={`/profile/${p.userId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
+                                       {p.playerName}
+                                     </Link>
+                                   ) : (
+                                     <strong>{p.playerName}</strong>
+                                   )}
+                                 </td>
+                                 <td>{p.rating}</td>
+                                 <td><strong>{p.points}</strong></td>
+                                 <td>{p.buchholz}</td>
+                                 {isAdmin && <td>
+                                     <button onClick={() => handleEditParticipantClick(p)} style={{ padding: '4px 8px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><i className="fas fa-edit"></i></button>
+                                 </td>}
+                               </>
+                            )}
                           </tr>
                         )) : (
                           <tr><td colSpan={6}>Ще немає даних</td></tr>
@@ -772,7 +843,6 @@ const TournamentViewPage = () => {
                         <tr>
                           <th>№</th>
                           <th>Учасник</th>
-                          <th>Очки</th>
                           <th>Рейтинг ELO</th>
                           <th>Титул</th>
                           <th>FIDE ID</th>
@@ -791,7 +861,6 @@ const TournamentViewPage = () => {
                                 p.playerName
                               )}
                             </td>
-                            <td>{p.points}</td>
                             <td>{p.rating}</td>
                             <td>
                               {p.title ? (
@@ -801,7 +870,7 @@ const TournamentViewPage = () => {
                             <td>{p.fideId || '—'}</td>
                           </tr>
                         )) : (
-                          <tr><td colSpan={6}>Учасники не знайдені</td></tr>
+                          <tr><td colSpan={5}>Учасники не знайдені</td></tr>
                         )}
                       </tbody>
                     </table>
