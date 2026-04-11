@@ -24,7 +24,8 @@ export interface ChessEventParticipantResponse {
 export interface ChessGameResponse {
   id: number;
   chessEventId: number;
-  roundNumber: number;
+  round: number;
+  board: number;
   whitePlayerId: number | null;
   whiteUserId?: number | null;
   whitePlayerName: string | null;

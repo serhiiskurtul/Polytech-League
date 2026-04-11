@@ -41,3 +41,7 @@ export const createChessGame = async (data: ChessGameDto): Promise<void> => {
 export const deleteChessGame = async (gameId: number | string, tournamentId: number | string): Promise<void> => {
     await api.delete(`/chess-games/${gameId}?tournamentId=${tournamentId}`);
 };
+
+export const updateChessGame = async (gameId: number | string, data: ChessGameDto): Promise<void> => {
+    await api.put(`/chess-games/${gameId}`, data);
+};
