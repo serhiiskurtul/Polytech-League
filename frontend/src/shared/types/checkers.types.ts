@@ -47,6 +47,7 @@ export interface CheckersEventResponse {
   rules?: string;
   prizes?: string;
   headRefereeName?: string;
+  referees?: string;
   schedule?: string;
 }
 
@@ -64,6 +65,7 @@ export interface CheckersEventRequest {
   rules?: string;
   prizes?: string;
   headRefereeName?: string;
+  referees?: string;
   schedule?: string;
   firstPlaceId?: number | null;
   secondPlaceId?: number | null;

@@ -397,11 +397,8 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
             <h3><i className="fas fa-user-shield"></i> Суддівська колегія</h3>
             <div className={styles.refereesBoard}>
               <div className={styles.headReferee}>
-                <strong>Головний суддя:</strong> {details.headRefereeName || 'Не призначено'}
+                <strong>Судді:</strong> {details.referees || details.headRefereeName || 'Не призначено'}
               </div>
-              <p className={styles.refereeNote}>
-                До складу колегії входять {details.refereeIds?.length || 0} сертифікованих суддів.
-              </p>
             </div>
           </div>
         </div>

@@ -31,6 +31,7 @@ public class ArmwrestlingEventRequest
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
     public string? HeadRefereeName { get; set; }
+    public string? Referees { get; set; }
     public string? Schedule { get; set; }
     public string? TimeControl { get; set; }
     public int ParticipantsCount { get; set; }
@@ -67,6 +68,7 @@ public class ArmwrestlingEventResponse
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
     public string? HeadRefereeName { get; set; }
+    public string? Referees { get; set; }
     public string? Schedule { get; set; }
     public string? TimeControl { get; set; }
     public int ParticipantsCount { get; set; }
@@ -96,6 +98,7 @@ public static class ArmwrestlingEventDtoExtensions
             Rules = request.Rules,
             Prizes = request.Prizes,
             HeadRefereeName = request.HeadRefereeName,
+            Referees = request.Referees,
             Schedule = request.Schedule,
             TimeControl = request.TimeControl,
             ParticipantsCount = request.ParticipantsCount,
@@ -124,6 +127,7 @@ public static class ArmwrestlingEventDtoExtensions
             Rules = entity.Rules,
             Prizes = entity.Prizes,
             HeadRefereeName = entity.HeadRefereeName,
+            Referees = entity.Referees,
             Schedule = entity.Schedule,
             TimeControl = entity.TimeControl,
             ParticipantsCount = entity.ParticipantsCount,

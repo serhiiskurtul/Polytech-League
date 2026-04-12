@@ -13,6 +13,7 @@ public abstract class Event
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
     public string? HeadRefereeName { get; set; }
+    public string? Referees { get; set; }
     public string? Schedule { get; set; }
 
     public long? FirstPlaceId { get; set; }

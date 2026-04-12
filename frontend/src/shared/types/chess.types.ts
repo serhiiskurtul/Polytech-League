@@ -61,6 +61,7 @@ export interface ChessEventResponse {
   rules?: string;
   prizes?: string;
   headRefereeName?: string;
+  referees?: string;
   schedule?: string;
 }
 
@@ -77,6 +78,7 @@ export interface ChessEventRequest {
   rules?: string;
   prizes?: string;
   headRefereeName?: string;
+  referees?: string;
   schedule?: string;
   firstPlaceId?: number | null;
   secondPlaceId?: number | null;

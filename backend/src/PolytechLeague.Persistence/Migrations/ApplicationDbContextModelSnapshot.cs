@@ -574,6 +574,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("bigint[]")
                         .HasColumnName("referee_ids");
 
+                    b.Property<string>("Referees")
+                        .HasColumnType("text");
+
                     b.Property<string>("Rules")
                         .HasColumnType("text");
 

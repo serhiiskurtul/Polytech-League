@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Entities.Checkers;
+using PolytechLeague.Application.Dto.ChessDto;
 using PolytechLeague.Application.Dto.GeneralDto;
 
 namespace PolytechLeague.Application.Dto.CheckersDto;
@@ -14,7 +15,7 @@ public class CheckersEventRequest
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required CompetitionLevel Level { get; set; }
-    
+
     public required string Description { get; set; }
     public required string TimeControl { get; set; }
     public required int ParticipantsCount { get; set; }
@@ -28,6 +29,7 @@ public class CheckersEventRequest
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
     public string? HeadRefereeName { get; set; }
+    public string? Referees { get; set; }
     public string? Schedule { get; set; }
 
     public long? FirstPlaceId { get; set; }
@@ -62,6 +64,7 @@ public class CheckersEventResponse
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
     public string? HeadRefereeName { get; set; }
+    public string? Referees { get; set; }
     public string? Schedule { get; set; }
 
     public PlayerDto? FirstPlace { get; set; }
@@ -88,6 +91,7 @@ public static class CheckersEventDtoExtension
             Rules = checkersEventRequest.Rules,
             Prizes = checkersEventRequest.Prizes,
             HeadRefereeName = checkersEventRequest.HeadRefereeName,
+            Referees = checkersEventRequest.Referees,
             Schedule = checkersEventRequest.Schedule,
             FirstPlaceId = checkersEventRequest.FirstPlaceId,
             SecondPlaceId = checkersEventRequest.SecondPlaceId,
@@ -116,6 +120,7 @@ public static class CheckersEventDtoExtension
             Rules = checkersEvent.Rules,
             Prizes = checkersEvent.Prizes,
             HeadRefereeName = checkersEvent.HeadRefereeName,
+            Referees = checkersEvent.Referees,
             Schedule = checkersEvent.Schedule,
             FirstPlace = checkersEvent.FirstPlace?.ToDto(),
             SecondPlace = checkersEvent.SecondPlace?.ToDto(),

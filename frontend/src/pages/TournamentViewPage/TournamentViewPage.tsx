@@ -28,7 +28,8 @@ import {
   deleteCheckersPhoto
 } from '@/shared/api/checkers.api';
 import { 
-  getArmwrestlingEventById 
+  getArmwrestlingEventById,
+  updateArmwrestlingEvent
 } from '@/shared/api/armwrestling.api';
 import ArmwrestlingTournamentView from './components/ArmwrestlingTournamentView';
 import TournamentPodium from './components/TournamentPodium';
@@ -153,6 +154,7 @@ const TournamentViewPage = () => {
     rules: '',
     prizes: '',
     headRefereeName: '',
+    referees: '',
     schedule: ''
   });
 
@@ -183,6 +185,7 @@ const TournamentViewPage = () => {
         rules: details.rules || '',
         prizes: details.prizes || '',
         headRefereeName: details.headRefereeName || '',
+        referees: (details as any).referees || '',
         schedule: details.schedule || ''
       });
       setIsEditingTournament(true);
@@ -240,6 +243,13 @@ const TournamentViewPage = () => {
       }
       if (tournament?.sport === 'checkers') {
         await updateCheckersEvent(id!, { ...editTournamentData, variant: 'Russian' } as any);
+      } else if (tournament?.sport === 'armwrestling') {
+        await updateArmwrestlingEvent(id!, {
+            ...editTournamentData,
+            hand: (details as any).hand,
+            weightClass: (details as any).weightClass,
+            category: (details as any).category
+        });
       } else {
         await updateChessEvent(id!, editTournamentData);
       }
@@ -397,6 +407,7 @@ const TournamentViewPage = () => {
               rules: detailsData.rules || '',
               prizes: detailsData.prizes || '',
               headRefereeName: detailsData.headRefereeName || '',
+              referees: (detailsData as any).referees || '',
               schedule: detailsData.schedule || ''
             });
           }
@@ -851,7 +862,9 @@ const TournamentViewPage = () => {
                     {(tournament.sport === 'chess' || tournament.sport === 'checkers') && (details as any)?.system && (
                       <>• {getSystemLabel((details as any).system)}<br /></>
                     )}
-                    • Контроль часу: {details?.timeControl || 'Не вказано'}<br />
+                    {tournament.sport !== 'armwrestling' && (
+                      <>• Контроль часу: {details?.timeControl || 'Не вказано'}<br /></>
+                    )}
                     • Заборонені підказки та мобільні телефони<br />
                     • Рішення судді остаточні
                   </>
@@ -861,15 +874,32 @@ const TournamentViewPage = () => {
             <div className={styles.infoSection}>
               <h3><i className="fas fa-users"></i> Судді</h3>
               <div className={styles.refereeList}>
-                <div className={styles.refereeItem}>
-                  <div className={styles.refereeAvatar}>
-                    <i className="fas fa-user-tie"></i>
-                  </div>
-                  <div>
-                    <strong>{details?.headRefereeName || 'Головний суддя'}</strong><br />
-                    <small>{details?.headRefereeName ? 'Офіційний суддя турніру' : 'Призначається організатором'}</small>
-                  </div>
-                </div>
+                {!(details as any)?.referees && !details?.headRefereeName && (
+                   <div className={styles.refereeItem}>
+                     <div className={styles.refereeAvatar}>
+                       <i className="fas fa-user-tie"></i>
+                     </div>
+                     <div>
+                       <strong>Призначається організатором</strong>
+                     </div>
+                   </div>
+                )}
+                {details?.headRefereeName && !(details as any)?.referees && (
+                   <div className={styles.refereeItem}>
+                     <div className={styles.refereeAvatar}>
+                       <i className="fas fa-user-tie"></i>
+                     </div>
+                     <div>
+                       <strong>{details.headRefereeName}</strong><br />
+                       <small>Суддя турніру</small>
+                     </div>
+                   </div>
+                )}
+                {(details as any)?.referees && (
+                   <div style={{ color: '#4b5563', fontSize: '0.95rem', whiteSpace: 'pre-line', padding: '8px 12px', background: '#fff', borderRadius: '10px', border: '1px solid #e5e7eb' }}>
+                     { (details as any).referees }
+                   </div>
+                )}
               </div>
             </div>
           </div>
@@ -1401,21 +1431,25 @@ const TournamentViewPage = () => {
                     <option value="National">Всеукраїнські</option>
                   </select>
                 </div>
-                <div className={styles.formGroup}>
-                  <label>Система проведення</label>
-                  <select value={editTournamentData.system} onChange={(e) => setEditTournamentData({ ...editTournamentData, system: e.target.value as ChessSystem })}>
-                    <option value="Swiss">Швейцарська система</option>
-                    <option value="RoundRobin">Кругова система</option>
-                    <option value="Knockout">Олімпійська система</option>
-                  </select>
-                </div>
-                <div className={styles.formGroup}>
-                  <label>Контроль часу</label>
-                  <input type="text" placeholder="напр. 10хв + 5с" value={editTournamentData.timeControl} onChange={(e) => setEditTournamentData({ ...editTournamentData, timeControl: e.target.value })} />
-                </div>
-                <div className={styles.formGroup}>
-                  <label>Головний суддя</label>
-                  <input type="text" placeholder="ПІБ судді" value={editTournamentData.headRefereeName} onChange={(e) => setEditTournamentData({ ...editTournamentData, headRefereeName: e.target.value })} />
+                {tournament?.sport !== 'armwrestling' && (
+                  <>
+                    <div className={styles.formGroup}>
+                      <label>Система проведення</label>
+                      <select value={editTournamentData.system} onChange={(e) => setEditTournamentData({ ...editTournamentData, system: e.target.value as ChessSystem })}>
+                        <option value="Swiss">Швейцарська система</option>
+                        <option value="RoundRobin">Кругова система</option>
+                        <option value="Knockout">Олімпійська система</option>
+                      </select>
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label>Контроль часу</label>
+                      <input type="text" placeholder="напр. 10хв + 5с" value={editTournamentData.timeControl} onChange={(e) => setEditTournamentData({ ...editTournamentData, timeControl: e.target.value })} />
+                    </div>
+                  </>
+                )}
+                <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                  <label>Судді</label>
+                  <textarea rows={3} placeholder="Введіть імена суддів..." value={editTournamentData.referees} onChange={(e) => setEditTournamentData({ ...editTournamentData, referees: e.target.value })} />
                 </div>
                 <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
                   <label>Опис турніру</label>

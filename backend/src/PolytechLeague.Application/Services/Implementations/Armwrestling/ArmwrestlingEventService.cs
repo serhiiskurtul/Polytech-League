@@ -51,6 +51,7 @@ public class ArmwrestlingEventService(
         oldEntity.Rules = newEntity.Rules;
         oldEntity.Prizes = newEntity.Prizes;
         oldEntity.HeadRefereeName = newEntity.HeadRefereeName;
+        oldEntity.Referees = newEntity.Referees;
         oldEntity.Schedule = newEntity.Schedule;
         oldEntity.TimeControl = newEntity.TimeControl;
         oldEntity.ParticipantsCount = newEntity.ParticipantsCount;

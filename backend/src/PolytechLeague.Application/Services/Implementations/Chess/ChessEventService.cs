@@ -26,6 +26,7 @@ public class ChessEventService(
         oldEntity.Rules = newEntity.Rules;
         oldEntity.Prizes = newEntity.Prizes;
         oldEntity.HeadRefereeName = newEntity.HeadRefereeName;
+        oldEntity.Referees = newEntity.Referees;
         oldEntity.RefereeIds = newEntity.RefereeIds;
         oldEntity.Schedule = newEntity.Schedule;
         oldEntity.FirstPlaceId = newEntity.FirstPlaceId;

@@ -43,6 +43,7 @@ export interface ArmwrestlingEventResponse {
   rules?: string;
   prizes?: string;
   headRefereeName?: string;
+  referees?: string;
   schedule?: string;
   firstPlace?: PlayerDto | null;
   secondPlace?: PlayerDto | null;
@@ -64,6 +65,7 @@ export interface ArmwrestlingEventRequest {
   rules?: string;
   prizes?: string;
   headRefereeName?: string;
+  referees?: string;
   schedule?: string;
   firstPlaceId?: number | null;
   secondPlaceId?: number | null;

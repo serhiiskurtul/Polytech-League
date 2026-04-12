@@ -28,6 +28,7 @@ public class CheckersEventService(
         oldEntity.Rules = newEntity.Rules;
         oldEntity.Prizes = newEntity.Prizes;
         oldEntity.HeadRefereeName = newEntity.HeadRefereeName;
+        oldEntity.Referees = newEntity.Referees;
         oldEntity.Schedule = newEntity.Schedule;
         oldEntity.RefereeIds = newEntity.RefereeIds;
         oldEntity.FirstPlaceId = newEntity.FirstPlaceId;
