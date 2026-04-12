@@ -1,3 +1,5 @@
+import { PlayerDto } from './player.types';
+
 export interface EventPhoto {
   id: number;
   url: string;
@@ -53,6 +55,9 @@ export interface ChessEventResponse {
   system: ChessSystem;
   games: ChessGameResponse[];
   players: ChessEventParticipantResponse[];
+  firstPlace?: PlayerDto | null;
+  secondPlace?: PlayerDto | null;
+  thirdPlace?: PlayerDto | null;
   rules?: string;
   prizes?: string;
   headRefereeName?: string;
@@ -73,6 +78,9 @@ export interface ChessEventRequest {
   prizes?: string;
   headRefereeName?: string;
   schedule?: string;
+  firstPlaceId?: number | null;
+  secondPlaceId?: number | null;
+  thirdPlaceId?: number | null;
 }
 
 // ChessPlayerDto removed in favor of unified PlayerDto

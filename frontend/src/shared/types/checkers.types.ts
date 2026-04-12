@@ -1,3 +1,4 @@
+import { PlayerDto } from './player.types';
 import { EventPhoto, CompetitionLevel, GameResult } from './chess.types';
 
 export type CheckersSystem = "Swiss" | "RoundRobin" | "Knockout";
@@ -40,6 +41,9 @@ export interface CheckersEventResponse {
   variant: CheckersVariant;
   games: CheckersGameResponse[];
   players: CheckersEventParticipantResponse[];
+  firstPlace?: PlayerDto | null;
+  secondPlace?: PlayerDto | null;
+  thirdPlace?: PlayerDto | null;
   rules?: string;
   prizes?: string;
   headRefereeName?: string;
@@ -61,6 +65,9 @@ export interface CheckersEventRequest {
   prizes?: string;
   headRefereeName?: string;
   schedule?: string;
+  firstPlaceId?: number | null;
+  secondPlaceId?: number | null;
+  thirdPlaceId?: number | null;
 }
 
 export interface CheckersEventParticipantDto {

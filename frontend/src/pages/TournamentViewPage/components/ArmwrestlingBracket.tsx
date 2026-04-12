@@ -8,10 +8,10 @@ interface ArmwrestlingBracketProps {
   onSetWinner?: (matchId: number, winnerId: number) => void;
 }
 
-const ArmwrestlingBracket: React.FC<ArmwrestlingBracketProps> = ({ 
-  matches, 
-  isAdmin, 
-  onSetWinner 
+const ArmwrestlingBracket: React.FC<ArmwrestlingBracketProps> = ({
+  matches,
+  isAdmin,
+  onSetWinner
 }) => {
   // Group matches by stage
   const stages = matches.reduce((acc, match) => {
@@ -53,7 +53,7 @@ const ArmwrestlingBracket: React.FC<ArmwrestlingBracketProps> = ({
                     <span className={styles.playerGroup}>{match.player1?.group}</span>
                   </div>
                   {isAdmin && onSetWinner && (
-                    <button 
+                    <button
                       className={`${styles.setWinnerBtn} ${match.winnerId === match.player1Id ? styles.winnerActive : ''}`}
                       onClick={() => onSetWinner(match.id, match.player1Id)}
                       title="Встановити переможцем"
@@ -77,7 +77,7 @@ const ArmwrestlingBracket: React.FC<ArmwrestlingBracketProps> = ({
                     <span className={styles.playerGroup}>{match.player2?.group}</span>
                   </div>
                   {isAdmin && onSetWinner && (
-                    <button 
+                    <button
                       className={`${styles.setWinnerBtn} ${match.winnerId === match.player2Id ? styles.winnerActive : ''}`}
                       onClick={() => onSetWinner(match.id, match.player2Id)}
                       title="Встановити переможцем"
@@ -98,7 +98,7 @@ const ArmwrestlingBracket: React.FC<ArmwrestlingBracketProps> = ({
           </div>
         </div>
       ))}
-      
+
       {matches.length === 0 && (
         <div className={styles.noData}>Сітка порожня. Додайте матчі для відображення.</div>
       )}
