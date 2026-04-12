@@ -7,7 +7,7 @@ using PolytechLeague.Infrastructure.Redis;
 namespace PolytechLeague.API.Controllers.Badminton;
 
 [ApiController]
-[Route("badminton-events")]
+[Route("api/badminton-events")]
 public class BadmintonEventsController(
     IBadmintonEventService badmintonEventService,
     IRedisService redisService) : ControllerBase

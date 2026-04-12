@@ -1,3 +1,4 @@
+using PolytechLeague.Application.Dto.GeneralDto;
 using PolytechLeague.Domain.Entities.Armwrestling;
 
 namespace PolytechLeague.Application.Dto.ArmwrestlingDto;
@@ -17,9 +18,9 @@ public class ArmwrestlingMatchResponse
     public long Id { get; set; }
     public long EventId { get; set; }
     public long Player1Id { get; set; }
-    public ArmwrestlingPlayerResponse? Player1 { get; set; }
+    public PlayerDto? Player1 { get; set; }
     public long Player2Id { get; set; }
-    public ArmwrestlingPlayerResponse? Player2 { get; set; }
+    public PlayerDto? Player2 { get; set; }
     public long? WinnerId { get; set; }
     public string? Stage { get; set; }
     public int TableNumber { get; set; }
@@ -46,9 +47,9 @@ public static class ArmwrestlingMatchDtoExtensions
             Id = entity.Id,
             EventId = entity.EventId,
             Player1Id = entity.Player1Id,
-            Player1 = entity.Player1?.ToResponse(),
+            Player1 = entity.Player1?.ToDto(),
             Player2Id = entity.Player2Id,
-            Player2 = entity.Player2?.ToResponse(),
+            Player2 = entity.Player2?.ToDto(),
             WinnerId = entity.WinnerId,
             Stage = entity.Stage
         };

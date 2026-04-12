@@ -7,15 +7,20 @@ namespace PolytechLeague.Application.Dto.CheckersDto;
 public class CheckersGameDto
 {
     public long Id { get; set; }
-    public long CheckersEventId { get; set; }
+    public long TournamentId { get; set; }
 
     public long WhitePlayerId { get; set; }
+    public string? WhitePlayerName { get; set; }
+    public long? WhiteUserId { get; set; }
+
     public long BlackPlayerId { get; set; }
+    public string? BlackPlayerName { get; set; }
+    public long? BlackUserId { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public GameResult Result { get; set; }
 
-    public int RoundNumber { get; set; }
+    public int Round { get; set; }
 
     public DateTime ScheduledAt { get; set; }
     public DateTime? FinishedAt { get; set; }
@@ -29,11 +34,15 @@ public static class CheckersGameDtoExtensions
         return new CheckersGameDto
         {
             Id = game.Id,
-            CheckersEventId = game.CheckersEventId,
+            TournamentId = game.TournamentId,
             WhitePlayerId = game.WhitePlayerId,
+            WhitePlayerName = game.WhitePlayer?.Player != null ? $"{game.WhitePlayer.Player.FirstName} {game.WhitePlayer.Player.LastName}" : null,
+            WhiteUserId = game.WhitePlayer?.Player?.UserId,
             BlackPlayerId = game.BlackPlayerId,
+            BlackPlayerName = game.BlackPlayer?.Player != null ? $"{game.BlackPlayer.Player.FirstName} {game.BlackPlayer.Player.LastName}" : null,
+            BlackUserId = game.BlackPlayer?.Player?.UserId,
             Result = game.Result,
-            RoundNumber = game.RoundNumber,
+            Round = game.Round,
             ScheduledAt = game.ScheduledAt,
             FinishedAt = game.FinishedAt
         };
@@ -44,11 +53,11 @@ public static class CheckersGameDtoExtensions
         return new CheckersGame
         {
             Id = dto.Id,
-            CheckersEventId = dto.CheckersEventId,
+            TournamentId = dto.TournamentId,
             WhitePlayerId = dto.WhitePlayerId,
             BlackPlayerId = dto.BlackPlayerId,
             Result = dto.Result,
-            RoundNumber = dto.RoundNumber,
+            Round = dto.Round,
             ScheduledAt = dto.ScheduledAt,
             FinishedAt = dto.FinishedAt
         };

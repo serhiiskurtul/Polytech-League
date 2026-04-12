@@ -29,13 +29,13 @@ public static class ChessEventParticipantDtoExtensions
             ChessEventId = participant.TournamentId,
             PlayerId = participant.PlayerId,
             PlayerName = participant.Player != null ? $"{participant.Player.FirstName} {participant.Player.LastName}" : null,
-            Rating = participant.Player?.RatingELO ?? 0,
+            Rating = participant.Player?.ChessRating ?? 0,
             Points = participant.Points,
             Rank = participant.Rank,
             Buchholz = 0,
             SonnebornBerger = 0,
-            FideId = participant.Player?.FideId,
-            Title = participant.Player?.Title
+            FideId = participant.Player?.ChessFideId,
+            Title = participant.Player?.ChessTitle
         };
     }
 

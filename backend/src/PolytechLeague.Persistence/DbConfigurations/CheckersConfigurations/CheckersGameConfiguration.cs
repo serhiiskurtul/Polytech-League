@@ -11,16 +11,16 @@ public class CheckersGameConfiguration : IEntityTypeConfiguration<CheckersGame>
         builder.ToTable("checkers_games");
 
         // ---------- Indexes ----------
-        builder.HasIndex(x => x.CheckersEventId)
+        builder.HasIndex(x => x.TournamentId)
             .HasDatabaseName("IX_checkers_games_event_id");
 
-        builder.HasIndex(x => new { x.CheckersEventId, x.RoundNumber })
+        builder.HasIndex(x => new { x.TournamentId, x.Round })
             .HasDatabaseName("IX_checkers_games_event_round");
 
-        builder.HasIndex(x => new { x.CheckersEventId, x.WhitePlayerId })
+        builder.HasIndex(x => new { x.TournamentId, x.WhitePlayerId })
             .HasDatabaseName("IX_checkers_games_event_white");
 
-        builder.HasIndex(x => new { x.CheckersEventId, x.BlackPlayerId })
+        builder.HasIndex(x => new { x.TournamentId, x.BlackPlayerId })
             .HasDatabaseName("IX_checkers_games_event_black");
 
         builder.HasIndex(x => x.Result)
@@ -30,7 +30,7 @@ public class CheckersGameConfiguration : IEntityTypeConfiguration<CheckersGame>
         builder.Property(x => x.Id)
             .HasColumnName("id");
 
-        builder.Property(x => x.CheckersEventId)
+        builder.Property(x => x.TournamentId)
             .HasColumnName("checkers_event_id")
             .IsRequired();
 
@@ -46,7 +46,7 @@ public class CheckersGameConfiguration : IEntityTypeConfiguration<CheckersGame>
             .HasColumnName("result")
             .IsRequired();
 
-        builder.Property(x => x.RoundNumber)
+        builder.Property(x => x.Round)
             .HasColumnName("round_number")
             .IsRequired();
 
@@ -61,7 +61,7 @@ public class CheckersGameConfiguration : IEntityTypeConfiguration<CheckersGame>
         // Tournament → Games
         builder.HasOne(g => g.Event)
             .WithMany(e => e.Games)
-            .HasForeignKey(g => g.CheckersEventId)
+            .HasForeignKey(g => g.TournamentId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // White player

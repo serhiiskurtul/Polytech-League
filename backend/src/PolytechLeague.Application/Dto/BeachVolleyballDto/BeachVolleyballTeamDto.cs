@@ -1,3 +1,4 @@
+using PolytechLeague.Application.Dto.GeneralDto;
 using PolytechLeague.Domain.Entities.BeachVolleyball;
 
 namespace PolytechLeague.Application.Dto.BeachVolleyballDto;
@@ -11,7 +12,7 @@ public class BeachVolleyballTeamResponse
 {
     public long Id { get; set; }
     public required string Name { get; set; }
-    public ICollection<BeachVolleyballPlayerResponse>? Players { get; set; }
+    public ICollection<PlayerDto>? Players { get; set; }
 }
 
 public static class BeachVolleyballTeamDtoExtensions
@@ -30,7 +31,7 @@ public static class BeachVolleyballTeamDtoExtensions
         {
             Id = entity.Id,
             Name = entity.Name,
-            Players = entity.Players?.Select(p => p.ToResponse()).ToList()
+            Players = entity.Players?.Select(p => p.ToDto()).ToList()
         };
     }
 }

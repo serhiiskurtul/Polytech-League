@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace PolytechLeague.API.Controllers.TableTennis;
 
 [ApiController]
-[Route("table-tennis-matches")]
+[Route("api/table-tennis-matches")]
 public class TableTennisMatchesController(ITableTennisMatchService ttMatchService) : Controller
 {
     [AllowAnonymous]

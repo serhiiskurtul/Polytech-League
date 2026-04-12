@@ -1,3 +1,4 @@
+using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Entities.Shared;
 
 namespace PolytechLeague.Domain.Entities.Chess;
@@ -10,8 +11,8 @@ public class ChessGame
 
     public long WhitePlayerId { get; set; }
     public long BlackPlayerId { get; set; }
-    public ChessPlayer? WhitePlayer { get; set; }
-    public ChessPlayer? BlackPlayer { get; set; }
+    public Player? WhitePlayer { get; set; }
+    public Player? BlackPlayer { get; set; }
 
     public GameResult Result { get; set; }
     public int Round { get; set; }

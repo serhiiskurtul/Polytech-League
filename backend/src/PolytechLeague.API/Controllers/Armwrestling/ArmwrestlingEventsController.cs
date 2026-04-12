@@ -7,7 +7,7 @@ using PolytechLeague.Infrastructure.Redis;
 namespace PolytechLeague.API.Controllers.Armwrestling;
 
 [ApiController]
-[Route("armwrestling-events")]
+[Route("api/armwrestling-events")]
 public class ArmwrestlingEventsController(
     IArmwrestlingEventService armEventService,
     IRedisService redisService) : ControllerBase

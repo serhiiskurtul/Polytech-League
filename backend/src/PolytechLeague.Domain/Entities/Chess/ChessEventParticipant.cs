@@ -1,3 +1,5 @@
+using PolytechLeague.Domain.Entities;
+
 namespace PolytechLeague.Domain.Entities.Chess;
 
 public class ChessEventParticipant
@@ -6,7 +8,7 @@ public class ChessEventParticipant
     public ChessEvent? Tournament { get; set; }
 
     public long PlayerId { get; set; }
-    public ChessPlayer? Player { get; set; }
+    public Player? Player { get; set; }
 
     public double Points { get; set; } = 0;
     public int Rank { get; set; } //місце

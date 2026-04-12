@@ -9,7 +9,7 @@ using PolytechLeague.Application.Extensions;
 namespace PolytechLeague.API.Controllers.Account;
 
 [ApiController]
-[Route("users")]
+[Route("api/users")]
 public class UsersController(IUserService userService) : Controller
 {
     [Authorize(Policy = "Admin")]

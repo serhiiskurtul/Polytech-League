@@ -1,5 +1,5 @@
 import api from './axiosInstance';
-import { ChessEventResponse, ChessPlayerDto, ChessEventParticipantDto, ChessGameDto, ChessEventRequest } from '../types/chess.types';
+import { ChessEventResponse, ChessEventParticipantDto, ChessGameDto, ChessEventRequest } from '@/shared/types/chess.types';
 
 export const getChessEventById = async (id: number | string): Promise<ChessEventResponse> => {
     try {
@@ -30,20 +30,7 @@ export const deleteTournamentPhoto = async (eventId: number | string, photoId: n
     await api.delete(`/chess-events/${eventId}/photos/${photoId}`);
 };
 
-export const createChessPlayer = async (data: ChessPlayerDto): Promise<ChessPlayerDto> => {
-    const res = await api.post<ChessPlayerDto>('/chess-players', data);
-    return res.data;
-};
-
-export const getAllChessPlayers = async (): Promise<ChessPlayerDto[]> => {
-    try {
-        const response = await api.get<ChessPlayerDto[]>('/chess-players');
-        return response.data;
-    } catch (error) {
-        console.error('Помилка при отриманні всіх шахових гравців:', error);
-        throw error;
-    }
-};
+// Player-related methods removed in favor of unified players.api.ts
 
 export const addParticipantToEvent = async (eventId: number | string, data: ChessEventParticipantDto): Promise<void> => {
     await api.post(`/chess-events/${eventId}/participants`, data);

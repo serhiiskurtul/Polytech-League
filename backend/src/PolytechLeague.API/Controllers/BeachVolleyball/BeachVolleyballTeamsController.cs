@@ -7,7 +7,7 @@ using PolytechLeague.Infrastructure.Redis;
 namespace PolytechLeague.API.Controllers.BeachVolleyball;
 
 [ApiController]
-[Route("beach-volleyball-teams")]
+[Route("api/beach-volleyball-teams")]
 public class BeachVolleyballTeamsController(
     IBeachVolleyballTeamService beachVolleyballTeamService,
     IRedisService redisService) : ControllerBase

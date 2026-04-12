@@ -75,17 +75,7 @@ export interface ChessEventRequest {
   schedule?: string;
 }
 
-export interface ChessPlayerDto {
-    id?: number;
-    userId?: number | null;
-    firstName: string;
-    lastName: string;
-    group: string;
-    city: string;
-    ratingELO: number;
-    fideId?: string | null;
-    title?: string | null;
-}
+// ChessPlayerDto removed in favor of unified PlayerDto
 
 export interface ChessEventParticipantDto {
     playerId: number;

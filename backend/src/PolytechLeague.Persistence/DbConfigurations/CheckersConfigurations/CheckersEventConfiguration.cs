@@ -31,12 +31,12 @@ public class CheckersEventConfiguration : IEntityTypeConfiguration<CheckersEvent
 
         builder.HasMany(x => x.Games)
             .WithOne()
-            .HasForeignKey(x => x.CheckersEventId)
+            .HasForeignKey(x => x.TournamentId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(x => x.Players)
             .WithOne()
-            .HasForeignKey(x => x.CheckersEventId)
+            .HasForeignKey(x => x.TournamentId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -8,7 +8,7 @@ export const getTournaments = async (
     sport?: string
 ): Promise<PagedResponse<Tournament>> => {
     try {
-        const response = await api.get<PagedResponse<Tournament>>('/api/tournaments', {
+        const response = await api.get<PagedResponse<Tournament>>('/tournaments', {
             params: { 
                 page, 
                 pageSize,
@@ -25,7 +25,7 @@ export const getTournaments = async (
 
 export const getTournamentById = async (id: string): Promise<Tournament> => {
     try {
-        const response = await api.get<Tournament>(`/api/tournaments/${id}`);
+        const response = await api.get<Tournament>(`/tournaments/${id}`);
         return response.data;
     } catch (error) {
         console.error(`Помилка при отриманні турніру з id ${id}:`, error);

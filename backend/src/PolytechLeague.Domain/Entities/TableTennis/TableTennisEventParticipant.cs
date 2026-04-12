@@ -1,3 +1,5 @@
+using PolytechLeague.Domain.Entities;
+
 namespace PolytechLeague.Domain.Entities.TableTennis;
 
 public class TableTennisEventParticipant
@@ -6,7 +8,7 @@ public class TableTennisEventParticipant
     public TableTennisEvent? Tournament { get; set; }
 
     public long PlayerId { get; set; }
-    public TableTennisPlayer? Player { get; set; }
+    public Player? Player { get; set; }
 
     public double Points { get; set; } = 0;
     public int Rank { get; set; }

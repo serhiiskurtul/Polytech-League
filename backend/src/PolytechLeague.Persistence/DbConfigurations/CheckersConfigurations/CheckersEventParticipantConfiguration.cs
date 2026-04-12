@@ -12,15 +12,13 @@ public class CheckersEventParticipantConfiguration : IEntityTypeConfiguration<Ch
 
         builder.HasKey(x => x.Id);
 
-        builder.HasQueryFilter(p => !p.User.IsDeleted);
+        builder.HasIndex(x => x.TournamentId).HasDatabaseName("IX_checkers_event_participants_event_id");
+        builder.HasIndex(x => x.PlayerId).HasDatabaseName("IX_checkers_event_participants_user_id");
+        builder.HasIndex(x => new { x.TournamentId, x.PlayerId }).HasDatabaseName("IX_checkers_event_participants_event_user").IsUnique();
+        builder.HasIndex(x => new { x.TournamentId, x.Points }).HasDatabaseName("IX_checkers_event_participants_event_points");
 
-        builder.HasIndex(x => x.CheckersEventId).HasDatabaseName("IX_checkers_event_participants_event_id");
-        builder.HasIndex(x => x.UserId).HasDatabaseName("IX_checkers_event_participants_user_id");
-        builder.HasIndex(x => new { x.CheckersEventId, x.UserId }).HasDatabaseName("IX_checkers_event_participants_event_user").IsUnique();
-        builder.HasIndex(x => new { x.CheckersEventId, x.PointsEarned }).HasDatabaseName("IX_checkers_event_participants_event_points");
-
-        builder.Property(x => x.PointsEarned)
-            .HasColumnName("points_earned")
+        builder.Property(x => x.Points)
+            .HasColumnName("points")
             .HasColumnType("double precision")
             .IsRequired();
 
@@ -30,12 +28,12 @@ public class CheckersEventParticipantConfiguration : IEntityTypeConfiguration<Ch
 
         builder.HasOne(x => x.Event)
             .WithMany(x => x.Players)
-            .HasForeignKey(x => x.CheckersEventId)
+            .HasForeignKey(x => x.TournamentId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne(x => x.User)
+        builder.HasOne(x => x.Player)
             .WithMany()
-            .HasForeignKey(x => x.UserId)
+            .HasForeignKey(x => x.PlayerId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

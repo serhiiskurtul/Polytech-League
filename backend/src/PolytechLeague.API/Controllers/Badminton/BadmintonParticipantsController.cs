@@ -5,7 +5,7 @@ using PolytechLeague.Application.Services.Interfaces.Badminton;
 namespace PolytechLeague.API.Controllers.Badminton;
 
 [ApiController]
-[Route("badminton-participants")]
+[Route("api/badminton-participants")]
 public class BadmintonParticipantsController(
     IBadmintonParticipantService badmintonParticipantService) : ControllerBase
 {

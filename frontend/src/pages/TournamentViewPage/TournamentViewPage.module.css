@@ -750,3 +750,369 @@
   background: #ef4444;
   transform: scale(1.1);
 }
+
+/* Armwrestling Bracket Styles */
+.bracketContainer {
+  display: flex;
+  gap: 32px;
+  overflow-x: auto;
+  padding: 40px 24px;
+  background-color: #f8fafc;
+  border-radius: 16px;
+  min-height: 400px;
+  margin-top: 20px;
+  border: 1px solid var(--border);
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) #f1f5f9;
+}
+
+.bracketContainer::-webkit-scrollbar {
+  height: 8px;
+}
+
+.bracketContainer::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.bracketContainer::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 10px;
+}
+
+.bracketColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 320px;
+  flex-shrink: 0;
+}
+
+.stageTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+  text-align: center;
+  margin-bottom: 24px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.matchList {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 24px;
+}
+
+.matchBox {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.matchBox:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.playerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  margin-bottom: 6px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.playerRow.winner {
+  background: #dcfce7;
+  border-color: #86efac;
+}
+
+.playerName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.winner .playerName {
+  color: #166534;
+}
+
+.playerGroup {
+  font-size: 11px;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.matchVs {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 800;
+  color: #94a3b8;
+  margin: 6px 0;
+  letter-spacing: 2px;
+}
+
+.tableTag {
+  position: absolute;
+  top: -12px;
+  right: 16px;
+  background: #1e293b;
+  color: white;
+  padding: 2px 12px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.setWinnerBtn {
+  background: none;
+  border: none;
+  color: #cbd5e1;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.setWinnerBtn:hover {
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.winnerActive {
+  color: #22c55e !important;
+}
+
+.tableTag {
+  position: absolute;
+  top: -10px;
+  right: 12px;
+  background: var(--primary);
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.armwCategoryNav {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  flex-wrap: wrap;
+  box-shadow: var(--shadow-sm);
+}
+
+.categoryBtn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-light);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.categoryBtn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.categoryBtn:hover:not(.active) {
+  background: var(--primary-light);
+}
+
+/* Armwrestling Layout & Components */
+.armwrestlingView {
+  margin-top: 24px;
+}
+
+.tournamentGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 1200px) {
+  .tournamentGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mainContent {
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  min-height: 500px;
+}
+
+.sidePanel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sideSection {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.sideSection h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sideSection h3 i {
+  color: var(--primary);
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sectionHeader h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+}
+
+.sectionHeader h2 i {
+  color: var(--primary);
+}
+
+.actionBtn {
+  padding: 8px 16px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.actionBtn:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.participantItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+}
+
+.participantItem:last-child {
+  border-bottom: none;
+}
+
+.participantItem:hover {
+  background: var(--bg);
+}
+
+.playerAvatar {
+  width: 40px;
+  height: 40px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.playerInfo {
+  flex-grow: 1;
+}
+
+.playerDetails {
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+.refereesBoard {
+  background: var(--bg);
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.headReferee {
+  font-size: 0.95rem;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.refereeNote {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  margin: 0;
+}
+
+.badge {
+  background: var(--primary-light);
+  color: var(--primary);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.noData {
+  text-align: center;
+  color: var(--text-light);
+  font-size: 0.9rem;
+  padding: 40px 0;
+}

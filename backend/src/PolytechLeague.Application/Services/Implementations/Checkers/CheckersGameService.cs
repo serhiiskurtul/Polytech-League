@@ -14,11 +14,11 @@ public class CheckersGameService(
 {
     protected override void UpdateValues(CheckersGame oldEntity, CheckersGame newEntity)
     {
-        oldEntity.CheckersEventId = newEntity.CheckersEventId;
+        oldEntity.TournamentId = newEntity.TournamentId;
         oldEntity.WhitePlayerId = newEntity.WhitePlayerId;
         oldEntity.BlackPlayerId = newEntity.BlackPlayerId;
         oldEntity.Result = newEntity.Result;
-        oldEntity.RoundNumber = newEntity.RoundNumber;
+        oldEntity.Round = newEntity.Round;
         oldEntity.ScheduledAt = newEntity.ScheduledAt;
         oldEntity.FinishedAt = newEntity.FinishedAt;
     }

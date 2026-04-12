@@ -1,3 +1,4 @@
+using PolytechLeague.Application.Dto.GeneralDto;
 using PolytechLeague.Domain.Entities.Basketball3x3;
 
 namespace PolytechLeague.Application.Dto.Basketball3x3Dto;
@@ -11,7 +12,7 @@ public class Basketball3x3TeamResponse
 {
     public long Id { get; set; }
     public required string Name { get; set; }
-    public ICollection<Basketball3x3PlayerResponse>? Players { get; set; }
+    public ICollection<PlayerDto>? Players { get; set; }
 }
 
 public static class Basketball3x3TeamDtoExtensions
@@ -30,7 +31,7 @@ public static class Basketball3x3TeamDtoExtensions
         {
             Id = entity.Id,
             Name = entity.Name,
-            Players = entity.Players?.Select(p => p.ToResponse()).ToList()
+            Players = entity.Players?.Select(p => p.ToDto()).ToList()
         };
     }
 }

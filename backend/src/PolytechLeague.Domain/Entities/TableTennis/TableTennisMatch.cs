@@ -1,3 +1,4 @@
+using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Entities.TableTennis.Enums;
 using PolytechLeague.Domain.Entities.Shared;
 
@@ -11,13 +12,13 @@ public class TableTennisMatch
     public TableTennisEvent? Tournament { get; set; }
 
     public long Player1Id { get; set; }
-    public TableTennisPlayer? Player1 { get; set; }
+    public Player? Player1 { get; set; }
 
     public long Player2Id { get; set; }
-    public TableTennisPlayer? Player2 { get; set; }
+    public Player? Player2 { get; set; }
 
     public long? WinnerId { get; set; }
-    public TableTennisPlayer? Winner { get; set; }
+    public Player? Winner { get; set; }
 
     public string? Stage { get; set; }
     public int TableNumber { get; set; }

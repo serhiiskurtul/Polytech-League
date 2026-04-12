@@ -1,5 +1,7 @@
 using PolytechLeague.Application.Dto.CheckersDto;
+using PolytechLeague.Application.Services.Interfaces;
 using PolytechLeague.Application.Services.Interfaces.Checkers;
+using PolytechLeague.Domain.Entities.Checkers;
 using PolytechLeague.Domain.Params;
 using PolytechLeague.Infrastructure.Redis;
 using Microsoft.AspNetCore.Authorization;
@@ -8,8 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace PolytechLeague.API.Controllers.Checkers;
 
 [ApiController]
-[Route("checkers-events")]
-public class CheckersEventsController(ICheckersEventService checkersEventService, IRedisService redisService) : Controller
+[Route("api/checkers-events")]
+public class CheckersEventsController(ICheckersEventService checkersEventService, IRedisService redisService, IFileService fileService) : Controller
 {
     [AllowAnonymous]
     [HttpGet]
@@ -93,6 +95,64 @@ public class CheckersEventsController(ICheckersEventService checkersEventService
 
         await redisService.RemoveGroupAsync("checkers_events_all");
         await redisService.RemoveDataAsync($"checkers_event_{id}");
+
+        return NoContent();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{eventId:long}/participants")]
+    public async Task<IActionResult> AddParticipant([FromRoute] long eventId, [FromBody] CheckersEventParticipantDto request, CancellationToken cancellationToken)
+    {
+        await checkersEventService.AddParticipantAsync(eventId, request, cancellationToken);
+        await redisService.RemoveDataAsync($"checkers_event_{eventId}");
+        await redisService.RemoveGroupAsync("checkers_events_all");
+        return Ok();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpDelete("{eventId:long}/participants/{playerId:long}")]
+    public async Task<IActionResult> RemoveParticipant([FromRoute] long eventId, [FromRoute] long playerId, CancellationToken cancellationToken)
+    {
+        await checkersEventService.RemoveParticipantAsync(eventId, playerId, cancellationToken);
+        await redisService.RemoveDataAsync($"checkers_event_{eventId}");
+        await redisService.RemoveGroupAsync("checkers_events_all");
+        return NoContent();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPut("{eventId:long}/participants/{playerId:long}")]
+    public async Task<IActionResult> UpdateParticipant([FromRoute] long eventId, [FromRoute] long playerId, [FromBody] CheckersEventParticipantDto request, CancellationToken cancellationToken)
+    {
+        await checkersEventService.UpdateParticipantAsync(eventId, playerId, request, cancellationToken);
+        await redisService.RemoveDataAsync($"checkers_event_{eventId}");
+        await redisService.RemoveGroupAsync("checkers_events_all");
+        return NoContent();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{id}/photos")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> UploadPhoto([FromRoute] long id, [FromForm] IFormFile photo, CancellationToken cancellationToken)
+    {
+        if (photo == null || photo.Length == 0) return BadRequest("File is empty");
+
+        var url = await fileService.SaveFileAsync(photo, $"tournaments/{id}", cancellationToken);
+        await checkersEventService.AddPhotoAsync(id, url, cancellationToken);
+        
+        await redisService.RemoveDataAsync($"checkers_event_{id}");
+        await redisService.RemoveGroupAsync("checkers_events_all");
+
+        return Ok(new { url });
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpDelete("{id:long}/photos/{photoId:long}")]
+    public async Task<IActionResult> DeletePhoto(long id, long photoId, CancellationToken cancellationToken)
+    {
+        await checkersEventService.RemovePhotoAsync(id, photoId, cancellationToken);
+        
+        await redisService.RemoveDataAsync($"checkers_event_{id}");
+        await redisService.RemoveGroupAsync("checkers_events_all");
 
         return NoContent();
     }

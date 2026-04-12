@@ -4,9 +4,14 @@ namespace PolytechLeague.Application.Dto.CheckersDto;
 
 public class CheckersEventParticipantDto
 {
-    public long UserId { get; set; }
-    public int StartingRating { get; set; }
-    public double PointsEarned { get; set; }
+    public long Id { get; set; }
+    public long? UserId { get; set; }
+    public long TournamentId { get; set; }
+    public long PlayerId { get; set; }
+    public string? PlayerName { get; set; }
+    public double Points { get; set; }
+    public int Rating { get; set; }
+    public int Rank { get; set; }
 }
 
 public static class CheckersEventParticipantDtoExtensions
@@ -15,20 +20,26 @@ public static class CheckersEventParticipantDtoExtensions
     {
         return new CheckersEventParticipantDto
         {
-            UserId = participant.UserId,
-            StartingRating = participant.StartingRating,
-            PointsEarned = participant.PointsEarned
+            Id = participant.Id,
+            UserId = participant.Player?.UserId,
+            TournamentId = participant.TournamentId,
+            PlayerId = participant.PlayerId,
+            PlayerName = participant.Player != null ? $"{participant.Player.FirstName} {participant.Player.LastName}" : null,
+            Points = participant.Points,
+            Rating = participant.StartingRating,
+            Rank = participant.Rank
         };
     }
 
-    public static CheckersEventParticipant FromDto(this CheckersEventParticipantDto dto, long checkersEventId)
+    public static CheckersEventParticipant FromDto(this CheckersEventParticipantDto dto, long tournamentId)
     {
         return new CheckersEventParticipant
         {
-            CheckersEventId = checkersEventId,
-            UserId = dto.UserId,
-            StartingRating = dto.StartingRating,
-            PointsEarned = dto.PointsEarned
+            TournamentId = tournamentId,
+            PlayerId = dto.PlayerId,
+            StartingRating = dto.Rating,
+            Points = dto.Points,
+            Rank = dto.Rank
         };
     }
 }

@@ -3,6 +3,7 @@ using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Entities.Armwrestling;
 using PolytechLeague.Domain.Entities.Armwrestling.Enums;
 using PolytechLeague.Application.Dto.ChessDto; // For EventPhotoDto
+using PolytechLeague.Application.Dto.GeneralDto;
 
 namespace PolytechLeague.Application.Dto.ArmwrestlingDto;
 
@@ -26,6 +27,13 @@ public class ArmwrestlingEventRequest
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required ArmwrestlingCategory Category { get; set; }
+
+    public string? Rules { get; set; }
+    public string? Prizes { get; set; }
+    public string? HeadRefereeName { get; set; }
+    public string? Schedule { get; set; }
+    public string? TimeControl { get; set; }
+    public int ParticipantsCount { get; set; }
 }
 
 public class ArmwrestlingEventResponse
@@ -51,6 +59,15 @@ public class ArmwrestlingEventResponse
     public required ArmwrestlingCategory Category { get; set; }
     
     public ICollection<ArmwrestlingMatchResponse>? Matches { get; set; }
+
+    public string? Rules { get; set; }
+    public string? Prizes { get; set; }
+    public string? HeadRefereeName { get; set; }
+    public string? Schedule { get; set; }
+    public string? TimeControl { get; set; }
+    public int ParticipantsCount { get; set; }
+
+    public ICollection<PlayerDto> Players { get; set; } = new List<PlayerDto>();
 }
 
 public static class ArmwrestlingEventDtoExtensions
@@ -67,13 +84,19 @@ public static class ArmwrestlingEventDtoExtensions
             Description = request.Description,
             Hand = request.Hand,
             WeightClass = request.WeightClass,
-            Category = request.Category
+            Category = request.Category,
+            Rules = request.Rules,
+            Prizes = request.Prizes,
+            HeadRefereeName = request.HeadRefereeName,
+            Schedule = request.Schedule,
+            TimeControl = request.TimeControl,
+            ParticipantsCount = request.ParticipantsCount
         };
     }
 
     public static ArmwrestlingEventResponse ToResponse(this ArmwrestlingEvent entity)
     {
-        return new ArmwrestlingEventResponse
+        var response = new ArmwrestlingEventResponse
         {
             Id = entity.Id,
             Name = entity.Name,
@@ -86,7 +109,29 @@ public static class ArmwrestlingEventDtoExtensions
             Hand = entity.Hand,
             WeightClass = entity.WeightClass,
             Category = entity.Category,
-            Matches = entity.Matches?.Select(m => m.ToResponse()).ToList()
+            Matches = entity.Matches?.Select(m => m.ToResponse()).ToList(),
+            Rules = entity.Rules,
+            Prizes = entity.Prizes,
+            HeadRefereeName = entity.HeadRefereeName,
+            Schedule = entity.Schedule,
+            TimeControl = entity.TimeControl,
+            ParticipantsCount = entity.ParticipantsCount
         };
+
+        // Extract unique players from matches to populate the "Players" virtual collection
+        if (response.Matches != null)
+        {
+            var playersMap = new Dictionary<long, PlayerDto?>();
+            foreach (var match in response.Matches)
+            {
+                if (match.Player1 != null && !playersMap.ContainsKey(match.Player1Id))
+                    playersMap[match.Player1Id] = match.Player1;
+                if (match.Player2 != null && !playersMap.ContainsKey(match.Player2Id))
+                    playersMap[match.Player2Id] = match.Player2;
+            }
+            response.Players = playersMap.Values.Where(p => p != null).Select(p => p!).ToList();
+        }
+
+        return response;
     }
 }

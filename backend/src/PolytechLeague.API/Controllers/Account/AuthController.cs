@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.RateLimiting;
 namespace PolytechLeague.API.Controllers.Account;
 
 [ApiController]
+[Route("api")]
 public class AuthController(IAuthService authService) : Controller
 {
     [EnableRateLimiting("fixed")]

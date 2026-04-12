@@ -7,7 +7,7 @@ using PolytechLeague.Infrastructure.Redis;
 namespace PolytechLeague.API.Controllers.Chess;
 
 [ApiController]
-[Route("chess-games")]
+[Route("api/chess-games")]
 public class ChessGamesController(IChessGameService chessGameService, IRedisService redisService) : Controller
 {
     [Authorize(Policy = "Admin")]

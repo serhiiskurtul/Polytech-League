@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace PolytechLeague.API.Controllers.Chess;
 
 [ApiController]
-[Route("chess-events")]
+[Route("api/chess-events")]
 public class ChessEventsController(IChessEventService chessEventService, IRedisService redisService, IFileService fileService) : Controller
 {
     [AllowAnonymous]

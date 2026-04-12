@@ -23,6 +23,11 @@ public class CheckersEventRequest
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required CheckersVariant Variant { get; set; }
+
+    public string? Rules { get; set; }
+    public string? Prizes { get; set; }
+    public string? HeadRefereeName { get; set; }
+    public string? Schedule { get; set; }
 }
 
 public class CheckersEventResponse
@@ -48,6 +53,11 @@ public class CheckersEventResponse
 
     public required ICollection<CheckersGameDto> Games { get; set; }
     public required ICollection<CheckersEventParticipantDto> Players { get; set; }
+
+    public string? Rules { get; set; }
+    public string? Prizes { get; set; }
+    public string? HeadRefereeName { get; set; }
+    public string? Schedule { get; set; }
 }
 
 public static class CheckersEventDtoExtension
@@ -65,7 +75,11 @@ public static class CheckersEventDtoExtension
             TimeControl = checkersEventRequest.TimeControl,
             ParticipantsCount = checkersEventRequest.ParticipantsCount,
             System = checkersEventRequest.System,
-            Variant = checkersEventRequest.Variant
+            Variant = checkersEventRequest.Variant,
+            Rules = checkersEventRequest.Rules,
+            Prizes = checkersEventRequest.Prizes,
+            HeadRefereeName = checkersEventRequest.HeadRefereeName,
+            Schedule = checkersEventRequest.Schedule
         };
     }
 
@@ -86,7 +100,11 @@ public static class CheckersEventDtoExtension
             System = checkersEvent.System,
             Variant = checkersEvent.Variant,
             Games = checkersEvent.Games?.Select(g => g.ToDto()).ToList() ?? [],
-            Players = checkersEvent.Players?.Select(p => p.ToDto()).ToList() ?? []
+            Players = checkersEvent.Players?.Select(p => p.ToDto()).ToList() ?? [],
+            Rules = checkersEvent.Rules,
+            Prizes = checkersEvent.Prizes,
+            HeadRefereeName = checkersEvent.HeadRefereeName,
+            Schedule = checkersEvent.Schedule
         };
     }
 

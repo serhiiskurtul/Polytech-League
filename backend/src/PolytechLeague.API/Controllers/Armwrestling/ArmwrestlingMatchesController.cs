@@ -6,7 +6,7 @@ using PolytechLeague.Application.Services.Interfaces.Armwrestling;
 namespace PolytechLeague.API.Controllers.Armwrestling;
 
 [ApiController]
-[Route("armwrestling-matches")]
+[Route("api/armwrestling-matches")]
 public class ArmwrestlingMatchesController(IArmwrestlingMatchService matchService) : ControllerBase
 {
     [HttpGet]

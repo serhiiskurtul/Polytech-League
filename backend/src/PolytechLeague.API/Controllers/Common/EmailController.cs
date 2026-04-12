@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace PolytechLeague.API.Controllers.Common;
 
 [ApiController]
-[Route("email")]
+[Route("api/email")]
 public class EmailController(
     IEmailVerificationService emailVerificationService,
     IEmailSender emailSender,

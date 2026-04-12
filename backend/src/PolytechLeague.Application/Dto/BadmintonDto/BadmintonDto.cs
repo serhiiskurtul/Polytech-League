@@ -1,3 +1,4 @@
+using PolytechLeague.Application.Dto.GeneralDto;
 using System.Text.Json.Serialization;
 using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Entities.Badminton;
@@ -45,11 +46,11 @@ public class BadmintonMatchResponse
 {
     public long Id { get; set; }
     public long Player1Id { get; set; }
-    public BadmintonPlayerResponse? Player1 { get; set; }
+    public PlayerDto? Player1 { get; set; }
     public long Player2Id { get; set; }
-    public BadmintonPlayerResponse? Player2 { get; set; }
+    public PlayerDto? Player2 { get; set; }
     public long? WinnerId { get; set; }
-    public BadmintonPlayerResponse? Winner { get; set; }
+    public PlayerDto? Winner { get; set; }
     public string? Stage { get; set; }
     public int CourtNumber { get; set; }
     public int SetsToWin { get; set; }
@@ -62,13 +63,6 @@ public class BadmintonSetResponse
     public int SetNumber { get; set; }
     public int Player1Score { get; set; }
     public int Player2Score { get; set; }
-}
-
-public class BadmintonPlayerResponse
-{
-    public long Id { get; set; }
-    public required string FirstName { get; set; }
-    public required string LastName { get; set; }
 }
 
 public static class BadmintonDtoExtensions
@@ -110,11 +104,11 @@ public static class BadmintonDtoExtensions
         {
             Id = entity.Id,
             Player1Id = entity.Player1Id,
-            Player1 = entity.Player1?.ToResponse(),
+            Player1 = entity.Player1?.ToDto(),
             Player2Id = entity.Player2Id,
-            Player2 = entity.Player2?.ToResponse(),
+            Player2 = entity.Player2?.ToDto(),
             WinnerId = entity.WinnerId,
-            Winner = entity.Winner?.ToResponse(),
+            Winner = entity.Winner?.ToDto(),
             Stage = entity.Stage,
             CourtNumber = entity.CourtNumber,
             SetsToWin = entity.SetsToWin,
@@ -130,16 +124,6 @@ public static class BadmintonDtoExtensions
             SetNumber = entity.SetNumber,
             Player1Score = entity.Player1Score,
             Player2Score = entity.Player2Score
-        };
-    }
-
-    public static BadmintonPlayerResponse ToResponse(this BadmintonPlayer entity)
-    {
-        return new BadmintonPlayerResponse
-        {
-            Id = entity.Id,
-            FirstName = entity.FirstName,
-            LastName = entity.LastName
         };
     }
 }

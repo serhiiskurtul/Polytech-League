@@ -30,6 +30,7 @@ export interface TournamentFormData {
   venue: string;
   rules: string;
   prizes: string;
+  schedule: string;
   isPublic: boolean;
   requireApproval: boolean;
   categories: string[];
@@ -67,6 +68,7 @@ export const useTournamentForm = () => {
     venue: '',
     rules: '',
     prizes: '',
+    schedule: '',
     isPublic: true,
     requireApproval: false,
     categories: [],
@@ -150,11 +152,14 @@ export const useTournamentForm = () => {
       // Базовий об'єкт, який спільний для всіх типів івентів у бекенді
       const basePayload = {
         name: formData.name,
-        date: formData.startDate, // На бекенді поле називається Date
+        date: formData.startDate ? new Date(formData.startDate).toISOString() : new Date().toISOString(), 
         location: formData.location,
         description: formData.description,
-        refereeIds: formData.refereeIds || [],
+        refereeIds: formData.refereeIds.map(id => Number(id)) || [],
         level: formData.level,
+        rules: formData.rules,
+        prizes: formData.prizes,
+        schedule: formData.schedule,
       };
 
       let payload: any = { ...basePayload };
@@ -188,6 +193,8 @@ export const useTournamentForm = () => {
           payload.hand = formData.armHand;
           payload.weightClass = formData.armWeightClass;
           payload.category = formData.armCategory;
+          payload.timeControl = formData.timeControl;
+          payload.participantsCount = formData.participantsCount;
           break;
       }
 

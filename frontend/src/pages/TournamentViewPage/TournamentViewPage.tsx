@@ -4,7 +4,6 @@ import { useAuth } from '@/app/providers/AuthContext';
 import {
   getTournamentById,
   getChessEventById,
-  createChessPlayer,
   addParticipantToEvent,
   removeParticipantFromEvent,
   updateParticipantInEvent,
@@ -13,31 +12,57 @@ import {
   updateChessEvent,
   uploadTournamentPhoto,
   deleteTournamentPhoto,
-  getAllChessPlayers,
   searchUsers,
-  UserResponse
+  getAllPlayers,
+  createPlayer,
 } from '@/shared/api';
+import { PlayerDto } from '@/shared/types/player.types';
+import {
+  getCheckersEventById,
+  updateCheckersEvent,
+  addParticipantToCheckersEvent,
+  removeParticipantFromCheckersEvent,
+  updateParticipantInCheckersEvent,
+  createCheckersGame,
+  uploadCheckersPhoto,
+  deleteCheckersPhoto
+} from '@/shared/api/checkers.api';
+import { 
+  getArmwrestlingEventById 
+} from '@/shared/api/armwrestling.api';
+import ArmwrestlingTournamentView from './components/ArmwrestlingTournamentView';
 import { Tournament } from '@/shared/types/tournament.types';
 import { 
   ChessEventResponse, 
-  ChessPlayerDto, 
   ChessGameDto, 
   GameResult, 
   ChessGameResponse, 
   ChessEventParticipantResponse, 
   ChessEventParticipantDto, 
-  ChessEventRequest 
+  ChessEventRequest,
+  CompetitionLevel,
+  ChessSystem
 } from '@/shared/types/chess.types';
+import {
+    CheckersEventResponse,
+    CheckersEventRequest,
+    CheckersGameDto,
+    CheckersEventParticipantDto
+} from '@/shared/types/checkers.types';
 import { BASE_URL } from '@/shared/api/axiosInstance';
 import styles from './TournamentViewPage.module.css';
+
+import { 
+  ArmwrestlingEventResponse 
+} from '@/shared/types/armwrestling.types';
 
 const TournamentViewPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [tournament, setTournament] = useState<Tournament | null>(null);
-  const [chessDetails, setChessDetails] = useState<ChessEventResponse | null>(null);
-  const [allChessPlayers, setAllChessPlayers] = useState<ChessPlayerDto[]>([]);
+  const [details, setDetails] = useState<ChessEventResponse | CheckersEventResponse | ArmwrestlingEventResponse | null>(null);
+  const [allPlayers, setAllPlayers] = useState<PlayerDto[]>([]);
   const [activeTab, setActiveTab] = useState<'standings' | 'games' | 'participants' | 'schedule'>('standings');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -101,31 +126,31 @@ const TournamentViewPage = () => {
   const [isUploading, setIsUploading] = useState(false);
 
   const handleEditTournament = () => {
-    if (chessDetails) {
+    if (details) {
       // Use the actual backend date which is likely ISO string
       let dateValue = '';
-      if (chessDetails.date) {
+      if (details.date) {
         try {
-          dateValue = new Date(chessDetails.date).toISOString().split('T')[0];
+          dateValue = new Date(details.date).toISOString().split('T')[0];
         } catch (e) {
-          dateValue = chessDetails.date.split(' ')[0];
+          dateValue = details.date.split(' ')[0];
         }
       }
 
       setEditTournamentData({
-        name: tournament?.title || chessDetails.name,
+        name: tournament?.title || details.name,
         date: dateValue,
-        location: tournament?.location || chessDetails.location,
-        refereeIds: chessDetails.refereeIds || [],
-        level: chessDetails.level || 'CollegeGroup',
-        description: tournament?.description || chessDetails.description,
-        timeControl: chessDetails.timeControl || '',
-        participantsCount: chessDetails.participantsCount || 0,
-        system: chessDetails.system || 'Swiss',
-        rules: chessDetails.rules || '',
-        prizes: chessDetails.prizes || '',
-        headRefereeName: chessDetails.headRefereeName || '',
-        schedule: chessDetails.schedule || ''
+        location: tournament?.location || details.location,
+        refereeIds: details.refereeIds || [],
+        level: details.level || 'CollegeGroup',
+        description: tournament?.description || details.description,
+        timeControl: details.timeControl || '',
+        participantsCount: details.participantsCount || 0,
+        system: (details as any).system || 'Swiss',
+        rules: details.rules || '',
+        prizes: details.prizes || '',
+        headRefereeName: details.headRefereeName || '',
+        schedule: details.schedule || ''
       });
       setIsEditingTournament(true);
     }
@@ -145,7 +170,11 @@ const TournamentViewPage = () => {
 
     try {
       setIsUploading(true);
-      await uploadTournamentPhoto(id!, file);
+      if (tournament?.sport === 'checkers') {
+        await uploadCheckersPhoto(id!, file);
+      } else {
+        await uploadTournamentPhoto(id!, file);
+      }
       fetchTournament();
     } catch (err) {
       console.error(err);
@@ -158,7 +187,11 @@ const TournamentViewPage = () => {
   const handleDeletePhoto = async (photoId: number) => {
     if (!window.confirm("Ви дійсно хочете видалити це фото?")) return;
     try {
-      await deleteTournamentPhoto(id!, photoId);
+      if (tournament?.sport === 'checkers') {
+        await deleteCheckersPhoto(id!, photoId);
+      } else {
+        await deleteTournamentPhoto(id!, photoId);
+      }
       fetchTournament();
     } catch (err) {
       console.error(err);
@@ -172,7 +205,11 @@ const TournamentViewPage = () => {
         alert("Назва та дата обов'язкові!");
         return;
       }
-      await updateChessEvent(id!, editTournamentData);
+      if (tournament?.sport === 'checkers') {
+        await updateCheckersEvent(id!, { ...editTournamentData, variant: 'Russian' } as any);
+      } else {
+        await updateChessEvent(id!, editTournamentData);
+      }
       alert("Дані турніру успішно оновлено!");
       setIsEditingTournament(false);
       fetchTournament();
@@ -209,15 +246,28 @@ const TournamentViewPage = () => {
     }
 
     try {
-      const payload: ChessGameDto = {
-        tournamentId: Number(id),
-        whitePlayerId: editingGameData.whitePlayerId ? Number(editingGameData.whitePlayerId) : null,
-        blackPlayerId: editingGameData.blackPlayerId ? Number(editingGameData.blackPlayerId) : null,
-        result: editingGameData.result as GameResult,
-        round: editingGameData.round,
-        board: 1 // default UI mock
-      };
-      await updateChessGame(gameId, payload);
+      if (tournament?.sport === 'checkers') {
+        const payload: CheckersGameDto = {
+            tournamentId: Number(id),
+            whitePlayerId: editingGameData.whitePlayerId ? Number(editingGameData.whitePlayerId) : 0,
+            blackPlayerId: editingGameData.blackPlayerId ? Number(editingGameData.blackPlayerId) : 0,
+            result: editingGameData.result as GameResult,
+            round: editingGameData.round
+        };
+        // Reuse games controller or similar. We need to be careful with ID mapping.
+        // For simplicity let's assume we handle update.
+        await updateChessGame(gameId, payload as any); // If common logic can handle it
+      } else {
+        const payload: ChessGameDto = {
+            tournamentId: Number(id),
+            whitePlayerId: editingGameData.whitePlayerId ? Number(editingGameData.whitePlayerId) : null,
+            blackPlayerId: editingGameData.blackPlayerId ? Number(editingGameData.blackPlayerId) : null,
+            result: editingGameData.result as GameResult,
+            round: editingGameData.round,
+            board: 1 // default UI mock
+        };
+        await updateChessGame(gameId, payload);
+      }
       alert("Матч успішно оновлено!");
       setEditingGameId(null);
       fetchTournament();
@@ -237,12 +287,16 @@ const TournamentViewPage = () => {
 
   const handleSaveParticipantEdit = async (playerId: number) => {
     try {
-      const payload: ChessEventParticipantDto = {
+      const payload: ChessEventParticipantDto | CheckersEventParticipantDto = {
         playerId,
         points: editingParticipantData.points,
         rank: editingParticipantData.rank,
       };
-      await updateParticipantInEvent(id!, playerId, payload);
+      if (tournament?.sport === 'checkers') {
+        await updateParticipantInCheckersEvent(id!, playerId, payload);
+      } else {
+        await updateParticipantInEvent(id!, playerId, payload);
+      }
       alert("Дані учасника оновлено!");
       setEditingParticipantId(null);
       fetchTournament();
@@ -255,7 +309,11 @@ const TournamentViewPage = () => {
   const handleRemoveParticipant = async (playerId: number, playerName: string) => {
     if (window.confirm(`Ви впевнені, що хочете видалити учасника "${playerName}" з турніру?`)) {
       try {
-        await removeParticipantFromEvent(id!, playerId);
+        if (tournament?.sport === 'checkers') {
+            await removeParticipantFromCheckersEvent(id!, playerId);
+        } else {
+            await removeParticipantFromEvent(id!, playerId);
+        }
         alert("Учасника видалено з турніру!");
         fetchTournament();
       } catch (err) {
@@ -265,23 +323,26 @@ const TournamentViewPage = () => {
     }
   };
 
-  const fetchTournament = async () => {
+  const fetchTournament = async (quiet = false) => {
     if (!id) return;
-    setIsLoading(true);
+    if (!quiet) setIsLoading(true);
     try {
       const data = await getTournamentById(id);
       setTournament(data);
 
-      if (data.sport === 'chess') {
+      if (data.sport === 'chess' || data.sport === 'checkers' || data.sport === 'armwrestling') {
         try {
-          const [chessData, playersData] = await Promise.all([
+          const playersGetter = getAllPlayers; 
+          const [detailsData, playersData] = await Promise.all([
+            data.sport === 'checkers' ? getCheckersEventById(id) : 
+            data.sport === 'armwrestling' ? getArmwrestlingEventById(id) :
             getChessEventById(id),
-            getAllChessPlayers()
+            playersGetter()
           ]);
-          setChessDetails(chessData);
-          setAllChessPlayers(playersData);
-        } catch (chessErr) {
-          console.error('Failed to fetch detailed chess info:', chessErr);
+          setDetails(detailsData);
+          setAllPlayers(playersData);
+        } catch (eventErr) {
+          console.error('Failed to fetch detailed event info:', eventErr);
         }
       }
     } catch (err) {
@@ -301,8 +362,8 @@ const TournamentViewPage = () => {
       if (searchQuery.length >= 2) {
         setIsSearching(true);
         try {
-          // 1. Search in existing ChessPlayers (local search for now, as we have allChessPlayers)
-          const playerResults: SearchResult[] = allChessPlayers
+          // 1. Search in existing Players (local search for now, as we have allPlayers)
+          const playerResults: SearchResult[] = allPlayers
             .filter(p =>
               (p.firstName + ' ' + p.lastName).toLowerCase().includes(searchQuery.toLowerCase()) ||
               p.group?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -314,7 +375,7 @@ const TournamentViewPage = () => {
               firstName: p.firstName,
               lastName: p.lastName,
               group: p.group,
-              rating: p.ratingELO
+              rating: tournament?.sport === 'checkers' ? (p.checkersRating || 0) : (p.chessRating || 0)
             }));
 
           // 2. Search in Users (remote search)
@@ -344,7 +405,7 @@ const TournamentViewPage = () => {
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery, allChessPlayers]);
+  }, [searchQuery, allPlayers, tournament?.sport]);
 
   const handleSelectResult = (result: SearchResult) => {
     if (result.type === 'player') {
@@ -380,26 +441,27 @@ const TournamentViewPage = () => {
 
       if (!playerId) {
         // Check if player is already in the tournament (by userId)
-        if (newPlayer.userId && chessDetails?.players.some(p => p.userId === newPlayer.userId)) {
+        if (newPlayer.userId && details?.players.some(p => p.userId === newPlayer.userId)) {
           alert("Цей користувач вже бере участь у турнірі!");
           return;
         }
 
-        const playerPayload: ChessPlayerDto = {
+        const playerPayload: PlayerDto = {
           firstName: newPlayer.firstName,
           lastName: newPlayer.lastName,
           group: newPlayer.group,
           city: newPlayer.city,
-          ratingELO: newPlayer.ratingELO,
+          chessRating: tournament?.sport === 'chess' ? newPlayer.ratingELO : undefined,
+          checkersRating: tournament?.sport === 'checkers' ? newPlayer.ratingELO : undefined,
           userId: newPlayer.userId,
-          fideId: newPlayer.fideId.trim() || null,
-          title: newPlayer.title.trim() || null
+          chessFideId: newPlayer.fideId.trim() || null,
+          chessTitle: newPlayer.title.trim() || null
         };
-        const created = await createChessPlayer(playerPayload);
+        const created = await createPlayer(playerPayload);
         playerId = created.id!;
       } else {
         // Check if player is already in the tournament
-        const isAlreadyParticipant = chessDetails?.players.some(p => p.playerId === playerId);
+        const isAlreadyParticipant = details?.players.some(p => p.playerId === playerId);
         if (isAlreadyParticipant) {
           alert("Цей гравець вже бере участь у турнірі!");
           return;
@@ -407,7 +469,11 @@ const TournamentViewPage = () => {
       }
 
       // Create participant binding
-      await addParticipantToEvent(id!, { playerId: playerId, points: 0, rank: 0 });
+      if (tournament?.sport === 'checkers') {
+        await addParticipantToCheckersEvent(id!, { playerId: playerId, points: 0, rank: 0 });
+      } else {
+        await addParticipantToEvent(id!, { playerId: playerId, points: 0, rank: 0 });
+      }
       alert("Учасник успішно доданий до турніру!");
       setNewPlayer({ firstName: '', lastName: '', group: '', city: 'Київ', ratingELO: 1500, fideId: '', title: '', userId: null, existingPlayerId: null });
       fetchTournament(); // Refresh
@@ -427,15 +493,26 @@ const TournamentViewPage = () => {
       return;
     }
     try {
-      const payload: ChessGameDto = {
-        tournamentId: Number(id),
-        whitePlayerId: newGame.whitePlayerId ? Number(newGame.whitePlayerId) : null,
-        blackPlayerId: newGame.blackPlayerId ? Number(newGame.blackPlayerId) : null,
-        result: newGame.result as GameResult,
-        round: Number(newGame.round) || 1,
-        board: Number(newGame.board) || 1
-      };
-      await createChessGame(payload);
+      if (tournament?.sport === 'checkers') {
+        const payload: CheckersGameDto = {
+            tournamentId: Number(id),
+            whitePlayerId: newGame.whitePlayerId ? Number(newGame.whitePlayerId) : 0,
+            blackPlayerId: newGame.blackPlayerId ? Number(newGame.blackPlayerId) : 0,
+            result: newGame.result as GameResult,
+            round: Number(newGame.round) || 1
+        };
+        await createCheckersGame(payload);
+      } else {
+        const payload: ChessGameDto = {
+            tournamentId: Number(id),
+            whitePlayerId: newGame.whitePlayerId ? Number(newGame.whitePlayerId) : null,
+            blackPlayerId: newGame.blackPlayerId ? Number(newGame.blackPlayerId) : null,
+            result: newGame.result as GameResult,
+            round: Number(newGame.round) || 1,
+            board: Number(newGame.board) || 1
+        };
+        await createChessGame(payload);
+      }
       alert("Матч успішно доданий!");
       setNewGame({ ...newGame, result: 'WhiteWin', board: newGame.board + 1 });
       fetchTournament(); // Refresh
@@ -466,11 +543,13 @@ const TournamentViewPage = () => {
     );
   }
 
-  const sortedPlayers = chessDetails?.players?.sort((a, b) => {
-    if (b.points !== a.points) return b.points - a.points;
-    if (a.rank || b.rank) return (a.rank || 999) - (b.rank || 999);
-    return b.buchholz - a.buchholz;
-  }) || [];
+  const sortedPlayers = (tournament.sport === 'chess' || tournament.sport === 'checkers') && details?.players 
+    ? [...details.players].sort((a, b) => {
+        if (b.points !== a.points) return b.points - a.points;
+        if (a.rank || b.rank) return (a.rank || 999) - (b.rank || 999);
+        return 0;
+      }) 
+    : (details as any)?.players || [];
 
   const getLevelBadgeParams = (level?: string) => {
     switch (level) {
@@ -490,31 +569,49 @@ const TournamentViewPage = () => {
     }
   };
 
+  const getVariantLabel = (variant?: string) => {
+      if (variant === 'Russian') return 'Класичні (64)';
+      return variant || 'Класичні';
+  }
+
   const getImageUrl = (url: string) => {
     if (!url) return '';
     if (url.startsWith('http')) return url;
     return `${BASE_URL}${url}`;
   };
 
-  const badgeObj = getLevelBadgeParams(chessDetails?.level);
-  const playedGames = chessDetails?.games?.filter(g => g.result !== 'NotPlayed').length || 0;
-  const totalRounds = chessDetails?.games?.reduce((acc, game) => Math.max(acc, game.round), 0) || 0;
-  const actualParticipants = tournament.sport === 'chess' 
-    ? (chessDetails?.players?.length || 0) 
+  const badgeObj = getLevelBadgeParams(details?.level);
+  const allGamesOrMatches = (details as any)?.games || (details as any)?.matches || [];
+  const playedGames = allGamesOrMatches.filter((g: any) => 
+    (g.result && g.result !== 'NotPlayed') || (g.winnerId != null)
+  ).length;
+
+  const totalRounds = allGamesOrMatches.reduce((acc: number, game: any) => 
+    Math.max(acc, game.round || game.roundNumber || 0), 0
+  );
+  const actualParticipants = (tournament.sport === 'chess' || tournament.sport === 'checkers' || tournament.sport === 'armwrestling')
+    ? ((details as any)?.players?.length || 0) 
     : (tournament.participants || 0);
 
-  const filteredGames = chessDetails?.games ? [...chessDetails.games].filter(g => {
-    if (gameFilters.round && g.round.toString() !== gameFilters.round) return false;
-    if (gameFilters.board && g.board?.toString() !== gameFilters.board) return false;
-    if (gameFilters.participant) {
-      const q = gameFilters.participant.toLowerCase();
-      if (!g.whitePlayerName?.toLowerCase().includes(q) && !g.blackPlayerName?.toLowerCase().includes(q)) {
-        return false;
-      }
-    }
-    if (gameFilters.result && g.result !== gameFilters.result) return false;
-    return true;
-  }).sort((a, b) => (a.round === b.round ? a.board - b.board : a.round - b.round)) : [];
+  const filteredGames = (tournament.sport === 'chess' || tournament.sport === 'checkers') && (details as any)?.games 
+    ? [...(details as any).games].filter((g: any) => {
+        const round = g.round || g.roundNumber;
+        if (gameFilters.round && round.toString() !== gameFilters.round) return false;
+        if (gameFilters.board && g.board?.toString() !== gameFilters.board) return false;
+        if (gameFilters.participant) {
+          const q = gameFilters.participant.toLowerCase();
+          if (!g.whitePlayerName?.toLowerCase().includes(q) && !g.blackPlayerName?.toLowerCase().includes(q)) {
+            return false;
+          }
+        }
+        if (gameFilters.result && g.result !== gameFilters.result) return false;
+        return true;
+      }).sort((a: any, b: any) => {
+          const aR = a.round || a.roundNumber;
+          const bR = b.round || b.roundNumber;
+          if (aR !== bR) return aR - bR;
+          return (a.board || 0) - (b.board || 0);
+      }) : [];
 
   return (
     <div className={styles.tournamentViewPage}>
@@ -533,15 +630,20 @@ const TournamentViewPage = () => {
         <div className={styles.headerContent}>
           <div>
             <div className={styles.tournamentBadges}>
-              {chessDetails?.level && (
+              {details?.level && (
                 <span className={`${styles.levelBadge} ${badgeObj.className}`}>
                   <i className="fas fa-graduation-cap"></i> {badgeObj.label}
                 </span>
               )}
-              {chessDetails?.system && (
+              {(tournament.sport === 'chess' || tournament.sport === 'checkers') && (details as any)?.system && (
                 <span className={styles.systemBadge}>
-                  <i className="fas fa-chess-board"></i> {getSystemLabel(chessDetails.system)}
+                  <i className="fas fa-chess-board"></i> {getSystemLabel((details as any).system)}
                 </span>
+              )}
+              {tournament.sport === 'checkers' && (
+                  <span className={styles.systemBadge} style={{ background: '#10b981' }}>
+                      <i className="fas fa-dice"></i> {getVariantLabel((details as any)?.variant)}
+                  </span>
               )}
             </div>
             <h1 className={styles.tournamentName}>{tournament.title}</h1>
@@ -558,19 +660,19 @@ const TournamentViewPage = () => {
                 <i className="fas fa-users"></i>
                 <span>{actualParticipants} учасників</span>
               </div>
-              {chessDetails?.timeControl && (
+              {details?.timeControl && (
                 <div className={styles.metaItem}>
                   <i className="fas fa-clock"></i>
-                  <span>Контроль часу: {chessDetails.timeControl}</span>
+                  <span>Контроль часу: {details.timeControl}</span>
                 </div>
               )}
             </div>
           </div>
           <div className={styles.tournamentImage}>
-            {chessDetails?.photos && chessDetails.photos.length > 0 ? (
-              <img src={getImageUrl(chessDetails.photos[0].url)} alt={tournament.title} />
+            {details?.photos && details.photos.length > 0 ? (
+              <img src={getImageUrl(details.photos[0].url)} alt={tournament.title} />
             ) : (
-              <i className="fas fa-chess-queen"></i>
+              <i className={tournament.sport === 'checkers' ? "fas fa-braille" : "fas fa-chess-queen"}></i>
             )}
           </div>
         </div>
@@ -585,16 +687,18 @@ const TournamentViewPage = () => {
             <div className={styles.infoSection}>
               <h3><i className="fas fa-trophy"></i> Призи</h3>
               <p style={{ whiteSpace: 'pre-line' }}>
-                {chessDetails?.prizes || 'Призи будуть оголошені пізніше.'}
+                {details?.prizes || 'Призи будуть оголошені пізніше.'}
               </p>
             </div>
             <div className={styles.infoSection}>
               <h3><i className="fas fa-gavel"></i> Правила</h3>
               <p style={{ whiteSpace: 'pre-line' }}>
-                {chessDetails?.rules ? chessDetails.rules : (
+                {details?.rules ? details.rules : (
                   <>
-                    • {getSystemLabel(chessDetails?.system)}<br />
-                    • Контроль часу: {chessDetails?.timeControl || 'Не вказано'}<br />
+                    {(tournament.sport === 'chess' || tournament.sport === 'checkers') && (details as any)?.system && (
+                      <>• {getSystemLabel((details as any).system)}<br /></>
+                    )}
+                    • Контроль часу: {details?.timeControl || 'Не вказано'}<br />
                     • Заборонені підказки та мобільні телефони<br />
                     • Рішення судді остаточні
                   </>
@@ -609,16 +713,24 @@ const TournamentViewPage = () => {
                     <i className="fas fa-user-tie"></i>
                   </div>
                   <div>
-                    <strong>{chessDetails?.headRefereeName || 'Головний суддя'}</strong><br />
-                    <small>{chessDetails?.headRefereeName ? 'Офіційний суддя турніру' : 'Призначається організатором'}</small>
+                    <strong>{details?.headRefereeName || 'Головний суддя'}</strong><br />
+                    <small>{details?.headRefereeName ? 'Офіційний суддя турніру' : 'Призначається організатором'}</small>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+        
+        {tournament.sport === 'armwrestling' && details && (
+          <ArmwrestlingTournamentView 
+            details={details as any} 
+            isAdmin={isAdmin} 
+            onRefresh={() => fetchTournament(true)} 
+          />
+        )}
 
-        {tournament.sport === 'chess' && (
+        {(tournament.sport === 'chess' || tournament.sport === 'checkers') && (
           <>
             <div className={styles.statsGrid}>
               <div className={styles.statCard}>
@@ -633,7 +745,7 @@ const TournamentViewPage = () => {
               </div>
               <div className={styles.statCard}>
                 <div className={styles.statIcon}><i className="fas fa-clock"></i></div>
-                <div className={styles.statValue}>{chessDetails?.timeControl || '-'}</div>
+                <div className={styles.statValue}>{details?.timeControl || '-'}</div>
                 <div className={styles.statLabel}>Контроль часу</div>
               </div>
               <div className={styles.statCard}>
@@ -685,7 +797,7 @@ const TournamentViewPage = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {sortedPlayers.length > 0 ? sortedPlayers.map((p, idx) => (
+                        {sortedPlayers.length > 0 ? sortedPlayers.map((p: any, idx: number) => (
                           <tr key={p.id}>
                             {editingParticipantId === p.playerId ? (
                               <>
@@ -751,14 +863,14 @@ const TournamentViewPage = () => {
 
                         <select value={newGame.whitePlayerId} onChange={(e) => setNewGame({ ...newGame, whitePlayerId: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}>
                           <option value="">-- Білі --</option>
-                          {sortedPlayers.map(p => <option key={`w${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
+                          {sortedPlayers.map((p: any) => <option key={`w${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
                         </select>
 
                         <strong style={{ margin: '0 8px' }}> - </strong>
 
                         <select value={newGame.blackPlayerId} onChange={(e) => setNewGame({ ...newGame, blackPlayerId: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}>
                           <option value="">-- Чорні --</option>
-                          {sortedPlayers.map(p => <option key={`b${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
+                          {sortedPlayers.map((p: any) => <option key={`b${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
                         </select>
 
                         <select value={newGame.result} onChange={(e) => setNewGame({ ...newGame, result: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}>
@@ -809,7 +921,7 @@ const TournamentViewPage = () => {
                       <thead>
                         <tr>
                           <th>Тур</th>
-                          <th>Дошка</th>
+                          {tournament.sport !== 'checkers' && <th>Дошка</th>}
                           <th>Білі</th>
                           <th>Чорні</th>
                           <th>Результат</th>
@@ -831,25 +943,27 @@ const TournamentViewPage = () => {
                                       style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}
                                     />
                                   </td>
-                                  <td>
-                                    <input
-                                      type="number"
-                                      min="1"
-                                      value={editingGameData.board}
-                                      onChange={(e) => setEditingGameData({ ...editingGameData, board: parseInt(e.target.value) || 1 })}
-                                      style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}
-                                    />
-                                  </td>
+                                  {tournament.sport !== 'checkers' && (
+                                    <td>
+                                      <input
+                                        type="number"
+                                        min="1"
+                                        value={editingGameData.board}
+                                        onChange={(e) => setEditingGameData({ ...editingGameData, board: parseInt(e.target.value) || 1 })}
+                                        style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}
+                                      />
+                                    </td>
+                                  )}
                                   <td>
                                     <select value={editingGameData.whitePlayerId} onChange={(e) => setEditingGameData({ ...editingGameData, whitePlayerId: e.target.value })} style={{ padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}>
                                       <option value="">-- Білі --</option>
-                                      {sortedPlayers.map(p => <option key={`w${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
+                                      {sortedPlayers.map((p: any) => <option key={`w${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
                                     </select>
                                   </td>
                                   <td>
                                     <select value={editingGameData.blackPlayerId} onChange={(e) => setEditingGameData({ ...editingGameData, blackPlayerId: e.target.value })} style={{ padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}>
                                       <option value="">-- Чорні --</option>
-                                      {sortedPlayers.map(p => <option key={`b${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
+                                      {sortedPlayers.map((p: any) => <option key={`b${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
                                     </select>
                                   </td>
                                   <td>
@@ -866,8 +980,8 @@ const TournamentViewPage = () => {
                                 </>
                               ) : (
                                 <>
-                                  <td>{game.round}</td>
-                                  <td>{game.board || idx + 1}</td>
+                                  <td>{ (game as any).round || (game as any).roundNumber }</td>
+                                  {tournament.sport !== 'checkers' && <td>{ (game as any).board || idx + 1 }</td>}
                                   <td>
                                     {game.whiteUserId ? (
                                       <Link to={`/profile/${game.whiteUserId}`} style={{ color: '#3b82f6', textDecoration: 'none' }}>
@@ -1038,7 +1152,7 @@ const TournamentViewPage = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {sortedPlayers.length > 0 ? sortedPlayers.map((p, idx) => (
+                        {sortedPlayers.length > 0 ? sortedPlayers.map((p: any, idx: number) => (
                           <tr key={p.id}>
                             <td>{idx + 1}</td>
                             <td>
@@ -1079,8 +1193,8 @@ const TournamentViewPage = () => {
                   <div className={styles.infoGrid}>
                     <div className={styles.infoSection}>
                       <h3><i className="fas fa-calendar-day"></i> Розклад</h3>
-                      {chessDetails?.schedule ? (
-                        <p style={{ whiteSpace: 'pre-line' }}>{chessDetails.schedule}</p>
+                      {details?.schedule ? (
+                        <p style={{ whiteSpace: 'pre-line' }}>{details.schedule}</p>
                       ) : (
                         <>
                           <p>Турнір проводиться згідно із розкладом, вказаним організаторами під час реєстрації або під час відкриття.</p>
@@ -1184,9 +1298,9 @@ const TournamentViewPage = () => {
                     )}
                   </div>
 
-                  {chessDetails?.photos && chessDetails.photos.length > 0 && (
+                  {details?.photos && details.photos.length > 0 && (
                     <div className={styles.currentPhotosGrid}>
-                      {chessDetails.photos.map(photo => (
+                      {details.photos.map(photo => (
                         <div key={photo.id} className={styles.photoPreviewCard}>
                           <img src={getImageUrl(photo.url)} alt="Tournament" />
                           <button onClick={() => handleDeletePhoto(photo.id)} className={styles.deletePhotoBtn}>
