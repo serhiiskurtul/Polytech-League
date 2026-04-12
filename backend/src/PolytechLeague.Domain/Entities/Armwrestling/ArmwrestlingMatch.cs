@@ -18,4 +18,5 @@ public class ArmwrestlingMatch
     public Player? Winner { get; set; }
     
     public string? Stage { get; set; } // Round of 16, Quarterfinal, etc.
+    public int TableNumber { get; set; }
 }

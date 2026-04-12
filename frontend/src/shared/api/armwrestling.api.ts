@@ -31,6 +31,13 @@ export const updateArmwrestlingMatch = async (matchId: number, data: Partial<Arm
 };
 
 /**
+ * Update an armwrestling event (e.g., set winners, rules, prizes)
+ */
+export const updateArmwrestlingEvent = async (id: string | number, data: any): Promise<void> => {
+  await api.put(`/armwrestling-events/${id}`, data);
+};
+
+/**
  * Create a new match for an armwrestling event
  */
 export const createArmwrestlingMatch = async (data: Partial<ArmwrestlingMatchResponse>): Promise<ArmwrestlingMatchResponse> => {

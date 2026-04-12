@@ -34,6 +34,10 @@ public class ArmwrestlingEventRequest
     public string? Schedule { get; set; }
     public string? TimeControl { get; set; }
     public int ParticipantsCount { get; set; }
+
+    public long? FirstPlaceId { get; set; }
+    public long? SecondPlaceId { get; set; }
+    public long? ThirdPlaceId { get; set; }
 }
 
 public class ArmwrestlingEventResponse
@@ -67,6 +71,10 @@ public class ArmwrestlingEventResponse
     public string? TimeControl { get; set; }
     public int ParticipantsCount { get; set; }
 
+    public PlayerDto? FirstPlace { get; set; }
+    public PlayerDto? SecondPlace { get; set; }
+    public PlayerDto? ThirdPlace { get; set; }
+
     public ICollection<PlayerDto> Players { get; set; } = new List<PlayerDto>();
 }
 
@@ -90,7 +98,10 @@ public static class ArmwrestlingEventDtoExtensions
             HeadRefereeName = request.HeadRefereeName,
             Schedule = request.Schedule,
             TimeControl = request.TimeControl,
-            ParticipantsCount = request.ParticipantsCount
+            ParticipantsCount = request.ParticipantsCount,
+            FirstPlaceId = request.FirstPlaceId,
+            SecondPlaceId = request.SecondPlaceId,
+            ThirdPlaceId = request.ThirdPlaceId
         };
     }
 
@@ -115,7 +126,10 @@ public static class ArmwrestlingEventDtoExtensions
             HeadRefereeName = entity.HeadRefereeName,
             Schedule = entity.Schedule,
             TimeControl = entity.TimeControl,
-            ParticipantsCount = entity.ParticipantsCount
+            ParticipantsCount = entity.ParticipantsCount,
+            FirstPlace = entity.FirstPlace?.ToDto(),
+            SecondPlace = entity.SecondPlace?.ToDto(),
+            ThirdPlace = entity.ThirdPlace?.ToDto()
         };
 
         // Extract unique players from matches to populate the "Players" virtual collection

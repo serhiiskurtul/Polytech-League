@@ -30,6 +30,9 @@ public class CheckersEventService(
         oldEntity.HeadRefereeName = newEntity.HeadRefereeName;
         oldEntity.Schedule = newEntity.Schedule;
         oldEntity.RefereeIds = newEntity.RefereeIds;
+        oldEntity.FirstPlaceId = newEntity.FirstPlaceId;
+        oldEntity.SecondPlaceId = newEntity.SecondPlaceId;
+        oldEntity.ThirdPlaceId = newEntity.ThirdPlaceId;
     }
 
     public override async Task<CheckersEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)
@@ -44,6 +47,9 @@ public class CheckersEventService(
                 .ThenInclude(g => g.BlackPlayer!)
                     .ThenInclude(p => p.Player)
             .Include(e => e.Photos)
+            .Include(e => e.FirstPlace)
+            .Include(e => e.SecondPlace)
+            .Include(e => e.ThirdPlace)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 
         if (entity is null)

@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Entities.Chess;
+using PolytechLeague.Application.Dto.GeneralDto;
 
 namespace PolytechLeague.Application.Dto.ChessDto;
 
@@ -25,6 +26,10 @@ public class ChessEventRequest
     public string? Prizes { get; set; }
     public string? HeadRefereeName { get; set; }
     public string? Schedule { get; set; }
+
+    public long? FirstPlaceId { get; set; }
+    public long? SecondPlaceId { get; set; }
+    public long? ThirdPlaceId { get; set; }
 }
 
 public class ChessEventResponse
@@ -51,6 +56,10 @@ public class ChessEventResponse
     public string? Prizes { get; set; }
     public string? HeadRefereeName { get; set; }
     public string? Schedule { get; set; }
+
+    public PlayerDto? FirstPlace { get; set; }
+    public PlayerDto? SecondPlace { get; set; }
+    public PlayerDto? ThirdPlace { get; set; }
 }
 
 public static class ChessEventDtoExtension
@@ -71,7 +80,10 @@ public static class ChessEventDtoExtension
             Rules = chessEventRequest.Rules,
             Prizes = chessEventRequest.Prizes,
             HeadRefereeName = chessEventRequest.HeadRefereeName,
-            Schedule = chessEventRequest.Schedule
+            Schedule = chessEventRequest.Schedule,
+            FirstPlaceId = chessEventRequest.FirstPlaceId,
+            SecondPlaceId = chessEventRequest.SecondPlaceId,
+            ThirdPlaceId = chessEventRequest.ThirdPlaceId
         };
     }
 
@@ -95,8 +107,10 @@ public static class ChessEventDtoExtension
             Rules = chessEvent.Rules,
             Prizes = chessEvent.Prizes,
             HeadRefereeName = chessEvent.HeadRefereeName,
-            Schedule = chessEvent.Schedule
+            Schedule = chessEvent.Schedule,
+            FirstPlace = chessEvent.FirstPlace?.ToDto(),
+            SecondPlace = chessEvent.SecondPlace?.ToDto(),
+            ThirdPlace = chessEvent.ThirdPlace?.ToDto()
         };
     }
-
 }

@@ -28,6 +28,9 @@ public class ChessEventService(
         oldEntity.HeadRefereeName = newEntity.HeadRefereeName;
         oldEntity.RefereeIds = newEntity.RefereeIds;
         oldEntity.Schedule = newEntity.Schedule;
+        oldEntity.FirstPlaceId = newEntity.FirstPlaceId;
+        oldEntity.SecondPlaceId = newEntity.SecondPlaceId;
+        oldEntity.ThirdPlaceId = newEntity.ThirdPlaceId;
     }
 
     public override async Task<ChessEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)
@@ -40,6 +43,9 @@ public class ChessEventService(
             .Include(e => e.Games!)
                 .ThenInclude(g => g.BlackPlayer)
             .Include(e => e.Photos)
+            .Include(e => e.FirstPlace)
+            .Include(e => e.SecondPlace)
+            .Include(e => e.ThirdPlace)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 
         if (entity is null)

@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Entities.Checkers;
+using PolytechLeague.Application.Dto.GeneralDto;
 
 namespace PolytechLeague.Application.Dto.CheckersDto;
 
@@ -28,6 +29,10 @@ public class CheckersEventRequest
     public string? Prizes { get; set; }
     public string? HeadRefereeName { get; set; }
     public string? Schedule { get; set; }
+
+    public long? FirstPlaceId { get; set; }
+    public long? SecondPlaceId { get; set; }
+    public long? ThirdPlaceId { get; set; }
 }
 
 public class CheckersEventResponse
@@ -58,6 +63,10 @@ public class CheckersEventResponse
     public string? Prizes { get; set; }
     public string? HeadRefereeName { get; set; }
     public string? Schedule { get; set; }
+
+    public PlayerDto? FirstPlace { get; set; }
+    public PlayerDto? SecondPlace { get; set; }
+    public PlayerDto? ThirdPlace { get; set; }
 }
 
 public static class CheckersEventDtoExtension
@@ -79,7 +88,10 @@ public static class CheckersEventDtoExtension
             Rules = checkersEventRequest.Rules,
             Prizes = checkersEventRequest.Prizes,
             HeadRefereeName = checkersEventRequest.HeadRefereeName,
-            Schedule = checkersEventRequest.Schedule
+            Schedule = checkersEventRequest.Schedule,
+            FirstPlaceId = checkersEventRequest.FirstPlaceId,
+            SecondPlaceId = checkersEventRequest.SecondPlaceId,
+            ThirdPlaceId = checkersEventRequest.ThirdPlaceId
         };
     }
 
@@ -104,8 +116,10 @@ public static class CheckersEventDtoExtension
             Rules = checkersEvent.Rules,
             Prizes = checkersEvent.Prizes,
             HeadRefereeName = checkersEvent.HeadRefereeName,
-            Schedule = checkersEvent.Schedule
+            Schedule = checkersEvent.Schedule,
+            FirstPlace = checkersEvent.FirstPlace?.ToDto(),
+            SecondPlace = checkersEvent.SecondPlace?.ToDto(),
+            ThirdPlace = checkersEvent.ThirdPlace?.ToDto()
         };
     }
-
 }

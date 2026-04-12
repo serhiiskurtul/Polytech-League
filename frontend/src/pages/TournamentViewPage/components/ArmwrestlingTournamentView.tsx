@@ -7,9 +7,11 @@ import { PlayerDto } from '@/shared/types/player.types';
 import { getAllPlayers, createPlayer } from '@/shared/api';
 import { 
   createArmwrestlingMatch,
-  updateArmwrestlingMatch
+  updateArmwrestlingMatch,
+  updateArmwrestlingEvent
 } from '@/shared/api/armwrestling.api';
 import ArmwrestlingBracket from './ArmwrestlingBracket';
+import TournamentPodium from './TournamentPodium';
 import PlayerSearchInput from './PlayerSearchInput';
 import styles from '../TournamentViewPage.module.css';
 
@@ -26,7 +28,14 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
 }) => {
   const [allPlayers, setAllPlayers] = useState<PlayerDto[]>([]);
   const [showAddPlayer, setShowAddPlayer] = useState(false);
+  const [showSetWinners, setShowSetWinners] = useState(false);
   
+  const [winners, setWinners] = useState({
+    firstPlaceId: details.firstPlace?.id || 0,
+    secondPlaceId: details.secondPlace?.id || 0,
+    thirdPlaceId: details.thirdPlace?.id || 0
+  });
+
   const [newMatch, setNewMatch] = useState({
     player1Id: 0,
     player2Id: 0,
@@ -45,6 +54,15 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
       loadPlayers();
     }
   }, [isAdmin]);
+
+  // Sync winners state with props when details change
+  useEffect(() => {
+    setWinners({
+      firstPlaceId: details.firstPlace?.id || 0,
+      secondPlaceId: details.secondPlace?.id || 0,
+      thirdPlaceId: details.thirdPlace?.id || 0
+    });
+  }, [details]);
 
   const loadPlayers = async (selectId?: { p1?: number, p2?: number }) => {
     try {
@@ -118,6 +136,23 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
     }
   };
 
+  const handleSaveWinners = async () => {
+    try {
+      await updateArmwrestlingEvent(details.id, {
+        ...details,
+        firstPlaceId: winners.firstPlaceId || null,
+        secondPlaceId: winners.secondPlaceId || null,
+        thirdPlaceId: winners.thirdPlaceId || null
+      });
+      alert('Призерів успішно збережено!');
+      setShowSetWinners(false);
+      onRefresh();
+    } catch (err) {
+      console.error(err);
+      alert('Помилка при збереженні призерів');
+    }
+  };
+
   const handleAddParticipant = async () => {
     if (!newParticipant.firstName || !newParticipant.lastName || !newParticipant.group) {
         alert("Заповніть всі поля!");
@@ -153,8 +188,73 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
         </div>
         <div className={styles.categoryInfo}>
           <span className={styles.badge}>{details.level}</span>
+          {isAdmin && (
+            <button 
+              className={styles.actionBtn} 
+              onClick={() => setShowSetWinners(!showSetWinners)}
+            >
+              <i className="fas fa-medal"></i> Встановити призерів
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Podium Display */}
+      {(details.firstPlace || details.secondPlace || details.thirdPlace) && !showSetWinners && (
+        <TournamentPodium 
+          firstPlace={details.firstPlace}
+          secondPlace={details.secondPlace}
+          thirdPlace={details.thirdPlace}
+        />
+      )}
+
+      {/* Admin Panel for Winners */}
+      {isAdmin && showSetWinners && (
+        <div className={styles.adminForm} style={{ background: '#fffbeb', padding: '24px', borderRadius: '16px', marginBottom: '32px', border: '1px solid #fcd34d' }}>
+           <h4 style={{ marginTop: 0, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+             <i className="fas fa-trophy" style={{ color: '#f59e0b' }}></i> Визначити призерів турніру
+           </h4>
+           <div className={styles.winnerSelectionGrid}>
+              <div className={styles.formGroup}>
+                <label>1 Місце (Золото)</label>
+                <select 
+                  value={winners.firstPlaceId} 
+                  onChange={(e) => setWinners({...winners, firstPlaceId: Number(e.target.value)})}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                >
+                  <option key="default-gold" value={0}>Оберіть гравця...</option>
+                  {currentParticipants.map(p => <option key={`gold-${p.id}`} value={p.id}>{p.firstName} {p.lastName}</option>)}
+                </select>
+              </div>
+              <div className={styles.formGroup}>
+                <label>2 Місце (Срібло)</label>
+                <select 
+                  value={winners.secondPlaceId} 
+                  onChange={(e) => setWinners({...winners, secondPlaceId: Number(e.target.value)})}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                >
+                  <option key="default-silver" value={0}>Оберіть гравця...</option>
+                  {currentParticipants.map(p => <option key={`silver-${p.id}`} value={p.id}>{p.firstName} {p.lastName}</option>)}
+                </select>
+              </div>
+              <div className={styles.formGroup}>
+                <label>3 Місце (Бронза)</label>
+                <select 
+                  value={winners.thirdPlaceId} 
+                  onChange={(e) => setWinners({...winners, thirdPlaceId: Number(e.target.value)})}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                >
+                  <option key="default-bronze" value={0}>Оберіть гравця...</option>
+                  {currentParticipants.map(p => <option key={`bronze-${p.id}`} value={p.id}>{p.firstName} {p.lastName}</option>)}
+                </select>
+              </div>
+           </div>
+           <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+             <button className={styles.cancelBtn} onClick={() => setShowSetWinners(false)}>Скасувати</button>
+             <button className={styles.saveBtn} onClick={handleSaveWinners}>Зберегти призерів</button>
+           </div>
+        </div>
+      )}
 
       {/* Main Grid: Bracket & Info */}
       <div className={styles.tournamentGrid}>

@@ -20,8 +20,8 @@ namespace PolytechLeague.Persistence.Migrations
                 .HasAnnotation("ProductVersion", "9.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "armwrestling_category", new[] { "men", "women" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "armwrestling_hand", new[] { "left", "right" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "armwrestling_category", new[] { "men", "women", "open" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "armwrestling_hand", new[] { "left", "right", "both" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "armwrestling_weight_class", new[] { "under60kg", "under70kg", "under80kg", "under90kg", "plus90kg" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "badminton_tournament_type", new[] { "single_elimination", "double_elimination", "round_robin", "groups_playoff", "swiss" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "basketball3x3tournament_type", new[] { "single_elimination", "double_elimination", "round_robin", "swiss", "groups_playoff" });
@@ -65,6 +65,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("stage");
+
+                    b.Property<int>("TableNumber")
+                        .HasColumnType("integer");
 
                     b.Property<long?>("WinnerId")
                         .HasColumnType("bigint")
@@ -543,6 +546,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("description");
 
+                    b.Property<long?>("FirstPlaceId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("HeadRefereeName")
                         .HasColumnType("text");
 
@@ -574,13 +580,25 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<string>("Schedule")
                         .HasColumnType("text");
 
+                    b.Property<long?>("SecondPlaceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ThirdPlaceId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Date")
                         .HasDatabaseName("IX_events_date");
 
+                    b.HasIndex("FirstPlaceId");
+
                     b.HasIndex("Level")
                         .HasDatabaseName("IX_events_level");
+
+                    b.HasIndex("SecondPlaceId");
+
+                    b.HasIndex("ThirdPlaceId");
 
                     b.ToTable("events", (string)null);
 
@@ -1584,6 +1602,27 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Navigation("Tournament");
 
                     b.Navigation("WhitePlayer");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Event", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "FirstPlace")
+                        .WithMany()
+                        .HasForeignKey("FirstPlaceId");
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "SecondPlace")
+                        .WithMany()
+                        .HasForeignKey("SecondPlaceId");
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "ThirdPlace")
+                        .WithMany()
+                        .HasForeignKey("ThirdPlaceId");
+
+                    b.Navigation("FirstPlace");
+
+                    b.Navigation("SecondPlace");
+
+                    b.Navigation("ThirdPlace");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.EventPhotos", b =>

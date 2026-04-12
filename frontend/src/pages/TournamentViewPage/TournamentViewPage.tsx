@@ -31,6 +31,7 @@ import {
   getArmwrestlingEventById 
 } from '@/shared/api/armwrestling.api';
 import ArmwrestlingTournamentView from './components/ArmwrestlingTournamentView';
+import TournamentPodium from './components/TournamentPodium';
 import { Tournament } from '@/shared/types/tournament.types';
 import { 
   ChessEventResponse, 
@@ -107,6 +108,38 @@ const TournamentViewPage = () => {
   const [gameFilters, setGameFilters] = useState({ round: '', board: '', participant: '', result: '' });
 
   const [isEditingTournament, setIsEditingTournament] = useState(false);
+  const [showWinnersAdmin, setShowWinnersAdmin] = useState(false);
+  const [winners, setWinners] = useState({
+    firstPlaceId: 0,
+    secondPlaceId: 0,
+    thirdPlaceId: 0
+  });
+
+  const handleSaveWinners = async () => {
+    if (!details || !id) return;
+    try {
+      const payload = {
+        ...editTournamentData,
+        firstPlaceId: winners.firstPlaceId || null,
+        secondPlaceId: winners.secondPlaceId || null,
+        thirdPlaceId: winners.thirdPlaceId || null
+      };
+
+      if (tournament?.sport === 'checkers') {
+        await updateCheckersEvent(id, { ...payload, variant: (details as any).variant } as any);
+      } else {
+        await updateChessEvent(id, payload as any);
+      }
+      
+      alert("Призерів успішно встановлено!");
+      setShowWinnersAdmin(false);
+      fetchTournament(true);
+    } catch (err) {
+      console.error(err);
+      alert("Помилка при збереженні призерів");
+    }
+  };
+
   const [editTournamentData, setEditTournamentData] = useState<ChessEventRequest>({
     name: '',
     date: '',
@@ -341,6 +374,32 @@ const TournamentViewPage = () => {
           ]);
           setDetails(detailsData);
           setAllPlayers(playersData);
+
+          // Initialize winners state
+          if (detailsData) {
+            setWinners({
+              firstPlaceId: detailsData.firstPlace?.id || 0,
+              secondPlaceId: detailsData.secondPlace?.id || 0,
+              thirdPlaceId: detailsData.thirdPlace?.id || 0
+            });
+            
+            // Sync editTournamentData for eventual updates
+            setEditTournamentData({
+              name: detailsData.name,
+              date: detailsData.date.split('T')[0],
+              location: detailsData.location,
+              refereeIds: detailsData.refereeIds,
+              level: detailsData.level,
+              description: detailsData.description,
+              timeControl: detailsData.timeControl || '',
+              participantsCount: detailsData.participantsCount || 0,
+              system: (detailsData as any).system || 'Swiss',
+              rules: detailsData.rules || '',
+              prizes: detailsData.prizes || '',
+              headRefereeName: detailsData.headRefereeName || '',
+              schedule: detailsData.schedule || ''
+            });
+          }
         } catch (eventErr) {
           console.error('Failed to fetch detailed event info:', eventErr);
         }
@@ -617,15 +676,97 @@ const TournamentViewPage = () => {
     <div className={styles.tournamentViewPage}>
       <div className={styles.container}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <button className={styles.backButton} onClick={() => navigate('/tournaments')}>
+            <button className={styles.backButton} onClick={() => navigate('/tournaments')}>
             <i className="fas fa-arrow-left"></i> Назад
           </button>
-          {isAdmin && (
-            <button onClick={handleEditTournament} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: '#3b82f6', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
-              <i className="fas fa-edit"></i> Редагувати турнір
-            </button>
-          )}
+          
+          <div style={{ display: 'flex', gap: '8px' }}>
+            {isAdmin && (
+              <button 
+                onClick={() => setShowWinnersAdmin(!showWinnersAdmin)} 
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
+              >
+                <i className="fas fa-medal"></i> Призначити переможців
+              </button>
+            )}
+            {isAdmin && (
+              <button onClick={handleEditTournament} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: '#3b82f6', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+                <i className="fas fa-edit"></i> Редагувати турнір
+              </button>
+            )}
+          </div>
         </div>
+
+        {isAdmin && showWinnersAdmin && (
+          <div className={styles.adminSection} style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '24px', borderRadius: '16px', marginBottom: '24px' }}>
+            <h3 style={{ marginTop: 0, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', color: '#166534' }}>
+              <i className="fas fa-trophy"></i> Призначити призерів турніру
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
+                  <i className="fas fa-crown" style={{ color: '#fbbf24' }}></i> 1-ше місце (Золото)
+                </label>
+                <select 
+                  value={winners.firstPlaceId} 
+                  onChange={(e) => setWinners({...winners, firstPlaceId: Number(e.target.value)})}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                >
+                  <option key="default-first" value="0">-- Оберіть гравця --</option>
+                  {details?.players.map(p => (
+                    <option key={`first-${p.playerId}`} value={p.playerId}>{p.playerName} ({p.points} очок)</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
+                  <i className="fas fa-medal" style={{ color: '#9ca3af' }}></i> 2-ге місце (Срібло)
+                </label>
+                <select 
+                  value={winners.secondPlaceId} 
+                  onChange={(e) => setWinners({...winners, secondPlaceId: Number(e.target.value)})}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                >
+                  <option key="default-second" value="0">-- Оберіть гравця --</option>
+                  {details?.players.map(p => (
+                    <option key={`second-${p.playerId}`} value={p.playerId}>{p.playerName} ({p.points} очок)</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
+                  <i className="fas fa-medal" style={{ color: '#b45309' }}></i> 3-тє місце (Бронза)
+                </label>
+                <select 
+                  value={winners.thirdPlaceId} 
+                  onChange={(e) => setWinners({...winners, thirdPlaceId: Number(e.target.value)})}
+                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                >
+                  <option key="default-third" value="0">-- Оберіть гравця --</option>
+                  {details?.players.map(p => (
+                    <option key={`third-${p.playerId}`} value={p.playerId}>{p.playerName} ({p.points} очок)</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
+              <button 
+                onClick={handleSaveWinners}
+                style={{ padding: '12px 24px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
+              >
+                Зберегти результати
+              </button>
+              <button 
+                onClick={() => setShowWinnersAdmin(false)}
+                style={{ padding: '12px 24px', background: '#6b7280', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
+              >
+                Скасувати
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className={styles.headerContent}>
           <div>
@@ -672,10 +813,22 @@ const TournamentViewPage = () => {
             {details?.photos && details.photos.length > 0 ? (
               <img src={getImageUrl(details.photos[0].url)} alt={tournament.title} />
             ) : (
-              <i className={tournament.sport === 'checkers' ? "fas fa-braille" : "fas fa-chess-queen"}></i>
+              <i className={
+                tournament.sport === 'checkers' ? "fas fa-braille" : 
+                tournament.sport === 'armwrestling' ? "fas fa-hand-rock" : 
+                "fas fa-chess-queen"
+              }></i>
             )}
           </div>
         </div>
+
+        {(tournament.sport === 'chess' || tournament.sport === 'checkers') && details && (
+          <TournamentPodium 
+            firstPlace={details.firstPlace}
+            secondPlace={details.secondPlace}
+            thirdPlace={details.thirdPlace}
+          />
+        )}
 
         <div className={styles.infoCard}>
           <h2><i className="fas fa-info-circle"></i> Про турнір</h2>

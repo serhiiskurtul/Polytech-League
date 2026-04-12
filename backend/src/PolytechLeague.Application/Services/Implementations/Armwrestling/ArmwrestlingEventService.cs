@@ -24,6 +24,9 @@ public class ArmwrestlingEventService(
                 .ThenInclude(m => m.Player1)
             .Include(e => e.Matches!)
                 .ThenInclude(m => m.Player2)
+            .Include(e => e.FirstPlace)
+            .Include(e => e.SecondPlace)
+            .Include(e => e.ThirdPlace)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 
         if (entity is null)
@@ -45,5 +48,15 @@ public class ArmwrestlingEventService(
         oldEntity.Hand = newEntity.Hand;
         oldEntity.WeightClass = newEntity.WeightClass;
         oldEntity.Category = newEntity.Category;
+        oldEntity.Rules = newEntity.Rules;
+        oldEntity.Prizes = newEntity.Prizes;
+        oldEntity.HeadRefereeName = newEntity.HeadRefereeName;
+        oldEntity.Schedule = newEntity.Schedule;
+        oldEntity.TimeControl = newEntity.TimeControl;
+        oldEntity.ParticipantsCount = newEntity.ParticipantsCount;
+        
+        oldEntity.FirstPlaceId = newEntity.FirstPlaceId;
+        oldEntity.SecondPlaceId = newEntity.SecondPlaceId;
+        oldEntity.ThirdPlaceId = newEntity.ThirdPlaceId;
     }
 }

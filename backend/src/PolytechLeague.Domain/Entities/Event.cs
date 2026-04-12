@@ -14,6 +14,13 @@ public abstract class Event
     public string? Prizes { get; set; }
     public string? HeadRefereeName { get; set; }
     public string? Schedule { get; set; }
+
+    public long? FirstPlaceId { get; set; }
+    public Player? FirstPlace { get; set; }
+    public long? SecondPlaceId { get; set; }
+    public Player? SecondPlace { get; set; }
+    public long? ThirdPlaceId { get; set; }
+    public Player? ThirdPlace { get; set; }
 }
 
 public enum CompetitionLevel
