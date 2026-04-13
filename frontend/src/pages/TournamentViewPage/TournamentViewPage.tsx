@@ -295,27 +295,49 @@ const TournamentViewPage = () => {
         alert("Назва та дата обов'язкові!");
         return;
       }
-      if (tournament?.sport === 'checkers') {
-        await updateCheckersEvent(id!, { ...editTournamentData, variant: 'Russian' } as any);
-      } else if (tournament?.sport === 'armwrestling') {
+      const sport = tournament?.sport;
+      // Build clean base payload
+      const payload: any = {
+        name: editTournamentData.name,
+        date: editTournamentData.date,
+        location: editTournamentData.location,
+        refereeIds: editTournamentData.refereeIds,
+        level: editTournamentData.level,
+        description: editTournamentData.description,
+        rules: editTournamentData.rules,
+        prizes: editTournamentData.prizes,
+        headRefereeName: editTournamentData.headRefereeName,
+        referees: editTournamentData.referees,
+        schedule: editTournamentData.schedule,
+      };
+
+      if (sport === 'checkers') {
+        await updateCheckersEvent(id!, { ...payload, variant: (details as any).variant || 'Russian' } as any);
+      } else if (sport === 'armwrestling') {
         await updateArmwrestlingEvent(id!, {
-            ...editTournamentData,
+            ...payload,
             hand: (details as any).hand,
             weightClass: (details as any).weightClass,
-            category: (details as any).category
+            category: (details as any).category,
+            timeControl: editTournamentData.timeControl,
+            participantsCount: editTournamentData.participantsCount
         });
-      } else if (tournament?.sport === 'volleyball') {
-        await updateVolleyballEvent(id!, { ...editTournamentData, setsToWin: (details as any).setsToWin });
-      } else if (tournament?.sport === 'beach_volleyball') {
-        await updateBeachVolleyballEvent(id!, { ...editTournamentData, setsToWin: (details as any).setsToWin });
-      } else if (tournament?.sport === 'futsal') {
-        await updateFutsalEvent(id!, editTournamentData);
-      } else if (tournament?.sport === 'basketball_3x3') {
-        await updateBasketball3x3Event(id!, editTournamentData);
-      } else if (tournament?.sport === 'badminton') {
-        await updateBadmintonEvent(id!, { ...editTournamentData, tournamentType: (details as any).tournamentType });
+      } else if (sport === 'volleyball' || sport === 'beach_volleyball') {
+        const updateFn = sport === 'volleyball' ? updateVolleyballEvent : updateBeachVolleyballEvent;
+        await updateFn(id!, { ...payload, setsToWin: (details as any).setsToWin || 2 });
+      } else if (sport === 'futsal' || sport === 'badminton') {
+        const updateFn = sport === 'futsal' ? updateFutsalEvent : updateBadmintonEvent;
+        await updateFn(id!, { ...payload, tournamentType: (details as any).tournamentType || 'RoundRobin' });
+      } else if (sport === 'basketball_3x3') {
+        await updateBasketball3x3Event(id!, payload);
       } else {
-        await updateChessEvent(id!, editTournamentData);
+        // Chess
+        await updateChessEvent(id!, {
+          ...payload,
+          system: editTournamentData.system,
+          timeControl: editTournamentData.timeControl,
+          participantsCount: editTournamentData.participantsCount
+        } as any);
       }
       alert("Дані турніру успішно оновлено!");
       setIsEditingTournament(false);
@@ -1533,7 +1555,7 @@ const TournamentViewPage = () => {
                     <option value="National">Всеукраїнські</option>
                   </select>
                 </div>
-                {tournament?.sport !== 'armwrestling' && (
+                {(tournament.sport === 'chess' || tournament.sport === 'checkers') && (
                   <>
                     <div className={styles.formGroup}>
                       <label>Система проведення</label>
