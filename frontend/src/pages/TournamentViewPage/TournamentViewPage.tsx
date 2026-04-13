@@ -27,7 +27,7 @@ import {
   uploadCheckersPhoto,
   deleteCheckersPhoto
 } from '@/shared/api/checkers.api';
-import { 
+import {
   getArmwrestlingEventById,
   updateArmwrestlingEvent
 } from '@/shared/api/armwrestling.api';
@@ -40,28 +40,28 @@ import ArmwrestlingTournamentView from './components/ArmwrestlingTournamentView'
 import TeamSportsTournamentView from './components/TeamSportsTournamentView';
 import TournamentPodium from './components/TournamentPodium';
 import { Tournament } from '@/shared/types/tournament.types';
-import { 
-  ChessEventResponse, 
-  ChessGameDto, 
-  GameResult, 
-  ChessGameResponse, 
-  ChessEventParticipantResponse, 
-  ChessEventParticipantDto, 
+import {
+  ChessEventResponse,
+  ChessGameDto,
+  GameResult,
+  ChessGameResponse,
+  ChessEventParticipantResponse,
+  ChessEventParticipantDto,
   ChessEventRequest,
   CompetitionLevel,
   ChessSystem
 } from '@/shared/types/chess.types';
 import {
-    CheckersEventResponse,
-    CheckersEventRequest,
-    CheckersGameDto,
-    CheckersEventParticipantDto
+  CheckersEventResponse,
+  CheckersEventRequest,
+  CheckersGameDto,
+  CheckersEventParticipantDto
 } from '@/shared/types/checkers.types';
 import { BASE_URL } from '@/shared/api/axiosInstance';
 import styles from './TournamentViewPage.module.css';
 
-import { 
-  ArmwrestlingEventResponse 
+import {
+  ArmwrestlingEventResponse
 } from '@/shared/types/armwrestling.types';
 
 const TournamentViewPage = () => {
@@ -127,7 +127,7 @@ const TournamentViewPage = () => {
     try {
       const sport = tournament?.sport;
       const isTeamSport = sport === 'futsal' || sport === 'volleyball' || sport === 'beach_volleyball' || sport === 'basketball_3x3' || sport === 'badminton';
-      
+
       // Build clean base payload with common fields to avoid "Extra fields" 400 error
       const payload: any = {
         name: editTournamentData.name,
@@ -147,7 +147,7 @@ const TournamentViewPage = () => {
         payload.firstPlaceTeamId = winners.firstPlaceId || null;
         payload.secondPlaceTeamId = winners.secondPlaceId || null;
         payload.thirdPlaceTeamId = winners.thirdPlaceId || null;
-        
+
         if (sport === 'futsal' || sport === 'badminton') {
           payload.tournamentType = (details as any).tournamentType || 'RoundRobin';
         }
@@ -158,7 +158,7 @@ const TournamentViewPage = () => {
         payload.firstPlaceId = winners.firstPlaceId || null;
         payload.secondPlaceId = winners.secondPlaceId || null;
         payload.thirdPlaceId = winners.thirdPlaceId || null;
-        
+
         if (sport === 'chess') {
           payload.system = editTournamentData.system;
           payload.timeControl = editTournamentData.timeControl;
@@ -185,7 +185,7 @@ const TournamentViewPage = () => {
         case 'badminton': await updateBadmintonEvent(id, payload as any); break;
         default: await updateChessEvent(id, payload as any);
       }
-      
+
       alert("Призерів успішно встановлено!");
       setShowWinnersAdmin(false);
       fetchTournament(true);
@@ -248,11 +248,11 @@ const TournamentViewPage = () => {
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement> | React.DragEvent) => {
     let file: File | undefined;
-    
+
     if ('files' in e.target && e.target.files) {
       file = e.target.files[0];
     } else if ('dataTransfer' in e && e.dataTransfer.files) {
-        e.preventDefault();
+      e.preventDefault();
       file = e.dataTransfer.files[0];
     }
 
@@ -315,12 +315,12 @@ const TournamentViewPage = () => {
         await updateCheckersEvent(id!, { ...payload, variant: (details as any).variant || 'Russian' } as any);
       } else if (sport === 'armwrestling') {
         await updateArmwrestlingEvent(id!, {
-            ...payload,
-            hand: (details as any).hand,
-            weightClass: (details as any).weightClass,
-            category: (details as any).category,
-            timeControl: editTournamentData.timeControl,
-            participantsCount: editTournamentData.participantsCount
+          ...payload,
+          hand: (details as any).hand,
+          weightClass: (details as any).weightClass,
+          category: (details as any).category,
+          timeControl: editTournamentData.timeControl,
+          participantsCount: editTournamentData.participantsCount
         });
       } else if (sport === 'volleyball' || sport === 'beach_volleyball') {
         const updateFn = sport === 'volleyball' ? updateVolleyballEvent : updateBeachVolleyballEvent;
@@ -377,23 +377,23 @@ const TournamentViewPage = () => {
     try {
       if (tournament?.sport === 'checkers') {
         const payload: CheckersGameDto = {
-            tournamentId: Number(id),
-            whitePlayerId: editingGameData.whitePlayerId ? Number(editingGameData.whitePlayerId) : 0,
-            blackPlayerId: editingGameData.blackPlayerId ? Number(editingGameData.blackPlayerId) : 0,
-            result: editingGameData.result as GameResult,
-            round: editingGameData.round
+          tournamentId: Number(id),
+          whitePlayerId: editingGameData.whitePlayerId ? Number(editingGameData.whitePlayerId) : 0,
+          blackPlayerId: editingGameData.blackPlayerId ? Number(editingGameData.blackPlayerId) : 0,
+          result: editingGameData.result as GameResult,
+          round: editingGameData.round
         };
         // Reuse games controller or similar. We need to be careful with ID mapping.
         // For simplicity let's assume we handle update.
         await updateChessGame(gameId, payload as any); // If common logic can handle it
       } else {
         const payload: ChessGameDto = {
-            tournamentId: Number(id),
-            whitePlayerId: editingGameData.whitePlayerId ? Number(editingGameData.whitePlayerId) : null,
-            blackPlayerId: editingGameData.blackPlayerId ? Number(editingGameData.blackPlayerId) : null,
-            result: editingGameData.result as GameResult,
-            round: editingGameData.round,
-            board: 1 // default UI mock
+          tournamentId: Number(id),
+          whitePlayerId: editingGameData.whitePlayerId ? Number(editingGameData.whitePlayerId) : null,
+          blackPlayerId: editingGameData.blackPlayerId ? Number(editingGameData.blackPlayerId) : null,
+          result: editingGameData.result as GameResult,
+          round: editingGameData.round,
+          board: 1 // default UI mock
         };
         await updateChessGame(gameId, payload);
       }
@@ -439,9 +439,9 @@ const TournamentViewPage = () => {
     if (window.confirm(`Ви впевнені, що хочете видалити учасника "${playerName}" з турніру?`)) {
       try {
         if (tournament?.sport === 'checkers') {
-            await removeParticipantFromCheckersEvent(id!, playerId);
+          await removeParticipantFromCheckersEvent(id!, playerId);
         } else {
-            await removeParticipantFromEvent(id!, playerId);
+          await removeParticipantFromEvent(id!, playerId);
         }
         alert("Учасника видалено з турніру!");
         fetchTournament();
@@ -461,9 +461,9 @@ const TournamentViewPage = () => {
 
       if (['chess', 'checkers', 'armwrestling', 'volleyball', 'beach_volleyball', 'futsal', 'basketball_3x3', 'badminton'].includes(data.sport)) {
         try {
-          const playersGetter = getAllPlayers; 
+          const playersGetter = getAllPlayers;
           let detailsPromise;
-          
+
           switch (data.sport) {
             case 'checkers': detailsPromise = getCheckersEventById(id); break;
             case 'armwrestling': detailsPromise = getArmwrestlingEventById(id); break;
@@ -490,7 +490,7 @@ const TournamentViewPage = () => {
               secondPlaceId: d.secondPlace?.id || d.secondPlaceTeam?.id || 0,
               thirdPlaceId: d.thirdPlace?.id || d.thirdPlaceTeam?.id || 0
             });
-            
+
             // Sync editTournamentData for eventual updates
             setEditTournamentData({
               name: detailsData.name,
@@ -663,21 +663,21 @@ const TournamentViewPage = () => {
     try {
       if (tournament?.sport === 'checkers') {
         const payload: CheckersGameDto = {
-            tournamentId: Number(id),
-            whitePlayerId: newGame.whitePlayerId ? Number(newGame.whitePlayerId) : 0,
-            blackPlayerId: newGame.blackPlayerId ? Number(newGame.blackPlayerId) : 0,
-            result: newGame.result as GameResult,
-            round: Number(newGame.round) || 1
+          tournamentId: Number(id),
+          whitePlayerId: newGame.whitePlayerId ? Number(newGame.whitePlayerId) : 0,
+          blackPlayerId: newGame.blackPlayerId ? Number(newGame.blackPlayerId) : 0,
+          result: newGame.result as GameResult,
+          round: Number(newGame.round) || 1
         };
         await createCheckersGame(payload);
       } else {
         const payload: ChessGameDto = {
-            tournamentId: Number(id),
-            whitePlayerId: newGame.whitePlayerId ? Number(newGame.whitePlayerId) : null,
-            blackPlayerId: newGame.blackPlayerId ? Number(newGame.blackPlayerId) : null,
-            result: newGame.result as GameResult,
-            round: Number(newGame.round) || 1,
-            board: Number(newGame.board) || 1
+          tournamentId: Number(id),
+          whitePlayerId: newGame.whitePlayerId ? Number(newGame.whitePlayerId) : null,
+          blackPlayerId: newGame.blackPlayerId ? Number(newGame.blackPlayerId) : null,
+          result: newGame.result as GameResult,
+          round: Number(newGame.round) || 1,
+          board: Number(newGame.board) || 1
         };
         await createChessGame(payload);
       }
@@ -711,12 +711,12 @@ const TournamentViewPage = () => {
     );
   }
 
-  const sortedPlayers = (tournament.sport === 'chess' || tournament.sport === 'checkers') && details?.players 
+  const sortedPlayers = (tournament.sport === 'chess' || tournament.sport === 'checkers') && details?.players
     ? [...details.players].sort((a, b) => {
-        if (b.points !== a.points) return b.points - a.points;
-        if (a.rank || b.rank) return (a.rank || 999) - (b.rank || 999);
-        return 0;
-      }) 
+      if (b.points !== a.points) return b.points - a.points;
+      if (a.rank || b.rank) return (a.rank || 999) - (b.rank || 999);
+      return 0;
+    })
     : (details as any)?.players || [];
 
   const getLevelBadgeParams = (level?: string) => {
@@ -738,8 +738,8 @@ const TournamentViewPage = () => {
   };
 
   const getVariantLabel = (variant?: string) => {
-      if (variant === 'Russian') return 'Класичні (64)';
-      return variant || 'Класичні';
+    if (variant === 'Russian') return 'Класичні (64)';
+    return variant || 'Класичні';
   }
 
   const getImageUrl = (url: string) => {
@@ -750,53 +750,53 @@ const TournamentViewPage = () => {
 
   const badgeObj = getLevelBadgeParams(details?.level);
   const allGamesOrMatches = (details as any)?.games || (details as any)?.matches || [];
-  const playedGames = allGamesOrMatches.filter((g: any) => 
+  const playedGames = allGamesOrMatches.filter((g: any) =>
     (g.result && g.result !== 'NotPlayed') || (g.winnerId != null)
   ).length;
 
-  const totalRounds = allGamesOrMatches.reduce((acc: number, game: any) => 
+  const totalRounds = allGamesOrMatches.reduce((acc: number, game: any) =>
     Math.max(acc, game.round || game.roundNumber || 0), 0
   );
   const isTeamSport = tournament?.sport === 'futsal' || tournament?.sport === 'volleyball' || tournament?.sport === 'beach_volleyball' || tournament?.sport === 'basketball_3x3' || tournament?.sport === 'badminton';
 
-  const actualParticipants = isTeamSport 
-    ? (details?.teams?.length || 0) 
+  const actualParticipants = isTeamSport
+    ? (details?.teams?.length || 0)
     : ((details as any)?.players?.length || (details as any)?.participants?.length || 0);
 
   const participantLabel = isTeamSport ? 'команд' : 'учасників';
 
-  const filteredGames = (tournament.sport === 'chess' || tournament.sport === 'checkers') && (details as any)?.games 
+  const filteredGames = (tournament.sport === 'chess' || tournament.sport === 'checkers') && (details as any)?.games
     ? [...(details as any).games].filter((g: any) => {
-        const round = g.round || g.roundNumber;
-        if (gameFilters.round && round.toString() !== gameFilters.round) return false;
-        if (gameFilters.board && g.board?.toString() !== gameFilters.board) return false;
-        if (gameFilters.participant) {
-          const q = gameFilters.participant.toLowerCase();
-          if (!g.whitePlayerName?.toLowerCase().includes(q) && !g.blackPlayerName?.toLowerCase().includes(q)) {
-            return false;
-          }
+      const round = g.round || g.roundNumber;
+      if (gameFilters.round && round.toString() !== gameFilters.round) return false;
+      if (gameFilters.board && g.board?.toString() !== gameFilters.board) return false;
+      if (gameFilters.participant) {
+        const q = gameFilters.participant.toLowerCase();
+        if (!g.whitePlayerName?.toLowerCase().includes(q) && !g.blackPlayerName?.toLowerCase().includes(q)) {
+          return false;
         }
-        if (gameFilters.result && g.result !== gameFilters.result) return false;
-        return true;
-      }).sort((a: any, b: any) => {
-          const aR = a.round || a.roundNumber;
-          const bR = b.round || b.roundNumber;
-          if (aR !== bR) return aR - bR;
-          return (a.board || 0) - (b.board || 0);
-      }) : [];
+      }
+      if (gameFilters.result && g.result !== gameFilters.result) return false;
+      return true;
+    }).sort((a: any, b: any) => {
+      const aR = a.round || a.roundNumber;
+      const bR = b.round || b.roundNumber;
+      if (aR !== bR) return aR - bR;
+      return (a.board || 0) - (b.board || 0);
+    }) : [];
 
   return (
     <div className={styles.tournamentViewPage}>
       <div className={styles.container}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <button className={styles.backButton} onClick={() => navigate('/tournaments')}>
+          <button className={styles.backButton} onClick={() => navigate('/tournaments')}>
             <i className="fas fa-arrow-left"></i> Назад
           </button>
-          
+
           <div style={{ display: 'flex', gap: '8px' }}>
             {isAdmin && (
-              <button 
-                onClick={() => setShowWinnersAdmin(!showWinnersAdmin)} 
+              <button
+                onClick={() => setShowWinnersAdmin(!showWinnersAdmin)}
                 style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
               >
                 <i className="fas fa-medal"></i> Призначити переможців
@@ -820,9 +820,9 @@ const TournamentViewPage = () => {
                 <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
                   <i className="fas fa-crown" style={{ color: '#fbbf24' }}></i> 1-ше місце (Золото)
                 </label>
-                <select 
-                  value={winners.firstPlaceId} 
-                  onChange={(e) => setWinners({...winners, firstPlaceId: Number(e.target.value)})}
+                <select
+                  value={winners.firstPlaceId}
+                  onChange={(e) => setWinners({ ...winners, firstPlaceId: Number(e.target.value) })}
                   style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
                 >
                   <option key="default-first" value="0">-- Оберіть переможця --</option>
@@ -839,9 +839,9 @@ const TournamentViewPage = () => {
                 <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
                   <i className="fas fa-medal" style={{ color: '#9ca3af' }}></i> 2-ге місце (Срібло)
                 </label>
-                <select 
-                  value={winners.secondPlaceId} 
-                  onChange={(e) => setWinners({...winners, secondPlaceId: Number(e.target.value)})}
+                <select
+                  value={winners.secondPlaceId}
+                  onChange={(e) => setWinners({ ...winners, secondPlaceId: Number(e.target.value) })}
                   style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
                 >
                   <option key="default-second" value="0">-- Оберіть переможця --</option>
@@ -858,9 +858,9 @@ const TournamentViewPage = () => {
                 <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
                   <i className="fas fa-medal" style={{ color: '#b45309' }}></i> 3-тє місце (Бронза)
                 </label>
-                <select 
-                  value={winners.thirdPlaceId} 
-                  onChange={(e) => setWinners({...winners, thirdPlaceId: Number(e.target.value)})}
+                <select
+                  value={winners.thirdPlaceId}
+                  onChange={(e) => setWinners({ ...winners, thirdPlaceId: Number(e.target.value) })}
                   style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
                 >
                   <option key="default-third" value="0">-- Оберіть переможця --</option>
@@ -874,13 +874,13 @@ const TournamentViewPage = () => {
               </div>
             </div>
             <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
-              <button 
+              <button
                 onClick={handleSaveWinners}
                 style={{ padding: '12px 24px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
               >
                 Зберегти результати
               </button>
-              <button 
+              <button
                 onClick={() => setShowWinnersAdmin(false)}
                 style={{ padding: '12px 24px', background: '#6b7280', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
               >
@@ -904,9 +904,9 @@ const TournamentViewPage = () => {
                 </span>
               )}
               {tournament.sport === 'checkers' && (
-                  <span className={styles.systemBadge} style={{ background: '#10b981' }}>
-                      <i className="fas fa-dice"></i> {getVariantLabel((details as any)?.variant)}
-                  </span>
+                <span className={styles.systemBadge} style={{ background: '#10b981' }}>
+                  <i className="fas fa-dice"></i> {getVariantLabel((details as any)?.variant)}
+                </span>
               )}
             </div>
             <h1 className={styles.tournamentName}>{tournament.title}</h1>
@@ -936,20 +936,20 @@ const TournamentViewPage = () => {
               <img src={getImageUrl(details.photos[0].url)} alt={tournament.title} />
             ) : (
               <i className={
-                tournament.sport === 'checkers' ? "fas fa-braille" : 
-                tournament.sport === 'armwrestling' ? "fas fa-hand-rock" : 
-                tournament.sport === 'futsal' ? "fas fa-futbol" :
-                tournament.sport === 'volleyball' || tournament.sport === 'beach_volleyball' ? "fas fa-volleyball-ball" :
-                tournament.sport === 'basketball_3x3' ? "fas fa-basketball-ball" :
-                tournament.sport === 'badminton' ? "fas fa-user-circle" :
-                "fas fa-chess-queen"
+                tournament.sport === 'checkers' ? "fas fa-braille" :
+                  tournament.sport === 'armwrestling' ? "fas fa-hand-rock" :
+                    tournament.sport === 'futsal' ? "fas fa-futbol" :
+                      tournament.sport === 'volleyball' || tournament.sport === 'beach_volleyball' ? "fas fa-volleyball-ball" :
+                        tournament.sport === 'basketball_3x3' ? "fas fa-basketball-ball" :
+                          tournament.sport === 'badminton' ? "fas fa-user-circle" :
+                            "fas fa-chess-queen"
               }></i>
             )}
           </div>
         </div>
 
         {(tournament.sport === 'chess' || tournament.sport === 'checkers') && details && (
-          <TournamentPodium 
+          <TournamentPodium
             firstPlace={details.firstPlace}
             secondPlace={details.secondPlace}
             thirdPlace={details.thirdPlace}
@@ -990,51 +990,51 @@ const TournamentViewPage = () => {
               <h3><i className="fas fa-users"></i> Судді</h3>
               <div className={styles.refereeList}>
                 {!(details as any)?.referees && !details?.headRefereeName && (
-                   <div className={styles.refereeItem}>
-                     <div className={styles.refereeAvatar}>
-                       <i className="fas fa-user-tie"></i>
-                     </div>
-                     <div>
-                       <strong>Призначається організатором</strong>
-                     </div>
-                   </div>
+                  <div className={styles.refereeItem}>
+                    <div className={styles.refereeAvatar}>
+                      <i className="fas fa-user-tie"></i>
+                    </div>
+                    <div>
+                      <strong>Призначається організатором</strong>
+                    </div>
+                  </div>
                 )}
                 {details?.headRefereeName && !(details as any)?.referees && (
-                   <div className={styles.refereeItem}>
-                     <div className={styles.refereeAvatar}>
-                       <i className="fas fa-user-tie"></i>
-                     </div>
-                     <div>
-                       <strong>{details.headRefereeName}</strong><br />
-                       <small>Суддя турніру</small>
-                     </div>
-                   </div>
+                  <div className={styles.refereeItem}>
+                    <div className={styles.refereeAvatar}>
+                      <i className="fas fa-user-tie"></i>
+                    </div>
+                    <div>
+                      <strong>{details.headRefereeName}</strong><br />
+                      <small>Суддя турніру</small>
+                    </div>
+                  </div>
                 )}
                 {(details as any)?.referees && (
-                   <div style={{ color: '#4b5563', fontSize: '0.95rem', whiteSpace: 'pre-line', padding: '8px 12px', background: '#fff', borderRadius: '10px', border: '1px solid #e5e7eb' }}>
-                     { (details as any).referees }
-                   </div>
+                  <div style={{ color: '#4b5563', fontSize: '0.95rem', whiteSpace: 'pre-line', padding: '8px 12px', background: '#fff', borderRadius: '10px', border: '1px solid #e5e7eb' }}>
+                    {(details as any).referees}
+                  </div>
                 )}
               </div>
             </div>
           </div>
         </div>
-        
+
         {tournament.sport === 'armwrestling' && details && (
-          <ArmwrestlingTournamentView 
-            details={details as any} 
-            isAdmin={isAdmin} 
-            onRefresh={() => fetchTournament(true)} 
+          <ArmwrestlingTournamentView
+            details={details as any}
+            isAdmin={isAdmin}
+            onRefresh={() => fetchTournament(true)}
           />
         )}
 
         {['volleyball', 'beach_volleyball', 'futsal', 'basketball_3x3', 'badminton'].includes(tournament.sport) && details && (
-            <TeamSportsTournamentView 
-                sport={tournament.sport as any}
-                details={details}
-                isAdmin={isAdmin}
-                onRefresh={() => fetchTournament(true)}
-            />
+          <TeamSportsTournamentView
+            sport={tournament.sport as any}
+            details={details}
+            isAdmin={isAdmin}
+            onRefresh={() => fetchTournament(true)}
+          />
         )}
 
         {(tournament.sport === 'chess' || tournament.sport === 'checkers') && (
@@ -1214,8 +1214,8 @@ const TournamentViewPage = () => {
                       </select>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-                      <button 
-                        onClick={() => setGameFilters({ round: '', board: '', participant: '', result: '' })} 
+                      <button
+                        onClick={() => setGameFilters({ round: '', board: '', participant: '', result: '' })}
                         style={{ padding: '8px 16px', background: '#6b7280', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
                       >
                         Скинути
@@ -1287,8 +1287,8 @@ const TournamentViewPage = () => {
                                 </>
                               ) : (
                                 <>
-                                  <td>{ (game as any).round || (game as any).roundNumber }</td>
-                                  {tournament.sport !== 'checkers' && <td>{ (game as any).board || idx + 1 }</td>}
+                                  <td>{(game as any).round || (game as any).roundNumber}</td>
+                                  {tournament.sport !== 'checkers' && <td>{(game as any).board || idx + 1}</td>}
                                   <td>
                                     {game.whiteUserId ? (
                                       <Link to={`/profile/${game.whiteUserId}`} style={{ color: '#3b82f6', textDecoration: 'none' }}>
@@ -1594,10 +1594,10 @@ const TournamentViewPage = () => {
 
                 <div className={styles.photoManagementSection} style={{ gridColumn: '1 / -1' }}>
                   <label><i className="fas fa-images"></i> Фотографії турніру</label>
-                  
+
                   <div className={styles.photoUploadArea}
-                       onDragOver={(e) => e.preventDefault()}
-                       onDrop={handlePhotoUpload}>
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={handlePhotoUpload}>
                     {isUploading ? (
                       <div className={styles.uploadSpinner}><i className="fas fa-circle-notch fa-spin"></i> Завантаження...</div>
                     ) : (

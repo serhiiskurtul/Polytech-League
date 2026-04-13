@@ -337,7 +337,6 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           <button className={activeTab === 'matches' ? styles.activeTab : ''} onClick={() => setActiveTab('matches')}>Матчі</button>
           <button className={activeTab === 'standings' ? styles.activeTab : ''} onClick={() => setActiveTab('standings')}>Таблиця</button>
           <button className={activeTab === 'teams' ? styles.activeTab : ''} onClick={() => setActiveTab('teams')}>Команди</button>
-          <button className={activeTab === 'info' ? styles.activeTab : ''} onClick={() => setActiveTab('info')}>Інфо</button>
           {isAdmin && activeTab === 'matches' && (
             <button className={styles.addMatchGlobalBtn} onClick={() => setIsCreateMatchModalOpen(true)}>
               <i className="fas fa-plus-circle"></i> Додати матч
@@ -503,22 +502,6 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           </div>
         )}
 
-        {activeTab === 'info' && (
-          <div className={styles.eventInfo}>
-            <div className={styles.infoCard}>
-              <h4><i className="fas fa-scroll"></i> Правила</h4>
-              <p>{details?.rules || 'Standard league rules'}</p>
-            </div>
-            <div className={styles.infoCard}>
-              <h4><i className="fas fa-gift"></i> Призи</h4>
-              <p>{details?.prizes || 'Certificates and cups'}</p>
-            </div>
-            <div className={styles.infoCard}>
-              <h4><i className="fas fa-user-tie"></i> Судді</h4>
-              <p>{details?.referees || 'Official college referee board'}</p>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Create Match Modal */}
