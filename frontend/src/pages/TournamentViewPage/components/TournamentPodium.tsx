@@ -25,7 +25,7 @@ const TournamentPodium: React.FC<TournamentPodiumProps> = ({
       : `${participant.firstName} ${participant.lastName}`;
     
     const displayAvatar = isTeam
-      ? (participant.name?.[0] || 'T')
+      ? (participant.name?.length > 10 ? participant.name.substring(0, 10) + '...' : participant.name)
       : `${participant.firstName?.[0] || ''}${participant.lastName?.[0] || ''}`;
 
     return (

@@ -125,8 +125,9 @@ const TournamentViewPage = () => {
   const handleSaveWinners = async () => {
     if (!details || !id) return;
     try {
-      const sport = tournament?.sport;
-      const isTeamSport = sport === 'futsal' || sport === 'volleyball' || sport === 'beach_volleyball' || sport === 'basketball_3x3' || sport === 'badminton';
+      const sportRaw = tournament?.sport || '';
+      const sportKey = sportRaw.toLowerCase().replace(/-/g, '_').replace(/\s/g, '');
+      const isTeamSport = ['futsal', 'volleyball', 'beach_volleyball', 'basketball_3x3', 'badminton'].includes(sportKey);
 
       // Build clean base payload with common fields to avoid "Extra fields" 400 error
       const payload: any = {
@@ -148,10 +149,10 @@ const TournamentViewPage = () => {
         payload.secondPlaceTeamId = winners.secondPlaceId || null;
         payload.thirdPlaceTeamId = winners.thirdPlaceId || null;
 
-        if (sport === 'futsal' || sport === 'badminton') {
+        if (['futsal', 'badminton', 'basketball_3x3', 'basketball3x3'].includes(sportKey)) {
           payload.tournamentType = (details as any).tournamentType || 'RoundRobin';
         }
-        if (sport === 'volleyball' || sport === 'beach_volleyball') {
+        if (['volleyball', 'beach_volleyball'].includes(sportKey)) {
           payload.setsToWin = (details as any).setsToWin || 2;
         }
       } else {
@@ -159,13 +160,13 @@ const TournamentViewPage = () => {
         payload.secondPlaceId = winners.secondPlaceId || null;
         payload.thirdPlaceId = winners.thirdPlaceId || null;
 
-        if (sport === 'chess') {
+        if (sportKey === 'chess') {
           payload.system = editTournamentData.system;
           payload.timeControl = editTournamentData.timeControl;
           payload.participantsCount = editTournamentData.participantsCount;
-        } else if (sport === 'checkers') {
+        } else if (sportKey === 'checkers') {
           payload.variant = (details as any).variant;
-        } else if (sport === 'armwrestling') {
+        } else if (sportKey === 'armwrestling') {
           payload.hand = (details as any).hand;
           payload.weightClass = (details as any).weightClass;
           payload.category = (details as any).category;
@@ -174,14 +175,15 @@ const TournamentViewPage = () => {
         }
       }
 
-      switch (sport) {
+      switch (sportKey) {
         case 'checkers': await updateCheckersEvent(id, payload as any); break;
         case 'chess': await updateChessEvent(id, payload as any); break;
         case 'armwrestling': await updateArmwrestlingEvent(id, payload as any); break;
         case 'futsal': await updateFutsalEvent(id, payload as any); break;
         case 'volleyball': await updateVolleyballEvent(id, payload as any); break;
         case 'beach_volleyball': await updateBeachVolleyballEvent(id, payload as any); break;
-        case 'basketball_3x3': await updateBasketball3x3Event(id, payload as any); break;
+        case 'basketball_3x3':
+        case 'basketball3x3': await updateBasketball3x3Event(id, payload as any); break;
         case 'badminton': await updateBadmintonEvent(id, payload as any); break;
         default: await updateChessEvent(id, payload as any);
       }
@@ -311,9 +313,11 @@ const TournamentViewPage = () => {
         schedule: editTournamentData.schedule,
       };
 
-      if (sport === 'checkers') {
+      const sportKey = sport.toLowerCase().replace(/-/g, '_').replace(/\s/g, '');
+
+      if (sportKey === 'checkers') {
         await updateCheckersEvent(id!, { ...payload, variant: (details as any).variant || 'Russian' } as any);
-      } else if (sport === 'armwrestling') {
+      } else if (sportKey === 'armwrestling') {
         await updateArmwrestlingEvent(id!, {
           ...payload,
           hand: (details as any).hand,
@@ -322,14 +326,14 @@ const TournamentViewPage = () => {
           timeControl: editTournamentData.timeControl,
           participantsCount: editTournamentData.participantsCount
         });
-      } else if (sport === 'volleyball' || sport === 'beach_volleyball') {
-        const updateFn = sport === 'volleyball' ? updateVolleyballEvent : updateBeachVolleyballEvent;
+      } else if (sportKey === 'volleyball' || sportKey === 'beach_volleyball') {
+        const updateFn = sportKey === 'volleyball' ? updateVolleyballEvent : updateBeachVolleyballEvent;
         await updateFn(id!, { ...payload, setsToWin: (details as any).setsToWin || 2 });
-      } else if (sport === 'futsal' || sport === 'badminton') {
-        const updateFn = sport === 'futsal' ? updateFutsalEvent : updateBadmintonEvent;
+      } else if (sportKey === 'futsal' || sportKey === 'badminton') {
+        const updateFn = sportKey === 'futsal' ? updateFutsalEvent : updateBadmintonEvent;
         await updateFn(id!, { ...payload, tournamentType: (details as any).tournamentType || 'RoundRobin' });
-      } else if (sport === 'basketball_3x3') {
-        await updateBasketball3x3Event(id!, payload);
+      } else if (sportKey === 'basketball_3x3' || sportKey === 'basketball3x3') {
+        await updateBasketball3x3Event(id!, { ...payload, tournamentType: (details as any).tournamentType || 'RoundRobin' });
       } else {
         // Chess
         await updateChessEvent(id!, {
