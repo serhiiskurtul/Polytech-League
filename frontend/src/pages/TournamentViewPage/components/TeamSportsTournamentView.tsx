@@ -94,13 +94,16 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       const updateApi = getMatchUpdateApi();
       const match = details.matches.find((m: any) => m.id === matchId);
       
+      const finalHomeScore = Math.max(0, homeScore);
+      const finalAwayScore = Math.max(0, awayScore);
+      
       const payload: any = { ...match };
       if (sport === 'volleyball' || sport === 'beach_volleyball') {
-        payload.homeSetsWon = homeScore;
-        payload.awaySetsWon = awayScore;
+        payload.homeSetsWon = finalHomeScore;
+        payload.awaySetsWon = finalAwayScore;
       } else {
-        payload.homeTeamScore = homeScore;
-        payload.awayTeamScore = awayScore;
+        payload.homeTeamScore = finalHomeScore;
+        payload.awayTeamScore = finalAwayScore;
       }
 
       await updateApi(matchId, payload);
@@ -126,7 +129,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     try {
       const updateApi = getTeamUpdateApi();
       const team = details.teams.find((t: any) => t.id === teamId);
-      await updateApi(teamId, { ...team, points });
+      await updateApi(teamId, { ...team, points: Math.max(0, points) });
       onRefresh();
     } catch (err) {
       console.error(err);
@@ -397,8 +400,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       <div className={styles.scoreInput}>
                         <input 
                           type="number" 
+                          min="0"
                           defaultValue={isVolleyball ? (match.homeSetsWon || match.homeScore) : match.homeTeamScore}
-                          onBlur={(e) => handleUpdateScore(match.id, parseInt(e.target.value), awayScore)}
+                          onBlur={(e) => handleUpdateScore(match.id, parseInt(e.target.value) || 0, awayScore)}
                           disabled={!isAdmin}
                         />
                       </div>
@@ -418,8 +422,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       <div className={styles.scoreInput}>
                         <input 
                           type="number" 
+                          min="0"
                           defaultValue={isVolleyball ? (match.awaySetsWon || match.awayScore) : match.awayTeamScore}
-                          onBlur={(e) => handleUpdateScore(match.id, homeScore, parseInt(e.target.value))}
+                          onBlur={(e) => handleUpdateScore(match.id, homeScore, parseInt(e.target.value) || 0)}
                           disabled={!isAdmin}
                         />
                       </div>
@@ -461,6 +466,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       {isAdmin ? (
                         <input 
                           type="number" 
+                          min="0"
                           className={styles.pointsInlineInput}
                           defaultValue={team.points}
                           onBlur={(e) => handleUpdateTeamPoints(team.id, parseInt(e.target.value) || 0)}
