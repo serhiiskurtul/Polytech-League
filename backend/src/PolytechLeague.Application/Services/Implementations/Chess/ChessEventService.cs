@@ -32,6 +32,9 @@ public class ChessEventService(
         oldEntity.FirstPlaceId = newEntity.FirstPlaceId;
         oldEntity.SecondPlaceId = newEntity.SecondPlaceId;
         oldEntity.ThirdPlaceId = newEntity.ThirdPlaceId;
+        oldEntity.FirstPlaceTeamId = newEntity.FirstPlaceTeamId;
+        oldEntity.SecondPlaceTeamId = newEntity.SecondPlaceTeamId;
+        oldEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
         oldEntity.IsTeam = newEntity.IsTeam;
     }
 
@@ -45,9 +48,14 @@ public class ChessEventService(
             .Include(e => e.Games!)
                 .ThenInclude(g => g.BlackPlayer)
             .Include(e => e.Photos)
+            .Include(e => e.Teams!)
+                .ThenInclude(t => t.Players)
             .Include(e => e.FirstPlace)
             .Include(e => e.SecondPlace)
             .Include(e => e.ThirdPlace)
+            .Include(e => e.FirstPlaceTeam)
+            .Include(e => e.SecondPlaceTeam)
+            .Include(e => e.ThirdPlaceTeam)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 
         if (entity is null)

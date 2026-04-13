@@ -211,7 +211,8 @@ const TournamentViewPage = () => {
     prizes: '',
     headRefereeName: '',
     referees: '',
-    schedule: ''
+    schedule: '',
+    isTeam: false
   });
 
   const [isUploading, setIsUploading] = useState(false);
@@ -242,7 +243,8 @@ const TournamentViewPage = () => {
         prizes: details.prizes || '',
         headRefereeName: details.headRefereeName || '',
         referees: (details as any).referees || '',
-        schedule: details.schedule || ''
+        schedule: details.schedule || '',
+        isTeam: !!(details as any).isTeam
       });
       setIsEditingTournament(true);
     }
@@ -318,6 +320,7 @@ const TournamentViewPage = () => {
         headRefereeName: editTournamentData.headRefereeName,
         referees: editTournamentData.referees,
         schedule: editTournamentData.schedule,
+        isTeam: editTournamentData.isTeam,
       };
 
       if (sportKey === 'checkers') {
@@ -519,7 +522,8 @@ const TournamentViewPage = () => {
               prizes: detailsData.prizes || '',
               headRefereeName: detailsData.headRefereeName || '',
               referees: (detailsData as any).referees || '',
-              schedule: detailsData.schedule || ''
+              schedule: detailsData.schedule || '',
+              isTeam: !!(detailsData as any).isTeam
             });
           }
         } catch (eventErr) {
@@ -770,7 +774,7 @@ const TournamentViewPage = () => {
   const totalRounds = allGamesOrMatches.reduce((acc: number, game: any) =>
     Math.max(acc, game.round || game.roundNumber || 0), 0
   );
-  const isTeamSport = tournament?.sport === 'futsal' || tournament?.sport === 'volleyball' || tournament?.sport === 'beach_volleyball' || tournament?.sport === 'basketball_3x3' || tournament?.sport === 'badminton';
+  const isTeamSport = !!(details as any)?.isTeam;
 
   const actualParticipants = isTeamSport
     ? (details?.teams?.length || 0)
@@ -1036,10 +1040,10 @@ const TournamentViewPage = () => {
 
         {(() => {
           const s = tournament?.sport.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') || '';
-          const isTeamFromDetails = (details as any)?.isTeam;
+          const isTeamFromDetails = !!(details as any)?.isTeam;
           const mandatoryTeamSports = ['volleyball', 'beach_volleyball', 'futsal', 'basketball_3x3', 'basketball3x3'];
           
-          if (isTeamFromDetails === true || (isTeamFromDetails === undefined && mandatoryTeamSports.includes(s))) {
+          if (isTeamFromDetails === true || (isTeamFromDetails === false && mandatoryTeamSports.includes(s) && (details as any).isTeam === undefined)) {
             return (
               <TeamSportsTournamentView
                 sport={s as any}
@@ -1599,6 +1603,20 @@ const TournamentViewPage = () => {
                       </div>
                     </>
                   )}
+                  <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={editTournamentData.isTeam} 
+                        onChange={(e) => setEditTournamentData({ ...editTournamentData, isTeam: e.target.checked })} 
+                        style={{ width: '20px', height: '20px' }}
+                      />
+                      <div>
+                        <strong style={{ display: 'block' }}>Командний турнір</strong>
+                        <small style={{ color: '#64748b' }}>Активуйте, якщо матчі проводяться між командами (групами)</small>
+                      </div>
+                    </label>
+                  </div>
                   <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
                     <label>Судді</label>
                     <textarea rows={3} placeholder="Введіть імена суддів..." value={editTournamentData.referees} onChange={(e) => setEditTournamentData({ ...editTournamentData, referees: e.target.value })} />

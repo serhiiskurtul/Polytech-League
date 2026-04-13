@@ -17,16 +17,20 @@ import {
   createFutsalTeam,
   createBasketball3x3Team,
   createBadmintonTeam,
+  createChessTeam,
+  createCheckersTeam,
   updateVolleyballTeam,
   updateBeachVolleyballTeam,
   updateFutsalTeam,
   updateBasketball3x3Team,
-  updateBadmintonTeam
+  updateBadmintonTeam,
+  updateChessTeam,
+  updateCheckersTeam
 } from '@/shared/api';
 import TournamentPodium from './TournamentPodium';
 import styles from '../TournamentViewPage.module.css';
 
-type Sport = 'volleyball' | 'beach_volleyball' | 'beach-volleyball' | 'futsal' | 'basketball_3x3' | 'basketball3x3' | 'basketball-3x3' | 'badminton';
+type Sport = 'volleyball' | 'beach_volleyball' | 'beach-volleyball' | 'futsal' | 'basketball_3x3' | 'basketball3x3' | 'basketball-3x3' | 'badminton' | 'chess' | 'checkers';
 
 interface TeamSportsTournamentViewProps {
   sport: Sport;
@@ -138,9 +142,11 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   };
 
   const calculateStandings = () => {
-    if (!details.teams || !details.matches) return [];
+    const teams = details.teams || [];
+    const matches = details.matches || details.games || [];
+    if (teams.length === 0) return [];
 
-    const standings = details.teams.map((team: any) => {
+    const standings = teams.map((team: any) => {
       const stats = {
         id: team.id,
         name: team.name,
@@ -153,9 +159,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         manualPoints: team.points
       };
 
-      details.matches.forEach((match: any) => {
-        const isHome = match.homeTeamId === team.id;
-        const isAway = match.awayTeamId === team.id;
+      matches.forEach((match: any) => {
+        const isHome = match.homeTeamId === team.id || match.whitePlayerId === team.id;
+        const isAway = match.awayTeamId === team.id || match.blackPlayerId === team.id;
 
         if (isHome || isAway) {
           const isVolleyball = sport.includes('volleyball') || sport === 'badminton';
@@ -271,6 +277,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         case 'futsal': createApi = createFutsalTeam; break;
         case 'basketball_3x3': createApi = createBasketball3x3Team; break;
         case 'badminton': createApi = createBadmintonTeam; break;
+        case 'chess': createApi = createChessTeam; break;
+        case 'checkers': createApi = createCheckersTeam; break;
         default: createApi = createVolleyballTeam;
       }
 
@@ -304,6 +312,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         case 'futsal': updateApi = updateFutsalTeam; break;
         case 'basketball_3x3': updateApi = updateBasketball3x3Team; break;
         case 'badminton': updateApi = updateBadmintonTeam; break;
+        case 'chess': updateApi = updateChessTeam; break;
+        case 'checkers': updateApi = updateCheckersTeam; break;
         default: updateApi = updateVolleyballTeam;
       }
 
@@ -325,6 +335,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       case 'basketball3x3':
       case 'basketball-3x3': return 'Баскетбол 3х3';
       case 'badminton': return 'Бадмінтон';
+      case 'chess': return 'Шахи';
+      case 'checkers': return 'Шашки';
       default: return 'Спорт';
     }
   };
@@ -374,10 +386,15 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       <div className={styles.tabContent}>
         {activeTab === 'matches' && (
           <div className={styles.matchesGrid}>
-            {details.matches?.map((match: any) => {
+            {(details.matches || details.games)?.map((match: any) => {
               const isVolleyball = sport.includes('volleyball') || sport === 'badminton';
-              const homeScore = isVolleyball ? (match.homeSetsWon || match.homeScore || 0) : (match.homeTeamScore || 0);
-              const awayScore = isVolleyball ? (match.awaySetsWon || match.awayScore || 0) : (match.awayTeamScore || 0);
+              const isChessLike = sport === 'chess' || sport === 'checkers';
+              const homeScore = isVolleyball ? (match.homeSetsWon || match.homeScore || 0) : 
+                               isChessLike ? (match.whitePlayerPoints || (match.result === 'WhiteWin' ? 1 : match.result === 'Draw' ? 0.5 : 0)) :
+                               (match.homeTeamScore || 0);
+              const awayScore = isVolleyball ? (match.awaySetsWon || match.awayScore || 0) : 
+                               isChessLike ? (match.blackPlayerPoints || (match.result === 'BlackWin' ? 1 : match.result === 'Draw' ? 0.5 : 0)) :
+                               (match.awayTeamScore || 0);
               
               const isHomeWinner = homeScore > awayScore;
               const isAwayWinner = awayScore > homeScore;
@@ -393,7 +410,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         {match.homeTeam?.name?.[0] || 'T'}
                       </div>
                       <div className={`${styles.teamName} ${isHomeWinner ? styles.winnerName : ''} ${isDraw ? styles.drawName : ''}`}>
-                        {match.homeTeam?.name || 'Home'}
+                        {match.homeTeam?.name || match.whitePlayer?.name || match.whitePlayer?.lastName || 'Home'}
                         {isHomeWinner && <i className={`fas fa-crown ${styles.crownIcon}`}></i>}
                         {isDraw && <i className={`fas fa-handshake ${styles.drawIcon}`}></i>}
                       </div>
@@ -401,8 +418,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         <input 
                           type="number" 
                           min="0"
-                          defaultValue={isVolleyball ? (match.homeSetsWon || match.homeScore) : match.homeTeamScore}
-                          onBlur={(e) => handleUpdateScore(match.id, parseInt(e.target.value) || 0, awayScore)}
+                          step="0.5"
+                          defaultValue={isVolleyball ? (match.homeSetsWon || match.homeScore) : isChessLike ? homeScore : match.homeTeamScore}
+                          onBlur={(e) => handleUpdateScore(match.id, parseFloat(e.target.value) || 0, awayScore)}
                           disabled={!isAdmin}
                         />
                       </div>
@@ -415,7 +433,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         {match.awayTeam?.name?.[0] || 'T'}
                       </div>
                       <div className={`${styles.teamName} ${isAwayWinner ? styles.winnerName : ''} ${isDraw ? styles.drawName : ''}`}>
-                        {match.awayTeam?.name || 'Away'}
+                        {match.awayTeam?.name || match.blackPlayer?.name || match.blackPlayer?.lastName || 'Away'}
                         {isAwayWinner && <i className={`fas fa-crown ${styles.crownIcon}`}></i>}
                         {isDraw && <i className={`fas fa-handshake ${styles.drawIcon}`}></i>}
                       </div>
@@ -423,8 +441,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         <input 
                           type="number" 
                           min="0"
-                          defaultValue={isVolleyball ? (match.awaySetsWon || match.awayScore) : match.awayTeamScore}
-                          onBlur={(e) => handleUpdateScore(match.id, homeScore, parseInt(e.target.value) || 0)}
+                          step="0.5"
+                          defaultValue={isVolleyball ? (match.awaySetsWon || match.awayScore) : isChessLike ? awayScore : match.awayTeamScore}
+                          onBlur={(e) => handleUpdateScore(match.id, homeScore, parseFloat(e.target.value) || 0)}
                           disabled={!isAdmin}
                         />
                       </div>
@@ -433,7 +452,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                 </div>
               );
             })}
-            {(!details.matches || details.matches.length === 0) && <p className={styles.noData}>Матчів ще не заплановано</p>}
+            {(!(details.matches || details.games) || (details.matches || details.games).length === 0) && <p className={styles.noData}>Матчів ще не заплановано</p>}
           </div>
         )}
 

@@ -45,3 +45,12 @@ export const uploadCheckersPhoto = async (id: number | string, file: File): Prom
 export const deleteCheckersPhoto = async (id: number | string, photoId: number): Promise<void> => {
   await api.delete(`/checkers-events/${id}/photos/${photoId}`);
 };
+
+export const createCheckersTeam = async (data: any): Promise<any> => {
+    const response = await api.post(`/checkers-teams`, data);
+    return response.data;
+};
+
+export const updateCheckersTeam = async (id: number, data: any): Promise<void> => {
+    await api.put(`/checkers-teams/${id}`, data);
+};

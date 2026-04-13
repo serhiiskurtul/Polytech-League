@@ -40,8 +40,10 @@ public static class ServiceExtension
 
         services.AddScoped<IChessEventService, ChessEventService>();
         services.AddScoped<IChessGameService, ChessGameService>();
+        services.AddScoped<IChessTeamService, ChessTeamService>();
         services.AddScoped<ICheckersEventService, CheckersEventService>();
         services.AddScoped<ICheckersGameService, CheckersGameService>();
+        services.AddScoped<ICheckersTeamService, CheckersTeamService>();
         services.AddScoped<ITableTennisEventService, TableTennisEventService>();
         services.AddScoped<ITableTennisMatchService, TableTennisMatchService>();
         services.AddScoped<ITableTennisSetService, TableTennisSetService>();

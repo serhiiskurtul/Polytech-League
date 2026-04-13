@@ -106,7 +106,7 @@ export const useTournamentForm = () => {
     const teamSports = ['futsal', 'basketball_3x3', 'volleyball', 'beach_volleyball'];
     if (teamSports.includes(formData.sport)) {
       setFormData(prev => ({ ...prev, isTeam: true }));
-    } else if (['chess', 'checkers', 'table_tennis', 'armwrestling'].includes(formData.sport)) {
+    } else if (['table_tennis', 'armwrestling'].includes(formData.sport)) {
       // Для індивідуальних видів спорту за замовчуванням false
       setFormData(prev => ({ ...prev, isTeam: false }));
     }

@@ -1,5 +1,11 @@
 import { PlayerDto } from './player.types';
 
+export interface ChessTeamResponse {
+  id: number;
+  name: string;
+  players?: PlayerDto[];
+}
+
 export interface EventPhoto {
   id: number;
   url: string;
@@ -55,6 +61,8 @@ export interface ChessEventResponse {
   system: ChessSystem;
   games: ChessGameResponse[];
   players: ChessEventParticipantResponse[];
+  teams: ChessTeamResponse[] | null;
+  isTeam: boolean;
   firstPlace?: PlayerDto | null;
   secondPlace?: PlayerDto | null;
   thirdPlace?: PlayerDto | null;
@@ -80,6 +88,7 @@ export interface ChessEventRequest {
   headRefereeName?: string;
   referees?: string;
   schedule?: string;
+  isTeam: boolean;
   firstPlaceId?: number | null;
   secondPlaceId?: number | null;
   thirdPlaceId?: number | null;

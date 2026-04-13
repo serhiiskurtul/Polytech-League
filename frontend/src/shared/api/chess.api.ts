@@ -55,3 +55,12 @@ export const deleteChessGame = async (gameId: number | string, tournamentId: num
 export const updateChessGame = async (gameId: number | string, data: ChessGameDto): Promise<void> => {
     await api.put(`/chess-games/${gameId}`, data);
 };
+
+export const createChessTeam = async (data: any): Promise<any> => {
+    const response = await api.post(`/chess-teams`, data);
+    return response.data;
+};
+
+export const updateChessTeam = async (id: number, data: any): Promise<void> => {
+    await api.put(`/chess-teams/${id}`, data);
+};

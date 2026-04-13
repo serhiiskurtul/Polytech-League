@@ -36,6 +36,10 @@ public class CheckersEventRequest
     public long? FirstPlaceId { get; set; }
     public long? SecondPlaceId { get; set; }
     public long? ThirdPlaceId { get; set; }
+
+    public long? FirstPlaceTeamId { get; set; }
+    public long? SecondPlaceTeamId { get; set; }
+    public long? ThirdPlaceTeamId { get; set; }
 }
 
 public class CheckersEventResponse
@@ -61,6 +65,7 @@ public class CheckersEventResponse
 
     public required ICollection<CheckersGameDto> Games { get; set; }
     public required ICollection<CheckersEventParticipantDto> Players { get; set; }
+    public ICollection<CheckersTeamResponse>? Teams { get; set; }
 
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
@@ -72,6 +77,10 @@ public class CheckersEventResponse
     public PlayerDto? FirstPlace { get; set; }
     public PlayerDto? SecondPlace { get; set; }
     public PlayerDto? ThirdPlace { get; set; }
+
+    public CheckersTeamResponse? FirstPlaceTeam { get; set; }
+    public CheckersTeamResponse? SecondPlaceTeam { get; set; }
+    public CheckersTeamResponse? ThirdPlaceTeam { get; set; }
 }
 
 public static class CheckersEventDtoExtension
@@ -98,7 +107,10 @@ public static class CheckersEventDtoExtension
             IsTeam = checkersEventRequest.IsTeam,
             FirstPlaceId = checkersEventRequest.FirstPlaceId,
             SecondPlaceId = checkersEventRequest.SecondPlaceId,
-            ThirdPlaceId = checkersEventRequest.ThirdPlaceId
+            ThirdPlaceId = checkersEventRequest.ThirdPlaceId,
+            FirstPlaceTeamId = checkersEventRequest.FirstPlaceTeamId,
+            SecondPlaceTeamId = checkersEventRequest.SecondPlaceTeamId,
+            ThirdPlaceTeamId = checkersEventRequest.ThirdPlaceTeamId
         };
     }
 
@@ -120,6 +132,7 @@ public static class CheckersEventDtoExtension
             Variant = checkersEvent.Variant,
             Games = checkersEvent.Games?.Select(g => g.ToDto()).ToList() ?? [],
             Players = checkersEvent.Players?.Select(p => p.ToDto()).ToList() ?? [],
+            Teams = checkersEvent.Teams?.Select(t => t.ToResponse()).ToList(),
             Rules = checkersEvent.Rules,
             Prizes = checkersEvent.Prizes,
             HeadRefereeName = checkersEvent.HeadRefereeName,
@@ -128,7 +141,10 @@ public static class CheckersEventDtoExtension
             IsTeam = checkersEvent.IsTeam,
             FirstPlace = checkersEvent.FirstPlace?.ToDto(),
             SecondPlace = checkersEvent.SecondPlace?.ToDto(),
-            ThirdPlace = checkersEvent.ThirdPlace?.ToDto()
+            ThirdPlace = checkersEvent.ThirdPlace?.ToDto(),
+            FirstPlaceTeam = checkersEvent.FirstPlaceTeam?.ToResponse(),
+            SecondPlaceTeam = checkersEvent.SecondPlaceTeam?.ToResponse(),
+            ThirdPlaceTeam = checkersEvent.ThirdPlaceTeam?.ToResponse()
         };
     }
 }

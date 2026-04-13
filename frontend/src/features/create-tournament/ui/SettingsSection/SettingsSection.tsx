@@ -41,26 +41,83 @@ const SettingsSection = ({ formData, handleInputChange }: SettingsSectionProps) 
             </select>
           </div>
 
-          {/* Варіант шашок (тільки якщо вибрано шашки) */}
-          {formData.sport === 'checkers' && (
-            <div className={shared.formGroup}>
-              <label className={shared.formLabel}>
-                <i className="fas fa-th-large"></i> Варіант шашок *
-              </label>
-              <select
-                name="variant"
-                value={formData.variant || "International"}
-                onChange={handleInputChange}
-                className={shared.formSelect}
-                required
-              >
-                {CHECKERS_VARIANTS.map(variant => (
-                  <option key={variant.id} value={variant.id}>
-                    {variant.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+          {/* Варіант шашок та налаштування для шашок/шахів */}
+          {(formData.sport === 'chess' || formData.sport === 'checkers') && (
+            <>
+              <div className={shared.formGroup}>
+                <label className={shared.formLabel}>
+                  <i className="fas fa-stopwatch"></i> Контроль часу *
+                </label>
+                <input
+                  type="text"
+                  name="timeControl"
+                  value={formData.timeControl}
+                  onChange={handleInputChange}
+                  placeholder="напр. 10+5 або 10хв"
+                  className={shared.formInput}
+                  required
+                />
+              </div>
+
+              <div className={shared.formGroup}>
+                <label className={shared.formLabel}>
+                  <i className="fas fa-project-diagram"></i> Система проведення *
+                </label>
+                <select
+                  name="system"
+                  value={formData.system}
+                  onChange={handleInputChange}
+                  className={shared.formSelect}
+                  required
+                >
+                  <option value="Swiss">Швейцарська система</option>
+                  <option value="RoundRobin">Кругова система</option>
+                  <option value="Knockout">Олімпійська система (Knockout)</option>
+                </select>
+              </div>
+
+              <div className={shared.formGroup} style={{ gridColumn: '1 / -1' }}>
+                <label className={shared.checkboxLabel}>
+                  <div className={shared.checkboxWrapper}>
+                    <input
+                      type="checkbox"
+                      name="isTeam"
+                      checked={formData.isTeam}
+                      onChange={handleInputChange}
+                      className={shared.hiddenCheckbox}
+                    />
+                    <div className={shared.customCheckbox}>
+                      <i className="fas fa-check"></i>
+                    </div>
+                  </div>
+                  <div className={shared.checkboxText}>
+                    <span className={shared.checkboxTitle}>Командний турнір</span>
+                    <span className={shared.checkboxDesc}>Турнір проводитиметься між командами, а не індивідуальними гравцями</span>
+                  </div>
+                </label>
+              </div>
+
+              {formData.sport === 'checkers' && (
+                <div className={shared.formGroup}>
+                  <label className={shared.formLabel}>
+                    <i className="fas fa-th-large"></i> Варіант шашок *
+                  </label>
+                  <select
+                    name="variant"
+                    value={formData.variant || "International"}
+                    onChange={handleInputChange}
+                    className={shared.formSelect}
+                    required
+                  >
+                    {CHECKERS_VARIANTS.map(variant => (
+                      <option key={variant.id} value={variant.id}>
+                        {variant.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </>
           )}
 
           {/* Налаштування настільного тенісу */}

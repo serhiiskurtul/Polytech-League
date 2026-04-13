@@ -46,11 +46,13 @@ public class ApplicationDbContext : DbContext
     public DbSet<ChessEventParticipant> ChessEventParticipants { get; set; }
     public DbSet<ChessEvent> ChessEvents { get; set; }
     public DbSet<ChessGame> ChessGames { get; set; }
+    public DbSet<ChessTeam> ChessTeams { get; set; }
     public DbSet<ChessReferee> ChessReferees { get; set; }
     public DbSet<CheckersGame> CheckersGames { get; set; }
     public DbSet<CheckersEventParticipant> CheckersEventParticipants { get; set; }
     public DbSet<CheckersReferee> CheckersReferees { get; set; }
     public DbSet<CheckersEvent> CheckersEvents { get; set; }
+    public DbSet<CheckersTeam> CheckersTeams { get; set; }
     public DbSet<TableTennisEvent> TableTennisEvents { get; set; }
     public DbSet<TableTennisEventParticipant> TableTennisEventParticipants { get; set; }
     public DbSet<TableTennisMatch> TableTennisMatches { get; set; }
@@ -126,12 +128,14 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new ChessEventConfiguration());
         modelBuilder.ApplyConfiguration(new ChessEventParticipantConfiguration());
         modelBuilder.ApplyConfiguration(new ChessGameConfiguration());
+        modelBuilder.ApplyConfiguration(new ChessTeamConfiguration());
 
         // Checkers configurations
         modelBuilder.ApplyConfiguration(new CheckersRefereeConfiguration());
         modelBuilder.ApplyConfiguration(new CheckersEventConfiguration());
         modelBuilder.ApplyConfiguration(new CheckersEventParticipantConfiguration());
         modelBuilder.ApplyConfiguration(new CheckersGameConfiguration());
+        modelBuilder.ApplyConfiguration(new CheckersTeamConfiguration());
 
         // Table Tennis configurations
         modelBuilder.ApplyConfiguration(new TableTennisEventConfiguration());

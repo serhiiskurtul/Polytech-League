@@ -1,4 +1,10 @@
 import { PlayerDto } from './player.types';
+
+export interface CheckersTeamResponse {
+  id: number;
+  name: string;
+  players?: PlayerDto[];
+}
 import { EventPhoto, CompetitionLevel, GameResult } from './chess.types';
 
 export type CheckersSystem = "Swiss" | "RoundRobin" | "Knockout";
@@ -41,6 +47,8 @@ export interface CheckersEventResponse {
   variant: CheckersVariant;
   games: CheckersGameResponse[];
   players: CheckersEventParticipantResponse[];
+  teams: CheckersTeamResponse[] | null;
+  isTeam: boolean;
   firstPlace?: PlayerDto | null;
   secondPlace?: PlayerDto | null;
   thirdPlace?: PlayerDto | null;
@@ -67,6 +75,7 @@ export interface CheckersEventRequest {
   headRefereeName?: string;
   referees?: string;
   schedule?: string;
+  isTeam: boolean;
   firstPlaceId?: number | null;
   secondPlaceId?: number | null;
   thirdPlaceId?: number | null;

@@ -32,6 +32,10 @@ public class ChessEventRequest
     public long? FirstPlaceId { get; set; }
     public long? SecondPlaceId { get; set; }
     public long? ThirdPlaceId { get; set; }
+    
+    public long? FirstPlaceTeamId { get; set; }
+    public long? SecondPlaceTeamId { get; set; }
+    public long? ThirdPlaceTeamId { get; set; }
 }
 
 public class ChessEventResponse
@@ -53,6 +57,7 @@ public class ChessEventResponse
     public required ChessSystem System { get; set; }
     public required ICollection<ChessGameDto> Games { get; set; }
     public required ICollection<ChessEventParticipantDto> Players { get; set; }
+    public ICollection<ChessTeamResponse>? Teams { get; set; }
     
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
@@ -64,6 +69,10 @@ public class ChessEventResponse
     public PlayerDto? FirstPlace { get; set; }
     public PlayerDto? SecondPlace { get; set; }
     public PlayerDto? ThirdPlace { get; set; }
+
+    public ChessTeamResponse? FirstPlaceTeam { get; set; }
+    public ChessTeamResponse? SecondPlaceTeam { get; set; }
+    public ChessTeamResponse? ThirdPlaceTeam { get; set; }
 }
 
 public static class ChessEventDtoExtension
@@ -89,7 +98,10 @@ public static class ChessEventDtoExtension
             IsTeam = chessEventRequest.IsTeam,
             FirstPlaceId = chessEventRequest.FirstPlaceId,
             SecondPlaceId = chessEventRequest.SecondPlaceId,
-            ThirdPlaceId = chessEventRequest.ThirdPlaceId
+            ThirdPlaceId = chessEventRequest.ThirdPlaceId,
+            FirstPlaceTeamId = chessEventRequest.FirstPlaceTeamId,
+            SecondPlaceTeamId = chessEventRequest.SecondPlaceTeamId,
+            ThirdPlaceTeamId = chessEventRequest.ThirdPlaceTeamId
         };
     }
 
@@ -110,6 +122,7 @@ public static class ChessEventDtoExtension
             System = chessEvent.System,
             Games = chessEvent.Games?.Select(g => g.ToDto()).ToList() ?? [],
             Players = chessEvent.Players?.Select(p => p.ToDto()).ToList() ?? [],
+            Teams = chessEvent.Teams?.Select(t => t.ToResponse()).ToList(),
             Rules = chessEvent.Rules,
             Prizes = chessEvent.Prizes,
             HeadRefereeName = chessEvent.HeadRefereeName,
@@ -118,7 +131,10 @@ public static class ChessEventDtoExtension
             IsTeam = chessEvent.IsTeam,
             FirstPlace = chessEvent.FirstPlace?.ToDto(),
             SecondPlace = chessEvent.SecondPlace?.ToDto(),
-            ThirdPlace = chessEvent.ThirdPlace?.ToDto()
+            ThirdPlace = chessEvent.ThirdPlace?.ToDto(),
+            FirstPlaceTeam = chessEvent.FirstPlaceTeam?.ToResponse(),
+            SecondPlaceTeam = chessEvent.SecondPlaceTeam?.ToResponse(),
+            ThirdPlaceTeam = chessEvent.ThirdPlaceTeam?.ToResponse()
         };
     }
 }

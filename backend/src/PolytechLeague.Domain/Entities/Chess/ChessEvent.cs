@@ -7,6 +7,13 @@ public class ChessEvent : Event
     public required ChessSystem System { get; set; }
     public ICollection<ChessGame>? Games { get; set; }
     public ICollection<ChessEventParticipant>? Players { get; set; }
+    public ICollection<ChessTeam>? Teams { get; set; }
+    public long? FirstPlaceTeamId { get; set; }
+    public ChessTeam? FirstPlaceTeam { get; set; }
+    public long? SecondPlaceTeamId { get; set; }
+    public ChessTeam? SecondPlaceTeam { get; set; }
+    public long? ThirdPlaceTeamId { get; set; }
+    public ChessTeam? ThirdPlaceTeam { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
 }
