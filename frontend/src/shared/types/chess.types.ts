@@ -45,6 +45,10 @@ export interface ChessGameResponse {
   result: GameResult;
   whiteColor: PiecesColor;
   blackColor: PiecesColor;
+  whiteTeamId?: number | null;
+  blackTeamId?: number | null;
+  whiteTeamScore?: number | null;
+  blackTeamScore?: number | null;
 }
 
 export interface ChessEventResponse {
@@ -109,4 +113,8 @@ export interface ChessGameDto {
     result: GameResult;
     round: number;
     board: number;
+    whiteTeamId?: number | null;
+    blackTeamId?: number | null;
+    whiteTeamScore?: number | null;
+    blackTeamScore?: number | null;
 }

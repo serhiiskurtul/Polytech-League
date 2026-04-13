@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PlayerDto } from '@/shared/types/player.types';
+import { ChessEventResponse, ChessEventParticipantDto, ChessGameDto, ChessEventRequest, GameResult } from '@/shared/types/chess.types';
 import { getAllPlayers } from '@/shared/api';
 import { 
   updateVolleyballMatch, 
@@ -7,11 +8,15 @@ import {
   updateFutsalMatch, 
   updateBasketball3x3Match,
   updateBadmintonMatch,
+  updateChessGame,
+  updateCheckersGame,
   createVolleyballMatch,
   createBeachVolleyballMatch,
   createFutsalMatch,
   createBasketball3x3Match,
   createBadmintonMatch,
+  createChessGame,
+  createCheckersGame,
   createVolleyballTeam,
   createBeachVolleyballTeam,
   createFutsalTeam,
@@ -89,6 +94,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       case 'futsal': return updateFutsalMatch;
       case 'basketball_3x3': return updateBasketball3x3Match;
       case 'badminton': return updateBadmintonMatch;
+      case 'chess': return updateChessGame;
+      case 'checkers': return updateCheckersGame;
       default: return updateVolleyballMatch;
     }
   };
@@ -96,24 +103,63 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const handleUpdateScore = async (matchId: number, homeScore: number, awayScore: number) => {
     try {
       const updateApi = getMatchUpdateApi();
-      const match = details.matches.find((m: any) => m.id === matchId);
+      const allMatches = details.matches || details.games || [];
+      const match = allMatches.find((m: any) => m.id === matchId);
+      if (!match) return;
       
       const finalHomeScore = Math.max(0, homeScore);
       const finalAwayScore = Math.max(0, awayScore);
       
-      const payload: any = { ...match };
-      if (sport === 'volleyball' || sport === 'beach_volleyball') {
-        payload.homeSetsWon = finalHomeScore;
-        payload.awaySetsWon = finalAwayScore;
+      let payload: any;
+
+      if (sport === 'volleyball' || sport === 'beach_volleyball' || sport === 'beach-volleyball') {
+        payload = {
+          id: matchId,
+          eventId: details.id,
+          homeTeamId: match.homeTeamId,
+          awayTeamId: match.awayTeamId,
+          stage: match.stage,
+          homeSetsWon: finalHomeScore,
+          awaySetsWon: finalAwayScore,
+          homeRosterIds: match.homeRosterIds || [],
+          awayRosterIds: match.awayRosterIds || []
+        };
+      } else if (sport === 'chess' || sport === 'checkers') {
+        // Auto-calculate result for board games
+        let calculatedResult: GameResult = 'NotPlayed';
+        if (finalHomeScore > finalAwayScore) calculatedResult = 'WhiteWin';
+        else if (finalAwayScore > finalHomeScore) calculatedResult = 'BlackWin';
+        else if (finalHomeScore > 0 || finalAwayScore > 0) calculatedResult = 'Draw';
+
+        payload = {
+          id: matchId,
+          tournamentId: details.id,
+          whitePlayerId: match.whitePlayerId,
+          blackPlayerId: match.blackPlayerId,
+          whiteTeamId: match.whiteTeamId,
+          blackTeamId: match.blackTeamId,
+          whiteTeamScore: finalHomeScore,
+          blackTeamScore: finalAwayScore,
+          result: calculatedResult,
+          round: match.round || 1,
+          board: match.board || 1
+        };
       } else {
-        payload.homeTeamScore = finalHomeScore;
-        payload.awayTeamScore = finalAwayScore;
+        // Futsal, Basketball, etc.
+        payload = {
+          id: matchId,
+          homeTeamId: match.homeTeamId,
+          awayTeamId: match.awayTeamId,
+          homeTeamScore: finalHomeScore,
+          awayTeamScore: finalAwayScore,
+          stage: match.stage
+        };
       }
 
       await updateApi(matchId, payload);
       onRefresh();
     } catch (err) {
-      console.error(err);
+      console.error('Update Score Error:', err);
       alert('Помилка при оновленні рахунку');
     }
   };
@@ -125,6 +171,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       case 'futsal': return updateFutsalTeam;
       case 'basketball_3x3': return updateBasketball3x3Team;
       case 'badminton': return updateBadmintonTeam;
+      case 'chess': return updateChessTeam;
+      case 'checkers': return updateCheckersTeam;
       default: return updateVolleyballTeam;
     }
   };
@@ -160,18 +208,30 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       };
 
       matches.forEach((match: any) => {
-        const isHome = match.homeTeamId === team.id || match.whitePlayerId === team.id;
-        const isAway = match.awayTeamId === team.id || match.blackPlayerId === team.id;
+        const isChessLike = sport === 'chess' || sport === 'checkers';
+        
+        let isHome = false;
+        let isAway = false;
+        let hScore = 0;
+        let aScore = 0;
+        let isPlayed = false;
+
+        if (isChessLike) {
+          isHome = match.whiteTeamId === team.id;
+          isAway = match.blackTeamId === team.id;
+          hScore = match.whiteTeamScore || 0;
+          aScore = match.blackTeamScore || 0;
+          isPlayed = match.whiteTeamScore !== null || match.blackTeamScore !== null;
+        } else {
+          isHome = match.homeTeamId === team.id;
+          isAway = match.awayTeamId === team.id;
+          const isVolleyball = sport.includes('volleyball') || sport === 'badminton';
+          hScore = isVolleyball ? (match.homeSetsWon || 0) : (match.homeTeamScore || 0);
+          aScore = isVolleyball ? (match.awaySetsWon || 0) : (match.awayTeamScore || 0);
+          isPlayed = isVolleyball ? (match.homeSetsWon !== null || match.awaySetsWon !== null) : (match.homeTeamScore !== null || match.awayTeamScore !== null);
+        }
 
         if (isHome || isAway) {
-          const isVolleyball = sport.includes('volleyball') || sport === 'badminton';
-          const hScore = isVolleyball ? (match.homeSetsWon || 0) : (match.homeTeamScore || 0);
-          const aScore = isVolleyball ? (match.awaySetsWon || 0) : (match.awayTeamScore || 0);
-          
-          // Only count if match has a score (at least one side > 0 or it's a 0-0 draw that was actually played)
-          // For simplicity, we assume if stage is set, it might be played, but let's check if score is entered
-          const isPlayed = isVolleyball ? (match.homeSetsWon !== null || match.awaySetsWon !== null) : (match.homeTeamScore !== null || match.awayTeamScore !== null);
-
           if (isPlayed) {
             stats.gp++;
             const tScore = isHome ? hScore : aScore;
@@ -229,7 +289,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       const homeTeam = details.teams.find((t: any) => t.id === parseInt(newMatchForm.homeTeamId));
       const awayTeam = details.teams.find((t: any) => t.id === parseInt(newMatchForm.awayTeamId));
 
-      const payload = {
+      let createApi;
+      let payload: any = {
         eventId: details.id,
         homeTeamId: parseInt(newMatchForm.homeTeamId),
         awayTeamId: parseInt(newMatchForm.awayTeamId),
@@ -238,13 +299,33 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         awayRosterIds: awayTeam?.players?.map((p: any) => p.id) || []
       };
 
-      let createApi;
       switch (sport) {
         case 'volleyball': createApi = createVolleyballMatch; break;
         case 'beach_volleyball': createApi = createBeachVolleyballMatch; break;
         case 'futsal': createApi = createFutsalMatch; break;
         case 'basketball_3x3': createApi = createBasketball3x3Match; break;
         case 'badminton': createApi = createBadmintonMatch; break;
+        case 'chess': 
+          createApi = createChessGame; 
+          payload = {
+            tournamentId: details.id,
+            whiteTeamId: parseInt(newMatchForm.homeTeamId),
+            blackTeamId: parseInt(newMatchForm.awayTeamId),
+            round: 1, // Default to round 1
+            board: 1, // Default to board 1
+            result: 'NotPlayed'
+          };
+          break;
+        case 'checkers': 
+          createApi = createCheckersGame; 
+          payload = {
+            tournamentId: details.id,
+            whiteTeamId: parseInt(newMatchForm.homeTeamId),
+            blackTeamId: parseInt(newMatchForm.awayTeamId),
+            round: 1,
+            result: 'NotPlayed'
+          };
+          break;
         default: createApi = createVolleyballMatch;
       }
 
@@ -389,16 +470,18 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
             {(details.matches || details.games)?.map((match: any) => {
               const isVolleyball = sport.includes('volleyball') || sport === 'badminton';
               const isChessLike = sport === 'chess' || sport === 'checkers';
-              const homeScore = isVolleyball ? (match.homeSetsWon || match.homeScore || 0) : 
-                               isChessLike ? (match.whitePlayerPoints || (match.result === 'WhiteWin' ? 1 : match.result === 'Draw' ? 0.5 : 0)) :
-                               (match.homeTeamScore || 0);
-              const awayScore = isVolleyball ? (match.awaySetsWon || match.awayScore || 0) : 
-                               isChessLike ? (match.blackPlayerPoints || (match.result === 'BlackWin' ? 1 : match.result === 'Draw' ? 0.5 : 0)) :
-                               (match.awayTeamScore || 0);
               
-              const isHomeWinner = homeScore > awayScore;
-              const isAwayWinner = awayScore > homeScore;
-              const isDraw = homeScore === awayScore && (homeScore > 0 || awayScore > 0);
+              // Get scores based on sport type
+              const homeScore = isVolleyball ? (match.homeSetsWon ?? match.homeScore ?? 0) : 
+                               isChessLike ? (match.whiteTeamScore ?? match.whitePlayerPoints ?? 0) :
+                               (match.homeTeamScore ?? 0);
+              const awayScore = isVolleyball ? (match.awaySetsWon ?? match.awayScore ?? 0) : 
+                               isChessLike ? (match.blackTeamScore ?? match.blackPlayerPoints ?? 0) :
+                               (match.awayTeamScore ?? 0);
+              
+              const isHomeWinner = Number(homeScore) > Number(awayScore);
+              const isAwayWinner = Number(awayScore) > Number(homeScore);
+              const isDraw = Number(homeScore) === Number(awayScore) && Number(homeScore) > 0;
 
               return (
                 <div key={match.id} className={styles.matchCard}>
@@ -407,10 +490,10 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   <div className={styles.matchTeams}>
                     <div className={`${styles.teamRow} ${isHomeWinner ? styles.winnerRow : ''} ${isDraw ? styles.drawRow : ''}`}>
                       <div className={`${styles.teamLogo} ${isHomeWinner ? styles.winnerLogo : ''}`}>
-                        {match.homeTeam?.name?.[0] || 'T'}
+                        {(match.whiteTeam?.name || match.homeTeam?.name || match.whitePlayer?.lastName)?.[0] || 'T'}
                       </div>
                       <div className={`${styles.teamName} ${isHomeWinner ? styles.winnerName : ''} ${isDraw ? styles.drawName : ''}`}>
-                        {match.homeTeam?.name || match.whitePlayer?.name || match.whitePlayer?.lastName || 'Home'}
+                        {match.whiteTeam?.name || match.homeTeam?.name || match.whitePlayer?.name || match.whitePlayer?.lastName || 'Home'}
                         {isHomeWinner && <i className={`fas fa-crown ${styles.crownIcon}`}></i>}
                         {isDraw && <i className={`fas fa-handshake ${styles.drawIcon}`}></i>}
                       </div>
@@ -419,7 +502,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                           type="number" 
                           min="0"
                           step="0.5"
-                          defaultValue={isVolleyball ? (match.homeSetsWon || match.homeScore) : isChessLike ? homeScore : match.homeTeamScore}
+                          key={`${match.id}-home-${homeScore}`}
+                          defaultValue={homeScore}
                           onBlur={(e) => handleUpdateScore(match.id, parseFloat(e.target.value) || 0, awayScore)}
                           disabled={!isAdmin}
                         />
@@ -430,10 +514,10 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
                     <div className={`${styles.teamRow} ${isAwayWinner ? styles.winnerRow : ''} ${isDraw ? styles.drawRow : ''}`}>
                       <div className={`${styles.teamLogo} ${isAwayWinner ? styles.winnerLogo : ''}`}>
-                        {match.awayTeam?.name?.[0] || 'T'}
+                        {(match.blackTeam?.name || match.awayTeam?.name || match.blackPlayer?.lastName)?.[0] || 'T'}
                       </div>
                       <div className={`${styles.teamName} ${isAwayWinner ? styles.winnerName : ''} ${isDraw ? styles.drawName : ''}`}>
-                        {match.awayTeam?.name || match.blackPlayer?.name || match.blackPlayer?.lastName || 'Away'}
+                        {match.blackTeam?.name || match.awayTeam?.name || match.blackPlayer?.name || match.blackPlayer?.lastName || 'Away'}
                         {isAwayWinner && <i className={`fas fa-crown ${styles.crownIcon}`}></i>}
                         {isDraw && <i className={`fas fa-handshake ${styles.drawIcon}`}></i>}
                       </div>
@@ -442,7 +526,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                           type="number" 
                           min="0"
                           step="0.5"
-                          defaultValue={isVolleyball ? (match.awaySetsWon || match.awayScore) : isChessLike ? awayScore : match.awayTeamScore}
+                          key={`${match.id}-away-${awayScore}`}
+                          defaultValue={awayScore}
                           onBlur={(e) => handleUpdateScore(match.id, homeScore, parseFloat(e.target.value) || 0)}
                           disabled={!isAdmin}
                         />

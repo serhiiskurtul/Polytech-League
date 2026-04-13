@@ -36,11 +36,27 @@ public class CheckersGameConfiguration : IEntityTypeConfiguration<CheckersGame>
 
         builder.Property(x => x.WhitePlayerId)
             .HasColumnName("white_player_id")
-            .IsRequired();
+            .IsRequired(false);
 
         builder.Property(x => x.BlackPlayerId)
             .HasColumnName("black_player_id")
-            .IsRequired();
+            .IsRequired(false);
+
+        builder.Property(x => x.WhiteTeamId)
+            .HasColumnName("white_team_id")
+            .IsRequired(false);
+
+        builder.Property(x => x.BlackTeamId)
+            .HasColumnName("black_team_id")
+            .IsRequired(false);
+
+        builder.Property(x => x.WhiteTeamScore)
+            .HasColumnName("white_team_score")
+            .IsRequired(false);
+
+        builder.Property(x => x.BlackTeamScore)
+            .HasColumnName("black_team_score")
+            .IsRequired(false);
 
         builder.Property(x => x.Result)
             .HasColumnName("result")
@@ -74,6 +90,18 @@ public class CheckersGameConfiguration : IEntityTypeConfiguration<CheckersGame>
         builder.HasOne(g => g.BlackPlayer)
             .WithMany()
             .HasForeignKey(g => g.BlackPlayerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // White team
+        builder.HasOne(g => g.WhiteTeam)
+            .WithMany()
+            .HasForeignKey(g => g.WhiteTeamId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Black team
+        builder.HasOne(g => g.BlackTeam)
+            .WithMany()
+            .HasForeignKey(g => g.BlackTeamId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

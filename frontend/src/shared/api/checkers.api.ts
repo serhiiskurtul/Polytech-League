@@ -54,3 +54,11 @@ export const createCheckersTeam = async (data: any): Promise<any> => {
 export const updateCheckersTeam = async (id: number, data: any): Promise<void> => {
     await api.put(`/checkers-teams/${id}`, data);
 };
+
+export const updateCheckersGame = async (gameId: number | string, data: CheckersGameDto): Promise<void> => {
+    await api.put(`/checkers-games/${gameId}`, data);
+};
+
+export const deleteCheckersGame = async (gameId: number | string, tournamentId: number | string): Promise<void> => {
+    await api.delete(`/checkers-games/${gameId}?tournamentId=${tournamentId}`);
+};

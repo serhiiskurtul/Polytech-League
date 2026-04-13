@@ -9,13 +9,20 @@ public class CheckersGameDto
     public long Id { get; set; }
     public long TournamentId { get; set; }
 
-    public long WhitePlayerId { get; set; }
+    public long? WhitePlayerId { get; set; }
     public string? WhitePlayerName { get; set; }
     public long? WhiteUserId { get; set; }
 
-    public long BlackPlayerId { get; set; }
+    public long? BlackPlayerId { get; set; }
     public string? BlackPlayerName { get; set; }
     public long? BlackUserId { get; set; }
+
+    public long? WhiteTeamId { get; set; }
+    public CheckersTeamResponse? WhiteTeam { get; set; }
+    public long? BlackTeamId { get; set; }
+    public CheckersTeamResponse? BlackTeam { get; set; }
+    public double? WhiteTeamScore { get; set; }
+    public double? BlackTeamScore { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public GameResult Result { get; set; }
@@ -41,6 +48,12 @@ public static class CheckersGameDtoExtensions
             BlackPlayerId = game.BlackPlayerId,
             BlackPlayerName = game.BlackPlayer?.Player != null ? $"{game.BlackPlayer.Player.FirstName} {game.BlackPlayer.Player.LastName}" : null,
             BlackUserId = game.BlackPlayer?.Player?.UserId,
+            WhiteTeamId = game.WhiteTeamId,
+            WhiteTeam = game.WhiteTeam?.ToResponse(),
+            BlackTeamId = game.BlackTeamId,
+            BlackTeam = game.BlackTeam?.ToResponse(),
+            WhiteTeamScore = game.WhiteTeamScore,
+            BlackTeamScore = game.BlackTeamScore,
             Result = game.Result,
             Round = game.Round,
             ScheduledAt = game.ScheduledAt,
@@ -56,6 +69,10 @@ public static class CheckersGameDtoExtensions
             TournamentId = dto.TournamentId,
             WhitePlayerId = dto.WhitePlayerId,
             BlackPlayerId = dto.BlackPlayerId,
+            WhiteTeamId = dto.WhiteTeamId,
+            BlackTeamId = dto.BlackTeamId,
+            WhiteTeamScore = dto.WhiteTeamScore,
+            BlackTeamScore = dto.BlackTeamScore,
             Result = dto.Result,
             Round = dto.Round,
             ScheduledAt = dto.ScheduledAt,

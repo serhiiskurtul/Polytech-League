@@ -40,30 +40,28 @@ public class ChessEventService(
 
     public override async Task<ChessEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)
     {
-        var entity = await _dbcontext.Set<ChessEvent>()
-            .Include(e => e.Players!)
-                .ThenInclude(p => p.Player)
-            .Include(e => e.Games!)
-                .ThenInclude(g => g.WhitePlayer)
-            .Include(e => e.Games!)
-                .ThenInclude(g => g.BlackPlayer)
+        return await _dbcontext.Set<ChessEvent>()
             .Include(e => e.Photos)
-            .Include(e => e.Teams!)
+            .Include(e => e.Players)
+                .ThenInclude(p => p.Player)
+            .Include(e => e.Teams)
                 .ThenInclude(t => t.Players)
+            .Include(e => e.Games)
+                .ThenInclude(g => g.WhitePlayer)
+            .Include(e => e.Games)
+                .ThenInclude(g => g.BlackPlayer)
+            .Include(e => e.Games)
+                .ThenInclude(g => g.WhiteTeam)
+            .Include(e => e.Games)
+                .ThenInclude(g => g.BlackTeam)
             .Include(e => e.FirstPlace)
             .Include(e => e.SecondPlace)
             .Include(e => e.ThirdPlace)
             .Include(e => e.FirstPlaceTeam)
             .Include(e => e.SecondPlaceTeam)
             .Include(e => e.ThirdPlaceTeam)
-            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-
-        if (entity is null)
-        {
-            throw new EntityNotFoundException(nameof(ChessEvent), id);
-        }
-
-        return entity;
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken)
+            ?? throw new EntityNotFoundException(nameof(ChessEvent), id);
     }
 
     public async Task AddParticipantAsync(long eventId, PolytechLeague.Application.Dto.ChessDto.ChessEventParticipantDto dto, CancellationToken cancellationToken = default)

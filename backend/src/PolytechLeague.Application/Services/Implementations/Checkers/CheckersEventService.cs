@@ -42,7 +42,7 @@ public class CheckersEventService(
 
     public override async Task<CheckersEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)
     {
-        var entity = await _dbcontext.Set<CheckersEvent>()
+        return await _dbcontext.Set<CheckersEvent>()
             .Include(e => e.Players!)
                 .ThenInclude(p => p.Player)
             .Include(e => e.Games!)
@@ -51,6 +51,10 @@ public class CheckersEventService(
             .Include(e => e.Games!)
                 .ThenInclude(g => g.BlackPlayer!)
                     .ThenInclude(p => p.Player)
+            .Include(e => e.Games!)
+                .ThenInclude(g => g.WhiteTeam)
+            .Include(e => e.Games!)
+                .ThenInclude(g => g.BlackTeam)
             .Include(e => e.Photos)
             .Include(e => e.Teams!)
                 .ThenInclude(t => t.Players)
@@ -60,14 +64,8 @@ public class CheckersEventService(
             .Include(e => e.FirstPlaceTeam)
             .Include(e => e.SecondPlaceTeam)
             .Include(e => e.ThirdPlaceTeam)
-            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-
-        if (entity is null)
-        {
-            throw new EntityNotFoundException(nameof(CheckersEvent), id);
-        }
-
-        return entity;
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken)
+            ?? throw new EntityNotFoundException(nameof(CheckersEvent), id);
     }
 
     public async Task AddParticipantAsync(long id, CheckersEventParticipantDto request, CancellationToken cancellationToken = default)

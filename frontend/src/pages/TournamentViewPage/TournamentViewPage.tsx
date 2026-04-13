@@ -1064,7 +1064,7 @@ const TournamentViewPage = () => {
             );
           }
 
-          if ((s === 'chess' || s === 'checkers' || (s === 'badminton' && isTeamFromDetails === false)) && isTeamFromDetails !== true) {
+          if (s === 'chess' || s === 'checkers' || s === 'badminton') {
             return (
               <>
                 <div className={styles.statsGrid}>

@@ -9,12 +9,19 @@ public class ChessGameDto
     public long Id { get; set; }
     public long TournamentId { get; set; }
 
-    public long WhitePlayerId { get; set; }
+    public long? WhitePlayerId { get; set; }
     public long? WhiteUserId { get; set; }
     public string? WhitePlayerName { get; set; }
-    public long BlackPlayerId { get; set; }
+    public long? BlackPlayerId { get; set; }
     public long? BlackUserId { get; set; }
     public string? BlackPlayerName { get; set; }
+
+    public long? WhiteTeamId { get; set; }
+    public ChessTeamResponse? WhiteTeam { get; set; }
+    public long? BlackTeamId { get; set; }
+    public ChessTeamResponse? BlackTeam { get; set; }
+    public double? WhiteTeamScore { get; set; }
+    public double? BlackTeamScore { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public GameResult Result { get; set; }
@@ -38,6 +45,12 @@ public static class ChessGameDtoExtensions
             BlackPlayerId = game.BlackPlayerId,
             BlackUserId = game.BlackPlayer?.UserId,
             BlackPlayerName = game.BlackPlayer != null ? $"{game.BlackPlayer.FirstName} {game.BlackPlayer.LastName}".Trim() : null,
+            WhiteTeamId = game.WhiteTeamId,
+            WhiteTeam = game.WhiteTeam?.ToResponse(),
+            BlackTeamId = game.BlackTeamId,
+            BlackTeam = game.BlackTeam?.ToResponse(),
+            WhiteTeamScore = game.WhiteTeamScore,
+            BlackTeamScore = game.BlackTeamScore,
             Result = game.Result,
             Round = game.Round,
             Board = game.Board
@@ -52,6 +65,10 @@ public static class ChessGameDtoExtensions
             TournamentId = dto.TournamentId,
             WhitePlayerId = dto.WhitePlayerId,
             BlackPlayerId = dto.BlackPlayerId,
+            WhiteTeamId = dto.WhiteTeamId,
+            BlackTeamId = dto.BlackTeamId,
+            WhiteTeamScore = dto.WhiteTeamScore,
+            BlackTeamScore = dto.BlackTeamScore,
             Result = dto.Result,
             Round = dto.Round,
             Board = dto.Board

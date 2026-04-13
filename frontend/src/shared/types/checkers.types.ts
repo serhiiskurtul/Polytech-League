@@ -30,6 +30,10 @@ export interface CheckersGameResponse {
   blackPlayerId: number | null;
   blackPlayerName: string | null;
   result: GameResult;
+  whiteTeamId?: number | null;
+  blackTeamId?: number | null;
+  whiteTeamScore?: number | null;
+  blackTeamScore?: number | null;
 }
 
 export interface CheckersEventResponse {
@@ -93,4 +97,8 @@ export interface CheckersGameDto {
     blackPlayerId: number | null;
     result: GameResult;
     round: number;
+    whiteTeamId?: number | null;
+    blackTeamId?: number | null;
+    whiteTeamScore?: number | null;
+    blackTeamScore?: number | null;
 }

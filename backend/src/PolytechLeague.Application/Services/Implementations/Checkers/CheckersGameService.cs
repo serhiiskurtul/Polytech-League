@@ -21,5 +21,9 @@ public class CheckersGameService(
         oldEntity.Round = newEntity.Round;
         oldEntity.ScheduledAt = newEntity.ScheduledAt;
         oldEntity.FinishedAt = newEntity.FinishedAt;
+        oldEntity.WhiteTeamId = newEntity.WhiteTeamId;
+        oldEntity.BlackTeamId = newEntity.BlackTeamId;
+        oldEntity.WhiteTeamScore = newEntity.WhiteTeamScore;
+        oldEntity.BlackTeamScore = newEntity.BlackTeamScore;
     }
 }

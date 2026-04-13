@@ -20,5 +20,9 @@ public class ChessGameService(
         oldEntity.Result = newEntity.Result;
         oldEntity.Round = newEntity.Round;
         oldEntity.Board = newEntity.Board;
+        oldEntity.WhiteTeamId = newEntity.WhiteTeamId;
+        oldEntity.BlackTeamId = newEntity.BlackTeamId;
+        oldEntity.WhiteTeamScore = newEntity.WhiteTeamScore;
+        oldEntity.BlackTeamScore = newEntity.BlackTeamScore;
     }
 }
