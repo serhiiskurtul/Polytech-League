@@ -145,7 +145,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         l: 0,  // Losses
         gf: 0, // Goals For
         ga: 0, // Goals Against
-        points: team.points || 0
+        manualPoints: team.points
       };
 
       details.matches.forEach((match: any) => {
@@ -177,28 +177,19 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       });
 
       // Traditional points calculation if not overridden or added to override
-      // Usually, points = w*3 + d*1. 
-      // User asked to EDIT points, so we use team.points as the base or total.
-      // Let's make it so calculated points are shown if manual points are 0? 
-      // Or better: show calculated points but allow manual override.
-      // Re-reading request: "редагувати дані ... саме поле очків".
-      // I'll show the manual points from DB, but calculate auto-points for reference if needed.
-      // But usually, users want auto-calc + manual adjustment.
-      // For now, I'll use the manual points from the DB as the source of truth, 
-      // and if it's 0 and there are wins, maybe suggest it.
-      // Actually, I'll calculate auto-points:
+      // Priority: Manual Points > Auto-calculated Points
       const autoPoints = stats.w * 3 + stats.d * 1;
-      // If team.points is 0, we use autoPoints as default for display if you want, 
-      // but the user want to EDIT.
-      // Let's use: finalPoints = team.points.
+      const finalPoints = (stats.manualPoints !== undefined && stats.manualPoints !== null) 
+        ? stats.manualPoints 
+        : autoPoints;
       
-      return stats;
+      return { ...stats, points: finalPoints };
     });
 
     return standings.sort((a: any, b: any) => {
-      // Priority 1: Points (Manual or Auto-calculated)
-      const aP = Number(a.points) || (a.w * 3 + a.d);
-      const bP = Number(b.points) || (b.w * 3 + b.d);
+      // Priority 1: Points
+      const aP = a.points;
+      const bP = b.points;
       if (bP !== aP) return bP - aP;
 
       // Priority 2: Goal Difference
@@ -471,7 +462,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                           onBlur={(e) => handleUpdateTeamPoints(team.id, parseInt(e.target.value) || 0)}
                         />
                       ) : (
-                        team.points || (team.w * 3 + team.d)
+                        team.points
                       )}
                     </td>
                   </tr>
