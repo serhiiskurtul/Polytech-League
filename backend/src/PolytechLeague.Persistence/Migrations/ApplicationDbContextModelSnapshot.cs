@@ -615,6 +615,9 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<string>("HeadRefereeName")
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsTeam")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("Level")
                         .HasColumnType("integer")
                         .HasColumnName("level");

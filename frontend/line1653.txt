@@ -1,0 +1,1 @@
+﻿          const s = tournament.sport.toLowerCase().replace(/-/g, '_').replace(/\s/g, '');

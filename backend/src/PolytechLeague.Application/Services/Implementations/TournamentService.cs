@@ -91,7 +91,8 @@ public class TournamentService : ITournamentService
             RegistrationEnd = e.Date.AddDays(-5).ToString("dd.MM.yyyy"),
             CurrentRound = GetStatus(e.Date) == "ongoing" ? "В процесі" : "Реєстрація",
             Registered = false,
-            Featured = false
+            Featured = false,
+            IsTeam = e.IsTeam
         });
 
         return new PagedResponse<TournamentDto>
@@ -127,7 +128,8 @@ public class TournamentService : ITournamentService
             RegistrationEnd = e.Date.AddDays(-5).ToString("dd.MM.yyyy"),
             CurrentRound = GetStatus(e.Date) == "ongoing" ? "В процесі" : "Реєстрація",
             Registered = false,
-            Featured = false
+            Featured = false,
+            IsTeam = e.IsTeam
         };
     }
 

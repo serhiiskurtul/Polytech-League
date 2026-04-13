@@ -19,4 +19,5 @@ public class TournamentDto
     public string? CurrentRound { get; set; }
     public bool Registered { get; set; }
     public bool Featured { get; set; }
+    public bool IsTeam { get; set; }
 }

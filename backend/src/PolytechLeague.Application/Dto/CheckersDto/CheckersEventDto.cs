@@ -31,6 +31,7 @@ public class CheckersEventRequest
     public string? HeadRefereeName { get; set; }
     public string? Referees { get; set; }
     public string? Schedule { get; set; }
+    public bool IsTeam { get; set; }
 
     public long? FirstPlaceId { get; set; }
     public long? SecondPlaceId { get; set; }
@@ -66,6 +67,7 @@ public class CheckersEventResponse
     public string? HeadRefereeName { get; set; }
     public string? Referees { get; set; }
     public string? Schedule { get; set; }
+    public bool IsTeam { get; set; }
 
     public PlayerDto? FirstPlace { get; set; }
     public PlayerDto? SecondPlace { get; set; }
@@ -93,6 +95,7 @@ public static class CheckersEventDtoExtension
             HeadRefereeName = checkersEventRequest.HeadRefereeName,
             Referees = checkersEventRequest.Referees,
             Schedule = checkersEventRequest.Schedule,
+            IsTeam = checkersEventRequest.IsTeam,
             FirstPlaceId = checkersEventRequest.FirstPlaceId,
             SecondPlaceId = checkersEventRequest.SecondPlaceId,
             ThirdPlaceId = checkersEventRequest.ThirdPlaceId
@@ -122,6 +125,7 @@ public static class CheckersEventDtoExtension
             HeadRefereeName = checkersEvent.HeadRefereeName,
             Referees = checkersEvent.Referees,
             Schedule = checkersEvent.Schedule,
+            IsTeam = checkersEvent.IsTeam,
             FirstPlace = checkersEvent.FirstPlace?.ToDto(),
             SecondPlace = checkersEvent.SecondPlace?.ToDto(),
             ThirdPlace = checkersEvent.ThirdPlace?.ToDto()

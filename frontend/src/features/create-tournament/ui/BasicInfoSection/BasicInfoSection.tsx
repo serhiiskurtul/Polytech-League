@@ -71,11 +71,50 @@ const BasicInfoSection = ({ formData, handleInputChange }: BasicInfoSectionProps
           </div>
         </div>
 
+        {/* Тип участі (тільки для гібридних видів) */}
+        {['chess', 'checkers', 'badminton'].includes(formData.sport) && (
+          <div className={shared.formGroup}>
+            <label className={shared.formLabel}>
+              <i className="fas fa-users-cog"></i> Формат участі *
+            </label>
+            <div className={styles.sportsGrid}>
+              <label className={`${styles.sportOption} ${!formData.isTeam ? styles.selected : ''}`}>
+                <input
+                  type="radio"
+                  name="isTeam"
+                  value="false"
+                  checked={!formData.isTeam}
+                  onChange={() => handleInputChange({ target: { name: 'isTeam', value: false } } as any)}
+                  className={styles.radioInput}
+                />
+                <div className={styles.sportIcon}>
+                  <i className="fas fa-user"></i>
+                </div>
+                <span className={styles.sportName}>Індивідуальний</span>
+              </label>
+              <label className={`${styles.sportOption} ${formData.isTeam ? styles.selected : ''}`}>
+                <input
+                  type="radio"
+                  name="isTeam"
+                  value="true"
+                  checked={formData.isTeam}
+                  onChange={() => handleInputChange({ target: { name: 'isTeam', value: true } } as any)}
+                  className={styles.radioInput}
+                />
+                <div className={styles.sportIcon}>
+                  <i className="fas fa-users"></i>
+                </div>
+                <span className={styles.sportName}>Командний</span>
+              </label>
+            </div>
+          </div>
+        )}
+
         {/* Формат змагань (не для армреслінгу) */}
         {formData.sport !== 'armwrestling' && (
         <div className={shared.formGroup}>
           <label className={shared.formLabel}>
-            <i className="fas fa-chess-board"></i> Формат змагань *
+            <i className="fas fa-chess-board"></i> Система проведення *
           </label>
           <select
             name={['chess', 'checkers'].includes(formData.sport) ? 'system' : formData.sport === 'table_tennis' ? 'tournamentType' : 'type'}

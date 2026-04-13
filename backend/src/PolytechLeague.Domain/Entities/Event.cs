@@ -15,6 +15,7 @@ public abstract class Event
     public string? HeadRefereeName { get; set; }
     public string? Referees { get; set; }
     public string? Schedule { get; set; }
+    public bool IsTeam { get; set; }
 
     public long? FirstPlaceId { get; set; }
     public Player? FirstPlace { get; set; }

@@ -25,6 +25,7 @@ public class BadmintonEventRequest
     public string? HeadRefereeName { get; set; }
     public string? Referees { get; set; }
     public string? Schedule { get; set; }
+    public bool IsTeam { get; set; }
 
     public long? FirstPlaceTeamId { get; set; }
     public long? SecondPlaceTeamId { get; set; }
@@ -81,6 +82,7 @@ public class BadmintonEventResponse
     public string? HeadRefereeName { get; set; }
     public string? Referees { get; set; }
     public string? Schedule { get; set; }
+    public bool IsTeam { get; set; }
 
     public PlayerDto? FirstPlace { get; set; }
     public PlayerDto? SecondPlace { get; set; }
@@ -91,6 +93,16 @@ public class BadmintonEventResponse
     public BadmintonTeamDto? ThirdPlaceTeam { get; set; }
     public ICollection<BadmintonTeamDto>? Teams { get; set; }
     public ICollection<BadmintonMatchResponse>? Matches { get; set; }
+    public ICollection<BadmintonEventParticipantDto>? Players { get; set; }
+}
+
+public class BadmintonEventParticipantDto
+{
+    public long PlayerId { get; set; }
+    public string? PlayerName { get; set; }
+    public double Points { get; set; }
+    public int Rank { get; set; }
+    public long? UserId { get; set; }
 }
 
 public class BadmintonMatchResponse
@@ -141,7 +153,8 @@ public static class BadmintonDtoExtensions
             Prizes = request.Prizes,
             HeadRefereeName = request.HeadRefereeName,
             Referees = request.Referees,
-            Schedule = request.Schedule
+            Schedule = request.Schedule,
+            IsTeam = request.IsTeam
         };
     }
 
@@ -163,11 +176,25 @@ public static class BadmintonDtoExtensions
             HeadRefereeName = entity.HeadRefereeName,
             Referees = entity.Referees,
             Schedule = entity.Schedule,
+            IsTeam = entity.IsTeam,
             FirstPlaceTeam = entity.FirstPlaceTeam?.ToDto(),
             SecondPlaceTeam = entity.SecondPlaceTeam?.ToDto(),
             ThirdPlaceTeam = entity.ThirdPlaceTeam?.ToDto(),
             Teams = entity.Teams?.Select(t => t.ToDto()).ToList(),
-            Matches = entity.Matches?.Select(m => m.ToResponse()).ToList()
+            Matches = entity.Matches?.Select(m => m.ToResponse()).ToList(),
+            Players = entity.Participants?.Select(p => p.ToDto()).ToList()
+        };
+    }
+
+    public static BadmintonEventParticipantDto ToDto(this BadmintonEventParticipant entity)
+    {
+        return new BadmintonEventParticipantDto
+        {
+            PlayerId = entity.PlayerId,
+            PlayerName = entity.Player != null ? $"{entity.Player.FirstName} {entity.Player.LastName}" : null,
+            Points = entity.Points,
+            Rank = entity.Rank,
+            UserId = entity.Player?.UserId
         };
     }
 

@@ -49,6 +49,7 @@ export interface TournamentFormData {
   armHand: string;
   armWeightClass: string;
   armCategory: string;
+  isTeam: boolean;
 }
 
 export const useTournamentForm = () => {
@@ -86,7 +87,8 @@ export const useTournamentForm = () => {
     // Армреслінг специфічні поля
     armHand: 'Right',
     armWeightClass: 'Under80kg',
-    armCategory: 'Men'
+    armCategory: 'Men',
+    isTeam: false
   });
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -98,6 +100,18 @@ export const useTournamentForm = () => {
       categories: selectedCategories
     }));
   }, [selectedCategories]);
+
+  useEffect(() => {
+    // Автоматично встановлюємо IsTeam для видів спорту, що завжди є командними
+    const teamSports = ['futsal', 'basketball_3x3', 'volleyball', 'beach_volleyball'];
+    if (teamSports.includes(formData.sport)) {
+      setFormData(prev => ({ ...prev, isTeam: true }));
+    } else if (['chess', 'checkers', 'table_tennis', 'armwrestling'].includes(formData.sport)) {
+      // Для індивідуальних видів спорту за замовчуванням false
+      setFormData(prev => ({ ...prev, isTeam: false }));
+    }
+    // Badminton залишаємо як є або за замовчуванням true/false - користувач сам перемкне
+  }, [formData.sport]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -160,6 +174,7 @@ export const useTournamentForm = () => {
         rules: formData.rules,
         prizes: formData.prizes,
         schedule: formData.schedule,
+        isTeam: formData.isTeam,
       };
 
       let payload: any = { ...basePayload };

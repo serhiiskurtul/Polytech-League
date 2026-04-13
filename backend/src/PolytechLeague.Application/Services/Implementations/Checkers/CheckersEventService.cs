@@ -34,6 +34,7 @@ public class CheckersEventService(
         oldEntity.FirstPlaceId = newEntity.FirstPlaceId;
         oldEntity.SecondPlaceId = newEntity.SecondPlaceId;
         oldEntity.ThirdPlaceId = newEntity.ThirdPlaceId;
+        oldEntity.IsTeam = newEntity.IsTeam;
     }
 
     public override async Task<CheckersEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)

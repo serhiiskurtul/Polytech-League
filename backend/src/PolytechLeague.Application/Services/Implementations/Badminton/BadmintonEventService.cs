@@ -29,6 +29,7 @@ public class BadmintonEventService(
         oldEntity.FirstPlaceTeamId = newEntity.FirstPlaceTeamId;
         oldEntity.SecondPlaceTeamId = newEntity.SecondPlaceTeamId;
         oldEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
+        oldEntity.IsTeam = newEntity.IsTeam;
     }
 
     public override async Task<BadmintonEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)
@@ -47,6 +48,8 @@ public class BadmintonEventService(
             .Include(e => e.Matches!)
                 .ThenInclude(m => m.AwayRoster)
             .Include(e => e.Photos)
+            .Include(e => e.Participants!)
+                .ThenInclude(p => p.Player)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 
         if (entity is null)
