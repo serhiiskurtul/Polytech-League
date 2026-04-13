@@ -26,8 +26,10 @@ import {
 import TournamentPodium from './TournamentPodium';
 import styles from '../TournamentViewPage.module.css';
 
+type Sport = 'volleyball' | 'beach_volleyball' | 'beach-volleyball' | 'futsal' | 'basketball_3x3' | 'basketball3x3' | 'basketball-3x3' | 'badminton';
+
 interface TeamSportsTournamentViewProps {
-  sport: 'volleyball' | 'beach_volleyball' | 'futsal' | 'basketball_3x3' | 'badminton';
+  sport: Sport;
   details: any;
   isAdmin: boolean;
   onRefresh: () => void;
@@ -313,9 +315,12 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const getSportLabel = () => {
     switch (sport) {
       case 'volleyball': return 'Волейбол';
-      case 'beach_volleyball': return 'Пляжний Волейбол';
+      case 'beach_volleyball':
+      case 'beach-volleyball': return 'Пляжний Волейбол';
       case 'futsal': return 'Футзал';
-      case 'basketball_3x3': return 'Баскетбол 3х3';
+      case 'basketball_3x3':
+      case 'basketball3x3':
+      case 'basketball-3x3': return 'Баскетбол 3х3';
       case 'badminton': return 'Бадмінтон';
       default: return 'Спорт';
     }

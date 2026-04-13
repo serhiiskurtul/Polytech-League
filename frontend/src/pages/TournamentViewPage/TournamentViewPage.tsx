@@ -459,18 +459,22 @@ const TournamentViewPage = () => {
       const data = await getTournamentById(id);
       setTournament(data);
 
-      if (['chess', 'checkers', 'armwrestling', 'volleyball', 'beach_volleyball', 'futsal', 'basketball_3x3', 'badminton'].includes(data.sport)) {
+      const sportKey = data.sport.toLowerCase().replace(/-/g, '_').replace(/\s/g, '');
+      setTournament({ ...data, sport: sportKey }); // Sync normalized sport back to state
+
+      if (['chess', 'checkers', 'armwrestling', 'volleyball', 'beach_volleyball', 'futsal', 'basketball_3x3', 'basketball3x3', 'badminton'].includes(sportKey)) {
         try {
           const playersGetter = getAllPlayers;
           let detailsPromise;
 
-          switch (data.sport) {
+          switch (sportKey) {
             case 'checkers': detailsPromise = getCheckersEventById(id); break;
             case 'armwrestling': detailsPromise = getArmwrestlingEventById(id); break;
             case 'volleyball': detailsPromise = getVolleyballEventById(id); break;
             case 'beach_volleyball': detailsPromise = getBeachVolleyballEventById(id); break;
             case 'futsal': detailsPromise = getFutsalEventById(id); break;
-            case 'basketball_3x3': detailsPromise = getBasketball3x3EventById(id); break;
+            case 'basketball_3x3':
+            case 'basketball3x3': detailsPromise = getBasketball3x3EventById(id); break;
             case 'badminton': detailsPromise = getBadmintonEventById(id); break;
             default: detailsPromise = getChessEventById(id);
           }
@@ -1028,9 +1032,12 @@ const TournamentViewPage = () => {
           />
         )}
 
-        {['volleyball', 'beach_volleyball', 'futsal', 'basketball_3x3', 'badminton'].includes(tournament.sport) && details && (
+        {(() => {
+          const s = tournament.sport.toLowerCase().replace(/-/g, '_').replace(/\s/g, '');
+          return ['volleyball', 'beach_volleyball', 'futsal', 'basketball_3x3', 'basketball3x3', 'badminton'].includes(s);
+        })() && details && (
           <TeamSportsTournamentView
-            sport={tournament.sport as any}
+            sport={tournament.sport.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') as any}
             details={details}
             isAdmin={isAdmin}
             onRefresh={() => fetchTournament(true)}

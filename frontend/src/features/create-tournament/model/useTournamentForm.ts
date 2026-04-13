@@ -10,9 +10,9 @@ const TOURNAMENT_CREATE_ENDPOINTS: Record<string, string> = {
   table_tennis: '/table-tennis-events',
   armwrestling: '/armwrestling-events',
   futsal: '/futsal-events',
-  'basketball-3x3': '/basketball3x3-events',
+  'basketball_3x3': '/basketball3x3-events',
   volleyball: '/volleyball-events',
-  'beach-volleyball': '/beach-volleyball-events',
+  'beach_volleyball': '/beach-volleyball-events',
   badminton: '/badminton-events',
 };
 
@@ -167,9 +167,9 @@ export const useTournamentForm = () => {
       // Додаємо специфічні поля залежно від виду спорту
       switch (formData.sport) {
         case 'futsal':
-        case 'basketball-3x3':
+        case 'basketball_3x3':
         case 'volleyball':
-        case 'beach-volleyball':
+        case 'beach_volleyball':
         case 'badminton':
           payload.tournamentType = formData.tournamentType;
           break;
