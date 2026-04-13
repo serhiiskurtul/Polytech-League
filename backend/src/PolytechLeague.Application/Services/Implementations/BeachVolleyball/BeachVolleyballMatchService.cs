@@ -14,6 +14,15 @@ public class BeachVolleyballMatchService(
     AbstractEntityService<BeachVolleyballMatch>(_dbcontext, _logger),
     IBeachVolleyballMatchService
 {
+    public override async Task<BeachVolleyballMatch> CreateAsync(BeachVolleyballMatch entity, CancellationToken cancellationToken = default)
+    {
+        _logger.LogDebug("Creating beach volleyball match with rosters.");
+        await MapRoster(entity, cancellationToken);
+        _dbcontext.BeachVolleyballMatches.Add(entity);
+        await _dbcontext.SaveChangesAsync(cancellationToken);
+        return entity;
+    }
+
     public override async Task UpdateAsync(long id, BeachVolleyballMatch newEntity, CancellationToken cancellationToken = default)
     {
         _logger.LogDebug("Updating beach volleyball match with rosters. Id: {Id}", id);
@@ -29,24 +38,43 @@ public class BeachVolleyballMatchService(
         }
 
         UpdateValues(oldEntity, newEntity);
-
-        if (newEntity.HomeRosterIds != null)
-        {
-            var homePlayers = await _dbcontext.Players
-                .Where(p => newEntity.HomeRosterIds.Contains(p.Id))
-                .ToListAsync(cancellationToken);
-            oldEntity.HomeRoster = homePlayers;
-        }
-
-        if (newEntity.AwayRosterIds != null)
-        {
-            var awayPlayers = await _dbcontext.Players
-                .Where(p => newEntity.AwayRosterIds.Contains(p.Id))
-                .ToListAsync(cancellationToken);
-            oldEntity.AwayRoster = awayPlayers;
-        }
+        await MapRoster(oldEntity, newEntity, cancellationToken);
 
         await _dbcontext.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task MapRoster(BeachVolleyballMatch target, BeachVolleyballMatch source, CancellationToken cancellationToken)
+    {
+        if (source.HomeRosterIds != null)
+        {
+            target.HomeRoster = await _dbcontext.Players
+                .Where(p => source.HomeRosterIds.Contains(p.Id))
+                .ToListAsync(cancellationToken);
+        }
+
+        if (source.AwayRosterIds != null)
+        {
+            target.AwayRoster = await _dbcontext.Players
+                .Where(p => source.AwayRosterIds.Contains(p.Id))
+                .ToListAsync(cancellationToken);
+        }
+    }
+
+    private async Task MapRoster(BeachVolleyballMatch entity, CancellationToken cancellationToken)
+    {
+        if (entity.HomeRosterIds != null)
+        {
+            entity.HomeRoster = await _dbcontext.Players
+                .Where(p => entity.HomeRosterIds.Contains(p.Id))
+                .ToListAsync(cancellationToken);
+        }
+
+        if (entity.AwayRosterIds != null)
+        {
+            entity.AwayRoster = await _dbcontext.Players
+                .Where(p => entity.AwayRosterIds.Contains(p.Id))
+                .ToListAsync(cancellationToken);
+        }
     }
 
     protected override void UpdateValues(BeachVolleyballMatch oldEntity, BeachVolleyballMatch newEntity)

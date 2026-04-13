@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PolytechLeague.Domain.Entities.Badminton;
+using PolytechLeague.Domain.Entities;
 
 namespace PolytechLeague.Persistence.DbConfigurations.BadmintonConfigurations;
 
@@ -43,5 +44,21 @@ public class BadmintonMatchConfiguration : IEntityTypeConfiguration<BadmintonMat
         builder.HasMany(m => m.Sets)
             .WithOne(s => s.Match)
             .HasForeignKey(s => s.MatchId);
+
+        builder.HasMany(m => m.HomeRoster)
+            .WithMany()
+            .UsingEntity<Dictionary<string, object>>(
+                "badminton_match_home_roster",
+                j => j.HasOne<Player>().WithMany().HasForeignKey("PlayerId"),
+                j => j.HasOne<BadmintonMatch>().WithMany().HasForeignKey("BadmintonMatchId")
+            );
+
+        builder.HasMany(m => m.AwayRoster)
+            .WithMany()
+            .UsingEntity<Dictionary<string, object>>(
+                "badminton_match_away_roster",
+                j => j.HasOne<Player>().WithMany().HasForeignKey("PlayerId"),
+                j => j.HasOne<BadmintonMatch>().WithMany().HasForeignKey("BadmintonMatchId")
+            );
     }
 }

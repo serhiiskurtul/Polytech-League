@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PolytechLeague.Domain.Entities.Volleyball;
+using PolytechLeague.Domain.Entities;
 
 namespace PolytechLeague.Persistence.DbConfigurations.VolleyballConfigurations;
 
@@ -36,11 +37,19 @@ public class VolleyballMatchConfiguration : IEntityTypeConfiguration<VolleyballM
 
         builder.HasMany(m => m.HomeRoster)
             .WithMany()
-            .UsingEntity("volleyball_match_home_roster");
+            .UsingEntity<Dictionary<string, object>>(
+                "volleyball_match_home_roster",
+                j => j.HasOne<Player>().WithMany().HasForeignKey("PlayerId"),
+                j => j.HasOne<VolleyballMatch>().WithMany().HasForeignKey("VolleyballMatchId")
+            );
 
         builder.HasMany(m => m.AwayRoster)
             .WithMany()
-            .UsingEntity("volleyball_match_away_roster");
+            .UsingEntity<Dictionary<string, object>>(
+                "volleyball_match_away_roster",
+                j => j.HasOne<Player>().WithMany().HasForeignKey("PlayerId"),
+                j => j.HasOne<VolleyballMatch>().WithMany().HasForeignKey("VolleyballMatchId")
+            );
     }
 
 }

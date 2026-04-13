@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PolytechLeague.Domain.Entities.Futsal;
+using PolytechLeague.Domain.Entities;
 
 namespace PolytechLeague.Persistence.DbConfigurations.FutsalConfigurations;
 
@@ -31,10 +32,18 @@ public class FutsalMatchConfiguration : IEntityTypeConfiguration<FutsalMatch>
 
         builder.HasMany(m => m.HomeRoster)
             .WithMany()
-            .UsingEntity("futsal_match_home_roster");
+            .UsingEntity<Dictionary<string, object>>(
+                "futsal_match_home_roster",
+                j => j.HasOne<Player>().WithMany().HasForeignKey("PlayerId"),
+                j => j.HasOne<FutsalMatch>().WithMany().HasForeignKey("FutsalMatchId")
+            );
 
         builder.HasMany(m => m.AwayRoster)
             .WithMany()
-            .UsingEntity("futsal_match_away_roster");
+            .UsingEntity<Dictionary<string, object>>(
+                "futsal_match_away_roster",
+                j => j.HasOne<Player>().WithMany().HasForeignKey("PlayerId"),
+                j => j.HasOne<FutsalMatch>().WithMany().HasForeignKey("FutsalMatchId")
+            );
     }
 }

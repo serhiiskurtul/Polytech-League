@@ -2,6 +2,7 @@ using PolytechLeague.Domain.Entities.BeachVolleyball;
 using Microsoft.Extensions.Logging;
 using PolytechLeague.Application.Services.Interfaces.BeachVolleyball;
 using PolytechLeague.Persistence.Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace PolytechLeague.Application.Services.Implementations.BeachVolleyball;
 
@@ -27,5 +28,29 @@ public class BeachVolleyballEventService(
         oldEntity.FirstPlaceTeamId = newEntity.FirstPlaceTeamId;
         oldEntity.SecondPlaceTeamId = newEntity.SecondPlaceTeamId;
         oldEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
+    }
+
+    public override async Task<BeachVolleyballEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)
+    {
+        var entity = await _dbcontext.BeachVolleyballEvents
+            .Include(e => e.Teams!)
+                .ThenInclude(t => t.Players)
+            .Include(e => e.Matches!)
+                .ThenInclude(m => m.HomeTeam)
+            .Include(e => e.Matches!)
+                .ThenInclude(m => m.AwayTeam)
+            .Include(e => e.Matches!)
+                .ThenInclude(m => m.HomeRoster)
+            .Include(e => e.Matches!)
+                .ThenInclude(m => m.AwayRoster)
+            .Include(e => e.Photos)
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+
+        if (entity is null)
+        {
+            throw new PolytechLeague.Domain.Exceptions.EntityNotFoundException(nameof(BeachVolleyballEvent), id);
+        }
+
+        return entity;
     }
 }

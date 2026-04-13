@@ -41,8 +41,6 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'standings' | 'matches' | 'teams' | 'info'>('matches');
   const [allPlayers, setAllPlayers] = useState<PlayerDto[]>([]);
-  const [editingRosterMatchId, setEditingRosterMatchId] = useState<number | null>(null);
-  const [editingSide, setEditingSide] = useState<'home' | 'away' | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   
   // Create Match State
@@ -111,34 +109,6 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     }
   };
 
-  const handleTogglePlayerInRoster = async (matchId: number, side: 'home' | 'away', playerId: number) => {
-    try {
-      const match = details.matches.find((m: any) => m.id === matchId);
-      const currentRosterIds = side === 'home' 
-        ? (match.homeRosterIds || match.homeRoster?.map((p: any) => p.id) || [])
-        : (match.awayRosterIds || match.awayRoster?.map((p: any) => p.id) || []);
-      
-      let newRosterIds: number[];
-      if (currentRosterIds.includes(playerId)) {
-        newRosterIds = currentRosterIds.filter((id: number) => id !== playerId);
-      } else {
-        newRosterIds = [...currentRosterIds, playerId];
-      }
-
-      const updateApi = getMatchUpdateApi();
-      const payload = { 
-        ...match,
-        [`${side}RosterIds`]: newRosterIds 
-      };
-
-      await updateApi(matchId, payload);
-      onRefresh();
-    } catch (err) {
-      console.error(err);
-      alert('Помилка при оновленні складу');
-    }
-  };
-
   const handleCreateMatch = async () => {
     try {
       if (!newMatchForm.homeTeamId || !newMatchForm.awayTeamId) {
@@ -150,11 +120,16 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         return;
       }
 
+      const homeTeam = details.teams.find((t: any) => t.id === parseInt(newMatchForm.homeTeamId));
+      const awayTeam = details.teams.find((t: any) => t.id === parseInt(newMatchForm.awayTeamId));
+
       const payload = {
         eventId: details.id,
         homeTeamId: parseInt(newMatchForm.homeTeamId),
         awayTeamId: parseInt(newMatchForm.awayTeamId),
-        stage: newMatchForm.stage
+        stage: newMatchForm.stage,
+        homeRosterIds: homeTeam?.players?.map((p: any) => p.id) || [],
+        awayRosterIds: awayTeam?.players?.map((p: any) => p.id) || []
       };
 
       let createApi;
@@ -305,14 +280,6 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   <div className={styles.teamRow}>
                     <div className={styles.teamLogo}>{match.homeTeam?.name?.[0] || 'T'}</div>
                     <div className={styles.teamName}>{match.homeTeam?.name || 'Home'}</div>
-                    <div className={styles.rosterInfo}>
-                        {match.homeRoster?.map((p: any) => `${p.lastName} ${p.firstName[0]}.`).join(', ') || 'Склад не вказано'}
-                        {isAdmin && (
-                            <button className={styles.rosterEditBtn} onClick={() => { setEditingRosterMatchId(match.id); setEditingSide('home'); }}>
-                                <i className="fas fa-user-plus"></i>
-                            </button>
-                        )}
-                    </div>
                     <div className={styles.scoreInput}>
                       <input 
                         type="number" 
@@ -328,14 +295,6 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   <div className={styles.teamRow}>
                     <div className={styles.teamLogo}>{match.awayTeam?.name?.[0] || 'T'}</div>
                     <div className={styles.teamName}>{match.awayTeam?.name || 'Away'}</div>
-                    <div className={styles.rosterInfo}>
-                        {match.awayRoster?.map((p: any) => `${p.lastName} ${p.firstName[0]}.`).join(', ') || 'Склад не вказано'}
-                        {isAdmin && (
-                            <button className={styles.rosterEditBtn} onClick={() => { setEditingRosterMatchId(match.id); setEditingSide('away'); }}>
-                                <i className="fas fa-user-plus"></i>
-                            </button>
-                        )}
-                    </div>
                     <div className={styles.scoreInput}>
                       <input 
                         type="number" 
@@ -432,45 +391,6 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         )}
       </div>
 
-      {/* Roster Edit Modal (Simple but effective) */}
-      {editingRosterMatchId && (
-        <div className={styles.rosterModalOverlay} onClick={() => setEditingRosterMatchId(null)}>
-            <div className={styles.rosterModal} onClick={e => e.stopPropagation()}>
-                <div className={styles.modalHeader}>
-                    <h3>Редагування складу: {editingSide === 'home' ? 'Господарі' : 'Гості'}</h3>
-                    <button className={styles.closeButton} onClick={() => setEditingRosterMatchId(null)}>&times;</button>
-                </div>
-                <div className={styles.searchBox}>
-                    <input 
-                        type="text" 
-                        placeholder="Пошук гравця (Прізвище, група)..." 
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                </div>
-                <div className={styles.playersList}>
-                    {filteredPlayers.map(player => {
-                        const match = details.matches.find((m: any) => m.id === editingRosterMatchId);
-                        const roster = editingSide === 'home' ? match.homeRoster : match.awayRoster;
-                        const isSelected = roster?.some((p: any) => p.id === player.id);
-                        
-                        return (
-                            <div key={player.id} className={`${styles.playerPickItem} ${isSelected ? styles.selected : ''}`} onClick={() => handleTogglePlayerInRoster(editingRosterMatchId, editingSide!, player.id!)}>
-                                <div className={styles.pickInfo}>
-                                    <span className={styles.pName}>{player.lastName} {player.firstName}</span>
-                                    <span className={styles.pGroup}>{player.group}</span>
-                                </div>
-                                <div className={styles.pickStatus}>
-                                    {isSelected ? <i className="fas fa-check-circle"></i> : <i className="far fa-circle"></i>}
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
-        </div>
-      )}
-
       {/* Create Match Modal */}
       {isCreateMatchModalOpen && (
         <div className={styles.rosterModalOverlay} onClick={() => setIsCreateMatchModalOpen(false)}>
@@ -483,7 +403,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
             <div className={styles.modalBody}>
               <div className={styles.createMatchForm}>
                 <div className={styles.formGroup}>
-                  <label>Господарі</label>
+                  <label>Команда 1</label>
                   <select 
                     value={newMatchForm.homeTeamId} 
                     onChange={e => setNewMatchForm({...newMatchForm, homeTeamId: e.target.value})}
@@ -496,7 +416,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label>Гості</label>
+                  <label>Команда 2</label>
                   <select 
                     value={newMatchForm.awayTeamId} 
                     onChange={e => setNewMatchForm({...newMatchForm, awayTeamId: e.target.value})}

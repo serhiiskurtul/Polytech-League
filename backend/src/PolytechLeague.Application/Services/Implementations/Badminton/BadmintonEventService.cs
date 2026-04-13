@@ -42,6 +42,10 @@ public class BadmintonEventService(
                 .ThenInclude(m => m.Team1)
             .Include(e => e.Matches!)
                 .ThenInclude(m => m.Team2)
+            .Include(e => e.Matches!)
+                .ThenInclude(m => m.HomeRoster)
+            .Include(e => e.Matches!)
+                .ThenInclude(m => m.AwayRoster)
             .Include(e => e.Photos)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 

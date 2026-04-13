@@ -40,6 +40,10 @@ public class Basketball3x3EventService(
                 .ThenInclude(m => m.HomeTeam)
             .Include(e => e.Matches!)
                 .ThenInclude(m => m.AwayTeam)
+            .Include(e => e.Matches!)
+                .ThenInclude(m => m.HomeRoster)
+            .Include(e => e.Matches!)
+                .ThenInclude(m => m.AwayRoster)
             .Include(e => e.Photos)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 

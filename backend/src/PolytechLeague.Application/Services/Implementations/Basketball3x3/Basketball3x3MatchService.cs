@@ -14,6 +14,15 @@ public class Basketball3x3MatchService(
     AbstractEntityService<Basketball3x3Match>(_dbcontext, _logger),
     IBasketball3x3MatchService
 {
+    public override async Task<Basketball3x3Match> CreateAsync(Basketball3x3Match entity, CancellationToken cancellationToken = default)
+    {
+        _logger.LogDebug("Creating basketball 3x3 match with rosters.");
+        await MapRoster(entity, cancellationToken);
+        _dbcontext.Basketball3x3Matches.Add(entity);
+        await _dbcontext.SaveChangesAsync(cancellationToken);
+        return entity;
+    }
+
     public override async Task UpdateAsync(long id, Basketball3x3Match newEntity, CancellationToken cancellationToken = default)
     {
         _logger.LogDebug("Updating basketball 3x3 match with rosters. Id: {Id}", id);
@@ -29,24 +38,43 @@ public class Basketball3x3MatchService(
         }
 
         UpdateValues(oldEntity, newEntity);
-
-        if (newEntity.HomeRosterIds != null)
-        {
-            var homePlayers = await _dbcontext.Players
-                .Where(p => newEntity.HomeRosterIds.Contains(p.Id))
-                .ToListAsync(cancellationToken);
-            oldEntity.HomeRoster = homePlayers;
-        }
-
-        if (newEntity.AwayRosterIds != null)
-        {
-            var awayPlayers = await _dbcontext.Players
-                .Where(p => newEntity.AwayRosterIds.Contains(p.Id))
-                .ToListAsync(cancellationToken);
-            oldEntity.AwayRoster = awayPlayers;
-        }
+        await MapRoster(oldEntity, newEntity, cancellationToken);
 
         await _dbcontext.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task MapRoster(Basketball3x3Match target, Basketball3x3Match source, CancellationToken cancellationToken)
+    {
+        if (source.HomeRosterIds != null)
+        {
+            target.HomeRoster = await _dbcontext.Players
+                .Where(p => source.HomeRosterIds.Contains(p.Id))
+                .ToListAsync(cancellationToken);
+        }
+
+        if (source.AwayRosterIds != null)
+        {
+            target.AwayRoster = await _dbcontext.Players
+                .Where(p => source.AwayRosterIds.Contains(p.Id))
+                .ToListAsync(cancellationToken);
+        }
+    }
+
+    private async Task MapRoster(Basketball3x3Match entity, CancellationToken cancellationToken)
+    {
+        if (entity.HomeRosterIds != null)
+        {
+            entity.HomeRoster = await _dbcontext.Players
+                .Where(p => entity.HomeRosterIds.Contains(p.Id))
+                .ToListAsync(cancellationToken);
+        }
+
+        if (entity.AwayRosterIds != null)
+        {
+            entity.AwayRoster = await _dbcontext.Players
+                .Where(p => entity.AwayRosterIds.Contains(p.Id))
+                .ToListAsync(cancellationToken);
+        }
     }
 
     protected override void UpdateValues(Basketball3x3Match oldEntity, Basketball3x3Match newEntity)
