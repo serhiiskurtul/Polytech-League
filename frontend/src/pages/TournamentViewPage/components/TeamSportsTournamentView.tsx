@@ -272,41 +272,63 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       <div className={styles.tabContent}>
         {activeTab === 'matches' && (
           <div className={styles.matchesGrid}>
-            {details.matches?.map((match: any) => (
-              <div key={match.id} className={styles.matchCard}>
-                <div className={styles.matchStage}>{match.stage || 'Груповий етап'}</div>
-                
-                <div className={styles.matchTeams}>
-                  <div className={styles.teamRow}>
-                    <div className={styles.teamLogo}>{match.homeTeam?.name?.[0] || 'T'}</div>
-                    <div className={styles.teamName}>{match.homeTeam?.name || 'Home'}</div>
-                    <div className={styles.scoreInput}>
-                      <input 
-                        type="number" 
-                        defaultValue={sport.includes('volleyball') ? match.homeSetsWon : match.homeTeamScore}
-                        onBlur={(e) => handleUpdateScore(match.id, parseInt(e.target.value), sport.includes('volleyball') ? match.awaySetsWon : (match.awayTeamScore || 0))}
-                        disabled={!isAdmin}
-                      />
+            {details.matches?.map((match: any) => {
+              const isVolleyball = sport.includes('volleyball') || sport === 'badminton';
+              const homeScore = isVolleyball ? (match.homeSetsWon || match.homeScore || 0) : (match.homeTeamScore || 0);
+              const awayScore = isVolleyball ? (match.awaySetsWon || match.awayScore || 0) : (match.awayTeamScore || 0);
+              
+              const isHomeWinner = homeScore > awayScore;
+              const isAwayWinner = awayScore > homeScore;
+              const isDraw = homeScore === awayScore && (homeScore > 0 || awayScore > 0);
+
+              return (
+                <div key={match.id} className={styles.matchCard}>
+                  <div className={styles.matchStage}>{match.stage || 'Груповий етап'}</div>
+                  
+                  <div className={styles.matchTeams}>
+                    <div className={`${styles.teamRow} ${isHomeWinner ? styles.winnerRow : ''} ${isDraw ? styles.drawRow : ''}`}>
+                      <div className={`${styles.teamLogo} ${isHomeWinner ? styles.winnerLogo : ''}`}>
+                        {match.homeTeam?.name?.[0] || 'T'}
+                      </div>
+                      <div className={`${styles.teamName} ${isHomeWinner ? styles.winnerName : ''} ${isDraw ? styles.drawName : ''}`}>
+                        {match.homeTeam?.name || 'Home'}
+                        {isHomeWinner && <i className={`fas fa-crown ${styles.crownIcon}`}></i>}
+                        {isDraw && <i className={`fas fa-handshake ${styles.drawIcon}`}></i>}
+                      </div>
+                      <div className={styles.scoreInput}>
+                        <input 
+                          type="number" 
+                          defaultValue={isVolleyball ? (match.homeSetsWon || match.homeScore) : match.homeTeamScore}
+                          onBlur={(e) => handleUpdateScore(match.id, parseInt(e.target.value), awayScore)}
+                          disabled={!isAdmin}
+                        />
+                      </div>
                     </div>
-                  </div>
 
-                  <div className={styles.vsDivider}>VS</div>
+                    <div className={styles.vsDivider}>VS</div>
 
-                  <div className={styles.teamRow}>
-                    <div className={styles.teamLogo}>{match.awayTeam?.name?.[0] || 'T'}</div>
-                    <div className={styles.teamName}>{match.awayTeam?.name || 'Away'}</div>
-                    <div className={styles.scoreInput}>
-                      <input 
-                        type="number" 
-                        defaultValue={sport.includes('volleyball') ? match.awaySetsWon : match.awayTeamScore}
-                        onBlur={(e) => handleUpdateScore(match.id, sport.includes('volleyball') ? match.homeSetsWon : (match.homeTeamScore || 0), parseInt(e.target.value))}
-                        disabled={!isAdmin}
-                      />
+                    <div className={`${styles.teamRow} ${isAwayWinner ? styles.winnerRow : ''} ${isDraw ? styles.drawRow : ''}`}>
+                      <div className={`${styles.teamLogo} ${isAwayWinner ? styles.winnerLogo : ''}`}>
+                        {match.awayTeam?.name?.[0] || 'T'}
+                      </div>
+                      <div className={`${styles.teamName} ${isAwayWinner ? styles.winnerName : ''} ${isDraw ? styles.drawName : ''}`}>
+                        {match.awayTeam?.name || 'Away'}
+                        {isAwayWinner && <i className={`fas fa-crown ${styles.crownIcon}`}></i>}
+                        {isDraw && <i className={`fas fa-handshake ${styles.drawIcon}`}></i>}
+                      </div>
+                      <div className={styles.scoreInput}>
+                        <input 
+                          type="number" 
+                          defaultValue={isVolleyball ? (match.awaySetsWon || match.awayScore) : match.awayTeamScore}
+                          onBlur={(e) => handleUpdateScore(match.id, homeScore, parseInt(e.target.value))}
+                          disabled={!isAdmin}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             {(!details.matches || details.matches.length === 0) && <p className={styles.noData}>Матчів ще не заплановано</p>}
           </div>
         )}
