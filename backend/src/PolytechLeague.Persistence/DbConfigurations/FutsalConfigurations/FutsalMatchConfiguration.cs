@@ -28,5 +28,13 @@ public class FutsalMatchConfiguration : IEntityTypeConfiguration<FutsalMatch>
             .OnDelete(DeleteBehavior.SetNull);
             
         builder.Property(m => m.Stage).HasMaxLength(100);
+
+        builder.HasMany(m => m.HomeRoster)
+            .WithMany()
+            .UsingEntity("futsal_match_home_roster");
+
+        builder.HasMany(m => m.AwayRoster)
+            .WithMany()
+            .UsingEntity("futsal_match_away_roster");
     }
 }

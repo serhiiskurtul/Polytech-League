@@ -1,3 +1,4 @@
+using PolytechLeague.Application.Dto.GeneralDto;
 using PolytechLeague.Domain.Entities.Volleyball;
 
 namespace PolytechLeague.Application.Dto.VolleyballDto;
@@ -20,6 +21,8 @@ public class VolleyballMatchRequest
     public int? AwaySetsWon { get; set; }
     public long? WinnerTeamId { get; set; }
     public string? Stage { get; set; }
+    public ICollection<long>? HomeRosterIds { get; set; }
+    public ICollection<long>? AwayRosterIds { get; set; }
 }
 
 public class VolleyballMatchResponse
@@ -43,6 +46,8 @@ public class VolleyballMatchResponse
 
     public string? Stage { get; set; }
 
+    public ICollection<PlayerDto>? HomeRoster { get; set; }
+    public ICollection<PlayerDto>? AwayRoster { get; set; }
     public ICollection<VolleyballSetDto>? Sets { get; set; }
 }
 
@@ -59,7 +64,9 @@ public static class VolleyballMatchDtoExtensions
             HomeSetsWon = request.HomeSetsWon,
             AwaySetsWon = request.AwaySetsWon,
             WinnerTeamId = request.WinnerTeamId,
-            Stage = request.Stage
+            Stage = request.Stage,
+            HomeRosterIds = request.HomeRosterIds,
+            AwayRosterIds = request.AwayRosterIds
         };
     }
 
@@ -80,6 +87,8 @@ public static class VolleyballMatchDtoExtensions
             WinnerTeamId = entity.WinnerTeamId,
             WinnerTeam = entity.WinnerTeam?.ToResponse(),
             Stage = entity.Stage,
+            HomeRoster = entity.HomeRoster?.Select(p => p.ToDto()).ToList(),
+            AwayRoster = entity.AwayRoster?.Select(p => p.ToDto()).ToList(),
             Sets = entity.Sets?.Select(s => s.ToDto()).ToList()
         };
     }

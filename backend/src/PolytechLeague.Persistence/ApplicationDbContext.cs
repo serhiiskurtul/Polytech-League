@@ -83,6 +83,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<BeachVolleyballSet> BeachVolleyballSets { get; set; }
 
     // Badminton
+    public DbSet<BadmintonTeam> BadmintonTeams { get; set; }
     public DbSet<BadmintonEvent> BadmintonEvents { get; set; }
     public DbSet<BadmintonEventParticipant> BadmintonEventParticipants { get; set; }
     public DbSet<BadmintonMatch> BadmintonMatches { get; set; }
@@ -165,6 +166,7 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new BeachVolleyballSetConfiguration());
 
         // Badminton configurations
+        modelBuilder.ApplyConfiguration(new BadmintonTeamConfiguration());
         modelBuilder.ApplyConfiguration(new BadmintonEventConfiguration());
         modelBuilder.ApplyConfiguration(new BadmintonEventParticipantConfiguration());
         modelBuilder.ApplyConfiguration(new BadmintonMatchConfiguration());

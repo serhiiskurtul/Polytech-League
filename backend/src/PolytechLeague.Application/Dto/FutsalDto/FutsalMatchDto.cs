@@ -1,3 +1,4 @@
+using PolytechLeague.Application.Dto.GeneralDto;
 using PolytechLeague.Domain.Entities.Futsal;
 
 namespace PolytechLeague.Application.Dto.FutsalDto;
@@ -9,8 +10,10 @@ public class FutsalMatchRequest
     public long AwayTeamId { get; set; }
     public int? HomeTeamScore { get; set; }
     public int? AwayTeamScore { get; set; }
-    public long? WinnerTeamId { get; set; }
     public string? Stage { get; set; }
+    public long? WinnerTeamId { get; set; }
+    public ICollection<long>? HomeRosterIds { get; set; }
+    public ICollection<long>? AwayRosterIds { get; set; }
 }
 
 public class FutsalMatchResponse
@@ -32,6 +35,9 @@ public class FutsalMatchResponse
     public FutsalTeamResponse? WinnerTeam { get; set; }
     
     public string? Stage { get; set; }
+    
+    public ICollection<PlayerDto>? HomeRoster { get; set; }
+    public ICollection<PlayerDto>? AwayRoster { get; set; }
 }
 
 public static class FutsalMatchDtoExtensions
@@ -46,7 +52,9 @@ public static class FutsalMatchDtoExtensions
             HomeTeamScore = request.HomeTeamScore,
             AwayTeamScore = request.AwayTeamScore,
             WinnerTeamId = request.WinnerTeamId,
-            Stage = request.Stage
+            Stage = request.Stage,
+            HomeRosterIds = request.HomeRosterIds,
+            AwayRosterIds = request.AwayRosterIds
         };
     }
 
@@ -65,7 +73,9 @@ public static class FutsalMatchDtoExtensions
             AwayTeamScore = entity.AwayTeamScore,
             WinnerTeamId = entity.WinnerTeamId,
             WinnerTeam = entity.WinnerTeam?.ToResponse(),
-            Stage = entity.Stage
+            Stage = entity.Stage,
+            HomeRoster = entity.HomeRoster?.Select(p => p.ToDto()).ToList(),
+            AwayRoster = entity.AwayRoster?.Select(p => p.ToDto()).ToList()
         };
     }
 }

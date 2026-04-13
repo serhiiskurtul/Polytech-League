@@ -6,6 +6,7 @@ namespace PolytechLeague.Application.Dto.FutsalDto;
 public class FutsalTeamRequest
 {
     public required string Name { get; set; }
+    public long EventId { get; set; }
 }
 
 public class FutsalTeamResponse
@@ -21,7 +22,8 @@ public static class FutsalTeamDtoExtensions
     {
         return new FutsalTeam
         {
-            Name = request.Name
+            Name = request.Name,
+            EventId = request.EventId
         };
     }
 

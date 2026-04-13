@@ -1,0 +1,32 @@
+import api from "./axiosInstance";
+import { 
+  FutsalEventResponse, 
+  FutsalMatchResponse 
+} from "../types/futsal.types";
+
+export const getFutsalEventById = async (id: string | number): Promise<FutsalEventResponse> => {
+  const response = await api.get<FutsalEventResponse>(`/futsal-events/${id}`);
+  return response.data;
+};
+
+export const updateFutsalEvent = async (id: string | number, data: any): Promise<void> => {
+  await api.put(`/futsal-events/${id}`, data);
+};
+
+export const updateFutsalMatch = async (id: number, data: any): Promise<void> => {
+  await api.put(`/futsal-matches/${id}`, data);
+};
+
+export const createFutsalMatch = async (data: any): Promise<FutsalMatchResponse> => {
+  const response = await api.post<FutsalMatchResponse>(`/futsal-matches`, data);
+  return response.data;
+};
+
+export const createFutsalTeam = async (data: any): Promise<any> => {
+  const response = await api.post(`/futsal-teams`, data);
+  return response.data;
+};
+
+export const updateFutsalTeam = async (id: number, data: any): Promise<void> => {
+  await api.put(`/futsal-teams/${id}`, data);
+};

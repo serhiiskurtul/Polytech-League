@@ -19,6 +19,15 @@ public class Basketball3x3EventRequest
     public required Basketball3x3TournamentType TournamentType { get; set; }
     
     public required string Description { get; set; }
+    public string? Rules { get; set; }
+    public string? Prizes { get; set; }
+    public string? HeadRefereeName { get; set; }
+    public string? Referees { get; set; }
+    public string? Schedule { get; set; }
+
+    public long? FirstPlaceTeamId { get; set; }
+    public long? SecondPlaceTeamId { get; set; }
+    public long? ThirdPlaceTeamId { get; set; }
 }
 
 public class Basketball3x3EventResponse
@@ -37,7 +46,16 @@ public class Basketball3x3EventResponse
     public required Basketball3x3TournamentType TournamentType { get; set; }
 
     public required string Description { get; set; }
-    
+    public string? Rules { get; set; }
+    public string? Prizes { get; set; }
+    public string? HeadRefereeName { get; set; }
+    public string? Referees { get; set; }
+    public string? Schedule { get; set; }
+
+    public Basketball3x3TeamResponse? FirstPlaceTeam { get; set; }
+    public Basketball3x3TeamResponse? SecondPlaceTeam { get; set; }
+    public Basketball3x3TeamResponse? ThirdPlaceTeam { get; set; }
+    public ICollection<Basketball3x3TeamResponse>? Teams { get; set; }
     public ICollection<Basketball3x3MatchResponse>? Matches { get; set; }
 }
 
@@ -53,7 +71,15 @@ public static class Basketball3x3EventDtoExtensions
             RefereeIds = request.RefereeIds,
             Level = request.Level,
             TournamentType = request.TournamentType,
-            Description = request.Description
+            Description = request.Description,
+            Rules = request.Rules,
+            Prizes = request.Prizes,
+            HeadRefereeName = request.HeadRefereeName,
+            Referees = request.Referees,
+            Schedule = request.Schedule,
+            FirstPlaceTeamId = request.FirstPlaceTeamId,
+            SecondPlaceTeamId = request.SecondPlaceTeamId,
+            ThirdPlaceTeamId = request.ThirdPlaceTeamId
         };
     }
 
@@ -70,6 +96,15 @@ public static class Basketball3x3EventDtoExtensions
             Level = entity.Level,
             TournamentType = entity.TournamentType,
             Description = entity.Description,
+            Rules = entity.Rules,
+            Prizes = entity.Prizes,
+            HeadRefereeName = entity.HeadRefereeName,
+            Referees = entity.Referees,
+            Schedule = entity.Schedule,
+            FirstPlaceTeam = entity.FirstPlaceTeam?.ToResponse(),
+            SecondPlaceTeam = entity.SecondPlaceTeam?.ToResponse(),
+            ThirdPlaceTeam = entity.ThirdPlaceTeam?.ToResponse(),
+            Teams = entity.Teams?.Select(t => t.ToResponse()).ToList(),
             Matches = entity.Matches?.Select(m => m.ToResponse()).ToList()
         };
     }

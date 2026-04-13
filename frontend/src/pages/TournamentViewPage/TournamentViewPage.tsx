@@ -31,7 +31,13 @@ import {
   getArmwrestlingEventById,
   updateArmwrestlingEvent
 } from '@/shared/api/armwrestling.api';
+import { getVolleyballEventById, updateVolleyballEvent } from '@/shared/api/volleyball.api';
+import { getBeachVolleyballEventById, updateBeachVolleyballEvent } from '@/shared/api/beachVolleyball.api';
+import { getFutsalEventById, updateFutsalEvent } from '@/shared/api/futsal.api';
+import { getBasketball3x3EventById, updateBasketball3x3Event } from '@/shared/api/basketball3x3.api';
+import { getBadmintonEventById, updateBadmintonEvent } from '@/shared/api/badminton.api';
 import ArmwrestlingTournamentView from './components/ArmwrestlingTournamentView';
+import TeamSportsTournamentView from './components/TeamSportsTournamentView';
 import TournamentPodium from './components/TournamentPodium';
 import { Tournament } from '@/shared/types/tournament.types';
 import { 
@@ -63,7 +69,7 @@ const TournamentViewPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [tournament, setTournament] = useState<Tournament | null>(null);
-  const [details, setDetails] = useState<ChessEventResponse | CheckersEventResponse | ArmwrestlingEventResponse | null>(null);
+  const [details, setDetails] = useState<any | null>(null);
   const [allPlayers, setAllPlayers] = useState<PlayerDto[]>([]);
   const [activeTab, setActiveTab] = useState<'standings' | 'games' | 'participants' | 'schedule'>('standings');
   const [isLoading, setIsLoading] = useState(true);
@@ -250,6 +256,16 @@ const TournamentViewPage = () => {
             weightClass: (details as any).weightClass,
             category: (details as any).category
         });
+      } else if (tournament?.sport === 'volleyball') {
+        await updateVolleyballEvent(id!, { ...editTournamentData, setsToWin: (details as any).setsToWin });
+      } else if (tournament?.sport === 'beach_volleyball') {
+        await updateBeachVolleyballEvent(id!, { ...editTournamentData, setsToWin: (details as any).setsToWin });
+      } else if (tournament?.sport === 'futsal') {
+        await updateFutsalEvent(id!, editTournamentData);
+      } else if (tournament?.sport === 'basketball_3x3') {
+        await updateBasketball3x3Event(id!, editTournamentData);
+      } else if (tournament?.sport === 'badminton') {
+        await updateBadmintonEvent(id!, { ...editTournamentData, tournamentType: (details as any).tournamentType });
       } else {
         await updateChessEvent(id!, editTournamentData);
       }
@@ -373,13 +389,24 @@ const TournamentViewPage = () => {
       const data = await getTournamentById(id);
       setTournament(data);
 
-      if (data.sport === 'chess' || data.sport === 'checkers' || data.sport === 'armwrestling') {
+      if (['chess', 'checkers', 'armwrestling', 'volleyball', 'beach_volleyball', 'futsal', 'basketball_3x3', 'badminton'].includes(data.sport)) {
         try {
           const playersGetter = getAllPlayers; 
+          let detailsPromise;
+          
+          switch (data.sport) {
+            case 'checkers': detailsPromise = getCheckersEventById(id); break;
+            case 'armwrestling': detailsPromise = getArmwrestlingEventById(id); break;
+            case 'volleyball': detailsPromise = getVolleyballEventById(id); break;
+            case 'beach_volleyball': detailsPromise = getBeachVolleyballEventById(id); break;
+            case 'futsal': detailsPromise = getFutsalEventById(id); break;
+            case 'basketball_3x3': detailsPromise = getBasketball3x3EventById(id); break;
+            case 'badminton': detailsPromise = getBadmintonEventById(id); break;
+            default: detailsPromise = getChessEventById(id);
+          }
+
           const [detailsData, playersData] = await Promise.all([
-            data.sport === 'checkers' ? getCheckersEventById(id) : 
-            data.sport === 'armwrestling' ? getArmwrestlingEventById(id) :
-            getChessEventById(id),
+            detailsPromise,
             playersGetter()
           ]);
           setDetails(detailsData);
@@ -387,10 +414,11 @@ const TournamentViewPage = () => {
 
           // Initialize winners state
           if (detailsData) {
+            const d = detailsData as any;
             setWinners({
-              firstPlaceId: detailsData.firstPlace?.id || 0,
-              secondPlaceId: detailsData.secondPlace?.id || 0,
-              thirdPlaceId: detailsData.thirdPlace?.id || 0
+              firstPlaceId: d.firstPlace?.id || d.firstPlaceTeam?.id || 0,
+              secondPlaceId: d.secondPlace?.id || d.secondPlaceTeam?.id || 0,
+              thirdPlaceId: d.thirdPlace?.id || d.thirdPlaceTeam?.id || 0
             });
             
             // Sync editTournamentData for eventual updates
@@ -401,8 +429,8 @@ const TournamentViewPage = () => {
               refereeIds: detailsData.refereeIds,
               level: detailsData.level,
               description: detailsData.description,
-              timeControl: detailsData.timeControl || '',
-              participantsCount: detailsData.participantsCount || 0,
+              timeControl: (detailsData as any).timeControl || '',
+              participantsCount: (detailsData as any).participantsCount || 0,
               system: (detailsData as any).system || 'Swiss',
               rules: detailsData.rules || '',
               prizes: detailsData.prizes || '',
@@ -511,7 +539,7 @@ const TournamentViewPage = () => {
 
       if (!playerId) {
         // Check if player is already in the tournament (by userId)
-        if (newPlayer.userId && details?.players.some(p => p.userId === newPlayer.userId)) {
+        if (newPlayer.userId && details?.players.some((p: any) => p.userId === newPlayer.userId)) {
           alert("Цей користувач вже бере участь у турнірі!");
           return;
         }
@@ -531,7 +559,7 @@ const TournamentViewPage = () => {
         playerId = created.id!;
       } else {
         // Check if player is already in the tournament
-        const isAlreadyParticipant = details?.players.some(p => p.playerId === playerId);
+        const isAlreadyParticipant = details?.players.some((p: any) => p.playerId === playerId);
         if (isAlreadyParticipant) {
           alert("Цей гравець вже бере участь у турнірі!");
           return;
@@ -723,9 +751,12 @@ const TournamentViewPage = () => {
                   onChange={(e) => setWinners({...winners, firstPlaceId: Number(e.target.value)})}
                   style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
                 >
-                  <option key="default-first" value="0">-- Оберіть гравця --</option>
-                  {details?.players.map(p => (
-                    <option key={`first-${p.playerId}`} value={p.playerId}>{p.playerName} ({p.points} очок)</option>
+                  <option key="default-first" value="0">-- Оберіть переможця --</option>
+                  {details?.players?.map((p: any) => (
+                    <option key={`first-p-${p.playerId}`} value={p.playerId}>{p.playerName} ({p.points} очок)</option>
+                  ))}
+                  {details?.teams?.map((t: any) => (
+                    <option key={`first-t-${t.id}`} value={t.id}>{t.name}</option>
                   ))}
                 </select>
               </div>
@@ -739,9 +770,12 @@ const TournamentViewPage = () => {
                   onChange={(e) => setWinners({...winners, secondPlaceId: Number(e.target.value)})}
                   style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
                 >
-                  <option key="default-second" value="0">-- Оберіть гравця --</option>
-                  {details?.players.map(p => (
-                    <option key={`second-${p.playerId}`} value={p.playerId}>{p.playerName} ({p.points} очок)</option>
+                  <option key="default-second" value="0">-- Оберіть переможця --</option>
+                  {details?.players?.map((p: any) => (
+                    <option key={`second-p-${p.playerId}`} value={p.playerId}>{p.playerName} ({p.points} очок)</option>
+                  ))}
+                  {details?.teams?.map((t: any) => (
+                    <option key={`second-t-${t.id}`} value={t.id}>{t.name}</option>
                   ))}
                 </select>
               </div>
@@ -755,9 +789,12 @@ const TournamentViewPage = () => {
                   onChange={(e) => setWinners({...winners, thirdPlaceId: Number(e.target.value)})}
                   style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
                 >
-                  <option key="default-third" value="0">-- Оберіть гравця --</option>
-                  {details?.players.map(p => (
-                    <option key={`third-${p.playerId}`} value={p.playerId}>{p.playerName} ({p.points} очок)</option>
+                  <option key="default-third" value="0">-- Оберіть переможця --</option>
+                  {details?.players?.map((p: any) => (
+                    <option key={`third-p-${p.playerId}`} value={p.playerId}>{p.playerName} ({p.points} очок)</option>
+                  ))}
+                  {details?.teams?.map((t: any) => (
+                    <option key={`third-t-${t.id}`} value={t.id}>{t.name}</option>
                   ))}
                 </select>
               </div>
@@ -911,6 +948,15 @@ const TournamentViewPage = () => {
             isAdmin={isAdmin} 
             onRefresh={() => fetchTournament(true)} 
           />
+        )}
+
+        {['volleyball', 'beach_volleyball', 'futsal', 'basketball_3x3', 'badminton'].includes(tournament.sport) && details && (
+            <TeamSportsTournamentView 
+                sport={tournament.sport as any}
+                details={details}
+                isAdmin={isAdmin}
+                onRefresh={() => fetchTournament(true)}
+            />
         )}
 
         {(tournament.sport === 'chess' || tournament.sport === 'checkers') && (
@@ -1487,7 +1533,7 @@ const TournamentViewPage = () => {
 
                   {details?.photos && details.photos.length > 0 && (
                     <div className={styles.currentPhotosGrid}>
-                      {details.photos.map(photo => (
+                      {details.photos.map((photo: any) => (
                         <div key={photo.id} className={styles.photoPreviewCard}>
                           <img src={getImageUrl(photo.url)} alt="Tournament" />
                           <button onClick={() => handleDeletePhoto(photo.id)} className={styles.deletePhotoBtn}>

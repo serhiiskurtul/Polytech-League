@@ -33,5 +33,14 @@ public class VolleyballMatchConfiguration : IEntityTypeConfiguration<VolleyballM
             .WithOne(s => s.Match)
             .HasForeignKey(s => s.MatchId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(m => m.HomeRoster)
+            .WithMany()
+            .UsingEntity("volleyball_match_home_roster");
+
+        builder.HasMany(m => m.AwayRoster)
+            .WithMany()
+            .UsingEntity("volleyball_match_away_roster");
     }
+
 }

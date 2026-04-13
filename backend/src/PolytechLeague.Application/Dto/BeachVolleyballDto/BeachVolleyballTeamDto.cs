@@ -6,6 +6,7 @@ namespace PolytechLeague.Application.Dto.BeachVolleyballDto;
 public class BeachVolleyballTeamRequest
 {
     public required string Name { get; set; }
+    public long EventId { get; set; }
 }
 
 public class BeachVolleyballTeamResponse
@@ -21,7 +22,8 @@ public static class BeachVolleyballTeamDtoExtensions
     {
         return new BeachVolleyballTeam
         {
-            Name = request.Name
+            Name = request.Name,
+            EventId = request.EventId
         };
     }
 

@@ -3,20 +3,30 @@ import { PlayerDto } from '@/shared/types/player.types';
 import styles from '../TournamentViewPage.module.css';
 
 interface TournamentPodiumProps {
-  firstPlace?: PlayerDto | null;
-  secondPlace?: PlayerDto | null;
-  thirdPlace?: PlayerDto | null;
+  firstPlace?: any | null;
+  secondPlace?: any | null;
+  thirdPlace?: any | null;
+  isTeam?: boolean;
 }
 
 const TournamentPodium: React.FC<TournamentPodiumProps> = ({ 
   firstPlace, 
   secondPlace, 
-  thirdPlace 
+  thirdPlace,
+  isTeam = false
 }) => {
   if (!firstPlace && !secondPlace && !thirdPlace) return null;
 
-  const renderPlace = (player: PlayerDto | null | undefined, rank: number, className: string) => {
-    if (!player) return null;
+  const renderPlace = (participant: any | null | undefined, rank: number, className: string) => {
+    if (!participant) return null;
+
+    const displayName = isTeam 
+      ? participant.name 
+      : `${participant.firstName} ${participant.lastName}`;
+    
+    const displayAvatar = isTeam
+      ? (participant.name?.[0] || 'T')
+      : `${participant.firstName?.[0] || ''}${participant.lastName?.[0] || ''}`;
 
     return (
       <div className={`${styles.podiumPlace} ${className}`}>
@@ -25,13 +35,13 @@ const TournamentPodium: React.FC<TournamentPodiumProps> = ({
           {rank !== 1 && rank}
         </div>
         <div className={styles.podiumAvatar}>
-          {player.firstName[0]}{player.lastName[0]}
+          {displayAvatar}
         </div>
         <div className={styles.podiumName}>
-          {player.firstName} {player.lastName}
+          {displayName}
         </div>
         <div className={styles.podiumGroup}>
-          {player.group}
+          {!isTeam && participant.group}
         </div>
       </div>
     );

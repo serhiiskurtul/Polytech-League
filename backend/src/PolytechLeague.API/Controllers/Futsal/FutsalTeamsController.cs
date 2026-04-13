@@ -42,6 +42,7 @@ public class FutsalTeamsController(
         await futsalTeamService.CreateAsync(entity, cancellationToken);
 
         await redisService.RemoveGroupAsync("futsal_teams_group");
+        await redisService.RemoveGroupAsync("futsal_events_group");
 
         return Created();
     }
@@ -57,6 +58,7 @@ public class FutsalTeamsController(
         await futsalTeamService.UpdateAsync(id, entity, cancellationToken);
 
         await redisService.RemoveGroupAsync("futsal_teams_group");
+        await redisService.RemoveGroupAsync("futsal_events_group");
 
         return NoContent();
     }
@@ -68,6 +70,7 @@ public class FutsalTeamsController(
         await futsalTeamService.DeleteAsync(id, cancellationToken);
 
         await redisService.RemoveGroupAsync("futsal_teams_group");
+        await redisService.RemoveGroupAsync("futsal_events_group");
 
         return NoContent();
     }

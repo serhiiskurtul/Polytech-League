@@ -20,6 +20,15 @@ public class BeachVolleyballEventRequest
     public required BeachVolleyballTournamentType TournamentType { get; set; }
 
     public required string Description { get; set; }
+    public string? Rules { get; set; }
+    public string? Prizes { get; set; }
+    public string? HeadRefereeName { get; set; }
+    public string? Referees { get; set; }
+    public string? Schedule { get; set; }
+
+    public long? FirstPlaceTeamId { get; set; }
+    public long? SecondPlaceTeamId { get; set; }
+    public long? ThirdPlaceTeamId { get; set; }
 }
 
 public class BeachVolleyballEventResponse
@@ -38,6 +47,15 @@ public class BeachVolleyballEventResponse
     public required BeachVolleyballTournamentType TournamentType { get; set; }
 
     public required string Description { get; set; }
+    public string? Rules { get; set; }
+    public string? Prizes { get; set; }
+    public string? HeadRefereeName { get; set; }
+    public string? Referees { get; set; }
+    public string? Schedule { get; set; }
+
+    public BeachVolleyballTeamResponse? FirstPlaceTeam { get; set; }
+    public BeachVolleyballTeamResponse? SecondPlaceTeam { get; set; }
+    public BeachVolleyballTeamResponse? ThirdPlaceTeam { get; set; }
 
     public ICollection<BeachVolleyballMatchResponse>? Matches { get; set; }
 }
@@ -54,7 +72,15 @@ public static class BeachVolleyballEventDtoExtensions
             RefereeIds = request.RefereeIds,
             Level = request.Level,
             TournamentType = request.TournamentType,
-            Description = request.Description
+            Description = request.Description,
+            Rules = request.Rules,
+            Prizes = request.Prizes,
+            HeadRefereeName = request.HeadRefereeName,
+            Referees = request.Referees,
+            Schedule = request.Schedule,
+            FirstPlaceTeamId = request.FirstPlaceTeamId,
+            SecondPlaceTeamId = request.SecondPlaceTeamId,
+            ThirdPlaceTeamId = request.ThirdPlaceTeamId
         };
     }
 
@@ -71,6 +97,14 @@ public static class BeachVolleyballEventDtoExtensions
             Level = entity.Level,
             TournamentType = entity.TournamentType,
             Description = entity.Description,
+            Rules = entity.Rules,
+            Prizes = entity.Prizes,
+            HeadRefereeName = entity.HeadRefereeName,
+            Referees = entity.Referees,
+            Schedule = entity.Schedule,
+            FirstPlaceTeam = entity.FirstPlaceTeam?.ToResponse(),
+            SecondPlaceTeam = entity.SecondPlaceTeam?.ToResponse(),
+            ThirdPlaceTeam = entity.ThirdPlaceTeam?.ToResponse(),
             Matches = entity.Matches?.Select(m => m.ToResponse()).ToList()
         };
     }

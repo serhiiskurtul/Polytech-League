@@ -19,6 +19,15 @@ public class FutsalEventRequest
     public required FutsalTournamentType TournamentType { get; set; }
     
     public required string Description { get; set; }
+    public string? Rules { get; set; }
+    public string? Prizes { get; set; }
+    public string? HeadRefereeName { get; set; }
+    public string? Referees { get; set; }
+    public string? Schedule { get; set; }
+
+    public long? FirstPlaceTeamId { get; set; }
+    public long? SecondPlaceTeamId { get; set; }
+    public long? ThirdPlaceTeamId { get; set; }
 }
 
 public class FutsalEventResponse
@@ -37,7 +46,16 @@ public class FutsalEventResponse
     public required FutsalTournamentType TournamentType { get; set; }
 
     public required string Description { get; set; }
-    
+    public string? Rules { get; set; }
+    public string? Prizes { get; set; }
+    public string? HeadRefereeName { get; set; }
+    public string? Referees { get; set; }
+    public string? Schedule { get; set; }
+
+    public FutsalTeamResponse? FirstPlaceTeam { get; set; }
+    public FutsalTeamResponse? SecondPlaceTeam { get; set; }
+    public FutsalTeamResponse? ThirdPlaceTeam { get; set; }
+    public ICollection<FutsalTeamResponse>? Teams { get; set; }
     public ICollection<FutsalMatchResponse>? Matches { get; set; }
 }
 
@@ -53,7 +71,15 @@ public static class FutsalEventDtoExtensions
             RefereeIds = request.RefereeIds,
             Level = request.Level,
             TournamentType = request.TournamentType,
-            Description = request.Description
+            Description = request.Description,
+            Rules = request.Rules,
+            Prizes = request.Prizes,
+            HeadRefereeName = request.HeadRefereeName,
+            Referees = request.Referees,
+            Schedule = request.Schedule,
+            FirstPlaceTeamId = request.FirstPlaceTeamId,
+            SecondPlaceTeamId = request.SecondPlaceTeamId,
+            ThirdPlaceTeamId = request.ThirdPlaceTeamId
         };
     }
 
@@ -70,6 +96,15 @@ public static class FutsalEventDtoExtensions
             Level = entity.Level,
             TournamentType = entity.TournamentType,
             Description = entity.Description,
+            Rules = entity.Rules,
+            Prizes = entity.Prizes,
+            HeadRefereeName = entity.HeadRefereeName,
+            Referees = entity.Referees,
+            Schedule = entity.Schedule,
+            FirstPlaceTeam = entity.FirstPlaceTeam?.ToResponse(),
+            SecondPlaceTeam = entity.SecondPlaceTeam?.ToResponse(),
+            ThirdPlaceTeam = entity.ThirdPlaceTeam?.ToResponse(),
+            Teams = entity.Teams?.Select(t => t.ToResponse()).ToList(),
             Matches = entity.Matches?.Select(m => m.ToResponse()).ToList()
         };
     }

@@ -12,6 +12,9 @@ public class Basketball3x3Match
     public long AwayTeamId { get; set; }
     public Basketball3x3Team? AwayTeam { get; set; }
     
+    public ICollection<Player>? HomeRoster { get; set; }
+    public ICollection<Player>? AwayRoster { get; set; }
+    
     public int? HomeTeamScore { get; set; }
     public int? AwayTeamScore { get; set; }
     
@@ -19,4 +22,9 @@ public class Basketball3x3Match
     public Basketball3x3Team? WinnerTeam { get; set; }
     
     public string? Stage { get; set; } // e.g., Group Stage, Quarterfinal
+
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public ICollection<long>? HomeRosterIds { get; set; }
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public ICollection<long>? AwayRosterIds { get; set; }
 }

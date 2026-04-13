@@ -20,9 +20,24 @@ public class BadmintonMatchConfiguration : IEntityTypeConfiguration<BadmintonMat
             .HasForeignKey(m => m.Player2Id)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(m => m.Winner)
+        builder.HasOne(m => m.WinnerPlayer)
             .WithMany()
-            .HasForeignKey(m => m.WinnerId)
+            .HasForeignKey(m => m.WinnerPlayerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(m => m.Team1)
+            .WithMany()
+            .HasForeignKey(m => m.Team1Id)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(m => m.Team2)
+            .WithMany()
+            .HasForeignKey(m => m.Team2Id)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(m => m.WinnerTeam)
+            .WithMany()
+            .HasForeignKey(m => m.WinnerTeamId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(m => m.Sets)

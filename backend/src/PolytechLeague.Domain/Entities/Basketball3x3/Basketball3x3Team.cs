@@ -6,6 +6,8 @@ public class Basketball3x3Team
 {
     public long Id { get; set; }
     public required string Name { get; set; }
+    public long EventId { get; set; }
+    public Basketball3x3Event? Event { get; set; }
     
     public ICollection<Player>? Players { get; set; }
 }

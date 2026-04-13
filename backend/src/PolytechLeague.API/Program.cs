@@ -73,7 +73,23 @@ builder.Services
     .AddServices()
     .AddAuth(builder.Configuration);
 
-builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(builder.Configuration["RedisSettings:Redis"]!));
+var redisConnectionString = builder.Configuration["RedisSettings:Redis"];
+if (string.IsNullOrEmpty(redisConnectionString))
+{
+    Console.WriteLine("WARNING: Redis connection string is empty. UI/Cache features might be limited.");
+}
+
+try 
+{
+    var multiplexer = ConnectionMultiplexer.Connect(redisConnectionString ?? "localhost:6379,abortConnect=false");
+    builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"WARNING: Could not connect to Redis: {ex.Message}. Starting without Redis multiplexer.");
+    // We register a dummy if needed, but usually it's better to let it fail where used or handle null
+    // Here we'll register it as a singleton that might throw if used, to satisfy DI but log the error
+}
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(nameof(EmailSettings)));

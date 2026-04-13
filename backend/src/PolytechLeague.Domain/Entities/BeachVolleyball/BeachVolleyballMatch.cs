@@ -12,6 +12,9 @@ public class BeachVolleyballMatch
     public long AwayTeamId { get; set; }
     public BeachVolleyballTeam? AwayTeam { get; set; }
 
+    public ICollection<Player>? HomeRoster { get; set; }
+    public ICollection<Player>? AwayRoster { get; set; }
+
     public int SetsToWin { get; set; } = 2;
 
     public int? HomeSetsWon { get; set; }
@@ -23,4 +26,9 @@ public class BeachVolleyballMatch
     public string? Stage { get; set; }
 
     public ICollection<BeachVolleyballSet>? Sets { get; set; }
+    
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public ICollection<long>? HomeRosterIds { get; set; }
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public ICollection<long>? AwayRosterIds { get; set; }
 }

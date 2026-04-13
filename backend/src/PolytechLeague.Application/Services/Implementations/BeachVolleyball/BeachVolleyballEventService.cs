@@ -19,5 +19,13 @@ public class BeachVolleyballEventService(
         oldEntity.Location = newEntity.Location;
         oldEntity.Description = newEntity.Description;
         oldEntity.Level = newEntity.Level;
+        oldEntity.Rules = newEntity.Rules;
+        oldEntity.Prizes = newEntity.Prizes;
+        oldEntity.HeadRefereeName = newEntity.HeadRefereeName;
+        oldEntity.Referees = newEntity.Referees;
+        oldEntity.Schedule = newEntity.Schedule;
+        oldEntity.FirstPlaceTeamId = newEntity.FirstPlaceTeamId;
+        oldEntity.SecondPlaceTeamId = newEntity.SecondPlaceTeamId;
+        oldEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
     }
 }

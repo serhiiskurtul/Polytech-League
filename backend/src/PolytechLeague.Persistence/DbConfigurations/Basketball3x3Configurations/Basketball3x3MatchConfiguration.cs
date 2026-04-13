@@ -28,5 +28,13 @@ public class Basketball3x3MatchConfiguration : IEntityTypeConfiguration<Basketba
             .OnDelete(DeleteBehavior.SetNull);
             
         builder.Property(m => m.Stage).HasMaxLength(100);
+
+        builder.HasMany(m => m.HomeRoster)
+            .WithMany()
+            .UsingEntity("basketball3x3_match_home_roster");
+
+        builder.HasMany(m => m.AwayRoster)
+            .WithMany()
+            .UsingEntity("basketball3x3_match_away_roster");
     }
 }

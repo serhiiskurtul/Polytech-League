@@ -6,6 +6,8 @@ public class FutsalTeam
 {
     public long Id { get; set; }
     public required string Name { get; set; }
+    public long EventId { get; set; }
+    public FutsalEvent? Event { get; set; }
     
     public ICollection<Player>? Players { get; set; }
 }

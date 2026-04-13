@@ -6,6 +6,7 @@ namespace PolytechLeague.Application.Dto.VolleyballDto;
 public class VolleyballTeamRequest
 {
     public required string Name { get; set; }
+    public long EventId { get; set; }
 }
 
 public class VolleyballTeamResponse
@@ -21,7 +22,8 @@ public static class VolleyballTeamDtoExtensions
     {
         return new VolleyballTeam
         {
-            Name = request.Name
+            Name = request.Name,
+            EventId = request.EventId
         };
     }
 

@@ -5,6 +5,7 @@ using Xunit;
 using PolytechLeague.Application.Services.Implementations;
 using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Exceptions;
+using PolytechLeague.Persistence.Database;
 
 namespace PolytechLeague.Tests.Services
 {

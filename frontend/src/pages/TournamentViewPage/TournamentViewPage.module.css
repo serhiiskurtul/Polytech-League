@@ -500,45 +500,67 @@
 }
 
 /* Modal Styles */
-.modalOverlay {
+.modalOverlay, .rosterModalOverlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 2000;
   padding: 20px;
+  animation: fadeIn 0.3s ease-out;
 }
 
-.modalContent {
-  background: var(--card);
-  border-radius: 20px;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modalContent, .rosterModal {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-radius: 24px;
   width: 100%;
-  max-width: 1000px;
-  max-height: 90vh;
+  max-width: 800px;
+  max-height: 85vh;
   display: flex;
   flex-direction: column;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 
+    0 8px 32px 0 rgba(31, 38, 135, 0.1),
+    0 20px 50px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   position: relative;
-  animation: modalFadeUp 0.3s ease-out;
+  animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
 }
 
-@keyframes modalFadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(30px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .modalHeader {
-  padding: 24px 32px;
-  border-bottom: 1px solid var(--border);
+  padding: 28px 32px;
+  background: rgba(255, 255, 255, 0.5);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.modalHeader h3 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+  letter-spacing: -0.5px;
 }
 
 .closeButton {
@@ -572,74 +594,86 @@
 }
 
 .formGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  margin-bottom: 24px;
 }
 
 .formGroup label {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
+  display: block;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  color: #6b7280;
+  margin-bottom: 8px;
+  padding-left: 4px;
 }
 
 .formGroup input,
 .formGroup select,
 .formGroup textarea {
-  padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  width: 100%;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
   font-size: 15px;
-  background: var(--bg);
-  transition: all 0.2s;
+  color: #1a1a1a;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .formGroup input:focus,
 .formGroup select:focus,
 .formGroup textarea:focus {
   outline: none;
+  background: #ffffff;
   border-color: var(--primary);
-  background: #fff;
-  box-shadow: 0 0 0 4px var(--primary-light);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  transform: translateY(-1px);
 }
 
 .modalFooter {
-  padding: 24px 32px;
-  border-top: 1px solid var(--border);
+  padding: 24px 40px;
+  background: rgba(255, 255, 255, 0.3);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: flex-end;
   gap: 16px;
 }
 
 .saveBtn {
-  padding: 12px 24px;
-  background: var(--primary);
+  padding: 14px 32px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   font-weight: 600;
+  font-size: 15px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .saveBtn:hover {
-  background: var(--primary-dark);
   transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+  filter: brightness(1.1);
 }
 
 .cancelBtn {
-  padding: 12px 24px;
-  background: var(--bg);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  padding: 14px 32px;
+  background: transparent;
+  color: #4b5563;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
   font-weight: 600;
+  font-size: 15px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .cancelBtn:hover {
-  background: #eee;
+  background: rgba(0, 0, 0, 0.05);
+  color: #1a1a1a;
 }
 
 /* Photo Management Styles */
@@ -1245,4 +1279,477 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
   margin-bottom: 24px;
+}
+
+/* Team Sports View Styles */
+.teamSportsView {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.sportHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  background: white;
+  padding: 16px 24px;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.sportBadge {
+  background: var(--primary);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+}
+
+.tabsNav {
+  display: flex;
+  gap: 8px;
+}
+
+.tabsNav button {
+  padding: 8px 16px;
+  border: none;
+  background: #f1f5f9;
+  color: #64748b;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tabsNav button:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.tabsNav button.activeTab {
+  background: var(--primary);
+  color: white;
+}
+
+.matchesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 24px;
+}
+
+.matchCard {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  transition: all 0.2s;
+}
+
+.matchCard:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.matchStage {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.matchTeams {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.teamRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.teamLogo {
+  width: 40px;
+  height: 40px;
+  background: #e2e8f0;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: #64748b;
+  font-size: 20px;
+}
+
+.teamName {
+  flex: 1;
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 16px;
+}
+
+.rosterInfo {
+  font-size: 12px;
+  color: #64748b;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rosterEditBtn {
+  background: none;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.rosterEditBtn:hover {
+  background: var(--primary-light);
+}
+
+.vsDivider {
+  text-align: center;
+  font-weight: 900;
+  color: #cbd5e1;
+  font-size: 12px;
+  position: relative;
+}
+
+.vsDivider::before, .vsDivider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 45%;
+  height: 1px;
+  background: #e2e8f0;
+}
+
+.vsDivider::before { left: 0; }
+.vsDivider::after { right: 0; }
+
+.scoreInput input {
+  width: 50px;
+  height: 40px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 800;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  background: white;
+}
+
+.scoreInput input:focus {
+  border-color: var(--primary);
+  outline: none;
+  background: var(--primary-light);
+}
+
+/* Standings */
+.leagueTable {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.leagueTable th {
+  background: #f8fafc;
+  padding: 16px;
+  text-align: left;
+  font-weight: 700;
+  color: #475569;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.leagueTable td {
+  padding: 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.tableName { font-weight: 700; color: #1e293b; }
+.tablePoints { font-weight: 800; color: var(--primary); }
+
+/* Roster Modal */
+.rosterModalOverlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.rosterModal {
+  width: 500px;
+  max-width: 95%;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modalHeader {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modalHeader h3 { margin: 0; font-size: 18px; font-weight: 800; }
+
+.searchBox { padding: 16px 24px; border-bottom: 1px solid #f1f5f9; }
+.searchBox input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.playersList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.playerPickItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 4px;
+}
+
+.playerPickItem:hover { background: #f8fafc; }
+.playerPickItem.selected { background: var(--primary-light); }
+
+.pickInfo { display: flex; flex-direction: column; }
+.pName { font-weight: 700; color: #1e293b; font-size: 14px; }
+.pGroup { font-size: 12px; color: #64748b; }
+
+.pickStatus { color: #cbd5e1; font-size: 20px; }
+.selected .pickStatus { color: var(--primary); }
+
+.noData {
+  text-align: center;
+  padding: 40px;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* Match Creation Styles */
+.addMatchGlobalBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--success);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-left: auto;
+  font-size: 14px;
+}
+
+.addMatchGlobalBtn:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.createMatchModal {
+  max-width: 500px !important;
+}
+
+.createMatchForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.createMatchForm select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.createMatchForm select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+/* Teams Tab & Cards */
+.teamsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  padding: 8px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.teamCard {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.teamCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.teamCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #f3f4f6;
+  padding-bottom: 16px;
+}
+
+.teamAvatar {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+}
+
+.teamInfo h4 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: -0.3px;
+}
+
+.teamInfo p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.editTeamBtn {
+  margin-left: auto;
+  padding: 8px 14px;
+  background: #f3f4f6;
+  color: #4b5563;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.editTeamBtn:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.teamPlayersPreview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pMiniTag {
+  background: #f9fafb;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #4b5563;
+  border: 1px solid #f1f3f5;
+  transition: all 0.2s;
+}
+
+.pMiniTag:hover {
+  background: white;
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.morePlayers {
+  font-size: 12px;
+  color: var(--primary);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  padding-left: 4px;
+}
+
+.noPlayersHint {
+  font-size: 13px;
+  color: #9ca3af;
+  font-style: italic;
+  margin: 0;
+}
+
+.glassModal {
+  max-width: 600px !important;
 }
