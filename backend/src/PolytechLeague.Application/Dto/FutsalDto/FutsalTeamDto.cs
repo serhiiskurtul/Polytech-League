@@ -8,6 +8,7 @@ public class FutsalTeamRequest
     public required string Name { get; set; }
     public long EventId { get; set; }
     public ICollection<long>? PlayerIds { get; set; }
+    public int Points { get; set; }
 }
 
 public class FutsalTeamResponse
@@ -15,6 +16,7 @@ public class FutsalTeamResponse
     public long Id { get; set; }
     public required string Name { get; set; }
     public ICollection<PlayerDto>? Players { get; set; }
+    public int Points { get; set; }
 }
 
 public static class FutsalTeamDtoExtensions
@@ -25,7 +27,8 @@ public static class FutsalTeamDtoExtensions
         {
             Name = request.Name,
             EventId = request.EventId,
-            PlayerIds = request.PlayerIds
+            PlayerIds = request.PlayerIds,
+            Points = request.Points
         };
     }
 
@@ -35,7 +38,8 @@ public static class FutsalTeamDtoExtensions
         {
             Id = entity.Id,
             Name = entity.Name,
-            Players = entity.Players?.Select(p => p.ToDto()).ToList()
+            Players = entity.Players?.Select(p => p.ToDto()).ToList(),
+            Points = entity.Points
         };
     }
 }

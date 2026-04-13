@@ -40,5 +40,6 @@ public class FutsalTeamService(
     protected override void UpdateValues(FutsalTeam oldEntity, FutsalTeam newEntity)
     {
         oldEntity.Name = newEntity.Name;
+        oldEntity.Points = newEntity.Points;
     }
 }

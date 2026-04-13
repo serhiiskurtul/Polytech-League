@@ -109,6 +109,110 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     }
   };
 
+  const getTeamUpdateApi = () => {
+    switch (sport) {
+      case 'volleyball': return updateVolleyballTeam;
+      case 'beach_volleyball': return updateBeachVolleyballTeam;
+      case 'futsal': return updateFutsalTeam;
+      case 'basketball_3x3': return updateBasketball3x3Team;
+      case 'badminton': return updateBadmintonTeam;
+      default: return updateVolleyballTeam;
+    }
+  };
+
+  const handleUpdateTeamPoints = async (teamId: number, points: number) => {
+    try {
+      const updateApi = getTeamUpdateApi();
+      const team = details.teams.find((t: any) => t.id === teamId);
+      await updateApi(teamId, { ...team, points });
+      onRefresh();
+    } catch (err) {
+      console.error(err);
+      alert('Помилка при оновленні очок');
+    }
+  };
+
+  const calculateStandings = () => {
+    if (!details.teams || !details.matches) return [];
+
+    const standings = details.teams.map((team: any) => {
+      const stats = {
+        id: team.id,
+        name: team.name,
+        gp: 0, // Games Played
+        w: 0,  // Wins
+        d: 0,  // Draws
+        l: 0,  // Losses
+        gf: 0, // Goals For
+        ga: 0, // Goals Against
+        points: team.points || 0
+      };
+
+      details.matches.forEach((match: any) => {
+        const isHome = match.homeTeamId === team.id;
+        const isAway = match.awayTeamId === team.id;
+
+        if (isHome || isAway) {
+          const isVolleyball = sport.includes('volleyball') || sport === 'badminton';
+          const hScore = isVolleyball ? (match.homeSetsWon || 0) : (match.homeTeamScore || 0);
+          const aScore = isVolleyball ? (match.awaySetsWon || 0) : (match.awayTeamScore || 0);
+          
+          // Only count if match has a score (at least one side > 0 or it's a 0-0 draw that was actually played)
+          // For simplicity, we assume if stage is set, it might be played, but let's check if score is entered
+          const isPlayed = isVolleyball ? (match.homeSetsWon !== null || match.awaySetsWon !== null) : (match.homeTeamScore !== null || match.awayTeamScore !== null);
+
+          if (isPlayed) {
+            stats.gp++;
+            const tScore = isHome ? hScore : aScore;
+            const oScore = isHome ? aScore : hScore;
+
+            stats.gf += tScore;
+            stats.ga += oScore;
+
+            if (tScore > oScore) stats.w++;
+            else if (tScore < oScore) stats.l++;
+            else stats.d++;
+          }
+        }
+      });
+
+      // Traditional points calculation if not overridden or added to override
+      // Usually, points = w*3 + d*1. 
+      // User asked to EDIT points, so we use team.points as the base or total.
+      // Let's make it so calculated points are shown if manual points are 0? 
+      // Or better: show calculated points but allow manual override.
+      // Re-reading request: "редагувати дані ... саме поле очків".
+      // I'll show the manual points from DB, but calculate auto-points for reference if needed.
+      // But usually, users want auto-calc + manual adjustment.
+      // For now, I'll use the manual points from the DB as the source of truth, 
+      // and if it's 0 and there are wins, maybe suggest it.
+      // Actually, I'll calculate auto-points:
+      const autoPoints = stats.w * 3 + stats.d * 1;
+      // If team.points is 0, we use autoPoints as default for display if you want, 
+      // but the user want to EDIT.
+      // Let's use: finalPoints = team.points.
+      
+      return stats;
+    });
+
+    return standings.sort((a: any, b: any) => {
+      // Priority 1: Points (Manual or Auto-calculated)
+      const aP = Number(a.points) || (a.w * 3 + a.d);
+      const bP = Number(b.points) || (b.w * 3 + b.d);
+      if (bP !== aP) return bP - aP;
+
+      // Priority 2: Goal Difference
+      const aDiff = a.gf - a.ga;
+      const bDiff = b.gf - b.ga;
+      if (bDiff !== aDiff) return bDiff - aDiff;
+
+      // Priority 3: Goals Scored
+      return b.gf - a.gf;
+    });
+  };
+
+  const standingsData = calculateStandings();
+
   const handleCreateMatch = async () => {
     try {
       if (!newMatchForm.homeTeamId || !newMatchForm.awayTeamId) {
@@ -338,25 +442,38 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
             <table className={styles.leagueTable}>
               <thead>
                 <tr>
-                  <th>#</th>
-                  <th>Команда (Група)</th>
-                  <th>І</th>
-                  <th>В</th>
-                  <th>П</th>
-                  <th>{sport.includes('volleyball') ? 'Сети' : 'М\'ячі'}</th>
-                  <th>Очки</th>
+                  <th title="Місце">#</th>
+                  <th title="Назва команди">Команда (Група)</th>
+                  <th title="Ігри">І</th>
+                  <th title="Виграші">В</th>
+                  <th title="Нічиї">Н</th>
+                  <th title="Поразки">П</th>
+                  <th title="Забиті - Пропущені">М'ячі (З-П)</th>
+                  <th title="Очки (3 за перемогу, 1 за нічию)">Очки</th>
                 </tr>
               </thead>
               <tbody>
-                {details.teams?.map((team: any, index: number) => (
+                {standingsData.map((team: any, index: number) => (
                   <tr key={team.id}>
                     <td>{index + 1}</td>
                     <td className={styles.tableName}>{team.name}</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0 - 0</td>
-                    <td className={styles.tablePoints}>0</td>
+                    <td>{team.gp}</td>
+                    <td>{team.w}</td>
+                    <td>{team.d}</td>
+                    <td>{team.l}</td>
+                    <td>{team.gf} - {team.ga}</td>
+                    <td className={styles.tablePoints}>
+                      {isAdmin ? (
+                        <input 
+                          type="number" 
+                          className={styles.pointsInlineInput}
+                          defaultValue={team.points}
+                          onBlur={(e) => handleUpdateTeamPoints(team.id, parseInt(e.target.value) || 0)}
+                        />
+                      ) : (
+                        team.points || (team.w * 3 + team.d)
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>

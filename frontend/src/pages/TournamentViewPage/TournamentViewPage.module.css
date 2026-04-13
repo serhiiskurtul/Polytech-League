@@ -1547,6 +1547,25 @@
 .tableName { font-weight: 700; color: #1e293b; }
 .tablePoints { font-weight: 800; color: var(--primary); }
 
+.pointsInlineInput {
+  width: 60px;
+  padding: 4px 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 800;
+  color: var(--primary);
+  background: transparent;
+  transition: all 0.2s;
+}
+
+.pointsInlineInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
 /* Roster Modal */
 .rosterModalOverlay {
   position: fixed;

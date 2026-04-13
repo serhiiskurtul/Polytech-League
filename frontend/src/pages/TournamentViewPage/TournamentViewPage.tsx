@@ -125,17 +125,65 @@ const TournamentViewPage = () => {
   const handleSaveWinners = async () => {
     if (!details || !id) return;
     try {
-      const payload = {
-        ...editTournamentData,
-        firstPlaceId: winners.firstPlaceId || null,
-        secondPlaceId: winners.secondPlaceId || null,
-        thirdPlaceId: winners.thirdPlaceId || null
+      const sport = tournament?.sport;
+      const isTeamSport = sport === 'futsal' || sport === 'volleyball' || sport === 'beach_volleyball' || sport === 'basketball_3x3' || sport === 'badminton';
+      
+      // Build clean base payload with common fields to avoid "Extra fields" 400 error
+      const payload: any = {
+        name: editTournamentData.name,
+        date: editTournamentData.date,
+        location: editTournamentData.location,
+        refereeIds: editTournamentData.refereeIds,
+        level: editTournamentData.level,
+        description: editTournamentData.description,
+        rules: editTournamentData.rules,
+        prizes: editTournamentData.prizes,
+        headRefereeName: editTournamentData.headRefereeName,
+        referees: editTournamentData.referees,
+        schedule: editTournamentData.schedule,
       };
 
-      if (tournament?.sport === 'checkers') {
-        await updateCheckersEvent(id, { ...payload, variant: (details as any).variant } as any);
+      if (isTeamSport) {
+        payload.firstPlaceTeamId = winners.firstPlaceId || null;
+        payload.secondPlaceTeamId = winners.secondPlaceId || null;
+        payload.thirdPlaceTeamId = winners.thirdPlaceId || null;
+        
+        if (sport === 'futsal' || sport === 'badminton') {
+          payload.tournamentType = (details as any).tournamentType || 'RoundRobin';
+        }
+        if (sport === 'volleyball' || sport === 'beach_volleyball') {
+          payload.setsToWin = (details as any).setsToWin || 2;
+        }
       } else {
-        await updateChessEvent(id, payload as any);
+        payload.firstPlaceId = winners.firstPlaceId || null;
+        payload.secondPlaceId = winners.secondPlaceId || null;
+        payload.thirdPlaceId = winners.thirdPlaceId || null;
+        
+        if (sport === 'chess') {
+          payload.system = editTournamentData.system;
+          payload.timeControl = editTournamentData.timeControl;
+          payload.participantsCount = editTournamentData.participantsCount;
+        } else if (sport === 'checkers') {
+          payload.variant = (details as any).variant;
+        } else if (sport === 'armwrestling') {
+          payload.hand = (details as any).hand;
+          payload.weightClass = (details as any).weightClass;
+          payload.category = (details as any).category;
+          payload.timeControl = editTournamentData.timeControl;
+          payload.participantsCount = editTournamentData.participantsCount;
+        }
+      }
+
+      switch (sport) {
+        case 'checkers': await updateCheckersEvent(id, payload as any); break;
+        case 'chess': await updateChessEvent(id, payload as any); break;
+        case 'armwrestling': await updateArmwrestlingEvent(id, payload as any); break;
+        case 'futsal': await updateFutsalEvent(id, payload as any); break;
+        case 'volleyball': await updateVolleyballEvent(id, payload as any); break;
+        case 'beach_volleyball': await updateBeachVolleyballEvent(id, payload as any); break;
+        case 'basketball_3x3': await updateBasketball3x3Event(id, payload as any); break;
+        case 'badminton': await updateBadmintonEvent(id, payload as any); break;
+        default: await updateChessEvent(id, payload as any);
       }
       
       alert("Призерів успішно встановлено!");
@@ -687,9 +735,13 @@ const TournamentViewPage = () => {
   const totalRounds = allGamesOrMatches.reduce((acc: number, game: any) => 
     Math.max(acc, game.round || game.roundNumber || 0), 0
   );
-  const actualParticipants = (tournament.sport === 'chess' || tournament.sport === 'checkers' || tournament.sport === 'armwrestling')
-    ? ((details as any)?.players?.length || 0) 
-    : (tournament.participants || 0);
+  const isTeamSport = tournament?.sport === 'futsal' || tournament?.sport === 'volleyball' || tournament?.sport === 'beach_volleyball' || tournament?.sport === 'basketball_3x3' || tournament?.sport === 'badminton';
+
+  const actualParticipants = isTeamSport 
+    ? (details?.teams?.length || 0) 
+    : ((details as any)?.players?.length || (details as any)?.participants?.length || 0);
+
+  const participantLabel = isTeamSport ? 'команд' : 'учасників';
 
   const filteredGames = (tournament.sport === 'chess' || tournament.sport === 'checkers') && (details as any)?.games 
     ? [...(details as any).games].filter((g: any) => {
@@ -847,7 +899,7 @@ const TournamentViewPage = () => {
               </div>
               <div className={styles.metaItem}>
                 <i className="fas fa-users"></i>
-                <span>{actualParticipants} учасників</span>
+                <span>{actualParticipants} {participantLabel}</span>
               </div>
               {details?.timeControl && (
                 <div className={styles.metaItem}>
@@ -864,6 +916,10 @@ const TournamentViewPage = () => {
               <i className={
                 tournament.sport === 'checkers' ? "fas fa-braille" : 
                 tournament.sport === 'armwrestling' ? "fas fa-hand-rock" : 
+                tournament.sport === 'futsal' ? "fas fa-futbol" :
+                tournament.sport === 'volleyball' || tournament.sport === 'beach_volleyball' ? "fas fa-volleyball-ball" :
+                tournament.sport === 'basketball_3x3' ? "fas fa-basketball-ball" :
+                tournament.sport === 'badminton' ? "fas fa-user-circle" :
                 "fas fa-chess-queen"
               }></i>
             )}
