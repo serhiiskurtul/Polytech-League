@@ -7,6 +7,7 @@ public class CheckersGame
     public long Id { get; set; }
     
     public long TournamentId { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore]
     public CheckersEvent Event { get; set; } = null!;
 
     public int Round { get; set; }

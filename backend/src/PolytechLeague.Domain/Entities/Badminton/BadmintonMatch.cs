@@ -7,6 +7,7 @@ public class BadmintonMatch
     public long Id { get; set; }
     
     public long TournamentId { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore]
     public BadmintonEvent? Tournament { get; set; }
 
     public long? Player1Id { get; set; }

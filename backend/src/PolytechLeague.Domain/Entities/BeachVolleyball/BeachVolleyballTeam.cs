@@ -7,6 +7,7 @@ public class BeachVolleyballTeam
     public long Id { get; set; }
     public required string Name { get; set; }
     public long EventId { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore]
     public BeachVolleyballEvent? Event { get; set; }
 
     public ICollection<Player>? Players { get; set; }

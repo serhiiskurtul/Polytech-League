@@ -1,4 +1,5 @@
 using System.Threading.RateLimiting;
+using System.Text.Json.Serialization;
 using PolytechLeague.Application.JWT;
 using PolytechLeague.Infrastructure.Persistence.Database;
 using PolytechLeague.Infrastructure.Email;
@@ -36,7 +37,13 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.AddControllers();
+
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options => 
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>

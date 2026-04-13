@@ -14,6 +14,7 @@ public class BadmintonTeam
     public Player? Player2 { get; set; }
     
     public long? EventId { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore]
     public BadmintonEvent? Event { get; set; }
 
     [System.ComponentModel.DataAnnotations.Schema.NotMapped]

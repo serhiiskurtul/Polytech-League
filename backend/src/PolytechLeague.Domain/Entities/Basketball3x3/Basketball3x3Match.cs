@@ -4,6 +4,7 @@ public class Basketball3x3Match
 {
     public long Id { get; set; }
     public long EventId { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore]
     public Basketball3x3Event? Event { get; set; }
     
     public long HomeTeamId { get; set; }

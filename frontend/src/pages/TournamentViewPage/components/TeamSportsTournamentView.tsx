@@ -480,46 +480,48 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
               <button className={styles.closeButton} onClick={() => setIsCreateMatchModalOpen(false)}>&times;</button>
             </div>
             
-            <div className={styles.createMatchForm}>
-              <div className={styles.formGroup}>
-                <label>Господарі</label>
-                <select 
-                  value={newMatchForm.homeTeamId} 
-                  onChange={e => setNewMatchForm({...newMatchForm, homeTeamId: e.target.value})}
-                >
-                  <option value="">-- Оберіть команду --</option>
-                  {details.teams?.map((t: any) => (
-                    <option key={t.id} value={t.id}>{t.name}</option>
-                  ))}
-                </select>
-              </div>
+            <div className={styles.modalBody}>
+              <div className={styles.createMatchForm}>
+                <div className={styles.formGroup}>
+                  <label>Господарі</label>
+                  <select 
+                    value={newMatchForm.homeTeamId} 
+                    onChange={e => setNewMatchForm({...newMatchForm, homeTeamId: e.target.value})}
+                  >
+                    <option value="">-- Оберіть команду --</option>
+                    {details.teams?.map((t: any) => (
+                      <option key={t.id} value={t.id}>{t.name}</option>
+                    ))}
+                  </select>
+                </div>
 
-              <div className={styles.formGroup}>
-                <label>Гості</label>
-                <select 
-                  value={newMatchForm.awayTeamId} 
-                  onChange={e => setNewMatchForm({...newMatchForm, awayTeamId: e.target.value})}
-                >
-                  <option value="">-- Оберіть команду --</option>
-                  {details.teams?.map((t: any) => (
-                    <option key={t.id} value={t.id}>{t.name}</option>
-                  ))}
-                </select>
-              </div>
+                <div className={styles.formGroup}>
+                  <label>Гості</label>
+                  <select 
+                    value={newMatchForm.awayTeamId} 
+                    onChange={e => setNewMatchForm({...newMatchForm, awayTeamId: e.target.value})}
+                  >
+                    <option value="">-- Оберіть команду --</option>
+                    {details.teams?.map((t: any) => (
+                      <option key={t.id} value={t.id}>{t.name}</option>
+                    ))}
+                  </select>
+                </div>
 
-              <div className={styles.formGroup}>
-                <label>Етап змагання</label>
-                <input 
-                  type="text" 
-                  value={newMatchForm.stage} 
-                  onChange={e => setNewMatchForm({...newMatchForm, stage: e.target.value})}
-                  placeholder="напр. Груповий етап, Фінал..."
-                />
-              </div>
+                <div className={styles.formGroup}>
+                  <label>Етап змагання</label>
+                  <input 
+                    type="text" 
+                    value={newMatchForm.stage} 
+                    onChange={e => setNewMatchForm({...newMatchForm, stage: e.target.value})}
+                    placeholder="напр. Груповий етап, Фінал..."
+                  />
+                </div>
 
-              <button className={styles.saveBtn} onClick={handleCreateMatch}>
-                Створити матч
-              </button>
+                <button className={styles.saveBtn} onClick={handleCreateMatch}>
+                  Створити матч
+                </button>
+              </div>
             </div>
           </div>
         </div>

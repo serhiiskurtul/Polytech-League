@@ -76,7 +76,6 @@ public static class BeachVolleyballMatchDtoExtensions
         {
             Id = entity.Id,
             EventId = entity.EventId,
-            Event = entity.Event?.ToResponse(),
             HomeTeamId = entity.HomeTeamId,
             HomeTeam = entity.HomeTeam?.ToResponse(),
             AwayTeamId = entity.AwayTeamId,
