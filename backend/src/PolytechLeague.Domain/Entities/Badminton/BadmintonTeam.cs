@@ -15,4 +15,7 @@ public class BadmintonTeam
     
     public long? EventId { get; set; }
     public BadmintonEvent? Event { get; set; }
+
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public ICollection<long>? PlayerIds { get; set; }
 }

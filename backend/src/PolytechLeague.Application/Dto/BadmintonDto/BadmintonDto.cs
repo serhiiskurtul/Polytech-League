@@ -41,6 +41,25 @@ public class BadmintonTeamDto
     public PlayerDto? Player2 { get; set; }
 }
 
+public class BadmintonTeamRequest
+{
+    public string? Name { get; set; }
+    public long Player1Id { get; set; }
+    public long Player2Id { get; set; }
+    public long EventId { get; set; }
+    public ICollection<long>? PlayerIds { get; set; } // For compatibility with TeamSportsTournamentView
+}
+
+public class BadmintonTeamResponse
+{
+    public long Id { get; set; }
+    public string? Name { get; set; }
+    public long Player1Id { get; set; }
+    public PlayerDto? Player1 { get; set; }
+    public long Player2Id { get; set; }
+    public PlayerDto? Player2 { get; set; }
+}
+
 public class BadmintonEventResponse
 {
     public long Id { get; set; }
@@ -184,6 +203,31 @@ public static class BadmintonDtoExtensions
             SetNumber = entity.SetNumber,
             Player1Score = entity.Player1Score,
             Player2Score = entity.Player2Score
+        };
+    }
+
+    public static BadmintonTeam ToEntity(this BadmintonTeamRequest request)
+    {
+        return new BadmintonTeam
+        {
+            Name = request.Name,
+            Player1Id = request.Player1Id,
+            Player2Id = request.Player2Id,
+            EventId = request.EventId,
+            PlayerIds = request.PlayerIds
+        };
+    }
+
+    public static BadmintonTeamResponse ToResponse(this BadmintonTeam entity)
+    {
+        return new BadmintonTeamResponse
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            Player1Id = entity.Player1Id,
+            Player1 = entity.Player1?.ToDto(),
+            Player2Id = entity.Player2Id,
+            Player2 = entity.Player2?.ToDto()
         };
     }
 

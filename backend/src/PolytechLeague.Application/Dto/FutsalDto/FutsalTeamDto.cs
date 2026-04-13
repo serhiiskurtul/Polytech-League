@@ -7,6 +7,7 @@ public class FutsalTeamRequest
 {
     public required string Name { get; set; }
     public long EventId { get; set; }
+    public ICollection<long>? PlayerIds { get; set; }
 }
 
 public class FutsalTeamResponse
@@ -23,7 +24,8 @@ public static class FutsalTeamDtoExtensions
         return new FutsalTeam
         {
             Name = request.Name,
-            EventId = request.EventId
+            EventId = request.EventId,
+            PlayerIds = request.PlayerIds
         };
     }
 

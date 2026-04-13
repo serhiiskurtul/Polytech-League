@@ -7,6 +7,7 @@ public class Basketball3x3TeamRequest
 {
     public required string Name { get; set; }
     public long EventId { get; set; }
+    public ICollection<long>? PlayerIds { get; set; }
 }
 
 public class Basketball3x3TeamResponse
@@ -23,7 +24,8 @@ public static class Basketball3x3TeamDtoExtensions
         return new Basketball3x3Team
         {
             Name = request.Name,
-            EventId = request.EventId
+            EventId = request.EventId,
+            PlayerIds = request.PlayerIds
         };
     }
 

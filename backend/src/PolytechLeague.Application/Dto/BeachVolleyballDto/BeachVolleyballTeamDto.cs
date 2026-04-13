@@ -7,6 +7,7 @@ public class BeachVolleyballTeamRequest
 {
     public required string Name { get; set; }
     public long EventId { get; set; }
+    public ICollection<long>? PlayerIds { get; set; }
 }
 
 public class BeachVolleyballTeamResponse
@@ -23,7 +24,8 @@ public static class BeachVolleyballTeamDtoExtensions
         return new BeachVolleyballTeam
         {
             Name = request.Name,
-            EventId = request.EventId
+            EventId = request.EventId,
+            PlayerIds = request.PlayerIds
         };
     }
 

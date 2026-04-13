@@ -184,8 +184,6 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         return;
       }
 
-      console.log(`Creating team "${newTeamForm.name}" for sport: ${sport}, eventId: ${details.id}`);
-
       const payload = {
         name: newTeamForm.name,
         eventId: details.id
@@ -201,9 +199,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         default: createApi = createVolleyballTeam;
       }
 
-      console.log('Calling API...');
-      const response = await createApi(payload);
-      console.log('API Response:', response);
+      await createApi(payload);
 
       setIsCreateTeamModalOpen(false);
       setNewTeamForm({ name: '' });
