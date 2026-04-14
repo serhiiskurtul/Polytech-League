@@ -25,6 +25,7 @@ export interface BeachVolleyballMatchResponse {
   
   homeSetsWon: number;
   awaySetsWon: number;
+  setsToWin: number;
   
   winnerTeamId?: number | null;
   winnerTeam?: BeachVolleyballTeamResponse;

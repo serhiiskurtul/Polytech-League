@@ -110,8 +110,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       const isChessLike = sport === 'chess' || sport === 'checkers';
       const maxScore = isChessLike ? 2 : 1000; // Arbitrary high default for other sports
       
-      const finalHomeScore = Math.min(maxScore, Math.max(0, homeScore));
-      const finalAwayScore = Math.min(maxScore, Math.max(0, awayScore));
+      const finalHomeScore = isChessLike ? Math.min(maxScore, Math.max(0, homeScore)) : Math.round(homeScore);
+      const finalAwayScore = isChessLike ? Math.min(maxScore, Math.max(0, awayScore)) : Math.round(awayScore);
       
       let payload: any;
 
@@ -124,8 +124,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           stage: match.stage,
           homeSetsWon: finalHomeScore,
           awaySetsWon: finalAwayScore,
-          homeRosterIds: match.homeRosterIds || [],
-          awayRosterIds: match.awayRosterIds || []
+          setsToWin: match.setsToWin || details.setsToWin || 2,
+          homeRosterIds: match.homeRoster?.map((p: any) => p.id) || match.homeRosterIds || [],
+          awayRosterIds: match.awayRoster?.map((p: any) => p.id) || match.awayRosterIds || []
         };
       } else if (sport === 'chess' || sport === 'checkers') {
         // Auto-calculate result for board games
@@ -298,6 +299,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         homeTeamId: parseInt(newMatchForm.homeTeamId),
         awayTeamId: parseInt(newMatchForm.awayTeamId),
         stage: newMatchForm.stage,
+        setsToWin: details.setsToWin || 2,
         homeRosterIds: homeTeam?.players?.map((p: any) => p.id) || [],
         awayRosterIds: awayTeam?.players?.map((p: any) => p.id) || []
       };
@@ -505,7 +507,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                           type="number" 
                           min="0"
                           max={isChessLike ? 2 : undefined}
-                          step="0.5"
+                          step={isChessLike ? "0.5" : "1"}
                           key={`${match.id}-home-${homeScore}`}
                           defaultValue={homeScore}
                           onBlur={(e) => handleUpdateScore(match.id, parseFloat(e.target.value) || 0, awayScore)}
@@ -529,7 +531,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         <input 
                           type="number" 
                           min="0"
-                          step="0.5"
+                          step={isChessLike ? "0.5" : "1"}
                           key={`${match.id}-away-${awayScore}`}
                           defaultValue={awayScore}
                           onBlur={(e) => handleUpdateScore(match.id, homeScore, parseFloat(e.target.value) || 0)}

@@ -25,6 +25,7 @@ export interface VolleyballMatchResponse {
   
   homeSetsWon: number;
   awaySetsWon: number;
+  setsToWin: number;
   
   winnerTeamId?: number | null;
   winnerTeam?: VolleyballTeamResponse;
