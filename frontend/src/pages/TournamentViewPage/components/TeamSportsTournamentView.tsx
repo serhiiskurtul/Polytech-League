@@ -107,8 +107,11 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       const match = allMatches.find((m: any) => m.id === matchId);
       if (!match) return;
       
-      const finalHomeScore = Math.max(0, homeScore);
-      const finalAwayScore = Math.max(0, awayScore);
+      const isChessLike = sport === 'chess' || sport === 'checkers';
+      const maxScore = isChessLike ? 2 : 1000; // Arbitrary high default for other sports
+      
+      const finalHomeScore = Math.min(maxScore, Math.max(0, homeScore));
+      const finalAwayScore = Math.min(maxScore, Math.max(0, awayScore));
       
       let payload: any;
 
@@ -501,6 +504,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         <input 
                           type="number" 
                           min="0"
+                          max={isChessLike ? 2 : undefined}
                           step="0.5"
                           key={`${match.id}-home-${homeScore}`}
                           defaultValue={homeScore}

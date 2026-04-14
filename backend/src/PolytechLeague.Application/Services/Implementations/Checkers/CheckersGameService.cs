@@ -23,7 +23,7 @@ public class CheckersGameService(
         oldEntity.FinishedAt = newEntity.FinishedAt;
         oldEntity.WhiteTeamId = newEntity.WhiteTeamId;
         oldEntity.BlackTeamId = newEntity.BlackTeamId;
-        oldEntity.WhiteTeamScore = newEntity.WhiteTeamScore;
-        oldEntity.BlackTeamScore = newEntity.BlackTeamScore;
+        oldEntity.WhiteTeamScore = newEntity.WhiteTeamScore.HasValue ? Math.Min(2.0, newEntity.WhiteTeamScore.Value) : null;
+        oldEntity.BlackTeamScore = newEntity.BlackTeamScore.HasValue ? Math.Min(2.0, newEntity.BlackTeamScore.Value) : null;
     }
 }
