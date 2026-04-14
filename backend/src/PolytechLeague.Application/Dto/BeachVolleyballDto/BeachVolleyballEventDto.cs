@@ -57,6 +57,7 @@ public class BeachVolleyballEventResponse
     public BeachVolleyballTeamResponse? SecondPlaceTeam { get; set; }
     public BeachVolleyballTeamResponse? ThirdPlaceTeam { get; set; }
 
+    public ICollection<BeachVolleyballTeamResponse>? Teams { get; set; }
     public ICollection<BeachVolleyballMatchResponse>? Matches { get; set; }
 }
 
@@ -105,6 +106,7 @@ public static class BeachVolleyballEventDtoExtensions
             FirstPlaceTeam = entity.FirstPlaceTeam?.ToResponse(),
             SecondPlaceTeam = entity.SecondPlaceTeam?.ToResponse(),
             ThirdPlaceTeam = entity.ThirdPlaceTeam?.ToResponse(),
+            Teams = entity.Teams?.Select(t => t.ToResponse()).ToList(),
             Matches = entity.Matches?.Select(m => m.ToResponse()).ToList()
         };
     }

@@ -15,6 +15,20 @@ public class BeachVolleyballTeamService(
     AbstractEntityService<BeachVolleyballTeam>(_dbcontext, _logger),
     IBeachVolleyballTeamService
 {
+    public override async Task<BeachVolleyballTeam> CreateAsync(BeachVolleyballTeam entity, CancellationToken cancellationToken = default)
+    {
+        if (entity.PlayerIds != null)
+        {
+            var players = await _dbcontext.Set<Player>()
+                .Where(p => entity.PlayerIds.Contains(p.Id))
+                .ToListAsync(cancellationToken);
+            
+            entity.Players = players;
+        }
+
+        return await base.CreateAsync(entity, cancellationToken);
+    }
+
     public override async Task UpdateAsync(long id, BeachVolleyballTeam newEntity, CancellationToken cancellationToken = default)
     {
         var oldEntity = await _dbcontext.Set<BeachVolleyballTeam>()
