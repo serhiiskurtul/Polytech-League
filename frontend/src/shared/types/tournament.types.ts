@@ -9,6 +9,7 @@ export interface Tournament {
   participants: number;
   teams: number;
   featured?: boolean;
+  isTeam?: boolean;
 }
 
 export interface PagedResponse<T> {

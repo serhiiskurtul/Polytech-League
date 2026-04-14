@@ -75,7 +75,7 @@ public class TournamentService : ITournamentService
             .Take(pageSize)
             .ToListAsync();
 
-        var items = events.Select(e => new TournamentDto
+        var tournamentDtos = events.Select(e => new TournamentDto
         {
             Id = e.Id,
             Title = e.Name,
@@ -93,11 +93,16 @@ public class TournamentService : ITournamentService
             Registered = false,
             Featured = false,
             IsTeam = e.IsTeam
-        });
+        }).ToList();
+
+        foreach (var dto in tournamentDtos)
+        {
+            await PopulateCountsAsync(dto);
+        }
 
         return new PagedResponse<TournamentDto>
         {
-            Items = items,
+            Items = tournamentDtos,
             TotalCount = totalCount,
             Page = page,
             PageSize = pageSize
@@ -112,7 +117,7 @@ public class TournamentService : ITournamentService
 
         if (e == null) return null;
 
-        return new TournamentDto
+        var dto = new TournamentDto
         {
             Id = e.Id,
             Title = e.Name,
@@ -131,6 +136,75 @@ public class TournamentService : ITournamentService
             Featured = false,
             IsTeam = e.IsTeam
         };
+
+        await PopulateCountsAsync(dto);
+        return dto;
+    }
+
+    private async Task PopulateCountsAsync(TournamentDto dto)
+    {
+        switch (dto.Sport)
+        {
+            case "futsal":
+                dto.Teams = await _context.FutsalTeams.CountAsync(t => t.EventId == dto.Id);
+                dto.Participants = dto.Teams; // Typically show team count for team sports
+                break;
+            case "basketball-3x3":
+                dto.Teams = await _context.Basketball3x3Teams.CountAsync(t => t.EventId == dto.Id);
+                dto.Participants = dto.Teams;
+                break;
+            case "volleyball":
+                dto.Teams = await _context.VolleyballTeams.CountAsync(t => t.EventId == dto.Id);
+                dto.Participants = dto.Teams;
+                break;
+            case "beach-volleyball":
+                dto.Teams = await _context.BeachVolleyballTeams.CountAsync(t => t.EventId == dto.Id);
+                dto.Participants = dto.Teams;
+                break;
+            case "chess":
+                if (dto.IsTeam)
+                {
+                    dto.Teams = await _context.ChessTeams.CountAsync(t => t.EventId == dto.Id);
+                    dto.Participants = dto.Teams;
+                }
+                else
+                {
+                    dto.Participants = await _context.ChessEventParticipants.CountAsync(p => p.TournamentId == dto.Id);
+                }
+                break;
+            case "checkers":
+                if (dto.IsTeam)
+                {
+                    dto.Teams = await _context.CheckersTeams.CountAsync(t => t.EventId == dto.Id);
+                    dto.Participants = dto.Teams;
+                }
+                else
+                {
+                    dto.Participants = await _context.CheckersEventParticipants.CountAsync(p => p.TournamentId == dto.Id);
+                }
+                break;
+            case "table-tennis":
+                dto.Participants = await _context.TableTennisEventParticipants.CountAsync(p => p.TournamentId == dto.Id);
+                break;
+            case "badminton":
+                if (dto.IsTeam)
+                {
+                    dto.Teams = await _context.BadmintonTeams.CountAsync(t => t.EventId == dto.Id);
+                    dto.Participants = dto.Teams;
+                }
+                else
+                {
+                    dto.Participants = await _context.BadmintonEventParticipants.CountAsync(p => p.EventId == dto.Id);
+                }
+                break;
+            case "armwrestling":
+                var armEvent = await _context.ArmwrestlingEvents.FirstOrDefaultAsync(e => e.Id == dto.Id);
+                if (armEvent != null)
+                {
+                    dto.Participants = armEvent.ParticipantsCount;
+                }
+                break;
+        }
     }
 
     private string GetSportName(PolytechLeague.Domain.Entities.Event e)

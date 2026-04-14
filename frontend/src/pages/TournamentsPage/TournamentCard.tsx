@@ -8,6 +8,7 @@ interface TournamentUI {
   location?: string;
   participants: number;
   featured?: boolean;
+  isTeam?: boolean;
   currentRound?: string;
   progress?: number;
 }
@@ -111,35 +112,11 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
           </div>
           <div className="detail-item">
             <i className="fas fa-users"></i>
-            <span>{tournament.participants} учасників</span>
+            <span>{tournament.participants} {tournament.isTeam ? 'команд' : 'учасників'}</span>
           </div>
         </div>
 
-        <div className="tournament-progress">
-          <div className="progress-label">{tournament.currentRound}</div>
-          <div className="progress-bar">
-            <div 
-              className="progress-fill"
-              style={{ width: `${tournament.progress || 0}%` }}
-            ></div>
-          </div>
-        </div>
 
-        <div className="tournament-actions">
-          <button 
-            className="btn btn-primary" 
-            onClick={(e) => { e.stopPropagation(); onRegister(tournament.id); }}
-            disabled={tournament.status === 'completed'}
-          >
-            {tournament.status === 'completed' ? 'Завершено' : 'Зареєструватись'}
-          </button>
-          <button 
-            className="btn btn-outline" 
-            onClick={() => onDetails(tournament.id)}
-          >
-            Деталі
-          </button>
-        </div>
       </div>
     );
   }
@@ -176,44 +153,13 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
             </div>
             <div className="detail-item">
               <i className="fas fa-users"></i>
-              <span>{tournament.participants} учасників</span>
+              <span>{tournament.participants} {tournament.isTeam ? 'команд' : 'учасників'}</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="list-sidebar">
-        <div className="list-progress">
-          <div 
-            className="tournament-status"
-            style={{ backgroundColor: `${statusColors[tournament.status]}20`, color: statusColors[tournament.status], display: 'inline-block', marginBottom: '12px' }}
-          >
-            {statusLabels[tournament.status] || tournament.status}
-          </div>
-          <div className="progress-bar">
-            <div 
-              className="progress-fill"
-              style={{ width: `${tournament.progress || 0}%` }}
-            ></div>
-          </div>
-        </div>
 
-        <div className="list-actions">
-          <button 
-            className="btn btn-primary" 
-            onClick={(e) => { e.stopPropagation(); onRegister(tournament.id); }}
-            disabled={tournament.status === 'completed'}
-          >
-            {tournament.status === 'completed' ? 'Завершено' : 'Реєстрація'}
-          </button>
-          <button 
-            className="btn btn-outline"
-            onClick={(e) => { e.stopPropagation(); onDetails(tournament.id); }}
-          >
-            Деталі
-          </button>
-        </div>
-      </div>
     </div>
   );
 };
