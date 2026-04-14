@@ -9,11 +9,11 @@ public class BadmintonEventParticipantConfiguration : IEntityTypeConfiguration<B
     public void Configure(EntityTypeBuilder<BadmintonEventParticipant> builder)
     {
         builder.ToTable("badminton_event_participants");
-        builder.HasKey(p => new { p.TournamentId, p.PlayerId });
+        builder.HasKey(p => new { p.EventId, p.PlayerId });
 
-        builder.HasOne(p => p.Tournament)
+        builder.HasOne(p => p.Event)
             .WithMany(e => e.Participants)
-            .HasForeignKey(p => p.TournamentId);
+            .HasForeignKey(p => p.EventId);
 
         builder.HasOne(p => p.Player)
             .WithMany()

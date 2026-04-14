@@ -152,11 +152,17 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         // Futsal, Basketball, etc.
         payload = {
           id: matchId,
+          eventId: details.id,
           homeTeamId: match.homeTeamId,
           awayTeamId: match.awayTeamId,
-          homeTeamScore: finalHomeScore,
+          homeTeamScore: finalHomeScore, // For Futsal, Basketball
           awayTeamScore: finalAwayScore,
-          stage: match.stage
+          homeScore: finalHomeScore,     // For Badminton
+          awayScore: finalAwayScore,
+          stage: match.stage,
+          setsToWin: match.setsToWin || details.setsToWin || 2,
+          homeRosterIds: match.homeRoster?.map((p: any) => p.id) || match.homeRosterIds || [],
+          awayRosterIds: match.awayRoster?.map((p: any) => p.id) || match.awayRosterIds || []
         };
       }
 
@@ -309,7 +315,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         case 'beach_volleyball': createApi = createBeachVolleyballMatch; break;
         case 'futsal': createApi = createFutsalMatch; break;
         case 'basketball_3x3': createApi = createBasketball3x3Match; break;
-        case 'badminton': createApi = createBadmintonMatch; break;
+        case 'badminton': 
+          createApi = createBadmintonMatch; 
+          payload.eventId = details.id;
+          payload.homeTeamId = parseInt(newMatchForm.homeTeamId);
+          payload.awayTeamId = parseInt(newMatchForm.awayTeamId);
+          payload.homeScore = 0;
+          payload.awayScore = 0;
+          break;
         case 'chess': 
           createApi = createChessGame; 
           payload = {
@@ -520,10 +533,10 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
                     <div className={`${styles.teamRow} ${isAwayWinner ? styles.winnerRow : ''} ${isDraw ? styles.drawRow : ''}`}>
                       <div className={`${styles.teamLogo} ${isAwayWinner ? styles.winnerLogo : ''}`}>
-                        {(match.blackTeam?.name || match.awayTeam?.name || match.blackPlayer?.lastName)?.[0] || 'T'}
+                        {(match.blackTeam?.name || match.awayTeam?.name || match.awayTeamName || match.blackPlayer?.lastName)?.[0] || 'T'}
                       </div>
                       <div className={`${styles.teamName} ${isAwayWinner ? styles.winnerName : ''} ${isDraw ? styles.drawName : ''}`}>
-                        {match.blackTeam?.name || match.awayTeam?.name || match.blackPlayer?.name || match.blackPlayer?.lastName || 'Away'}
+                        {match.blackTeam?.name || match.awayTeam?.name || match.awayTeamName || match.blackPlayer?.name || match.blackPlayer?.lastName || 'Away'}
                         {isAwayWinner && <i className={`fas fa-crown ${styles.crownIcon}`}></i>}
                         {isDraw && <i className={`fas fa-handshake ${styles.drawIcon}`}></i>}
                       </div>

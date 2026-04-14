@@ -36,17 +36,17 @@ public class BadmintonTeamDto
 {
     public long Id { get; set; }
     public string? Name { get; set; }
-    public long Player1Id { get; set; }
+    public long? Player1Id { get; set; }
     public PlayerDto? Player1 { get; set; }
-    public long Player2Id { get; set; }
+    public long? Player2Id { get; set; }
     public PlayerDto? Player2 { get; set; }
 }
 
 public class BadmintonTeamRequest
 {
     public string? Name { get; set; }
-    public long Player1Id { get; set; }
-    public long Player2Id { get; set; }
+    public long? Player1Id { get; set; }
+    public long? Player2Id { get; set; }
     public long EventId { get; set; }
     public ICollection<long>? PlayerIds { get; set; } // For compatibility with TeamSportsTournamentView
 }
@@ -55,9 +55,9 @@ public class BadmintonTeamResponse
 {
     public long Id { get; set; }
     public string? Name { get; set; }
-    public long Player1Id { get; set; }
+    public long? Player1Id { get; set; }
     public PlayerDto? Player1 { get; set; }
-    public long Player2Id { get; set; }
+    public long? Player2Id { get; set; }
     public PlayerDto? Player2 { get; set; }
 }
 
@@ -105,6 +105,24 @@ public class BadmintonEventParticipantDto
     public long? UserId { get; set; }
 }
 
+public class BadmintonMatchRequest
+{
+    public long EventId { get; set; }
+    public long? Player1Id { get; set; }
+    public long? Player2Id { get; set; }
+    public long? HomeTeamId { get; set; }
+    public long? AwayTeamId { get; set; }
+    public int? HomeScore { get; set; }
+    public int? AwayScore { get; set; }
+    public long? WinnerPlayerId { get; set; }
+    public long? WinnerTeamId { get; set; }
+    public string? Stage { get; set; }
+    public int CourtNumber { get; set; }
+    public int SetsToWin { get; set; }
+    public ICollection<long>? HomeRosterIds { get; set; }
+    public ICollection<long>? AwayRosterIds { get; set; }
+}
+
 public class BadmintonMatchResponse
 {
     public long Id { get; set; }
@@ -113,10 +131,8 @@ public class BadmintonMatchResponse
     public long? Player2Id { get; set; }
     public PlayerDto? Player2 { get; set; }
 
-    public long? Team1Id { get; set; }
-    public BadmintonTeamDto? Team1 { get; set; }
-    public long? Team2Id { get; set; }
-    public BadmintonTeamDto? Team2 { get; set; }
+    public long? HomeTeamId { get; set; }
+    public long? AwayTeamId { get; set; }
 
     public long? WinnerPlayerId { get; set; }
     public PlayerDto? WinnerPlayer { get; set; }
@@ -125,7 +141,15 @@ public class BadmintonMatchResponse
     public string? Stage { get; set; }
     public int CourtNumber { get; set; }
     public int SetsToWin { get; set; }
+    public int? HomeScore { get; set; }
+    public int? AwayScore { get; set; }
     public ICollection<BadmintonSetResponse>? Sets { get; set; }
+
+    public BadmintonTeamDto? HomeTeam { get; set; }
+    public BadmintonTeamDto? AwayTeam { get; set; }
+
+    public string? HomeTeamName { get; set; }
+    public string? AwayTeamName { get; set; }
 }
 
 public class BadmintonSetResponse
@@ -198,6 +222,27 @@ public static class BadmintonDtoExtensions
         };
     }
 
+    public static BadmintonMatch FromRequest(this BadmintonMatchRequest request)
+    {
+        return new BadmintonMatch
+        {
+            EventId = request.EventId,
+            Player1Id = request.Player1Id,
+            Player2Id = request.Player2Id,
+            HomeTeamId = request.HomeTeamId,
+            AwayTeamId = request.AwayTeamId,
+            HomeScore = request.HomeScore,
+            AwayScore = request.AwayScore,
+            WinnerPlayerId = request.WinnerPlayerId,
+            WinnerTeamId = request.WinnerTeamId,
+            Stage = request.Stage,
+            CourtNumber = request.CourtNumber,
+            SetsToWin = request.SetsToWin,
+            HomeRosterIds = request.HomeRosterIds,
+            AwayRosterIds = request.AwayRosterIds
+        };
+    }
+
     public static BadmintonMatchResponse ToResponse(this BadmintonMatch entity)
     {
         return new BadmintonMatchResponse
@@ -207,10 +252,10 @@ public static class BadmintonDtoExtensions
             Player1 = entity.Player1?.ToDto(),
             Player2Id = entity.Player2Id,
             Player2 = entity.Player2?.ToDto(),
-            Team1Id = entity.Team1Id,
-            Team1 = entity.Team1?.ToDto(),
-            Team2Id = entity.Team2Id,
-            Team2 = entity.Team2?.ToDto(),
+            HomeTeamId = entity.HomeTeamId,
+            AwayTeamId = entity.AwayTeamId,
+            HomeScore = entity.HomeScore,
+            AwayScore = entity.AwayScore,
             WinnerPlayerId = entity.WinnerPlayerId,
             WinnerPlayer = entity.WinnerPlayer?.ToDto(),
             WinnerTeamId = entity.WinnerTeamId,
@@ -218,7 +263,11 @@ public static class BadmintonDtoExtensions
             Stage = entity.Stage,
             CourtNumber = entity.CourtNumber,
             SetsToWin = entity.SetsToWin,
-            Sets = entity.Sets?.Select(s => s.ToResponse()).ToList()
+            Sets = entity.Sets?.Select(s => s.ToResponse()).ToList(),
+            HomeTeam = entity.HomeTeam?.ToDto(),
+            AwayTeam = entity.AwayTeam?.ToDto(),
+            HomeTeamName = entity.HomeTeam?.Name,
+            AwayTeamName = entity.AwayTeam?.Name
         };
     }
 

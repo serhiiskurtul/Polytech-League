@@ -6,9 +6,9 @@ public class BadmintonMatch
 {
     public long Id { get; set; }
     
-    public long TournamentId { get; set; }
+    public long EventId { get; set; }
     [System.Text.Json.Serialization.JsonIgnore]
-    public BadmintonEvent? Tournament { get; set; }
+    public BadmintonEvent? Event { get; set; }
 
     public long? Player1Id { get; set; }
     public Player? Player1 { get; set; }
@@ -16,11 +16,11 @@ public class BadmintonMatch
     public long? Player2Id { get; set; }
     public Player? Player2 { get; set; }
 
-    public long? Team1Id { get; set; }
-    public BadmintonTeam? Team1 { get; set; }
+    public long? HomeTeamId { get; set; }
+    public BadmintonTeam? HomeTeam { get; set; }
 
-    public long? Team2Id { get; set; }
-    public BadmintonTeam? Team2 { get; set; }
+    public long? AwayTeamId { get; set; }
+    public BadmintonTeam? AwayTeam { get; set; }
 
     public ICollection<Player>? HomeRoster { get; set; }
     public ICollection<Player>? AwayRoster { get; set; }

@@ -14,6 +14,23 @@ public class BadmintonTeamService(
     AbstractEntityService<BadmintonTeam>(_dbcontext, _logger),
     IBadmintonTeamService
 {
+    public override async Task<BadmintonTeam> CreateAsync(BadmintonTeam entity, CancellationToken cancellationToken = default)
+    {
+        _logger.LogDebug("Creating badminton team with player mapping.");
+        
+        if (entity.PlayerIds != null && entity.PlayerIds.Count >= 2)
+        {
+            var ids = entity.PlayerIds.ToList();
+            entity.Player1Id = ids[0];
+            entity.Player2Id = ids[1];
+        }
+
+        _dbcontext.Set<BadmintonTeam>().Add(entity);
+        await _dbcontext.SaveChangesAsync(cancellationToken);
+        
+        return entity;
+    }
+
     public override async Task UpdateAsync(long id, BadmintonTeam newEntity, CancellationToken cancellationToken = default)
     {
         var oldEntity = await _dbcontext.Set<BadmintonTeam>()

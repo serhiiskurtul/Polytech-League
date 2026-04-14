@@ -11,12 +11,12 @@ public class BadmintonEventConfiguration : IEntityTypeConfiguration<BadmintonEve
         builder.ToTable("badminton_events");
         
         builder.HasMany(e => e.Matches)
-            .WithOne(m => m.Tournament)
-            .HasForeignKey(m => m.TournamentId);
+            .WithOne(m => m.Event)
+            .HasForeignKey(m => m.EventId);
 
         builder.HasMany(e => e.Participants)
-            .WithOne(p => p.Tournament)
-            .HasForeignKey(p => p.TournamentId);
+            .WithOne(p => p.Event)
+            .HasForeignKey(p => p.EventId);
 
         builder.HasMany(e => e.Teams)
             .WithOne(t => t.Event)

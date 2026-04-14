@@ -28,6 +28,37 @@ public class BadmintonMatchesController(
     }
 
     [Authorize(Policy = "Admin")]
+    [HttpPost]
+    public async Task<IActionResult> Create(
+        [FromBody] BadmintonMatchRequest request,
+        CancellationToken cancellationToken)
+    {
+        Console.WriteLine($"[CREATE MATCH] EventId: {request.EventId}, Home: {request.HomeTeamId}, Away: {request.AwayTeamId}, Score: {request.HomeScore}:{request.AwayScore}");
+        var entity = request.FromRequest();
+        await badmintonMatchService.CreateAsync(entity, cancellationToken);
+
+        await redisService.RemoveGroupAsync("badminton_events_group");
+
+        return CreatedAtAction(nameof(GetById), new { id = entity.Id }, entity.ToResponse());
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(
+        long id,
+        [FromBody] BadmintonMatchRequest request,
+        CancellationToken cancellationToken)
+    {
+        Console.WriteLine($"[UPDATE MATCH] Id: {id}, Home: {request.HomeTeamId}, Away: {request.AwayTeamId}, Score: {request.HomeScore}:{request.AwayScore}");
+        var entity = request.FromRequest();
+        await badmintonMatchService.UpdateAsync(id, entity, cancellationToken);
+
+        await redisService.RemoveGroupAsync("badminton_events_group");
+
+        return NoContent();
+    }
+
+    [Authorize(Policy = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(long id, CancellationToken cancellationToken)
     {

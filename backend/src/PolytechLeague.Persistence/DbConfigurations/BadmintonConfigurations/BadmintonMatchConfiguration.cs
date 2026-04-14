@@ -11,6 +11,13 @@ public class BadmintonMatchConfiguration : IEntityTypeConfiguration<BadmintonMat
     {
         builder.ToTable("badminton_matches");
 
+        builder.HasKey(m => m.Id);
+
+        builder.HasOne(m => m.Event)
+            .WithMany(e => e.Matches)
+            .HasForeignKey(m => m.EventId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasOne(m => m.Player1)
             .WithMany()
             .HasForeignKey(m => m.Player1Id)
@@ -26,14 +33,14 @@ public class BadmintonMatchConfiguration : IEntityTypeConfiguration<BadmintonMat
             .HasForeignKey(m => m.WinnerPlayerId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(m => m.Team1)
+        builder.HasOne(m => m.HomeTeam)
             .WithMany()
-            .HasForeignKey(m => m.Team1Id)
+            .HasForeignKey(m => m.HomeTeamId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(m => m.Team2)
+        builder.HasOne(m => m.AwayTeam)
             .WithMany()
-            .HasForeignKey(m => m.Team2Id)
+            .HasForeignKey(m => m.AwayTeamId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(m => m.WinnerTeam)

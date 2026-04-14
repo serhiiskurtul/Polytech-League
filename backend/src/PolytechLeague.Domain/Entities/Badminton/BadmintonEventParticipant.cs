@@ -4,8 +4,8 @@ namespace PolytechLeague.Domain.Entities.Badminton;
 
 public class BadmintonEventParticipant
 {
-    public long TournamentId { get; set; }
-    public BadmintonEvent? Tournament { get; set; }
+    public long EventId { get; set; }
+    public BadmintonEvent? Event { get; set; }
 
     public long PlayerId { get; set; }
     public Player? Player { get; set; }

@@ -91,7 +91,7 @@ namespace PolytechLeague.Persistence.Migrations
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Badminton.BadmintonEventParticipant", b =>
                 {
-                    b.Property<long>("TournamentId")
+                    b.Property<long>("EventId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("PlayerId")
@@ -103,7 +103,7 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<int>("Rank")
                         .HasColumnType("integer");
 
-                    b.HasKey("TournamentId", "PlayerId");
+                    b.HasKey("EventId", "PlayerId");
 
                     b.HasIndex("PlayerId");
 
@@ -121,11 +121,20 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<int?>("AwayScore")
                         .HasColumnType("integer");
 
+                    b.Property<long?>("AwayTeamId")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("CourtNumber")
                         .HasColumnType("integer");
 
+                    b.Property<long>("EventId")
+                        .HasColumnType("bigint");
+
                     b.Property<int?>("HomeScore")
                         .HasColumnType("integer");
+
+                    b.Property<long?>("HomeTeamId")
+                        .HasColumnType("bigint");
 
                     b.Property<long?>("Player1Id")
                         .HasColumnType("bigint");
@@ -139,15 +148,6 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<string>("Stage")
                         .HasColumnType("text");
 
-                    b.Property<long?>("Team1Id")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("Team2Id")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("TournamentId")
-                        .HasColumnType("bigint");
-
                     b.Property<long?>("WinnerPlayerId")
                         .HasColumnType("bigint");
 
@@ -156,15 +156,15 @@ namespace PolytechLeague.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AwayTeamId");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("HomeTeamId");
+
                     b.HasIndex("Player1Id");
 
                     b.HasIndex("Player2Id");
-
-                    b.HasIndex("Team1Id");
-
-                    b.HasIndex("Team2Id");
-
-                    b.HasIndex("TournamentId");
 
                     b.HasIndex("WinnerPlayerId");
 
@@ -215,10 +215,10 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<long>("Player1Id")
+                    b.Property<long?>("Player1Id")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("Player2Id")
+                    b.Property<long?>("Player2Id")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
@@ -1804,25 +1804,41 @@ namespace PolytechLeague.Persistence.Migrations
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Badminton.BadmintonEventParticipant", b =>
                 {
+                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonEvent", "Event")
+                        .WithMany("Participants")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("PolytechLeague.Domain.Entities.Player", "Player")
                         .WithMany()
                         .HasForeignKey("PlayerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonEvent", "Tournament")
-                        .WithMany("Participants")
-                        .HasForeignKey("TournamentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Event");
 
                     b.Navigation("Player");
-
-                    b.Navigation("Tournament");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Badminton.BadmintonMatch", b =>
                 {
+                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonTeam", "AwayTeam")
+                        .WithMany()
+                        .HasForeignKey("AwayTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonEvent", "Event")
+                        .WithMany("Matches")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonTeam", "HomeTeam")
+                        .WithMany()
+                        .HasForeignKey("HomeTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PolytechLeague.Domain.Entities.Player", "Player1")
                         .WithMany()
                         .HasForeignKey("Player1Id")
@@ -1832,22 +1848,6 @@ namespace PolytechLeague.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("Player2Id")
                         .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonTeam", "Team1")
-                        .WithMany()
-                        .HasForeignKey("Team1Id")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonTeam", "Team2")
-                        .WithMany()
-                        .HasForeignKey("Team2Id")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonEvent", "Tournament")
-                        .WithMany("Matches")
-                        .HasForeignKey("TournamentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.HasOne("PolytechLeague.Domain.Entities.Player", "WinnerPlayer")
                         .WithMany()
@@ -1859,15 +1859,15 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasForeignKey("WinnerTeamId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.Navigation("AwayTeam");
+
+                    b.Navigation("Event");
+
+                    b.Navigation("HomeTeam");
+
                     b.Navigation("Player1");
 
                     b.Navigation("Player2");
-
-                    b.Navigation("Team1");
-
-                    b.Navigation("Team2");
-
-                    b.Navigation("Tournament");
 
                     b.Navigation("WinnerPlayer");
 
@@ -1895,14 +1895,12 @@ namespace PolytechLeague.Persistence.Migrations
                     b.HasOne("PolytechLeague.Domain.Entities.Player", "Player1")
                         .WithMany()
                         .HasForeignKey("Player1Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PolytechLeague.Domain.Entities.Player", "Player2")
                         .WithMany()
                         .HasForeignKey("Player2Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Event");
 

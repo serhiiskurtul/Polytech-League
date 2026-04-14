@@ -42,8 +42,9 @@ public class BadmintonTeamsController(
         await badmintonTeamService.CreateAsync(entity, cancellationToken);
 
         await redisService.RemoveGroupAsync("badminton_events_group");
-
-        return Created();
+        
+        var response = entity.ToResponse();
+        return CreatedAtAction(nameof(GetById), new { id = entity.Id }, response);
     }
 
     [Authorize(Policy = "Admin")]
