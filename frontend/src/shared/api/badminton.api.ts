@@ -22,6 +22,10 @@ export const createBadmintonMatch = async (data: any): Promise<BadmintonMatchRes
   return response.data;
 };
 
+export const deleteBadmintonMatch = async (id: number): Promise<void> => {
+  await api.delete(`/badminton-matches/${id}`);
+};
+
 export const createBadmintonTeam = async (data: any): Promise<any> => {
   const response = await api.post(`/badminton-teams`, data);
   return response.data;

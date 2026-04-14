@@ -30,7 +30,14 @@ import {
   updateBasketball3x3Team,
   updateBadmintonTeam,
   updateChessTeam,
-  updateCheckersTeam
+  updateCheckersTeam,
+  deleteVolleyballMatch,
+  deleteBeachVolleyballMatch,
+  deleteFutsalMatch,
+  deleteBasketball3x3Match,
+  deleteBadmintonMatch,
+  deleteChessGame,
+  deleteCheckersGame
 } from '@/shared/api';
 import TournamentPodium from './TournamentPodium';
 import styles from '../TournamentViewPage.module.css';
@@ -171,6 +178,32 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     } catch (err) {
       console.error('Update Score Error:', err);
       alert('Помилка при оновленні рахунку');
+    }
+  };
+
+  const handleDeleteMatch = async (matchId: number) => {
+    if (!window.confirm('Ви впевнені, що хочете видалити цей матч? Цю дію неможливо скасувати.')) {
+      return;
+    }
+
+    try {
+      let deleteApi;
+      switch (sport) {
+        case 'volleyball': deleteApi = deleteVolleyballMatch; break;
+        case 'beach_volleyball': deleteApi = deleteBeachVolleyballMatch; break;
+        case 'futsal': deleteApi = deleteFutsalMatch; break;
+        case 'basketball_3x3': deleteApi = (id: number) => deleteBasketball3x3Match(id); break;
+        case 'badminton': deleteApi = deleteBadmintonMatch; break;
+        case 'chess': deleteApi = (id: number) => deleteChessGame(id, details.id); break;
+        case 'checkers': deleteApi = (id: number) => deleteCheckersGame(id, details.id); break;
+        default: deleteApi = deleteVolleyballMatch;
+      }
+
+      await deleteApi(matchId);
+      onRefresh();
+    } catch (err) {
+      console.error('Delete Match Error:', err);
+      alert('Помилка при видаленні матчу');
     }
   };
 
@@ -553,6 +586,18 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       </div>
                     </div>
                   </div>
+
+                  {isAdmin && (
+                    <div className={styles.matchActions}>
+                      <button 
+                        className={styles.deleteMatchBtn} 
+                        onClick={() => handleDeleteMatch(match.id)}
+                        title="Видалити матч"
+                      >
+                        <i className="fas fa-trash-alt"></i>
+                      </button>
+                    </div>
+                  )}
                 </div>
               );
             })}

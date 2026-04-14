@@ -27,6 +27,10 @@ export const createFutsalTeam = async (data: any): Promise<any> => {
   return response.data;
 };
 
+export const deleteFutsalMatch = async (id: number): Promise<void> => {
+  await api.delete(`/futsal-matches/${id}`);
+};
+
 export const updateFutsalTeam = async (id: number, data: any): Promise<void> => {
   await api.put(`/futsal-teams/${id}`, data);
 };

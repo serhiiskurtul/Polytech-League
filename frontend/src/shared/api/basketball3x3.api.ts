@@ -27,6 +27,10 @@ export const createBasketball3x3Team = async (data: any): Promise<any> => {
   return response.data;
 };
 
+export const deleteBasketball3x3Match = async (id: number): Promise<void> => {
+  await api.delete(`/basketball3x3-matches/${id}`);
+};
+
 export const updateBasketball3x3Team = async (id: number, data: any): Promise<void> => {
   await api.put(`/basketball3x3-teams/${id}`, data);
 };

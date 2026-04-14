@@ -1360,6 +1360,7 @@
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
   transition: all 0.2s;
+  position: relative;
 }
 
 .matchCard:hover {
@@ -1826,4 +1827,45 @@
 
 .glassModal {
   max-width: 600px !important;
+}
+
+/* Match Deletion Styles */
+.matchActions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+
+.matchCard:hover .matchActions {
+  opacity: 1;
+}
+
+.deleteMatchBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 14px;
+}
+
+.deleteMatchBtn:hover {
+  background: #ef4444;
+  color: white;
+  border-color: #ef4444;
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.deleteMatchBtn:active {
+  transform: scale(0.95);
 }
