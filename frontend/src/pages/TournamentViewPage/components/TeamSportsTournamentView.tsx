@@ -269,11 +269,12 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           isHome = match.homeTeamId === team.id;
           isAway = match.awayTeamId === team.id;
           const isVolleyball = sport.includes('volleyball') || sport === 'badminton';
-          hScore = isVolleyball ? (match.homeSetsWon || 0) : (match.homeTeamScore || 0);
-          aScore = isVolleyball ? (match.awaySetsWon || 0) : (match.awayTeamScore || 0);
-          isPlayed = isVolleyball ? (match.homeSetsWon !== null || match.awaySetsWon !== null) : (match.homeTeamScore !== null || match.awayTeamScore !== null);
+          hScore = isVolleyball ? (match.homeSetsWon ?? match.homeScore ?? 0) : (match.homeTeamScore ?? 0);
+          aScore = isVolleyball ? (match.awaySetsWon ?? match.awayScore ?? 0) : (match.awayTeamScore ?? 0);
+          isPlayed = isVolleyball 
+            ? (match.homeSetsWon != null || match.awaySetsWon != null || match.homeScore != null || match.awayScore != null) 
+            : (match.homeTeamScore != null || match.awayTeamScore != null);
         }
-
         if (isHome || isAway) {
           if (isPlayed) {
             stats.gp++;

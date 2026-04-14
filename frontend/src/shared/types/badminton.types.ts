@@ -28,11 +28,21 @@ export interface BadmintonMatchResponse {
   player2Id?: number | null;
   player2?: PlayerDto;
   
-  // Doubles
+  // Doubles / Team Sports
   team1Id?: number | null;
   team1?: BadmintonTeamDto;
   team2Id?: number | null;
   team2?: BadmintonTeamDto;
+  
+  // Home/Away mapping for TeamSportsTournamentView compatibility
+  homeTeamId?: number | null;
+  homeTeam?: BadmintonTeamDto;
+  awayTeamId?: number | null;
+  awayTeam?: BadmintonTeamDto;
+  
+  // Scores
+  homeScore?: number | null;
+  awayScore?: number | null;
   
   winnerPlayerId?: number | null;
   winnerPlayer?: PlayerDto;
@@ -70,7 +80,18 @@ export interface BadmintonEventResponse {
   secondPlaceTeam?: BadmintonTeamDto | null;
   thirdPlaceTeam?: BadmintonTeamDto | null;
   
+  isTeam: boolean;
+  teams: BadmintonTeamDto[] | null;
   matches: BadmintonMatchResponse[] | null;
+  players: BadmintonEventParticipantDto[] | null;
+}
+
+export interface BadmintonEventParticipantDto {
+  playerId: number;
+  playerName?: string;
+  points: number;
+  rank: number;
+  userId?: number;
 }
 
 export interface BadmintonEventRequest {
