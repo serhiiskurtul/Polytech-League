@@ -43,15 +43,6 @@ const TournamentStats = ({ stats }: TournamentStatsProps) => {
         </div>
       </div>
 
-      <div className="stat-card">
-        <div className="stat-icon" style={{ backgroundColor: 'rgba(244, 63, 94, 0.1)' }}>
-          <i className="fas fa-users" style={{ color: '#f43f5e' }}></i>
-        </div>
-        <div className="stat-info">
-          <div className="stat-value">{stats.totalParticipants}</div>
-          <div className="stat-label">Учасників</div>
-        </div>
-      </div>
 
       <div className="stat-card">
         <div className="stat-icon" style={{ backgroundColor: 'rgba(139, 92, 246, 0.1)' }}>

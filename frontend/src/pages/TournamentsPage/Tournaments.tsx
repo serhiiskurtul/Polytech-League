@@ -187,9 +187,7 @@ const Tournaments = () => {
           
           <select className="sort-select" value={sortBy} onChange={handleSortChange}>
             <option value="date">За датою</option>
-            <option value="participants">За учасниками</option>
-            <option value="title">За назвою</option>
-          </select>
+            <option value="title">За назвою</option>          </select>
 
           <div className="view-toggle">
             <button 

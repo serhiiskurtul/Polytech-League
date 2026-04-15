@@ -110,10 +110,6 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
             <i className="fas fa-map-marker-alt"></i>
             <span>{tournament.location}</span>
           </div>
-          <div className="detail-item">
-            <i className="fas fa-users"></i>
-            <span>{tournament.participants} {tournament.isTeam ? 'команд' : 'учасників'}</span>
-          </div>
         </div>
 
 
@@ -150,10 +146,6 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
             <div className="detail-item">
               <i className="far fa-calendar"></i>
               <span>{formatDate(tournament.date)}</span>
-            </div>
-            <div className="detail-item">
-              <i className="fas fa-users"></i>
-              <span>{tournament.participants} {tournament.isTeam ? 'команд' : 'учасників'}</span>
             </div>
           </div>
         </div>
