@@ -6,4 +6,5 @@ public interface ITournamentService
 {
     Task<PagedResponse<TournamentDto>> GetAllTournamentsAsync(int page = 1, int pageSize = 10, string? status = null, string? sport = null);
     Task<TournamentDto?> GetTournamentByIdAsync(long id);
+    Task<GeneralStatsDto> GetGeneralStatsAsync();
 }

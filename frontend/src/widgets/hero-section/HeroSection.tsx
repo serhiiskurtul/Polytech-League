@@ -1,6 +1,16 @@
+import { useEffect, useState } from 'react';
 import styles from './HeroSection.module.css';
+import { getTournamentsStats, TournamentStats } from '@/shared/api/tournaments.api';
 
 const HeroSection = () => {
+  const [stats, setStats] = useState<TournamentStats | null>(null);
+
+  useEffect(() => {
+    getTournamentsStats()
+      .then(data => setStats(data))
+      .catch(err => console.error(err));
+  }, []);
+
   return (
     <section className={styles.heroSection}>
       <div className={styles.heroCard}>
@@ -11,15 +21,15 @@ const HeroSection = () => {
         
         <div className={styles.heroStats}>
           <div className={styles.stat}>
-            <div className={styles.statValue}>24</div>
+            <div className={styles.statValue}>{stats?.activeTournamentsCount ?? '...'}</div>
             <div className={styles.statLabel}>Активні турніри</div>
           </div>
           <div className={styles.stat}>
-            <div className={styles.statValue}>156</div>
+            <div className={styles.statValue}>{stats?.registeredPlayersCount ?? '...'}</div>
             <div className={styles.statLabel}>Зареєстровані гравці</div>
           </div>
           <div className={styles.stat}>
-            <div className={styles.statValue}>8</div>
+            <div className={styles.statValue}>9</div>
             <div className={styles.statLabel}>Спортивних дисциплін</div>
           </div>
         </div>

@@ -33,4 +33,11 @@ public class TournamentsController : ControllerBase
         if (tournament == null) return NotFound();
         return Ok(tournament);
     }
+
+    [HttpGet("stats")]
+    public async Task<ActionResult<GeneralStatsDto>> GetStats()
+    {
+        var stats = await _tournamentService.GetGeneralStatsAsync();
+        return Ok(stats);
+    }
 }

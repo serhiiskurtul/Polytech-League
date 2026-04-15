@@ -32,3 +32,18 @@ export const getTournamentById = async (id: string): Promise<Tournament> => {
         throw error;
     }
 };
+
+export interface TournamentStats {
+    activeTournamentsCount: number;
+    registeredPlayersCount: number;
+}
+
+export const getTournamentsStats = async (): Promise<TournamentStats> => {
+    try {
+        const response = await api.get<TournamentStats>('/tournaments/stats');
+        return response.data;
+    } catch (error) {
+        console.error('Помилка при отриманні статистики турнірів:', error);
+        throw error;
+    }
+};

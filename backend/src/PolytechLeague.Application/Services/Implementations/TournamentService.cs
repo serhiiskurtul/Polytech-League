@@ -231,4 +231,21 @@ public class TournamentService : ITournamentService
         if (date < now.AddDays(-1)) return "completed";
         return "ongoing";
     }
+
+    public async Task<GeneralStatsDto> GetGeneralStatsAsync()
+    {
+        var today = DateTime.UtcNow.Date;
+        
+        var activeTournamentsCount = await _context.Set<PolytechLeague.Domain.Entities.Event>()
+            .CountAsync(e => e.Date >= today);
+
+        var registeredPlayersCount = await _context.Set<PolytechLeague.Domain.Entities.Player>()
+            .CountAsync();
+
+        return new GeneralStatsDto
+        {
+            ActiveTournamentsCount = activeTournamentsCount,
+            RegisteredPlayersCount = registeredPlayersCount
+        };
+    }
 }
