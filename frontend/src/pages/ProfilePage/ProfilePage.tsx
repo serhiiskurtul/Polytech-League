@@ -8,6 +8,10 @@ import {
   RecentActivity 
 } from '@/widgets/profile-widgets';
 import styles from './ProfilePage.module.css';
+import { useAuth } from '@/app/providers/AuthContext';
+import { getProfile } from '@/shared/api/players.api';
+import { PlayerDto } from '@/shared/types/player.types';
+import { toast } from 'react-hot-toast';
 
 interface UserData {
   name: string;
@@ -56,54 +60,65 @@ interface ActivityChartItem {
 }
 
 const ProfilePage = () => {
-  const [userData] = useState<UserData>({
-    name: 'Артем Іванов',
-    studentId: 'IT-31-2022',
-    faculty: 'Інформаційних технологій',
-    email: 'artem.ivanov@college.edu',
-    phone: '+380 67 123 4567',
-    city: 'Київ',
-    joinDate: 'Вересень 2022',
-    bio: 'Студент 3 курсу, ІТ-спеціальність. Капітан команди з футзалу "ІТ-31". Активно беру участь у шахових турнірах та чемпіонатах з настільного тенісу.',
-    badges: ['Капітан', 'Активний', 'ТОП-5']
-  });
+  const { user } = useAuth();
+  const [playerProfile, setPlayerProfile] = useState<PlayerDto | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const [stats] = useState<Stats>({
-    matchesPlayed: 42,
-    wins: 28,
-    eloRating: 2184,
-    goalsScored: 15
-  });
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await getProfile();
+        setPlayerProfile(data);
+      } catch (error) {
+        console.error("Failed to fetch player profile:", error);
+        toast.error("Не вдалося завантажити спортивний профіль");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const [teams] = useState<Team[]>([
-    { id: 1, logo: 'ІТ', name: 'ІТ-31', sport: 'Футзал', role: 'Капітан' },
-    { id: 2, logo: 'ШХ', name: 'Шаховий клуб', sport: 'Шахи', role: 'Учасник' },
-    { id: 3, logo: 'НТ', name: 'Настільний теніс', sport: 'Теніс', role: 'Учасник' }
-  ]);
+    fetchProfile();
+  }, []);
 
-  const [achievements] = useState<Achievement[]>([
-    { id: 1, icon: 'fas fa-chess-queen', name: 'Чемпіон з шахів', year: '2024' },
-    { id: 2, icon: 'fas fa-futbol', name: 'Кращий бомбардир', year: '2023' },
-    { id: 3, icon: 'fas fa-medal', name: 'ТОП-3 теніс', year: '2024' },
-    { id: 4, icon: 'fas fa-star', name: 'Активний учасник', year: '2023' }
-  ]);
+  const userData = {
+    name: user ? `${user.firstName} ${user.lastName}` : 'Користувач',
+    studentId: playerProfile?.group || 'IT-ХХ-202X',
+    faculty: 'Політехнічний інститут',
+    email: user?.email || '',
+    phone: '+380 XX XXX XXXX',
+    city: playerProfile?.city || 'Київ',
+    joinDate: 'Вересень 2024',
+    bio: playerProfile?.chessFideId ? `FIDE ID: ${playerProfile.chessFideId}` : 'Активний учасник спортивної ліги Політехніки.',
+    badges: ['Студент', 'Учасник']
+  };
 
-  const [activities] = useState<Activity[]>([
-    { id: 1, icon: 'fas fa-futbol', title: 'Перемога у матчі з футзалу', time: 'Сьогодні, 15:30' },
-    { id: 2, icon: 'fas fa-chess-board', title: 'Нова перемога у шахах', time: 'Вчора, 19:15' },
-    { id: 3, icon: 'fas fa-user-plus', title: 'Приєднався до команди з тенісу', time: '2 дні тому' },
-    { id: 4, icon: 'fas fa-trophy', title: 'Отримав досягнення "Активний учасник"', time: '3 дні тому' }
-  ]);
+  const stats = {
+    matchesPlayed: 0,
+    wins: 0,
+    eloRating: playerProfile?.chessRating || 0,
+    goalsScored: 0
+  };
 
-  const [activityChart] = useState<ActivityChartItem[]>([
-    { day: 'Пн', value: 40 },
-    { day: 'Вт', value: 70 },
-    { day: 'Ср', value: 90 },
-    { day: 'Чт', value: 110 },
-    { day: 'Пт', value: 80 },
-    { day: 'Сб', value: 60 },
-    { day: 'Нд', value: 30 }
-  ]);
+  const teams: any[] = [];
+  
+  const achievements = [
+    { id: 1, icon: 'fas fa-star', name: 'Новий учасник', year: '2024' },
+    { id: 2, icon: 'fas fa-user-check', name: 'Профіль створено', year: '2024' }
+  ];
+
+  const activities: any[] = [
+    { id: 1, icon: 'fas fa-user-plus', title: 'Реєстрація в системі', time: 'Нещодавно' }
+  ];
+
+  const activityChart = [
+    { day: 'Пн', value: 10 },
+    { day: 'Вт', value: 20 },
+    { day: 'Ср', value: 15 },
+    { day: 'Чт', value: 30 },
+    { day: 'Пт', value: 25 },
+    { day: 'Сб', value: 40 },
+    { day: 'Нд', value: 20 }
+  ];
 
   const handleEditProfile = () => {
     alert('Редагування профілю - в розробці');
@@ -150,27 +165,38 @@ const ProfilePage = () => {
     };
   }, []);
 
+  if (loading) {
+    return (
+      <div className={styles.loadingContainer}>
+        <div className={styles.loader}></div>
+        <p>Завантаження профілю...</p>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.profilePage}>
-      <ProfileHeader 
-        userData={userData} 
-        onEdit={handleEditProfile}
-        onAvatarUpload={handleAvatarUpload}
-      />
-      
-      <div className={styles.profileGrid}>
-        <div className={styles.profileMain}>
-          <ProfileStats stats={stats} />
-          <div className={styles.profileTwoColumn}>
-            <UserTeams teams={teams} onTeamClick={handleTeamClick} />
-            <UserAchievements achievements={achievements} />
-          </div>
-          <RecentActivity activities={activities} activityChart={activityChart} />
-        </div>
+      <div className={styles.container}>
+        <ProfileHeader 
+          userData={userData} 
+          onEdit={handleEditProfile}
+          onAvatarUpload={handleAvatarUpload}
+        />
         
-        <aside className={styles.profileSidebar}>
-          <SidebarActions onActionClick={handleActionClick} />
-        </aside>
+        <div className={styles.profileContent}>
+          <div className={styles.mainContent}>
+            <ProfileStats stats={stats} />
+            <div className={styles.profileTwoColumn}>
+              <UserTeams teams={teams} onTeamClick={handleTeamClick} />
+              <UserAchievements achievements={achievements} />
+            </div>
+            <RecentActivity activities={activities} activityChart={activityChart} />
+          </div>
+          
+          <aside className={styles.sidebar}>
+            <SidebarActions onActionClick={handleActionClick} />
+          </aside>
+        </div>
       </div>
     </div>
   );

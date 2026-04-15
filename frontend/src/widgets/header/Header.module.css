@@ -164,6 +164,39 @@
   font-size: 14px;
 }
 
+.loginBtn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.15);
+}
+
+.loginBtn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 102, 204, 0.25);
+}
+
+.loginBtn:active {
+  transform: translateY(0);
+}
+
+.userProfileLink {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
 /* Адаптивність */
 @media (max-width: 1024px) {
   .navPrimary {

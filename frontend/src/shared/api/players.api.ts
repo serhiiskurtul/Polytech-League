@@ -11,6 +11,11 @@ export const getPlayerById = async (id: number | string): Promise<PlayerDto> => 
     return response.data;
 };
 
+export const getProfile = async (): Promise<PlayerDto> => {
+    const response = await api.get<PlayerDto>('/players/profile');
+    return response.data;
+};
+
 export const createPlayer = async (data: PlayerDto): Promise<PlayerDto> => {
     const response = await api.post<PlayerDto>('/players', data);
     return response.data;

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using PolytechLeague.Application.Dto.GeneralDto;
 using PolytechLeague.Application.Services.Interfaces;
+using PolytechLeague.Application.Extensions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PolytechLeague.API.Controllers;
 
@@ -9,10 +11,36 @@ namespace PolytechLeague.API.Controllers;
 public class PlayersController : ControllerBase
 {
     private readonly IPlayerService _playerService;
+    private readonly IUserService _userService;
 
-    public PlayersController(IPlayerService playerService)
+    public PlayersController(IPlayerService playerService, IUserService userService)
     {
         _playerService = playerService;
+        _userService = userService;
+    }
+
+    [Authorize]
+    [HttpGet("profile")]
+    public async Task<ActionResult<PlayerDto>> GetProfile(CancellationToken cancellationToken)
+    {
+        var userId = User.GetUserId();
+        var player = await _playerService.GetByUserIdAsync(userId, cancellationToken);
+
+        if (player == null)
+        {
+            var user = await _userService.GetByIdAsync(userId, cancellationToken);
+            player = new PlayerDto
+            {
+                UserId = userId,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Group = "Гість", // Default value
+                City = "Київ"
+            };
+            player = await _playerService.CreateAsync(player, cancellationToken);
+        }
+
+        return Ok(player);
     }
 
     [HttpGet]

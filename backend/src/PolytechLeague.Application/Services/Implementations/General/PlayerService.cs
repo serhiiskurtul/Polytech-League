@@ -29,6 +29,13 @@ public class PlayerService : IPlayerService
         return player?.ToDto();
     }
 
+    public async Task<PlayerDto?> GetByUserIdAsync(long userId, CancellationToken cancellationToken = default)
+    {
+        var player = await _dbContext.Players
+            .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
+        return player?.ToDto();
+    }
+
     public async Task<PlayerDto> CreateAsync(PlayerDto dto, CancellationToken cancellationToken = default)
     {
         var player = dto.FromDto();
