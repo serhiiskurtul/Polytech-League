@@ -64,17 +64,8 @@ const ProfilePage = () => {
     name: user ? `${user.firstName} ${user.lastName}` : 'Користувач',
     studentId: playerProfile?.group || '-',
     faculty: playerProfile?.faculty || '-',
-    email: user?.email || '-',
     phone: '-', 
     city: playerProfile?.city || '-',
-    joinDate: (user?.createdAt || (user as any)?.CreatedAt)
-      ? (() => {
-          const date = new Date(user?.createdAt || (user as any)?.CreatedAt);
-          return isNaN(date.getTime()) 
-            ? '-' 
-            : new Intl.DateTimeFormat('uk-UA', { month: 'long', year: 'numeric' }).format(date);
-        })()
-      : '-',
     bio: playerProfile?.bio || '-',
     badges: ['Студент', 'Учасник'],
     instagramUrl: playerProfile?.instagramUrl,

@@ -14,6 +14,7 @@ import { PlayersRatingPage } from '@/pages/PlayersRatingPage';
 import { ProfilePage } from '@/pages/ProfilePage';
 import { NotificationsPage } from '@/pages/NotificationsPage';
 import { TournamentCreatePage } from '@/pages/TournamentCreatePage';
+import { PlayerViewPage } from '@/pages/PlayerViewPage';
 import ProtectedRoute from '../providers/ProtectedRoute';
 import { Toaster } from 'react-hot-toast';
 
@@ -99,6 +100,15 @@ export default function App() {
           element={
             <ProtectedRoute requireAuth={false}>
               <PlayersRatingPage />
+            </ProtectedRoute>
+          } 
+        />
+
+        <Route 
+          path="/players/:id" 
+          element={
+            <ProtectedRoute requireAuth={false}>
+              <PlayerViewPage />
             </ProtectedRoute>
           } 
         />

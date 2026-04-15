@@ -46,7 +46,7 @@ const UserAchievements = ({ achievements }: UserAchievementsProps) => {
       
       {achievements.length === 0 ? (
         <div className={styles.emptyState}>
-          <p>Ви ще не брали участі в турнірах</p>
+          <p>Немає записів про участь у турнірах</p>
         </div>
       ) : (
         <div className={styles.achievementsGrid}>
