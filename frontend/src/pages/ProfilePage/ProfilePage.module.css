@@ -15,7 +15,7 @@
 
 .profileContent {
   display: grid;
-  grid-template-columns: 1fr 350px;
+  grid-template-columns: 1fr;
   gap: 30px;
   margin-top: 40px;
 }

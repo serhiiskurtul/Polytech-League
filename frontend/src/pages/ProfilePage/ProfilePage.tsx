@@ -4,7 +4,6 @@ import {
   ProfileStats, 
   UserTeams, 
   UserAchievements, 
-  SidebarActions, 
   RecentActivity 
 } from '@/widgets/profile-widgets';
 import styles from './ProfilePage.module.css';
@@ -132,9 +131,7 @@ const ProfilePage = () => {
     alert(`Інформація про команду "${teamName}" буде доступна найближчим часом!`);
   };
 
-  const handleActionClick = (actionName: string) => {
-    alert(`Функція "${actionName}" буде доступна найближчим часом!`);
-  };
+
 
   // Анімація появи при завантаженні
   useEffect(() => {
@@ -193,9 +190,7 @@ const ProfilePage = () => {
             <RecentActivity activities={activities} activityChart={activityChart} />
           </div>
           
-          <aside className={styles.sidebar}>
-            <SidebarActions onActionClick={handleActionClick} />
-          </aside>
+
         </div>
       </div>
     </div>
