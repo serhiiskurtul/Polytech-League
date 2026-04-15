@@ -1,4 +1,5 @@
 using PolytechLeague.Domain.Entities;
+using System.Text.Json.Serialization;
 
 namespace PolytechLeague.Application.Dto;
 
@@ -17,6 +18,9 @@ public class UserResponse
     public required string LastName { get; set; }
     public UserRole Role { get; set; }
     public string? Email { get; set; }
+    
+    [JsonPropertyName("createdAt")]
+    public DateTime CreatedAt { get; set; }
 }
 
 public class UserWithDeletedResponse
@@ -51,7 +55,8 @@ public static class UserDtoExtension
             FirstName = user.FirstName,
             LastName = user.LastName,
             Role = user.Role,
-            Email = user.Email
+            Email = user.Email,
+            CreatedAt = user.CreatedAt
         };
     }
 

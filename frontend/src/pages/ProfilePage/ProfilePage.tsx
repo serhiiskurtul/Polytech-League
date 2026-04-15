@@ -88,7 +88,14 @@ const ProfilePage = () => {
     email: user?.email || '-',
     phone: '-', // Removed phone as requested
     city: playerProfile?.city || '-',
-    joinDate: 'Вересень 2024',
+    joinDate: (user?.createdAt || (user as any)?.CreatedAt)
+      ? (() => {
+          const date = new Date(user?.createdAt || (user as any)?.CreatedAt);
+          return isNaN(date.getTime()) 
+            ? '-' 
+            : new Intl.DateTimeFormat('uk-UA', { month: 'long', year: 'numeric' }).format(date);
+        })()
+      : '-',
     bio: playerProfile?.bio || '-',
     badges: ['Студент', 'Учасник'],
     instagramUrl: playerProfile?.instagramUrl
