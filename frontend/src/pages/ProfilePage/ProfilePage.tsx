@@ -1,17 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
   ProfileHeader, 
   ProfileStats, 
-  UserTeams, 
-  UserAchievements, 
-  RecentActivity 
+  UserAchievements 
 } from '@/widgets/profile-widgets';
 import EditProfileModal from '@/widgets/profile-widgets/edit-profile-modal/EditProfileModal';
 import styles from './ProfilePage.module.css';
 import { useAuth } from '@/app/providers/AuthContext';
 import { PlayerDto } from '@/shared/types/player.types';
 import { updatePlayer, getProfile, uploadAvatar } from '@/shared/api/players.api';
-import { useRef } from 'react';
 import { toast } from 'react-hot-toast';
 
 interface UserData {
@@ -33,31 +30,11 @@ interface Stats {
   goalsScored: number;
 }
 
-interface Team {
-  id: number;
-  logo: string;
-  name: string;
-  sport: string;
-  role: string;
-}
-
 interface Achievement {
   id: number;
   icon: string;
   name: string;
   year: string;
-}
-
-interface Activity {
-  id: number;
-  icon: string;
-  title: string;
-  time: string;
-}
-
-interface ActivityChartItem {
-  day: string;
-  value: number;
 }
 
 const ProfilePage = () => {
@@ -88,7 +65,7 @@ const ProfilePage = () => {
     studentId: playerProfile?.group || '-',
     faculty: playerProfile?.faculty || '-',
     email: user?.email || '-',
-    phone: '-', // Removed phone as requested
+    phone: '-', 
     city: playerProfile?.city || '-',
     joinDate: (user?.createdAt || (user as any)?.CreatedAt)
       ? (() => {
@@ -111,25 +88,9 @@ const ProfilePage = () => {
     goalsScored: 0
   };
 
-  const teams: any[] = [];
-  
   const achievements = [
     { id: 1, icon: 'fas fa-star', name: 'Новий учасник', year: '2024' },
     { id: 2, icon: 'fas fa-user-check', name: 'Профіль створено', year: '2024' }
-  ];
-
-  const activities: any[] = [
-    { id: 1, icon: 'fas fa-user-plus', title: 'Реєстрація в системі', time: 'Нещодавно' }
-  ];
-
-  const activityChart = [
-    { day: 'Пн', value: 10 },
-    { day: 'Вт', value: 20 },
-    { day: 'Ср', value: 15 },
-    { day: 'Чт', value: 30 },
-    { day: 'Пт', value: 25 },
-    { day: 'Сб', value: 40 },
-    { day: 'Нд', value: 20 }
   ];
 
   const handleEditProfile = () => {
@@ -168,15 +129,8 @@ const ProfilePage = () => {
     }
   };
 
-  const handleTeamClick = (teamName: string) => {
-    alert(`Інформація про команду "${teamName}" буде доступна найближчим часом!`);
-  };
-
-
-
   // Анімація появи при завантаженні
   useEffect(() => {
-    // Додаємо анімацію для карток при скролі
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -191,7 +145,6 @@ const ProfilePage = () => {
       }
     );
 
-    // Спостерігаємо за всіма картками
     const cards = document.querySelectorAll(`.${styles.card}`);
     cards.forEach(card => {
       card.classList.add(styles.fadeIn);
@@ -224,15 +177,9 @@ const ProfilePage = () => {
         
         <div className={styles.profileContent}>
           <div className={styles.mainContent}>
+            <UserAchievements achievements={achievements} />
             <ProfileStats stats={stats} />
-            <div className={styles.profileTwoColumn}>
-              <UserTeams teams={teams} onTeamClick={handleTeamClick} />
-              <UserAchievements achievements={achievements} />
-            </div>
-            <RecentActivity activities={activities} activityChart={activityChart} />
           </div>
-          
-
         </div>
       </div>
 
