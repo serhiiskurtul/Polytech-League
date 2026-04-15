@@ -82,16 +82,11 @@ const ProfilePage = () => {
   };
 
   const stats = {
-    matchesPlayed: 0,
-    wins: 0,
+    matchesPlayed: playerProfile?.matchesPlayed || 0,
+    wins: playerProfile?.winsCount || 0,
     eloRating: playerProfile?.chessRating || 0,
-    goalsScored: 0
+    goalsScored: playerProfile?.goalsScored || 0
   };
-
-  const achievements = [
-    { id: 1, icon: 'fas fa-star', name: 'Новий учасник', year: '2024' },
-    { id: 2, icon: 'fas fa-user-check', name: 'Профіль створено', year: '2024' }
-  ];
 
   const handleEditProfile = () => {
     setIsEditModalOpen(true);
@@ -177,7 +172,7 @@ const ProfilePage = () => {
         
         <div className={styles.profileContent}>
           <div className={styles.mainContent}>
-            <UserAchievements achievements={achievements} />
+            <UserAchievements achievements={playerProfile?.achievements || []} />
             <ProfileStats stats={stats} />
           </div>
         </div>

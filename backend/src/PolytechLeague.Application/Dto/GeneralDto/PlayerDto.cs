@@ -49,6 +49,13 @@ public class PlayerDto
 
     public int? BeachVolleyballShirtNumber { get; set; }
     public long? BeachVolleyballTeamId { get; set; }
+
+    public List<AchievementDto> Achievements { get; set; } = new();
+
+    // Stats
+    public int MatchesPlayed { get; set; }
+    public int WinsCount { get; set; }
+    public int GoalsScored { get; set; }
 }
 
 public static class PlayerDtoExtensions
@@ -84,7 +91,11 @@ public static class PlayerDtoExtensions
             BasketballShirtNumber = player.BasketballShirtNumber,
             BasketballTeamId = player.BasketballTeamId,
             BeachVolleyballShirtNumber = player.BeachVolleyballShirtNumber,
-            BeachVolleyballTeamId = player.BeachVolleyballTeamId
+            BeachVolleyballTeamId = player.BeachVolleyballTeamId,
+            Achievements = new List<AchievementDto>(),
+            MatchesPlayed = 0,
+            WinsCount = 0,
+            GoalsScored = 0
         };
     }
 
