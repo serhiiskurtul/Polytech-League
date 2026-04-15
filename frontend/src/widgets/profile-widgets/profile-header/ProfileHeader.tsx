@@ -16,9 +16,10 @@ interface ProfileHeaderProps {
   userData: UserData;
   onEdit?: () => void;
   onAvatarUpload?: () => void;
+  onLogout?: () => void;
 }
 
-const ProfileHeader = ({ userData, onEdit, onAvatarUpload }: ProfileHeaderProps) => {
+const ProfileHeader = ({ userData, onEdit, onAvatarUpload, onLogout }: ProfileHeaderProps) => {
   return (
     <div className={styles.profileHeader}>
       <div className={styles.profileHeaderCard}>
@@ -48,9 +49,14 @@ const ProfileHeader = ({ userData, onEdit, onAvatarUpload }: ProfileHeaderProps)
                 ))}
               </div>
             </div>
-            <button className={styles.editProfileBtn} onClick={onEdit}>
-              <i className="fas fa-edit"></i> Редагувати профіль
-            </button>
+            <div className={styles.profileActions}>
+              <button className={styles.editProfileBtn} onClick={onEdit}>
+                <i className="fas fa-edit"></i> Редагувати профіль
+              </button>
+              <button className={styles.logoutBtn} onClick={onLogout}>
+                <i className="fas fa-sign-out-alt"></i> Вийти
+              </button>
+            </div>
           </div>
           
           <p className={styles.profileBio}>

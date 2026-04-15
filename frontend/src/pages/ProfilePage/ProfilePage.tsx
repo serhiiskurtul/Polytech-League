@@ -59,7 +59,7 @@ interface ActivityChartItem {
 }
 
 const ProfilePage = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [playerProfile, setPlayerProfile] = useState<PlayerDto | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -178,6 +178,7 @@ const ProfilePage = () => {
           userData={userData} 
           onEdit={handleEditProfile}
           onAvatarUpload={handleAvatarUpload}
+          onLogout={logout}
         />
         
         <div className={styles.profileContent}>
