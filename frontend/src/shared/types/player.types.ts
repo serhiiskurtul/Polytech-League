@@ -5,6 +5,9 @@ export interface PlayerDto {
     lastName: string;
     group: string;
     city: string;
+    faculty?: string | null;
+    bio?: string | null;
+    instagramUrl?: string | null;
 
     // Chess
     chessRating?: number | null;

@@ -14,6 +14,9 @@ public class PlayerDto
     public string? LastName { get; set; }
     public string? Group { get; set; }
     public string? City { get; set; }
+    public string? Faculty { get; set; }
+    public string? Bio { get; set; }
+    public string? InstagramUrl { get; set; }
 
     // Chess
     public int? ChessRating { get; set; }
@@ -59,6 +62,9 @@ public static class PlayerDtoExtensions
             LastName = player.LastName,
             Group = player.Group,
             City = player.City,
+            Faculty = player.Faculty,
+            Bio = player.Bio,
+            InstagramUrl = player.InstagramUrl,
             ChessRating = player.ChessRating,
             ChessFideId = player.ChessFideId,
             ChessTitle = player.ChessTitle,
@@ -89,7 +95,10 @@ public static class PlayerDtoExtensions
             FirstName = dto.FirstName ?? string.Empty,
             LastName = dto.LastName ?? string.Empty,
             Group = dto.Group ?? string.Empty,
-            City = dto.City ?? "Київ",
+            City = dto.City ?? "Чернівці",
+            Faculty = dto.Faculty,
+            Bio = dto.Bio,
+            InstagramUrl = dto.InstagramUrl,
             ChessRating = dto.ChessRating,
             ChessFideId = dto.ChessFideId,
             ChessTitle = dto.ChessTitle,

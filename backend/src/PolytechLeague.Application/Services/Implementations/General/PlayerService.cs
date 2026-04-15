@@ -55,6 +55,9 @@ public class PlayerService : IPlayerService
         player.Group = dto.Group ?? player.Group;
         player.City = dto.City ?? player.City;
         player.UserId = dto.UserId ?? player.UserId;
+        player.Faculty = dto.Faculty ?? player.Faculty;
+        player.Bio = dto.Bio ?? player.Bio;
+        player.InstagramUrl = dto.InstagramUrl ?? player.InstagramUrl;
 
         // Update sport stats (only if provided in DTO)
         if (dto.ChessRating.HasValue) player.ChessRating = dto.ChessRating;

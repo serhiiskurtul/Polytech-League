@@ -6,10 +6,11 @@ import {
   UserAchievements, 
   RecentActivity 
 } from '@/widgets/profile-widgets';
+import EditProfileModal from '@/widgets/profile-widgets/edit-profile-modal/EditProfileModal';
 import styles from './ProfilePage.module.css';
 import { useAuth } from '@/app/providers/AuthContext';
-import { getProfile } from '@/shared/api/players.api';
 import { PlayerDto } from '@/shared/types/player.types';
+import { updatePlayer, getProfile } from '@/shared/api/players.api';
 import { toast } from 'react-hot-toast';
 
 interface UserData {
@@ -62,6 +63,7 @@ const ProfilePage = () => {
   const { user, logout } = useAuth();
   const [playerProfile, setPlayerProfile] = useState<PlayerDto | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -81,14 +83,15 @@ const ProfilePage = () => {
 
   const userData = {
     name: user ? `${user.firstName} ${user.lastName}` : 'Користувач',
-    studentId: playerProfile?.group || 'IT-ХХ-202X',
-    faculty: 'Політехнічний інститут',
-    email: user?.email || '',
-    phone: '+380 XX XXX XXXX',
-    city: playerProfile?.city || 'Київ',
+    studentId: playerProfile?.group || '-',
+    faculty: playerProfile?.faculty || '-',
+    email: user?.email || '-',
+    phone: '-', // Removed phone as requested
+    city: playerProfile?.city || '-',
     joinDate: 'Вересень 2024',
-    bio: playerProfile?.chessFideId ? `FIDE ID: ${playerProfile.chessFideId}` : 'Активний учасник спортивної ліги Політехніки.',
-    badges: ['Студент', 'Учасник']
+    bio: playerProfile?.bio || '-',
+    badges: ['Студент', 'Учасник'],
+    instagramUrl: playerProfile?.instagramUrl
   };
 
   const stats = {
@@ -120,7 +123,20 @@ const ProfilePage = () => {
   ];
 
   const handleEditProfile = () => {
-    alert('Редагування профілю - в розробці');
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveProfile = async (data: Partial<PlayerDto>) => {
+    if (!playerProfile?.id) return;
+    try {
+      await updatePlayer(playerProfile.id, { ...playerProfile, ...data });
+      const updatedProfile = await getProfile();
+      setPlayerProfile(updatedProfile);
+      toast.success('Профіль успішно оновлено');
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      toast.error('Не вдалося оновити профіль');
+    }
   };
 
   const handleAvatarUpload = () => {
@@ -194,6 +210,15 @@ const ProfilePage = () => {
 
         </div>
       </div>
+      
+      {playerProfile && (
+        <EditProfileModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={handleSaveProfile}
+          initialData={playerProfile}
+        />
+      )}
     </div>
   );
 };

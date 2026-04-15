@@ -10,6 +10,7 @@ interface UserData {
   phone: string;
   city: string;
   joinDate: string;
+  instagramUrl?: string;
 }
 
 interface ProfileHeaderProps {
@@ -49,6 +50,13 @@ const ProfileHeader = ({ userData, onEdit, onAvatarUpload, onLogout }: ProfileHe
                 ))}
               </div>
             </div>
+            <div className={styles.socialLinks}>
+              {userData.instagramUrl && (
+                <a href={userData.instagramUrl} target="_blank" rel="noopener noreferrer" className={styles.socialIcon} title="Instagram">
+                  <i className="fab fa-instagram"></i>
+                </a>
+              )}
+            </div>
             <div className={styles.profileActions}>
               <button className={styles.editProfileBtn} onClick={onEdit}>
                 <i className="fas fa-edit"></i> Редагувати профіль
@@ -65,7 +73,7 @@ const ProfileHeader = ({ userData, onEdit, onAvatarUpload, onLogout }: ProfileHe
           
           <div className={styles.profileDetails}>
             <div className={styles.detailItem}>
-              <span className={styles.detailLabel}><i className="fas fa-id-card"></i> Студентський квиток</span>
+              <span className={styles.detailLabel}><i className="fas fa-id-card"></i> Група</span>
               <span className={styles.detailValue}>{userData.studentId}</span>
             </div>
             <div className={styles.detailItem}>
@@ -75,10 +83,6 @@ const ProfileHeader = ({ userData, onEdit, onAvatarUpload, onLogout }: ProfileHe
             <div className={styles.detailItem}>
               <span className={styles.detailLabel}><i className="fas fa-envelope"></i> Email</span>
               <span className={styles.detailValue}>{userData.email}</span>
-            </div>
-            <div className={styles.detailItem}>
-              <span className={styles.detailLabel}><i className="fas fa-phone"></i> Телефон</span>
-              <span className={styles.detailValue}>{userData.phone}</span>
             </div>
             <div className={styles.detailItem}>
               <span className={styles.detailLabel}><i className="fas fa-map-marker-alt"></i> Місто</span>
