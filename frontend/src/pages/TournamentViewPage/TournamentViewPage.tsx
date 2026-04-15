@@ -966,7 +966,11 @@ const TournamentViewPage = () => {
           </div>
         </div>
 
-        {(tournament?.sport === 'chess' || tournament?.sport === 'checkers') && details && (
+        {(tournament?.sport === 'chess' || 
+          tournament?.sport === 'checkers' || 
+          tournament?.sport === 'badminton' || 
+          tournament?.sport === 'table_tennis' || 
+          tournament?.sport === 'table-tennis') && details && (
           <TournamentPodium
             firstPlace={details.firstPlace}
             secondPlace={details.secondPlace}

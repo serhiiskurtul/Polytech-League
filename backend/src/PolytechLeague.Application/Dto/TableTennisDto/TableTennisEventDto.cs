@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Entities.TableTennis;
 using PolytechLeague.Domain.Entities.TableTennis.Enums;
+using PolytechLeague.Application.Dto.GeneralDto;
 using PolytechLeague.Application.Dto.ChessDto; // For EventPhotoDto if shared, otherwise adjust
 
 namespace PolytechLeague.Application.Dto.TableTennisDto;
@@ -44,6 +45,10 @@ public class TableTennisEventResponse
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required TableTennisCategory Category { get; set; }
     
+    public PlayerDto? FirstPlace { get; set; }
+    public PlayerDto? SecondPlace { get; set; }
+    public PlayerDto? ThirdPlace { get; set; }
+
     public ICollection<TableTennisMatchResponse>? Matches { get; set; }
 }
 
@@ -78,6 +83,9 @@ public static class TableTennisEventDtoExtensions
             Description = entity.Description,
             TournamentType = entity.TournamentType,
             Category = entity.Category,
+            FirstPlace = entity.FirstPlace?.ToDto(),
+            SecondPlace = entity.SecondPlace?.ToDto(),
+            ThirdPlace = entity.ThirdPlace?.ToDto(),
             Matches = entity.Matches?.Select(m => m.ToResponse()).ToList()
         };
     }

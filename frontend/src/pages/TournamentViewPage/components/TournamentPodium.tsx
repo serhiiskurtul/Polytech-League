@@ -1,5 +1,5 @@
 import React from 'react';
-import { PlayerDto } from '@/shared/types/player.types';
+import { BASE_URL } from '@/shared/api/axiosInstance';
 import styles from '../TournamentViewPage.module.css';
 
 interface TournamentPodiumProps {
@@ -17,6 +17,12 @@ const TournamentPodium: React.FC<TournamentPodiumProps> = ({
 }) => {
   if (!firstPlace && !secondPlace && !thirdPlace) return null;
 
+  const getImageUrl = (url: string) => {
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    return `${BASE_URL}${url}`;
+  };
+
   const renderPlace = (participant: any | null | undefined, rank: number, className: string) => {
     if (!participant) return null;
 
@@ -24,9 +30,11 @@ const TournamentPodium: React.FC<TournamentPodiumProps> = ({
       ? participant.name 
       : `${participant.firstName} ${participant.lastName}`;
     
-    const displayAvatar = isTeam
+    const initials = isTeam
       ? (participant.name?.length > 10 ? participant.name.substring(0, 10) + '...' : participant.name)
       : `${participant.firstName?.[0] || ''}${participant.lastName?.[0] || ''}`;
+
+    const hasPhoto = !isTeam && participant.photoUrl;
 
     return (
       <div className={`${styles.podiumPlace} ${className}`}>
@@ -35,7 +43,15 @@ const TournamentPodium: React.FC<TournamentPodiumProps> = ({
           {rank !== 1 && rank}
         </div>
         <div className={styles.podiumAvatar}>
-          {displayAvatar}
+          {hasPhoto ? (
+            <img 
+              src={getImageUrl(participant.photoUrl)} 
+              alt={displayName} 
+              className={styles.podiumPhoto}
+            />
+          ) : (
+            initials
+          )}
         </div>
         <div className={styles.podiumName}>
           {displayName}
