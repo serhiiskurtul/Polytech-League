@@ -52,8 +52,8 @@ const PlayersRatingPage = () => {
     // Filter by search
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      result = result.filter(p => 
-        p.firstName.toLowerCase().includes(q) || 
+      result = result.filter(p =>
+        p.firstName.toLowerCase().includes(q) ||
         p.lastName.toLowerCase().includes(q) ||
         p.faculty?.toLowerCase().includes(q)
       );
@@ -114,9 +114,9 @@ const PlayersRatingPage = () => {
           <div className={styles.filtersRow}>
             <div className={styles.searchBox}>
               <i className="fa-solid fa-search"></i>
-              <input 
-                type="text" 
-                placeholder="Пошук за ім'ям або факультетом..." 
+              <input
+                type="text"
+                placeholder="Пошук за ім'ям..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -151,10 +151,10 @@ const PlayersRatingPage = () => {
                   <div className={styles.headerCell}>Статистика</div>
                   <div className={`${styles.headerCell} ${styles.centered}`}>Дії</div>
                 </div>
-                
+
                 <div className={styles.tableBody}>
                   {filteredPlayers.map((player, index) => {
-                    const photoSrc = player.photoUrl 
+                    const photoSrc = player.photoUrl
                       ? (player.photoUrl.startsWith('http') ? player.photoUrl : `${baseUrl}${player.photoUrl}`)
                       : null;
 
@@ -165,7 +165,7 @@ const PlayersRatingPage = () => {
                             {index + 1}
                           </div>
                         </div>
-                        
+
                         <div className={styles.cell}>
                           <Link to={`/players/${player.id}`} className={styles.playerInfo}>
                             {photoSrc ? (
@@ -227,7 +227,7 @@ const PlayersRatingPage = () => {
                     );
                   })}
                 </div>
-                
+
                 {filteredPlayers.length === 0 && (
                   <div className={styles.noResults}>Гравців не знайдено</div>
                 )}
