@@ -12,6 +12,7 @@ export interface AuthResponse {
     lastName: string;
     email: string;
     role: number | string;
+    photoUrl?: string;
     createdAt: string;
   };
 }

@@ -10,7 +10,7 @@ namespace PolytechLeague.API.Controllers.Account;
 
 [ApiController]
 [Route("api/users")]
-public class UsersController(IUserService userService) : Controller
+public class UsersController(IUserService userService, IPlayerService playerService) : Controller
 {
     [Authorize(Policy = "Admin")]
     [HttpGet]
@@ -57,8 +57,12 @@ public class UsersController(IUserService userService) : Controller
 
         var userId = User.GetUserId();
         var user = await userService.GetByIdAsync(userId, cancellationToken);
+        var response = user.ToResponse();
 
-        return Ok(user.ToResponse());
+        // Get photo from player profile if exists (lightweight check)
+        response.PhotoUrl = await playerService.GetPhotoUrlByUserIdAsync(userId, cancellationToken);
+
+        return Ok(response);
     }
 
     [EnableRateLimiting("fixed")]

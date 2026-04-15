@@ -52,6 +52,15 @@ public class PlayerService : IPlayerService
         return dto;
     }
 
+    public async Task<string?> GetPhotoUrlByUserIdAsync(long userId, CancellationToken cancellationToken = default)
+    {
+        var player = await _dbContext.Players
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
+            
+        return player?.PhotoUrl;
+    }
+
     public async Task<PlayerDto?> GetByUserIdAsync(long userId, CancellationToken cancellationToken = default)
     {
         var player = await _dbContext.Players

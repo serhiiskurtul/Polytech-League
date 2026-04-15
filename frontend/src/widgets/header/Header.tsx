@@ -56,7 +56,17 @@ export default function Header() {
           {isAuthenticated && user ? (
             <Link to="/profile" className={styles.userProfileLink}>
               <div className={styles.userProfile}>
-                <div className={styles.userAvatar}>{initials || <i className="fas fa-user"></i>}</div>
+                <div className={styles.userAvatar}>
+                  {user.photoUrl && user.photoUrl.trim() !== '' ? (
+                    <img 
+                      src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}${user.photoUrl}`} 
+                      alt={`${user.firstName} ${user.lastName}`} 
+                      className={styles.avatarImg}
+                    />
+                  ) : (
+                    initials || <i className="fas fa-user"></i>
+                  )}
+                </div>
                 <span className={styles.userName}>{user.firstName} {user.lastName[0]}.</span>
               </div>
             </Link>

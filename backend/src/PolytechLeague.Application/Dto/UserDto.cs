@@ -18,6 +18,7 @@ public class UserResponse
     public required string LastName { get; set; }
     public UserRole Role { get; set; }
     public string? Email { get; set; }
+    public string? PhotoUrl { get; set; }
     
     [JsonPropertyName("createdAt")]
     public DateTime CreatedAt { get; set; }
