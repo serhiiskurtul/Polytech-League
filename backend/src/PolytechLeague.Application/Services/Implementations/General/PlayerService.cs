@@ -174,6 +174,7 @@ public class PlayerService : IPlayerService
                     SportType = "chess",
                     Date = p.Tournament.Date,
                     Rank = rank,
+                    TournamentId = p.TournamentId,
                     Result = rank > 0 ? $"{rank} місце ({p.Points} очок)" : $"{p.Points} очок"
                 });
             }
@@ -206,6 +207,7 @@ public class PlayerService : IPlayerService
                     SportType = "checkers",
                     Date = p.Event.Date,
                     Rank = rank,
+                    TournamentId = p.TournamentId,
                     Result = rank > 0 ? $"{rank} місце ({p.Points} очок)" : $"{p.Points} очок"
                 });
             }
@@ -238,6 +240,7 @@ public class PlayerService : IPlayerService
                     SportType = "table_tennis",
                     Date = p.Tournament.Date,
                     Rank = rank,
+                    TournamentId = p.TournamentId,
                     Result = rank > 0 ? $"{rank} місце" : "Учасник"
                 });
             }
@@ -270,6 +273,7 @@ public class PlayerService : IPlayerService
                     SportType = "badminton",
                     Date = p.Event.Date,
                     Rank = rank,
+                    TournamentId = p.EventId,
                     Result = rank > 0 ? $"{rank} місце" : "Учасник"
                 });
             }
@@ -292,6 +296,7 @@ public class PlayerService : IPlayerService
                     SportType = sport,
                     Date = e.Date,
                     Rank = rank,
+                    TournamentId = e.Id,
                     Result = $"{rank} місце"
                 });
             }
@@ -323,6 +328,7 @@ public class PlayerService : IPlayerService
                     SportType = "futsal",
                     Date = team.Event.Date,
                     Rank = rank,
+                    TournamentId = team.EventId,
                     Result = rank > 0 ? $"{rank} місце (команда {team.Name})" : $"Учасник (команда {team.Name})"
                 });
             }
@@ -340,7 +346,7 @@ public class PlayerService : IPlayerService
             foreach (var t in vTeams) {
                 if (t.Event == null) continue;
                 int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "volleyball", Date = t.Event.Date, Rank = rank, Result = rank > 0 ? $"{rank} місце ({t.Name})" : $"Учасник ({t.Name})" });
+                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "volleyball", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId, Result = rank > 0 ? $"{rank} місце ({t.Name})" : $"Учасник ({t.Name})" });
             }
 
             // Basketball 3x3
@@ -351,7 +357,7 @@ public class PlayerService : IPlayerService
             foreach (var t in bTeams) {
                 if (t.Event == null) continue;
                 int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "basketball_3x3", Date = t.Event.Date, Rank = rank, Result = rank > 0 ? $"{rank} місце ({t.Name})" : $"Учасник ({t.Name})" });
+                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "basketball_3x3", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId, Result = rank > 0 ? $"{rank} місце ({t.Name})" : $"Учасник ({t.Name})" });
             }
 
             // Beach Volleyball
@@ -362,7 +368,7 @@ public class PlayerService : IPlayerService
             foreach (var t in bvTeams) {
                 if (t.Event == null) continue;
                 int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "beach_volleyball", Date = t.Event.Date, Rank = rank, Result = rank > 0 ? $"{rank} місце ({t.Name})" : $"Учасник ({t.Name})" });
+                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "beach_volleyball", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId, Result = rank > 0 ? $"{rank} місце ({t.Name})" : $"Учасник ({t.Name})" });
             }
         } catch (Exception ex) {
             _logger.LogError(ex, "Error populating other team achievements for player {PlayerId}", playerId);

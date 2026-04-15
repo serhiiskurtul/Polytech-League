@@ -1,6 +1,8 @@
+import { Link } from 'react-router-dom';
 import styles from './UserAchievements.module.css';
 
 interface Achievement {
+  tournamentId: number;
   tournamentName: string;
   sportType: string;
   result?: string;
@@ -49,7 +51,11 @@ const UserAchievements = ({ achievements }: UserAchievementsProps) => {
       ) : (
         <div className={styles.achievementsGrid}>
           {achievements.map((achievement, index) => (
-            <div key={`${achievement.tournamentName}-${index}`} className={`${styles.achievementCard} ${getRankBadgeClass(achievement.rank)}`}>
+            <Link 
+              key={`${achievement.tournamentId}-${index}`} 
+              to={`/tournaments/${achievement.tournamentId}`}
+              className={`${styles.achievementCard} ${getRankBadgeClass(achievement.rank)}`}
+            >
               <div className={styles.iconContainer}>
                 <div className={styles.achievementIcon}>
                   <i className={getSportIcon(achievement.sportType)}></i>
@@ -70,7 +76,7 @@ const UserAchievements = ({ achievements }: UserAchievementsProps) => {
                   {new Date(achievement.date).toLocaleDateString('uk-UA', { year: 'numeric', month: 'short' })}
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}
