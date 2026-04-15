@@ -62,16 +62,6 @@
   object-fit: cover;
 }
 
-.avatarStatus {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  width: 24px;
-  height: 24px;
-  background: var(--success);
-  border-radius: 50%;
-  border: 3px solid var(--card);
-}
 
 .avatarUpload {
   display: flex;

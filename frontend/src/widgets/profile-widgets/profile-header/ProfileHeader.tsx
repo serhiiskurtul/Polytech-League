@@ -34,7 +34,6 @@ const ProfileHeader = ({ userData, onEdit, onAvatarUpload, onLogout }: ProfileHe
             ) : (
               userData.name.split(' ').map(n => n[0]).join('')
             )}
-            <div className={styles.avatarStatus}></div>
           </div>
           {onAvatarUpload && (
             <button className={styles.avatarUpload} onClick={onAvatarUpload}>
