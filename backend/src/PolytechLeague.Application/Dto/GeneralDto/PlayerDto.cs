@@ -51,11 +51,13 @@ public class PlayerDto
     public long? BeachVolleyballTeamId { get; set; }
 
     public List<AchievementDto> Achievements { get; set; } = new();
+    public List<string> Sports { get; set; } = new();
 
     // Stats
     public int MatchesPlayed { get; set; }
     public int WinsCount { get; set; }
     public int GoalsScored { get; set; }
+    public int PerformanceScore { get; set; }
 }
 
 public static class PlayerDtoExtensions
@@ -95,7 +97,9 @@ public static class PlayerDtoExtensions
             Achievements = new List<AchievementDto>(),
             MatchesPlayed = 0,
             WinsCount = 0,
-            GoalsScored = 0
+            GoalsScored = 0,
+            PerformanceScore = 0,
+            Sports = new List<string>()
         };
     }
 

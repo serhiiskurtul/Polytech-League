@@ -1,205 +1,84 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import styles from './PlayersRatingPage.module.css';
-
-interface Player {
-  id: number;
-  name: string;
-  avatar: string;
-  sport: string;
-  sportIcon: string;
-  team: string;
-  rating: number;
-  ratingChange: number;
-  games: number;
-  wins: number;
-  points: number;
-  years: string;
-  gender: 'Ч' | 'Ж';
-  rank: number;
-  trend: 'up' | 'down' | 'stable';
-}
-
-interface Filters {
-  sport: string;
-  gender: string;
-  search: string;
-  sortBy: keyof Player;
-  sortOrder: 'asc' | 'desc';
-}
+import { getPlayersRankings } from '../../shared/api/players.api';
+import { PlayerDto } from '../../shared/types/player.types';
+import { Link } from 'react-router-dom';
 
 const PlayersRatingPage = () => {
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [filteredPlayers, setFilteredPlayers] = useState<Player[]>([]);
+  const [players, setPlayers] = useState<PlayerDto[]>([]);
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    totalPlayers: 50,
-    totalSports: 8,
-    maxRating: 2192
-  });
-  
-  const [filters, setFilters] = useState<Filters>({
-    sport: 'Всі',
-    gender: 'Всі',
-    search: '',
-    sortBy: 'rating',
-    sortOrder: 'desc'
-  });
+  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('Загальний');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const sports = [
-    { id: 'all', name: 'Всі', icon: 'fa-filter' },
-    { id: 'futsal', name: 'Футзал', icon: 'fa-futbol' },
-    { id: 'basketball', name: 'Баскетбол', icon: 'fa-basketball-ball' },
-    { id: 'volleyball', name: 'Волейбол', icon: 'fa-volleyball-ball' },
-    { id: 'chess', name: 'Шахи', icon: 'fa-chess' },
-    { id: 'checkers', name: 'Шашки', icon: 'fa-chess-board' },
-    { id: 'table_tennis', name: 'Настільний теніс', icon: 'fa-table-tennis' },
-    { id: 'badminton', name: 'Бадмінтон', icon: 'fa-feather-alt' },
-    { id: 'armwrestling', name: 'Армреслінг', icon: 'fa-fist-raised' }
-  ];
-
-  const genders = [
-    { id: 'all', name: 'Всі', icon: 'fa-users' },
-    { id: 'men', name: 'Чоловіки', icon: '👨' },
-    { id: 'women', name: 'Жінки', icon: '👩' }
-  ];
-
-  const sortOptions = [
-    { value: 'rating', label: 'Рейтинг' },
-    { value: 'games', label: 'Кількість ігор' },
-    { value: 'wins', label: 'Перемоги' },
-    { value: 'years', label: 'Роки навчання' },
-    { value: 'name', label: 'Ім\'я' }
-  ];
-
-  // Імітація завантаження даних
   useEffect(() => {
-    const mockPlayers = generateMockPlayers();
-    setPlayers(mockPlayers);
-    setFilteredPlayers(mockPlayers);
-    
-    if (mockPlayers.length > 0) {
-      setStats({
-        totalPlayers: mockPlayers.length,
-        totalSports: new Set(mockPlayers.map(p => p.sport)).size,
-        maxRating: Math.max(...mockPlayers.map(p => p.rating))
-      });
-    }
-    
-    setLoading(false);
+    const fetchRankings = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await getPlayersRankings();
+        setPlayers(data);
+      } catch (err: any) {
+        console.error('Error fetching rankings:', err);
+        setError('Не вдалося завантажити рейтинги. Будь ласка, спробуйте пізніше.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRankings();
   }, []);
 
-  // Фільтрація та сортування
-  useEffect(() => {
+  const sportsTabs = [
+    { id: 'all', name: 'Загальний', icon: 'fa-globe', key: 'Загальний' },
+    { id: 'chess', name: 'Шахи', icon: 'fa-chess', key: 'chess' },
+    { id: 'checkers', name: 'Шашки', icon: 'fa-chess-board', key: 'checkers' },
+    { id: 'tt', name: 'Настільний теніс', icon: 'fa-table-tennis-paddle-ball', key: 'table_tennis' },
+    { id: 'futsal', name: 'Футзал', icon: 'fa-futbol', key: 'futsal' },
+    { id: 'volleyball', name: 'Волейбол', icon: 'fa-volleyball-ball', key: 'volleyball' },
+    { id: 'basketball', name: 'Баскетбол 3х3', icon: 'fa-basketball-ball', key: 'basketball_3x3' },
+    { id: 'beach', name: 'Пляжний волейбол', icon: 'fa-umbrella-beach', key: 'beach_volleyball' },
+    { id: 'arm', name: 'Армрестлинг', icon: 'fa-fist-raised', key: 'armwrestling' },
+    { id: 'badm', name: 'Бадмінтон', icon: 'fa-feather-alt', key: 'badminton' }
+  ];
+
+  const filteredPlayers = useMemo(() => {
     let result = [...players];
 
-    // Фільтрація за видом спорту
-    if (filters.sport !== 'Всі') {
-      result = result.filter(player => player.sport === filters.sport);
+    // Filter by tab
+    if (activeTab !== 'Загальний') {
+      result = result.filter(p => p.sports?.includes(activeTab) || p.sports?.some(s => s.toLowerCase() === activeTab.toLowerCase()));
     }
 
-    // Фільтрація за статтю
-    if (filters.gender !== 'Всі') {
-      const genderFilter = filters.gender === 'Чоловіки' ? 'Ч' : 'Ж';
-      result = result.filter(player => player.gender === genderFilter);
-    }
-
-    // Пошук за ім'ям або команді
-    if (filters.search) {
-      const searchLower = filters.search.toLowerCase();
-      result = result.filter(player => 
-        player.name.toLowerCase().includes(searchLower) ||
-        player.team.toLowerCase().includes(searchLower)
+    // Filter by search
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(p => 
+        p.firstName.toLowerCase().includes(q) || 
+        p.lastName.toLowerCase().includes(q) ||
+        p.faculty?.toLowerCase().includes(q)
       );
     }
 
-    // Сортування
-    result.sort((a, b) => {
-      const aValue = a[filters.sortBy];
-      const bValue = b[filters.sortBy];
-      
-      if (typeof aValue === 'string' && typeof bValue === 'string') {
-        return filters.sortOrder === 'asc' 
-          ? aValue.localeCompare(bValue)
-          : bValue.localeCompare(aValue);
-      }
+    // Sorting by performance score (already sorted by backend but good to have)
+    return result.sort((a, b) => (b.performanceScore || 0) - (a.performanceScore || 0));
+  }, [players, activeTab, searchQuery]);
 
-      if (typeof aValue === 'number' && typeof bValue === 'number') {
-        return filters.sortOrder === 'asc' 
-          ? aValue - bValue
-          : bValue - aValue;
-      }
-      
-      return 0;
-    });
-
-    setFilteredPlayers(result);
-  }, [filters, players]);
-
-  const generateMockPlayers = (): Player[] => {
-    const sportsData = [
-      { name: 'Футзал', icon: '⚽' },
-      { name: 'Баскетбол', icon: '🏀' },
-      { name: 'Волейбол', icon: '🏐' },
-      { name: 'Шахи', icon: '♟️' },
-      { name: 'Шашки', icon: '♟️' },
-      { name: 'Настільний теніс', icon: '🏓' },
-      { name: 'Бадмінтон', icon: '🏸' },
-      { name: 'Армреслінг', icon: '💪' }
-    ];
-    const teamsList = ['ІТ-31', 'ЕК-22', 'ПР-11', 'МК-41', 'ФІ-21', 'ЕП-32', 'МК-31', 'ЕК-41'];
-    const names = [
-      'Артем Іванов', 'Марія Семенова', 'Влад Ковальчук', 'Катерина Шевченко', 
-      'Олексій Петренко', 'Юлія Мороз', 'Дмитро Соколов', 'Анна Бойко',
-      'Сергій Бондар', 'Олена Кравченко', 'Ігор Лисенко', 'Тетяна Руденко',
-      'Поліщук Вікторія', 'Бондаренко Дмитро', 'Шевчук Павло'
-    ];
-
-    const mockData = Array.from({ length: 50 }, (_, i): Player => {
-      const wins = Math.floor(Math.random() * 20) + 5;
-      const games = wins + Math.floor(Math.random() * 15);
-      const sportObj = sportsData[i % sportsData.length];
-      const rating = 1200 + Math.floor(Math.random() * 1000);
-      const ratingChange = Math.floor(Math.random() * 40) - 15;
-      
-      const startYear = 2022 + Math.floor(Math.random() * 3);
-      const endYear = startYear + 4;
-      const years = i % 5 === 0 ? `${startYear} - тепер` : `${startYear} - ${endYear}`;
-
-      return {
-        id: i + 1,
-        name: i < names.length ? names[i] : names[i % names.length] + ' ' + (Math.floor(i / names.length) + 1),
-        avatar: names[i % names.length].split(' ').map(n => n[0]).join(''),
-        sport: sportObj.name,
-        sportIcon: sportObj.icon,
-        team: teamsList[Math.floor(Math.random() * teamsList.length)],
-        rating: rating,
-        ratingChange: ratingChange,
-        games,
-        wins,
-        points: wins * 10 + Math.floor(Math.random() * 50),
-        years,
-        gender: Math.random() > 0.4 ? 'Ч' : 'Ж',
-        rank: 0,
-        trend: ratingChange > 0 ? 'up' : (ratingChange < 0 ? 'down' : 'stable')
-      };
-    });
-
-    return mockData.sort((a, b) => b.rating - a.rating).map((p, i) => ({ ...p, rank: i + 1 }));
+  const getSportInfo = (sportKey: string) => {
+    switch (sportKey.toLowerCase()) {
+      case 'chess': return { icon: '♟️', color: '#8b4513' };
+      case 'checkers': return { icon: '🏁', color: '#555' };
+      case 'futsal': return { icon: '⚽', color: '#2c3e50' };
+      case 'basketball_3x3': return { icon: '🏀', color: '#e67e22' };
+      case 'volleyball': return { icon: '🏐', color: '#f1c40f' };
+      case 'table_tennis': return { icon: '🏓', color: '#e74c3c' };
+      case 'badminton': return { icon: '🏸', color: '#1abc9c' };
+      case 'armwrestling': return { icon: '💪', color: '#7f8c8d' };
+      case 'beach_volleyball': return { icon: '🏖️', color: '#3498db' };
+      default: return { icon: '🏅', color: '#9b59b6' };
+    }
   };
 
-  const handleFilterChange = (key: keyof Filters, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-  };
-
-  const resetFilters = () => {
-    setFilters({
-      sport: 'Всі',
-      gender: 'Всі',
-      search: '',
-      sortBy: 'rating',
-      sortOrder: 'desc'
-    });
-  };
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
   return (
     <div className={styles.page}>
@@ -208,122 +87,59 @@ const PlayersRatingPage = () => {
           {/* Hero Section */}
           <div className={styles.heroSection}>
             <h1 className={styles.heroTitle}>
-              <i className="fa-solid fa-chart-line"></i>
-              Рейтинг гравців
+              <i className="fa-solid fa-ranking-star"></i>
+              Рейтинги гравців
             </h1>
             <p className={styles.heroDescription}>
-              Детальна статистика та рейтинг всіх гравців платформи. Фільтруйте, сортуйте та аналізуйте результати.
+              Система рейтингів на основі результатів змагань (призові місця, рівень турніру та ігрова активність).
             </p>
-            
-            <div className={styles.statsOverview}>
-              <div className={styles.statCard}>
-                <div className={styles.statValue}>{stats.totalPlayers}</div>
-                <div className={styles.statLabel}>ГРАВЦІВ У СИСТЕМІ</div>
-              </div>
-              <div className={styles.statCard}>
-                <div className={styles.statValue}>{stats.totalSports}</div>
-                <div className={styles.statLabel}>ВИДІВ СПОРТУ</div>
-              </div>
-              <div className={styles.statCard}>
-                <div className={styles.statValue}>{stats.maxRating}</div>
-                <div className={styles.statLabel}>МАКСИМАЛЬНИЙ РЕЙТИНГ</div>
-              </div>
+          </div>
+
+          {/* Tabs Section */}
+          <div className={styles.tabsContainer}>
+            <div className={styles.tabsScroll}>
+              {sportsTabs.map(tab => (
+                <button
+                  key={tab.id}
+                  className={`${styles.tabItem} ${activeTab === tab.key ? styles.activeTab : ''}`}
+                  onClick={() => setActiveTab(tab.key)}
+                >
+                  <i className={`fa-solid ${tab.icon}`}></i>
+                  {tab.name}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Filters Section */}
-          <div className={styles.filtersSection}>
-            <div className={styles.filtersCard}>
-              <div className={styles.filtersHeader}>
-                <h3 className={styles.filtersTitle}>
-                  <i className="fa-solid fa-filter"></i> Фільтри та сортування
-                </h3>
-                <div className={styles.actions}>
-                  <button className={styles.resetButton} onClick={resetFilters}>
-                    <i className="fa-solid fa-redo"></i> Скинути фільтри
-                  </button>
-                  <button className={styles.exportButton}>
-                    <i className="fa-solid fa-file-csv"></i> Експорт CSV
-                  </button>
-                </div>
-              </div>
-
-              <div className={styles.filtersContent}>
-                <div className={styles.searchSide}>
-                  <label className={styles.filterLabel}>
-                    <i className="fa-solid fa-search"></i> Пошук гравця
-                  </label>
-                  <div className={styles.searchContainer}>
-                    <i className="fa-solid fa-search"></i>
-                    <input 
-                      type="text" 
-                      className={styles.searchInput}
-                      placeholder="Введіть ім'я або команду..." 
-                      value={filters.search}
-                      onChange={(e) => handleFilterChange('search', e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div className={styles.sportsSide}>
-                  <label className={styles.filterLabel}>
-                    <i className="fa-solid fa-running"></i> Вид спорту
-                  </label>
-                  <div className={styles.chipsContainer}>
-                    {sports.map(s => (
-                      <button 
-                        key={s.id}
-                        className={`${styles.chip} ${filters.sport === s.name ? styles.active : ''}`}
-                        onClick={() => handleFilterChange('sport', s.name)}
-                      >
-                        <i className={`fa-solid ${s.icon}`}></i>
-                        {s.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className={styles.bottomFilters}>
-                <div className={styles.genderChips}>
-                  {genders.map(g => (
-                    <button
-                      key={g.id}
-                      className={`${styles.chip} ${filters.gender === g.name ? styles.active : ''}`}
-                      onClick={() => handleFilterChange('gender', g.name)}
-                    >
-                      {g.icon.includes('fa-') ? <i className={`fa-solid ${g.icon}`}></i> : <span>{g.icon}</span>}
-                      {g.name}
-                    </button>
-                  ))}
-                </div>
-
-                <div className={styles.sortChips}>
-                  {sortOptions.map(opt => (
-                    <button
-                      key={opt.value}
-                      className={`${styles.sortChip} ${filters.sortBy === opt.value ? styles.active : ''}`}
-                      onClick={() => handleFilterChange('sortBy', opt.value)}
-                    >
-                      {opt.label}
-                      {filters.sortBy === opt.value && <i className="fa-solid fa-chevron-down"></i>}
-                    </button>
-                  ))}
-                </div>
-              </div>
+          <div className={styles.filtersRow}>
+            <div className={styles.searchBox}>
+              <i className="fa-solid fa-search"></i>
+              <input 
+                type="text" 
+                placeholder="Пошук за ім'ям або факультетом..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
-            
-            <div className={styles.resultsSummary}>
+            <div className={styles.resultsCount}>
               Знайдено: <strong>{filteredPlayers.length}</strong> гравців
             </div>
           </div>
 
-          {/* Rating Table Section */}
+          {/* Rating Table */}
           <div className={styles.ratingSection}>
             {loading ? (
               <div className={styles.loadingContainer}>
                 <div className={styles.spinner}></div>
-                <p>Завантаження рейтингу...</p>
+                <p>Завантаження даних...</p>
+              </div>
+            ) : error ? (
+              <div className={styles.errorContainer}>
+                <i className="fa-solid fa-triangle-exclamation"></i>
+                <p>{error}</p>
+                <button onClick={() => window.location.reload()} className={styles.retryBtn}>
+                  Спробувати ще раз
+                </button>
               </div>
             ) : (
               <div className={styles.ratingTable}>
@@ -331,90 +147,85 @@ const PlayersRatingPage = () => {
                   <div className={styles.headerCell}>#</div>
                   <div className={styles.headerCell}>Гравець</div>
                   <div className={styles.headerCell}>Спорт</div>
-                  <div className={styles.headerCell}>Рейтинг</div>
+                  <div className={styles.headerCell}>Очки</div>
                   <div className={styles.headerCell}>Статистика</div>
-                  <div className={`${styles.headerCell} ${styles.centered}`}>Роки навчання</div>
                   <div className={`${styles.headerCell} ${styles.centered}`}>Дії</div>
                 </div>
                 
                 <div className={styles.tableBody}>
-                  {filteredPlayers.map((player) => (
-                    <div key={player.id} className={styles.tableRow}>
-                      <div className={styles.cell}>
-                        <div className={`${styles.rankCircle} ${player.rank <= 3 ? styles.topRank : ''}`}>
-                          {player.rank}
-                          <i className={`fa-solid fa-arrow-${player.trend === 'up' ? 'up' : 'down'} ${styles.trendIcon} ${styles[player.trend]}`}></i>
-                        </div>
-                      </div>
-                      
-                      <div className={styles.cell}>
-                        <div className={styles.playerInfo}>
-                          <div 
-                            className={styles.playerAvatar}
-                            style={{ background: `linear-gradient(135deg, hsl(${(player.id * 137.5) % 360}, 70%, 50%), hsl(${(player.id * 137.5 + 40) % 360}, 70%, 40%))` }}
-                          >
-                            {player.avatar}
+                  {filteredPlayers.map((player, index) => {
+                    const photoSrc = player.photoUrl 
+                      ? (player.photoUrl.startsWith('http') ? player.photoUrl : `${baseUrl}${player.photoUrl}`)
+                      : null;
+
+                    return (
+                      <div key={player.id} className={styles.tableRow}>
+                        <div className={styles.cell}>
+                          <div className={`${styles.rankCircle} ${index < 3 ? styles.topRank : ''}`}>
+                            {index + 1}
                           </div>
-                          <div className={styles.playerDetails}>
-                            <div className={styles.playerName}>{player.name}</div>
-                            <div className={styles.playerSubInfo}>
-                              <span className={styles.genderIcon} title={player.gender === 'Ч' ? 'Чоловік' : 'Жінка'}>
-                                {player.gender === 'Ч' ? '👨' : '👩'}
-                              </span>
-                              <span className={styles.teamText}>{player.team}</span>
+                        </div>
+                        
+                        <div className={styles.cell}>
+                          <Link to={`/players/${player.id}`} className={styles.playerInfo}>
+                            {photoSrc ? (
+                              <img src={photoSrc} alt="" className={styles.playerAvatarImg} />
+                            ) : (
+                              <div className={styles.playerAvatar}>
+                                {player.firstName[0]}{player.lastName[0]}
+                              </div>
+                            )}
+                            <div className={styles.playerDetails}>
+                              <div className={styles.playerName}>{player.firstName} {player.lastName}</div>
+                              <div className={styles.playerSubInfo}>
+                                <span className={styles.groupText}>{player.group || '—'}</span>
+                              </div>
+                            </div>
+                          </Link>
+                        </div>
+
+                        <div className={styles.cell}>
+                          <div className={styles.sportsList}>
+                            {player.sports?.map(s => {
+                              const info = getSportInfo(s);
+                              return (
+                                <div key={s} className={styles.sportBadgeSmall} title={s} style={{ backgroundColor: info.color + '22', color: info.color }}>
+                                  {info.icon}
+                                </div>
+                              );
+                            })}
+                            {(!player.sports || player.sports.length === 0) && <span className={styles.emptyVal}>—</span>}
+                          </div>
+                        </div>
+
+                        <div className={styles.cell}>
+                          <div className={styles.ratingBox}>
+                            <div className={styles.ratingLarge}>{player.performanceScore}</div>
+                            <div className={styles.pointsLabel}>очок</div>
+                          </div>
+                        </div>
+
+                        <div className={styles.cell}>
+                          <div className={styles.statsMini}>
+                            <div className={styles.statMiniItem}>
+                              <span className={styles.statMiniVal}>{player.matchesPlayed}</span> ігор
+                            </div>
+                            <div className={styles.statMiniItem}>
+                              <span className={styles.statMiniVal}>{player.winsCount}</span> перемог
                             </div>
                           </div>
                         </div>
-                      </div>
 
-                      <div className={styles.cell}>
-                        <div className={styles.sportBadge} title={player.sport}>
-                          {player.sportIcon}
-                        </div>
-                      </div>
-
-                      <div className={styles.cell}>
-                        <div className={styles.ratingBox}>
-                          <div className={styles.ratingLarge}>{player.rating}</div>
-                          <div className={`${styles.ratingBadge} ${player.ratingChange >= 0 ? styles.positive : styles.negative}`}>
-                            {player.ratingChange >= 0 ? `+${player.ratingChange}` : player.ratingChange}
+                        <div className={`${styles.cell} ${styles.centered}`}>
+                          <div className={styles.actionsGroup}>
+                            <Link to={`/players/${player.id}`} className={styles.actionBtn} title="Профіль">
+                              <i className="fa-regular fa-user"></i>
+                            </Link>
                           </div>
                         </div>
                       </div>
-
-                      <div className={styles.cell}>
-                        <div className={styles.statsColumn}>
-                          <div className={styles.statsLine}>
-                            <i className="fa-regular fa-play-circle"></i> {player.games} ігор
-                          </div>
-                          <div className={styles.statsLine}>
-                            <i className="fa-solid fa-trophy"></i> {player.wins} перемог
-                          </div>
-                          <div className={styles.statsLine}>
-                            <i className="fa-solid fa-star"></i> {player.points} очок
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className={`${styles.cell} ${styles.centered}`}>
-                        <div className={styles.yearsBadge}>{player.years}</div>
-                      </div>
-
-                      <div className={`${styles.cell} ${styles.centered}`}>
-                        <div className={styles.actionsGroup}>
-                          <button className={styles.actionBtn} title="Профіль">
-                            <i className="fa-regular fa-user"></i>
-                          </button>
-                          <button className={styles.actionBtn} title="Статистика">
-                            <i className="fa-solid fa-chart-bar"></i>
-                          </button>
-                          <button className={styles.actionBtn} title="Порівняти">
-                            <i className="fa-solid fa-balance-scale"></i>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 
                 {filteredPlayers.length === 0 && (
@@ -422,6 +233,52 @@ const PlayersRatingPage = () => {
                 )}
               </div>
             )}
+          </div>
+
+          {/* Scoring Formula Section */}
+          <div className={styles.formulaSection}>
+            <div className={styles.formulaHeader}>
+              <i className="fa-solid fa-circle-info"></i>
+              <h2>Як нараховуються очки?</h2>
+            </div>
+            <div className={styles.formulaGrid}>
+              <div className={styles.formulaCard}>
+                <div className={styles.formulaIcon} style={{ background: '#fef3c7', color: '#d97706' }}>
+                  <i className="fa-solid fa-trophy"></i>
+                </div>
+                <h3>Призові місця</h3>
+                <ul>
+                  <li><span>🥇 1 місце:</span> 100 балів</li>
+                  <li><span>🥈 2 місце:</span> 50 балів</li>
+                  <li><span>🥉 3 місце:</span> 30 балів</li>
+                </ul>
+              </div>
+
+              <div className={styles.formulaCard}>
+                <div className={styles.formulaIcon} style={{ background: '#dcfce7', color: '#16a34a' }}>
+                  <i className="fa-solid fa-layer-group"></i>
+                </div>
+                <h3>Рівень турніру</h3>
+                <p>Бали за призові місця множаться на статус змагань:</p>
+                <ul>
+                  <li><span>Міжгрупові:</span> x1.0</li>
+                  <li><span>Обласні:</span> x2.5</li>
+                  <li><span>Всеукраїнські:</span> x5.0</li>
+                </ul>
+              </div>
+
+              <div className={styles.formulaCard}>
+                <div className={styles.formulaIcon} style={{ background: '#e0f2fe', color: '#0284c7' }}>
+                  <i className="fa-solid fa-bolt"></i>
+                </div>
+                <h3>Ігрова активність</h3>
+                <p>Додаткові бали за кожну гру незалежно від турніру:</p>
+                <ul>
+                  <li><span>Участь у грі:</span> +1 бал</li>
+                  <li><span>Перемога в грі:</span> +2 бали</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>

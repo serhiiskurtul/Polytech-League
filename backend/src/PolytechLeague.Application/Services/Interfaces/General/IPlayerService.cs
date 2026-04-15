@@ -12,4 +12,5 @@ public interface IPlayerService
     Task UpdateAsync(long id, PlayerDto dto, CancellationToken cancellationToken = default);
     Task DeleteAsync(long id, CancellationToken cancellationToken = default);
     Task<IEnumerable<PlayerDto>> SearchAsync(string query, CancellationToken cancellationToken = default);
+    Task<IEnumerable<PlayerDto>> GetAllWithRankingsAsync(CancellationToken cancellationToken = default);
 }

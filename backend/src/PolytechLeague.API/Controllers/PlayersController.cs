@@ -112,4 +112,11 @@ public class PlayersController : ControllerBase
         var results = await _playerService.SearchAsync(query, cancellationToken);
         return Ok(results);
     }
+
+    [HttpGet("rankings")]
+    public async Task<ActionResult<IEnumerable<PlayerDto>>> GetRankings(CancellationToken cancellationToken)
+    {
+        var results = await _playerService.GetAllWithRankingsAsync(cancellationToken);
+        return Ok(results);
+    }
 }

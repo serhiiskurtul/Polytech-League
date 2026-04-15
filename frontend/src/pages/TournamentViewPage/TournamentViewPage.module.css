@@ -1876,3 +1876,200 @@
 .deleteMatchBtn:active {
   transform: scale(0.95);
 }
+
+/* Photo Gallery Section */
+.gallerySection {
+  margin-top: 32px;
+  background: var(--card);
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.galleryHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.galleryHeader h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.galleryHeader i {
+  color: var(--primary);
+  font-size: 1.4rem;
+}
+
+.photoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.galleryItem {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 4/3;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #f8fafc;
+}
+
+.galleryItem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.galleryItem:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  border-color: var(--primary);
+}
+
+.galleryItem:hover img {
+  transform: scale(1.08);
+}
+
+.photoOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 16px;
+}
+
+.galleryItem:hover .photoOverlay {
+  opacity: 1;
+}
+
+.photoOverlay i {
+  color: white;
+  font-size: 1.2rem;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(4px);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Lightbox (Fullscreen Photo) */
+.lightboxOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease-out;
+  padding: 40px;
+}
+
+.lightboxContent {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.lightboxImage {
+  max-width: 100%;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 0 50px rgba(0,0,0,0.5);
+  animation: zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes zoomIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.lightboxClose {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 32px;
+  cursor: pointer;
+  padding: 10px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightboxClose:hover {
+  transform: scale(1.1);
+  color: var(--primary);
+}
+
+.lightboxNav {
+  display: flex;
+  gap: 20px;
+}
+
+.lightboxBtn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lightboxBtn:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .photoGrid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+  
+  .lightboxOverlay {
+    padding: 20px;
+  }
+  
+  .lightboxClose {
+    top: 10px;
+    right: 10px;
+  }
+}

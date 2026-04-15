@@ -40,4 +40,20 @@ export interface PlayerDto {
 
     beachVolleyballShirtNumber?: number | null;
     beachVolleyballTeamId?: number | null;
+
+    achievements?: AchievementDto[];
+    matchesPlayed: number;
+    winsCount: number;
+    goalsScored: number;
+    performanceScore: number;
+    sports: string[];
+}
+
+export interface AchievementDto {
+    tournamentName: string;
+    sportType: string;
+    date: string;
+    rank: number;
+    result: string;
+    tournamentId?: number;
 }

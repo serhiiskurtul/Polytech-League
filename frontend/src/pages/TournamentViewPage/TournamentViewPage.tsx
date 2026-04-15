@@ -74,6 +74,7 @@ const TournamentViewPage = () => {
   const [activeTab, setActiveTab] = useState<'standings' | 'games' | 'participants' | 'schedule'>('standings');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
 
   // Admin access check (0 = User, 1 = Admin)
   const isAdmin = user?.role === 1 || user?.role === '1' || user?.role === 'Admin';
@@ -1559,6 +1560,67 @@ const TournamentViewPage = () => {
           return null;
         })()}
 
+        {/* Photo Gallery Section */}
+        {details?.photos && details.photos.length > 0 && (
+          <div className={styles.gallerySection}>
+            <div className={styles.galleryHeader}>
+              <i className="fas fa-images"></i>
+              <h2>Галерея турніру</h2>
+            </div>
+            <div className={styles.photoGrid}>
+              {details.photos.map((photo: any, index: number) => (
+                <div 
+                  key={photo.id} 
+                  className={styles.galleryItem}
+                  onClick={() => setSelectedPhotoIndex(index)}
+                >
+                  <img src={getImageUrl(photo.url)} alt={`Фото ${index + 1}`} loading="lazy" />
+                  <div className={styles.photoOverlay}>
+                    <i className="fas fa-search-plus"></i>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Lightbox / Fullscreen Preview */}
+        {selectedPhotoIndex !== null && details?.photos && (
+          <div className={styles.lightboxOverlay} onClick={() => setSelectedPhotoIndex(null)}>
+            <div className={styles.lightboxContent} onClick={(e) => e.stopPropagation()}>
+              <button className={styles.lightboxClose} onClick={() => setSelectedPhotoIndex(null)}>
+                <i className="fas fa-times"></i>
+              </button>
+              
+              <img 
+                src={getImageUrl(details.photos[selectedPhotoIndex].url)} 
+                alt="Tournament Fullscreen" 
+                className={styles.lightboxImage} 
+              />
+              
+              <div className={styles.lightboxNav}>
+                <button 
+                  className={styles.lightboxBtn}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedPhotoIndex((selectedPhotoIndex - 1 + details.photos.length) % details.photos.length);
+                  }}
+                >
+                  <i className="fas fa-chevron-left"></i> Назад
+                </button>
+                <button 
+                  className={styles.lightboxBtn}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedPhotoIndex((selectedPhotoIndex + 1) % details.photos.length);
+                  }}
+                >
+                  Вперед <i className="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         {isEditingTournament && (
           <div className={styles.modalOverlay}>
             <div className={styles.modalContent}>

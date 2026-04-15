@@ -12,13 +12,18 @@
 /* Hero Section */
 .heroSection {
   margin-bottom: 40px;
+  background: white;
+  padding: 40px;
+  border-radius: 24px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f1f5f9;
 }
 
 .heroTitle {
-  font-size: 32px;
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 12px;
+  font-size: 36px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
   gap: 16px;
@@ -26,142 +31,131 @@
 
 .heroTitle i {
   color: #3b82f6;
+  background: #eff6ff;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
 }
 
 .heroDescription {
-  font-size: 16px;
+  font-size: 17px;
   color: #64748b;
-  max-width: 800px;
+  max-width: 700px;
   line-height: 1.6;
-  margin-bottom: 32px;
+  margin-bottom: 40px;
 }
 
 .statsOverview {
   display: flex;
-  gap: 20px;
+  gap: 24px;
   flex-wrap: wrap;
 }
 
 .statCard {
-  background: white;
+  background: #f8fafc;
   padding: 24px 32px;
-  border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  min-width: 200px;
+  border-radius: 20px;
+  min-width: 180px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  transition: transform 0.2s;
+}
+
+.statCard:hover {
+  transform: translateY(-5px);
 }
 
 .statValue {
   font-size: 32px;
   font-weight: 800;
-  color: #3b82f6;
+  color: #1e293b;
 }
 
 .statLabel {
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   color: #94a3b8;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
-/* Filters Section */
-.filtersSection {
+/* Tabs */
+.tabsContainer {
   margin-bottom: 32px;
-}
-
-.filtersCard {
   background: white;
-  border-radius: 20px;
-  padding: 24px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
+  padding: 8px;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   border: 1px solid #f1f5f9;
 }
 
-.filtersHeader {
+.tabsScroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.tabsScroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.tabsScroll::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
+}
+
+.tabItem {
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.tabItem i {
+  font-size: 16px;
+}
+
+.tabItem:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.activeTab {
+  background: #3b82f6 !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Filter/Search Bar */
+.filtersRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+  gap: 20px;
 }
 
-.filtersTitle {
-  font-size: 20px;
-  font-weight: 700;
-  color: #1e293b;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.filtersTitle i {
-  color: #3b82f6;
-}
-
-.actions {
-  display: flex;
-  gap: 12px;
-}
-
-.resetButton, .exportButton {
-  padding: 10px 20px;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: none;
-}
-
-.resetButton {
-  background: #eff6ff;
-  color: #3b82f6;
-}
-
-.resetButton:hover {
-  background: #dbeafe;
-}
-
-.exportButton {
-  background: #10b981;
-  color: white;
-}
-
-.exportButton:hover {
-  background: #059669;
-}
-
-.filtersContent {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-  margin-bottom: 24px;
-}
-
-.filterLabel {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: #334155;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.filterLabel i {
-  color: #3b82f6;
-}
-
-.searchContainer {
+.searchBox {
   position: relative;
+  flex: 1;
+  max-width: 400px;
 }
 
-.searchContainer i {
+.searchBox i {
   position: absolute;
   left: 16px;
   top: 50%;
@@ -169,153 +163,71 @@
   color: #94a3b8;
 }
 
-.searchInput {
+.searchBox input {
   width: 100%;
-  padding: 14px 14px 14px 44px;
-  background: #f8fafc;
+  padding: 12px 16px 12px 48px;
+  background: white;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 14px;
   font-size: 15px;
-  color: #1e293b;
   transition: all 0.2s;
 }
 
-.searchInput:focus {
+.searchBox input:focus {
   outline: none;
   border-color: #3b82f6;
-  background: white;
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
 }
 
-.chipsContainer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.chip {
-  padding: 8px 16px;
-  border-radius: 20px;
-  background: #eff6ff;
-  color: #1e293b;
-  font-size: 14px;
-  font-weight: 600;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.chip span {
-  font-size: 18px;
-}
-
-.chip i {
-  font-size: 14px;
-}
-
-.chip:hover {
-  background: #dbeafe;
-}
-
-.chip.active {
-  background: #3b82f6;
-  color: white;
-}
-
-.bottomFilters {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 24px;
-  border-top: 1px solid #f1f5f9;
-}
-
-.genderChips, .sortChips {
-  display: flex;
-  gap: 12px;
-}
-
-.sortChip {
-  padding: 10px 20px;
-  border-radius: 20px;
-  background: #eff6ff;
-  color: #475569;
-  font-size: 14px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.2s;
-}
-
-.sortChip.active {
-  background: #3b82f6;
-  color: white;
-}
-
-.resultsSummary {
-  margin-top: 20px;
+.resultsCount {
   font-size: 14px;
   color: #64748b;
 }
 
-/* Rating Table Section */
+/* Table styling */
 .ratingSection {
   background: white;
-  border-radius: 20px;
+  border-radius: 24px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   border: 1px solid #f1f5f9;
-}
-
-.yearsBadge {
-  padding: 6px 14px;
-  background: #f1f5f9;
-  color: #475569;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 600;
-  border: 1px solid #e2e8f0;
-  white-space: nowrap;
 }
 
 .tableHeader {
   display: grid;
-  grid-template-columns: 80px 2fr 1fr 120px 1.2fr 140px 150px;
-  background: #f1f5f9;
-  padding: 16px 24px;
+  grid-template-columns: 80px 2fr 180px 150px 1fr 100px;
+  background: #f8fafc;
+  padding: 20px 32px;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .headerCell {
-  font-size: 13px;
-  font-weight: 700;
-  color: #475569;
+  font-size: 11px;
+  font-weight: 800;
+  color: #94a3b8;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  display: flex;
-  align-items: center;
+  letter-spacing: 0.1em;
 }
 
-.headerCell.centered {
-  justify-content: center;
+.headerCell.centered { text-align: center; }
+
+.tableBody {
+  display: flex;
+  flex-direction: column;
 }
 
 .tableRow {
   display: grid;
-  grid-template-columns: 80px 2fr 1fr 120px 1.2fr 140px 150px;
-  padding: 20px 24px;
+  grid-template-columns: 80px 2fr 180px 150px 1fr 100px;
+  padding: 20px 32px;
   align-items: center;
-  border-bottom: 1px solid #f1f5f9;
-  transition: background 0.2s;
+  border-bottom: 1px solid #f8fafc;
+  transition: all 0.2s;
 }
 
 .tableRow:hover {
   background: #f8fafc;
+  transform: translateX(4px);
 }
 
 .cell {
@@ -323,196 +235,183 @@
   align-items: center;
 }
 
-.cell.centered {
-  justify-content: center;
-}
+.cell.centered { justify-content: center; }
 
 .rankCircle {
-  width: 36px;
-  height: 36px;
-  background: #3b82f6;
-  color: white;
-  border-radius: 50%;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 16px;
-  position: relative;
+  background: #f1f5f9;
+  color: #64748b;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 14px;
 }
 
-.trendIcon {
-  position: absolute;
-  right: -14px;
-  bottom: 0;
-  font-size: 12px;
+.topRank {
+  background: #3b82f6;
+  color: white;
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.25);
 }
-
-.trendIcon.up { color: #10b981; }
-.trendIcon.down { color: #ef4444; }
 
 .playerInfo {
   display: flex;
   align-items: center;
   gap: 16px;
+  text-decoration: none;
 }
 
 .playerAvatar {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
   font-weight: 700;
   font-size: 14px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.playerDetails {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.playerAvatarImg {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .playerName {
   font-weight: 700;
   color: #1e293b;
-  font-size: 15px;
+  font-size: 16px;
+  margin-bottom: 2px;
 }
 
 .playerSubInfo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  font-size: 12px;
+  color: #94a3b8;
 }
 
-.sportBadge {
+.sportsList {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.sportBadgeSmall {
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
-  background: #eff6ff;
-  border-radius: 50%;
-  font-size: 20px;
-  border: 1px solid #dbeafe;
-  transition: all 0.2s ease;
-  cursor: help;
-}
-
-.sportBadge:hover {
-  background: #3b82f6;
-  transform: scale(1.1);
-}
-
-.genderIcon {
+  border-radius: 8px;
   font-size: 14px;
-  display: flex;
-  align-items: center;
-  cursor: help;
-}
-
-.teamText {
-  font-weight: 500;
-  color: #64748b;
-  font-size: 13px;
 }
 
 .ratingBox {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
+  align-items: baseline;
+  gap: 6px;
 }
 
 .ratingLarge {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 800;
   color: #1e293b;
 }
 
-.ratingBadge {
-  font-size: 11px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 10px;
+.pointsLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
 }
 
-.ratingBadge.positive {
-  background: #ecfdf5;
-  color: #10b981;
-}
-
-.ratingBadge.negative {
-  background: #fef2f2;
-  color: #ef4444;
-}
-
-.statsColumn {
+.statsMini {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.statsLine {
-  font-size: 13px;
+.statMiniItem {
+  font-size: 12px;
   color: #64748b;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
-.statsLine i {
-  color: #3b82f6;
-  width: 14px;
-}
-
-.winRateText {
+.statMiniVal {
   font-weight: 700;
   color: #1e293b;
-  font-size: 15px;
-}
-
-.actionsGroup {
-  display: flex;
-  gap: 8px;
 }
 
 .actionBtn {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: #eff6ff;
-  color: #3b82f6;
-  border: none;
-  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #f1f5f9;
+  color: #64748b;
   transition: all 0.2s;
 }
 
 .actionBtn:hover {
+  background: #e2e8f0;
+  color: #3b82f6;
+}
+
+.errorContainer {
+  padding: 60px;
+  text-align: center;
+  color: #ef4444;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.errorContainer i {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.retryBtn {
+  margin-top: 10px;
+  padding: 10px 24px;
   background: #3b82f6;
   color: white;
+  border-radius: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.retryBtn:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
 }
 
 .loadingContainer {
-  padding: 80px;
-  text-align: center;
-  color: #64748b;
+  padding: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  color: #94a3b8;
 }
 
 .spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #f1f5f9;
+  border: 3px solid #f1f5f9;
   border-top-color: #3b82f6;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 20px;
+  animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
@@ -523,21 +422,119 @@
   padding: 60px;
   text-align: center;
   color: #94a3b8;
-  font-weight: 600;
+  font-size: 15px;
 }
 
-@media (max-width: 1024px) {
-  .filtersContent {
+.emptyVal {
+  color: #cbd5e1;
+}
+
+@media (max-width: 900px) {
+  .tableHeader, .tableRow {
+    grid-template-columns: 60px 1fr 100px 100px;
+  }
+  
+  .headerCell:nth-child(3), .headerCell:nth-child(5),
+  .cell:nth-child(3), .cell:nth-child(5) {
+    display: none;
+  }
+}
+
+.formulaSection {
+  margin-top: 60px;
+  background: white;
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.05);
+  margin-bottom: 40px;
+}
+
+.formulaHeader {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.formulaHeader i {
+  font-size: 24px;
+  color: #3b82f6;
+}
+
+.formulaHeader h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.formulaGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.formulaCard {
+  background: #f8fafc;
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid rgba(0,0,0,0.02);
+  transition: transform 0.3s ease;
+}
+
+.formulaCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.formulaIcon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+.formulaCard h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #334155;
+  margin: 0 0 12px 0;
+}
+
+.formulaCard p {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.formulaCard ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.formulaCard li {
+  font-size: 14px;
+  color: #1e293b;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.formulaCard li span {
+  font-weight: 600;
+  color: #475569;
+}
+
+@media (max-width: 991px) {
+  .formulaGrid {
     grid-template-columns: 1fr;
     gap: 20px;
-  }
-  
-  .tableHeader, .tableRow {
-    grid-template-columns: 60px 1.5fr 1fr 1fr 100px;
-  }
-  
-  .headerCell:nth-child(6), .headerCell:nth-child(7), .headerCell:nth-child(8),
-  .cell:nth-child(6), .cell:nth-child(7), .cell:nth-child(8) {
-    display: none;
   }
 }
