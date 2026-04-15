@@ -33,3 +33,14 @@ export const searchPlayers = async (query: string): Promise<PlayerDto[]> => {
     const response = await api.get<PlayerDto[]>(`/players/search?query=${query}`);
     return response.data;
 };
+
+export const uploadAvatar = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await api.post<{ photoUrl: string }>('/players/profile/avatar', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+    return response.data.photoUrl;
+};

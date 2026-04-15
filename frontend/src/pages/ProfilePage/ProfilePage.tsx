@@ -10,7 +10,8 @@ import EditProfileModal from '@/widgets/profile-widgets/edit-profile-modal/EditP
 import styles from './ProfilePage.module.css';
 import { useAuth } from '@/app/providers/AuthContext';
 import { PlayerDto } from '@/shared/types/player.types';
-import { updatePlayer, getProfile } from '@/shared/api/players.api';
+import { updatePlayer, getProfile, uploadAvatar } from '@/shared/api/players.api';
+import { useRef } from 'react';
 import { toast } from 'react-hot-toast';
 
 interface UserData {
@@ -64,6 +65,7 @@ const ProfilePage = () => {
   const [playerProfile, setPlayerProfile] = useState<PlayerDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -98,7 +100,8 @@ const ProfilePage = () => {
       : '-',
     bio: playerProfile?.bio || '-',
     badges: ['Студент', 'Учасник'],
-    instagramUrl: playerProfile?.instagramUrl
+    instagramUrl: playerProfile?.instagramUrl,
+    photoUrl: playerProfile?.photoUrl
   };
 
   const stats = {
@@ -147,7 +150,22 @@ const ProfilePage = () => {
   };
 
   const handleAvatarUpload = () => {
-    alert('Функція завантаження фото буде доступна найближчим часом!');
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const photoUrl = await uploadAvatar(file);
+      const updatedProfile = await getProfile();
+      setPlayerProfile(updatedProfile);
+      toast.success('Фото профілю оновлено');
+    } catch (error) {
+      console.error('Failed to upload avatar:', error);
+      toast.error('Не вдалося завантажити фото');
+    }
   };
 
   const handleTeamClick = (teamName: string) => {
@@ -217,6 +235,14 @@ const ProfilePage = () => {
 
         </div>
       </div>
+
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        style={{ display: 'none' }} 
+        accept="image/*"
+        onChange={handleFileChange}
+      />
       
       {playerProfile && (
         <EditProfileModal

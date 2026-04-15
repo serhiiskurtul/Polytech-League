@@ -11,6 +11,7 @@ interface UserData {
   city: string;
   joinDate: string;
   instagramUrl?: string;
+  photoUrl?: string;
 }
 
 interface ProfileHeaderProps {
@@ -26,7 +27,15 @@ const ProfileHeader = ({ userData, onEdit, onAvatarUpload, onLogout }: ProfileHe
       <div className={styles.profileHeaderCard}>
         <div className={styles.profileAvatarSection}>
           <div className={styles.profileAvatar}>
-            АІ
+            {userData.photoUrl ? (
+              <img 
+                src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}${userData.photoUrl}`} 
+                alt={userData.name} 
+                className={styles.avatarImage} 
+              />
+            ) : (
+              userData.name.split(' ').map(n => n[0]).join('')
+            )}
             <div className={styles.avatarStatus}></div>
           </div>
           <button className={styles.avatarUpload} onClick={onAvatarUpload}>

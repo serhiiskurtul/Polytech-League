@@ -8,6 +8,7 @@ export interface PlayerDto {
     faculty?: string | null;
     bio?: string | null;
     instagramUrl?: string | null;
+    photoUrl?: string | null;
 
     // Chess
     chessRating?: number | null;

@@ -12,11 +12,13 @@ public class PlayersController : ControllerBase
 {
     private readonly IPlayerService _playerService;
     private readonly IUserService _userService;
+    private readonly IFileService _fileService;
 
-    public PlayersController(IPlayerService playerService, IUserService userService)
+    public PlayersController(IPlayerService playerService, IUserService userService, IFileService fileService)
     {
         _playerService = playerService;
         _userService = userService;
+        _fileService = fileService;
     }
 
     [Authorize]
@@ -41,6 +43,31 @@ public class PlayersController : ControllerBase
         }
 
         return Ok(player);
+    }
+
+    [Authorize]
+    [HttpPost("profile/avatar")]
+    public async Task<ActionResult<string>> UploadAvatar([FromForm] IFormFile file, CancellationToken cancellationToken)
+    {
+        var userId = User.GetUserId();
+        var player = await _playerService.GetByUserIdAsync(userId, cancellationToken);
+
+        if (player == null) return NotFound("Player not found");
+
+        // Save new file
+        var photoUrl = await _fileService.SaveFileAsync(file, "avatars", cancellationToken);
+
+        // Delete old file if it exists and is not a default one
+        if (!string.IsNullOrEmpty(player.PhotoUrl) && player.PhotoUrl.StartsWith("/uploads/avatars/"))
+        {
+            try { _fileService.DeleteFile(player.PhotoUrl); } catch { /* ignore */ }
+        }
+
+        // Update player
+        player.PhotoUrl = photoUrl;
+        await _playerService.UpdateAsync(player.Id ?? 0, player, cancellationToken);
+
+        return Ok(new { photoUrl });
     }
 
     [HttpGet]

@@ -14,6 +14,7 @@ public class PlayerDto
     public string? LastName { get; set; }
     public string? Group { get; set; }
     public string? City { get; set; }
+    public string? PhotoUrl { get; set; }
     public string? Faculty { get; set; }
     public string? Bio { get; set; }
     public string? InstagramUrl { get; set; }
@@ -62,6 +63,7 @@ public static class PlayerDtoExtensions
             LastName = player.LastName,
             Group = player.Group,
             City = player.City,
+            PhotoUrl = player.PhotoUrl,
             Faculty = player.Faculty,
             Bio = player.Bio,
             InstagramUrl = player.InstagramUrl,
@@ -96,6 +98,7 @@ public static class PlayerDtoExtensions
             LastName = dto.LastName ?? string.Empty,
             Group = dto.Group ?? string.Empty,
             City = dto.City ?? "Чернівці",
+            PhotoUrl = dto.PhotoUrl ?? "",
             Faculty = dto.Faculty,
             Bio = dto.Bio,
             InstagramUrl = dto.InstagramUrl,
@@ -117,8 +120,7 @@ public static class PlayerDtoExtensions
             BasketballTeamId = dto.BasketballTeamId,
             BeachVolleyballShirtNumber = dto.BeachVolleyballShirtNumber,
             BeachVolleyballTeamId = dto.BeachVolleyballTeamId,
-            BirthDate = DateOnly.MinValue,
-            PhotoUrl = ""
+            BirthDate = DateOnly.MinValue
         };
     }
 }
