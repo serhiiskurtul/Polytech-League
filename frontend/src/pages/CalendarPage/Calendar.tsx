@@ -4,6 +4,7 @@ import CalendarSidebar from './CalendarSidebar';
 import CalendarStats from './CalendarStats';
 import CalendarControls from './CalendarControls';
 import CalendarFilters from './CalendarFilters';
+import { getTournaments } from '@/shared/api/tournaments.api';
 import './Calendar.css';
 
 export interface CalendarEventData {
@@ -26,17 +27,26 @@ const Calendar = () => {
 
   // Ініціалізація даних подій
   useEffect(() => {
-    const eventsData: CalendarEventData[] = [
-      { id: 1, day: 15, month: 11, year: 2025, sport: 'football', title: 'Чемпіонат коледжу з футзалу', time: '14:00', location: 'Спортивний зал №1', description: 'Чвертьфінальний матч між командами ІТ-31 та ЕК-22' },
-      { id: 2, day: 15, month: 11, year: 2025, sport: 'table-tennis', title: 'Турнір з настільного тенісу', time: '16:30', location: 'Спортивний зал №3', description: 'Груповий етап турніру' },
-      { id: 3, day: 18, month: 11, year: 2025, sport: 'basketball', title: 'Кубок декана: баскетбол', time: '15:00', location: 'Спортивний зал №2', description: 'Півфінальні матчі' },
-      { id: 4, day: 20, month: 11, year: 2025, sport: 'chess', title: 'Чемпіонат з шахів', time: '13:00', location: 'Бібліотека, зал №4', description: 'Фінальний тур' },
-      { id: 5, day: 22, month: 11, year: 2025, sport: 'volleyball', title: 'Волейбольний турнір', time: '16:00', location: 'Спортивний зал №1', description: 'Фінальний матч' },
-      { id: 6, day: 25, month: 11, year: 2025, sport: 'football', title: 'Футзал: півфінал', time: '14:30', location: 'Спортивний зал №1', description: 'МК-41 vs ПР-23' },
-      { id: 7, day: 28, month: 11, year: 2025, sport: 'table-tennis', title: 'Фінал настільного тенісу', time: '17:00', location: 'Спортивний зал №3', description: 'Визначення чемпіона' },
-      { id: 8, day: 5, month: 0, year: 2026, sport: 'basketball', title: 'Новорічний турнір', time: '12:00', location: 'Спортивний зал №2', description: 'Відкритий турнір з баскетболу' },
-    ];
-    setEvents(eventsData);
+    // Fetch all tournaments (using a large page size for simplicity in the calendar)
+    getTournaments(1, 100)
+      .then(response => {
+        const mappedEvents: CalendarEventData[] = response.items.map(tournament => {
+          const date = new Date(tournament.rawDate || tournament.date);
+          return {
+            id: Number(tournament.id),
+            day: date.getDate(),
+            month: date.getMonth(),
+            year: date.getFullYear(),
+            sport: tournament.sport,
+            title: tournament.title,
+            time: tournament.time || '00:00',
+            location: tournament.location || 'Уточнюється',
+            description: tournament.description || ''
+          };
+        });
+        setEvents(mappedEvents);
+      })
+      .catch(err => console.error('Помилка завантаження турнірів для календаря:', err));
   }, []);
 
   // Назви місяців
@@ -47,11 +57,15 @@ const Calendar = () => {
 
   // Назви видів спорту
   const sportNames: Record<string, string> = {
-    'football': 'Футзал',
-    'basketball': 'Баскетбол',
+    'futsal': 'Футзал',
+    'basketball-3x3': 'Баскетбол 3х3',
     'volleyball': 'Волейбол',
+    'beach-volleyball': 'Пляжний волейбол',
     'chess': 'Шахи',
-    'table-tennis': 'Настільний теніс'
+    'checkers': 'Шашки',
+    'table-tennis': 'Настільний теніс',
+    'badminton': 'Бадмінтон',
+    'armwrestling': 'Армреслінг'
   };
 
   // Отримати події для вибраного дня

@@ -10,6 +10,8 @@ export interface Tournament {
   teams: number;
   featured?: boolean;
   isTeam?: boolean;
+  time?: string;
+  rawDate?: string;
 }
 
 export interface PagedResponse<T> {

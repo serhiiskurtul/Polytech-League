@@ -30,11 +30,15 @@ const CalendarGrid = ({
   
   // Іконки для видів спорту
   const sportIcons: Record<string, string> = {
-    'football': 'fas fa-futbol',
-    'basketball': 'fas fa-basketball-ball',
+    'futsal': 'fas fa-futbol',
+    'basketball-3x3': 'fas fa-basketball-ball',
     'volleyball': 'fas fa-volleyball-ball',
+    'beach-volleyball': 'fas fa-umbrella-beach',
     'chess': 'fas fa-chess',
-    'table-tennis': 'fas fa-table-tennis'
+    'checkers': 'fas fa-chess-board',
+    'table-tennis': 'fas fa-table-tennis',
+    'badminton': 'fas fa-feather-alt',
+    'armwrestling': 'fas fa-fist-raised'
   };
 
   // Отримати події для дня

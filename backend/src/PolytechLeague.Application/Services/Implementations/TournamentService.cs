@@ -92,7 +92,9 @@ public class TournamentService : ITournamentService
             CurrentRound = GetStatus(e.Date) == "ongoing" ? "В процесі" : "Реєстрація",
             Registered = false,
             Featured = false,
-            IsTeam = e.IsTeam
+            IsTeam = e.IsTeam,
+            Time = e.Date.ToString("HH:mm"),
+            RawDate = e.Date
         }).ToList();
 
         foreach (var dto in tournamentDtos)
@@ -134,7 +136,9 @@ public class TournamentService : ITournamentService
             CurrentRound = GetStatus(e.Date) == "ongoing" ? "В процесі" : "Реєстрація",
             Registered = false,
             Featured = false,
-            IsTeam = e.IsTeam
+            IsTeam = e.IsTeam,
+            Time = e.Date.ToString("HH:mm"),
+            RawDate = e.Date
         };
 
         await PopulateCountsAsync(dto);

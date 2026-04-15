@@ -20,4 +20,6 @@ public class TournamentDto
     public bool Registered { get; set; }
     public bool Featured { get; set; }
     public bool IsTeam { get; set; }
+    public string? Time { get; set; }
+    public DateTime RawDate { get; set; }
 }
