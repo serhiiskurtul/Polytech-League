@@ -10,5 +10,6 @@ public class ArmwrestlingEvent : Event
     public string? TimeControl { get; set; }
     public int ParticipantsCount { get; set; }
     
+    public ICollection<ArmwrestlingEventParticipant>? Players { get; set; }
     public ICollection<ArmwrestlingMatch>? Matches { get; set; }
 }

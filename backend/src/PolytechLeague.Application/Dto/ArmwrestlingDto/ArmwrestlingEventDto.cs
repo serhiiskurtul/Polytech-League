@@ -136,9 +136,18 @@ public static class ArmwrestlingEventDtoExtensions
             ThirdPlace = entity.ThirdPlace?.ToDto()
         };
 
-        // Extract unique players from matches to populate the "Players" virtual collection
-        if (response.Matches != null)
+        // Populate Players from the actual participants collection
+        if (entity.Players != null && entity.Players.Any())
         {
+            response.Players = entity.Players
+                .Select(p => p.Player?.ToDto())
+                .Where(p => p != null)
+                .Select(p => p!)
+                .ToList();
+        }
+        else if (response.Matches != null)
+        {
+            // Fallback for older data or if participants weren't properly migrated
             var playersMap = new Dictionary<long, PlayerDto?>();
             foreach (var match in response.Matches)
             {

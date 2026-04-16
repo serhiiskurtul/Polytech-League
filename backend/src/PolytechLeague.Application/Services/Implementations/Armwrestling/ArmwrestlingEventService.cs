@@ -24,9 +24,9 @@ public class ArmwrestlingEventService(
                 .ThenInclude(m => m.Player1)
             .Include(e => e.Matches!)
                 .ThenInclude(m => m.Player2)
-            .Include(e => e.FirstPlace)
-            .Include(e => e.SecondPlace)
             .Include(e => e.ThirdPlace)
+            .Include(e => e.Players!)
+                .ThenInclude(p => p.Player)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 
         if (entity is null)
@@ -59,5 +59,34 @@ public class ArmwrestlingEventService(
         oldEntity.FirstPlaceId = newEntity.FirstPlaceId;
         oldEntity.SecondPlaceId = newEntity.SecondPlaceId;
         oldEntity.ThirdPlaceId = newEntity.ThirdPlaceId;
+    }
+
+    public async Task AddParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken)
+    {
+        var alreadyExists = await _dbcontext.ArmwrestlingEventParticipants
+            .AnyAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
+        
+        if (alreadyExists) return;
+
+        var participant = new ArmwrestlingEventParticipant
+        {
+            TournamentId = eventId,
+            PlayerId = playerId
+        };
+
+        _dbcontext.ArmwrestlingEventParticipants.Add(participant);
+        await _dbcontext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task RemoveParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken)
+    {
+        var participant = await _dbcontext.ArmwrestlingEventParticipants
+            .FirstOrDefaultAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
+
+        if (participant != null)
+        {
+            _dbcontext.ArmwrestlingEventParticipants.Remove(participant);
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+        }
     }
 }

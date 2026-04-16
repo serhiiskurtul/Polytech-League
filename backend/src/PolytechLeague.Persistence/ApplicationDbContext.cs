@@ -60,6 +60,7 @@ public class ApplicationDbContext : DbContext
 
     // Armwrestling
     public DbSet<ArmwrestlingEvent> ArmwrestlingEvents { get; set; }
+    public DbSet<ArmwrestlingEventParticipant> ArmwrestlingEventParticipants { get; set; }
     public DbSet<ArmwrestlingMatch> ArmwrestlingMatches { get; set; }
 
     // Futsal
@@ -145,6 +146,7 @@ public class ApplicationDbContext : DbContext
 
         // Armwrestling configurations
         modelBuilder.ApplyConfiguration(new ArmwrestlingEventConfiguration());
+        modelBuilder.ApplyConfiguration(new ArmwrestlingEventParticipantConfiguration());
         modelBuilder.ApplyConfiguration(new ArmwrestlingMatchConfiguration());
 
         // Futsal configurations

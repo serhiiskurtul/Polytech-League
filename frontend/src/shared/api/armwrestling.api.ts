@@ -44,3 +44,22 @@ export const createArmwrestlingMatch = async (data: Partial<ArmwrestlingMatchRes
   const response = await api.post<ArmwrestlingMatchResponse>(`/armwrestling-matches`, data);
   return response.data;
 };
+
+/**
+ * Add a participant to an armwrestling event
+ */
+export const addParticipantToArmwrestlingEvent = async (eventId: string | number, playerId: number): Promise<void> => {
+    await api.post(`/armwrestling-events/${eventId}/participants`, playerId, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+};
+
+/**
+ * Remove a participant from an armwrestling event
+ */
+export const removeParticipantFromArmwrestlingEvent = async (eventId: string | number, playerId: number): Promise<void> => {
+    await api.delete(`/armwrestling-events/${eventId}/participants/${playerId}`);
+};
+

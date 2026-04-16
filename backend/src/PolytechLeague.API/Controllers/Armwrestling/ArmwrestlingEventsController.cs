@@ -71,4 +71,22 @@ public class ArmwrestlingEventsController(
 
         return NoContent();
     }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{id:long}/participants")]
+    public async Task<IActionResult> AddParticipant(long id, [FromBody] long playerId, CancellationToken cancellationToken)
+    {
+        await armEventService.AddParticipantAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("arm_events_group");
+        return Ok();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpDelete("{id:long}/participants/{playerId:long}")]
+    public async Task<IActionResult> RemoveParticipant(long id, long playerId, CancellationToken cancellationToken)
+    {
+        await armEventService.RemoveParticipantAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("arm_events_group");
+        return NoContent();
+    }
 }
