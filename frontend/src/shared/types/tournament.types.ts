@@ -12,6 +12,7 @@ export interface Tournament {
   isTeam?: boolean;
   time?: string;
   rawDate?: string;
+  currentRound?: string;
 }
 
 export interface PagedResponse<T> {
