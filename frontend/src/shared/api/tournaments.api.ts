@@ -48,6 +48,9 @@ export const getTournamentById = async (id: string): Promise<Tournament> => {
 export interface TournamentStats {
     activeTournamentsCount: number;
     registeredPlayersCount: number;
+    totalMatchesCount: number;
+    seasonProgress: number;
+    topSport: string;
 }
 
 export const getTournamentsStats = async (): Promise<TournamentStats> => {

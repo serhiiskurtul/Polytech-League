@@ -1,4 +1,6 @@
+import { useState, useEffect } from 'react';
 import styles from './SeasonStats.module.css';
+import { getTournamentsStats } from '@/shared/api/tournaments.api';
 
 interface Stats {
   totalMatches: number;
@@ -9,13 +11,40 @@ interface Stats {
 }
 
 const SeasonStats= () => {
-  const stats: Stats = {
-    totalMatches: 156,
-    activeTournaments: 8,
-    registeredPlayers: 324,
-    progress: 68,
-    topSport: '⚽'
-  };
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        const data = await getTournamentsStats();
+        setStats({
+          totalMatches: data.totalMatchesCount,
+          activeTournaments: data.activeTournamentsCount,
+          registeredPlayers: data.registeredPlayersCount,
+          progress: data.seasonProgress,
+          topSport: data.topSport === 'Футзал' ? '⚽' : '🏆'
+        });
+      } catch (error) {
+        console.error('Помилка при завантаженні статистики:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  if (loading || !stats) {
+    return (
+      <div className={`${styles.seasonStatsCompact} ${styles.skeleton}`}>
+        <div className={styles.skeletonHeader}></div>
+        <div className={styles.skeletonStats}></div>
+        <div className={styles.skeletonProgress}></div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.seasonStatsCompact}>
@@ -44,7 +73,6 @@ const SeasonStats= () => {
       <div className={styles.progressSection}>
         <div className={styles.progressInfo}>
           <span>Прогрес: {stats.progress}%</span>
-          <span>Топ: {stats.topSport}</span>
         </div>
         <div className={styles.progressBar}>
           <div 

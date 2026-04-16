@@ -216,12 +216,6 @@ const RecentMatches = () => {
           )}
         </div>
 
-        <div className={styles.viewAllContainer}>
-          <button className={styles.viewAllButton}>
-            Переглянути всі матчі
-            <i className="fas fa-arrow-right"></i>
-          </button>
-        </div>
       </div>
     </section>
   );

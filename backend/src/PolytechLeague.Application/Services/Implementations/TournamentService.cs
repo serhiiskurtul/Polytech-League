@@ -239,17 +239,48 @@ public class TournamentService : ITournamentService
     public async Task<GeneralStatsDto> GetGeneralStatsAsync()
     {
         var today = DateTime.UtcNow.Date;
+        var startOfSeason = new DateTime(today.Year, 9, 1);
+        if (today.Month < 9) startOfSeason = new DateTime(today.Year - 1, 9, 1);
         
         var activeTournamentsCount = await _context.Set<PolytechLeague.Domain.Entities.Event>()
-            .CountAsync(e => e.Date >= today);
+            .CountAsync(e => e.Date >= startOfSeason);
 
         var registeredPlayersCount = await _context.Set<PolytechLeague.Domain.Entities.Player>()
             .CountAsync();
 
+        // Count total matches across all sport tables
+        int totalMatches = 0;
+        totalMatches += await _context.FutsalMatches.CountAsync();
+        totalMatches += await _context.VolleyballMatches.CountAsync();
+        totalMatches += await _context.Basketball3x3Matches.CountAsync();
+        totalMatches += await _context.ChessGames.CountAsync();
+        totalMatches += await _context.CheckersGames.CountAsync();
+        totalMatches += await _context.BeachVolleyballMatches.CountAsync();
+        totalMatches += await _context.TableTennisMatches.CountAsync();
+        totalMatches += await _context.BadmintonMatches.CountAsync();
+        totalMatches += await _context.ArmwrestlingMatches.CountAsync();
+
+        // Calculate Season Progress (Sept 1st to June 30th)
+        int progress = 0;
+        var start = new DateTime(today.Year, 9, 1);
+        if (today.Month < 9) start = new DateTime(today.Year - 1, 9, 1);
+        var end = start.AddMonths(10); // Ends end of June next year
+        
+        var totalDays = (end - start).TotalDays;
+        var elapsedDays = (today - start).TotalDays;
+        
+        if (elapsedDays > 0 && totalDays > 0)
+        {
+            progress = (int)Math.Min(100, Math.Max(0, (elapsedDays / totalDays) * 100));
+        }
+
         return new GeneralStatsDto
         {
             ActiveTournamentsCount = activeTournamentsCount,
-            RegisteredPlayersCount = registeredPlayersCount
+            RegisteredPlayersCount = registeredPlayersCount,
+            TotalMatchesCount = totalMatches,
+            SeasonProgress = progress,
+            TopSport = "Футзал" // Could be dynamic based on match counts
         };
     }
 

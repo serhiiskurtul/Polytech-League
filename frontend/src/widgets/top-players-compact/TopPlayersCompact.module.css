@@ -1,90 +1,88 @@
-.topPlayersCompact {
+﻿.topPlayersCompact {
   margin-bottom: 20px;
 }
 
 .card {
   background: var(--card);
   border-radius: var(--radius);
-  padding: 20px;
+  padding: 16px;
   box-shadow: var(--shadow);
   border: 1px solid var(--border);
   transition: all 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
 .cardHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .cardTitle {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
   color: var(--text);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   margin: 0;
+  white-space: nowrap;
 }
 
 .cardIcon {
   color: var(--warning);
+  font-size: 14px;
 }
 
-/* Вибір виду спорту */
 .sportSelector {
   display: flex;
-  gap: 6px;
+  gap: 2px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .sportButton {
-  background: var(--primary-light);
-  color: var(--primary);
+  background: transparent;
+  color: var(--muted);
   border: none;
-  border-radius: 8px;
-  width: 32px;
-  height: 32px;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 14px;
+  transition: all 0.2s ease;
+  font-size: 11px;
   padding: 0;
 }
 
 .sportButton:hover {
-  background: var(--primary);
-  color: white;
-  transform: translateY(-2px);
+  background: var(--primary-light);
+  color: var(--primary);
 }
 
 .sportButton.active {
   background: var(--primary);
   color: white;
-  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.2);
 }
 
-/* Список гравців */
 .playersList {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .playerItem {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
+  gap: 10px;
+  padding: 8px 12px;
   background: var(--primary-light);
-  border-radius: 12px;
+  border-radius: 10px;
   transition: all 0.3s ease;
 }
 
@@ -105,17 +103,15 @@
   color: var(--primary);
 }
 
-/* Ранг гравця */
 .playerRank {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
 }
 
 .rankNumber {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: var(--muted);
   color: white;
@@ -123,21 +119,16 @@
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .topRank {
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
 }
 
-.trendIcon {
-  font-size: 10px;
-}
-
-/* Аватарка */
 .playerAvatar {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   color: white;
@@ -145,11 +136,18 @@
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 12px;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
-/* Інформація про гравця */
+.avatarImage {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
+}
+
 .playerInfo {
   flex: 1;
   min-width: 0;
@@ -158,48 +156,38 @@
 .playerName {
   font-weight: 600;
   color: var(--text);
-  font-size: 14px;
-  margin-bottom: 2px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  font-size: 13px;
+  margin-bottom: 0px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.playerSport {
-  font-size: 12px;
-  opacity: 0.8;
-}
-
 .playerTeam {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* Рейтинг */
 .playerRating {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 2px;
 }
 
 .ratingValue {
   font-weight: 700;
   color: var(--text);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .ratingChange {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 10px;
+  padding: 1px 4px;
+  border-radius: 8px;
 }
 
 .positive {
@@ -207,59 +195,55 @@
   color: var(--success);
 }
 
-.negative {
-  background: rgba(244, 63, 94, 0.12);
-  color: var(--accent);
-}
-
-/* Кнопка перегляду детального рейтингу */
 .seeMoreContainer {
-  margin-top: 16px;
-  padding-top: 16px;
+  margin-top: 12px;
+  padding-top: 12px;
   border-top: 1px solid var(--border);
 }
 
 .seeMoreButton {
-  padding: 12px 24px;
-  border-radius: 14px;
+  padding: 8px 16px;
+  border-radius: 10px;
   background: transparent;
-  border: 2px solid var(--primary);
+  border: 1px solid var(--primary);
   color: var(--primary);
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  transition: all 0.3s ease;
-  font-size: 15px;
+  gap: 8px;
+  transition: all 0.2s ease;
+  font-size: 13px;
   width: 100%;
 }
 
 .seeMoreButton:hover {
   background: var(--primary);
   color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 102, 204, 0.2);
 }
 
-/* Адаптивність */
-@media (max-width: 480px) {
-  .card {
-    padding: 16px;
-  }
-  
-  .playerItem {
-    padding: 10px;
-  }
-  
-  .playerAvatar {
-    width: 36px;
-    height: 36px;
-    font-size: 12px;
-  }
-  
-  .playerName {
-    font-size: 13px;
-  }
+.skeletonRank { height: 20px; width: 20px; border-radius: 50%; }
+.skeletonAvatar { height: 32px; width: 32px; border-radius: 50%; }
+.skeletonInfo { height: 24px; flex: 1; }
+.skeletonRating { height: 24px; width: 40px; }
+
+.skeletonRank, .skeletonAvatar, .skeletonInfo, .skeletonRating {
+  background: linear-gradient(90deg, var(--primary-light) 25%, #f0f0f0 50%, var(--primary-light) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.noPlayers {
+  padding: 12px;
+  text-align: center;
+  color: var(--muted);
+  font-style: italic;
+  font-size: 12px;
 }

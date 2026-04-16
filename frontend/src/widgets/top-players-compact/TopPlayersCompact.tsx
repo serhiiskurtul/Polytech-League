@@ -1,90 +1,83 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './TopPlayersCompact.module.css';
-import { Player } from '@/entities/player';
+import { getPlayersRankings } from '@/shared/api/players.api';
+import { PlayerDto } from '@/shared/types/player.types';
+import { useNavigate } from 'react-router-dom';
+import { BASE_URL } from '@/shared/api/axiosInstance';
 
 const TopPlayersCompact = () => {
+  const navigate = useNavigate();
   const [selectedSport, setSelectedSport] = useState('Всі');
+  const [players, setPlayers] = useState<PlayerDto[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const sports = ['Всі', 'Футзал', 'Баскетбол', 'Волейбол'];
-
-  const players: Player[] = [
-    {
-      id: 1,
-      rank: 1,
-      name: 'Артем Іванов',
-      initials: 'АІ',
-      sport: 'Шахи',
-      rating: 2184,
-      ratingChange: '+24',
-      team: 'ІТ-31',
-      trend: 'up'
-    },
-    {
-      id: 2,
-      rank: 2,
-      name: 'Влад Ковальчук',
-      initials: 'ВК',
-      sport: 'Футзал',
-      rating: 1850,
-      ratingChange: '+18',
-      team: 'ФІ-22',
-      trend: 'up'
-    },
-    {
-      id: 3,
-      rank: 3,
-      name: 'Марія Семенова',
-      initials: 'МС',
-      sport: 'Настільний теніс',
-      rating: 1790,
-      ratingChange: '+12',
-      team: 'ЕК-41',
-      trend: 'up'
-    },
-    {
-      id: 4,
-      rank: 4,
-      name: 'Олексій Петренко',
-      initials: 'ОП',
-      sport: 'Баскетбол',
-      rating: 1720,
-      ratingChange: '-5',
-      team: 'МК-31',
-      trend: 'down'
-    },
-    {
-      id: 5,
-      rank: 5,
-      name: 'Катерина Шевченко',
-      initials: 'КШ',
-      sport: 'Волейбол',
-      rating: 1680,
-      ratingChange: '+32',
-      team: 'ПР-21',
-      trend: 'up'
-    }
+  const sports = [
+    { label: 'Всі', slug: 'all' },
+    { label: 'Футзал', slug: 'futsal' },
+    { label: 'Баскетбол', slug: 'basketball-3x3' },
+    { label: 'Волейбол', slug: 'volleyball' },
+    { label: 'Шахи', slug: 'chess' },
+    { label: 'Шашки', slug: 'checkers' },
+    { label: 'Настільний теніс', slug: 'table-tennis' },
+    { label: 'Пляжний волейбол', slug: 'beach-volleyball' },
+    { label: 'Бадмінтон', slug: 'badminton' },
+    { label: 'Армреслінг', slug: 'armwrestling' }
   ];
 
-  const filteredPlayers = selectedSport === 'Всі' 
-    ? players.slice(0, 3) // Показуємо тільки топ-3 для компактного вигляду
-    : players.filter(player => player.sport === selectedSport).slice(0, 3);
-
-  const getSportIcon = (sport: string) => {
-    const icons: Record<string, string> = {
-      'Футзал': 'fas fa-futbol',
-      'Баскетбол': 'fas fa-basketball-ball',
-      'Волейбол': 'fas fa-volleyball-ball',
-      'Шахи': 'fas fa-chess',
-      'Настільний теніс': 'fas fa-table-tennis'
+  useEffect(() => {
+    const fetchRankings = async () => {
+      try {
+        setLoading(true);
+        const data = await getPlayersRankings();
+        setPlayers(data);
+      } catch (error) {
+        console.error('Помилка при завантаженні рейтингів:', error);
+      } finally {
+        setLoading(false);
+      }
     };
-    return icons[sport] || 'fas fa-trophy';
+
+    fetchRankings();
+  }, []);
+
+  const getFilteredPlayers = () => {
+    const sportObj = sports.find(s => s.label === selectedSport);
+    const slug = sportObj?.slug || 'all';
+
+    let filtered = players;
+    if (slug !== 'all') {
+      filtered = players.filter(p => p.sports?.includes(slug));
+    }
+    return filtered.slice(0, 5);
   };
 
-  const getTrendIcon = (trend: 'up' | 'down') => {
-    if (trend === 'up') return 'fas fa-caret-up';
-    if (trend === 'down') return 'fas fa-caret-down';
-    return 'fas fa-minus';
+  const getSportIcon = (sportSlug: string) => {
+    const icons: Record<string, string> = {
+      'futsal': 'fas fa-futbol',
+      'football': 'fas fa-futbol',
+      'basketball-3x3': 'fas fa-basketball-ball',
+      'volleyball': 'fas fa-volleyball-ball',
+      'chess': 'fas fa-chess',
+      'table-tennis': 'fas fa-table-tennis',
+      'badminton': 'fas fa-feather-alt',
+      'armwrestling': 'fas fa-fist-raised',
+      'checkers': 'fas fa-chess-board',
+      'beach-volleyball': 'fas fa-umbrella-beach'
+    };
+    return icons[sportSlug] || 'fas fa-trophy';
   };
+
+  const getInitials = (firstName: string, lastName: string) => {
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  };
+
+  const getPhotoUrl = (path: string | null | undefined) => {
+    if (!path) return null;
+    if (path.startsWith('http')) return path;
+    return `${BASE_URL}${path}`;
+  };
+
+  const filteredPlayers = getFilteredPlayers();
 
   return (
     <section className={styles.topPlayersCompact}>
@@ -98,47 +91,68 @@ const TopPlayersCompact = () => {
           <div className={styles.sportSelector}>
             {sports.map((sport) => (
               <button
-                key={sport}
-                className={`${styles.sportButton} ${selectedSport === sport ? styles.active : ''}`}
-                onClick={() => setSelectedSport(sport)}
-                title={sport}
+                key={sport.label}
+                className={`${styles.sportButton} ${selectedSport === sport.label ? styles.active : ''}`}
+                onClick={() => setSelectedSport(sport.label)}
+                title={sport.label}
               >
-                {sport === 'Всі' ? <i className="fas fa-users"></i> : <i className={getSportIcon(sport)}></i>}
+                {sport.label === 'Всі' ? <i className="fas fa-users"></i> : <i className={getSportIcon(sport.slug)}></i>}
               </button>
             ))}
           </div>
         </div>
 
         <div className={styles.playersList}>
-          {filteredPlayers.map((player) => (
-            <div key={player.id} className={styles.playerItem}>
-              <div className={styles.playerRank}>
-                <div className={`${styles.rankNumber} ${player.rank <= 3 ? styles.topRank : ''}`}>
-                  {player.rank}
+          {loading ? (
+             [...Array(5)].map((_, i) => (
+              <div key={i} className={`${styles.playerItem} ${styles.skeleton}`}>
+                <div className={styles.skeletonRank}></div>
+                <div className={styles.skeletonAvatar}></div>
+                <div className={styles.skeletonInfo}></div>
+                <div className={styles.skeletonRating}></div>
+              </div>
+            ))
+          ) : filteredPlayers.length > 0 ? (
+            filteredPlayers.map((player, index) => (
+              <div 
+                key={player.id} 
+                className={styles.playerItem}
+                onClick={() => navigate(`/players/${player.id}`)}
+                style={{ cursor: 'pointer' }}
+              >
+                <div className={styles.playerRank}>
+                  <div className={`${styles.rankNumber} ${index < 3 ? styles.topRank : ''}`}>
+                    {index + 1}
+                  </div>
+                </div>
+                <div className={styles.playerAvatar}>
+                  {player.photoUrl ? (
+                    <img src={getPhotoUrl(player.photoUrl)!} alt={player.firstName} className={styles.avatarImage} />
+                  ) : (
+                    getInitials(player.firstName, player.lastName)
+                  )}
+                </div>
+                <div className={styles.playerInfo}>
+                  <div className={styles.playerName}>{player.firstName} {player.lastName}</div>
+                  <div className={styles.playerTeam}>{player.group}</div>
+                </div>
+                <div className={styles.playerRating}>
+                  <div className={styles.ratingValue}>
+                    {player.performanceScore}
+                  </div>
+                  <div className={`${styles.ratingChange} ${styles.positive}`}>
+                    <i className="fas fa-caret-up"></i> New
+                  </div>
                 </div>
               </div>
-              <div className={styles.playerAvatar}>{player.initials}</div>
-              <div className={styles.playerInfo}>
-                <div className={styles.playerName}>{player.name}</div>
-                <div className={styles.playerTeam}>{player.team}</div>
-              </div>
-              <div className={styles.playerRating}>
-                <div className={styles.ratingValue}>
-                  {player.rating}
-                  <span className={styles.ratingIcon}>
-                    <i className={getSportIcon(player.sport)}></i>
-                  </span>
-                </div>
-                <div className={`${styles.ratingChange} ${player.trend === 'up' ? styles.positive : styles.negative}`}>
-                  <i className={getTrendIcon(player.trend)}></i> {player.ratingChange}
-                </div>
-              </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <div className={styles.noPlayers}>Поки немає рейтингу для цієї дисципліни</div>
+          )}
         </div>
 
         <div className={styles.seeMoreContainer}>
-          <button className={styles.seeMoreButton}>
+          <button className={styles.seeMoreButton} onClick={() => navigate('/ratings')}>
             Переглянути весь рейтинг
             <i className="fas fa-arrow-right"></i>
           </button>

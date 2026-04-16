@@ -83,3 +83,35 @@
   background: linear-gradient(90deg, #0066cc, #3b82f6);
   border-radius: 3px;
 }
+.skeleton {
+  pointer-events: none;
+}
+
+.skeletonHeader, .skeletonStats, .skeletonProgress {
+  background: linear-gradient(90deg, var(--primary-light) 25%, #e0e0e0 50%, var(--primary-light) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 8px;
+}
+
+.skeletonHeader {
+  height: 24px;
+  width: 60%;
+  margin-bottom: 20px;
+}
+
+.skeletonStats {
+  height: 60px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.skeletonProgress {
+  height: 40px;
+  width: 100%;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
