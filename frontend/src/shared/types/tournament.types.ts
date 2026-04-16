@@ -15,6 +15,20 @@ export interface Tournament {
   currentRound?: string;
 }
 
+export interface RecentMatch {
+  id: number;
+  sport: string;
+  team1Name: string;
+  team2Name: string;
+  score1?: string;
+  score2?: string;
+  status: string;
+  date: string;
+  location: string;
+  tournamentName: string;
+  tournamentId: number;
+}
+
 export interface PagedResponse<T> {
   items: T[];
   totalCount: number;

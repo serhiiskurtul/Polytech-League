@@ -1,5 +1,5 @@
 import api from './axiosInstance';
-import { Tournament, PagedResponse } from '../types/tournament.types';
+import { Tournament, PagedResponse, RecentMatch } from '../types/tournament.types';
 
 export const getTournaments = async (
     page: number = 1, 
@@ -19,6 +19,18 @@ export const getTournaments = async (
         return response.data;
     } catch (error) {
         console.error('Помилка при отриманні турнірів:', error);
+        throw error;
+    }
+};
+
+export const getRecentResults = async (count: number = 4, sport?: string): Promise<RecentMatch[]> => {
+    try {
+        const response = await api.get<RecentMatch[]>('/tournaments/recent-results', {
+            params: { count, sport }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Помилка при отриманні останніх результатів:', error);
         throw error;
     }
 };

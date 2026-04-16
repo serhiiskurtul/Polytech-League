@@ -40,4 +40,11 @@ public class TournamentsController : ControllerBase
         var stats = await _tournamentService.GetGeneralStatsAsync();
         return Ok(stats);
     }
+
+    [HttpGet("recent-results")]
+    public async Task<ActionResult<IEnumerable<RecentMatchDto>>> GetRecentResults([FromQuery] int count = 4, [FromQuery] string? sport = null)
+    {
+        var results = await _tournamentService.GetRecentMatchesAsync(count, sport);
+        return Ok(results);
+    }
 }
