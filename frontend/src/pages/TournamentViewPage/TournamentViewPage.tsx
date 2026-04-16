@@ -270,7 +270,7 @@ const TournamentViewPage = () => {
       } else {
         await uploadTournamentPhoto(id!, file);
       }
-      fetchTournament();
+      fetchTournament(true);
     } catch (err) {
       console.error(err);
       alert("Помилка при завантаженні фото");
@@ -287,7 +287,7 @@ const TournamentViewPage = () => {
       } else {
         await deleteTournamentPhoto(id!, photoId);
       }
-      fetchTournament();
+      fetchTournament(true);
     } catch (err) {
       console.error(err);
       alert("Помилка при видаленні фото");
@@ -354,7 +354,7 @@ const TournamentViewPage = () => {
       }
       alert("Дані турніру успішно оновлено!");
       setIsEditingTournament(false);
-      fetchTournament();
+      fetchTournament(true);
     } catch (err) {
       console.error(err);
       alert("Помилка при оновленні турніру");
@@ -412,7 +412,7 @@ const TournamentViewPage = () => {
       }
       alert("Матч успішно оновлено!");
       setEditingGameId(null);
-      fetchTournament();
+      fetchTournament(true);
     } catch (err) {
       console.error(err);
       alert("Помилка при оновленні матчу");
@@ -441,7 +441,7 @@ const TournamentViewPage = () => {
       }
       alert("Дані учасника оновлено!");
       setEditingParticipantId(null);
-      fetchTournament();
+      fetchTournament(true);
     } catch (err) {
       console.error(err);
       alert("Помилка при оновленні учасника");
@@ -457,7 +457,7 @@ const TournamentViewPage = () => {
           await removeParticipantFromEvent(id!, playerId);
         }
         alert("Учасника видалено з турніру!");
-        fetchTournament();
+        fetchTournament(true);
       } catch (err) {
         console.error(err);
         alert("Помилка при видаленні учасника");
@@ -662,7 +662,7 @@ const TournamentViewPage = () => {
       }
       alert("Учасник успішно доданий до турніру!");
       setNewPlayer({ firstName: '', lastName: '', group: '', city: 'Київ', ratingELO: 1500, fideId: '', title: '', userId: null, existingPlayerId: null });
-      fetchTournament(); // Refresh
+      fetchTournament(true); // Refresh
     } catch (err) {
       console.error(err);
       alert("Помилка при додаванні учасника");
@@ -701,7 +701,7 @@ const TournamentViewPage = () => {
       }
       alert("Матч успішно доданий!");
       setNewGame({ ...newGame, result: 'WhiteWin', board: newGame.board + 1 });
-      fetchTournament(); // Refresh
+      fetchTournament(true); // Refresh
     } catch (err) {
       console.error(err);
       alert("Помилка при додаванні матчу");
@@ -1160,8 +1160,8 @@ const TournamentViewPage = () => {
                                       <input type="number" step="0.5" value={editingParticipantData.points} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, points: parseFloat(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
                                     </td>
                                     <td>
-                                      <button onClick={() => handleSaveParticipantEdit(p.playerId)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }}><i className="fas fa-check"></i></button>
-                                      <button onClick={handleCancelParticipantEdit} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><i className="fas fa-times"></i></button>
+                                      <button type="button" onClick={() => handleSaveParticipantEdit(p.playerId)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }}><i className="fas fa-check"></i></button>
+                                      <button type="button" onClick={handleCancelParticipantEdit} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><i className="fas fa-times"></i></button>
                                     </td>
                                   </>
                                 ) : (
@@ -1179,8 +1179,8 @@ const TournamentViewPage = () => {
                                     <td>{p.rating}</td>
                                     <td><strong>{p.points}</strong></td>
                                     {isAdmin && <td>
-                                      <button onClick={() => handleEditParticipantClick(p)} style={{ padding: '4px 8px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }} title="Редагувати"><i className="fas fa-edit"></i></button>
-                                      <button onClick={() => handleRemoveParticipant(p.playerId, p.playerName)} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Видалити"><i className="fas fa-trash"></i></button>
+                                      <button type="button" onClick={() => handleEditParticipantClick(p)} style={{ padding: '4px 8px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }} title="Редагувати"><i className="fas fa-edit"></i></button>
+                                      <button type="button" onClick={() => handleRemoveParticipant(p.playerId, p.playerName)} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Видалити"><i className="fas fa-trash"></i></button>
                                     </td>}
                                   </>
                                 )}
@@ -1221,7 +1221,7 @@ const TournamentViewPage = () => {
                               <option value="Draw">Нічия (½-½)</option>
                             </select>
 
-                            <button onClick={handleAddGame} style={{ padding: '8px 16px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>Зберегти</button>
+                            <button type="button" onClick={handleAddGame} style={{ padding: '8px 16px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>Зберегти</button>
                           </div>
                         </div>
                       )}
@@ -1250,6 +1250,7 @@ const TournamentViewPage = () => {
                         </div>
                         <div style={{ display: 'flex', alignItems: 'flex-end' }}>
                           <button
+                            type="button"
                             onClick={() => setGameFilters({ round: '', board: '', participant: '', result: '' })}
                             style={{ padding: '8px 16px', background: '#6b7280', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
                           >
@@ -1316,8 +1317,8 @@ const TournamentViewPage = () => {
                                         </select>
                                       </td>
                                       <td>
-                                        <button onClick={() => handleSaveEdit(game.id)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }}><i className="fas fa-check"></i></button>
-                                        <button onClick={handleCancelEdit} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><i className="fas fa-times"></i></button>
+                                        <button type="button" onClick={() => handleSaveEdit(game.id)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }}><i className="fas fa-check"></i></button>
+                                        <button type="button" onClick={handleCancelEdit} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><i className="fas fa-times"></i></button>
                                       </td>
                                     </>
                                   ) : (
@@ -1466,7 +1467,7 @@ const TournamentViewPage = () => {
                             </div>
                           </div>
                           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                            <button onClick={handleAddPlayer} style={{ padding: '10px 24px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
+                            <button type="button" onClick={handleAddPlayer} style={{ padding: '10px 24px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
                               {newPlayer.existingPlayerId ? 'Додати існуючого гравця' : newPlayer.userId ? 'Створити профіль гравця та додати' : 'Створити гостя та додати'}
                             </button>
                             {(newPlayer.userId || newPlayer.existingPlayerId) && (

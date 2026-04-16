@@ -42,11 +42,11 @@ export interface PlayerDto {
     beachVolleyballTeamId?: number | null;
 
     achievements?: AchievementDto[];
-    matchesPlayed: number;
-    winsCount: number;
-    goalsScored: number;
-    performanceScore: number;
-    sports: string[];
+    matchesPlayed?: number;
+    winsCount?: number;
+    goalsScored?: number;
+    performanceScore?: number;
+    sports?: string[];
 }
 
 export interface AchievementDto {
