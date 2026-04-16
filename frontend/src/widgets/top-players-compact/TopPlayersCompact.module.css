@@ -1,4 +1,4 @@
-﻿.topPlayersCompact {
+.topPlayersCompact {
   margin-bottom: 20px;
 }
 
@@ -9,6 +9,11 @@
   box-shadow: var(--shadow);
   border: 1px solid var(--border);
   transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
 .cardHeader {
@@ -81,21 +86,38 @@
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
-  background: var(--primary-light);
+  background: var(--card);
+  border: 1px solid var(--border);
   border-radius: 10px;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .playerItem:hover {
-  background: var(--primary);
+  border-color: var(--primary);
   transform: translateX(4px);
-  color: white;
+  box-shadow: 0 8px 25px rgba(0, 102, 204, 0.1);
 }
 
-.playerItem:hover .playerName,
-.playerItem:hover .playerTeam,
-.playerItem:hover .ratingValue {
-  color: white;
+.playerItem::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--primary);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.playerItem:hover::before {
+  opacity: 1;
+}
+
+.playerItem:hover .playerName {
+  color: var(--primary);
 }
 
 .playerItem:hover .playerAvatar {
@@ -223,12 +245,32 @@
   color: white;
 }
 
-.skeletonRank { height: 20px; width: 20px; border-radius: 50%; }
-.skeletonAvatar { height: 32px; width: 32px; border-radius: 50%; }
-.skeletonInfo { height: 24px; flex: 1; }
-.skeletonRating { height: 24px; width: 40px; }
+.skeletonRank {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+}
 
-.skeletonRank, .skeletonAvatar, .skeletonInfo, .skeletonRating {
+.skeletonAvatar {
+  height: 32px;
+  width: 32px;
+  border-radius: 50%;
+}
+
+.skeletonInfo {
+  height: 24px;
+  flex: 1;
+}
+
+.skeletonRating {
+  height: 24px;
+  width: 40px;
+}
+
+.skeletonRank,
+.skeletonAvatar,
+.skeletonInfo,
+.skeletonRating {
   background: linear-gradient(90deg, var(--primary-light) 25%, #f0f0f0 50%, var(--primary-light) 75%);
   background-size: 200% 100%;
   animation: skeleton-loading 1.5s infinite;
@@ -236,8 +278,13 @@
 }
 
 @keyframes skeleton-loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .noPlayers {
