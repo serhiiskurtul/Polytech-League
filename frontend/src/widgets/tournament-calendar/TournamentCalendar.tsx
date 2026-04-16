@@ -140,7 +140,7 @@ const TournamentCalendar = () => {
 
         <div className={styles.viewAllContainer}>
           <button className={styles.viewAllButton} onClick={() => navigate('/tournaments')}>
-            Весь календар
+            Всі змагання
             <i className="fas fa-arrow-right"></i>
           </button>
         </div>

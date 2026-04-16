@@ -4,7 +4,6 @@ import { SeasonStats } from '@/widgets/season-stats';
 import { HeroSection } from '@/widgets/hero-section';
 import { TournamentCalendar } from '@/widgets/tournament-calendar';
 import { RecentMatches } from '@/widgets/recent-matches';
-import { QuickActions } from '@/widgets/quick-actions';
 
 export default function HomePage() {
   return (
@@ -17,7 +16,6 @@ export default function HomePage() {
         </main>
 
         <aside className={styles.sidebar}>
-          <QuickActions />
           <TopPlayersCompact />
           <SeasonStats />
         </aside>
