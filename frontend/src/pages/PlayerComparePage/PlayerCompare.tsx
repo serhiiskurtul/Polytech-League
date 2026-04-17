@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import styles from './PlayerComparePage.module.css';
 import { getPlayerById, getPlayersRankings } from '../../shared/api/players.api';
 import { PlayerDto } from '../../shared/types/player.types';
 
-const PlayerComparePage = () => {
+export const PlayerComparePage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const p1Id = searchParams.get('p1');
@@ -211,5 +211,3 @@ const StatRow = ({ label, val1, val2, suffix = '', isBetterHigh = true }: {
     </div>
   );
 };
-
-export default PlayerComparePage;

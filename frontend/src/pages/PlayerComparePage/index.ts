@@ -1,1 +1,1 @@
-export { default as PlayerComparePage } from './PlayerComparePage';
+export * from './PlayerCompare';

@@ -15,7 +15,7 @@ import { ProfilePage } from '@/pages/ProfilePage';
 import { NotificationsPage } from '@/pages/NotificationsPage';
 import { TournamentCreatePage } from '@/pages/TournamentCreatePage';
 import { PlayerViewPage } from '@/pages/PlayerViewPage';
-import { PlayerComparePage } from '@/pages/PlayerComparePage';
+import { PlayerComparePage } from '@/pages/PlayerComparePage/index'; // Player comparison page
 import ProtectedRoute from '../providers/ProtectedRoute';
 import ScrollToTop from '../providers/ScrollToTop';
 import { Toaster } from 'react-hot-toast';
