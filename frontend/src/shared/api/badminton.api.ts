@@ -34,3 +34,16 @@ export const createBadmintonTeam = async (data: any): Promise<any> => {
 export const updateBadmintonTeam = async (id: number, data: any): Promise<void> => {
   await api.put(`/badminton-teams/${id}`, data);
 };
+
+export const addParticipantToBadmintonEvent = async (eventId: string | number, data: any): Promise<void> => {
+  await api.post(`/badminton-events/${eventId}/participants`, data);
+};
+
+export const removeParticipantFromBadmintonEvent = async (eventId: string | number, playerId: number): Promise<void> => {
+  await api.delete(`/badminton-events/${eventId}/participants/${playerId}`);
+};
+
+export const updateBadmintonParticipant = async (eventId: string | number, playerId: number, data: any): Promise<void> => {
+  await api.put(`/badminton-events/${eventId}/participants/${playerId}`, data);
+};
+  

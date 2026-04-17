@@ -4,15 +4,18 @@ using PolytechLeague.Application.Dto.CheckersDto;
 using Microsoft.Extensions.Logging;
 using PolytechLeague.Application.Services.Interfaces.Checkers;
 using Microsoft.EntityFrameworkCore;
+using PolytechLeague.Application.Services.Interfaces;
+using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Exceptions;
 
 namespace PolytechLeague.Application.Services.Implementations.Checkers;
 
 public class CheckersEventService(
     ApplicationDbContext _dbcontext,
-    ILogger<AbstractEntityService<CheckersEvent>> _logger
+    ILogger<AbstractEntityService<CheckersEvent>> _logger,
+    INotificationService _notificationService
 ) :
-    AbstractEntityService<CheckersEvent>(_dbcontext, _logger),
+    AbstractEntityService<CheckersEvent>(_dbcontext, _logger, _notificationService),
     ICheckersEventService
 {
     protected override void UpdateValues(CheckersEvent oldEntity, CheckersEvent newEntity)
@@ -123,6 +126,32 @@ public class CheckersEventService(
         {
             _dbcontext.Set<PolytechLeague.Domain.Entities.EventPhotos>().Remove(photo);
             await _dbcontext.SaveChangesAsync(cancellationToken);
+        }
+    }
+
+    protected override async Task OnCreatedAsync(CheckersEvent entity, CancellationToken cancellationToken)
+    {
+        await _notificationService.SendNotificationToAllAsync(
+            "Нове змагання!",
+            $"Створено нове змагання з шашок: {entity.Name}",
+            NotificationType.Tournament,
+            $"/tournaments/{entity.Id}"
+        );
+    }
+
+    protected override async Task OnUpdatedAsync(CheckersEvent oldEntity, CheckersEvent newEntity, CancellationToken cancellationToken)
+    {
+        bool individualWinnersSet = newEntity.FirstPlaceId != null && newEntity.SecondPlaceId != null && newEntity.ThirdPlaceId != null;
+        bool teamWinnersSet = newEntity.FirstPlaceTeamId != null && newEntity.SecondPlaceTeamId != null && newEntity.ThirdPlaceTeamId != null;
+        
+        if (individualWinnersSet || teamWinnersSet)
+        {
+            await _notificationService.SendNotificationToAllAsync(
+                "Змагання завершено!",
+                $"Визначено переможців у змаганні з шашок: {newEntity.Name}",
+                NotificationType.Tournament,
+                $"/tournaments/{newEntity.Id}"
+            );
         }
     }
 }

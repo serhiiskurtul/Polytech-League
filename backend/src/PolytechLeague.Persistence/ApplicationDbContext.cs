@@ -39,6 +39,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<EventPhotos> EventPhotos { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
     
     // Unified Players
     public DbSet<Player> Players { get; set; }
@@ -111,7 +112,8 @@ public class ApplicationDbContext : DbContext
             .HasPostgresEnum<VolleyballTournamentType>()
             .HasPostgresEnum<VolleyballPosition>()
             .HasPostgresEnum<BeachVolleyballTournamentType>()
-            .HasPostgresEnum<BadmintonTournamentType>();
+            .HasPostgresEnum<BadmintonTournamentType>()
+            .HasPostgresEnum<NotificationType>();
 
         modelBuilder.Entity<Person>().UseTptMappingStrategy();
         modelBuilder.Entity<Event>().UseTptMappingStrategy();
@@ -123,6 +125,7 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new PlayerConfiguration()); // Unified Player config
         modelBuilder.ApplyConfiguration(new EventConfiguration());
         modelBuilder.ApplyConfiguration(new EventPhotosConfiguration());
+        modelBuilder.ApplyConfiguration(new NotificationConfiguration());
 
         // Chess configurations
         modelBuilder.ApplyConfiguration(new ChessRefereeConfiguration());

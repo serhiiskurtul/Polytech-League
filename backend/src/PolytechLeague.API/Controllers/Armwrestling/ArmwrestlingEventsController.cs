@@ -74,9 +74,9 @@ public class ArmwrestlingEventsController(
 
     [Authorize(Policy = "Admin")]
     [HttpPost("{id:long}/participants")]
-    public async Task<IActionResult> AddParticipant(long id, [FromBody] long playerId, CancellationToken cancellationToken)
+    public async Task<IActionResult> AddParticipant(long id, [FromBody] ArmwrestlingEventParticipantDto dto, CancellationToken cancellationToken)
     {
-        await armEventService.AddParticipantAsync(id, playerId, cancellationToken);
+        await armEventService.AddParticipantAsync(id, dto, cancellationToken);
         await redisService.RemoveGroupAsync("arm_events_group");
         return Ok();
     }

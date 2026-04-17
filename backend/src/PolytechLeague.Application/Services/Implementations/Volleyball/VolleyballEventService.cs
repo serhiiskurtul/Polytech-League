@@ -3,14 +3,17 @@ using Microsoft.Extensions.Logging;
 using PolytechLeague.Application.Services.Interfaces.Volleyball;
 using PolytechLeague.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
+using PolytechLeague.Application.Services.Interfaces;
+using PolytechLeague.Domain.Entities;
 
 namespace PolytechLeague.Application.Services.Implementations.Volleyball;
 
 public class VolleyballEventService(
     ApplicationDbContext _dbcontext,
-    ILogger<AbstractEntityService<VolleyballEvent>> _logger
+    ILogger<AbstractEntityService<VolleyballEvent>> _logger,
+    INotificationService _notificationService
 ) :
-    AbstractEntityService<VolleyballEvent>(_dbcontext, _logger),
+    AbstractEntityService<VolleyballEvent>(_dbcontext, _logger, _notificationService),
     IVolleyballEventService
 {
     protected override void UpdateValues(VolleyballEvent oldEntity, VolleyballEvent newEntity)
@@ -52,5 +55,30 @@ public class VolleyballEventService(
         }
 
         return entity;
+    }
+
+    protected override async Task OnCreatedAsync(VolleyballEvent entity, CancellationToken cancellationToken)
+    {
+        await _notificationService.SendNotificationToAllAsync(
+            "Нове змагання!",
+            $"Створено нове змагання з волейболу: {entity.Name}",
+            NotificationType.Tournament,
+            $"/tournaments/{entity.Id}"
+        );
+    }
+
+    protected override async Task OnUpdatedAsync(VolleyballEvent oldEntity, VolleyballEvent newEntity, CancellationToken cancellationToken)
+    {
+        bool winnersSet = newEntity.FirstPlaceTeamId != null && newEntity.SecondPlaceTeamId != null && newEntity.ThirdPlaceTeamId != null;
+        
+        if (winnersSet)
+        {
+            await _notificationService.SendNotificationToAllAsync(
+                "Змагання завершено!",
+                $"Визначено переможців у змаганні з волейболу: {newEntity.Name}",
+                NotificationType.Tournament,
+                $"/tournaments/{newEntity.Id}"
+            );
+        }
     }
 }

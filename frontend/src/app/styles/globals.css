@@ -62,6 +62,8 @@ ul {
   --border: #e2e8f0;
   --radius: 16px;
   --shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+  --primary-rgb: 0, 102, 204;
+  --accent-rgb: 244, 63, 94;
 }
 
 .dark {
@@ -76,6 +78,8 @@ ul {
   --muted: #94a3b8;
   --border: #334155;
   --shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  --primary-rgb: 59, 130, 246;
+  --accent-rgb: 251, 113, 133;
 }
 
 .card {

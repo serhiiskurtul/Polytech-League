@@ -96,15 +96,6 @@ public class BadmintonEventResponse
     public ICollection<BadmintonEventParticipantDto>? Players { get; set; }
 }
 
-public class BadmintonEventParticipantDto
-{
-    public long PlayerId { get; set; }
-    public string? PlayerName { get; set; }
-    public double Points { get; set; }
-    public int Rank { get; set; }
-    public long? UserId { get; set; }
-}
-
 public class BadmintonMatchRequest
 {
     public long EventId { get; set; }
@@ -210,18 +201,6 @@ public static class BadmintonDtoExtensions
             Teams = entity.Teams?.Select(t => t.ToDto()).ToList(),
             Matches = entity.Matches?.Select(m => m.ToResponse()).ToList(),
             Players = entity.Participants?.Select(p => p.ToDto()).ToList()
-        };
-    }
-
-    public static BadmintonEventParticipantDto ToDto(this BadmintonEventParticipant entity)
-    {
-        return new BadmintonEventParticipantDto
-        {
-            PlayerId = entity.PlayerId,
-            PlayerName = entity.Player != null ? $"{entity.Player.FirstName} {entity.Player.LastName}" : null,
-            Points = entity.Points,
-            Rank = entity.Rank,
-            UserId = entity.Player?.UserId
         };
     }
 

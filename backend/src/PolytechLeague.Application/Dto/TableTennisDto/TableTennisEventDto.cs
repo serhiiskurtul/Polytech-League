@@ -50,6 +50,7 @@ public class TableTennisEventResponse
     public PlayerDto? ThirdPlace { get; set; }
 
     public ICollection<TableTennisMatchResponse>? Matches { get; set; }
+    public ICollection<TableTennisEventParticipantDto>? Players { get; set; }
 }
 
 public static class TableTennisEventDtoExtensions
@@ -86,7 +87,8 @@ public static class TableTennisEventDtoExtensions
             FirstPlace = entity.FirstPlace?.ToDto(),
             SecondPlace = entity.SecondPlace?.ToDto(),
             ThirdPlace = entity.ThirdPlace?.ToDto(),
-            Matches = entity.Matches?.Select(m => m.ToResponse()).ToList()
+            Matches = entity.Matches?.Select(m => m.ToResponse()).ToList(),
+            Players = entity.Participants?.Select(p => p.ToDto()).ToList()
         };
     }
 }

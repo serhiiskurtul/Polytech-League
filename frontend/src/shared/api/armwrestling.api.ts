@@ -48,18 +48,15 @@ export const createArmwrestlingMatch = async (data: Partial<ArmwrestlingMatchRes
 /**
  * Add a participant to an armwrestling event
  */
-export const addParticipantToArmwrestlingEvent = async (eventId: string | number, playerId: number): Promise<void> => {
-    await api.post(`/armwrestling-events/${eventId}/participants`, playerId, {
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    });
+export const addParticipantToArmwrestlingEvent = async (eventId: string | number, data: { playerId: number }): Promise<void> => {
+    await api.post(`/armwrestling-events/${eventId}/participants`, data);
 };
 
-/**
- * Remove a participant from an armwrestling event
- */
 export const removeParticipantFromArmwrestlingEvent = async (eventId: string | number, playerId: number): Promise<void> => {
     await api.delete(`/armwrestling-events/${eventId}/participants/${playerId}`);
+};
+
+export const updateArmwrestlingParticipant = async (eventId: string | number, playerId: number, data: any): Promise<void> => {
+    await api.put(`/armwrestling-events/${eventId}/participants/${playerId}`, data);
 };
 

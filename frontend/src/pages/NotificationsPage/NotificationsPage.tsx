@@ -1,82 +1,38 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './NotificationsPage.module.css';
-
-interface Notification {
-  id: number;
-  type: string;
-  title: string;
-  message: string;
-  time: string;
-  isRead: boolean;
-  icon: string;
-  color: string;
-}
+import { 
+  getMyNotifications, 
+  markAsRead as apiMarkAsRead, 
+  markAllAsRead as apiMarkAllAsRead, 
+  deleteNotification as apiDeleteNotification, 
+  clearReadNotifications as apiClearReadNotifications 
+} from '@/shared/api/notifications.api';
+import { Notification } from '@/shared/types/notification.types';
+import toast from 'react-hot-toast';
 
 const NotificationsPage = () => {
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: 1,
-      type: 'match',
-      title: 'Новий матч заплановано',
-      message: 'Ваша команда "ІТ-31" запланована на матч з "ЕК-22" 15 грудня о 18:00',
-      time: '10 хвилин тому',
-      isRead: false,
-      icon: 'fas fa-futbol',
-      color: 'var(--primary)'
-    },
-    {
-      id: 2,
-      type: 'tournament',
-      title: 'Реєстрація на турнір',
-      message: 'Чемпіонат з шахів розпочинає реєстрацію. Термін до 12 грудня',
-      time: '2 години тому',
-      isRead: false,
-      icon: 'fas fa-chess-board',
-      color: 'var(--success)'
-    },
-    {
-      id: 3,
-      type: 'achievement',
-      title: 'Нове досягнення',
-      message: 'Ви отримали досягнення "Активний учасник" за участь у 10 матчах',
-      time: 'Вчора, 14:30',
-      isRead: true,
-      icon: 'fas fa-trophy',
-      color: 'var(--warning)'
-    },
-    {
-      id: 4,
-      type: 'team',
-      title: 'Запрошення до команди',
-      message: 'Марія Семенова запрошує вас до команди з настільного тенісу',
-      time: '2 дні тому',
-      isRead: true,
-      icon: 'fas fa-user-plus',
-      color: 'var(--accent)'
-    },
-    {
-      id: 5,
-      type: 'system',
-      title: 'Оновлення системи',
-      message: 'Заплановано технічні роботи на платформі 14 грудня з 23:00 до 02:00',
-      time: '3 дні тому',
-      isRead: true,
-      icon: 'fas fa-cog',
-      color: 'var(--muted)'
-    },
-    {
-      id: 6,
-      type: 'friend',
-      title: 'Новий друг',
-      message: 'Влад Ковальчук прийняв ваш запит на дружбу',
-      time: '1 тиждень тому',
-      isRead: true,
-      icon: 'fas fa-user-friends',
-      color: 'var(--primary)'
-    }
-  ]);
-
+  const navigate = useNavigate();
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'unread' | 'read'>('all');
+
+  const fetchNotifications = async () => {
+    try {
+      setLoading(true);
+      const data = await getMyNotifications();
+      setNotifications(data);
+    } catch (error) {
+      console.error('Failed to fetch notifications:', error);
+      toast.error('Помилка при завантаженні сповіщень');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
 
   // Фільтрація сповіщень
   const filteredNotifications = notifications.filter(notification => {
@@ -87,52 +43,105 @@ const NotificationsPage = () => {
   });
 
   // Позначити всі як прочитані
-  const markAllAsRead = () => {
-    setNotifications(prev => prev.map(notification => ({
-      ...notification,
-      isRead: true
-    })));
+  const markAllAsRead = async () => {
+    try {
+      await apiMarkAllAsRead();
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      toast.success('Всі сповіщення позначено як прочитані');
+    } catch (error) {
+      toast.error('Не вдалося оновити сповіщення');
+    }
   };
 
   // Позначити конкретне сповіщення як прочитане
-  const markAsRead = (id: number) => {
-    setNotifications(prev => prev.map(notification => 
-      notification.id === id ? { ...notification, isRead: true } : notification
-    ));
+  const markAsRead = async (notification: Notification) => {
+    if (notification.isRead) {
+      if (notification.link) navigate(notification.link);
+      return;
+    }
+
+    try {
+      await apiMarkAsRead(notification.id);
+      setNotifications(prev => prev.map(n => 
+        n.id === notification.id ? { ...n, isRead: true } : n
+      ));
+      if (notification.link) navigate(notification.link);
+    } catch (error) {
+      console.error('Failed to mark as read:', error);
+    }
   };
 
   // Видалити сповіщення
-  const deleteNotification = (id: number) => {
-    setNotifications(prev => prev.filter(notification => notification.id !== id));
+  const deleteNotification = async (id: number) => {
+    try {
+      await apiDeleteNotification(id);
+      setNotifications(prev => prev.filter(n => n.id !== id));
+      toast.success('Сповіщення видалено');
+    } catch (error) {
+      toast.error('Не вдалося видалити сповіщення');
+    }
   };
 
   // Очистити всі прочитані
-  const clearAllRead = () => {
-    setNotifications(prev => prev.filter(notification => !notification.isRead));
+  const clearAllRead = async () => {
+    try {
+      await apiClearReadNotifications();
+      setNotifications(prev => prev.filter(n => !n.isRead));
+      toast.success('Прочитані сповіщення видалено');
+    } catch (error) {
+      toast.error('Не вдалося очистити сповіщення');
+    }
+  };
+
+  const formatNotificationTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (isNaN(date.getTime())) return 'Невідомо';
+    if (diffMins < 1) return 'Щойно';
+    if (diffMins < 60) return `${diffMins} хв. тому`;
+    if (diffHours < 24) return `${diffHours} год. тому`;
+    if (diffDays === 1) return 'Вчора';
+    if (diffDays < 7) return `${diffDays} дн. тому`;
+    
+    return date.toLocaleDateString('uk-UA', {
+      day: 'numeric',
+      month: 'long',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
-    <div className={styles.notificationsContainer}>
-      <div className={styles.header}>
-        <div className={styles.titleSection}>
-          <h1 className={styles.title}>
-            <i className="fas fa-bell"></i>
-            Сповіщення
-          </h1>
-          <div className={styles.unreadCount}>
-            {notifications.filter(n => !n.isRead).length} нових
+    <div className={styles.notificationsPage}>
+      <div className={styles.notificationsContainer}>
+        <div className={styles.header}>
+          <div className={styles.titleSection}>
+            <h1 className={styles.title}>
+              <i className="fas fa-bell"></i>
+              Сповіщення
+            </h1>
+            <p className={styles.pageSubtitle}>Будьте в курсі всіх подій вашого спортивного життя</p>
+            <div className={styles.unreadCount}>
+              {notifications.filter(n => !n.isRead).length} нових сповіщень
+            </div>
+          </div>
+          
+          <div className={styles.actions}>
+            <button className={styles.markAllBtn} onClick={markAllAsRead}>
+              <i className="fas fa-check-double"></i>
+              Прочитати все
+            </button>
+            <button className={styles.clearReadBtn} onClick={clearAllRead}>
+              <i className="fas fa-broom"></i>
+              Очистити
+            </button>
           </div>
         </div>
-        
-        <div className={styles.actions}>
-          <button className={styles.markAllBtn} onClick={markAllAsRead}>
-            Позначити всі як прочитані
-          </button>
-          <button className={styles.clearReadBtn} onClick={clearAllRead}>
-            Очистити прочитані
-          </button>
-        </div>
-      </div>
 
       <div className={styles.filters}>
         <button 
@@ -160,8 +169,8 @@ const NotificationsPage = () => {
           filteredNotifications.map(notification => (
             <div 
               key={notification.id} 
-              className={`${styles.notificationCard} ${!notification.isRead ? styles.unread : ''}`}
-              onClick={() => markAsRead(notification.id)}
+              className={`${styles.notificationCard} ${!notification.isRead ? styles.unread : ''} ${notification.link ? styles.clickable : ''}`}
+              onClick={() => markAsRead(notification)}
             >
               <div 
                 className={styles.notificationIcon}
@@ -173,7 +182,7 @@ const NotificationsPage = () => {
               <div className={styles.notificationContent}>
                 <div className={styles.notificationHeader}>
                   <h3 className={styles.notificationTitle}>{notification.title}</h3>
-                  <span className={styles.notificationTime}>{notification.time}</span>
+                  <span className={styles.notificationTime}>{formatNotificationTime(notification.createdAt)}</span>
                 </div>
                 <p className={styles.notificationMessage}>{notification.message}</p>
               </div>
@@ -193,14 +202,19 @@ const NotificationsPage = () => {
               </div>
             </div>
           ))
-        ) : (
+        ) : !loading ? (
           <div className={styles.emptyState}>
             <div className={styles.emptyIcon}>
               <i className="fas fa-bell-slash"></i>
             </div>
-            <p>У вас немає нових сповіщень</p>
+            <p>У вас немає сповіщень</p>
+          </div>
+        ) : (
+          <div className={styles.emptyState}>
+            <p>Завантаження...</p>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

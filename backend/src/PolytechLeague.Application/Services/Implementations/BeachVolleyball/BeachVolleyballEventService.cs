@@ -3,14 +3,17 @@ using Microsoft.Extensions.Logging;
 using PolytechLeague.Application.Services.Interfaces.BeachVolleyball;
 using PolytechLeague.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
+using PolytechLeague.Application.Services.Interfaces;
+using PolytechLeague.Domain.Entities;
 
 namespace PolytechLeague.Application.Services.Implementations.BeachVolleyball;
 
 public class BeachVolleyballEventService(
     ApplicationDbContext _dbcontext,
-    ILogger<AbstractEntityService<BeachVolleyballEvent>> _logger
+    ILogger<AbstractEntityService<BeachVolleyballEvent>> _logger,
+    INotificationService _notificationService
 ) :
-    AbstractEntityService<BeachVolleyballEvent>(_dbcontext, _logger),
+    AbstractEntityService<BeachVolleyballEvent>(_dbcontext, _logger, _notificationService),
     IBeachVolleyballEventService
 {
     protected override void UpdateValues(BeachVolleyballEvent oldEntity, BeachVolleyballEvent newEntity)
@@ -52,5 +55,30 @@ public class BeachVolleyballEventService(
         }
 
         return entity;
+    }
+
+    protected override async Task OnCreatedAsync(BeachVolleyballEvent entity, CancellationToken cancellationToken)
+    {
+        await _notificationService.SendNotificationToAllAsync(
+            "Нове змагання!",
+            $"Створено нове змагання з пляжного волейболу: {entity.Name}",
+            NotificationType.Tournament,
+            $"/tournaments/{entity.Id}"
+        );
+    }
+
+    protected override async Task OnUpdatedAsync(BeachVolleyballEvent oldEntity, BeachVolleyballEvent newEntity, CancellationToken cancellationToken)
+    {
+        bool winnersSet = newEntity.FirstPlaceTeamId != null && newEntity.SecondPlaceTeamId != null && newEntity.ThirdPlaceTeamId != null;
+        
+        if (winnersSet)
+        {
+            await _notificationService.SendNotificationToAllAsync(
+                "Змагання завершено!",
+                $"Визначено переможців у змаганні з пляжного волейболу: {newEntity.Name}",
+                NotificationType.Tournament,
+                $"/tournaments/{newEntity.Id}"
+            );
+        }
     }
 }

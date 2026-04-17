@@ -3,14 +3,19 @@ using Microsoft.Extensions.Logging;
 using PolytechLeague.Application.Services.Interfaces.Badminton;
 using PolytechLeague.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
+using PolytechLeague.Application.Services.Interfaces;
+using PolytechLeague.Domain.Entities;
+
+using PolytechLeague.Application.Dto.BadmintonDto;
 
 namespace PolytechLeague.Application.Services.Implementations.Badminton;
 
 public class BadmintonEventService(
     ApplicationDbContext _dbcontext,
-    ILogger<AbstractEntityService<BadmintonEvent>> _logger
+    ILogger<AbstractEntityService<BadmintonEvent>> _logger,
+    INotificationService _notificationService
 ) :
-    AbstractEntityService<BadmintonEvent>(_dbcontext, _logger),
+    AbstractEntityService<BadmintonEvent>(_dbcontext, _logger, _notificationService),
     IBadmintonEventService
 {
     protected override void UpdateValues(BadmintonEvent oldEntity, BadmintonEvent newEntity)
@@ -63,5 +68,67 @@ public class BadmintonEventService(
         }
 
         return entity;
+    }
+
+    protected override async Task OnCreatedAsync(BadmintonEvent entity, CancellationToken cancellationToken)
+    {
+        await _notificationService.SendNotificationToAllAsync(
+            "Нове змагання!",
+            $"Створено нове змагання з бадмінтону: {entity.Name}",
+            NotificationType.Tournament,
+            $"/tournaments/{entity.Id}"
+        );
+    }
+
+    protected override async Task OnUpdatedAsync(BadmintonEvent oldEntity, BadmintonEvent newEntity, CancellationToken cancellationToken)
+    {
+        bool individualWinnersSet = newEntity.FirstPlaceId != null && newEntity.SecondPlaceId != null && newEntity.ThirdPlaceId != null;
+        bool teamWinnersSet = newEntity.FirstPlaceTeamId != null && newEntity.SecondPlaceTeamId != null && newEntity.ThirdPlaceTeamId != null;
+        
+        if (individualWinnersSet || teamWinnersSet)
+        {
+            await _notificationService.SendNotificationToAllAsync(
+                "Змагання завершено!",
+                $"Визначено переможців у змаганні з бадмінтону: {newEntity.Name}",
+                NotificationType.Tournament,
+                $"/tournaments/{newEntity.Id}"
+            );
+        }
+    }
+
+    public async Task AddParticipantAsync(long eventId, BadmintonEventParticipantDto dto, CancellationToken cancellationToken = default)
+    {
+        var exists = await _dbcontext.BadmintonEventParticipants
+            .AnyAsync(p => p.EventId == eventId && p.PlayerId == dto.PlayerId, cancellationToken);
+
+        if (exists) return;
+
+        var participant = dto.FromDto(eventId);
+        _dbcontext.BadmintonEventParticipants.Add(participant);
+        await _dbcontext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task UpdateParticipantAsync(long eventId, long playerId, BadmintonEventParticipantDto dto, CancellationToken cancellationToken = default)
+    {
+        var participant = await _dbcontext.BadmintonEventParticipants
+            .FirstOrDefaultAsync(p => p.EventId == eventId && p.PlayerId == playerId, cancellationToken);
+        if (participant != null)
+        {
+            participant.Points = dto.Points;
+            participant.Rank = dto.Rank;
+            _dbcontext.BadmintonEventParticipants.Update(participant);
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+        }
+    }
+
+    public async Task RemoveParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken = default)
+    {
+        var participant = await _dbcontext.BadmintonEventParticipants
+            .FirstOrDefaultAsync(p => p.EventId == eventId && p.PlayerId == playerId, cancellationToken);
+        if (participant != null)
+        {
+            _dbcontext.BadmintonEventParticipants.Remove(participant);
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+        }
     }
 }

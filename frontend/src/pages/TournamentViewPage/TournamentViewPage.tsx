@@ -29,13 +29,28 @@ import {
 } from '@/shared/api/checkers.api';
 import {
   getArmwrestlingEventById,
-  updateArmwrestlingEvent
+  updateArmwrestlingEvent,
+  addParticipantToArmwrestlingEvent,
+  removeParticipantFromArmwrestlingEvent,
+  updateArmwrestlingParticipant,
 } from '@/shared/api/armwrestling.api';
 import { getVolleyballEventById, updateVolleyballEvent } from '@/shared/api/volleyball.api';
 import { getBeachVolleyballEventById, updateBeachVolleyballEvent } from '@/shared/api/beachVolleyball.api';
 import { getFutsalEventById, updateFutsalEvent } from '@/shared/api/futsal.api';
 import { getBasketball3x3EventById, updateBasketball3x3Event } from '@/shared/api/basketball3x3.api';
-import { getBadmintonEventById, updateBadmintonEvent } from '@/shared/api/badminton.api';
+import {
+  getBadmintonEventById,
+  updateBadmintonEvent,
+  addParticipantToBadmintonEvent,
+  removeParticipantFromBadmintonEvent,
+  updateBadmintonParticipant,
+} from '@/shared/api/badminton.api';
+import {
+  getTableTennisEventById,
+  addParticipantToTableTennisEvent,
+  removeParticipantFromTableTennisEvent,
+  updateTableTennisParticipant,
+} from '@/shared/api/tabletennis.api';
 import ArmwrestlingTournamentView from './components/ArmwrestlingTournamentView';
 import TeamSportsTournamentView from './components/TeamSportsTournamentView';
 import TournamentPodium from './components/TournamentPodium';
@@ -101,7 +116,8 @@ const TournamentViewPage = () => {
     fideId: '',
     title: '',
     userId: null as number | null,
-    existingPlayerId: null as number | null
+    existingPlayerId: null as number | null,
+    weight: 0
   });
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -112,7 +128,7 @@ const TournamentViewPage = () => {
   const [editingGameData, setEditingGameData] = useState<{ round: number; board: number; result: string; whitePlayerId: string; blackPlayerId: string }>({ round: 1, board: 1, result: 'WhiteWin', whitePlayerId: '', blackPlayerId: '' });
 
   const [editingParticipantId, setEditingParticipantId] = useState<number | null>(null);
-  const [editingParticipantData, setEditingParticipantData] = useState<{ points: number; rank: number }>({ points: 0, rank: 0 });
+  const [editingParticipantData, setEditingParticipantData] = useState<{ points: number; rank: number; weight: number }>({ points: 0, rank: 0, weight: 0 });
   const [gameFilters, setGameFilters] = useState({ round: '', board: '', participant: '', result: '' });
 
   const [isEditingTournament, setIsEditingTournament] = useState(false);
@@ -372,9 +388,13 @@ const TournamentViewPage = () => {
     });
   };
 
-  const handleEditParticipantClick = (p: ChessEventParticipantResponse) => {
+  const handleEditParticipantClick = (p: any) => {
     setEditingParticipantId(p.playerId);
-    setEditingParticipantData({ points: p.points, rank: p.rank });
+    setEditingParticipantData({ 
+      points: p.points || 0, 
+      rank: p.rank || 0,
+      weight: p.weight || 0 
+    });
   };
 
   const handleSaveEdit = async (gameId: number) => {
@@ -429,16 +449,42 @@ const TournamentViewPage = () => {
 
   const handleSaveParticipantEdit = async (playerId: number) => {
     try {
-      const payload: ChessEventParticipantDto | CheckersEventParticipantDto = {
-        playerId,
-        points: editingParticipantData.points,
-        rank: editingParticipantData.rank,
-      };
-      if (tournament?.sport === 'checkers') {
+      const sportKey = tournament?.sport?.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') || '';
+      
+      if (sportKey === 'checkers') {
+        const payload: CheckersEventParticipantDto = {
+          playerId,
+          points: editingParticipantData.points,
+          rank: editingParticipantData.rank,
+        };
         await updateParticipantInCheckersEvent(id!, playerId, payload);
+      } else if (sportKey === 'armwrestling') {
+        await updateArmwrestlingParticipant(id!, playerId, {
+          playerId,
+          weight: (editingParticipantData as any).weight || 0,
+          rank: editingParticipantData.rank,
+        });
+      } else if (sportKey === 'badminton') {
+        await updateBadmintonParticipant(id!, playerId, {
+          playerId,
+          points: editingParticipantData.points,
+          rank: editingParticipantData.rank,
+        });
+      } else if (sportKey === 'tabletennis' || sportKey === 'table_tennis') {
+        await updateTableTennisParticipant(id!, playerId, {
+          playerId,
+          points: editingParticipantData.points,
+          rank: editingParticipantData.rank,
+        });
       } else {
+        const payload: ChessEventParticipantDto = {
+          playerId,
+          points: editingParticipantData.points,
+          rank: editingParticipantData.rank,
+        };
         await updateParticipantInEvent(id!, playerId, payload);
       }
+      
       alert("Дані учасника оновлено!");
       setEditingParticipantId(null);
       fetchTournament(true);
@@ -451,11 +497,26 @@ const TournamentViewPage = () => {
   const handleRemoveParticipant = async (playerId: number, playerName: string) => {
     if (window.confirm(`Ви впевнені, що хочете видалити учасника "${playerName}" з турніру?`)) {
       try {
-        if (tournament?.sport === 'checkers') {
-          await removeParticipantFromCheckersEvent(id!, playerId);
-        } else {
-          await removeParticipantFromEvent(id!, playerId);
+        const sportKey = tournament?.sport?.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') || '';
+        
+        switch (sportKey) {
+          case 'checkers':
+            await removeParticipantFromCheckersEvent(id!, playerId);
+            break;
+          case 'armwrestling':
+            await removeParticipantFromArmwrestlingEvent(id!, playerId);
+            break;
+          case 'badminton':
+            await removeParticipantFromBadmintonEvent(id!, playerId);
+            break;
+          case 'tabletennis':
+          case 'table_tennis':
+            await removeParticipantFromTableTennisEvent(id!, playerId);
+            break;
+          default:
+            await removeParticipantFromEvent(id!, playerId);
         }
+        
         alert("Учасника видалено з турніру!");
         fetchTournament(true);
       } catch (err) {
@@ -655,10 +716,24 @@ const TournamentViewPage = () => {
       }
 
       // Create participant binding
-      if (tournament?.sport === 'checkers') {
-        await addParticipantToCheckersEvent(id!, { playerId: playerId, points: 0, rank: 0 });
-      } else {
-        await addParticipantToEvent(id!, { playerId: playerId, points: 0, rank: 0 });
+      const sportKey = tournament?.sport?.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') || '';
+      
+      switch (sportKey) {
+        case 'checkers':
+          await addParticipantToCheckersEvent(id!, { playerId: playerId, points: 0, rank: 0 });
+          break;
+        case 'armwrestling':
+          await addParticipantToArmwrestlingEvent(id!, { playerId: playerId, weight: newPlayer.weight || 0, rank: 0 });
+          break;
+        case 'badminton':
+          await addParticipantToBadmintonEvent(id!, { playerId: playerId, points: 0, rank: 0 });
+          break;
+        case 'tabletennis':
+        case 'table_tennis':
+          await addParticipantToTableTennisEvent(id!, { playerId: playerId, points: 0, rank: 0 });
+          break;
+        default:
+          await addParticipantToEvent(id!, { playerId: playerId, points: 0, rank: 0 });
       }
       alert("Учасник успішно доданий до турніру!");
       setNewPlayer({ firstName: '', lastName: '', group: '', city: 'Київ', ratingELO: 1500, fideId: '', title: '', userId: null, existingPlayerId: null });
@@ -1069,7 +1144,7 @@ const TournamentViewPage = () => {
             );
           }
 
-          if (s === 'chess' || s === 'checkers' || s === 'badminton') {
+          if (s === 'chess' || s === 'checkers' || s === 'badminton' || s === 'tabletennis' || s === 'table_tennis') {
             return (
               <>
                 <div className={styles.statsGrid}>
@@ -1155,10 +1230,26 @@ const TournamentViewPage = () => {
                                         <span style={{ fontWeight: 'bold' }}>{p.playerName}</span>
                                       )}
                                     </td>
-                                    <td>{p.rating}</td>
-                                    <td>
-                                      <input type="number" step="0.5" value={editingParticipantData.points} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, points: parseFloat(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
-                                    </td>
+                                    {tournament?.sport === 'chess' ? (
+                                      <>
+                                        <td>{p.rating}</td>
+                                        <td>
+                                          <input type="number" step="0.5" value={editingParticipantData.points} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, points: parseFloat(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
+                                        </td>
+                                      </>
+                                    ) : (
+                                      <>
+                                        {tournament?.sport === 'armwrestling' ? (
+                                          <td>
+                                            <input type="number" step="0.1" value={editingParticipantData.weight} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, weight: parseFloat(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
+                                          </td>
+                                        ) : (
+                                          <td>
+                                            <input type="number" step="0.5" value={editingParticipantData.points} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, points: parseFloat(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
+                                          </td>
+                                        )}
+                                      </>
+                                    )}
                                     <td>
                                       <button type="button" onClick={() => handleSaveParticipantEdit(p.playerId)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }}><i className="fas fa-check"></i></button>
                                       <button type="button" onClick={handleCancelParticipantEdit} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><i className="fas fa-times"></i></button>
@@ -1176,8 +1267,14 @@ const TournamentViewPage = () => {
                                         <strong>{p.playerName}</strong>
                                       )}
                                     </td>
-                                    <td>{p.rating}</td>
-                                    <td><strong>{p.points}</strong></td>
+                                    {tournament?.sport === 'chess' ? (
+                                      <>
+                                        <td>{p.rating}</td>
+                                        <td><strong>{p.points}</strong></td>
+                                      </>
+                                    ) : (
+                                      <td><strong>{tournament?.sport === 'armwrestling' ? (p.weight + ' кг') : p.points}</strong></td>
+                                    )}
                                     {isAdmin && <td>
                                       <button type="button" onClick={() => handleEditParticipantClick(p)} style={{ padding: '4px 8px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }} title="Редагувати"><i className="fas fa-edit"></i></button>
                                       <button type="button" onClick={() => handleRemoveParticipant(p.playerId, p.playerName)} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Видалити"><i className="fas fa-trash"></i></button>
@@ -1453,18 +1550,28 @@ const TournamentViewPage = () => {
                               <label style={{ marginBottom: '4px', fontSize: '12px' }}>Група (напр. КН-31)</label>
                               <input type="text" placeholder="Група (напр. КН-31)" value={newPlayer.group} onChange={(e) => setNewPlayer({ ...newPlayer, group: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
                             </div>
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                              <label style={{ marginBottom: '4px', fontSize: '12px' }}>Рейтинг ELO</label>
-                              <input type="number" placeholder="Рейтинг ELO" value={newPlayer.ratingELO} onChange={(e) => setNewPlayer({ ...newPlayer, ratingELO: parseInt(e.target.value) || 1500 })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                              <label style={{ marginBottom: '4px', fontSize: '12px' }}>FIDE ID (опціонально)</label>
-                              <input type="text" placeholder="FIDE ID (опціонально)" value={newPlayer.fideId} onChange={(e) => setNewPlayer({ ...newPlayer, fideId: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                              <label style={{ marginBottom: '4px', fontSize: '12px' }}>Звання (напр. CM, FM, IM, GM) (опціонально)</label>
-                              <input type="text" placeholder="Звання (напр. CM, FM, IM, GM) (опціонально)" value={newPlayer.title} onChange={(e) => setNewPlayer({ ...newPlayer, title: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
-                            </div>
+                            {tournament?.sport === 'chess' && (
+                              <>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                  <label style={{ marginBottom: '4px', fontSize: '12px' }}>Рейтинг ELO</label>
+                                  <input type="number" placeholder="Рейтинг ELO" value={newPlayer.ratingELO} onChange={(e) => setNewPlayer({ ...newPlayer, ratingELO: parseInt(e.target.value) || 1500 })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                  <label style={{ marginBottom: '4px', fontSize: '12px' }}>FIDE ID (опціонально)</label>
+                                  <input type="text" placeholder="FIDE ID (опціонально)" value={newPlayer.fideId} onChange={(e) => setNewPlayer({ ...newPlayer, fideId: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                  <label style={{ marginBottom: '4px', fontSize: '12px' }}>Звання (напр. CM, FM, IM, GM) (опціонально)</label>
+                                  <input type="text" placeholder="Звання (напр. CM, FM, IM, GM) (опціонально)" value={newPlayer.title} onChange={(e) => setNewPlayer({ ...newPlayer, title: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
+                                </div>
+                              </>
+                            )}
+                            {tournament?.sport === 'armwrestling' && (
+                              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <label style={{ marginBottom: '4px', fontSize: '12px' }}>Вага (кг)</label>
+                                <input type="number" step="0.1" placeholder="Вага" value={newPlayer.weight} onChange={(e) => setNewPlayer({ ...newPlayer, weight: parseFloat(e.target.value) || 0 })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
+                              </div>
+                            )}
                           </div>
                           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                             <button type="button" onClick={handleAddPlayer} style={{ padding: '10px 24px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
@@ -1488,9 +1595,15 @@ const TournamentViewPage = () => {
                             <tr>
                               <th>№</th>
                               <th>Учасник</th>
-                              <th>Рейтинг ELO</th>
-                              <th>Титул</th>
-                              <th>FIDE ID</th>
+                              {tournament?.sport === 'chess' ? (
+                                <>
+                                  <th>Рейтинг ELO</th>
+                                  <th>Титул</th>
+                                  <th>FIDE ID</th>
+                                </>
+                              ) : (
+                                <th>Очки</th>
+                              )}
                               {isAdmin && <th>Дії</th>}
                             </tr>
                           </thead>
@@ -1507,13 +1620,19 @@ const TournamentViewPage = () => {
                                     p.playerName
                                   )}
                                 </td>
-                                <td>{p.rating}</td>
-                                <td>
-                                  {p.title ? (
-                                    <span className={styles.systemBadge} style={{ fontWeight: 'bold' }}>{p.title}</span>
-                                  ) : '—'}
-                                </td>
-                                <td>{p.fideId || '—'}</td>
+                                {tournament?.sport === 'chess' ? (
+                                  <>
+                                    <td>{p.rating}</td>
+                                    <td>
+                                      {p.title ? (
+                                        <span className={styles.systemBadge} style={{ fontWeight: 'bold' }}>{p.title}</span>
+                                      ) : '—'}
+                                    </td>
+                                    <td>{p.fideId || '—'}</td>
+                                  </>
+                                ) : (
+                                  <td>{p.points}</td>
+                                )}
                                 {isAdmin && (
                                   <td>
                                     <button onClick={() => handleRemoveParticipant(p.playerId, p.playerName)} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Видалити">

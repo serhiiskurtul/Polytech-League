@@ -37,6 +37,7 @@ public static class ServiceExtension
         services.AddSingleton<IJwtService, JwtService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<IPlayerService, PlayerService>(); // Unified Player Service
+        services.AddScoped<INotificationService, NotificationService>();
 
         services.AddScoped<IChessEventService, ChessEventService>();
         services.AddScoped<IChessGameService, ChessGameService>();

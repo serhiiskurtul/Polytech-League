@@ -97,4 +97,33 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
 
         return NoContent();
     }
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{id}/participants")]
+    public async Task<IActionResult> AddParticipant(long id, [FromBody] TableTennisEventParticipantDto dto, CancellationToken cancellationToken)
+    {
+        await ttEventService.AddParticipantAsync(id, dto, cancellationToken);
+        await redisService.RemoveGroupAsync("tt_events_all");
+        await redisService.RemoveDataAsync($"tt_event_{id}");
+        return Ok();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPut("{id}/participants/{playerId}")]
+    public async Task<IActionResult> UpdateParticipant(long id, long playerId, [FromBody] TableTennisEventParticipantDto dto, CancellationToken cancellationToken)
+    {
+        await ttEventService.UpdateParticipantAsync(id, playerId, dto, cancellationToken);
+        await redisService.RemoveGroupAsync("tt_events_all");
+        await redisService.RemoveDataAsync($"tt_event_{id}");
+        return Ok();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpDelete("{id}/participants/{playerId}")]
+    public async Task<IActionResult> RemoveParticipant(long id, long playerId, CancellationToken cancellationToken)
+    {
+        await ttEventService.RemoveParticipantAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("tt_events_all");
+        await redisService.RemoveDataAsync($"tt_event_{id}");
+        return Ok();
+    }
 }

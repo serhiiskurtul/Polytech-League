@@ -11,6 +11,8 @@ public class User
     public bool isEmailConfirmed { get; set; } = false;
     public required string Password { get; set; }
     public bool IsDeleted { get; set; } = false;
+
+    public ICollection<Notification>? Notifications { get; set; }
 }
 
 public enum UserRole

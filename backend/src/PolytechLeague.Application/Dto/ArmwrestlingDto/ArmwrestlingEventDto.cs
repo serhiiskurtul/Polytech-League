@@ -77,7 +77,7 @@ public class ArmwrestlingEventResponse
     public PlayerDto? SecondPlace { get; set; }
     public PlayerDto? ThirdPlace { get; set; }
 
-    public ICollection<PlayerDto> Players { get; set; } = new List<PlayerDto>();
+    public ICollection<ArmwrestlingEventParticipantDto> Players { get; set; } = new List<ArmwrestlingEventParticipantDto>();
 }
 
 public static class ArmwrestlingEventDtoExtensions
@@ -140,23 +140,21 @@ public static class ArmwrestlingEventDtoExtensions
         if (entity.Players != null && entity.Players.Any())
         {
             response.Players = entity.Players
-                .Select(p => p.Player?.ToDto())
-                .Where(p => p != null)
-                .Select(p => p!)
+                .Select(p => p.ToDto())
                 .ToList();
         }
-        else if (response.Matches != null)
+        else if (entity.Matches != null)
         {
             // Fallback for older data or if participants weren't properly migrated
-            var playersMap = new Dictionary<long, PlayerDto?>();
-            foreach (var match in response.Matches)
+            var playersMap = new Dictionary<long, ArmwrestlingEventParticipantDto>();
+            foreach (var match in entity.Matches)
             {
                 if (match.Player1 != null && !playersMap.ContainsKey(match.Player1Id))
-                    playersMap[match.Player1Id] = match.Player1;
+                    playersMap[match.Player1Id] = new ArmwrestlingEventParticipantDto { PlayerId = match.Player1Id, PlayerName = $"{match.Player1.FirstName} {match.Player1.LastName}" };
                 if (match.Player2 != null && !playersMap.ContainsKey(match.Player2Id))
-                    playersMap[match.Player2Id] = match.Player2;
+                    playersMap[match.Player2Id] = new ArmwrestlingEventParticipantDto { PlayerId = match.Player2Id, PlayerName = $"{match.Player2.FirstName} {match.Player2.LastName}" };
             }
-            response.Players = playersMap.Values.Where(p => p != null).Select(p => p!).ToList();
+            response.Players = playersMap.Values.ToList();
         }
 
         return response;

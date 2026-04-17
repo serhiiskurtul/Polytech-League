@@ -9,4 +9,7 @@ public class ArmwrestlingEventParticipant
 
     public long PlayerId { get; set; }
     public Player? Player { get; set; }
+
+    public double Weight { get; set; }
+    public int Rank { get; set; }
 }

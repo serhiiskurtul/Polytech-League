@@ -2,16 +2,21 @@ using PolytechLeague.Domain.Entities.Armwrestling;
 using Microsoft.Extensions.Logging;
 using PolytechLeague.Application.Services.Interfaces.Armwrestling;
 using PolytechLeague.Persistence.Database;
+using PolytechLeague.Application.Services.Interfaces;
+using PolytechLeague.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using PolytechLeague.Domain.Exceptions;
+using PolytechLeague.Application.Dto.ArmwrestlingDto;
+
 
 namespace PolytechLeague.Application.Services.Implementations.Armwrestling;
 
 public class ArmwrestlingEventService(
     ApplicationDbContext _dbcontext,
-    ILogger<AbstractEntityService<ArmwrestlingEvent>> _logger
+    ILogger<AbstractEntityService<ArmwrestlingEvent>> _logger,
+    INotificationService _notificationService
 ) :
-    AbstractEntityService<ArmwrestlingEvent>(_dbcontext, _logger),
+    AbstractEntityService<ArmwrestlingEvent>(_dbcontext, _logger, _notificationService),
     IArmwrestlingEventService
 {
     public override async Task<ArmwrestlingEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)
@@ -61,21 +66,62 @@ public class ArmwrestlingEventService(
         oldEntity.ThirdPlaceId = newEntity.ThirdPlaceId;
     }
 
-    public async Task AddParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken)
+    protected override async Task OnCreatedAsync(ArmwrestlingEvent entity, CancellationToken cancellationToken)
+    {
+        await _notificationService.SendNotificationToAllAsync(
+            "Нове змагання!",
+            $"Створено нове змагання з армреслінгу: {entity.Name}",
+            NotificationType.Tournament,
+            $"/tournaments/{entity.Id}"
+        );
+    }
+
+    protected override async Task OnUpdatedAsync(ArmwrestlingEvent oldEntity, ArmwrestlingEvent newEntity, CancellationToken cancellationToken)
+    {
+        // Перевірка чи були визначені призери (перехід від null до значення)
+        bool winnersSet = newEntity.FirstPlaceId != null && newEntity.SecondPlaceId != null && newEntity.ThirdPlaceId != null;
+        
+        if (winnersSet)
+        {
+            await _notificationService.SendNotificationToAllAsync(
+                "Змагання завершено!",
+                $"Визначено переможців у змаганні з армреслінгу: {newEntity.Name}",
+                NotificationType.Tournament,
+                $"/tournaments/{newEntity.Id}"
+            );
+        }
+    }
+
+    public async Task AddParticipantAsync(long eventId, ArmwrestlingEventParticipantDto dto, CancellationToken cancellationToken)
     {
         var alreadyExists = await _dbcontext.ArmwrestlingEventParticipants
-            .AnyAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
+            .AnyAsync(p => p.TournamentId == eventId && p.PlayerId == dto.PlayerId, cancellationToken);
         
         if (alreadyExists) return;
 
         var participant = new ArmwrestlingEventParticipant
         {
             TournamentId = eventId,
-            PlayerId = playerId
+            PlayerId = dto.PlayerId,
+            Weight = dto.Weight,
+            Rank = dto.Rank
         };
 
         _dbcontext.ArmwrestlingEventParticipants.Add(participant);
         await _dbcontext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task UpdateParticipantAsync(long eventId, long playerId, ArmwrestlingEventParticipantDto dto, CancellationToken cancellationToken)
+    {
+        var participant = await _dbcontext.Set<ArmwrestlingEventParticipant>()
+            .FirstOrDefaultAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
+        if (participant != null)
+        {
+            participant.Weight = dto.Weight;
+            participant.Rank = dto.Rank;
+            _dbcontext.Set<ArmwrestlingEventParticipant>().Update(participant);
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+        }
     }
 
     public async Task RemoveParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken)

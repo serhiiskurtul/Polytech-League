@@ -3,14 +3,17 @@ using Microsoft.Extensions.Logging;
 using PolytechLeague.Application.Services.Interfaces.Futsal;
 using PolytechLeague.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
+using PolytechLeague.Application.Services.Interfaces;
+using PolytechLeague.Domain.Entities;
 
 namespace PolytechLeague.Application.Services.Implementations.Futsal;
 
 public class FutsalEventService(
     ApplicationDbContext _dbcontext,
-    ILogger<AbstractEntityService<FutsalEvent>> _logger
+    ILogger<AbstractEntityService<FutsalEvent>> _logger,
+    INotificationService _notificationService
 ) :
-    AbstractEntityService<FutsalEvent>(_dbcontext, _logger),
+    AbstractEntityService<FutsalEvent>(_dbcontext, _logger, _notificationService),
     IFutsalEventService
 {
     protected override void UpdateValues(FutsalEvent oldEntity, FutsalEvent newEntity)
@@ -52,5 +55,30 @@ public class FutsalEventService(
         }
 
         return entity;
+    }
+
+    protected override async Task OnCreatedAsync(FutsalEvent entity, CancellationToken cancellationToken)
+    {
+        await _notificationService.SendNotificationToAllAsync(
+            "Нове змагання!",
+            $"Створено нове змагання з футзалу: {entity.Name}",
+            NotificationType.Tournament,
+            $"/tournaments/{entity.Id}"
+        );
+    }
+
+    protected override async Task OnUpdatedAsync(FutsalEvent oldEntity, FutsalEvent newEntity, CancellationToken cancellationToken)
+    {
+        bool winnersSet = newEntity.FirstPlaceTeamId != null && newEntity.SecondPlaceTeamId != null && newEntity.ThirdPlaceTeamId != null;
+        
+        if (winnersSet)
+        {
+            await _notificationService.SendNotificationToAllAsync(
+                "Змагання завершено!",
+                $"Визначено переможців у змаганні з футзалу: {newEntity.Name}",
+                NotificationType.Tournament,
+                $"/tournaments/{newEntity.Id}"
+            );
+        }
     }
 }

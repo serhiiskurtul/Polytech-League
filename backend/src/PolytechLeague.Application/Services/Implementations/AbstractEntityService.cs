@@ -5,14 +5,19 @@ using PolytechLeague.Domain.Params;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PolytechLeague.Persistence.Database;
+using PolytechLeague.Domain.Entities;
 
 namespace PolytechLeague.Application.Services.Implementations;
 
 public abstract class AbstractEntityService<TEntity>(
     ApplicationDbContext _dbcontext,
-    ILogger<AbstractEntityService<TEntity>> _logger) 
+    ILogger<AbstractEntityService<TEntity>> _logger,
+    INotificationService? _notificationService = null) 
     : IAbstractEntityService<TEntity> where TEntity : class
 {
+    protected virtual Task OnCreatedAsync(TEntity entity, CancellationToken cancellationToken) => Task.CompletedTask;
+    protected virtual Task OnUpdatedAsync(TEntity oldEntity, TEntity newEntity, CancellationToken cancellationToken) => Task.CompletedTask;
+
     public virtual async Task<IEnumerable<TEntity>> GetAllAsync(
         FilterParams? filterParams = null,
         SortParams? sortParams = null,
@@ -73,6 +78,8 @@ public abstract class AbstractEntityService<TEntity>(
         _dbcontext.Set<TEntity>().Add(entity);
         await _dbcontext.SaveChangesAsync(cancellationToken);
 
+        await OnCreatedAsync(entity, cancellationToken);
+
         _logger.LogInformation("Entity of type {EntityType} successfully created", typeof(TEntity).Name);
         return entity;
     }
@@ -90,7 +97,11 @@ public abstract class AbstractEntityService<TEntity>(
         }
 
         UpdateValues(oldEntity, newEntity);
+        var originalEntity = await _dbcontext.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(e => EF.Property<long>(e, "Id") == id, cancellationToken); // This is tricky, maybe better to call it before SaveChanges
+
         await _dbcontext.SaveChangesAsync(cancellationToken);
+
+        await OnUpdatedAsync(oldEntity, newEntity, cancellationToken);
 
         _logger.LogInformation("Entity of type {EntityType} with id {Id} successfully updated", typeof(TEntity).Name, id);
     }

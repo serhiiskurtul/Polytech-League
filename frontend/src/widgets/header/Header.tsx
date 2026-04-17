@@ -2,9 +2,33 @@ import { Link } from "react-router-dom";
 import styles from './Header.module.css';
 import { Logo } from "@/shared/ui";
 import { useAuth } from "@/app/providers/AuthContext";
+import { useState, useEffect } from "react";
+import { getMyNotifications } from "@/shared/api/notifications.api";
+import { Notification } from "@/shared/types/notification.types";
 
 export default function Header() {
   const { user, isAuthenticated } = useAuth();
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const fetchNotifications = async () => {
+        try {
+          const data = await getMyNotifications();
+          setNotifications(data);
+          setUnreadCount(data.filter(n => !n.isRead).length);
+        } catch (error) {
+          console.error('Failed to fetch notifications in header:', error);
+        }
+      };
+
+      fetchNotifications();
+      // Опитування кожні 60 секунд (опціонально)
+      const interval = setInterval(fetchNotifications, 60000);
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated]);
 
   const initials = user ? `${user.firstName[0] || ''}${user.lastName[0] || ''}`.toUpperCase() : '';
 
@@ -48,10 +72,12 @@ export default function Header() {
         </nav>
 
         <div className={styles.userActions}>
-          <button className={styles.notificationBtn}>
+          <Link to="/notifications" className={styles.notificationBtn}>
             <i className="fas fa-bell"></i>
-            <span className={styles.notificationBadge}></span>
-          </button>
+            {unreadCount > 0 && (
+              <span className={styles.notificationBadge}>{unreadCount}</span>
+            )}
+          </Link>
 
           {isAuthenticated && user ? (
             <Link to="/profile" className={styles.userProfileLink}>
