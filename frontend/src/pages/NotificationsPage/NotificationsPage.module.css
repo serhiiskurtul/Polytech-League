@@ -37,19 +37,14 @@
   font-size: 42px;
   font-weight: 800;
   margin: 0;
-  background: linear-gradient(135deg, var(--text) 0%, var(--muted) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--primary);
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
 .title i {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 8px rgba(var(--primary-rgb), 0.3));
+  color: var(--primary);
 }
 
 .pageSubtitle {
@@ -92,7 +87,8 @@
 }
 
 .markAllBtn:hover {
-  background: var(--primary-hover);
+  background: var(--primary);
+  filter: brightness(0.9);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(var(--primary-rgb), 0.4);
 }

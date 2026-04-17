@@ -118,13 +118,21 @@
 /* Індикатор сповіщень - червона точка біля іконки сповіщення */
 .notificationBadge {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 8px;
-  height: 8px;
-  background: var(--accent);
-  border-radius: 50%;
-  border: 2px solid var(--card);
+  top: 4px;
+  right: 4px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  background: var(--accent, #ef4444);
+  color: white;
+  border-radius: 7px;
+  border: 1px solid var(--card, #fff);
+  font-size: 9px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 
