@@ -80,10 +80,14 @@ const PlayerViewPage = () => {
     goalsScored: playerProfile.goalsScored || 0
   };
 
+  const handleCompare = () => {
+    navigate(`/compare?p1=${playerProfile.id}`);
+  };
+
   return (
     <div className={styles.playerViewPage}>
       <div className={styles.container}>
-        <ProfileHeader userData={userData} />
+        <ProfileHeader userData={userData} onCompare={handleCompare} />
         
         <div className={styles.profileContent}>
           <div className={styles.mainContent}>

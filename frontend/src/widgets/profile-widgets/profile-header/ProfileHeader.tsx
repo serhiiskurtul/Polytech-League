@@ -8,8 +8,8 @@ interface UserData {
   faculty: string;
   phone: string;
   city: string;
-  instagramUrl?: string;
-  photoUrl?: string;
+  instagramUrl?: string | null;
+  photoUrl?: string | null;
 }
 
 interface ProfileHeaderProps {
@@ -17,9 +17,10 @@ interface ProfileHeaderProps {
   onEdit?: () => void;
   onAvatarUpload?: () => void;
   onLogout?: () => void;
+  onCompare?: () => void;
 }
 
-const ProfileHeader = ({ userData, onEdit, onAvatarUpload, onLogout }: ProfileHeaderProps) => {
+const ProfileHeader = ({ userData, onEdit, onAvatarUpload, onLogout, onCompare }: ProfileHeaderProps) => {
   return (
     <div className={styles.profileHeader}>
       <div className={styles.profileHeaderCard}>
@@ -69,6 +70,11 @@ const ProfileHeader = ({ userData, onEdit, onAvatarUpload, onLogout }: ProfileHe
               {onEdit && (
                 <button className={styles.editProfileBtn} onClick={onEdit}>
                   <i className="fas fa-edit"></i> Редагувати профіль
+                </button>
+              )}
+              {onCompare && (
+                <button className={styles.compareBtn} onClick={onCompare}>
+                  <i className="fas fa-arrows-left-right"></i> Порівняти
                 </button>
               )}
               {onLogout && (

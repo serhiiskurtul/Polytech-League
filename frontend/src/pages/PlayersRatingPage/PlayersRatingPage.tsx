@@ -1,15 +1,40 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
 import styles from './PlayersRatingPage.module.css';
 import { getPlayersRankings } from '../../shared/api/players.api';
 import { PlayerDto } from '../../shared/types/player.types';
-import { Link } from 'react-router-dom';
 
 const PlayersRatingPage = () => {
+  const [searchParams] = useSearchParams();
+  const p1Id = searchParams.get('p1');
   const [players, setPlayers] = useState<PlayerDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('Загальний');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedPlayers, setSelectedPlayers] = useState<PlayerDto[]>([]);
+
+  useEffect(() => {
+    if (players.length > 0 && p1Id && selectedPlayers.length === 0) {
+      const playerToPreselect = players.find(p => p.id === Number(p1Id));
+      if (playerToPreselect) {
+        setSelectedPlayers([playerToPreselect]);
+      }
+    }
+  }, [players, p1Id]);
+
+  const togglePlayerSelection = (player: PlayerDto) => {
+    setSelectedPlayers(prev => {
+      const isSelected = prev.find(p => p.id === player.id);
+      if (isSelected) {
+        return prev.filter(p => p.id !== player.id);
+      }
+      if (prev.length >= 2) {
+        return [prev[1], player];
+      }
+      return [...prev, player];
+    });
+  };
 
   useEffect(() => {
     const fetchRankings = async () => {
@@ -216,11 +241,18 @@ const PlayersRatingPage = () => {
                           </div>
                         </div>
 
-                        <div className={`${styles.cell} ${styles.centered}`}>
+                         <div className={`${styles.cell} ${styles.centered}`}>
                           <div className={styles.actionsGroup}>
                             <Link to={`/players/${player.id}`} className={styles.actionBtn} title="Профіль">
                               <i className="fa-regular fa-user"></i>
                             </Link>
+                            <button 
+                              className={`${styles.actionBtn} ${selectedPlayers.find(p => p.id === player.id) ? styles.activeAction : ''}`}
+                              onClick={() => togglePlayerSelection(player)}
+                              title="Порівняти"
+                            >
+                              <i className="fa-solid fa-arrows-left-right"></i>
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -282,6 +314,39 @@ const PlayersRatingPage = () => {
           </div>
         </div>
       </div>
+      
+      {/* Comparison Floating Bar */}
+      {selectedPlayers.length > 0 && (
+        <div className={styles.comparisonBar}>
+          <div className={styles.comparisonBarContent}>
+            <div className={styles.selectedInfo}>
+              <span className={styles.compareCount}>{selectedPlayers.length}/2</span>
+              <span>гравців вибрано</span>
+            </div>
+            <div className={styles.selectedPlayersList}>
+              {selectedPlayers.map(p => (
+                <div key={p.id} className={styles.selectedPlayerBadge}>
+                  {p.firstName} {p.lastName[0]}.
+                   <button onClick={() => togglePlayerSelection(p)} className={styles.removeBtn}>
+                    <i className="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className={styles.compareActions}>
+              <button onClick={() => setSelectedPlayers([])} className={styles.clearBtn}>
+                Очистити
+              </button>
+              <Link 
+                to={`/compare?p1=${selectedPlayers[0]?.id}${selectedPlayers[1] ? `&p2=${selectedPlayers[1].id}` : ''}`}
+                className={`${styles.compareBtn} ${selectedPlayers.length < 2 ? styles.disabled : ''}`}
+              >
+                Порівняти
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
