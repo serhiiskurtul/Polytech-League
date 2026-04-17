@@ -572,7 +572,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
                   />
                 </div>
                 <input 
-                    placeholder="Група (напр. КН-31)" 
+                    placeholder="Група (напр. 211)" 
                     value={newParticipant.group} 
                     onChange={(e) => setNewParticipant({...newParticipant, group: e.target.value})}
                     style={{ width: '100%', padding: '8px', marginBottom: '12px', borderRadius: '6px', border: '1px solid #ccc' }}

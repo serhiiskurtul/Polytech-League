@@ -21,7 +21,7 @@ export const removeParticipantFromTableTennisEvent = async (eventId: number, pla
   return response.data;
 };
 
-export const updateParticipantInTableTennisEvent = async (eventId: number, playerId: number, dto: TableTennisEventParticipantDto) => {
+export const updateTableTennisParticipant = async (eventId: number, playerId: number, dto: TableTennisEventParticipantDto) => {
   const response = await api.put(`/table-tennis-events/${eventId}/participants/${playerId}`, dto);
   return response.data;
 };

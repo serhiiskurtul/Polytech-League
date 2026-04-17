@@ -1547,8 +1547,8 @@ const TournamentViewPage = () => {
                               <input type="text" placeholder="Прізвище" value={newPlayer.lastName} onChange={(e) => setNewPlayer({ ...newPlayer, lastName: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
-                              <label style={{ marginBottom: '4px', fontSize: '12px' }}>Група (напр. КН-31)</label>
-                              <input type="text" placeholder="Група (напр. КН-31)" value={newPlayer.group} onChange={(e) => setNewPlayer({ ...newPlayer, group: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
+                              <label style={{ marginBottom: '4px', fontSize: '12px' }}>Група (напр. 211)</label>
+                              <input type="text" placeholder="Група (напр. 211)" value={newPlayer.group} onChange={(e) => setNewPlayer({ ...newPlayer, group: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
                             </div>
                             {tournament?.sport === 'chess' && (
                               <>
