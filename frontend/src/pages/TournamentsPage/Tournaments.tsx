@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import TournamentCard from './TournamentCard';
 import TournamentFilters from './TournamentFilters';
 import TournamentStats from './TournamentStats';
@@ -19,6 +19,9 @@ interface TournamentUI extends Tournament {
 
 const Tournaments = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const sportFromUrl = searchParams.get('sport');
+  
   const [tournaments, setTournaments] = useState<TournamentUI[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -27,7 +30,7 @@ const Tournaments = () => {
     totalPages: 0
   });
   const [activeStatus, setActiveStatus] = useState('all');
-  const [activeSport, setActiveSport] = useState('all');
+  const [activeSport, setActiveSport] = useState(sportFromUrl || 'all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('date');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -109,6 +112,15 @@ const Tournaments = () => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (sportFromUrl) {
+      setActiveSport(sportFromUrl);
+    } else {
+      setActiveSport('all');
+    }
+    setPagination(prev => ({ ...prev, page: 1 }));
+  }, [sportFromUrl]);
 
   useEffect(() => {
     fetchTournamentsData(pagination.page);

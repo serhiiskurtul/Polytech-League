@@ -5,49 +5,40 @@ import { Logo } from '@/shared/ui';
 const Footer = () => {
 
   const sports = [
-    'Футзал', 'Баскетбол 3х3', 'Волейбол', 'Пляжний волейбол', 'Шахи', 'Шашки',
-    'Настільний теніс', 'Бадмінтон', 'Армреслінг'
+    { id: 'futsal', label: 'Футзал' },
+    { id: 'basketball-3x3', label: 'Баскетбол 3х3' },
+    { id: 'volleyball', label: 'Волейбол' },
+    { id: 'beach-volleyball', label: 'Пляжний волейбол' },
+    { id: 'chess', label: 'Шахи' },
+    { id: 'checkers', label: 'Шашки' },
+    { id: 'table-tennis', label: 'Настільний теніс' },
+    { id: 'badminton', label: 'Бадмінтон' },
+    { id: 'armwrestling', label: 'Армреслінг' }
   ];
 
   const quickLinks = [
     { name: 'Календар подій', path: '/calendar' },
-    { name: 'Результати матчів', path: '/results' },
     { name: 'Рейтинг гравців', path: '/ratings' },
-    { name: 'Статистика команд', path: '/teams/stats' },
-    { name: 'Правила турнірів', path: '/rules' },
-    { name: 'FAQ', path: '/faq' }
+    { name: 'Список турнірів', path: '/tournaments' }
   ];
 
   const socialLinks = [
-    { name: 'Telegram', icon: 'fab fa-telegram', url: 'https://t.me/unileague' },
-    { name: 'Instagram', icon: 'fab fa-instagram', url: 'https://instagram.com/unileague' },
-    { name: 'Facebook', icon: 'fab fa-facebook', url: 'https://facebook.com/unileague' },
-    { name: 'YouTube', icon: 'fab fa-youtube', url: 'https://youtube.com/unileague' }
+    { name: 'Instagram', icon: 'fab fa-instagram', url: 'https://www.instagram.com/sportclubpolytech/' }
   ];
 
-  const handleNewsletterSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const emailInput = form.elements.namedItem('email') as HTMLInputElement;
-    const email = emailInput.value;
-    console.log('Підписка на розсилку:', email);
-    alert('Дякуємо за підписку на розсилку!');
-    form.reset();
-  };
-
-  const getSportIcon = (sport: string) => {
+  const getSportIcon = (sportId: string) => {
     const icons: Record<string, string> = {
-      'Футзал': 'fas fa-futbol',
-      'Баскетбол 3х3': 'fas fa-basketball-ball',
-      'Волейбол': 'fas fa-volleyball-ball',
-      'Шахи': 'fas fa-chess',
-      'Шашки': 'fas fa-chess-board',
-      'Настільний теніс': 'fas fa-table-tennis',
-      'Бадмінтон': 'fas fa-feather-alt',
-      'Армреслінг': 'fas fa-fist-raised',
-      'Пляжний волейбол': 'fas fa-umbrella-beach'
+      'futsal': 'fas fa-futbol',
+      'basketball-3x3': 'fas fa-basketball-ball',
+      'volleyball': 'fas fa-volleyball-ball',
+      'chess': 'fas fa-chess',
+      'checkers': 'fas fa-chess-board',
+      'table-tennis': 'fas fa-table-tennis',
+      'badminton': 'fas fa-feather-alt',
+      'armwrestling': 'fas fa-fist-raised',
+      'beach-volleyball': 'fas fa-umbrella-beach'
     };
-    const iconClass = icons[sport] || 'fas fa-trophy';
+    const iconClass = icons[sportId] || 'fas fa-trophy';
     return <i className={iconClass} style={{ marginRight: '8px' }}></i>;
   };
 
@@ -65,22 +56,6 @@ const Footer = () => {
                 Спортивна платформа для студентів та викладачів Чернівецького політехнічного фахового коледжу.
                 Організація турнірів, ведення статистики та спілкування спортивної спільноти.
               </p>
-
-              <div className={styles.newsletter}>
-                <h4 className={styles.newsletterTitle}>Слідкуйте за оновленнями</h4>
-                <form className={styles.newsletterForm} onSubmit={handleNewsletterSubmit}>
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Ваш email"
-                    className={styles.newsletterInput}
-                    required
-                  />
-                  <button type="submit" className={styles.newsletterButton}>
-                    <i className="fas fa-paper-plane"></i>
-                  </button>
-                </form>
-              </div>
             </div>
 
             <div className={styles.footerColumn}>
@@ -101,23 +76,21 @@ const Footer = () => {
               <h4 className={styles.footerTitle}>Спортивні дисципліни</h4>
               <div className={styles.sportsGrid}>
                 {sports.map((sport, index) => (
-                  <div key={index} className={styles.sportTag}>
-                    {getSportIcon(sport)}
-                    {sport}
-                  </div>
+                  <Link 
+                    key={index} 
+                    to={`/tournaments?sport=${sport.id}`} 
+                    className={styles.sportTag}
+                    style={{ textDecoration: 'none', color: 'inherit' }}
+                  >
+                    {getSportIcon(sport.id)}
+                    {sport.label}
+                  </Link>
                 ))}
               </div>
             </div>
 
             <div className={styles.footerColumn}>
               <h4 className={styles.footerTitle}>Зв'яжіться з нами</h4>
-              <ul className={styles.footerLinks}>
-                <li>
-                   <a href="#" className={styles.footerLink}>
-                    <i className="fas fa-envelope"></i> info@cpfc.edu.ua
-                   </a>
-                </li>
-              </ul>
               <div className={styles.socialLinks}>
                 <div className={styles.socialIcons}>
                   {socialLinks.map((social, index) => (
@@ -129,11 +102,6 @@ const Footer = () => {
               </div>
             </div>
           </div>
-        </div>
-      </div>
-      <div className={styles.footerBottom}>
-        <div className={styles.container}>
-          <p className={styles.copyright}>&copy; 2025 Polytech League. Всі права захищені.</p>
         </div>
       </div>
     </footer>

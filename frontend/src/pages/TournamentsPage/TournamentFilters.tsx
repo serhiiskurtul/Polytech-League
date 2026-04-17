@@ -33,6 +33,7 @@ const TournamentFilters = ({ activeStatus, activeSport, onStatusChange, onSportC
     { id: 'volleyball', label: 'Волейбол', icon: 'fas fa-volleyball-ball' },
     { id: 'chess', label: 'Шахи', icon: 'fas fa-chess' },
     { id: 'checkers', label: 'Шашки', icon: 'fas fa-chess-board' },
+    { id: 'table-tennis', label: 'Настільний теніс', icon: 'fas fa-table-tennis' },
     { id: 'beach-volleyball', label: 'Пляжний волейбол', icon: 'fas fa-umbrella-beach' },
     { id: 'badminton', label: 'Бадмінтон', icon: 'fas fa-feather-alt' },
     { id: 'armwrestling', label: 'Армреслінг', icon: 'fas fa-fist-raised' }
