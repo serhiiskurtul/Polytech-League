@@ -50,7 +50,7 @@ export interface CheckersEventResponse {
   system: CheckersSystem;
   variant: CheckersVariant;
   games: CheckersGameResponse[];
-  players: CheckersEventParticipantResponse[];
+  participants: CheckersEventParticipantResponse[];
   teams: CheckersTeamResponse[] | null;
   isTeam: boolean;
   firstPlace?: PlayerDto | null;

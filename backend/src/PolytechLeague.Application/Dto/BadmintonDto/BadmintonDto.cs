@@ -93,7 +93,7 @@ public class BadmintonEventResponse
     public BadmintonTeamDto? ThirdPlaceTeam { get; set; }
     public ICollection<BadmintonTeamDto>? Teams { get; set; }
     public ICollection<BadmintonMatchResponse>? Matches { get; set; }
-    public ICollection<BadmintonEventParticipantDto>? Players { get; set; }
+    public ICollection<BadmintonEventParticipantDto>? Participants { get; set; }
 }
 
 public class BadmintonMatchRequest
@@ -200,7 +200,7 @@ public static class BadmintonDtoExtensions
             ThirdPlaceTeam = entity.ThirdPlaceTeam?.ToDto(),
             Teams = entity.Teams?.Select(t => t.ToDto()).ToList(),
             Matches = entity.Matches?.Select(m => m.ToResponse()).ToList(),
-            Players = entity.Participants?.Select(p => p.ToDto()).ToList()
+            Participants = entity.Participants?.Select(p => p.ToDto()).ToList()
         };
     }
 

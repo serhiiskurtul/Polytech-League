@@ -24,7 +24,7 @@ public static class CheckersEventParticipantDtoExtensions
             UserId = participant.Player?.UserId,
             TournamentId = participant.TournamentId,
             PlayerId = participant.PlayerId,
-            PlayerName = participant.Player != null ? $"{participant.Player.FirstName} {participant.Player.LastName}" : null,
+            PlayerName = participant.Player != null ? $"{participant.Player.FirstName} {participant.Player.Patronymic ?? ""} {participant.Player.LastName}".Replace("  ", " ").Trim() : null,
             Points = participant.Points,
             Rating = participant.StartingRating,
             Rank = participant.Rank

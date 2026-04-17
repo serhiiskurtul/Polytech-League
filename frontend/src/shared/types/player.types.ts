@@ -2,8 +2,11 @@ export interface PlayerDto {
     id?: number;
     userId?: number | null;
     firstName: string;
+    patronymic?: string | null;
     lastName: string;
+    birthDate?: string | null;
     group: string;
+    studentId?: string | null;
     city: string;
     faculty?: string | null;
     bio?: string | null;

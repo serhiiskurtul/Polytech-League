@@ -77,7 +77,7 @@ public class ArmwrestlingEventResponse
     public PlayerDto? SecondPlace { get; set; }
     public PlayerDto? ThirdPlace { get; set; }
 
-    public ICollection<ArmwrestlingEventParticipantDto> Players { get; set; } = new List<ArmwrestlingEventParticipantDto>();
+    public ICollection<ArmwrestlingEventParticipantDto> Participants { get; set; } = new List<ArmwrestlingEventParticipantDto>();
 }
 
 public static class ArmwrestlingEventDtoExtensions
@@ -136,10 +136,10 @@ public static class ArmwrestlingEventDtoExtensions
             ThirdPlace = entity.ThirdPlace?.ToDto()
         };
 
-        // Populate Players from the actual participants collection
+        // Populate Participants from the actual participants collection
         if (entity.Players != null && entity.Players.Any())
         {
-            response.Players = entity.Players
+            response.Participants = entity.Players
                 .Select(p => p.ToDto())
                 .ToList();
         }
@@ -154,7 +154,7 @@ public static class ArmwrestlingEventDtoExtensions
                 if (match.Player2 != null && !playersMap.ContainsKey(match.Player2Id))
                     playersMap[match.Player2Id] = new ArmwrestlingEventParticipantDto { PlayerId = match.Player2Id, PlayerName = $"{match.Player2.FirstName} {match.Player2.LastName}" };
             }
-            response.Players = playersMap.Values.ToList();
+            response.Participants = playersMap.Values.ToList();
         }
 
         return response;

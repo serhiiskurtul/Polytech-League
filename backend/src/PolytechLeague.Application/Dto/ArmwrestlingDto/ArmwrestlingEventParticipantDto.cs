@@ -23,7 +23,7 @@ public static class ArmwrestlingEventParticipantDtoExtensions
             UserId = participant.Player?.UserId,
             TournamentId = participant.TournamentId,
             PlayerId = participant.PlayerId,
-            PlayerName = participant.Player != null ? $"{participant.Player.FirstName} {participant.Player.LastName}" : null,
+            PlayerName = participant.Player != null ? $"{participant.Player.FirstName} {participant.Player.Patronymic ?? ""} {participant.Player.LastName}".Replace("  ", " ").Trim() : null,
             Weight = participant.Weight,
             Rank = participant.Rank
         };

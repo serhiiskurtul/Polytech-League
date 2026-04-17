@@ -20,7 +20,7 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
         [FromQuery] PageParams? pageParams,
         CancellationToken cancellationToken)
     {
-        var cacheKey = $"tt_events_" +
+        var cacheKey = $"tt_events_v2_" +
                        $"{filterParams?.ToCacheKey() ?? "nofilter"}_" +
                        $"{sortParams?.ToCacheKey() ?? "nosort"}_" +
                        $"{pageParams?.ToCacheKey() ?? "nopage"}";
@@ -43,7 +43,7 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById([FromRoute] long id, CancellationToken cancellationToken)
     {
-        var cacheKey = $"tt_event_{id}";
+        var cacheKey = $"tt_event_v2_{id}";
 
         var cached = await redisService.GetDataAsync<TableTennisEventResponse>(cacheKey);
         if (cached is not null) return Ok(cached);
@@ -81,7 +81,7 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
         await ttEventService.UpdateAsync(id, entity, cancellationToken);
 
         await redisService.RemoveGroupAsync("tt_events_all");
-        await redisService.RemoveDataAsync($"tt_event_{id}");
+        await redisService.RemoveDataAsync($"tt_event_v2_{id}");
 
         return NoContent();
     }
@@ -93,7 +93,7 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
         await ttEventService.DeleteAsync(id, cancellationToken);
 
         await redisService.RemoveGroupAsync("tt_events_all");
-        await redisService.RemoveDataAsync($"tt_event_{id}");
+        await redisService.RemoveDataAsync($"tt_event_v2_{id}");
 
         return NoContent();
     }
@@ -103,7 +103,7 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
     {
         await ttEventService.AddParticipantAsync(id, dto, cancellationToken);
         await redisService.RemoveGroupAsync("tt_events_all");
-        await redisService.RemoveDataAsync($"tt_event_{id}");
+        await redisService.RemoveDataAsync($"tt_event_v2_{id}");
         return Ok();
     }
 
@@ -113,7 +113,7 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
     {
         await ttEventService.UpdateParticipantAsync(id, playerId, dto, cancellationToken);
         await redisService.RemoveGroupAsync("tt_events_all");
-        await redisService.RemoveDataAsync($"tt_event_{id}");
+        await redisService.RemoveDataAsync($"tt_event_v2_{id}");
         return Ok();
     }
 
@@ -123,7 +123,7 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
     {
         await ttEventService.RemoveParticipantAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("tt_events_all");
-        await redisService.RemoveDataAsync($"tt_event_{id}");
+        await redisService.RemoveDataAsync($"tt_event_v2_{id}");
         return Ok();
     }
 }

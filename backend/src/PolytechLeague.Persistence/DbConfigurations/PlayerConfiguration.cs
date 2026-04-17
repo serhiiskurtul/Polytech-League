@@ -18,6 +18,12 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
             .HasColumnName("group")
             .IsRequired();
 
+        builder.Property(x => x.StudentId)
+            .HasColumnName("student_id");
+
+        builder.HasIndex(x => x.StudentId)
+            .IsUnique();
+
         // Chess
         builder.Property(x => x.ChessRating).HasColumnName("chess_rating");
         builder.Property(x => x.ChessFideId).HasColumnName("chess_fide_id");

@@ -64,7 +64,7 @@ export interface ChessEventResponse {
   participantsCount: number;
   system: ChessSystem;
   games: ChessGameResponse[];
-  players: ChessEventParticipantResponse[];
+  participants: ChessEventParticipantResponse[];
   teams: ChessTeamResponse[] | null;
   isTeam: boolean;
   firstPlace?: PlayerDto | null;

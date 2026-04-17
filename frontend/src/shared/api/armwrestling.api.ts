@@ -1,7 +1,8 @@
 import api from "./axiosInstance";
 import { 
   ArmwrestlingEventResponse, 
-  ArmwrestlingMatchResponse 
+  ArmwrestlingMatchResponse,
+  ArmwrestlingEventParticipantDto 
 } from "../types/armwrestling.types";
 
 /**
@@ -48,7 +49,7 @@ export const createArmwrestlingMatch = async (data: Partial<ArmwrestlingMatchRes
 /**
  * Add a participant to an armwrestling event
  */
-export const addParticipantToArmwrestlingEvent = async (eventId: string | number, data: { playerId: number }): Promise<void> => {
+export const addParticipantToArmwrestlingEvent = async (eventId: string | number, data: ArmwrestlingEventParticipantDto): Promise<void> => {
     await api.post(`/armwrestling-events/${eventId}/participants`, data);
 };
 

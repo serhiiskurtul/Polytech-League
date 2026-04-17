@@ -28,7 +28,7 @@ public static class ChessEventParticipantDtoExtensions
             UserId = participant.Player?.UserId,
             ChessEventId = participant.TournamentId,
             PlayerId = participant.PlayerId,
-            PlayerName = participant.Player != null ? $"{participant.Player.FirstName} {participant.Player.LastName}" : null,
+            PlayerName = participant.Player != null ? $"{participant.Player.FirstName} {participant.Player.Patronymic ?? ""} {participant.Player.LastName}".Replace("  ", " ").Trim() : null,
             Rating = participant.Player?.ChessRating ?? 0,
             Points = participant.Points,
             Rank = participant.Rank,

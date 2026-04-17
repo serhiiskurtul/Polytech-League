@@ -9,6 +9,7 @@ public class Player : Person
 {
     public required string City { get; set; }
     public required string Group { get; set; }
+    public string? StudentId { get; set; }
     public string? Faculty { get; set; }
     public string? Bio { get; set; }
     public string? InstagramUrl { get; set; }

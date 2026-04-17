@@ -6,6 +6,7 @@ public abstract class Person
     public long? UserId { get; set; }
     public User? User { get; set; }
     public required string FirstName { get; set; }
+    public string? Patronymic { get; set; }
     public required string LastName { get; set; }
     public DateOnly BirthDate { get; set; }
     public required string PhotoUrl { get; set; }

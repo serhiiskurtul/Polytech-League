@@ -93,8 +93,10 @@ public class PlayerService : IPlayerService
 
         // Update basic info
         player.FirstName = dto.FirstName ?? player.FirstName;
+        player.Patronymic = dto.Patronymic ?? player.Patronymic;
         player.LastName = dto.LastName ?? player.LastName;
         player.Group = dto.Group ?? player.Group;
+        player.StudentId = dto.StudentId ?? player.StudentId;
         player.City = dto.City ?? player.City;
         player.UserId = dto.UserId ?? player.UserId;
         player.Faculty = dto.Faculty ?? player.Faculty;
@@ -145,8 +147,10 @@ public class PlayerService : IPlayerService
         var lowerQuery = query.ToLower();
         var players = await _dbContext.Players
             .Where(p => p.FirstName.ToLower().Contains(lowerQuery) || 
+                        (p.Patronymic != null && p.Patronymic.ToLower().Contains(lowerQuery)) ||
                         p.LastName.ToLower().Contains(lowerQuery) ||
-                        p.Group.ToLower().Contains(lowerQuery))
+                        p.Group.ToLower().Contains(lowerQuery) ||
+                        (p.StudentId != null && p.StudentId.ToLower().Contains(lowerQuery)))
             .ToListAsync(cancellationToken);
         
         return players.Select(p => p.ToDto());

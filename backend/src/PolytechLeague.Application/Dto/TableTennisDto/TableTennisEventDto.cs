@@ -24,6 +24,13 @@ public class TableTennisEventRequest
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required TableTennisCategory Category { get; set; }
+
+    public string? Rules { get; set; }
+    public string? Prizes { get; set; }
+    public string? HeadRefereeName { get; set; }
+    public string? Referees { get; set; }
+    public string? Schedule { get; set; }
+    public bool IsTeam { get; set; }
 }
 
 public class TableTennisEventResponse
@@ -50,7 +57,15 @@ public class TableTennisEventResponse
     public PlayerDto? ThirdPlace { get; set; }
 
     public ICollection<TableTennisMatchResponse>? Matches { get; set; }
-    public ICollection<TableTennisEventParticipantDto>? Players { get; set; }
+    public int ParticipantsCount { get; set; }
+    public ICollection<TableTennisEventParticipantDto>? Participants { get; set; }
+
+    public string? Rules { get; set; }
+    public string? Prizes { get; set; }
+    public string? HeadRefereeName { get; set; }
+    public string? Referees { get; set; }
+    public string? Schedule { get; set; }
+    public bool IsTeam { get; set; }
 }
 
 public static class TableTennisEventDtoExtensions
@@ -66,7 +81,13 @@ public static class TableTennisEventDtoExtensions
             Level = request.Level,
             Description = request.Description,
             TournamentType = request.TournamentType,
-            Category = request.Category
+            Category = request.Category,
+            Rules = request.Rules,
+            Prizes = request.Prizes,
+            HeadRefereeName = request.HeadRefereeName,
+            Referees = request.Referees,
+            Schedule = request.Schedule,
+            IsTeam = request.IsTeam
         };
     }
 
@@ -88,7 +109,14 @@ public static class TableTennisEventDtoExtensions
             SecondPlace = entity.SecondPlace?.ToDto(),
             ThirdPlace = entity.ThirdPlace?.ToDto(),
             Matches = entity.Matches?.Select(m => m.ToResponse()).ToList(),
-            Players = entity.Participants?.Select(p => p.ToDto()).ToList()
+            ParticipantsCount = entity.Participants?.Count ?? 0,
+            Participants = entity.Participants?.Select(p => p.ToDto()).ToList(),
+            Rules = entity.Rules,
+            Prizes = entity.Prizes,
+            HeadRefereeName = entity.HeadRefereeName,
+            Referees = entity.Referees,
+            Schedule = entity.Schedule,
+            IsTeam = entity.IsTeam
         };
     }
 }

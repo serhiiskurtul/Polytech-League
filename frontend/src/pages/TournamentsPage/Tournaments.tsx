@@ -55,8 +55,8 @@ const Tournaments = () => {
     result.sort((a, b) => {
       switch (sortBy) {
         case 'date':
-          return new Date(a.date.split('.').reverse().join('-')).getTime() -
-            new Date(b.date.split('.').reverse().join('-')).getTime();
+          return new Date(b.date.split('.').reverse().join('-')).getTime() -
+            new Date(a.date.split('.').reverse().join('-')).getTime();
         case 'participants':
           return b.participants - a.participants;
         case 'title':

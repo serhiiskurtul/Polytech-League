@@ -83,7 +83,7 @@ export interface BadmintonEventResponse {
   isTeam: boolean;
   teams: BadmintonTeamDto[] | null;
   matches: BadmintonMatchResponse[] | null;
-  players: BadmintonEventParticipantDto[] | null;
+  participants: BadmintonEventParticipantDto[] | null;
 }
 
 export interface BadmintonEventParticipantDto {

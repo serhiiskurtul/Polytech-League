@@ -64,7 +64,7 @@ public class CheckersEventResponse
     public required CheckersVariant Variant { get; set; }
 
     public required ICollection<CheckersGameDto> Games { get; set; }
-    public required ICollection<CheckersEventParticipantDto> Players { get; set; }
+    public required ICollection<CheckersEventParticipantDto> Participants { get; set; }
     public ICollection<CheckersTeamResponse>? Teams { get; set; }
 
     public string? Rules { get; set; }
@@ -131,7 +131,7 @@ public static class CheckersEventDtoExtension
             System = checkersEvent.System,
             Variant = checkersEvent.Variant,
             Games = checkersEvent.Games?.Select(g => g.ToDto()).ToList() ?? [],
-            Players = checkersEvent.Players?.Select(p => p.ToDto()).ToList() ?? [],
+            Participants = checkersEvent.Players?.Select(p => p.ToDto()).ToList() ?? [],
             Teams = checkersEvent.Teams?.Select(t => t.ToResponse()).ToList(),
             Rules = checkersEvent.Rules,
             Prizes = checkersEvent.Prizes,

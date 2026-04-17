@@ -47,9 +47,11 @@ const PlayerSearchInput: React.FC<PlayerSearchInputProps> = ({
   }, []);
 
   const filteredPlayers = players.filter(p => {
-    const fullName = `${p.firstName} ${p.lastName}`.toLowerCase();
+    const fullName = `${p.firstName} ${p.patronymic || ''} ${p.lastName}`.toLowerCase();
     const search = searchTerm.toLowerCase();
-    return fullName.includes(search) || p.group?.toLowerCase().includes(search);
+    return fullName.includes(search) || 
+           p.group?.toLowerCase().includes(search) ||
+           p.studentId?.toLowerCase().includes(search);
   }).slice(0, 8);
 
   const exactMatch = players.find(p => 
@@ -101,8 +103,15 @@ const PlayerSearchInput: React.FC<PlayerSearchInputProps> = ({
                 {player.firstName[0]}{player.lastName[0]}
               </div>
               <div className={styles.playerInfo}>
-                <span className={styles.playerName}>{player.firstName} {player.lastName}</span>
-                <span className={styles.playerGroup}>{player.group}</span>
+                <span className={styles.playerName}>
+                  {player.firstName} {player.patronymic} {player.lastName}
+                </span>
+                <span className={styles.playerGroup}>
+                  {player.group} {player.faculty ? `• ${player.faculty}` : ''}
+                </span>
+                {player.studentId && (
+                  <span className={styles.studentId}>ID: {player.studentId}</span>
+                )}
               </div>
             </li>
           ))}

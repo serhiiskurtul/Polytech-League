@@ -11,8 +11,11 @@ public class PlayerDto
     public long? Id { get; set; }
     public long? UserId { get; set; }
     public string? FirstName { get; set; }
+    public string? Patronymic { get; set; }
     public string? LastName { get; set; }
+    public DateOnly? BirthDate { get; set; }
     public string? Group { get; set; }
+    public string? StudentId { get; set; }
     public string? City { get; set; }
     public string? PhotoUrl { get; set; }
     public string? Faculty { get; set; }
@@ -69,8 +72,11 @@ public static class PlayerDtoExtensions
             Id = player.Id,
             UserId = player.UserId,
             FirstName = player.FirstName,
+            Patronymic = player.Patronymic,
             LastName = player.LastName,
+            BirthDate = player.BirthDate,
             Group = player.Group,
+            StudentId = player.StudentId,
             City = player.City,
             PhotoUrl = player.PhotoUrl,
             Faculty = player.Faculty,
@@ -110,8 +116,11 @@ public static class PlayerDtoExtensions
             Id = dto.Id ?? 0,
             UserId = dto.UserId,
             FirstName = dto.FirstName ?? string.Empty,
+            Patronymic = dto.Patronymic,
             LastName = dto.LastName ?? string.Empty,
+            BirthDate = dto.BirthDate ?? DateOnly.MinValue,
             Group = dto.Group ?? string.Empty,
+            StudentId = dto.StudentId,
             City = dto.City ?? "Чернівці",
             PhotoUrl = dto.PhotoUrl ?? "",
             Faculty = dto.Faculty,
@@ -134,8 +143,7 @@ public static class PlayerDtoExtensions
             BasketballShirtNumber = dto.BasketballShirtNumber,
             BasketballTeamId = dto.BasketballTeamId,
             BeachVolleyballShirtNumber = dto.BeachVolleyballShirtNumber,
-            BeachVolleyballTeamId = dto.BeachVolleyballTeamId,
-            BirthDate = DateOnly.MinValue
+            BeachVolleyballTeamId = dto.BeachVolleyballTeamId
         };
     }
 }

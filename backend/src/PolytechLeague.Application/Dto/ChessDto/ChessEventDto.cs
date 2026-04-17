@@ -56,7 +56,7 @@ public class ChessEventResponse
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required ChessSystem System { get; set; }
     public required ICollection<ChessGameDto> Games { get; set; }
-    public required ICollection<ChessEventParticipantDto> Players { get; set; }
+    public required ICollection<ChessEventParticipantDto> Participants { get; set; }
     public ICollection<ChessTeamResponse>? Teams { get; set; }
     
     public string? Rules { get; set; }
@@ -121,7 +121,7 @@ public static class ChessEventDtoExtension
             ParticipantsCount = chessEvent.ParticipantsCount,
             System = chessEvent.System,
             Games = chessEvent.Games?.Select(g => g.ToDto()).ToList() ?? [],
-            Players = chessEvent.Players?.Select(p => p.ToDto()).ToList() ?? [],
+            Participants = chessEvent.Players?.Select(p => p.ToDto()).ToList() ?? [],
             Teams = chessEvent.Teams?.Select(t => t.ToResponse()).ToList(),
             Rules = chessEvent.Rules,
             Prizes = chessEvent.Prizes,
