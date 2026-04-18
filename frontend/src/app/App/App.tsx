@@ -16,42 +16,44 @@ import { NotificationsPage } from '@/pages/NotificationsPage';
 import { TournamentCreatePage } from '@/pages/TournamentCreatePage';
 import { PlayerViewPage } from '@/pages/PlayerViewPage';
 import { PlayerComparePage } from '@/pages/PlayerComparePage/index'; // Player comparison page
+import NotFoundPage from '@/pages/NotFoundPage/NotFoundPage';
+import InternalServerErrorPage from '@/pages/InternalServerErrorPage/InternalServerErrorPage';
 import ProtectedRoute from '../providers/ProtectedRoute';
 import ScrollToTop from '../providers/ScrollToTop';
 import { Toaster } from 'react-hot-toast';
 
 export default function App() {
   const location = useLocation();
-  const hideLayout = location.pathname === "/login" || 
-                     location.pathname === "/signup" || 
-                     location.pathname === "/email-verification";
+  const hideLayout = location.pathname === "/login" ||
+    location.pathname === "/signup" ||
+    location.pathname === "/email-verification";
 
   return (
     <>
       <ScrollToTop />
-      <Toaster 
-          position="top-center"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              borderRadius: '10px',
-              background: '#333',
-              color: '#fff',
-              padding: '16px 24px',
-              fontSize: '16px',
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            borderRadius: '10px',
+            background: '#333',
+            color: '#fff',
+            padding: '16px 24px',
+            fontSize: '16px',
+          },
+          success: {
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
             },
-            success: {
-              iconTheme: {
-                primary: '#10b981',
-                secondary: '#fff',
-              },
-            },
-          }}
-        />
+          },
+        }}
+      />
 
       {!hideLayout && <Header />}
 
-      <Routes>    
+      <Routes>
         {/* Головна */}
         <Route
           path="/"
@@ -65,18 +67,18 @@ export default function App() {
         />
 
         {/* Календар */}
-        <Route 
-          path="/calendar" 
+        <Route
+          path="/calendar"
           element={
             <ProtectedRoute requireAuth={false}>
               <CalendarPage />
             </ProtectedRoute>
-          } 
+          }
         />
 
         {/* Турніри */}
-        <Route 
-          path="/tournaments" 
+        <Route
+          path="/tournaments"
           element={
             <ProtectedRoute requireAuth={false}>
               <div className="page-wrapper">
@@ -86,8 +88,8 @@ export default function App() {
           }
         />
 
-        <Route 
-          path="/tournaments/:id" 
+        <Route
+          path="/tournaments/:id"
           element={
             <ProtectedRoute requireAuth={false}>
               <div className="page-wrapper">
@@ -98,47 +100,47 @@ export default function App() {
         />
 
         {/* Рейтинги */}
-        <Route 
-          path="/ratings" 
+        <Route
+          path="/ratings"
           element={
             <ProtectedRoute requireAuth={false}>
               <PlayersRatingPage />
             </ProtectedRoute>
-          } 
+          }
         />
 
-        <Route 
-          path="/players/:id" 
+        <Route
+          path="/players/:id"
           element={
             <ProtectedRoute requireAuth={false}>
               <PlayerViewPage />
             </ProtectedRoute>
-          } 
+          }
         />
 
-        <Route 
-          path="/compare" 
+        <Route
+          path="/compare"
           element={
             <ProtectedRoute requireAuth={false}>
               <PlayerComparePage />
             </ProtectedRoute>
-          } 
+          }
         />
 
         {/* Команди */}
-        <Route 
-          path="/teams" 
+        <Route
+          path="/teams"
           element={
             <ProtectedRoute requireAuth={false}>
               <div>Список команд</div>
             </ProtectedRoute>
-          } 
+          }
         />
-        
+
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/email-verification" element={<EmailVerificationPage />} />
-        
+
         {/* Профіль */}
         <Route
           path="/profile"
@@ -150,24 +152,29 @@ export default function App() {
         />
 
         {/* Сповіщення */}
-        <Route 
-          path="/notifications" 
+        <Route
+          path="/notifications"
           element={
             <ProtectedRoute requireAuth={true}>
               <NotificationsPage />
             </ProtectedRoute>
-          } 
+          }
         />
 
         {/* Створення турніру */}
-        <Route 
-          path="/create-tournament" 
+        <Route
+          path="/create-tournament"
           element={
             <ProtectedRoute requireAuth={true}>
               <TournamentCreatePage />
             </ProtectedRoute>
-          } 
+          }
         />
+
+        {/* Помилки */}
+        <Route path="/404" element={<NotFoundPage />} />
+        <Route path="/500" element={<InternalServerErrorPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
 
       {!hideLayout && <Footer />}

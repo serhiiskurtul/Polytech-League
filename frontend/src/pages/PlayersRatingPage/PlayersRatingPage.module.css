@@ -347,6 +347,12 @@
   color: #1e293b;
 }
 
+.actionsGroup {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
 .actionBtn {
   width: 36px;
   height: 36px;
@@ -357,6 +363,9 @@
   background: #f1f5f9;
   color: #64748b;
   transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+  outline: none;
 }
 
 .actionBtn:hover {
