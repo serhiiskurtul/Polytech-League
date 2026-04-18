@@ -70,6 +70,7 @@ public class SportStatsDto
     public int PerformanceScore { get; set; }
     public int MatchesPlayed { get; set; }
     public int WinsCount { get; set; }
+    public int GoalsCount { get; set; }
 }
 
 public static class PlayerDtoExtensions

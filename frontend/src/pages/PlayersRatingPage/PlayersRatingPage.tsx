@@ -329,6 +329,17 @@ const PlayersRatingPage = () => {
                   <li><span>Перемога в грі:</span> +2 бали</li>
                 </ul>
               </div>
+
+              <div className={styles.formulaCard}>
+                <div className={styles.formulaIcon} style={{ background: '#ffedd5', color: '#ea580c' }}>
+                  <i className="fa-solid fa-futbol"></i>
+                </div>
+                <h3>Забиті голи (Футзал)</h3>
+                <p>Додаткові бали за індивідуальну результативність:</p>
+                <ul>
+                  <li><span>Кожен забитий гол:</span> +5 балів</li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>

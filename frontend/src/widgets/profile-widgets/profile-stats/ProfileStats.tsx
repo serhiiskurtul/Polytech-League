@@ -27,14 +27,18 @@ const ProfileStats = ({ stats }: ProfileStatsProps) => {
           <div className={styles.statValue}>{stats.wins}</div>
           <div className={styles.statLabel}>Перемог</div>
         </div>
-        <div className={styles.statCard}>
-          <div className={styles.statValue}>{stats.eloRating}</div>
-          <div className={styles.statLabel}>Рейтинг Elo (шахи)</div>
-        </div>
-        <div className={styles.statCard}>
-          <div className={styles.statValue}>{stats.goalsScored}</div>
-          <div className={styles.statLabel}>Забитих голів</div>
-        </div>
+        {stats.eloRating > 0 && (
+          <div className={styles.statCard}>
+            <div className={styles.statValue}>{stats.eloRating}</div>
+            <div className={styles.statLabel}>Рейтинг Elo (шахи)</div>
+          </div>
+        )}
+        {stats.goalsScored > 0 && (
+          <div className={styles.statCard}>
+            <div className={styles.statValue}>{stats.goalsScored}</div>
+            <div className={styles.statLabel}>Забитих голів</div>
+          </div>
+        )}
       </div>
     </section>
   );

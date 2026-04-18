@@ -204,6 +204,12 @@ public class PlayerService : IPlayerService
             var arm2S = await _dbContext.ArmwrestlingMatches.Where(g => playerIds.Contains(g.Player2Id)).GroupBy(g => g.Player2Id).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
             var bad1S = await _dbContext.BadmintonMatches.Where(g => g.Player1Id.HasValue && playerIds.Contains(g.Player1Id.Value)).GroupBy(g => g.Player1Id!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerPlayerId == g.Key) }).ToListAsync(cancellationToken);
             var bad2S = await _dbContext.BadmintonMatches.Where(g => g.Player2Id.HasValue && playerIds.Contains(g.Player2Id.Value)).GroupBy(g => g.Player2Id!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerPlayerId == g.Key) }).ToListAsync(cancellationToken);
+            
+            var goalsS = await _dbContext.FutsalGoals
+                .Where(g => playerIds.Contains(g.PlayerId))
+                .GroupBy(g => g.PlayerId)
+                .Select(g => new { Id = g.Key, Goals = g.Sum(x => x.GoalsCount) })
+                .ToListAsync(cancellationToken);
 
             var playerDtos = new List<PlayerDto>();
 
@@ -305,9 +311,21 @@ public class PlayerService : IPlayerService
                 AddStats("table_tennis", (t1?.Count ?? 0) + (t2?.Count ?? 0), (t1?.Wins ?? 0) + (t2?.Wins ?? 0));
                 AddStats("armwrestling", (a1?.Count ?? 0) + (a2?.Count ?? 0), (a1?.Wins ?? 0) + (a2?.Wins ?? 0));
                 AddStats("badminton", (b1?.Count ?? 0) + (b2?.Count ?? 0), (b1?.Wins ?? 0) + (b2?.Wins ?? 0));
+                
+                // 4. Team Sport Stats & Goals
+                var pGoals = goalsS.FirstOrDefault(x => x.Id == playerId)?.Goals ?? 0;
+                if (pGoals > 0) {
+                    if (!sportStatsMap.ContainsKey("futsal")) sportStatsMap["futsal"] = new SportStatsDto { SportType = "futsal" };
+                    var s = sportStatsMap["futsal"];
+                    s.GoalsCount += pGoals;
+                    int goalPts = pGoals * 5;
+                    s.PerformanceScore += goalPts;
+                    totalScore += goalPts;
+                }
 
                 dto.MatchesPlayed = played;
                 dto.WinsCount = won;
+                dto.GoalsScored = pGoals;
                 dto.PerformanceScore = (int)Math.Round(totalScore);
                 dto.SportStats = sportStatsMap.Values.ToList();
                 playerDtos.Add(dto);
@@ -588,7 +606,9 @@ public class PlayerService : IPlayerService
 
         dto.WinsCount = chessWins + checkersWins + ttWins + armWins;
 
-        // 3. Goals (TBD - placeholders for now as we don't have individual goal tracking yet)
-        dto.GoalsScored = 0;
+        // 3. Goals
+        dto.GoalsScored = await _dbContext.FutsalGoals
+            .Where(g => g.PlayerId == playerId)
+            .SumAsync(g => (int?)g.GoalsCount ?? 0, cancellationToken);
     }
 }
