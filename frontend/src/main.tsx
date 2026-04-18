@@ -5,6 +5,8 @@ import './index.css'
 import App from './app/App/App'
 import './app/styles/globals.css';
 import { AuthProvider } from './app/providers/AuthContext';
+import { ChatProvider } from './app/providers/ChatProvider';
+
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Failed to find the root element');
@@ -13,7 +15,9 @@ createRoot(rootElement).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <App />
+        <ChatProvider>
+          <App />
+        </ChatProvider>
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>

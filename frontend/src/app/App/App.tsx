@@ -22,6 +22,8 @@ import ProtectedRoute from '../providers/ProtectedRoute';
 import ScrollToTop from '../providers/ScrollToTop';
 import { Toaster } from 'react-hot-toast';
 
+
+
 export default function App() {
   const location = useLocation();
   const hideLayout = location.pathname === "/login" ||

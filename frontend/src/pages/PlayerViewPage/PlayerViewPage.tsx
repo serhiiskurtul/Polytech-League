@@ -9,6 +9,10 @@ import styles from './PlayerViewPage.module.css';
 import { PlayerDto } from '@/shared/types/player.types';
 import { getPlayerById } from '@/shared/api/players.api';
 import { toast } from 'react-hot-toast';
+import { useChat } from '@/app/providers/ChatProvider';
+import { chatApi } from '@/shared/api/chat.api';
+import { useAuth } from '@/app/providers/AuthContext';
+
 
 const PlayerViewPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +20,9 @@ const PlayerViewPage = () => {
   const [playerProfile, setPlayerProfile] = useState<PlayerDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { setActiveConversationId, refreshConversations } = useChat();
+  const { user } = useAuth();
+
 
   useEffect(() => {
     const fetchPlayer = async () => {
@@ -85,10 +92,27 @@ const PlayerViewPage = () => {
     navigate(`/compare?p1=${playerProfile.id}`);
   };
 
+  const handleMessage = async () => {
+    if (!playerProfile.id) return;
+    try {
+      const convId = await chatApi.getConversationIdWithUser(playerProfile.id);
+      setActiveConversationId(convId);
+      await refreshConversations();
+      navigate('/notifications?tab=messages');
+    } catch (err) {
+      console.error("Failed to start conversation:", err);
+      toast.error("Не вдалося почати чат");
+    }
+  };
+
   return (
     <div className={styles.playerViewPage}>
       <div className={styles.container}>
-        <ProfileHeader userData={userData} onCompare={handleCompare} />
+        <ProfileHeader 
+          userData={userData} 
+          onCompare={handleCompare} 
+          onMessage={user?.id !== playerProfile?.id ? handleMessage : undefined} 
+        />
         
         <div className={styles.profileContent}>
           <div className={styles.mainContent}>

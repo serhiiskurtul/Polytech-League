@@ -17,61 +17,113 @@ public class RedisService : IRedisService
 
     public async Task<T?> GetDataAsync<T>(string key)
     {
-        _logger.LogInformation("Fetching data from Redis for key: {Key}", key);
-
-        var data = await _db.StringGetAsync(key);
-        if (data.IsNullOrEmpty)
+        if (!_db.Multiplexer.IsConnected)
         {
-            _logger.LogWarning("No data found in Redis for key: {Key}", key);
+            _logger.LogWarning("Redis is not connected. Skipping GetData for key: {Key}", key);
             return default;
         }
 
-        _logger.LogInformation("Successfully fetched data from Redis for key: {Key}", key);
-        return JsonSerializer.Deserialize<T>(data!);
+        try
+        {
+            _logger.LogInformation("Fetching data from Redis for key: {Key}", key);
+            var data = await _db.StringGetAsync(key);
+            if (data.IsNullOrEmpty)
+            {
+                _logger.LogWarning("No data found in Redis for key: {Key}", key);
+                return default;
+            }
+
+            _logger.LogInformation("Successfully fetched data from Redis for key: {Key}", key);
+            return JsonSerializer.Deserialize<T>(data!);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching data from Redis for key: {Key}", key);
+            return default;
+        }
     }
 
     public async Task SetDataAsync<T>(
         string key, T data, TimeSpan expirationTime, string? group = null)
     {
-        _logger.LogInformation("Saving data to Redis for key: {Key} with expiration {Expiration}", key, expirationTime);
-
-        var jsonData = JsonSerializer.Serialize(data);
-        await _db.StringSetAsync(key, jsonData, expirationTime);
-
-        if (!string.IsNullOrEmpty(group))
+        if (!_db.Multiplexer.IsConnected)
         {
-            await _db.SetAddAsync(group, key);
-            _logger.LogInformation("Key: {Key} added to group: {Group}", key, group);
+            _logger.LogWarning("Redis is not connected. Skipping SetData for key: {Key}", key);
+            return;
         }
 
-        _logger.LogInformation("Successfully saved data to Redis for key: {Key}", key);
+        try
+        {
+            _logger.LogInformation("Saving data to Redis for key: {Key} with expiration {Expiration}", key, expirationTime);
+
+            var jsonData = JsonSerializer.Serialize(data);
+            await _db.StringSetAsync(key, jsonData, expirationTime);
+
+            if (!string.IsNullOrEmpty(group))
+            {
+                await _db.SetAddAsync(group, key);
+                _logger.LogInformation("Key: {Key} added to group: {Group}", key, group);
+            }
+
+            _logger.LogInformation("Successfully saved data to Redis for key: {Key}", key);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error saving data to Redis for key: {Key}", key);
+        }
     }
 
     public async Task RemoveDataAsync(string key)
     {
-        _logger.LogInformation("Removing data from Redis for key: {Key}", key);
+        if (!_db.Multiplexer.IsConnected)
+        {
+            _logger.LogWarning("Redis is not connected. Skipping RemoveData for key: {Key}", key);
+            return;
+        }
 
-        var result = await _db.KeyDeleteAsync(key);
+        try
+        {
+            _logger.LogInformation("Removing data from Redis for key: {Key}", key);
 
-        if (result)
-            _logger.LogInformation("Successfully removed data from Redis for key: {Key}", key);
-        else
-            _logger.LogWarning("No data found in Redis to remove for key: {Key}", key);
+            var result = await _db.KeyDeleteAsync(key);
+
+            if (result)
+                _logger.LogInformation("Successfully removed data from Redis for key: {Key}", key);
+            else
+                _logger.LogWarning("No data found in Redis to remove for key: {Key}", key);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error removing data from Redis for key: {Key}", key);
+        }
     }
 
     public async Task RemoveGroupAsync(string setName)
     {
-        _logger.LogInformation("Removing group: {Group} from Redis", setName);
-
-        var keys = await _db.SetMembersAsync(setName);
-
-        foreach (var key in keys)
+        if (!_db.Multiplexer.IsConnected)
         {
-            await _db.KeyDeleteAsync(key.ToString());
-            _logger.LogInformation("Removed key: {Key} from Redis group: {Group}", key, setName);
+            _logger.LogWarning("Redis is not connected. Skipping RemoveGroup for group: {Group}", setName);
+            return;
         }
 
-        await _db.KeyDeleteAsync(setName);
-        _logger.LogInformation("Successfully removed group: {Group} and all its keys from Redis", setName);
+        try
+        {
+            _logger.LogInformation("Removing group: {Group} from Redis", setName);
+
+            var keys = await _db.SetMembersAsync(setName);
+
+            foreach (var key in keys)
+            {
+                await _db.KeyDeleteAsync(key.ToString());
+                _logger.LogInformation("Removed key: {Key} from Redis group: {Group}", key, setName);
+            }
+
+            await _db.KeyDeleteAsync(setName);
+            _logger.LogInformation("Successfully removed group: {Group} and all its keys from Redis", setName);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error removing group: {Group} from Redis", setName);
+        }
     }
 }

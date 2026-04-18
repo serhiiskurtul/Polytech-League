@@ -40,6 +40,15 @@ public static class AuthenticationExtensions
                     // Якщо токен вже є в заголовку Authorization, нічого не робимо
                     if (!string.IsNullOrEmpty(context.Token)) return Task.CompletedTask;
 
+                    // Support SignalR tokens in query string
+                    var accessToken = context.Request.Query["access_token"];
+                    var path = context.HttpContext.Request.Path;
+                    if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                    {
+                        context.Token = accessToken;
+                        return Task.CompletedTask;
+                    }
+
                     // Якщо в заголовку немає, шукаємо в куках
                     var cookieToken = context.Request.Cookies["access_token"];
                     if (!string.IsNullOrEmpty(cookieToken)) {

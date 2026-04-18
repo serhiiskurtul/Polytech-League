@@ -38,6 +38,8 @@ public static class ServiceExtension
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<IPlayerService, PlayerService>(); // Unified Player Service
         services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IChatService, ChatService>();
+
 
         services.AddScoped<IChessEventService, ChessEventService>();
         services.AddScoped<IChessGameService, ChessGameService>();

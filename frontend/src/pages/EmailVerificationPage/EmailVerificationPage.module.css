@@ -1,99 +1,129 @@
-/* EmailVerificationPage.module.css */
-.container {
+.verificationContainer {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px;
+  padding: 40px 20px;
+  background: var(--bg);
 }
 
-.card {
-  background: white;
-  border-radius: 16px;
-  padding: 40px;
+.verificationCard {
+  background: var(--card);
+  border-radius: 24px;
+  padding: 48px;
   width: 100%;
   max-width: 480px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
   text-align: center;
+  animation: fadeIn 0.5s ease-out;
 }
 
-.icon {
-  font-size: 64px;
-  margin-bottom: 20px;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-h2 {
-  color: #333;
-  margin-bottom: 16px;
-  font-size: 28px;
+.header {
+  margin-bottom: 32px;
+}
+
+.iconContainer {
+  width: 80px;
+  height: 80px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin: 0 auto 24px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 12px;
 }
 
 .description {
-  color: #666;
-  margin-bottom: 32px;
+  font-size: 16px;
+  color: var(--muted);
   line-height: 1.6;
 }
 
-.emailHighlight {
-  font-weight: bold;
-  color: #667eea;
+.description strong {
+  color: var(--text);
 }
 
-.message {
-  padding: 12px 16px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  font-size: 14px;
-}
-
-.successMessage {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
+.codeSection {
+  margin-bottom: 32px;
 }
 
 .errorMessage {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-}
-
-.resendLink {
-  background: none;
-  border: none;
-  color: #667eea;
-  cursor: pointer;
+  margin-top: 12px;
+  color: var(--accent);
   font-size: 14px;
-  margin: 20px 0;
-  padding: 8px;
-  transition: color 0.2s;
+  font-weight: 500;
 }
 
-.resendLink:hover:not(:disabled) {
-  color: #764ba2;
+.actionSection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.resendSection {
+  min-height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.resendButton {
+  background: transparent;
+  border: none;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: all 0.2s;
+}
+
+.resendButton:hover:not(:disabled) {
   text-decoration: underline;
+  opacity: 0.8;
 }
 
-.resendLink:disabled {
-  color: #999;
+.resendButton:disabled {
+  color: var(--muted);
   cursor: not-allowed;
 }
 
-.backLink {
-  display: block;
-  margin-top: 24px;
-  color: #666;
-  text-decoration: none;
-  font-size: 14px;
-  transition: color 0.2s;
-  background: none;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-  padding: 8px;
+.footer {
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
 }
 
-.backLink:hover {
-  color: #667eea;
+.backButton {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  transition: color 0.2s;
+}
+
+.backButton:hover {
+  color: var(--text);
 }

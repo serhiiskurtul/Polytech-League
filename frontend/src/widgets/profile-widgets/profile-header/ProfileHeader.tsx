@@ -19,9 +19,10 @@ interface ProfileHeaderProps {
   onAvatarUpload?: () => void;
   onLogout?: () => void;
   onCompare?: () => void;
+  onMessage?: () => void;
 }
 
-const ProfileHeader = ({ userData, onEdit, onAvatarUpload, onLogout, onCompare }: ProfileHeaderProps) => {
+const ProfileHeader = ({ userData, onEdit, onAvatarUpload, onLogout, onCompare, onMessage }: ProfileHeaderProps) => {
   return (
     <div className={styles.profileHeader}>
       <div className={styles.profileHeaderCard}>
@@ -76,6 +77,11 @@ const ProfileHeader = ({ userData, onEdit, onAvatarUpload, onLogout, onCompare }
               {onCompare && (
                 <button className={styles.compareBtn} onClick={onCompare}>
                   <i className="fas fa-arrows-left-right"></i> Порівняти
+                </button>
+              )}
+              {onMessage && (
+                <button className={styles.messageBtn} onClick={onMessage}>
+                  <i className="fas fa-comment-dots"></i> Написати
                 </button>
               )}
               {onLogout && (

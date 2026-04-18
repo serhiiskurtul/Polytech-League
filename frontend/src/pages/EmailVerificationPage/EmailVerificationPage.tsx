@@ -3,8 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { CodeInput, VerificationButton, CountdownTimer } from "@/shared/ui";
 import { showToast } from '@/shared/lib/toast';
 import styles from './EmailVerificationPage.module.css';
-
-const API_URL = 'http://localhost:5000';
+import axiosInstance from '@/shared/api/axiosInstance';
 
 const EmailVerification = () => {
   const [code, setCode] = useState<string[]>(['', '', '', '', '', '']);
@@ -32,23 +31,9 @@ const EmailVerification = () => {
 
   const verifyEmail = async (email: string, code: string) => {
     try {
-      const response = await fetch(`${API_URL}/email/verify`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email,
-          code: code
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Помилка верифікації: ${response.status}`);
-      }
-
+      await axiosInstance.post('/email/verify', { email, code });
       return;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Помилка запиту верифікації:', error);
       throw error;
     }
@@ -56,19 +41,8 @@ const EmailVerification = () => {
 
   const resendVerificationEmail = async (email: string) => {
     try {
-      const response = await fetch(`${API_URL}/email/send-verification-email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Помилка відправки email: ${response.status}`);
-      }
-
-      return await response.json();
+      const response = await axiosInstance.post('/email/send-verification-email', { email });
+      return response.data;
     } catch (error) {
       console.error('Помилка відправки email:', error);
       throw error;

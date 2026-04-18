@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using Testcontainers.PostgreSql;
 using Xunit;
-using PolytechLeague.Infrastructure.Persistence.Database;
+using PolytechLeague.Persistence.Database;
 using PolytechLeague.Infrastructure.Redis;
 using PolytechLeague.Application.Services.Interfaces;
 using PolytechLeague.Application.Dto;

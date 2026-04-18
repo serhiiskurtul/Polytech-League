@@ -40,6 +40,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<EventPhotos> EventPhotos { get; set; }
     public DbSet<Notification> Notifications { get; set; }
+    public DbSet<Conversation> Conversations { get; set; }
+    public DbSet<Message> Messages { get; set; }
+
     
     // Unified Players
     public DbSet<Player> Players { get; set; }
@@ -126,6 +129,9 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new EventConfiguration());
         modelBuilder.ApplyConfiguration(new EventPhotosConfiguration());
         modelBuilder.ApplyConfiguration(new NotificationConfiguration());
+        modelBuilder.ApplyConfiguration(new ConversationConfiguration());
+        modelBuilder.ApplyConfiguration(new MessageConfiguration());
+
 
         // Chess configurations
         modelBuilder.ApplyConfiguration(new ChessRefereeConfiguration());

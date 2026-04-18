@@ -11,6 +11,8 @@ using PolytechLeague.API.Extensions;
 using Serilog;
 using PolytechLeague.API.Middlewares;
 using Microsoft.OpenApi.Models;
+using PolytechLeague.API.Hubs;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,23 +82,11 @@ builder.Services
     .AddServices()
     .AddAuth(builder.Configuration);
 
-var redisConnectionString = builder.Configuration["RedisSettings:Redis"];
-if (string.IsNullOrEmpty(redisConnectionString))
-{
-    Console.WriteLine("WARNING: Redis connection string is empty. UI/Cache features might be limited.");
-}
+var redisConnectionString = builder.Configuration["RedisSettings:Redis"] ?? "localhost:6379";
 
-try 
-{
-    var multiplexer = ConnectionMultiplexer.Connect(redisConnectionString ?? "localhost:6379,abortConnect=false");
-    builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"WARNING: Could not connect to Redis: {ex.Message}. Starting without Redis multiplexer.");
-    // We register a dummy if needed, but usually it's better to let it fail where used or handle null
-    // Here we'll register it as a singleton that might throw if used, to satisfy DI but log the error
-}
+// Use abortConnect=false to prevent it from throwing on startup if Redis is down
+var multiplexer = ConnectionMultiplexer.Connect($"{redisConnectionString},abortConnect=false");
+builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(nameof(EmailSettings)));
@@ -108,6 +98,9 @@ builder.Services.AddResponseCompression(options =>
     options.Providers.Add<BrotliCompressionProvider>();
     options.Providers.Add<GzipCompressionProvider>();
 });
+
+builder.Services.AddSignalR();
+
 
 
 builder.Services.AddRateLimiter(options =>
@@ -151,6 +144,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<ChatHub>("/hubs/chat");
+
 
 app.Run();
 

@@ -5,8 +5,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { InputSign, ButtonSign, Logo } from '@/shared/ui';
-
-const API_URL = 'http://localhost:5000';
+import axiosInstance from '@/shared/api/axiosInstance';
 
 // Схема валідації
 const signupSchema = yup.object({
@@ -62,36 +61,25 @@ export default function Signup() {
 
   const registerUser = async (userData: any) => {
     try {
-      console.log('Відправка запиту на:', `${API_URL}/users`);
+      console.log('Відправка запиту на реєстрацію...');
       
-      const response = await fetch(`${API_URL}/users`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-      });
-
-      if (!response.ok) {
-        let serverMessage = `Помилка сервера: ${response.status}`;
-
-        try {
-          const errorData = await response.json();
-          serverMessage =
-            errorData.detail ||
-            errorData.message ||
-            errorData.title ||
-            serverMessage;
-        } catch (e) {
-          console.log('Не вдалося розпарсити помилку як JSON');
-        }
-
-        throw new Error(serverMessage);
+      const response = await axiosInstance.post('/users', userData);
+      return { success: true, data: response.data };
+    } catch (error: any) {
+      let serverMessage = 'Помилка сервера';
+      
+      if (error.response) {
+        const errorData = error.response.data;
+        serverMessage =
+          errorData.detail ||
+          errorData.message ||
+          errorData.title ||
+          `Помилка ${error.response.status}`;
+      } else if (error.request) {
+        serverMessage = 'Сервер не відповідає';
       }
 
-      return { success: true };
-    } catch (error) {
-      throw error;
+      throw new Error(serverMessage);
     }
   };
 
@@ -107,6 +95,14 @@ export default function Signup() {
 
     try {
       await registerUser(userData);
+      
+      // Відправляємо лист для підтвердження
+      try {
+        await axiosInstance.post('/email/send-verification-email', { email: data.email });
+      } catch (emailError) {
+        console.error("Не вдалося відправити лист для підтвердження", emailError);
+        // Не перериваємо процес, якщо лист не відправився (може бути Debug Mode)
+      }
       
       localStorage.setItem('emailToVerify', data.email);
       sessionStorage.setItem('pendingEmailVerification', 'true');

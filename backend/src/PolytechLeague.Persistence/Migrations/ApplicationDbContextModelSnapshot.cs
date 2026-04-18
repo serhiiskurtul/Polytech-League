@@ -36,7 +36,7 @@ namespace PolytechLeague.Persistence.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "table_tennis_category", new[] { "men", "women", "mixed" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "table_tennis_hand", new[] { "left", "right", "both" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "table_tennis_tournament_type", new[] { "single_elimination", "double_elimination", "round_robin" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "user_role", new[] { "user", "admin" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "user_role", new[] { "none", "user", "admin" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "volleyball_position", new[] { "setter", "outside_hitter", "middle_blocker", "opposite", "libero" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "volleyball_tournament_type", new[] { "single_elimination", "double_elimination", "round_robin", "swiss", "groups_playoff" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -699,6 +699,41 @@ namespace PolytechLeague.Persistence.Migrations
                     b.ToTable("chess_teams", (string)null);
                 });
 
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Conversation", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("LastMessageAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_message_at");
+
+                    b.Property<long>("User1Id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("user1_id");
+
+                    b.Property<long>("User2Id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("user2_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("User2Id");
+
+                    b.HasIndex("User1Id", "User2Id")
+                        .IsUnique();
+
+                    b.ToTable("conversations", (string)null);
+                });
+
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Event", b =>
                 {
                     b.Property<long>("Id")
@@ -875,6 +910,47 @@ namespace PolytechLeague.Persistence.Migrations
                     b.HasIndex("EventId");
 
                     b.ToTable("futsal_teams", (string)null);
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Message", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("content");
+
+                    b.Property<long>("ConversationId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("conversation_id");
+
+                    b.Property<bool>("IsRead")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_read");
+
+                    b.Property<long>("SenderId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("sender_id");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("sent_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConversationId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("messages", (string)null);
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Notification", b =>
@@ -2255,6 +2331,25 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Navigation("Event");
                 });
 
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Conversation", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.User", "User1")
+                        .WithMany()
+                        .HasForeignKey("User1Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.User", "User2")
+                        .WithMany()
+                        .HasForeignKey("User2Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User1");
+
+                    b.Navigation("User2");
+                });
+
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Event", b =>
                 {
                     b.HasOne("PolytechLeague.Domain.Entities.Player", "FirstPlace")
@@ -2330,6 +2425,25 @@ namespace PolytechLeague.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Message", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Conversation", "Conversation")
+                        .WithMany("Messages")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Conversation");
+
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Notification", b =>
@@ -2924,6 +3038,11 @@ namespace PolytechLeague.Persistence.Migrations
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Chess.ChessTeam", b =>
                 {
                     b.Navigation("Players");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Conversation", b =>
+                {
+                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Event", b =>
