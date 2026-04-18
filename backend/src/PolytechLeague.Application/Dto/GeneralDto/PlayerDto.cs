@@ -61,6 +61,15 @@ public class PlayerDto
     public int WinsCount { get; set; }
     public int GoalsScored { get; set; }
     public int PerformanceScore { get; set; }
+    public List<SportStatsDto> SportStats { get; set; } = new();
+}
+
+public class SportStatsDto
+{
+    public string SportType { get; set; } = string.Empty;
+    public int PerformanceScore { get; set; }
+    public int MatchesPlayed { get; set; }
+    public int WinsCount { get; set; }
 }
 
 public static class PlayerDtoExtensions
@@ -105,7 +114,8 @@ public static class PlayerDtoExtensions
             WinsCount = 0,
             GoalsScored = 0,
             PerformanceScore = 0,
-            Sports = new List<string>()
+            Sports = new List<string>(),
+            SportStats = new List<SportStatsDto>()
         };
     }
 

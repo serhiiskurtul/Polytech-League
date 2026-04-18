@@ -165,51 +165,45 @@ public class PlayerService : IPlayerService
 
             var playerIds = players.Select(p => p.Id).ToList();
 
-            // 1. Fetch ALL relevant events for multipliers (Cache by Type and Id)
+            // 1. Level multipliers
             var levelMultipliers = new Dictionary<CompetitionLevel, double> {
                 { CompetitionLevel.CollegeGroup, 1.0 },
                 { CompetitionLevel.Regional, 2.5 },
                 { CompetitionLevel.National, 5.0 }
             };
 
-            // Safely fetch event levels. Using anonymous type to avoid TPT issues if needed.
             var allEvents = await _dbContext.Set<Event>()
                 .Select(e => new { e.Id, e.Level })
                 .ToDictionaryAsync(e => e.Id, e => e.Level, cancellationToken);
 
-            // 2. Fetch ALL achievements for these players in a few queries
+            // 2. Achievements
             var chessAch = await _dbContext.ChessEventParticipants.Include(p => p.Tournament).Where(p => playerIds.Contains(p.PlayerId)).ToListAsync(cancellationToken);
             var checkersAch = await _dbContext.CheckersEventParticipants.Include(p => p.Event).Where(p => playerIds.Contains(p.PlayerId)).ToListAsync(cancellationToken);
             var ttAch = await _dbContext.TableTennisEventParticipants.Include(p => p.Tournament).Where(p => playerIds.Contains(p.PlayerId)).ToListAsync(cancellationToken);
             var badmintonAch = await _dbContext.BadmintonEventParticipants.Include(p => p.Event).Where(p => playerIds.Contains(p.PlayerId)).ToListAsync(cancellationToken);
             
-            // Generic Winners
             var genericWinners = await _dbContext.Set<Event>()
                 .Where(e => (e.FirstPlaceId.HasValue && playerIds.Contains(e.FirstPlaceId.Value)) || 
                             (e.SecondPlaceId.HasValue && playerIds.Contains(e.SecondPlaceId.Value)) || 
                             (e.ThirdPlaceId.HasValue && playerIds.Contains(e.ThirdPlaceId.Value)))
                 .ToListAsync(cancellationToken);
 
-            // Team Sports
             var futsalTeams = await _dbContext.FutsalTeams.Include(t => t.Event).Include(t => t.Players).Where(t => t.Players.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
             var volleyballTeams = await _dbContext.VolleyballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => t.Players.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
             var bballTeams = await _dbContext.Basketball3x3Teams.Include(t => t.Event).Include(t => t.Players).Where(t => t.Players.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
             var beachVTeams = await _dbContext.BeachVolleyballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => t.Players.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
 
-            // 3. Collect Match Stats (Simplified for performance)
-            // Fetching counts directly per player is expensive in a loop, fetching all relevant games is memory intensive.
-            // We'll do a middle ground: aggregate using GroupBy in the DB.
-            var chessWhite = await _dbContext.ChessGames.Where(g => g.WhitePlayerId.HasValue && playerIds.Contains(g.WhitePlayerId.Value)).GroupBy(g => g.WhitePlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.WhiteWin) }).ToListAsync(cancellationToken);
-            var chessBlack = await _dbContext.ChessGames.Where(g => g.BlackPlayerId.HasValue && playerIds.Contains(g.BlackPlayerId.Value)).GroupBy(g => g.BlackPlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.BlackWin) }).ToListAsync(cancellationToken);
-            
-            var checkersWhite = await _dbContext.CheckersGames.Where(g => g.WhitePlayerId.HasValue && playerIds.Contains(g.WhitePlayerId.Value)).GroupBy(g => g.WhitePlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.WhiteWin) }).ToListAsync(cancellationToken);
-            var checkersBlack = await _dbContext.CheckersGames.Where(g => g.BlackPlayerId.HasValue && playerIds.Contains(g.BlackPlayerId.Value)).GroupBy(g => g.BlackPlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.BlackWin) }).ToListAsync(cancellationToken);
-
-            var ttP1 = await _dbContext.TableTennisMatches.Where(g => playerIds.Contains(g.Player1Id)).GroupBy(g => g.Player1Id).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
-            var ttP2 = await _dbContext.TableTennisMatches.Where(g => playerIds.Contains(g.Player2Id)).GroupBy(g => g.Player2Id).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
-
-            var armP1 = await _dbContext.ArmwrestlingMatches.Where(g => playerIds.Contains(g.Player1Id)).GroupBy(g => g.Player1Id).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
-            var armP2 = await _dbContext.ArmwrestlingMatches.Where(g => playerIds.Contains(g.Player2Id)).GroupBy(g => g.Player2Id).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
+            // 3. Match Stats
+            var cwS = await _dbContext.ChessGames.Where(g => g.WhitePlayerId.HasValue && playerIds.Contains(g.WhitePlayerId.Value)).GroupBy(g => g.WhitePlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.WhiteWin) }).ToListAsync(cancellationToken);
+            var cbS = await _dbContext.ChessGames.Where(g => g.BlackPlayerId.HasValue && playerIds.Contains(g.BlackPlayerId.Value)).GroupBy(g => g.BlackPlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.BlackWin) }).ToListAsync(cancellationToken);
+            var chwS = await _dbContext.CheckersGames.Where(g => g.WhitePlayerId.HasValue && playerIds.Contains(g.WhitePlayerId.Value)).GroupBy(g => g.WhitePlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.WhiteWin) }).ToListAsync(cancellationToken);
+            var chbS = await _dbContext.CheckersGames.Where(g => g.BlackPlayerId.HasValue && playerIds.Contains(g.BlackPlayerId.Value)).GroupBy(g => g.BlackPlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.BlackWin) }).ToListAsync(cancellationToken);
+            var tt1S = await _dbContext.TableTennisMatches.Where(g => playerIds.Contains(g.Player1Id)).GroupBy(g => g.Player1Id).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
+            var tt2S = await _dbContext.TableTennisMatches.Where(g => playerIds.Contains(g.Player2Id)).GroupBy(g => g.Player2Id).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
+            var arm1S = await _dbContext.ArmwrestlingMatches.Where(g => playerIds.Contains(g.Player1Id)).GroupBy(g => g.Player1Id).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
+            var arm2S = await _dbContext.ArmwrestlingMatches.Where(g => playerIds.Contains(g.Player2Id)).GroupBy(g => g.Player2Id).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
+            var bad1S = await _dbContext.BadmintonMatches.Where(g => g.Player1Id.HasValue && playerIds.Contains(g.Player1Id.Value)).GroupBy(g => g.Player1Id!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerPlayerId == g.Key) }).ToListAsync(cancellationToken);
+            var bad2S = await _dbContext.BadmintonMatches.Where(g => g.Player2Id.HasValue && playerIds.Contains(g.Player2Id.Value)).GroupBy(g => g.Player2Id!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerPlayerId == g.Key) }).ToListAsync(cancellationToken);
 
             var playerDtos = new List<PlayerDto>();
 
@@ -217,113 +211,114 @@ public class PlayerService : IPlayerService
             {
                 var dto = player.ToDto();
                 var playerId = player.Id;
-                var playerAchievements = new List<AchievementDto>();
+                var achievements = new List<AchievementDto>();
                 var sportTypes = new HashSet<string>();
 
-                // Add Achievements from bulk data
                 foreach (var a in chessAch.Where(x => x.PlayerId == playerId && x.Tournament != null)) {
-                    playerAchievements.Add(new AchievementDto { TournamentName = a.Tournament!.Name, SportType = "chess", Date = a.Tournament.Date, Rank = a.Rank, TournamentId = a.TournamentId });
+                    achievements.Add(new AchievementDto { TournamentName = a.Tournament!.Name, SportType = "chess", Date = a.Tournament.Date, Rank = a.Rank, TournamentId = a.TournamentId });
                     sportTypes.Add("chess");
                 }
                 foreach (var a in checkersAch.Where(x => x.PlayerId == playerId && x.Event != null)) {
-                    playerAchievements.Add(new AchievementDto { TournamentName = a.Event!.Name, SportType = "checkers", Date = a.Event.Date, Rank = a.Rank, TournamentId = a.TournamentId });
+                    achievements.Add(new AchievementDto { TournamentName = a.Event!.Name, SportType = "checkers", Date = a.Event.Date, Rank = a.Rank, TournamentId = a.TournamentId });
                     sportTypes.Add("checkers");
                 }
                 foreach (var a in ttAch.Where(x => x.PlayerId == playerId && x.Tournament != null)) {
-                    playerAchievements.Add(new AchievementDto { TournamentName = a.Tournament!.Name, SportType = "table_tennis", Date = a.Tournament.Date, Rank = a.Rank, TournamentId = a.TournamentId });
+                    achievements.Add(new AchievementDto { TournamentName = a.Tournament!.Name, SportType = "table_tennis", Date = a.Tournament.Date, Rank = a.Rank, TournamentId = a.TournamentId });
                     sportTypes.Add("table_tennis");
                 }
                 foreach (var a in badmintonAch.Where(x => x.PlayerId == playerId && x.Event != null)) {
-                    playerAchievements.Add(new AchievementDto { TournamentName = a.Event!.Name, SportType = "badminton", Date = a.Event.Date, Rank = a.Rank, TournamentId = a.EventId });
+                    achievements.Add(new AchievementDto { TournamentName = a.Event!.Name, SportType = "badminton", Date = a.Event.Date, Rank = a.Rank, TournamentId = a.EventId });
                     sportTypes.Add("badminton");
                 }
                 foreach (var e in genericWinners.Where(x => x.FirstPlaceId == playerId || x.SecondPlaceId == playerId || x.ThirdPlaceId == playerId)) {
                     int r = (e.FirstPlaceId == playerId) ? 1 : ((e.SecondPlaceId == playerId) ? 2 : 3);
-                    playerAchievements.Add(new AchievementDto { TournamentName = e.Name, SportType = "armwrestling", Date = e.Date, Rank = r, TournamentId = e.Id });
+                    achievements.Add(new AchievementDto { TournamentName = e.Name, SportType = "armwrestling", Date = e.Date, Rank = r, TournamentId = e.Id });
                     sportTypes.Add("armwrestling");
                 }
 
                 // Team Sports
                 foreach (var t in futsalTeams.Where(x => x.Players.Any(p => p.Id == playerId) && x.Event != null)) {
                     int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                    playerAchievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "futsal", Date = t.Event.Date, Rank = r, TournamentId = t.EventId });
+                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "futsal", Date = t.Event.Date, Rank = r, TournamentId = t.EventId });
                     sportTypes.Add("futsal");
                 }
                 foreach (var t in volleyballTeams.Where(x => x.Players.Any(p => p.Id == playerId) && x.Event != null)) {
                     int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                    playerAchievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "volleyball", Date = t.Event.Date, Rank = r, TournamentId = t.EventId });
+                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "volleyball", Date = t.Event.Date, Rank = r, TournamentId = t.EventId });
                     sportTypes.Add("volleyball");
                 }
                 foreach (var t in bballTeams.Where(x => x.Players.Any(p => p.Id == playerId) && x.Event != null)) {
                     int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                    playerAchievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "basketball_3x3", Date = t.Event.Date, Rank = r, TournamentId = t.EventId });
+                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "basketball_3x3", Date = t.Event.Date, Rank = r, TournamentId = t.EventId });
                     sportTypes.Add("basketball_3x3");
                 }
                 foreach (var t in beachVTeams.Where(x => x.Players.Any(p => p.Id == playerId) && x.Event != null)) {
                     int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                    playerAchievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "beach_volleyball", Date = t.Event.Date, Rank = r, TournamentId = t.EventId });
+                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "beach_volleyball", Date = t.Event.Date, Rank = r, TournamentId = t.EventId });
                     sportTypes.Add("beach_volleyball");
                 }
 
-                dto.Achievements = playerAchievements;
+                dto.Achievements = achievements;
                 dto.Sports = sportTypes.ToList();
 
-                // Calculate Stats
-                int played = 0;
-                int won = 0;
+                // Stats
+                int played = 0, won = 0;
+                double totalScore = 0;
+                var sportStatsMap = new Dictionary<string, SportStatsDto>();
+                foreach (var sport in sportTypes) sportStatsMap[sport] = new SportStatsDto { SportType = sport };
 
-                played += chessWhite.FirstOrDefault(x => x.Id == playerId)?.Count ?? 0;
-                played += chessBlack.FirstOrDefault(x => x.Id == playerId)?.Count ?? 0;
-                won += chessWhite.FirstOrDefault(x => x.Id == playerId)?.Wins ?? 0;
-                won += chessBlack.FirstOrDefault(x => x.Id == playerId)?.Wins ?? 0;
+                foreach (var ach in achievements) {
+                    double pts = (ach.Rank == 1) ? 100 : (ach.Rank == 2 ? 50 : (ach.Rank == 3 ? 30 : 0));
+                    double mult = 1.0;
+                    if (allEvents.TryGetValue(ach.TournamentId, out var lvl)) {
+                        if (levelMultipliers.TryGetValue(lvl, out var m)) mult = m;
+                    }
+                    var finalPts = (int)Math.Round(pts * mult);
+                    totalScore += finalPts;
+                    if (sportStatsMap.TryGetValue(ach.SportType, out var s)) s.PerformanceScore += finalPts;
+                }
 
-                played += checkersWhite.FirstOrDefault(x => x.Id == playerId)?.Count ?? 0;
-                played += checkersBlack.FirstOrDefault(x => x.Id == playerId)?.Count ?? 0;
-                won += checkersWhite.FirstOrDefault(x => x.Id == playerId)?.Wins ?? 0;
-                won += checkersBlack.FirstOrDefault(x => x.Id == playerId)?.Wins ?? 0;
+                void AddStats(string sport, int p, int w) {
+                    played += p; won += w;
+                    if (p > 0) {
+                        if (!sportStatsMap.ContainsKey(sport)) sportStatsMap[sport] = new SportStatsDto { SportType = sport };
+                        var s = sportStatsMap[sport];
+                        s.MatchesPlayed += p; s.WinsCount += w;
+                        int pts = (p * 1) + (w * 2);
+                        s.PerformanceScore += pts; totalScore += pts;
+                    }
+                }
 
-                played += ttP1.FirstOrDefault(x => x.Id == playerId)?.Count ?? 0;
-                played += ttP2.FirstOrDefault(x => x.Id == playerId)?.Count ?? 0;
-                won += ttP1.FirstOrDefault(x => x.Id == playerId)?.Wins ?? 0;
-                won += ttP2.FirstOrDefault(x => x.Id == playerId)?.Wins ?? 0;
+                var cw = cwS.FirstOrDefault(x => x.Id == playerId);
+                var cb = cbS.FirstOrDefault(x => x.Id == playerId);
+                var chw = chwS.FirstOrDefault(x => x.Id == playerId);
+                var chb = chbS.FirstOrDefault(x => x.Id == playerId);
+                var t1 = tt1S.FirstOrDefault(x => x.Id == playerId);
+                var t2 = tt2S.FirstOrDefault(x => x.Id == playerId);
+                var a1 = arm1S.FirstOrDefault(x => x.Id == playerId);
+                var a2 = arm2S.FirstOrDefault(x => x.Id == playerId);
+                var b1 = bad1S.FirstOrDefault(x => x.Id == playerId);
+                var b2 = bad2S.FirstOrDefault(x => x.Id == playerId);
 
-                played += armP1.FirstOrDefault(x => x.Id == playerId)?.Count ?? 0;
-                played += armP2.FirstOrDefault(x => x.Id == playerId)?.Count ?? 0;
-                won += armP1.FirstOrDefault(x => x.Id == playerId)?.Wins ?? 0;
-                won += armP2.FirstOrDefault(x => x.Id == playerId)?.Wins ?? 0;
+                AddStats("chess", (cw?.Count ?? 0) + (cb?.Count ?? 0), (cw?.Wins ?? 0) + (cb?.Wins ?? 0));
+                AddStats("checkers", (chw?.Count ?? 0) + (chb?.Count ?? 0), (chw?.Wins ?? 0) + (chb?.Wins ?? 0));
+                AddStats("table_tennis", (t1?.Count ?? 0) + (t2?.Count ?? 0), (t1?.Wins ?? 0) + (t2?.Wins ?? 0));
+                AddStats("armwrestling", (a1?.Count ?? 0) + (a2?.Count ?? 0), (a1?.Wins ?? 0) + (a2?.Wins ?? 0));
+                AddStats("badminton", (b1?.Count ?? 0) + (b2?.Count ?? 0), (b1?.Wins ?? 0) + (b2?.Wins ?? 0));
 
                 dto.MatchesPlayed = played;
                 dto.WinsCount = won;
-
-                // Score Calculation
-                double score = 0;
-                foreach (var ach in dto.Achievements)
-                {
-                    double points = 0;
-                    if (ach.Rank == 1) points = 100;
-                    else if (ach.Rank == 2) points = 50;
-                    else if (ach.Rank == 3) points = 30;
-
-                    double multiplier = 1.0;
-                    if (allEvents.TryGetValue(ach.TournamentId, out var level))
-                    {
-                        if (levelMultipliers.TryGetValue(level, out var m)) multiplier = m;
-                    }
-                    score += points * multiplier;
-                }
-
-                score += played * 1;
-                score += won * 2;
-
-                dto.PerformanceScore = (int)Math.Round(score);
+                dto.PerformanceScore = (int)Math.Round(totalScore);
+                dto.SportStats = sportStatsMap.Values.ToList();
                 playerDtos.Add(dto);
             }
 
-            return playerDtos.OrderByDescending(p => p.PerformanceScore);
+            return playerDtos.OrderByDescending(p => p.PerformanceScore).ToList();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error in GetAllWithRankingsAsync");
+            try { System.IO.File.WriteAllText("rankings_error.txt", ex.ToString()); } catch {}
             return Enumerable.Empty<PlayerDto>();
         }
     }

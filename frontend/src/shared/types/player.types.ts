@@ -50,6 +50,12 @@ export interface PlayerDto {
     goalsScored?: number;
     performanceScore?: number;
     sports?: string[];
+    sportStats?: {
+        sportType: string;
+        performanceScore: number;
+        matchesPlayed: number;
+        winsCount: number;
+    }[];
 }
 
 export interface AchievementDto {

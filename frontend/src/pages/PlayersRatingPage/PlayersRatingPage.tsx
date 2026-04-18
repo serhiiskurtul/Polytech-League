@@ -84,8 +84,15 @@ const PlayersRatingPage = () => {
       );
     }
 
-    // Sorting by performance score (already sorted by backend but good to have)
-    return result.sort((a, b) => (b.performanceScore || 0) - (a.performanceScore || 0));
+    // Sorting
+    return result.sort((a, b) => {
+      if (activeTab !== 'Загальний') {
+        const aSport = a.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase());
+        const bSport = b.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase());
+        return (bSport?.performanceScore || 0) - (aSport?.performanceScore || 0);
+      }
+      return (b.performanceScore || 0) - (a.performanceScore || 0);
+    });
   }, [players, activeTab, searchQuery]);
 
   const getSportInfo = (sportKey: string) => {
@@ -225,7 +232,11 @@ const PlayersRatingPage = () => {
 
                         <div className={styles.cell}>
                           <div className={styles.ratingBox}>
-                            <div className={styles.ratingLarge}>{player.performanceScore}</div>
+                            <div className={styles.ratingLarge}>
+                              {activeTab === 'Загальний' 
+                                ? player.performanceScore 
+                                : player.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase())?.performanceScore || 0}
+                            </div>
                             <div className={styles.pointsLabel}>очок</div>
                           </div>
                         </div>
@@ -233,10 +244,18 @@ const PlayersRatingPage = () => {
                         <div className={styles.cell}>
                           <div className={styles.statsMini}>
                             <div className={styles.statMiniItem}>
-                              <span className={styles.statMiniVal}>{player.matchesPlayed}</span> ігор
+                              <span className={styles.statMiniVal}>
+                                {activeTab === 'Загальний' 
+                                  ? player.matchesPlayed 
+                                  : player.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase())?.matchesPlayed || 0}
+                              </span> ігор
                             </div>
                             <div className={styles.statMiniItem}>
-                              <span className={styles.statMiniVal}>{player.winsCount}</span> перемог
+                              <span className={styles.statMiniVal}>
+                                {activeTab === 'Загальний' 
+                                  ? player.winsCount 
+                                  : player.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase())?.winsCount || 0}
+                              </span> перемог
                             </div>
                           </div>
                         </div>
