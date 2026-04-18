@@ -518,9 +518,45 @@
 }
 
 /* Адаптивність */
+@media (max-width: 1024px) {
+  .profileContent {
+    grid-template-columns: 1fr;
+  }
+  
+  .profileTwoColumn {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+  
+  .profilePage {
+    padding: 16px 0 32px;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .mainContent, .sidebar {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 16px;
+  }
+}
+
 @media (max-width: 1200px) {
   .calendar-layout {
     grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 0 16px;
   }
   
   .day-details {
@@ -533,32 +569,83 @@
 }
 
 @media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 16px;
+    margin-bottom: 24px;
+  }
+
+  .page-title {
+    font-size: 28px;
+  }
+
   .calendar-controls {
     flex-direction: column;
     align-items: stretch;
+    gap: 16px;
+    padding: 16px;
   }
   
+  .calendar-container {
+    border-radius: 16px;
+  }
+
   .calendar-day {
-    min-height: 100px;
+    min-height: 80px;
+    padding: 8px;
   }
   
   .stat-card {
     padding: 16px;
   }
+
+  .calendar-stats {
+    padding: 0 16px;
+    gap: 12px;
+  }
+
+  .stat-value {
+    font-size: 20px;
+  }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 580px) {
   .calendar-weekdays {
     display: none;
   }
   
   .calendar-day {
-    min-height: 70px;
+    min-height: 60px;
   }
   
   .day-number {
     width: 24px;
     height: 24px;
     font-size: 12px;
+    top: 6px;
+    right: 6px;
+  }
+
+  .day-events {
+    margin-top: 24px;
+    gap: 2px;
+  }
+
+  .calendar-event {
+    height: 6px;
+    padding: 0;
+    text-indent: -9999px; /* Hide text, show only color bar */
+    border-radius: 3px;
+    border: none;
+  }
+  
+  .calendar-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .filters {
+    padding: 0 16px;
+    margin-bottom: 24px;
   }
 }

@@ -289,9 +289,37 @@
   cursor: pointer;
 }
 
+/* Responsive */
 @media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+  
+  .playerViewPage {
+    padding: 16px 0 32px;
+  }
+
+  .profileContent {
+    gap: 20px;
+    margin-top: 24px;
+  }
+
+  .page {
+    padding: 20px 16px 100px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .backBtnSmall {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+
   .playersRow {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
   
   .vsCircle {
@@ -299,20 +327,63 @@
   }
   
   .playerCard {
-    padding: 20px;
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .avatarWrapper {
+    width: 60px;
+    height: 60px;
+  }
+
+  .cardName {
+    font-size: 18px;
   }
   
   .statRow {
-    grid-template-columns: 1fr;
-    gap: 8px;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 4px;
+    padding: 12px 8px;
   }
   
   .statLabel {
-    order: -1;
-    font-size: 12px;
+    font-size: 11px;
+    grid-column: 2;
+    grid-row: 1;
   }
   
   .statValue {
-    font-size: 16px;
+    font-size: 14px;
+  }
+
+  .statValue:first-child {
+    grid-column: 1;
+    grid-row: 1;
+    text-align: left;
+  }
+
+  .statValue:last-child {
+    grid-column: 3;
+    grid-row: 1;
+    text-align: right;
+  }
+
+  .statsSection {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .playerCard {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .avatarWrapper {
+    margin: 0 auto;
+  }
+
+  .cardRank {
+    justify-content: center;
   }
 }

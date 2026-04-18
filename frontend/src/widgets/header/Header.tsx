@@ -30,49 +30,64 @@ export default function Header() {
     }
   }, [isAuthenticated]);
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const initials = user ? `${user.firstName[0] || ''}${user.lastName[0] || ''}`.toUpperCase() : '';
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+    if (!isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+    document.body.style.overflow = 'unset';
+  };
+
   return (
-    <header className={styles.header}>
+    <header className={`${styles.header} ${isMenuOpen ? styles.menuOpen : ''}`}>
       <div className={styles.container}>
         <div className={styles.logoContainer}>
           <Logo />
-          <Link to="/" className={styles.logoLink}>
+          <Link to="/" className={styles.logoLink} onClick={closeMenu}>
             <span className={styles.logoText}>Polytech League</span>
           </Link>
         </div>
 
-        <nav className={styles.navPrimary}>
+        <nav className={`${styles.navPrimary} ${isMenuOpen ? styles.navActive : ''}`}>
           <ul className={styles.navList}>
             <li>
-              <Link to="/" className={`${styles.navLink} ${styles.active}`}>
+              <Link to="/" className={`${styles.navLink} ${styles.active}`} onClick={closeMenu}>
                 <i className={`fas fa-home ${styles.navIcon}`}></i>
-                Головна
+                <span>Головна</span>
               </Link>
             </li>
             <li>
-              <Link to="/calendar" className={styles.navLink}>
+              <Link to="/calendar" className={styles.navLink} onClick={closeMenu}>
                 <i className={`fas fa-calendar-alt ${styles.navIcon}`}></i>
-                Календар
+                <span>Календар</span>
               </Link>
             </li>
             <li>
-              <Link to="/tournaments" className={styles.navLink}>
+              <Link to="/tournaments" className={styles.navLink} onClick={closeMenu}>
                 <i className={`fas fa-trophy ${styles.navIcon}`}></i>
-                Турніри
+                <span>Турніри</span>
               </Link>
             </li>
             <li>
-              <Link to="/ratings" className={styles.navLink}>
+              <Link to="/ratings" className={styles.navLink} onClick={closeMenu}>
                 <i className={`fas fa-chart-line ${styles.navIcon}`}></i>
-                Рейтинги
+                <span>Рейтинги</span>
               </Link>
             </li>
           </ul>
         </nav>
 
         <div className={styles.userActions}>
-          <Link to="/notifications" className={styles.notificationBtn}>
+          <Link to="/notifications" className={styles.notificationBtn} onClick={closeMenu}>
             <i className="fas fa-bell"></i>
             {unreadCount > 0 && (
               <span className={styles.notificationBadge}>{unreadCount}</span>
@@ -80,7 +95,7 @@ export default function Header() {
           </Link>
 
           {isAuthenticated && user ? (
-            <Link to="/profile" className={styles.userProfileLink}>
+            <Link to="/profile" className={styles.userProfileLink} onClick={closeMenu}>
               <div className={styles.userProfile}>
                 <div className={styles.userAvatar}>
                   {user.photoUrl && user.photoUrl.trim() !== '' ? (
@@ -97,13 +112,27 @@ export default function Header() {
               </div>
             </Link>
           ) : (
-            <Link to="/login" className={styles.loginBtn}>
+            <Link to="/login" className={styles.loginBtn} onClick={closeMenu}>
               <i className="fas fa-sign-in-alt"></i>
               <span>Увійти</span>
             </Link>
           )}
+
+          <button 
+            className={`${styles.burgerBtn} ${isMenuOpen ? styles.burgerActive : ''}`} 
+            onClick={toggleMenu}
+            aria-label="Toggle menu"
+          >
+            <div className={styles.burgerIcon}>
+              <span className={styles.burgerLine}></span>
+              <span className={styles.burgerLine}></span>
+              <span className={styles.burgerLine}></span>
+            </div>
+            <span className={styles.burgerText}>Меню</span>
+          </button>
         </div>
       </div>
+      {isMenuOpen && <div className={styles.overlay} onClick={closeMenu}></div>}
     </header>
   );
 }

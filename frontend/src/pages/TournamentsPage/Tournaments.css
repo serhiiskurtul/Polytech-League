@@ -28,7 +28,7 @@
 .create-tournament-btn {
   padding: 12px 24px;
   font-size: 16px;
-  max-width: 10%;
+  min-width: 200px;
 }
 
 /* Статистика */
