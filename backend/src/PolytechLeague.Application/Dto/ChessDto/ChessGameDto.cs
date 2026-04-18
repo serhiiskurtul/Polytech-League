@@ -28,6 +28,7 @@ public class ChessGameDto
 
     public int Round { get; set; }
     public int Board { get; set; }
+    public string? Pgn { get; set; }
 }
 
 
@@ -53,7 +54,8 @@ public static class ChessGameDtoExtensions
             BlackTeamScore = game.BlackTeamScore,
             Result = game.Result,
             Round = game.Round,
-            Board = game.Board
+            Board = game.Board,
+            Pgn = game.Pgn
         };
     }
 
@@ -71,7 +73,8 @@ public static class ChessGameDtoExtensions
             BlackTeamScore = dto.BlackTeamScore,
             Result = dto.Result,
             Round = dto.Round,
-            Board = dto.Board
+            Board = dto.Board,
+            Pgn = dto.Pgn
         };
     }
 }

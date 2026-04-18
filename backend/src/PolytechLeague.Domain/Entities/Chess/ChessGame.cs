@@ -26,4 +26,5 @@ public class ChessGame
     public GameResult Result { get; set; }
     public int Round { get; set; }
     public int Board { get; set; }
+    public string? Pgn { get; set; }
 }

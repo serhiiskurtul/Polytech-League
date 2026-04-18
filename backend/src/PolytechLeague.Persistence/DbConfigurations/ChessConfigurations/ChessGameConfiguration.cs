@@ -70,6 +70,10 @@ public class ChessGameConfiguration : IEntityTypeConfiguration<ChessGame>
             .HasColumnName("board")
             .IsRequired();
 
+        builder.Property(x => x.Pgn)
+            .HasColumnName("pgn")
+            .IsRequired(false);
+
         // ---------- Relationships ----------
         builder.HasOne(x => x.Tournament)
             .WithMany(x => x.Games)

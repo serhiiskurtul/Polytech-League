@@ -49,6 +49,7 @@ export interface ChessGameResponse {
   blackTeamId?: number | null;
   whiteTeamScore?: number | null;
   blackTeamScore?: number | null;
+  pgn?: string;
 }
 
 export interface ChessEventResponse {
@@ -117,4 +118,5 @@ export interface ChessGameDto {
     blackTeamId?: number | null;
     whiteTeamScore?: number | null;
     blackTeamScore?: number | null;
+    pgn?: string;
 }

@@ -24,5 +24,6 @@ public class ChessGameService(
         oldEntity.BlackTeamId = newEntity.BlackTeamId;
         oldEntity.WhiteTeamScore = newEntity.WhiteTeamScore.HasValue ? Math.Min(2.0, newEntity.WhiteTeamScore.Value) : null;
         oldEntity.BlackTeamScore = newEntity.BlackTeamScore.HasValue ? Math.Min(2.0, newEntity.BlackTeamScore.Value) : null;
+        oldEntity.Pgn = newEntity.Pgn;
     }
 }

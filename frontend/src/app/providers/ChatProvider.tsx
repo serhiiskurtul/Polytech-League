@@ -81,7 +81,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 accessTokenFactory: () => localStorage.getItem('access_token') || ''
             })
             .withAutomaticReconnect()
-            .configureLogging(LogLevel.Information)
+            .configureLogging(LogLevel.None)
             .build();
 
         setConnection(newConnection);
@@ -101,7 +101,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             try {
                 if (connection.state === HubConnectionState.Disconnected) {
                     await connection.start();
-                    isMounted && setConnection(newConnection);
+                    // Connection started successfully
                 }
             } catch (err: any) {
                 // Ignore AbortError caused by rapid re-mounting in dev mode

@@ -624,6 +624,10 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("board");
 
+                    b.Property<string>("Pgn")
+                        .HasColumnType("text")
+                        .HasColumnName("pgn");
+
                     b.Property<int>("Result")
                         .HasColumnType("integer")
                         .HasColumnName("result");

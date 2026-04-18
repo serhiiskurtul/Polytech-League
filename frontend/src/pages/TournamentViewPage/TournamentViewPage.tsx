@@ -54,6 +54,7 @@ import {
 import ArmwrestlingTournamentView from './components/ArmwrestlingTournamentView';
 import TeamSportsTournamentView from './components/TeamSportsTournamentView';
 import TournamentPodium from './components/TournamentPodium';
+import ChessGameViewerModal from './components/ChessGameViewerModal';
 import { Tournament } from '@/shared/types/tournament.types';
 import {
   ChessEventResponse,
@@ -129,10 +130,12 @@ const TournamentViewPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [newGame, setNewGame] = useState({ whitePlayerId: '', blackPlayerId: '', result: 'WhiteWin', round: 1, board: 1 });
+  const [newGame, setNewGame] = useState({ whitePlayerId: '', blackPlayerId: '', result: 'WhiteWin', round: 1, board: 1, pgn: '' });
+
+  const [viewingPgnGame, setViewingPgnGame] = useState<ChessGameResponse | null>(null);
 
   const [editingGameId, setEditingGameId] = useState<number | null>(null);
-  const [editingGameData, setEditingGameData] = useState<{ round: number; board: number; result: string; whitePlayerId: string; blackPlayerId: string }>({ round: 1, board: 1, result: 'WhiteWin', whitePlayerId: '', blackPlayerId: '' });
+  const [editingGameData, setEditingGameData] = useState<{ round: number; board: number; result: string; whitePlayerId: string; blackPlayerId: string, pgn: string }>({ round: 1, board: 1, result: 'WhiteWin', whitePlayerId: '', blackPlayerId: '', pgn: '' });
 
   const [editingParticipantId, setEditingParticipantId] = useState<number | null>(null);
   const [editingParticipantData, setEditingParticipantData] = useState<{ points: number; rank: number; weight: number }>({ points: 0, rank: 0, weight: 0 });
@@ -427,7 +430,8 @@ const TournamentViewPage = () => {
       board: game.board || 1,
       result: game.result,
       whitePlayerId: game.whitePlayerId ? game.whitePlayerId.toString() : '',
-      blackPlayerId: game.blackPlayerId ? game.blackPlayerId.toString() : ''
+      blackPlayerId: game.blackPlayerId ? game.blackPlayerId.toString() : '',
+      pgn: game.pgn || ''
     });
   };
 
@@ -469,7 +473,8 @@ const TournamentViewPage = () => {
           blackPlayerId: editingGameData.blackPlayerId ? Number(editingGameData.blackPlayerId) : null,
           result: editingGameData.result as GameResult,
           round: editingGameData.round,
-          board: 1 // default UI mock
+          board: editingGameData.board || 1,
+          pgn: editingGameData.pgn
         };
         await updateChessGame(gameId, payload);
       }
@@ -824,12 +829,13 @@ const TournamentViewPage = () => {
           blackPlayerId: newGame.blackPlayerId ? Number(newGame.blackPlayerId) : null,
           result: newGame.result as GameResult,
           round: Number(newGame.round) || 1,
-          board: Number(newGame.board) || 1
+          board: Number(newGame.board) || 1,
+          pgn: newGame.pgn
         };
         await createChessGame(payload);
       }
       alert("Матч успішно доданий!");
-      setNewGame({ ...newGame, result: 'WhiteWin', board: newGame.board + 1 });
+      setNewGame({ ...newGame, result: 'WhiteWin', board: newGame.board + 1, pgn: '' });
       fetchTournament(true); // Refresh
     } catch (err) {
       console.error(err);
@@ -934,6 +940,14 @@ const TournamentViewPage = () => {
 
   return (
     <div className={styles.tournamentViewPage}>
+      {viewingPgnGame && (
+        <ChessGameViewerModal
+          pgn={viewingPgnGame.pgn || ''}
+          whitePlayer={viewingPgnGame.whitePlayerName || 'Білі'}
+          blackPlayer={viewingPgnGame.blackPlayerName || 'Чорні'}
+          onClose={() => setViewingPgnGame(null)}
+        />
+      )}
       <div className={styles.container}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <button className={styles.backButton} onClick={() => navigate('/tournaments')}>
@@ -1386,6 +1400,16 @@ const TournamentViewPage = () => {
 
                             <button type="button" onClick={handleAddGame} style={{ padding: '8px 16px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>Зберегти</button>
                           </div>
+                          
+                          <div style={{ marginTop: '16px' }}>
+                            <label style={{ display: 'block', fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>PGN (опціонально)</label>
+                            <textarea 
+                              placeholder="Вставте PGN партії сюди..." 
+                              value={newGame.pgn} 
+                              onChange={(e) => setNewGame({ ...newGame, pgn: e.target.value })} 
+                              style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #ccc', minHeight: '80px', fontFamily: 'monospace' }}
+                            />
+                          </div>
                         </div>
                       )}
 
@@ -1431,7 +1455,7 @@ const TournamentViewPage = () => {
                               <th>{tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'Гравець 1' : 'Білі'}</th>
                               <th>{tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'Гравець 2' : 'Чорні'}</th>
                               <th>Результат</th>
-                              {isAdmin && <th>Дії</th>}
+                              {(isAdmin || tournament?.sport === 'chess') && <th>Дії</th>}
                             </tr>
                           </thead>
                           <tbody>
@@ -1480,6 +1504,14 @@ const TournamentViewPage = () => {
                                         </select>
                                       </td>
                                       <td>
+                                        <textarea 
+                                          placeholder="PGN..." 
+                                          value={editingGameData.pgn} 
+                                          onChange={(e) => setEditingGameData({ ...editingGameData, pgn: e.target.value })} 
+                                          style={{ width: '100%', padding: '4px', borderRadius: '4px', border: '1px solid #ccc', minHeight: '60px', fontFamily: 'monospace' }}
+                                        />
+                                      </td>
+                                      <td>
                                         <button type="button" onClick={() => handleSaveEdit(game.id)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }}><i className="fas fa-check"></i></button>
                                         <button type="button" onClick={handleCancelEdit} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><i className="fas fa-times"></i></button>
                                       </td>
@@ -1525,13 +1557,30 @@ const TournamentViewPage = () => {
                                           </span>
                                         )}
                                       </td>
-                                      {isAdmin && (
-                                        <td>
+                                      <td>
+                                        {isAdmin && (
                                           <button onClick={() => handleEditClick(game)} style={{ padding: '4px 8px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
                                             <i className="fas fa-edit"></i>
                                           </button>
-                                        </td>
-                                      )}
+                                        )}
+                                        {game.pgn && (
+                                          <button onClick={() => setViewingPgnGame(game)} style={{ 
+                                            padding: isAdmin ? '4px 8px' : '6px 16px', 
+                                            background: '#10b981', 
+                                            color: '#fff', 
+                                            border: 'none', 
+                                            borderRadius: '6px', 
+                                            cursor: 'pointer', 
+                                            marginLeft: isAdmin ? '4px' : '0',
+                                            fontSize: isAdmin ? '13px' : '14px',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '6px'
+                                          }} title="Переглянути партію">
+                                            <i className="fas fa-eye"></i> {!isAdmin && 'Дивитись'}
+                                          </button>
+                                        )}
+                                      </td>
                                     </>
                                   )}
                                 </tr>
