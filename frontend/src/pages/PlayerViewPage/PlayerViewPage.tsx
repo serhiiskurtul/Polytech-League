@@ -61,7 +61,8 @@ const PlayerViewPage = () => {
 
   const userData = {
     name: `${playerProfile.firstName} ${playerProfile.lastName}`,
-    studentId: playerProfile.group || '—',
+    group: playerProfile.group || '—',
+    studentId: playerProfile.studentId || '—',
     faculty: playerProfile.faculty || '—',
     email: '—', // Hide email for public profiles
     phone: '—',

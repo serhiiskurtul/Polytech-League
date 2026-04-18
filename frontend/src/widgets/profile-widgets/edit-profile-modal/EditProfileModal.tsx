@@ -12,6 +12,7 @@ interface EditProfileModalProps {
 const EditProfileModal = ({ isOpen, onClose, onSave, initialData }: EditProfileModalProps) => {
   const [formData, setFormData] = useState({
     group: initialData.group || '',
+    studentId: initialData.studentId || '',
     faculty: initialData.faculty || '',
     city: initialData.city || '',
     bio: initialData.bio || '',
@@ -57,6 +58,18 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData }: EditProfileM
               value={formData.group}
               onChange={handleChange}
               placeholder="Наприклад: ІТ-41"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="studentId">Студентський квиток (ID)</label>
+            <input
+              type="text"
+              id="studentId"
+              name="studentId"
+              value={formData.studentId}
+              onChange={handleChange}
+              placeholder="Наприклад: KB 12345678"
             />
           </div>
           

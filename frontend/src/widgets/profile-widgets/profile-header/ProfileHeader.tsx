@@ -4,6 +4,7 @@ interface UserData {
   name: string;
   badges: string[];
   bio: string;
+  group: string;
   studentId: string;
   faculty: string;
   phone: string;
@@ -91,7 +92,11 @@ const ProfileHeader = ({ userData, onEdit, onAvatarUpload, onLogout, onCompare }
           
           <div className={styles.profileDetails}>
             <div className={styles.detailItem}>
-              <span className={styles.detailLabel}><i className="fas fa-id-card"></i> Група</span>
+              <span className={styles.detailLabel}><i className="fas fa-users-rectangle"></i> Група</span>
+              <span className={styles.detailValue}>{userData.group}</span>
+            </div>
+            <div className={styles.detailItem}>
+              <span className={styles.detailLabel}><i className="fas fa-id-card"></i> Студ. квиток</span>
               <span className={styles.detailValue}>{userData.studentId}</span>
             </div>
             <div className={styles.detailItem}>

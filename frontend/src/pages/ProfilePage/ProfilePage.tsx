@@ -62,7 +62,8 @@ const ProfilePage = () => {
 
   const userData = {
     name: user ? `${user.firstName} ${user.lastName}` : 'Користувач',
-    studentId: playerProfile?.group || '-',
+    group: playerProfile?.group || '-',
+    studentId: playerProfile?.studentId || '-',
     faculty: playerProfile?.faculty || '-',
     phone: '-', 
     city: playerProfile?.city || '-',
