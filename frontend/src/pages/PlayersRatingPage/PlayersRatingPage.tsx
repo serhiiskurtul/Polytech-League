@@ -238,6 +238,26 @@ const PlayersRatingPage = () => {
                                 : player.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase())?.performanceScore || 0}
                             </div>
                             <div className={styles.pointsLabel}>очок</div>
+                            
+                            {player.pointsBreakdown && player.pointsBreakdown.length > 0 && (
+                              <div className={styles.breakdownTrigger}>
+                                <i className="fa-solid fa-circle-info"></i>
+                                <div className={`${styles.breakdownTooltip} ${index < 3 ? styles.tooltipDown : ''}`}>
+                                  <div className={styles.breakdownHeader}>Деталізація балів</div>
+                                  <div className={styles.breakdownList}>
+                                    {player.pointsBreakdown.map((entry, i) => (
+                                      <div key={i} className={styles.breakdownItem}>
+                                        <span className={styles.breakdownDesc}>{entry.description}</span>
+                                        <span className={styles.breakdownPoints}>+{entry.points}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                  <div className={styles.breakdownTotal}>
+                                    Разом: {player.performanceScore} очок
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
 

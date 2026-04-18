@@ -55,7 +55,15 @@ export interface PlayerDto {
         performanceScore: number;
         matchesPlayed: number;
         winsCount: number;
+        goalsCount: number;
     }[];
+    pointsBreakdown?: PointEntryDto[];
+}
+
+export interface PointEntryDto {
+    description: string;
+    points: number;
+    category: string;
 }
 
 export interface AchievementDto {

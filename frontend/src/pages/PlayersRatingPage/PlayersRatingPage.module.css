@@ -228,6 +228,8 @@
 .tableRow:hover {
   background: #f8fafc;
   transform: translateX(4px);
+  z-index: 10;
+  position: relative;
 }
 
 .cell {
@@ -329,6 +331,104 @@
   font-size: 12px;
   font-weight: 600;
   color: #94a3b8;
+}
+
+.breakdownTrigger {
+  position: relative;
+  margin-left: 8px;
+  color: #cbd5e1;
+  cursor: help;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.breakdownTrigger:hover {
+  color: #3b82f6;
+}
+
+.breakdownTooltip {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  width: 280px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  visibility: hidden;
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  z-index: 9999;
+  margin-bottom: 12px;
+  pointer-events: none;
+}
+
+.breakdownTrigger:hover .breakdownTooltip {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(-8px);
+}
+
+.tooltipDown {
+  bottom: auto !important;
+  top: 100% !important;
+  margin-top: 12px;
+  margin-bottom: 0 !important;
+}
+
+.breakdownTrigger:hover .tooltipDown {
+  transform: translateY(8px) !important;
+}
+
+.breakdownHeader {
+  font-size: 11px;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 8px;
+}
+
+.breakdownList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.breakdownItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.breakdownDesc {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.breakdownPoints {
+  font-size: 13px;
+  font-weight: 700;
+  color: #10b981;
+  white-space: nowrap;
+}
+
+.breakdownTotal {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px dashed #e2e8f0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1e293b;
+  text-align: right;
 }
 
 .statsMini {

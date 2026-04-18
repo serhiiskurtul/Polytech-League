@@ -62,6 +62,14 @@ public class PlayerDto
     public int GoalsScored { get; set; }
     public int PerformanceScore { get; set; }
     public List<SportStatsDto> SportStats { get; set; } = new();
+    public List<PointEntryDto> PointsBreakdown { get; set; } = new();
+}
+
+public class PointEntryDto
+{
+    public string Description { get; set; } = string.Empty;
+    public int Points { get; set; }
+    public string Category { get; set; } = string.Empty;
 }
 
 public class SportStatsDto

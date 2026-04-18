@@ -101,7 +101,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             try {
                 if (connection.state === HubConnectionState.Disconnected) {
                     await connection.start();
-                    if (isMounted) console.log('Connected to ChatHub');
+                    isMounted && setConnection(newConnection);
                 }
             } catch (err: any) {
                 // Ignore AbortError caused by rapid re-mounting in dev mode

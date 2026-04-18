@@ -271,17 +271,32 @@ public class PlayerService : IPlayerService
                 int played = 0, won = 0;
                 double totalScore = 0;
                 var sportStatsMap = new Dictionary<string, SportStatsDto>();
+                var pointsBreakdown = new List<PointEntryDto>();
                 foreach (var sport in sportTypes) sportStatsMap[sport] = new SportStatsDto { SportType = sport };
 
                 foreach (var ach in achievements) {
                     double pts = (ach.Rank == 1) ? 100 : (ach.Rank == 2 ? 50 : (ach.Rank == 3 ? 30 : 0));
+                    if (pts <= 0) continue;
+                    
                     double mult = 1.0;
+                    string levelName = "Міжгрупові";
                     if (allEvents.TryGetValue(ach.TournamentId, out var lvl)) {
                         if (levelMultipliers.TryGetValue(lvl, out var m)) mult = m;
+                        levelName = lvl switch {
+                            CompetitionLevel.Regional => "Обласні",
+                            CompetitionLevel.National => "Всеукраїнські",
+                            _ => "Міжгрупові"
+                        };
                     }
                     var finalPts = (int)Math.Round(pts * mult);
                     totalScore += finalPts;
                     if (sportStatsMap.TryGetValue(ach.SportType, out var s)) s.PerformanceScore += finalPts;
+                    
+                    pointsBreakdown.Add(new PointEntryDto {
+                        Description = $"{ach.Rank} місце: {ach.TournamentName} ({levelName})",
+                        Points = finalPts,
+                        Category = "Achievements"
+                    });
                 }
 
                 void AddStats(string sport, int p, int w) {
@@ -290,8 +305,21 @@ public class PlayerService : IPlayerService
                         if (!sportStatsMap.ContainsKey(sport)) sportStatsMap[sport] = new SportStatsDto { SportType = sport };
                         var s = sportStatsMap[sport];
                         s.MatchesPlayed += p; s.WinsCount += w;
-                        int pts = (p * 1) + (w * 2);
-                        s.PerformanceScore += pts; totalScore += pts;
+                        
+                        int matchPts = p * 1;
+                        int winPts = w * 2;
+                        int totalPts = matchPts + winPts;
+                        
+                        s.PerformanceScore += totalPts; 
+                        totalScore += totalPts;
+                        
+                        string sportName = sport switch {
+                            "chess" => "Шахи", "checkers" => "Шашки", "table_tennis" => "Настільний теніс",
+                            "armwrestling" => "Армрестлинг", "badminton" => "Бадмінтон", _ => sport
+                        };
+                        
+                        if (matchPts > 0) pointsBreakdown.Add(new PointEntryDto { Description = $"Участь у матчах ({sportName}): {p} ігор", Points = matchPts, Category = "Activity" });
+                        if (winPts > 0) pointsBreakdown.Add(new PointEntryDto { Description = $"Перемоги ({sportName}): {w} ігор", Points = winPts, Category = "Activity" });
                     }
                 }
 
@@ -321,6 +349,12 @@ public class PlayerService : IPlayerService
                     int goalPts = pGoals * 5;
                     s.PerformanceScore += goalPts;
                     totalScore += goalPts;
+                    
+                    pointsBreakdown.Add(new PointEntryDto { 
+                        Description = $"Забиті голи (Футзал): {pGoals} голів", 
+                        Points = goalPts, 
+                        Category = "Goals" 
+                    });
                 }
 
                 dto.MatchesPlayed = played;
@@ -328,6 +362,7 @@ public class PlayerService : IPlayerService
                 dto.GoalsScored = pGoals;
                 dto.PerformanceScore = (int)Math.Round(totalScore);
                 dto.SportStats = sportStatsMap.Values.ToList();
+                dto.PointsBreakdown = pointsBreakdown.OrderByDescending(x => x.Points).ToList();
                 playerDtos.Add(dto);
             }
 
@@ -583,32 +618,96 @@ public class PlayerService : IPlayerService
     {
         if (dto.Id == null) return;
         var playerId = dto.Id.Value;
+        var pointsBreakdown = new List<PointEntryDto>();
+        double totalScore = 0;
 
-        // 1. Matches Played
+        // 1. Achievements Points (from previously populated Achievements list)
+        var levelMultipliers = new Dictionary<CompetitionLevel, double> {
+            { CompetitionLevel.CollegeGroup, 1.0 },
+            { CompetitionLevel.Regional, 2.5 },
+            { CompetitionLevel.National, 5.0 }
+        };
+
+        var eventIds = dto.Achievements.Select(a => a.TournamentId).Distinct().ToList();
+        var eventLevels = await _dbContext.Set<Event>()
+            .Where(e => eventIds.Contains(e.Id))
+            .Select(e => new { e.Id, e.Level })
+            .ToDictionaryAsync(e => e.Id, e => e.Level, cancellationToken);
+
+        foreach (var ach in dto.Achievements) {
+            double basePts = (ach.Rank == 1) ? 100 : (ach.Rank == 2 ? 50 : (ach.Rank == 3 ? 30 : 0));
+            if (basePts <= 0) continue;
+
+            double mult = 1.0;
+            string levelName = "Міжгрупові";
+            if (eventLevels.TryGetValue(ach.TournamentId, out var lvl)) {
+                if (levelMultipliers.TryGetValue(lvl, out var m)) mult = m;
+                levelName = lvl switch {
+                    CompetitionLevel.Regional => "Обласні",
+                    CompetitionLevel.National => "Всеукраїнські",
+                    _ => "Міжгрупові"
+                };
+            }
+
+            int finalPts = (int)Math.Round(basePts * mult);
+            totalScore += finalPts;
+            pointsBreakdown.Add(new PointEntryDto {
+                Description = $"{ach.Rank} місце: {ach.TournamentName} ({levelName})",
+                Points = finalPts,
+                Category = "Achievements"
+            });
+        }
+
+        // 2. Individual Matches Played & Wins
         int chessMatches = await _dbContext.ChessGames.CountAsync(g => g.WhitePlayerId == playerId || g.BlackPlayerId == playerId, cancellationToken);
-        int checkersMatches = await _dbContext.CheckersGames.CountAsync(g => g.WhitePlayerId == playerId || g.BlackPlayerId == playerId, cancellationToken);
-        int ttMatches = await _dbContext.TableTennisMatches.CountAsync(g => g.Player1Id == playerId || g.Player2Id == playerId, cancellationToken);
-        int armMatches = await _dbContext.ArmwrestlingMatches.CountAsync(g => g.Player1Id == playerId || g.Player2Id == playerId, cancellationToken);
+        int chessWins = await _dbContext.ChessGames.CountAsync(g => (g.WhitePlayerId == playerId && g.Result == GameResult.WhiteWin) || (g.BlackPlayerId == playerId && g.Result == GameResult.BlackWin), cancellationToken);
         
-        dto.MatchesPlayed = chessMatches + checkersMatches + ttMatches + armMatches;
-
-        // 2. Wins Count
-        int chessWins = await _dbContext.ChessGames.CountAsync(g => 
-            (g.WhitePlayerId == playerId && g.Result == GameResult.WhiteWin) || 
-            (g.BlackPlayerId == playerId && g.Result == GameResult.BlackWin), cancellationToken);
-            
-        int checkersWins = await _dbContext.CheckersGames.CountAsync(g => 
-            (g.WhitePlayerId == playerId && g.Result == GameResult.WhiteWin) || 
-            (g.BlackPlayerId == playerId && g.Result == GameResult.BlackWin), cancellationToken);
-            
+        int checkersMatches = await _dbContext.CheckersGames.CountAsync(g => g.WhitePlayerId == playerId || g.BlackPlayerId == playerId, cancellationToken);
+        int checkersWins = await _dbContext.CheckersGames.CountAsync(g => (g.WhitePlayerId == playerId && g.Result == GameResult.WhiteWin) || (g.BlackPlayerId == playerId && g.Result == GameResult.BlackWin), cancellationToken);
+        
+        int ttMatches = await _dbContext.TableTennisMatches.CountAsync(g => g.Player1Id == playerId || g.Player2Id == playerId, cancellationToken);
         int ttWins = await _dbContext.TableTennisMatches.CountAsync(g => g.WinnerId == playerId, cancellationToken);
+        
+        int armMatches = await _dbContext.ArmwrestlingMatches.CountAsync(g => g.Player1Id == playerId || g.Player2Id == playerId, cancellationToken);
         int armWins = await _dbContext.ArmwrestlingMatches.CountAsync(g => g.WinnerId == playerId, cancellationToken);
+        
+        int badMatches = await _dbContext.BadmintonMatches.CountAsync(g => g.Player1Id == playerId || g.Player2Id == playerId, cancellationToken);
+        int badWins = await _dbContext.BadmintonMatches.CountAsync(g => g.WinnerPlayerId == playerId, cancellationToken);
 
-        dto.WinsCount = chessWins + checkersWins + ttWins + armWins;
+        void AddActivityStats(string sportName, int p, int w) {
+            if (p <= 0) return;
+            int pts = (p * 1) + (w * 2);
+            totalScore += pts;
+            pointsBreakdown.Add(new PointEntryDto { Description = $"Участь у матчах ({sportName}): {p} ігор", Points = p * 1, Category = "Activity" });
+            if (w > 0) pointsBreakdown.Add(new PointEntryDto { Description = $"Перемоги ({sportName}): {w} ігор", Points = w * 2, Category = "Activity" });
+        }
 
-        // 3. Goals
-        dto.GoalsScored = await _dbContext.FutsalGoals
+        AddActivityStats("Шахи", chessMatches, chessWins);
+        AddActivityStats("Шашки", checkersMatches, checkersWins);
+        AddActivityStats("Настільний теніс", ttMatches, ttWins);
+        AddActivityStats("Армрестлинг", armMatches, armWins);
+        AddActivityStats("Бадмінтон", badMatches, badWins);
+
+        dto.MatchesPlayed = chessMatches + checkersMatches + ttMatches + armMatches + badMatches;
+        dto.WinsCount = chessWins + checkersWins + ttWins + armWins + badWins;
+
+        // 3. Futsal Goals
+        int futsalGoals = await _dbContext.FutsalGoals
             .Where(g => g.PlayerId == playerId)
             .SumAsync(g => (int?)g.GoalsCount ?? 0, cancellationToken);
+        
+        if (futsalGoals > 0) {
+            int goalPts = futsalGoals * 5;
+            totalScore += goalPts;
+            pointsBreakdown.Add(new PointEntryDto { 
+                Description = $"Забиті голи (Футзал): {futsalGoals} голів", 
+                Points = goalPts, 
+                Category = "Goals" 
+            });
+        }
+        
+        dto.GoalsScored = futsalGoals;
+        dto.PerformanceScore = (int)Math.Round(totalScore);
+        dto.PointsBreakdown = pointsBreakdown.OrderByDescending(x => x.Points).ToList();
     }
 }
