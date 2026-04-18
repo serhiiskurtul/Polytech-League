@@ -30,6 +30,7 @@ public class FutsalMatchService(
         var oldEntity = await _dbcontext.FutsalMatches
             .Include(m => m.HomeRoster)
             .Include(m => m.AwayRoster)
+            .Include(m => m.Goals)
             .FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
         
         if (oldEntity == null)
@@ -39,8 +40,41 @@ public class FutsalMatchService(
 
         UpdateValues(oldEntity, newEntity);
         await MapRoster(oldEntity, newEntity, cancellationToken);
+        SyncGoals(oldEntity, newEntity);
 
         await _dbcontext.SaveChangesAsync(cancellationToken);
+    }
+
+    private void SyncGoals(FutsalMatch target, FutsalMatch source)
+    {
+        if (source.Goals == null) return;
+
+        target.Goals ??= new List<FutsalGoal>();
+
+        // Remove goals not in source
+        var goalsToRemove = target.Goals
+            .Where(tg => !source.Goals.Any(sg => sg.PlayerId == tg.PlayerId))
+            .ToList();
+
+        foreach (var goal in goalsToRemove)
+        {
+            _dbcontext.FutsalGoals.Remove(goal);
+        }
+
+        // Add or update goals
+        foreach (var sourceGoal in source.Goals)
+        {
+            var existingGoal = target.Goals.FirstOrDefault(tg => tg.PlayerId == sourceGoal.PlayerId);
+            if (existingGoal != null)
+            {
+                existingGoal.GoalsCount = sourceGoal.GoalsCount;
+            }
+            else
+            {
+                sourceGoal.MatchId = target.Id;
+                target.Goals.Add(sourceGoal);
+            }
+        }
     }
 
     private async Task MapRoster(FutsalMatch target, FutsalMatch source, CancellationToken cancellationToken)

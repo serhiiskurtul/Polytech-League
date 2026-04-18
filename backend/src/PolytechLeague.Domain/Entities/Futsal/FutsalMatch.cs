@@ -28,4 +28,6 @@ public class FutsalMatch
     public ICollection<long>? HomeRosterIds { get; set; }
     [System.ComponentModel.DataAnnotations.Schema.NotMapped]
     public ICollection<long>? AwayRosterIds { get; set; }
+
+    public virtual ICollection<FutsalGoal>? Goals { get; set; }
 }

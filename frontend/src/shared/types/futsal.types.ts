@@ -6,6 +6,19 @@ export interface FutsalTeamResponse {
   name: string;
 }
 
+export interface FutsalGoal {
+  id: number;
+  matchId: number;
+  playerId: number;
+  player?: PlayerDto;
+  goalsCount: number;
+}
+
+export interface FutsalGoalRequest {
+  playerId: number;
+  goalsCount: number;
+}
+
 export interface FutsalMatchResponse {
   id: number;
   eventId: number;
@@ -26,6 +39,7 @@ export interface FutsalMatchResponse {
   
   homeRoster?: PlayerDto[];
   awayRoster?: PlayerDto[];
+  goals?: FutsalGoal[];
 }
 
 export interface FutsalEventResponse {

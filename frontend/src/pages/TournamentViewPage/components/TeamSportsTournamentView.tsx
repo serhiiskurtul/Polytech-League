@@ -79,6 +79,11 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const [editingTeamId, setEditingTeamId] = useState<number | null>(null);
   const [isTeamRosterModalOpen, setIsTeamRosterModalOpen] = useState(false);
 
+  // Match Scorers State
+  const [isScorersModalOpen, setIsScorersModalOpen] = useState(false);
+  const [selectedMatchForScorers, setSelectedMatchForScorers] = useState<any>(null);
+  const [tempScorers, setTempScorers] = useState<{[playerId: number]: number}>({});
+
   useEffect(() => {
     if (isAdmin) {
       loadAllPlayers();
@@ -178,6 +183,54 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     } catch (err) {
       console.error('Update Score Error:', err);
       alert('Помилка при оновленні рахунку');
+    }
+  };
+
+  const handleOpenScorers = (match: any) => {
+    setSelectedMatchForScorers(match);
+    const initialScorers: {[playerId: number]: number} = {};
+    match.goals?.forEach((g: any) => {
+      initialScorers[g.playerId] = g.goalsCount;
+    });
+    setTempScorers(initialScorers);
+    setIsScorersModalOpen(true);
+  };
+
+  const handleSaveScorers = async () => {
+    if (!selectedMatchForScorers) return;
+
+    try {
+      const goalsPayload = Object.entries(tempScorers)
+        .filter(([_, count]) => count > 0)
+        .map(([playerId, count]) => ({
+          playerId: parseInt(playerId),
+          goalsCount: count
+        }));
+
+      const payload = {
+        id: selectedMatchForScorers.id,
+        eventId: details.id,
+        homeTeamId: selectedMatchForScorers.homeTeamId,
+        awayTeamId: selectedMatchForScorers.awayTeamId,
+        homeTeamScore: selectedMatchForScorers.homeTeamScore,
+        awayTeamScore: selectedMatchForScorers.awayTeamScore,
+        stage: selectedMatchForScorers.stage,
+        // Update rosters to match team players if they were empty
+        homeRosterIds: selectedMatchForScorers.homeRoster?.length > 0 
+            ? selectedMatchForScorers.homeRoster.map((p: any) => p.id) 
+            : details.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players?.map((p: any) => p.id) || [],
+        awayRosterIds: selectedMatchForScorers.awayRoster?.length > 0 
+            ? selectedMatchForScorers.awayRoster.map((p: any) => p.id) 
+            : details.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players?.map((p: any) => p.id) || [],
+        goals: goalsPayload
+      };
+
+      await updateFutsalMatch(selectedMatchForScorers.id, payload);
+      setIsScorersModalOpen(false);
+      onRefresh();
+    } catch (err) {
+      console.error('Save Scorers Error:', err);
+      alert('Помилка при збереженні авторів голів');
     }
   };
 
@@ -590,6 +643,15 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
                   {isAdmin && (
                     <div className={styles.matchActions}>
+                      {(sport === 'futsal') && (
+                        <button 
+                          className={styles.scorersBtn}
+                          onClick={() => handleOpenScorers(match)}
+                          title="Автори голів"
+                        >
+                          <i className="fas fa-futbol"></i>
+                        </button>
+                      )}
                       <button 
                         className={styles.deleteMatchBtn} 
                         onClick={() => handleDeleteMatch(match.id)}
@@ -597,6 +659,26 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       >
                         <i className="fas fa-trash-alt"></i>
                       </button>
+                    </div>
+                  )}
+                  
+                  {/* Goals summary for non-admins or small preview */}
+                  {match.goals && match.goals.length > 0 && (
+                    <div className={styles.scorersPreview}>
+                       <div className={styles.scorersColumn}>
+                          {match.goals.filter((g: any) => match.homeRoster?.some((p: any) => p.id === g.playerId)).map((g: any) => (
+                             <span key={g.id} className={styles.scorerItem}>
+                               {g.player?.lastName} ({g.goalsCount})
+                             </span>
+                          ))}
+                       </div>
+                       <div className={styles.scorersColumn}>
+                          {match.goals.filter((g: any) => match.awayRoster?.some((p: any) => p.id === g.playerId)).map((g: any) => (
+                             <span key={g.id} className={styles.scorerItem}>
+                               {g.player?.lastName} ({g.goalsCount})
+                             </span>
+                          ))}
+                       </div>
                     </div>
                   )}
                 </div>
@@ -807,6 +889,83 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           </div>
         </div>
       )}
+      
+      {/* Match Scorers Modal */}
+      {isScorersModalOpen && selectedMatchForScorers && (
+        <div className={styles.rosterModalOverlay} onClick={() => setIsScorersModalOpen(false)}>
+          <div className={`${styles.rosterModal} ${styles.glassModal}`} style={{maxWidth: '600px'}} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3>Автори голів: {selectedMatchForScorers.homeTeam?.name} vs {selectedMatchForScorers.awayTeam?.name}</h3>
+              <button className={styles.closeButton} onClick={() => setIsScorersModalOpen(false)}>&times;</button>
+            </div>
+            
+            <div className={styles.modalBody}>
+              <div className={styles.scorersGrid}>
+                {/* Home Team Scorers */}
+                <div className={styles.teamScorersSection}>
+                  <h5>{selectedMatchForScorers.homeTeam?.name}</h5>
+                  <div className={styles.scorersList}>
+                    {(selectedMatchForScorers.homeRoster?.length > 0 
+                        ? selectedMatchForScorers.homeRoster 
+                        : details.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players || []
+                    ).map((player: any) => (
+                      <div key={player.id} className={styles.scorerInputItem}>
+                        <span className={styles.playerNameMini}>{player.lastName} {player.firstName[0]}.</span>
+                        <input 
+                          type="number" 
+                          min="0"
+                          value={tempScorers[player.id] || 0}
+                          onChange={(e) => setTempScorers({
+                            ...tempScorers,
+                            [player.id]: Math.max(0, parseInt(e.target.value) || 0)
+                          })}
+                        />
+                      </div>
+                    ))}
+                    {!(selectedMatchForScorers.homeRoster?.length > 0 || details.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players?.length > 0) && (
+                        <p className={styles.noPlayersHint}>У цій команді ще немає гравців</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className={styles.scorersDivider}></div>
+
+                {/* Away Team Scorers */}
+                <div className={styles.teamScorersSection}>
+                  <h5>{selectedMatchForScorers.awayTeam?.name}</h5>
+                  <div className={styles.scorersList}>
+                    {(selectedMatchForScorers.awayRoster?.length > 0 
+                        ? selectedMatchForScorers.awayRoster 
+                        : details.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players || []
+                    ).map((player: any) => (
+                      <div key={player.id} className={styles.scorerInputItem}>
+                        <span className={styles.playerNameMini}>{player.lastName} {player.firstName[0]}.</span>
+                        <input 
+                          type="number" 
+                          min="0"
+                          value={tempScorers[player.id] || 0}
+                          onChange={(e) => setTempScorers({
+                            ...tempScorers,
+                            [player.id]: Math.max(0, parseInt(e.target.value) || 0)
+                          })}
+                        />
+                      </div>
+                    ))}
+                    {!(selectedMatchForScorers.awayRoster?.length > 0 || details.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players?.length > 0) && (
+                        <p className={styles.noPlayersHint}>У цій команді ще немає гравців</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.modalFooter} style={{padding: '24px 0 0 0', background: 'transparent', borderTop: 'none'}}>
+                <button className={styles.saveBtn} onClick={handleSaveScorers}>Зберегти зміни</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

@@ -46,6 +46,9 @@ public class FutsalEventService(
                 .ThenInclude(m => m.HomeRoster)
             .Include(e => e.Matches!)
                 .ThenInclude(m => m.AwayRoster)
+            .Include(e => e.Matches!)
+                .ThenInclude(m => m.Goals!)
+                    .ThenInclude(g => g.Player)
             .Include(e => e.Photos)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 
