@@ -15,7 +15,7 @@ public class NotificationService(ApplicationDbContext _context) : INotificationS
     public async Task SendNotificationToAllAsync(string title, string message, NotificationType type, string? link = null)
     {
         var users = await _context.Users
-            .Where(u => !u.IsDeleted)
+            .Where(u => !u.IsDeleted && u.Role != UserRole.Admin)
             .Select(u => u.Id)
             .ToListAsync();
 
@@ -35,6 +35,13 @@ public class NotificationService(ApplicationDbContext _context) : INotificationS
 
     public async Task SendNotificationToUserAsync(long userId, string title, string message, NotificationType type, string? link = null)
     {
+        var userRole = await _context.Users
+            .Where(u => u.Id == userId)
+            .Select(u => u.Role)
+            .FirstOrDefaultAsync();
+
+        if (userRole == UserRole.Admin) return;
+
         var notification = new Notification
         {
             UserId = userId,
