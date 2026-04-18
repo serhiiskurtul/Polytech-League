@@ -123,7 +123,7 @@ const PlayersRatingPage = () => {
               Рейтинги гравців
             </h1>
             <p className={styles.heroDescription}>
-              Система рейтингів на основі результатів змагань (призові місця, рівень турніру та ігрова активність).
+              Система рейтингів на основі результатів змагань (призові місця, рівень змагань та ігрова активність).
             </p>
           </div>
 
@@ -309,7 +309,7 @@ const PlayersRatingPage = () => {
                 <div className={styles.formulaIcon} style={{ background: '#dcfce7', color: '#16a34a' }}>
                   <i className="fa-solid fa-layer-group"></i>
                 </div>
-                <h3>Рівень турніру</h3>
+                <h3>Рівень змагань</h3>
                 <p>Бали за призові місця множаться на статус змагань:</p>
                 <ul>
                   <li><span>Міжгрупові:</span> x1.0</li>
@@ -323,7 +323,7 @@ const PlayersRatingPage = () => {
                   <i className="fa-solid fa-bolt"></i>
                 </div>
                 <h3>Ігрова активність</h3>
-                <p>Додаткові бали за кожну гру незалежно від турніру:</p>
+                <p>Додаткові бали за кожну гру незалежно від змагань:</p>
                 <ul>
                   <li><span>Участь у грі:</span> +1 бал</li>
                   <li><span>Перемога в грі:</span> +2 бали</li>

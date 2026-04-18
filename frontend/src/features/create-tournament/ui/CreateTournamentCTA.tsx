@@ -5,7 +5,7 @@ export default function CreateTournamentCTA() {
   return (
     <div className="card">
       <div className={`header-row ${styles.headerRowCreateTournament}`}>
-        <h3>Створити турнір</h3>
+        <h3>Створити змагання</h3>
       </div>
 
       <SimpleButton

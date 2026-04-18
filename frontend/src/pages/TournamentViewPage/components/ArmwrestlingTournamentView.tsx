@@ -305,7 +305,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
   };
 
   const handleRemoveParticipant = async (playerId: number, playerName: string) => {
-    if (!window.confirm(`Видалити учасника ${playerName} з турніру?`)) return;
+    if (!window.confirm(`Видалити учасника ${playerName} зі змагання?`)) return;
     try {
         await removeParticipantFromArmwrestlingEvent(details.id, playerId);
         onRefresh();
@@ -362,7 +362,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
       {isAdmin && showSetWinners && (
         <div className={styles.adminForm} style={{ background: '#fffbeb', padding: '24px', borderRadius: '16px', marginBottom: '32px', border: '1px solid #fcd34d' }}>
            <h4 style={{ marginTop: 0, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-             <i className="fas fa-trophy" style={{ color: '#f59e0b' }}></i> Визначити призерів турніру
+             <i className="fas fa-trophy" style={{ color: '#f59e0b' }}></i> Визначити призерів змагання
            </h4>
            <div className={styles.winnerSelectionGrid}>
               <div className={styles.formGroup}>
@@ -434,7 +434,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
                 />
 
                 <div className={styles.formGroup}>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#64748b', marginBottom: '6px' }}>Етап турніру</label>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#64748b', marginBottom: '6px' }}>Етап змагання</label>
                   <select 
                     value={newMatch.stage} 
                     onChange={(e) => setNewMatch({...newMatch, stage: e.target.value})}
@@ -476,7 +476,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
           )}
 
           <div className={styles.sectionHeader}>
-            <h2><i className="fas fa-sitemap"></i> Турнірна сітка</h2>
+            <h2><i className="fas fa-sitemap"></i> Сітка змагань</h2>
           </div>
           
           <ArmwrestlingBracket 

@@ -18,15 +18,15 @@ const QuickActions = () => {
       id: 1,
       icon: 'fa-plus',
       title: 'Створити команду',
-      description: 'Зареєструйте нову команду для участі в турнірах',
+      description: 'Зареєструйте нову команду для участі в змаганнях',
       color: '#0066cc',
       path: '/teams/create'
     },
     {
       id: 2,
       icon: 'fa-calendar-plus',
-      title: 'Записатись на турнір',
-      description: 'Оберіть турнір та подайте заявку',
+      title: 'Записатись на змагання',
+      description: 'Оберіть змагання та подайте заявку',
       color: '#10b981',
       path: '/tournaments'
     },
@@ -58,7 +58,7 @@ const QuickActions = () => {
       id: 6,
       icon: 'fa-calendar-check',
       title: 'Мої події',
-      description: 'Майбутні матчі та турніри',
+      description: 'Майбутні матчі та змагання',
       color: '#3b82f6',
       path: '/my-events'
     }

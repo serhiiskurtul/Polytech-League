@@ -19,7 +19,7 @@ const TournamentStats = ({ stats }: TournamentStatsProps) => {
         </div>
         <div className="stat-info">
           <div className="stat-value">{stats.total}</div>
-          <div className="stat-label">Всього турнірів</div>
+          <div className="stat-label">Всього змагань</div>
         </div>
       </div>
 

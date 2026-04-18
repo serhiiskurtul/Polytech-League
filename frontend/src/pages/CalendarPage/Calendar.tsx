@@ -126,7 +126,7 @@ const Calendar = () => {
       <div className="page-header">
         <div>
           <h1 className="page-title">Календар спортивних подій</h1>
-          <p className="page-subtitle">Слідкуйте за розкладом матчів та турнірів коледжу</p>
+          <p className="page-subtitle">Слідкуйте за розкладом матчів та змагань коледжу</p>
         </div>
       </div>
 

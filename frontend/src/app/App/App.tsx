@@ -78,7 +78,7 @@ export default function App() {
           }
         />
 
-        {/* Турніри */}
+        {/* Змагання */}
         <Route
           path="/tournaments"
           element={
@@ -163,7 +163,7 @@ export default function App() {
           }
         />
 
-        {/* Створення турніру */}
+        {/* Створення змагань */}
         <Route
           path="/create-tournament"
           element={

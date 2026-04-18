@@ -91,8 +91,8 @@ const SettingsSection = ({ formData, handleInputChange }: SettingsSectionProps) 
                     </div>
                   </div>
                   <div className={shared.checkboxText}>
-                    <span className={shared.checkboxTitle}>Командний турнір</span>
-                    <span className={shared.checkboxDesc}>Турнір проводитиметься між командами, а не індивідуальними гравцями</span>
+                    <span className={shared.checkboxTitle}>Командні змагання</span>
+                    <span className={shared.checkboxDesc}>Змагання проводитимуться між командами, а не індивідуальними гравцями</span>
                   </div>
                 </label>
               </div>
@@ -222,7 +222,7 @@ const SettingsSection = ({ formData, handleInputChange }: SettingsSectionProps) 
               </div>
               <div className={shared.checkboxText}>
                 <span className={shared.checkboxTitle}>Публічне змагання</span>
-                <span className={shared.checkboxDesc}>Турнір буде видимим для всіх користувачів</span>
+                <span className={shared.checkboxDesc}>Змагання будуть видимими для всіх користувачів</span>
               </div>
             </label>
           </div>

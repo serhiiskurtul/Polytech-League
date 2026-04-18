@@ -7,7 +7,7 @@ interface SidebarActionsProps {
 const SidebarActions = ({ onActionClick }: SidebarActionsProps) => {
   const actions = [
     { icon: 'fas fa-plus', text: 'Створити команду' },
-    { icon: 'fas fa-calendar-plus', text: 'Записатись на турнір' },
+    { icon: 'fas fa-calendar-plus', text: 'Записатись на змагання' },
     { icon: 'fas fa-chart-line', text: 'Переглянути статистику' },
     { icon: 'fas fa-cog', text: 'Налаштування профілю' },
     { icon: 'fas fa-share-alt', text: 'Поділитись профілем' }

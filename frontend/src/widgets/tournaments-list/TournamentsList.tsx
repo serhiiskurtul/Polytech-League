@@ -16,7 +16,7 @@ interface TournamentsListProps {
 export default function TournamentsList({ tournaments }: TournamentsListProps) {
   return (
     <section className={styles.card}>
-      <h3>Список Турнірів</h3>
+      <h3>Список змагань</h3>
 
       <div className={styles.tournamentList}>
         {tournaments.map((t) => (

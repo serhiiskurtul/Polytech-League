@@ -243,7 +243,7 @@ const TournamentViewPage = () => {
 
   const handleDeleteTournament = async () => {
     if (!id || !tournament) return;
-    if (window.confirm('Ви впевнені, що хочете видалити цей турнір? Цю дію неможливо скасувати.')) {
+    if (window.confirm('Ви впевнені, що хочете видалити ці змагання? Цю дію неможливо скасувати.')) {
       try {
         const sportEndpointRecord: Record<string, string> = {
           checkers: '/checkers-events',
@@ -263,16 +263,16 @@ const TournamentViewPage = () => {
         const endpoint = sportEndpointRecord[s] || sportEndpointRecord[tournament?.sport || ''];
 
         if (!endpoint) {
-          alert('Неможливо видалити турнір: невідомий вид спорту.');
+          alert('Неможливо видалити змагання: невідомий вид спорту.');
           return;
         }
 
         await api.delete(`${endpoint}/${id}`);
-        alert('Турнір успішно видалено.');
+        alert('Змагання успішно видалено.');
         navigate('/tournaments');
       } catch (error) {
-        console.error('Помилка при видаленні турніру:', error);
-        alert('Помилка при видаленні турніру. Деталі в консолі.');
+        console.error('Помилка при видаленні змагання:', error);
+        alert('Помилка при видаленні змагань. Деталі в консолі.');
       }
     }
   };
@@ -411,12 +411,12 @@ const TournamentViewPage = () => {
           participantsCount: editTournamentData.participantsCount
         } as any);
       }
-      alert("Дані турніру успішно оновлено!");
+      alert("Дані змагань успішно оновлено!");
       setIsEditingTournament(false);
       fetchTournament(true);
     } catch (err) {
       console.error(err);
-      alert("Помилка при оновленні турніру");
+      alert("Помилка при оновленні змагань");
     }
   };
 
@@ -538,7 +538,7 @@ const TournamentViewPage = () => {
   };
 
   const handleRemoveParticipant = async (playerId: number, playerName: string) => {
-    if (window.confirm(`Ви впевнені, що хочете видалити учасника "${playerName}" з турніру?`)) {
+    if (window.confirm(`Ви впевнені, що хочете видалити учасника "${playerName}" зі змагань?`)) {
       try {
         const sportKey = tournament?.sport?.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') || '';
         
@@ -560,7 +560,7 @@ const TournamentViewPage = () => {
             await removeParticipantFromEvent(id!, playerId);
         }
         
-        alert("Учасника видалено з турніру!");
+        alert("Учасника видалено зі змагань!");
         fetchTournament(true);
       } catch (err) {
         console.error(err);
@@ -639,7 +639,7 @@ const TournamentViewPage = () => {
       }
     } catch (err) {
       console.error('Failed to fetch tournament:', err);
-      setError('Не вдалося завантажити інформацію про турнір.');
+      setError('Не вдалося завантажити інформацію про змагання.');
     } finally {
       setIsLoading(false);
     }
@@ -740,7 +740,7 @@ const TournamentViewPage = () => {
       if (!playerId) {
         // Check if player is already in the tournament (by userId)
         if (newPlayer.userId && details?.players.some((p: any) => p.userId === newPlayer.userId)) {
-          alert("Цей користувач вже бере участь у турнірі!");
+          alert("Цей користувач вже бере участь у змаганнях!");
           return;
         }
 
@@ -764,7 +764,7 @@ const TournamentViewPage = () => {
         // Check if player is already in the tournament
         const isAlreadyParticipant = (details?.players || details?.participants || []).some((p: any) => p.playerId === playerId);
         if (isAlreadyParticipant) {
-          alert("Цей гравець вже бере участь у турнірі!");
+          alert("Цей гравець вже бере участь у змаганнях!");
           return;
         }
       }
@@ -789,7 +789,7 @@ const TournamentViewPage = () => {
         default:
           await addParticipantToEvent(id!, { playerId: playerId, points: 0, rank: 0 });
       }
-      alert("Учасник успішно доданий до турніру!");
+      alert("Учасник успішно доданий до змагань!");
       setNewPlayer({ firstName: '', patronymic: '', lastName: '', group: '', studentId: '', birthDate: '', city: 'Чернівці', ratingELO: 1500, fideId: '', title: '', userId: null, existingPlayerId: null, weight: 0 });
       fetchTournament(true); // Refresh
     } catch (err) {
@@ -841,7 +841,7 @@ const TournamentViewPage = () => {
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.loader}></div>
-        <p>Завантаження інформації про турнір...</p>
+        <p>Завантаження інформації про змагання...</p>
       </div>
     );
   }
@@ -850,7 +850,7 @@ const TournamentViewPage = () => {
     return (
       <div className={styles.errorContainer}>
         <h2>Помилка</h2>
-        <p>{error || 'Турнір не знайдено.'}</p>
+        <p>{error || 'Змагання не знайдено.'}</p>
         <button className="btn btn-primary" onClick={() => navigate('/tournaments')}>
           Повернутися до списку
         </button>
@@ -951,7 +951,7 @@ const TournamentViewPage = () => {
             )}
             {isAdmin && (
               <button onClick={handleEditTournament} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: '#3b82f6', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
-                <i className="fas fa-edit"></i> Редагувати турнір
+                <i className="fas fa-edit"></i> Редагувати змагання
               </button>
             )}
             {isAdmin && (
@@ -966,7 +966,7 @@ const TournamentViewPage = () => {
         {isAdmin && showWinnersAdmin && (
           <div className={styles.adminSection} style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '24px', borderRadius: '16px', marginBottom: '24px' }}>
             <h3 style={{ marginTop: 0, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', color: '#166534' }}>
-              <i className="fas fa-trophy"></i> Призначити призерів турніру
+              <i className="fas fa-trophy"></i> Призначити призерів змагань
             </h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
               <div>
@@ -1115,7 +1115,7 @@ const TournamentViewPage = () => {
         )}
 
         <div className={styles.infoCard}>
-          <h2><i className="fas fa-info-circle"></i> Про турнір</h2>
+          <h2><i className="fas fa-info-circle"></i> Про змагання</h2>
           <div className={styles.infoGrid}>
             <div className={styles.infoSection}>
               <h3><i className="fas fa-align-left"></i> Опис</h3>
@@ -1164,7 +1164,7 @@ const TournamentViewPage = () => {
                     </div>
                     <div>
                       <strong>{details.headRefereeName}</strong><br />
-                      <small>Суддя турніру</small>
+                      <small>Суддя змагань</small>
                     </div>
                   </div>
                 )}
@@ -1244,7 +1244,7 @@ const TournamentViewPage = () => {
                       className={`${styles.tabButton} ${activeTab === 'standings' ? styles.active : ''}`}
                       onClick={() => setActiveTab('standings')}
                     >
-                      <i className="fas fa-chart-simple"></i> Турнірна таблиця
+                      <i className="fas fa-chart-simple"></i> Таблиця змагань
                     </button>
                     <button
                       className={`${styles.tabButton} ${activeTab === 'games' ? styles.active : ''}`}
@@ -1738,7 +1738,7 @@ const TournamentViewPage = () => {
                             <p style={{ whiteSpace: 'pre-line' }}>{details.schedule}</p>
                           ) : (
                             <>
-                              <p>Турнір проводиться згідно із розкладом, вказаним організаторами під час реєстрації або під час відкриття.</p>
+                              <p>Змагання проводяться згідно із розкладом, вказаним організаторами під час реєстрації або під час відкриття.</p>
                               <br />
                               <p>
                                 <strong>Примірний розклад:</strong><br />
@@ -1764,7 +1764,7 @@ const TournamentViewPage = () => {
           <div className={styles.gallerySection}>
             <div className={styles.galleryHeader}>
               <i className="fas fa-images"></i>
-              <h2>Галерея турніру</h2>
+              <h2>Галерея змагань</h2>
             </div>
             <div className={styles.photoGrid}>
               {details.photos.map((photo: any, index: number) => (
@@ -1826,14 +1826,14 @@ const TournamentViewPage = () => {
               <div className={styles.modalHeader}>
                 <h2 style={{ margin: 0, fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <i className="fas fa-edit" style={{ color: '#3b82f6' }}></i>
-                  Редагувати турнір
+                  Редагувати змагання
                 </h2>
                 <button onClick={() => setIsEditingTournament(false)} className={styles.closeButton}>&times;</button>
               </div>
               <div className={styles.modalBody}>
                 <div className={styles.editFormGrid}>
                   <div className={styles.formGroup}>
-                    <label>Назва турніру</label>
+                    <label>Назва змагань</label>
                     <input type="text" value={editTournamentData.name} onChange={(e) => setEditTournamentData({ ...editTournamentData, name: e.target.value })} />
                   </div>
                   <div className={styles.formGroup}>
@@ -1877,7 +1877,7 @@ const TournamentViewPage = () => {
                         style={{ width: '20px', height: '20px' }}
                       />
                       <div>
-                        <strong style={{ display: 'block' }}>Командний турнір</strong>
+                        <strong style={{ display: 'block' }}>Командні змагання</strong>
                         <small style={{ color: '#64748b' }}>Активуйте, якщо матчі проводяться між командами (групами)</small>
                       </div>
                     </label>
@@ -1887,24 +1887,24 @@ const TournamentViewPage = () => {
                     <textarea rows={3} placeholder="Введіть імена суддів..." value={editTournamentData.referees} onChange={(e) => setEditTournamentData({ ...editTournamentData, referees: e.target.value })} />
                   </div>
                   <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
-                    <label>Опис турніру</label>
+                    <label>Опис змагань</label>
                     <textarea rows={3} value={editTournamentData.description} onChange={(e) => setEditTournamentData({ ...editTournamentData, description: e.target.value })} />
                   </div>
                   <div className={styles.formGroup}>
                     <label>Правила</label>
-                    <textarea rows={5} placeholder="Введіть правила турніру..." value={editTournamentData.rules} onChange={(e) => setEditTournamentData({ ...editTournamentData, rules: e.target.value })} />
+                    <textarea rows={5} placeholder="Введіть правила змагань..." value={editTournamentData.rules} onChange={(e) => setEditTournamentData({ ...editTournamentData, rules: e.target.value })} />
                   </div>
                   <div className={styles.formGroup}>
                     <label>Призи</label>
                     <textarea rows={5} placeholder="Опишіть призовий фонд..." value={editTournamentData.prizes} onChange={(e) => setEditTournamentData({ ...editTournamentData, prizes: e.target.value })} />
                   </div>
                   <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
-                    <label>Розклад турніру</label>
+                    <label>Розклад змагань</label>
                     <textarea rows={5} placeholder="Введіть детальний розклад (кожен пункт з нового рядка)..." value={editTournamentData.schedule} onChange={(e) => setEditTournamentData({ ...editTournamentData, schedule: e.target.value })} />
                   </div>
 
                   <div className={styles.photoManagementSection} style={{ gridColumn: '1 / -1' }}>
-                    <label><i className="fas fa-images"></i> Фотографії турніру</label>
+                    <label><i className="fas fa-images"></i> Фотографії змагань</label>
 
                     <div className={styles.photoUploadArea}
                       onDragOver={(e) => e.preventDefault()}

@@ -62,7 +62,7 @@ const SeasonStats= () => {
         </div>
         <div className={styles.statItem}>
           <div className={styles.statValue}>{stats.activeTournaments}</div>
-          <div className={styles.statLabel}>Турнірів</div>
+          <div className={styles.statLabel}>Змагань</div>
         </div>
         <div className={styles.statItem}>
           <div className={styles.statValue}>{stats.registeredPlayers}</div>

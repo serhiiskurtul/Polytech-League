@@ -82,7 +82,7 @@ const TopPlayers = () => {
       setsWon: 32,
       setsLost: 18,
       winRate: '71%',
-      achievements: ['Фіналістка турніру першості'],
+      achievements: ['Фіналістка змагання першості'],
       team: 'ЕК-41',
       trend: 'up'
     },

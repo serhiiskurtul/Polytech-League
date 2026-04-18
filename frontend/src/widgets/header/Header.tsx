@@ -78,7 +78,7 @@ export default function Header() {
             <li>
               <Link to="/tournaments" className={styles.navLink} onClick={closeMenu}>
                 <i className={`fas fa-trophy ${styles.navIcon}`}></i>
-                <span>Турніри</span>
+                <span>Змагання</span>
               </Link>
             </li>
             <li>

@@ -16,13 +16,13 @@ const HeroSection = () => {
       <div className={styles.heroCard}>
         <h1 className={styles.heroTitle}>Спортивна платформа ЧПФК</h1>
         <p className={styles.heroDescription}>
-          Приєднуйтесь до турнірів, стежте за результатами матчів та ведіть статистику
+          Приєднуйтесь до змагань, стежте за результатами матчів та ведіть статистику
         </p>
         
         <div className={styles.heroStats}>
           <div className={styles.stat}>
             <div className={styles.statValue}>{stats?.activeTournamentsCount ?? '...'}</div>
-            <div className={styles.statLabel}>Активні турніри</div>
+            <div className={styles.statLabel}>Активні змагання</div>
           </div>
           <div className={styles.stat}>
             <div className={styles.statValue}>{stats?.registeredPlayersCount ?? '...'}</div>

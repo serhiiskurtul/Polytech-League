@@ -21,7 +21,7 @@ interface TournamentFiltersProps {
 
 const TournamentFilters = ({ activeStatus, activeSport, onStatusChange, onSportChange }: TournamentFiltersProps) => {
   const filters: Filter[] = [
-    { id: 'all', label: 'Всі турніри', icon: 'fas fa-trophy' },
+    { id: 'all', label: 'Всі змагання', icon: 'fas fa-trophy' },
     { id: 'ongoing', label: 'Тривають', icon: 'fas fa-play-circle', color: '#10b981' },
     { id: 'upcoming', label: 'Майбутні', icon: 'fas fa-clock',color: '#f59e0b' },
     { id: 'completed', label: 'Завершені', icon: 'fas fa-check-circle', color: '#64748b' }

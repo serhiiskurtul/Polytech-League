@@ -678,7 +678,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                 </div>
               </div>
             ))}
-            {(!details.teams || details.teams.length === 0) && <p className={styles.noData}>У цьому турнірі ще немає команд</p>}
+            {(!details.teams || details.teams.length === 0) && <p className={styles.noData}>У цих змаганнях ще немає команд</p>}
           </div>
         )}
 

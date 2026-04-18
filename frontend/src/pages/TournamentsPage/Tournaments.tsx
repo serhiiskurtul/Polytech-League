@@ -150,7 +150,7 @@ const Tournaments = () => {
   };
 
   const handleRegister = (id: string) => {
-    alert(`Реєстрація на турнір з ID: ${id}`);
+    alert(`Реєстрація на змагання з ID: ${id}`);
   };
 
   const handleDetails = (id: string) => {
@@ -161,7 +161,7 @@ const Tournaments = () => {
     <div className="tournaments-page container">
       <header className="page-header">
         <div className="header-left">
-          <h1 className="page-title">Турніри</h1>
+          <h1 className="page-title">Змагання</h1>
           <p className="page-subtitle">Відкривайте нові можливості та змагайтесь за першість</p>
         </div>
         <button className="btn btn-primary create-tournament-btn" onClick={() => navigate('/create-tournament')}>
