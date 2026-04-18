@@ -5,11 +5,15 @@ import { useAuth } from "@/app/providers/AuthContext";
 import { useState, useEffect } from "react";
 import { getMyNotifications } from "@/shared/api/notifications.api";
 import { Notification } from "@/shared/types/notification.types";
+import { useChat } from "@/app/providers/ChatProvider";
 
 export default function Header() {
   const { user, isAuthenticated } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const { unreadTotal } = useChat();
+
+  const totalUnread = unreadCount + unreadTotal;
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -89,8 +93,8 @@ export default function Header() {
         <div className={styles.userActions}>
           <Link to="/notifications" className={styles.notificationBtn} onClick={closeMenu}>
             <i className="fas fa-bell"></i>
-            {unreadCount > 0 && (
-              <span className={styles.notificationBadge}>{unreadCount}</span>
+            {totalUnread > 0 && (
+              <span className={styles.notificationBadge}>{totalUnread}</span>
             )}
           </Link>
 

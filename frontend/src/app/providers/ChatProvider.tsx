@@ -61,6 +61,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     useEffect(() => {
         if (activeConversationId) {
             loadMessages(activeConversationId);
+            markAsRead(activeConversationId);
         } else {
             setMessages([]);
         }
@@ -86,31 +87,51 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setConnection(newConnection);
     }, [isAuthenticated, user]);
 
+    const activeConversationIdRef = useRef<number | null>(null);
     useEffect(() => {
-        if (connection) {
-            connection.start()
-                .then(() => {
-                    console.log('Connected to ChatHub');
-                    
-                    connection.on('ReceiveMessage', (message: MessageDto) => {
-                        // Update messages if this belongs to active conversation
-                        if (messagesRef.current.length > 0 && messagesRef.current[0].conversationId === message.conversationId) {
-                           setMessages(prev => [...prev, message]);
-                        } else if (activeConversationId === message.conversationId) {
-                            setMessages(prev => [...prev, message]);
-                        }
+        activeConversationIdRef.current = activeConversationId;
+    }, [activeConversationId]);
 
-                        // Refresh conversations to update last message and unread count
-                        refreshConversations();
-                    });
-                })
-                .catch(e => console.log('Connection failed: ', e));
+    useEffect(() => {
+        if (!connection) return;
 
-            return () => {
+        let isMounted = true;
+
+        const startConnection = async () => {
+            try {
+                if (connection.state === HubConnectionState.Disconnected) {
+                    await connection.start();
+                    if (isMounted) console.log('Connected to ChatHub');
+                }
+            } catch (err: any) {
+                // Ignore AbortError caused by rapid re-mounting in dev mode
+                if (err.name !== 'AbortError' && !err.message?.includes('stopped during negotiation')) {
+                    console.error('Connection failed: ', err);
+                }
+            }
+        };
+
+        startConnection();
+
+        connection.on('ReceiveMessage', (message: MessageDto) => {
+            // Update messages if this belongs to active conversation
+            if (activeConversationIdRef.current === message.conversationId) {
+                setMessages(prev => [...prev, message]);
+                // Mark as read immediately if the conversation is active
+                markAsRead(message.conversationId);
+            }
+            // Refresh conversations list for all incoming messages
+            refreshConversations();
+        });
+
+        return () => {
+            isMounted = false;
+            connection.off('ReceiveMessage');
+            if (connection.state !== HubConnectionState.Disconnected) {
                 connection.stop();
-            };
-        }
-    }, [connection, refreshConversations, activeConversationId]);
+            }
+        };
+    }, [connection, refreshConversations]);
 
     const sendMessage = async (recipientId: number, content: string) => {
         if (connection && connection.state === HubConnectionState.Connected) {
@@ -128,7 +149,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const markAsRead = async (conversationId: number) => {
         try {
-            await chatApi.markAsReadAsync(conversationId);
+            await chatApi.markAsRead(conversationId);
             if (connection) {
                 await connection.invoke('MarkAsRead', conversationId);
             }
