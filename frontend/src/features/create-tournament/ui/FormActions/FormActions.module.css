@@ -80,16 +80,17 @@
 @media (max-width: 768px) {
   .formActions {
     flex-direction: column;
-    align-items: stretch;
+    align-items: flex-start;
   }
   
   .submitActions {
     width: 100%;
+    flex-direction: column;
   }
   
   .cancelBtn,
   .submitBtn {
-    flex: 1;
+    width: fit-content;
     justify-content: center;
   }
 }

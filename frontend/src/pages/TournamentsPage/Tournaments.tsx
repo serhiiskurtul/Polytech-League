@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useAuth } from '@/app/providers/AuthContext';
 import TournamentCard from './TournamentCard';
 import TournamentFilters from './TournamentFilters';
 import TournamentStats from './TournamentStats';
@@ -21,6 +22,9 @@ const Tournaments = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const sportFromUrl = searchParams.get('sport');
+  const { user } = useAuth();
+  
+  const isAdmin = user?.role === 1 || user?.role === '1' || user?.role === 'Admin';
   
   const [tournaments, setTournaments] = useState<TournamentUI[]>([]);
   const [pagination, setPagination] = useState({
@@ -164,9 +168,11 @@ const Tournaments = () => {
           <h1 className="page-title">Змагання</h1>
           <p className="page-subtitle">Відкривайте нові можливості та змагайтесь за першість</p>
         </div>
-        <button className="btn btn-primary create-tournament-btn" onClick={() => navigate('/create-tournament')}>
-          <i className="fas fa-plus"></i> Створити
-        </button>
+        {isAdmin && (
+          <button className="btn btn-primary create-tournament-btn" onClick={() => navigate('/create-tournament')}>
+            <i className="fas fa-plus"></i> Створити
+          </button>
+        )}
       </header>
 
       <TournamentStats stats={stats} />

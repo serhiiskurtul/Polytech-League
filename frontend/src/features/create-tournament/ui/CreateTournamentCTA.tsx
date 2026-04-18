@@ -11,7 +11,6 @@ export default function CreateTournamentCTA() {
       <SimpleButton
         to="/create-tournament"
         text="Створити"
-        fullWidth
       />
     </div>
   );
