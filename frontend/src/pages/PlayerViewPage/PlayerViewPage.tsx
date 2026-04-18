@@ -93,9 +93,13 @@ const PlayerViewPage = () => {
   };
 
   const handleMessage = async () => {
-    if (!playerProfile.id) return;
+    if (!playerProfile.userId) {
+      toast.error("Цей користувач ще не зареєстрував акаунт для спілкування");
+      return;
+    }
+    
     try {
-      const convId = await chatApi.getConversationIdWithUser(playerProfile.id);
+      const convId = await chatApi.getConversationIdWithUser(playerProfile.userId);
       setActiveConversationId(convId);
       await refreshConversations();
       navigate('/notifications?tab=messages');
@@ -111,7 +115,7 @@ const PlayerViewPage = () => {
         <ProfileHeader 
           userData={userData} 
           onCompare={handleCompare} 
-          onMessage={user?.id !== playerProfile?.id ? handleMessage : undefined} 
+          onMessage={user?.id !== playerProfile?.userId ? handleMessage : undefined} 
         />
         
         <div className={styles.profileContent}>

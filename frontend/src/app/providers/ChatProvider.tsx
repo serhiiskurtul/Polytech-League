@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
-import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import { HubConnection, HubConnectionBuilder, LogLevel, HubConnectionState } from '@microsoft/signalr';
 import { useAuth } from './AuthContext';
 import { chatApi, ConversationDto, MessageDto } from '@/shared/api/chat.api';
 
@@ -113,8 +113,16 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, [connection, refreshConversations, activeConversationId]);
 
     const sendMessage = async (recipientId: number, content: string) => {
-        if (connection) {
-            await connection.invoke('SendMessage', recipientId, content);
+        if (connection && connection.state === HubConnectionState.Connected) {
+            try {
+                await connection.invoke('SendMessage', recipientId, content);
+            } catch (err) {
+                console.error("SignalR SendMessage failed:", err);
+                throw err;
+            }
+        } else {
+            console.error("Cannot send message: SignalR is not connected. Current state:", connection?.state);
+            throw new Error("З'єднання з сервером втрачено. Спробуйте пізніше.");
         }
     };
 

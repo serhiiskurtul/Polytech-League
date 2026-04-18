@@ -164,16 +164,18 @@ const NotificationsPage = () => {
             </button>
           </div>
           
-          <div className={styles.actions}>
-            <button className={styles.markAllBtn} onClick={markAllAsRead}>
-              <i className="fas fa-check-double"></i>
-              Прочитати все
-            </button>
-            <button className={styles.clearReadBtn} onClick={clearAllRead}>
-              <i className="fas fa-broom"></i>
-              Очистити
-            </button>
-          </div>
+          {activeTab === 'notifications' && (
+            <div className={styles.actions}>
+              <button className={styles.markAllBtn} onClick={markAllAsRead}>
+                <i className="fas fa-check-double"></i>
+                Прочитати все
+              </button>
+              <button className={styles.clearReadBtn} onClick={clearAllRead}>
+                <i className="fas fa-broom"></i>
+                Очистити
+              </button>
+            </div>
+          )}
         </div>
 
       {activeTab === 'notifications' ? (

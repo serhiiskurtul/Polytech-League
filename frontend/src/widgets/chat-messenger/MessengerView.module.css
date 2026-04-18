@@ -2,13 +2,13 @@
     display: flex;
     flex-direction: column;
     height: 700px;
-    background: rgba(30, 41, 59, 0.4);
-    backdrop-filter: blur(20px);
-    border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--bg);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    border: 1px solid var(--border);
     overflow: hidden;
     position: relative;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow);
     animation: slideUp 0.5s ease-out;
 }
 
@@ -36,12 +36,12 @@
 }
 
 .conversationItem:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--primary-light);
 }
 
 .conversationItem.active {
-    background: rgba(var(--primary-rgb), 0.1);
-    border-color: rgba(var(--primary-rgb), 0.2);
+    background: var(--primary-light);
+    border-color: var(--primary);
 }
 
 .avatar {
@@ -112,15 +112,15 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    background: rgba(30, 41, 59, 0.6);
+    background: var(--card);
 }
 
 .chatHeader {
     display: flex;
     align-items: center;
     padding: 16px 20px;
-    background: rgba(255, 255, 255, 0.03);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
     gap: 15px;
 }
 
@@ -193,9 +193,10 @@
 
 .msgReceived {
     align-self: flex-start;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--bg);
     color: var(--text);
     border-bottom-left-radius: 4px;
+    border: 1px solid var(--border);
 }
 
 .msgTime {
@@ -209,14 +210,14 @@
     padding: 16px 20px;
     display: flex;
     gap: 12px;
-    background: rgba(255, 255, 255, 0.03);
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--card);
+    border-top: 1px solid var(--border);
 }
 
 .chatInput {
     flex: 1;
-    background: rgba(43, 44, 48, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--bg);
+    border: 1px solid var(--border);
     border-radius: 12px;
     padding: 10px 16px;
     color: var(--text);
@@ -226,7 +227,7 @@
 
 .chatInput:focus {
     border-color: var(--primary);
-    background: rgba(43, 44, 48, 0.9);
+    background: var(--card);
 }
 
 .sendButton {

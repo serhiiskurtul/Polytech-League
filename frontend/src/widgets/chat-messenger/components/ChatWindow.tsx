@@ -62,7 +62,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ onBack }) => {
                 </div>
                 <div className={styles.headerInfo}>
                     <h3 className={styles.headerName}>{otherParticipant?.otherUserName}</h3>
-                    <span className={styles.headerStatus}>онлайн</span>
                 </div>
             </div>
             
