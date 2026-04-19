@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthContext';
 import {
@@ -15,6 +15,7 @@ import {
   searchUsers,
   getAllPlayers,
   createPlayer,
+  importDataFromFile,
 } from '@/shared/api';
 import { PlayerDto } from '@/shared/types/player.types';
 import {
@@ -25,7 +26,8 @@ import {
   updateParticipantInCheckersEvent,
   createCheckersGame,
   uploadCheckersPhoto,
-  deleteCheckersPhoto
+  deleteCheckersPhoto,
+  importCheckersDataFromFile
 } from '@/shared/api/checkers.api';
 import {
   getArmwrestlingEventById,
@@ -140,6 +142,8 @@ const TournamentViewPage = () => {
   const [editingParticipantId, setEditingParticipantId] = useState<number | null>(null);
   const [editingParticipantData, setEditingParticipantData] = useState<{ points: number; rank: number; weight: number }>({ points: 0, rank: 0, weight: 0 });
   const [gameFilters, setGameFilters] = useState({ round: '', board: '', participant: '', result: '' });
+  const [isImporting, setIsImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isEditingTournament, setIsEditingTournament] = useState(false);
   const [showWinnersAdmin, setShowWinnersAdmin] = useState(false);
@@ -241,6 +245,35 @@ const TournamentViewPage = () => {
     schedule: '',
     isTeam: false
   });
+
+
+
+  const handleImportData = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !id) return;
+
+    if (!window.confirm(`Ви впевнені? Це дію оновить список учасників з файлу "${file.name}". Існуючі результати учасників можуть бути змінені.`)) {
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    try {
+      setIsImporting(true);
+      if (tournament?.sport === 'chess') {
+        await importDataFromFile(id, file);
+      } else if (tournament?.sport === 'checkers') {
+        await importCheckersDataFromFile(id, file);
+      }
+      alert('Дані успішно імпортовано з файлу!');
+      fetchTournament(true);
+    } catch (err: any) {
+      console.error(err);
+      alert('Помилка при імпорті даних з файлу: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setIsImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   const [isUploading, setIsUploading] = useState(false);
 
@@ -1597,8 +1630,52 @@ const TournamentViewPage = () => {
                   {activeTab === 'participants' && (
                     <div className={styles.tabContent}>
                       {isAdmin && (
-                        <div style={{ background: '#f5f5f5', padding: '24px', borderRadius: '12px', marginBottom: '24px' }}>
-                          <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#111' }}>[Admin] Додати учасника</h3>
+                        <>
+                          {(tournament?.sport === 'chess' || tournament?.sport === 'checkers') && (
+                            <div style={{ background: '#ebf5ff', padding: '24px', borderRadius: '12px', marginBottom: '16px', border: '1px solid #bfdbfe' }}>
+                              <h3 style={{ marginTop: 0, marginBottom: '8px', color: '#1e40af', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <i className="fas fa-file-excel"></i> Завантажити Excel з Chess-Results.com
+                              </h3>
+                              <p style={{ fontSize: '14px', color: '#1e3a8a', marginBottom: '16px' }}>
+                                Виберіть Excel-файл (.xlsx або .xls), завантажений з сайту chess-results.com (меню "Excel and Print"), щоб автоматично заповнити список учасників та їх результати.
+                              </p>
+                              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                <input
+                                  type="file"
+                                  ref={fileInputRef}
+                                  accept=".xlsx, .xls"
+                                  onChange={handleImportData}
+                                  style={{ display: 'none' }}
+                                  id="excel-import-input"
+                                />
+                                <label
+                                  htmlFor="excel-import-input"
+                                  style={{
+                                    padding: '10px 20px',
+                                    background: isImporting ? '#94a3b8' : '#3b82f6',
+                                    color: '#fff',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    cursor: isImporting ? 'not-allowed' : 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    fontWeight: 'bold'
+                                  }}
+                                >
+                                  {isImporting ? (
+                                    <><i className="fas fa-spinner fa-spin"></i> Обробка...</>
+                                  ) : (
+                                    <><i className="fas fa-upload"></i> Вибрати та завантажити файл</>
+                                  )}
+                                </label>
+                                {isImporting && <span style={{ color: '#1e40af', fontSize: '14px' }}>Це може зайняти кілька секунд...</span>}
+                              </div>
+                            </div>
+                          )}
+
+                          <div style={{ background: '#f5f5f5', padding: '24px', borderRadius: '12px', marginBottom: '24px' }}>
+                            <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#111' }}>[Admin] Додати учасника</h3>
 
                           <div style={{ marginBottom: '20px', position: 'relative' }}>
                             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Пошук гравця або користувача:</label>
@@ -1715,7 +1792,8 @@ const TournamentViewPage = () => {
                             )}
                           </div>
                         </div>
-                      )}
+                      </>
+                    )}
 
                       <div className={styles.tableWrapper}>
                         <table className={styles.dataTable}>

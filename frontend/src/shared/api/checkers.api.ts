@@ -62,3 +62,12 @@ export const updateCheckersGame = async (gameId: number | string, data: Checkers
 export const deleteCheckersGame = async (gameId: number | string, tournamentId: number | string): Promise<void> => {
     await api.delete(`/checkers-games/${gameId}?tournamentId=${tournamentId}`);
 };
+
+export const importCheckersDataFromFile = async (eventId: number | string, file: File): Promise<void> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  await api.post(`/checkers-events/${eventId}/import-file`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+};
+

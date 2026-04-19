@@ -64,3 +64,14 @@ export const createChessTeam = async (data: any): Promise<any> => {
 export const updateChessTeam = async (id: number, data: any): Promise<void> => {
     await api.put(`/chess-teams/${id}`, data);
 };
+
+export const importDataFromUrl = async (eventId: number | string, url: string): Promise<void> => {
+    await api.post(`/chess-events/${eventId}/import?url=${encodeURIComponent(url)}`);
+};
+export const importDataFromFile = async (eventId: number | string, file: File): Promise<void> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    await api.post(`/chess-events/${eventId}/import-file`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
+};

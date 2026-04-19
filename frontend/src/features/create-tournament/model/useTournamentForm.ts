@@ -225,25 +225,6 @@ export const useTournamentForm = () => {
     }
   };
 
-  const fillTestData = () => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const nextWeek = new Date();
-    nextWeek.setDate(nextWeek.getDate() + 7);
-
-    setFormData(prev => ({
-      ...prev,
-      name: 'Тестовий турнір ' + Math.floor(Math.random() * 1000),
-      sport: 'futsal',
-      description: 'Це автоматично згенерований опис для тестування форми створення турніру.',
-      location: 'Спортивний зал №1',
-      registrationDeadline: tomorrow.toISOString().split('T')[0],
-      startDate: nextWeek.toISOString().split('T')[0],
-      maxTeams: 16,
-      minTeams: 4
-    }));
-    setSelectedCategories([]);
-  };
 
   const calculateDuration = () => {
     if (!formData.startDate || !formData.endDate) return 0;
@@ -260,7 +241,6 @@ export const useTournamentForm = () => {
     handleInputChange,
     handleCategoryToggle,
     handleSubmit,
-    fillTestData,
     calculateDuration
   };
 };

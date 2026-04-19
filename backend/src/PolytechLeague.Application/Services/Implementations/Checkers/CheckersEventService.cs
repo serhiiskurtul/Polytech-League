@@ -7,13 +7,15 @@ using Microsoft.EntityFrameworkCore;
 using PolytechLeague.Application.Services.Interfaces;
 using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Exceptions;
+using PolytechLeague.Application.Dto;
 
 namespace PolytechLeague.Application.Services.Implementations.Checkers;
 
 public class CheckersEventService(
     ApplicationDbContext _dbcontext,
     ILogger<AbstractEntityService<CheckersEvent>> _logger,
-    INotificationService _notificationService
+    INotificationService _notificationService,
+    IExcelImportService _excelImportService
 ) :
     AbstractEntityService<CheckersEvent>(_dbcontext, _logger, _notificationService),
     ICheckersEventService
@@ -153,5 +155,73 @@ public class CheckersEventService(
                 $"/tournaments/{newEntity.Id}"
             );
         }
+    }
+    public async Task ImportDataFromUrlAsync(long eventId, string url, CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Starting Excel data import for checkers event {EventId} from URL: {Url}", eventId, url);
+        var data = await _excelImportService.ImportFromChessResultsUrlAsync(url, cancellationToken);
+        await ProcessImportData(eventId, data, cancellationToken);
+    }
+
+    public async Task ImportDataFromFileAsync(long eventId, Stream stream, CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Starting Excel data import for checkers event {EventId} from uploaded file", eventId);
+        var data = await _excelImportService.ImportFromStreamAsync(stream, cancellationToken);
+        await ProcessImportData(eventId, data, cancellationToken);
+    }
+
+    private async Task ProcessImportData(long eventId, ScrapedTournamentExcelData data, CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Processing {PlayerCount} players for checkers event {EventId}", 
+            data.Players.Count, eventId);
+
+        if (data.Players.Count == 0)
+        {
+            throw new Exception("Не вдалося знайти список учасників або дані в Excel. Перевірте посилання.");
+        }
+
+        foreach (var sp in data.Players)
+        {
+            Player? player = null;
+
+            // 1. Try match by Name
+            var names = sp.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (names.Length >= 2)
+            {
+                var lastName = names[0];
+                var firstName = names[1];
+                player = await _dbcontext.Set<Player>()
+                    .FirstOrDefaultAsync(p => p.LastName.ToLower() == lastName.ToLower() && p.FirstName.ToLower() == firstName.ToLower(), cancellationToken);
+            }
+
+            // 2. Create if not found
+            if (player == null)
+            {
+                names = sp.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                var lastName = names.Length > 0 ? names[0] : "Невідомий";
+                var firstName = names.Length > 1 ? names[1] : "Гравець";
+
+                player = new Player
+                {
+                    LastName = lastName,
+                    FirstName = firstName,
+                    City = "Чернівці",
+                    Group = "Unknown",
+                    PhotoUrl = "/images/placeholders/user.png"
+                };
+                _dbcontext.Set<Player>().Add(player);
+                await _dbcontext.SaveChangesAsync(cancellationToken);
+            }
+
+            // Add as participant if not already
+            await AddParticipantAsync(eventId, new CheckersEventParticipantDto
+            {
+                PlayerId = player.Id,
+                Points = sp.Points,
+                Rank = sp.Rank ?? 0
+            }, cancellationToken);
+        }
+
+        await _dbcontext.SaveChangesAsync(cancellationToken);
     }
 }

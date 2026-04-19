@@ -10,4 +10,6 @@ public interface ICheckersEventService : IAbstractEntityService<CheckersEvent>
     Task RemoveParticipantAsync(long id, long playerId, CancellationToken cancellationToken = default);
     Task AddPhotoAsync(long id, string url, CancellationToken cancellationToken = default);
     Task RemovePhotoAsync(long id, long photoId, CancellationToken cancellationToken = default);
+    Task ImportDataFromUrlAsync(long eventId, string url, CancellationToken cancellationToken = default);
+    Task ImportDataFromFileAsync(long eventId, Stream stream, CancellationToken cancellationToken = default);
 }

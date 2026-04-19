@@ -18,7 +18,6 @@ const TournamentCreateForm = () => {
     handleInputChange,
     handleCategoryToggle,
     handleSubmit,
-    fillTestData,
     calculateDuration
   } = useTournamentForm();
 
@@ -52,7 +51,6 @@ const TournamentCreateForm = () => {
 
               <FormActions 
                 isSubmitting={isSubmitting} 
-                fillTestData={fillTestData} 
               />
             </form>
           </div>

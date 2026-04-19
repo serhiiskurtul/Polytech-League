@@ -2,20 +2,11 @@ import styles from './FormActions.module.css';
 
 interface FormActionsProps {
   isSubmitting: boolean;
-  fillTestData: () => void;
 }
 
-const FormActions = ({ isSubmitting, fillTestData }: FormActionsProps) => {
+const FormActions = ({ isSubmitting }: FormActionsProps) => {
   return (
     <div className={styles.formActions}>
-      <button
-        type="button"
-        className={styles.testDataBtn}
-        onClick={fillTestData}
-      >
-        <i className="fas fa-vial"></i> Заповнити тестові дані
-      </button>
-      
       <div className={styles.submitActions}>
         <button
           type="button"

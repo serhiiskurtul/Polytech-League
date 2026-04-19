@@ -10,8 +10,12 @@ namespace PolytechLeague.API.Controllers.Chess;
 
 [ApiController]
 [Route("api/chess-events")]
-public class ChessEventsController(IChessEventService chessEventService, IRedisService redisService, IFileService fileService) : Controller
+public class ChessEventsController(IChessEventService chessEventService, IRedisService redisService, IFileService fileService) : ControllerBase
 {
+    [AllowAnonymous]
+    [HttpGet("ping")]
+    public IActionResult Ping() => Ok("pong");
+
     [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> GetAll(
@@ -157,5 +161,47 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
         await redisService.RemoveGroupAsync("chess_events_all");
 
         return NoContent();
+    }
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{id}/import")]
+    public async Task<IActionResult> ImportFromChessResults(long id, [FromQuery] string url, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrEmpty(url)) return BadRequest("URL is required");
+
+        try
+        {
+            await chessEventService.ImportDataFromUrlAsync(id, url, cancellationToken);
+
+            await redisService.RemoveDataAsync($"chess_event_{id}");
+            await redisService.RemoveGroupAsync("chess_events_all");
+
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{id}/import-file")]
+    public async Task<IActionResult> ImportFromFile(long id, IFormFile file, CancellationToken cancellationToken)
+    {
+        if (file == null || file.Length == 0) return BadRequest("File is required");
+
+        try
+        {
+            using var stream = file.OpenReadStream();
+            await chessEventService.ImportDataFromFileAsync(id, stream, cancellationToken);
+
+            await redisService.RemoveDataAsync($"chess_event_{id}");
+            await redisService.RemoveGroupAsync("chess_events_all");
+
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
     }
 }

@@ -156,4 +156,47 @@ public class CheckersEventsController(ICheckersEventService checkersEventService
 
         return NoContent();
     }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{id}/import")]
+    public async Task<IActionResult> ImportFromChessResults(long id, [FromQuery] string url, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrEmpty(url)) return BadRequest("URL is required");
+
+        try
+        {
+            await checkersEventService.ImportDataFromUrlAsync(id, url, cancellationToken);
+
+            await redisService.RemoveDataAsync($"checkers_event_{id}");
+            await redisService.RemoveGroupAsync("checkers_events_all");
+
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{id}/import-file")]
+    public async Task<IActionResult> ImportFromFile(long id, IFormFile file, CancellationToken cancellationToken)
+    {
+        if (file == null || file.Length == 0) return BadRequest("File is required");
+
+        try
+        {
+            using var stream = file.OpenReadStream();
+            await checkersEventService.ImportDataFromFileAsync(id, stream, cancellationToken);
+
+            await redisService.RemoveDataAsync($"checkers_event_{id}");
+            await redisService.RemoveGroupAsync("checkers_events_all");
+
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
 }

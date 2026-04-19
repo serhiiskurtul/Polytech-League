@@ -9,4 +9,6 @@ public interface IChessEventService : IAbstractEntityService<ChessEvent>
     Task RemoveParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken = default);
     Task AddPhotoAsync(long eventId, string url, CancellationToken cancellationToken = default);
     Task RemovePhotoAsync(long eventId, long photoId, CancellationToken cancellationToken = default);
+    Task ImportDataFromUrlAsync(long eventId, string url, CancellationToken cancellationToken = default);
+    Task ImportDataFromFileAsync(long eventId, Stream stream, CancellationToken cancellationToken = default);
 }

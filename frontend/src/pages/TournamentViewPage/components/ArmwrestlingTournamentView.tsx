@@ -184,9 +184,9 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
       }
 
       // 2. Add to event if not already there
-      const isAlreadyInEvent = details.players?.some((p: any) => p.id === playerId);
+      const isAlreadyInEvent = details.participants?.some((p: any) => (p.playerId || p.id) === playerId);
       if (!isAlreadyInEvent) {
-          await addParticipantToArmwrestlingEvent(details.id, playerId);
+          await addParticipantToArmwrestlingEvent(details.id, { playerId, weight: 0, rank: 0 });
       }
 
       await loadPlayers(playerNum === 1 ? { p1: playerId } : { p2: playerId });
@@ -267,7 +267,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
 
         if (!playerId) {
             // Check if player is already in the tournament (by userId)
-            if (newParticipant.userId && details.players?.some((p: any) => p.userId === newParticipant.userId)) {
+            if (newParticipant.userId && details.participants?.some((p: any) => (p.userId === newParticipant.userId))) {
               alert("Цей користувач вже бере участь у змаганні!");
               return;
             }
@@ -283,7 +283,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
             alert('Гравця створено та додано у базу!');
         } else {
             // Check if player is already in the tournament
-            const isAlreadyInEvent = details.players?.some((p: any) => p.id === playerId);
+            const isAlreadyInEvent = details.participants?.some((p: any) => (p.playerId || p.id) === playerId);
             if (isAlreadyInEvent) {
                 alert("Цей гравець вже бере участь у змаганні!");
                 return;
@@ -291,7 +291,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
         }
 
         // Add link to event
-        await addParticipantToArmwrestlingEvent(details.id, playerId);
+        await addParticipantToArmwrestlingEvent(details.id, { playerId: playerId!, weight: 0, rank: 0 });
         alert('Учасника успішно додано до змагання!');
 
         setShowAddPlayer(false);
@@ -316,10 +316,23 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
   };
 
   // Use participants from event details (linked Players)
-  // The backend now returns players directly as PlayerDto[] in details.players
-  const currentParticipants = (details.players || []) as PlayerDto[];
+  // The backend now returns participants which we map to full PlayerDto using allPlayers if available
+  const currentParticipants = (details.participants || []).map(p => {
+    // If we have full player data in allPlayers, use it to get 'group' and other fields
+    const fullInfo = allPlayers.find(ap => ap.id === p.playerId);
+    if (fullInfo) return fullInfo;
+    
+    // Fallback if full info not loaded yet
+    return {
+      id: p.playerId,
+      userId: p.userId,
+      firstName: p.playerName?.split(' ')[0] || '',
+      lastName: p.playerName?.split(' ').slice(1).join(' ') || '',
+      group: 'Учасник'
+    } as PlayerDto;
+  });
   
-  // Fallback to matches only if players collection is truly empty
+  // Fallback to matches only if participants collection is truly empty
   const matchParticipants = details.matches?.reduce((acc, m) => {
     if (m.player1 && !acc.find(p => p.id === m.player1?.id)) acc.push(m.player1);
     if (m.player2 && !acc.find(p => p.id === m.player2?.id)) acc.push(m.player2);
@@ -615,7 +628,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
                   {isAdmin && (
                     <button 
                       type="button"
-                      onClick={() => handleRemoveParticipant(player.id, `${player.firstName} ${player.lastName}`)}
+                      onClick={() => handleRemoveParticipant(player.id!, `${player.firstName} ${player.lastName}`)}
                       style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '8px' }}
                       title="Видалити учасника"
                     >
