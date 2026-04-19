@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Entities.TableTennis.Enums;
 using PolytechLeague.Domain.Entities.Armwrestling.Enums;
@@ -36,6 +37,7 @@ public class PlayerDto
 
     // Armwrestling
     public float? ArmwrestlingWeight { get; set; }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public ArmwrestlingWeightClass? ArmwrestlingPreferredWeightClass { get; set; }
 
     // Team Sports

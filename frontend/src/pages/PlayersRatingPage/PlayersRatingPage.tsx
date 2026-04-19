@@ -12,6 +12,7 @@ const PlayersRatingPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('Загальний');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedWeightClass, setSelectedWeightClass] = useState<string>('all');
   const [selectedPlayers, setSelectedPlayers] = useState<PlayerDto[]>([]);
 
   useEffect(() => {
@@ -66,12 +67,31 @@ const PlayersRatingPage = () => {
     { id: 'badm', name: 'Бадмінтон', icon: 'fa-feather-alt', key: 'badminton' }
   ];
 
+  const armwrestlingWeightClasses = [
+    { id: 'all', name: 'Всі категорії' },
+    { id: 'Under60kg', name: 'До 60 кг' },
+    { id: 'Under70kg', name: 'До 70 кг' },
+    { id: 'Under80kg', name: 'До 80 кг' },
+    { id: 'Under90kg', name: 'До 90 кг' },
+    { id: 'Plus90kg', name: 'Понад 90 кг' }
+  ];
+
+  // Reset filters when changing tab
+  useEffect(() => {
+    setSelectedWeightClass('all');
+  }, [activeTab]);
+
   const filteredPlayers = useMemo(() => {
     let result = [...players];
 
     // Filter by tab
     if (activeTab !== 'Загальний') {
       result = result.filter(p => p.sports?.includes(activeTab) || p.sports?.some(s => s.toLowerCase() === activeTab.toLowerCase()));
+      
+      // Filter by weight class for armwrestling
+      if (activeTab.toLowerCase() === 'armwrestling' && selectedWeightClass !== 'all') {
+        result = result.filter(p => p.armwrestlingPreferredWeightClass === selectedWeightClass);
+      }
     }
 
     // Filter by search
@@ -153,6 +173,22 @@ const PlayersRatingPage = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
+            
+            {activeTab.toLowerCase() === 'armwrestling' && (
+              <div className={styles.weightFilter}>
+                <i className="fa-solid fa-weight-hanging"></i>
+                <select 
+                  value={selectedWeightClass} 
+                  onChange={(e) => setSelectedWeightClass(e.target.value)}
+                  className={styles.weightSelect}
+                >
+                  {armwrestlingWeightClasses.map(wc => (
+                    <option key={wc.id} value={wc.id}>{wc.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <div className={styles.resultsCount}>
               Знайдено: <strong>{filteredPlayers.length}</strong> гравців
             </div>

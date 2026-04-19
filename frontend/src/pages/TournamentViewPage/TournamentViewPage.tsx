@@ -470,10 +470,10 @@ const TournamentViewPage = () => {
 
   const handleEditParticipantClick = (p: any) => {
     setEditingParticipantId(p.playerId);
-    setEditingParticipantData({ 
-      points: p.points || 0, 
+    setEditingParticipantData({
+      points: p.points || 0,
       rank: p.rank || 0,
-      weight: p.weight || 0 
+      weight: p.weight || 0
     });
   };
 
@@ -531,7 +531,7 @@ const TournamentViewPage = () => {
   const handleSaveParticipantEdit = async (playerId: number) => {
     try {
       const sportKey = tournament?.sport?.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') || '';
-      
+
       if (sportKey === 'checkers') {
         const payload: CheckersEventParticipantDto = {
           playerId,
@@ -565,7 +565,7 @@ const TournamentViewPage = () => {
         };
         await updateParticipantInEvent(id!, playerId, payload);
       }
-      
+
       alert("Дані учасника оновлено!");
       setEditingParticipantId(null);
       fetchTournament(true);
@@ -579,7 +579,7 @@ const TournamentViewPage = () => {
     if (window.confirm(`Ви впевнені, що хочете видалити учасника "${playerName}" зі змагань?`)) {
       try {
         const sportKey = tournament?.sport?.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') || '';
-        
+
         switch (sportKey) {
           case 'checkers':
             await removeParticipantFromCheckersEvent(id!, playerId);
@@ -597,7 +597,7 @@ const TournamentViewPage = () => {
           default:
             await removeParticipantFromEvent(id!, playerId);
         }
-        
+
         alert("Учасника видалено зі змагань!");
         fetchTournament(true);
       } catch (err) {
@@ -809,7 +809,7 @@ const TournamentViewPage = () => {
 
       // Create participant binding
       const sportKey = tournament?.sport?.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') || '';
-      
+
       switch (sportKey) {
         case 'checkers':
           await addParticipantToCheckersEvent(id!, { playerId: playerId, points: 0, rank: 0 });
@@ -1010,1065 +1010,1065 @@ const TournamentViewPage = () => {
         </div>
 
         <>
-        {isAdmin && showWinnersAdmin && (
-          <div className={styles.adminSection} style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '24px', borderRadius: '16px', marginBottom: '24px' }}>
-            <h3 style={{ marginTop: 0, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', color: '#166534' }}>
-              <i className="fas fa-trophy"></i> Призначити призерів змагань
-            </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
-              <div>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
-                  <i className="fas fa-crown" style={{ color: '#fbbf24' }}></i> 1-ше місце (Золото)
-                </label>
-                <select
-                  value={winners.firstPlaceId}
-                  onChange={(e) => setWinners({ ...winners, firstPlaceId: Number(e.target.value) })}
-                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
-                >
-                  <option key="default-first" value="0">-- Оберіть переможця --</option>
-                  {details?.players?.map((p: any) => (
-                    <option key={`first-p-${p.playerId}`} value={p.playerId}>{p.playerName} ({p.points} очок)</option>
-                  ))}
-                  {details?.teams?.map((t: any) => (
-                    <option key={`first-t-${t.id}`} value={t.id}>{t.name}</option>
-                  ))}
-                </select>
-              </div>
+          {isAdmin && showWinnersAdmin && (
+            <div className={styles.adminSection} style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '24px', borderRadius: '16px', marginBottom: '24px' }}>
+              <h3 style={{ marginTop: 0, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', color: '#166534' }}>
+                <i className="fas fa-trophy"></i> Призначити призерів змагань
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
+                    <i className="fas fa-crown" style={{ color: '#fbbf24' }}></i> 1-ше місце (Золото)
+                  </label>
+                  <select
+                    value={winners.firstPlaceId}
+                    onChange={(e) => setWinners({ ...winners, firstPlaceId: Number(e.target.value) })}
+                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                  >
+                    <option key="default-first" value="0">-- Оберіть переможця --</option>
+                    {(details?.players || details?.participants || [])?.map((p: any) => (
+                      <option key={`first-p-${p.playerId}`} value={p.playerId}>{p.playerName} {p.points !== undefined ? `(${p.points} очок)` : ''}</option>
+                    ))}
+                    {details?.teams?.map((t: any) => (
+                      <option key={`first-t-${t.id}`} value={t.id}>{t.name}</option>
+                    ))}
+                  </select>
+                </div>
 
-              <div>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
-                  <i className="fas fa-medal" style={{ color: '#9ca3af' }}></i> 2-ге місце (Срібло)
-                </label>
-                <select
-                  value={winners.secondPlaceId}
-                  onChange={(e) => setWinners({ ...winners, secondPlaceId: Number(e.target.value) })}
-                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
-                >
-                  <option key="default-second" value="0">-- Оберіть переможця --</option>
-                  {details?.players?.map((p: any) => (
-                    <option key={`second-p-${p.playerId}`} value={p.playerId}>{p.playerName} ({p.points} очок)</option>
-                  ))}
-                  {details?.teams?.map((t: any) => (
-                    <option key={`second-t-${t.id}`} value={t.id}>{t.name}</option>
-                  ))}
-                </select>
-              </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
+                    <i className="fas fa-medal" style={{ color: '#9ca3af' }}></i> 2-ге місце (Срібло)
+                  </label>
+                  <select
+                    value={winners.secondPlaceId}
+                    onChange={(e) => setWinners({ ...winners, secondPlaceId: Number(e.target.value) })}
+                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                  >
+                    <option key="default-second" value="0">-- Оберіть переможця --</option>
+                    {(details?.players || details?.participants || [])?.map((p: any) => (
+                      <option key={`second-p-${p.playerId}`} value={p.playerId}>{p.playerName} {p.points !== undefined ? `(${p.points} очок)` : ''}</option>
+                    ))}
+                    {details?.teams?.map((t: any) => (
+                      <option key={`second-t-${t.id}`} value={t.id}>{t.name}</option>
+                    ))}
+                  </select>
+                </div>
 
-              <div>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
-                  <i className="fas fa-medal" style={{ color: '#b45309' }}></i> 3-тє місце (Бронза)
-                </label>
-                <select
-                  value={winners.thirdPlaceId}
-                  onChange={(e) => setWinners({ ...winners, thirdPlaceId: Number(e.target.value) })}
-                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
+                    <i className="fas fa-medal" style={{ color: '#b45309' }}></i> 3-тє місце (Бронза)
+                  </label>
+                  <select
+                    value={winners.thirdPlaceId}
+                    onChange={(e) => setWinners({ ...winners, thirdPlaceId: Number(e.target.value) })}
+                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                  >
+                    <option key="default-third" value="0">-- Оберіть переможця --</option>
+                    {(details?.players || details?.participants || [])?.map((p: any) => (
+                      <option key={`third-p-${p.playerId}`} value={p.playerId}>{p.playerName} {p.points !== undefined ? `(${p.points} очок)` : ''}</option>
+                    ))}
+                    {details?.teams?.map((t: any) => (
+                      <option key={`third-t-${t.id}`} value={t.id}>{t.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
+                <button
+                  onClick={handleSaveWinners}
+                  style={{ padding: '12px 24px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
                 >
-                  <option key="default-third" value="0">-- Оберіть переможця --</option>
-                  {details?.players?.map((p: any) => (
-                    <option key={`third-p-${p.playerId}`} value={p.playerId}>{p.playerName} ({p.points} очок)</option>
-                  ))}
-                  {details?.teams?.map((t: any) => (
-                    <option key={`third-t-${t.id}`} value={t.id}>{t.name}</option>
-                  ))}
-                </select>
+                  Зберегти результати
+                </button>
+                <button
+                  onClick={() => setShowWinnersAdmin(false)}
+                  style={{ padding: '12px 24px', background: '#6b7280', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
+                >
+                  Скасувати
+                </button>
               </div>
             </div>
-            <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
-              <button
-                onClick={handleSaveWinners}
-                style={{ padding: '12px 24px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
-              >
-                Зберегти результати
-              </button>
-              <button
-                onClick={() => setShowWinnersAdmin(false)}
-                style={{ padding: '12px 24px', background: '#6b7280', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
-              >
-                Скасувати
-              </button>
-            </div>
-          </div>
-        )}
+          )}
 
-        <div className={styles.headerContent}>
-          <div>
-            <div className={styles.tournamentBadges}>
-              {details?.level && (
-                <span className={`${styles.levelBadge} ${badgeObj.className}`}>
-                  <i className="fas fa-graduation-cap"></i> {badgeObj.label}
-                </span>
-              )}
-              {(tournament?.sport === 'chess' || tournament?.sport === 'checkers') && (details as any)?.system && (
-                <span className={styles.systemBadge}>
-                  <i className="fas fa-chess-board"></i> {getSystemLabel((details as any).system)}
-                </span>
-              )}
-              {tournament?.sport === 'checkers' && (
-                <span className={styles.systemBadge} style={{ background: '#10b981' }}>
-                  <i className="fas fa-dice"></i> {getVariantLabel((details as any)?.variant)}
-                </span>
-              )}
-            </div>
-            <h1 className={styles.tournamentName}>{tournament?.title}</h1>
-            <div className={styles.tournamentMeta}>
-              <div className={styles.metaItem}>
-                <i className="fas fa-calendar-alt"></i>
-                <span>{tournament?.date}</span>
+          <div className={styles.headerContent}>
+            <div>
+              <div className={styles.tournamentBadges}>
+                {details?.level && (
+                  <span className={`${styles.levelBadge} ${badgeObj.className}`}>
+                    <i className="fas fa-graduation-cap"></i> {badgeObj.label}
+                  </span>
+                )}
+                {(tournament?.sport === 'chess' || tournament?.sport === 'checkers') && (details as any)?.system && (
+                  <span className={styles.systemBadge}>
+                    <i className="fas fa-chess-board"></i> {getSystemLabel((details as any).system)}
+                  </span>
+                )}
+                {tournament?.sport === 'checkers' && (
+                  <span className={styles.systemBadge} style={{ background: '#10b981' }}>
+                    <i className="fas fa-dice"></i> {getVariantLabel((details as any)?.variant)}
+                  </span>
+                )}
               </div>
-              <div className={styles.metaItem}>
-                <i className="fas fa-map-marker-alt"></i>
-                <span>{tournament?.location}</span>
-              </div>
-              <div className={styles.metaItem}>
-                <i className="fas fa-users"></i>
-                <span>{actualParticipants} {participantLabel}</span>
-              </div>
-              {details?.timeControl && (
+              <h1 className={styles.tournamentName}>{tournament?.title}</h1>
+              <div className={styles.tournamentMeta}>
                 <div className={styles.metaItem}>
-                  <i className="fas fa-clock"></i>
-                  <span>Контроль часу: {details.timeControl}</span>
+                  <i className="fas fa-calendar-alt"></i>
+                  <span>{tournament?.date}</span>
                 </div>
-              )}
-            </div>
-          </div>
-          <div className={styles.tournamentImage}>
-            {details?.photos && details.photos.length > 0 ? (
-              <img src={getImageUrl(details.photos[0].url)} alt={tournament?.title} />
-            ) : (
-              <i className={
-                tournament?.sport === 'checkers' ? "fas fa-braille" :
-                  tournament?.sport === 'armwrestling' ? "fas fa-hand-rock" :
-                    tournament?.sport === 'futsal' ? "fas fa-futbol" :
-                      tournament?.sport === 'volleyball' || tournament?.sport === 'beach_volleyball' ? "fas fa-volleyball-ball" :
-                        tournament?.sport === 'basketball_3x3' ? "fas fa-basketball-ball" :
-                          tournament?.sport === 'badminton' ? "fas fa-shuttlecock" :
-                            tournament?.sport === 'table_tennis' || tournament?.sport === 'table-tennis' || tournament?.sport === 'tabletennis' ? "fas fa-table-tennis" :
-                              "fas fa-chess-queen"
-              }></i>
-            )}
-          </div>
-        </div>
-
-        {(tournament?.sport === 'chess' || 
-          tournament?.sport === 'checkers' || 
-          tournament?.sport === 'badminton' || 
-          tournament?.sport === 'table_tennis' || 
-          tournament?.sport === 'table-tennis') && details && (
-          <TournamentPodium
-            firstPlace={details.firstPlace}
-            secondPlace={details.secondPlace}
-            thirdPlace={details.thirdPlace}
-          />
-        )}
-
-        <div className={styles.infoCard}>
-          <h2><i className="fas fa-info-circle"></i> Про змагання</h2>
-          <div className={styles.infoGrid}>
-            <div className={styles.infoSection}>
-              <h3><i className="fas fa-align-left"></i> Опис</h3>
-              <p>{tournament?.description}</p>
-            </div>
-            <div className={styles.infoSection}>
-              <h3><i className="fas fa-trophy"></i> Призи</h3>
-              <p style={{ whiteSpace: 'pre-line' }}>
-                {details?.prizes || 'Призи будуть оголошені пізніше.'}
-              </p>
-            </div>
-            <div className={styles.infoSection}>
-              <h3><i className="fas fa-gavel"></i> Правила</h3>
-              <p style={{ whiteSpace: 'pre-line' }}>
-                {details?.rules ? details.rules : (
-                  <>
-                    {(tournament?.sport === 'chess' || tournament?.sport === 'checkers') && (details as any)?.system && (
-                      <>• {getSystemLabel((details as any).system)}<br /></>
-                    )}
-                    {tournament?.sport !== 'armwrestling' && (
-                      <>• Контроль часу: {details?.timeControl || 'Не вказано'}<br /></>
-                    )}
-                    • Заборонені підказки та мобільні телефони<br />
-                    • Рішення судді остаточні
-                  </>
-                )}
-              </p>
-            </div>
-            <div className={styles.infoSection}>
-              <h3><i className="fas fa-users"></i> Судді</h3>
-              <div className={styles.refereeList}>
-                {!(details as any)?.referees && !details?.headRefereeName && (
-                  <div className={styles.refereeItem}>
-                    <div className={styles.refereeAvatar}>
-                      <i className="fas fa-user-tie"></i>
-                    </div>
-                    <div>
-                      <strong>Призначається організатором</strong>
-                    </div>
-                  </div>
-                )}
-                {details?.headRefereeName && !(details as any)?.referees && (
-                  <div className={styles.refereeItem}>
-                    <div className={styles.refereeAvatar}>
-                      <i className="fas fa-user-tie"></i>
-                    </div>
-                    <div>
-                      <strong>{details.headRefereeName}</strong><br />
-                      <small>Суддя змагань</small>
-                    </div>
-                  </div>
-                )}
-                {(details as any)?.referees && (
-                  <div style={{ color: '#4b5563', fontSize: '0.95rem', whiteSpace: 'pre-line', padding: '8px 12px', background: '#fff', borderRadius: '10px', border: '1px solid #e5e7eb' }}>
-                    {(details as any).referees}
+                <div className={styles.metaItem}>
+                  <i className="fas fa-map-marker-alt"></i>
+                  <span>{tournament?.location}</span>
+                </div>
+                <div className={styles.metaItem}>
+                  <i className="fas fa-users"></i>
+                  <span>{actualParticipants} {participantLabel}</span>
+                </div>
+                {details?.timeControl && (
+                  <div className={styles.metaItem}>
+                    <i className="fas fa-clock"></i>
+                    <span>Контроль часу: {details.timeControl}</span>
                   </div>
                 )}
               </div>
             </div>
+            <div className={styles.tournamentImage}>
+              {details?.photos && details.photos.length > 0 ? (
+                <img src={getImageUrl(details.photos[0].url)} alt={tournament?.title} />
+              ) : (
+                <i className={
+                  tournament?.sport === 'checkers' ? "fas fa-braille" :
+                    tournament?.sport === 'armwrestling' ? "fas fa-hand-rock" :
+                      tournament?.sport === 'futsal' ? "fas fa-futbol" :
+                        tournament?.sport === 'volleyball' || tournament?.sport === 'beach_volleyball' ? "fas fa-volleyball-ball" :
+                          tournament?.sport === 'basketball_3x3' ? "fas fa-basketball-ball" :
+                            tournament?.sport === 'badminton' ? "fas fa-shuttlecock" :
+                              tournament?.sport === 'table_tennis' || tournament?.sport === 'table-tennis' || tournament?.sport === 'tabletennis' ? "fas fa-table-tennis" :
+                                "fas fa-chess-queen"
+                }></i>
+              )}
+            </div>
           </div>
-        </div>
 
-        {(() => {
-          const s = tournament?.sport.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') || '';
-          const isTeamFromDetails = !!(details as any)?.isTeam;
-          const mandatoryTeamSports = ['volleyball', 'beach_volleyball', 'futsal', 'basketball_3x3', 'basketball3x3'];
-          
-          if (isTeamFromDetails === true || (isTeamFromDetails === false && mandatoryTeamSports.includes(s) && (details as any).isTeam === undefined)) {
-            return (
-              <TeamSportsTournamentView
-                sport={s as any}
-                details={details}
-                isAdmin={isAdmin}
-                onRefresh={() => fetchTournament(true)}
+          {(tournament?.sport === 'chess' ||
+            tournament?.sport === 'checkers' ||
+            tournament?.sport === 'badminton' ||
+            tournament?.sport === 'table_tennis' ||
+            tournament?.sport === 'table-tennis') && details && (
+              <TournamentPodium
+                firstPlace={details.firstPlace}
+                secondPlace={details.secondPlace}
+                thirdPlace={details.thirdPlace}
               />
-            );
-          }
+            )}
 
-          if (s === 'armwrestling' && details) {
-            return (
-              <ArmwrestlingTournamentView
-                details={details as any}
-                isAdmin={isAdmin}
-                onRefresh={() => fetchTournament(true)}
-              />
-            );
-          }
-
-          if (s === 'chess' || s === 'checkers' || s === 'badminton' || s === 'tabletennis' || s === 'table_tennis') {
-            return (
-              <>
-                <div className={styles.statsGrid}>
-                  <div className={styles.statCard}>
-                    <div className={styles.statIcon}><i className={tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? "fas fa-project-diagram" : "fas fa-chess-board"}></i></div>
-                    <div className={styles.statValue}>{totalRounds || '-'}</div>
-                    <div className={styles.statLabel}>Всього турів</div>
-                  </div>
-                  <div className={styles.statCard}>
-                    <div className={styles.statIcon}><i className="fas fa-users"></i></div>
-                    <div className={styles.statValue}>{actualParticipants}</div>
-                    <div className={styles.statLabel}>Учасників</div>
-                  </div>
-                  <div className={styles.statCard}>
-                    <div className={styles.statIcon}>
-                      <i className={tournament?.sport === 'badminton' ? "fas fa-shuttlecock" : tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? "fas fa-table-tennis" : "fas fa-clock"}></i>
-                    </div>
-                    <div className={styles.statValue}>
-                      {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' 
-                        ? ((details as any)?.category === 'Men' ? 'Чоловіки' : (details as any)?.category === 'Women' ? 'Жінки' : (details as any)?.category === 'Mixed' ? 'Змішані' : (details as any)?.category || '-')
-                        : details?.timeControl || (tournament?.sport === 'badminton' ? 'За регламентом' : '-')}
-                    </div>
-                    <div className={styles.statLabel}>
-                      {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? 'Категорія' : tournament?.sport === 'badminton' ? 'Формат' : 'Контроль часу'}
-                    </div>
-                  </div>
-                  <div className={styles.statCard}>
-                    <div className={styles.statIcon}><i className="fas fa-chart-line"></i></div>
-                    <div className={styles.statValue}>{playedGames}</div>
-                    <div className={styles.statLabel}>Зіграно партій</div>
-                  </div>
-                </div>
-
-                <div className={styles.tabsContainer}>
-                  <div className={styles.tabsHeader}>
-                    <button
-                      className={`${styles.tabButton} ${activeTab === 'standings' ? styles.active : ''}`}
-                      onClick={() => setActiveTab('standings')}
-                    >
-                      <i className="fas fa-chart-simple"></i> Таблиця змагань
-                    </button>
-                    <button
-                      className={`${styles.tabButton} ${activeTab === 'games' ? styles.active : ''}`}
-                      onClick={() => setActiveTab('games')}
-                    >
-                      <i className={tournament?.sport === 'badminton' ? "fas fa-table-tennis-paddle-ball" : tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? "fas fa-table-tennis" : "fas fa-chess-board"}></i> {tournament?.sport === 'badminton' || tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? 'Всі матчі' : 'Всі партії'}
-                    </button>
-                    <button
-                      className={`${styles.tabButton} ${activeTab === 'participants' ? styles.active : ''}`}
-                      onClick={() => setActiveTab('participants')}
-                    >
-                      <i className="fas fa-users"></i> Учасники
-                    </button>
-                    <button
-                      className={`${styles.tabButton} ${activeTab === 'schedule' ? styles.active : ''}`}
-                      onClick={() => setActiveTab('schedule')}
-                    >
-                      <i className="fas fa-calendar-week"></i> Розклад турів
-                    </button>
-                  </div>
-
-                  {activeTab === 'standings' && (
-                    <div className={styles.tabContent}>
-                      <div className={styles.tableWrapper}>
-                        <table className={styles.dataTable}>
-                          <thead>
-                            <tr>
-                              <th>Місце</th>
-                              <th>Учасник</th>
-                              <th>Рейтинг</th>
-                              <th>Очки</th>
-                              {isAdmin && <th>Дії</th>}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {sortedPlayers.length > 0 ? sortedPlayers.map((p: any, idx: number) => (
-                              <tr key={p.id}>
-                                {editingParticipantId === p.playerId ? (
-                                  <>
-                                    <td>
-                                      <input type="number" value={editingParticipantData.rank} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, rank: parseInt(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
-                                    </td>
-                                    <td>
-                                      {p.userId ? (
-                                        <Link to={`/profile/${p.userId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
-                                          {p.playerName}
-                                        </Link>
-                                      ) : (
-                                        <span style={{ fontWeight: 'bold' }}>{p.playerName}</span>
-                                      )}
-                                    </td>
-                                    {tournament?.sport === 'chess' ? (
-                                      <>
-                                        <td>{p.rating}</td>
-                                        <td>
-                                          <input type="number" step="0.5" value={editingParticipantData.points} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, points: parseFloat(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
-                                        </td>
-                                      </>
-                                    ) : (
-                                      <>
-                                        {tournament?.sport === 'armwrestling' ? (
-                                          <td>
-                                            <input type="number" step="0.1" value={editingParticipantData.weight} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, weight: parseFloat(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
-                                          </td>
-                                        ) : (
-                                          <td>
-                                            <input type="number" step="0.5" value={editingParticipantData.points} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, points: parseFloat(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
-                                          </td>
-                                        )}
-                                      </>
-                                    )}
-                                    <td>
-                                      <button type="button" onClick={() => handleSaveParticipantEdit(p.playerId)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }}><i className="fas fa-check"></i></button>
-                                      <button type="button" onClick={handleCancelParticipantEdit} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><i className="fas fa-times"></i></button>
-                                    </td>
-                                  </>
-                                ) : (
-                                  <>
-                                    <td>{p.rank || idx + 1}</td>
-                                    <td>
-                                      {p.userId ? (
-                                        <Link to={`/profile/${p.userId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
-                                          {p.playerName}
-                                        </Link>
-                                      ) : (
-                                        <strong>{p.playerName}</strong>
-                                      )}
-                                    </td>
-                                    {tournament?.sport === 'chess' ? (
-                                      <>
-                                        <td>{p.rating}</td>
-                                        <td><strong>{p.points}</strong></td>
-                                      </>
-                                    ) : (
-                                      <td><strong>{tournament?.sport === 'armwrestling' ? (p.weight + ' кг') : p.points}</strong></td>
-                                    )}
-                                    {isAdmin && <td>
-                                      <button type="button" onClick={() => handleEditParticipantClick(p)} style={{ padding: '4px 8px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }} title="Редагувати"><i className="fas fa-edit"></i></button>
-                                      <button type="button" onClick={() => handleRemoveParticipant(p.playerId, p.playerName)} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Видалити"><i className="fas fa-trash"></i></button>
-                                    </td>}
-                                  </>
-                                )}
-                              </tr>
-                            )) : (
-                              <tr><td colSpan={6}>Ще немає даних</td></tr>
-                            )}
-                          </tbody>
-                        </table>
+          <div className={styles.infoCard}>
+            <h2><i className="fas fa-info-circle"></i> Про змагання</h2>
+            <div className={styles.infoGrid}>
+              <div className={styles.infoSection}>
+                <h3><i className="fas fa-align-left"></i> Опис</h3>
+                <p>{tournament?.description}</p>
+              </div>
+              <div className={styles.infoSection}>
+                <h3><i className="fas fa-trophy"></i> Призи</h3>
+                <p style={{ whiteSpace: 'pre-line' }}>
+                  {details?.prizes || 'Призи будуть оголошені пізніше.'}
+                </p>
+              </div>
+              <div className={styles.infoSection}>
+                <h3><i className="fas fa-gavel"></i> Правила</h3>
+                <p style={{ whiteSpace: 'pre-line' }}>
+                  {details?.rules ? details.rules : (
+                    <>
+                      {(tournament?.sport === 'chess' || tournament?.sport === 'checkers') && (details as any)?.system && (
+                        <>• {getSystemLabel((details as any).system)}<br /></>
+                      )}
+                      {tournament?.sport !== 'armwrestling' && (
+                        <>• Контроль часу: {details?.timeControl || 'Не вказано'}<br /></>
+                      )}
+                      • Заборонені підказки та мобільні телефони<br />
+                      • Рішення судді остаточні
+                    </>
+                  )}
+                </p>
+              </div>
+              <div className={styles.infoSection}>
+                <h3><i className="fas fa-users"></i> Судді</h3>
+                <div className={styles.refereeList}>
+                  {!(details as any)?.referees && !details?.headRefereeName && (
+                    <div className={styles.refereeItem}>
+                      <div className={styles.refereeAvatar}>
+                        <i className="fas fa-user-tie"></i>
+                      </div>
+                      <div>
+                        <strong>Призначається організатором</strong>
                       </div>
                     </div>
                   )}
-
-                  {activeTab === 'games' && (
-                    <div className={styles.tabContent}>
-                      {isAdmin && (
-                        <div style={{ background: '#f5f5f5', padding: '16px', borderRadius: '12px', marginBottom: '24px' }}>
-                          <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#111' }}>[Admin] Додати партію (результат)</h3>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
-                            <input type="number" min="1" placeholder="Тур" title="Номер туру" value={newGame.round} onChange={(e) => setNewGame({ ...newGame, round: parseInt(e.target.value) || 1 })} style={{ width: '60px', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
-                            <input type="number" min="1" placeholder="Дошка" title="Номер дошки" value={newGame.board} onChange={(e) => setNewGame({ ...newGame, board: parseInt(e.target.value) || 1 })} style={{ width: '60px', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
-
-                            <select value={newGame.whitePlayerId} onChange={(e) => setNewGame({ ...newGame, whitePlayerId: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}>
-                              <option value="">-- Білі --</option>
-                              {sortedPlayers.map((p: any) => <option key={`w${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
-                            </select>
-
-                            <strong style={{ margin: '0 8px' }}> - </strong>
-
-                            <select value={newGame.blackPlayerId} onChange={(e) => setNewGame({ ...newGame, blackPlayerId: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}>
-                              <option value="">-- Чорні --</option>
-                              {sortedPlayers.map((p: any) => <option key={`b${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
-                            </select>
-
-                            <select value={newGame.result} onChange={(e) => setNewGame({ ...newGame, result: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}>
-                              <option value="WhiteWin">Перемога {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'Гравця 1' : 'Білих'} (1-0)</option>
-                              <option value="BlackWin">Перемога {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'Гравця 2' : 'Чорних'} (0-1)</option>
-                              <option value="Draw">Нічия (½-½)</option>
-                            </select>
-
-                            <button type="button" onClick={handleAddGame} style={{ padding: '8px 16px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>Зберегти</button>
-                          </div>
-                          
-                          <div style={{ marginTop: '16px' }}>
-                            <label style={{ display: 'block', fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>PGN (опціонально)</label>
-                            <textarea 
-                              placeholder="Вставте PGN партії сюди..." 
-                              value={newGame.pgn} 
-                              onChange={(e) => setNewGame({ ...newGame, pgn: e.target.value })} 
-                              style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #ccc', minHeight: '80px', fontFamily: 'monospace' }}
-                            />
-                          </div>
-                        </div>
-                      )}
-
-                      <div style={{ display: 'flex', gap: '16px', marginBottom: '16px', flexWrap: 'wrap', padding: '16px', background: '#f9fafb', borderRadius: '12px' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                          <label style={{ fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>Тур</label>
-                          <input type="number" placeholder="Усі" value={gameFilters.round} onChange={(e) => setGameFilters({ ...gameFilters, round: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', width: '80px' }} />
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                          <label style={{ fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>Дошка</label>
-                          <input type="number" placeholder="Усі" value={gameFilters.board} onChange={(e) => setGameFilters({ ...gameFilters, board: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', width: '80px' }} />
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                          <label style={{ fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>Учасник (ім'я)</label>
-                          <input type="text" placeholder="Пошук..." value={gameFilters.participant} onChange={(e) => setGameFilters({ ...gameFilters, participant: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', minWidth: '200px' }} />
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                          <label style={{ fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>Результат</label>
-                          <select value={gameFilters.result} onChange={(e) => setGameFilters({ ...gameFilters, result: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}>
-                            <option value="">Усі результати</option>
-                            <option value="WhiteWin">Перемога Білих (1-0)</option>
-                            <option value="BlackWin">Перемога Чорних (0-1)</option>
-                            <option value="Draw">Нічия (½-½)</option>
-                          </select>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-                          <button
-                            type="button"
-                            onClick={() => setGameFilters({ round: '', board: '', participant: '', result: '' })}
-                            style={{ padding: '8px 16px', background: '#6b7280', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
-                          >
-                            Скинути
-                          </button>
-                        </div>
+                  {details?.headRefereeName && !(details as any)?.referees && (
+                    <div className={styles.refereeItem}>
+                      <div className={styles.refereeAvatar}>
+                        <i className="fas fa-user-tie"></i>
                       </div>
+                      <div>
+                        <strong>{details.headRefereeName}</strong><br />
+                        <small>Суддя змагань</small>
+                      </div>
+                    </div>
+                  )}
+                  {(details as any)?.referees && (
+                    <div style={{ color: '#4b5563', fontSize: '0.95rem', whiteSpace: 'pre-line', padding: '8px 12px', background: '#fff', borderRadius: '10px', border: '1px solid #e5e7eb' }}>
+                      {(details as any).referees}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
 
-                      <div className={styles.tableWrapper}>
-                        <table className={styles.dataTable}>
-                          <thead>
-                            <tr>
-                              <th>Тур</th>
-                              {tournament?.sport !== 'checkers' && <th>{tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? 'Стіл' : tournament?.sport === 'badminton' ? 'Корт' : 'Дошка'}</th>}
-                              <th>{tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'Гравець 1' : 'Білі'}</th>
-                              <th>{tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'Гравець 2' : 'Чорні'}</th>
-                              <th>Результат</th>
-                              {(isAdmin || tournament?.sport === 'chess') && <th>Дії</th>}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {filteredGames.length > 0 ? (
-                              filteredGames.map((game, idx) => (
-                                <tr key={game.id}>
-                                  {editingGameId === game.id ? (
+          {(() => {
+            const s = tournament?.sport.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') || '';
+            const isTeamFromDetails = !!(details as any)?.isTeam;
+            const mandatoryTeamSports = ['volleyball', 'beach_volleyball', 'futsal', 'basketball_3x3', 'basketball3x3'];
+
+            if (isTeamFromDetails === true || (isTeamFromDetails === false && mandatoryTeamSports.includes(s) && (details as any).isTeam === undefined)) {
+              return (
+                <TeamSportsTournamentView
+                  sport={s as any}
+                  details={details}
+                  isAdmin={isAdmin}
+                  onRefresh={() => fetchTournament(true)}
+                />
+              );
+            }
+
+            if (s === 'armwrestling' && details) {
+              return (
+                <ArmwrestlingTournamentView
+                  details={details as any}
+                  isAdmin={isAdmin}
+                  onRefresh={() => fetchTournament(true)}
+                />
+              );
+            }
+
+            if (s === 'chess' || s === 'checkers' || s === 'badminton' || s === 'tabletennis' || s === 'table_tennis') {
+              return (
+                <>
+                  <div className={styles.statsGrid}>
+                    <div className={styles.statCard}>
+                      <div className={styles.statIcon}><i className={tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? "fas fa-project-diagram" : "fas fa-chess-board"}></i></div>
+                      <div className={styles.statValue}>{totalRounds || '-'}</div>
+                      <div className={styles.statLabel}>Всього турів</div>
+                    </div>
+                    <div className={styles.statCard}>
+                      <div className={styles.statIcon}><i className="fas fa-users"></i></div>
+                      <div className={styles.statValue}>{actualParticipants}</div>
+                      <div className={styles.statLabel}>Учасників</div>
+                    </div>
+                    <div className={styles.statCard}>
+                      <div className={styles.statIcon}>
+                        <i className={tournament?.sport === 'badminton' ? "fas fa-shuttlecock" : tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? "fas fa-table-tennis" : "fas fa-clock"}></i>
+                      </div>
+                      <div className={styles.statValue}>
+                        {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis'
+                          ? ((details as any)?.category === 'Men' ? 'Чоловіки' : (details as any)?.category === 'Women' ? 'Жінки' : (details as any)?.category === 'Mixed' ? 'Змішані' : (details as any)?.category || '-')
+                          : details?.timeControl || (tournament?.sport === 'badminton' ? 'За регламентом' : '-')}
+                      </div>
+                      <div className={styles.statLabel}>
+                        {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? 'Категорія' : tournament?.sport === 'badminton' ? 'Формат' : 'Контроль часу'}
+                      </div>
+                    </div>
+                    <div className={styles.statCard}>
+                      <div className={styles.statIcon}><i className="fas fa-chart-line"></i></div>
+                      <div className={styles.statValue}>{playedGames}</div>
+                      <div className={styles.statLabel}>Зіграно партій</div>
+                    </div>
+                  </div>
+
+                  <div className={styles.tabsContainer}>
+                    <div className={styles.tabsHeader}>
+                      <button
+                        className={`${styles.tabButton} ${activeTab === 'standings' ? styles.active : ''}`}
+                        onClick={() => setActiveTab('standings')}
+                      >
+                        <i className="fas fa-chart-simple"></i> Таблиця змагань
+                      </button>
+                      <button
+                        className={`${styles.tabButton} ${activeTab === 'games' ? styles.active : ''}`}
+                        onClick={() => setActiveTab('games')}
+                      >
+                        <i className={tournament?.sport === 'badminton' ? "fas fa-table-tennis-paddle-ball" : tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? "fas fa-table-tennis" : "fas fa-chess-board"}></i> {tournament?.sport === 'badminton' || tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? 'Всі матчі' : 'Всі партії'}
+                      </button>
+                      <button
+                        className={`${styles.tabButton} ${activeTab === 'participants' ? styles.active : ''}`}
+                        onClick={() => setActiveTab('participants')}
+                      >
+                        <i className="fas fa-users"></i> Учасники
+                      </button>
+                      <button
+                        className={`${styles.tabButton} ${activeTab === 'schedule' ? styles.active : ''}`}
+                        onClick={() => setActiveTab('schedule')}
+                      >
+                        <i className="fas fa-calendar-week"></i> Розклад турів
+                      </button>
+                    </div>
+
+                    {activeTab === 'standings' && (
+                      <div className={styles.tabContent}>
+                        <div className={styles.tableWrapper}>
+                          <table className={styles.dataTable}>
+                            <thead>
+                              <tr>
+                                <th>Місце</th>
+                                <th>Учасник</th>
+                                <th>Рейтинг</th>
+                                <th>Очки</th>
+                                {isAdmin && <th>Дії</th>}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {sortedPlayers.length > 0 ? sortedPlayers.map((p: any, idx: number) => (
+                                <tr key={p.id}>
+                                  {editingParticipantId === p.playerId ? (
                                     <>
                                       <td>
-                                        <input
-                                          type="number"
-                                          min="1"
-                                          value={editingGameData.round}
-                                          onChange={(e) => setEditingGameData({ ...editingGameData, round: parseInt(e.target.value) || 1 })}
-                                          style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}
-                                        />
+                                        <input type="number" value={editingParticipantData.rank} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, rank: parseInt(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
                                       </td>
-                                      {tournament?.sport !== 'checkers' && (
+                                      <td>
+                                        {p.userId ? (
+                                          <Link to={`/profile/${p.userId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
+                                            {p.playerName}
+                                          </Link>
+                                        ) : (
+                                          <span style={{ fontWeight: 'bold' }}>{p.playerName}</span>
+                                        )}
+                                      </td>
+                                      {tournament?.sport === 'chess' ? (
+                                        <>
+                                          <td>{p.rating}</td>
+                                          <td>
+                                            <input type="number" step="0.5" value={editingParticipantData.points} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, points: parseFloat(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
+                                          </td>
+                                        </>
+                                      ) : (
+                                        <>
+                                          {tournament?.sport === 'armwrestling' ? (
+                                            <td>
+                                              <input type="number" step="0.1" value={editingParticipantData.weight} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, weight: parseFloat(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
+                                            </td>
+                                          ) : (
+                                            <td>
+                                              <input type="number" step="0.5" value={editingParticipantData.points} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, points: parseFloat(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
+                                            </td>
+                                          )}
+                                        </>
+                                      )}
+                                      <td>
+                                        <button type="button" onClick={() => handleSaveParticipantEdit(p.playerId)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }}><i className="fas fa-check"></i></button>
+                                        <button type="button" onClick={handleCancelParticipantEdit} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><i className="fas fa-times"></i></button>
+                                      </td>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <td>{p.rank || idx + 1}</td>
+                                      <td>
+                                        {p.userId ? (
+                                          <Link to={`/profile/${p.userId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
+                                            {p.playerName}
+                                          </Link>
+                                        ) : (
+                                          <strong>{p.playerName}</strong>
+                                        )}
+                                      </td>
+                                      {tournament?.sport === 'chess' ? (
+                                        <>
+                                          <td>{p.rating}</td>
+                                          <td><strong>{p.points}</strong></td>
+                                        </>
+                                      ) : (
+                                        <td><strong>{tournament?.sport === 'armwrestling' ? (p.weight + ' кг') : p.points}</strong></td>
+                                      )}
+                                      {isAdmin && <td>
+                                        <button type="button" onClick={() => handleEditParticipantClick(p)} style={{ padding: '4px 8px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }} title="Редагувати"><i className="fas fa-edit"></i></button>
+                                        <button type="button" onClick={() => handleRemoveParticipant(p.playerId, p.playerName)} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Видалити"><i className="fas fa-trash"></i></button>
+                                      </td>}
+                                    </>
+                                  )}
+                                </tr>
+                              )) : (
+                                <tr><td colSpan={6}>Ще немає даних</td></tr>
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+
+                    {activeTab === 'games' && (
+                      <div className={styles.tabContent}>
+                        {isAdmin && (
+                          <div style={{ background: '#f5f5f5', padding: '16px', borderRadius: '12px', marginBottom: '24px' }}>
+                            <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#111' }}>[Admin] Додати партію (результат)</h3>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
+                              <input type="number" min="1" placeholder="Тур" title="Номер туру" value={newGame.round} onChange={(e) => setNewGame({ ...newGame, round: parseInt(e.target.value) || 1 })} style={{ width: '60px', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
+                              <input type="number" min="1" placeholder="Дошка" title="Номер дошки" value={newGame.board} onChange={(e) => setNewGame({ ...newGame, board: parseInt(e.target.value) || 1 })} style={{ width: '60px', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
+
+                              <select value={newGame.whitePlayerId} onChange={(e) => setNewGame({ ...newGame, whitePlayerId: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}>
+                                <option value="">-- Білі --</option>
+                                {sortedPlayers.map((p: any) => <option key={`w${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
+                              </select>
+
+                              <strong style={{ margin: '0 8px' }}> - </strong>
+
+                              <select value={newGame.blackPlayerId} onChange={(e) => setNewGame({ ...newGame, blackPlayerId: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}>
+                                <option value="">-- Чорні --</option>
+                                {sortedPlayers.map((p: any) => <option key={`b${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
+                              </select>
+
+                              <select value={newGame.result} onChange={(e) => setNewGame({ ...newGame, result: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}>
+                                <option value="WhiteWin">Перемога {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'Гравця 1' : 'Білих'} (1-0)</option>
+                                <option value="BlackWin">Перемога {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'Гравця 2' : 'Чорних'} (0-1)</option>
+                                <option value="Draw">Нічия (½-½)</option>
+                              </select>
+
+                              <button type="button" onClick={handleAddGame} style={{ padding: '8px 16px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>Зберегти</button>
+                            </div>
+
+                            <div style={{ marginTop: '16px' }}>
+                              <label style={{ display: 'block', fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>PGN (опціонально)</label>
+                              <textarea
+                                placeholder="Вставте PGN партії сюди..."
+                                value={newGame.pgn}
+                                onChange={(e) => setNewGame({ ...newGame, pgn: e.target.value })}
+                                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #ccc', minHeight: '80px', fontFamily: 'monospace' }}
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        <div style={{ display: 'flex', gap: '16px', marginBottom: '16px', flexWrap: 'wrap', padding: '16px', background: '#f9fafb', borderRadius: '12px' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <label style={{ fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>Тур</label>
+                            <input type="number" placeholder="Усі" value={gameFilters.round} onChange={(e) => setGameFilters({ ...gameFilters, round: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', width: '80px' }} />
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <label style={{ fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>Дошка</label>
+                            <input type="number" placeholder="Усі" value={gameFilters.board} onChange={(e) => setGameFilters({ ...gameFilters, board: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', width: '80px' }} />
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <label style={{ fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>Учасник (ім'я)</label>
+                            <input type="text" placeholder="Пошук..." value={gameFilters.participant} onChange={(e) => setGameFilters({ ...gameFilters, participant: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', minWidth: '200px' }} />
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <label style={{ fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>Результат</label>
+                            <select value={gameFilters.result} onChange={(e) => setGameFilters({ ...gameFilters, result: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}>
+                              <option value="">Усі результати</option>
+                              <option value="WhiteWin">Перемога Білих (1-0)</option>
+                              <option value="BlackWin">Перемога Чорних (0-1)</option>
+                              <option value="Draw">Нічия (½-½)</option>
+                            </select>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+                            <button
+                              type="button"
+                              onClick={() => setGameFilters({ round: '', board: '', participant: '', result: '' })}
+                              style={{ padding: '8px 16px', background: '#6b7280', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+                            >
+                              Скинути
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className={styles.tableWrapper}>
+                          <table className={styles.dataTable}>
+                            <thead>
+                              <tr>
+                                <th>Тур</th>
+                                {tournament?.sport !== 'checkers' && <th>{tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? 'Стіл' : tournament?.sport === 'badminton' ? 'Корт' : 'Дошка'}</th>}
+                                <th>{tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'Гравець 1' : 'Білі'}</th>
+                                <th>{tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'Гравець 2' : 'Чорні'}</th>
+                                <th>Результат</th>
+                                {(isAdmin || tournament?.sport === 'chess') && <th>Дії</th>}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {filteredGames.length > 0 ? (
+                                filteredGames.map((game, idx) => (
+                                  <tr key={game.id}>
+                                    {editingGameId === game.id ? (
+                                      <>
                                         <td>
                                           <input
                                             type="number"
                                             min="1"
-                                            value={editingGameData.board}
-                                            onChange={(e) => setEditingGameData({ ...editingGameData, board: parseInt(e.target.value) || 1 })}
+                                            value={editingGameData.round}
+                                            onChange={(e) => setEditingGameData({ ...editingGameData, round: parseInt(e.target.value) || 1 })}
                                             style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}
                                           />
                                         </td>
-                                      )}
-                                      <td>
-                                        <select value={editingGameData.whitePlayerId} onChange={(e) => setEditingGameData({ ...editingGameData, whitePlayerId: e.target.value })} style={{ padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}>
-                                          <option value="">-- {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'Гравець 1' : 'Білі'} --</option>
-                                          {sortedPlayers.map((p: any) => <option key={`w${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
-                                        </select>
-                                      </td>
-                                      <td>
-                                        <select value={editingGameData.blackPlayerId} onChange={(e) => setEditingGameData({ ...editingGameData, blackPlayerId: e.target.value })} style={{ padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}>
-                                          <option value="">-- {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'Гравець 2' : 'Чорні'} --</option>
-                                          {sortedPlayers.map((p: any) => <option key={`b${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
-                                        </select>
-                                      </td>
-                                      <td>
-                                        <select value={editingGameData.result} onChange={(e) => setEditingGameData({ ...editingGameData, result: e.target.value })} style={{ padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}>
-                                          <option value="WhiteWin">Перемога {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'Гравця 1' : 'Білих'} (1-0)</option>
-                                          <option value="BlackWin">Перемога {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'Гравця 2' : 'Чорних'} (0-1)</option>
-                                          <option value="Draw">Нічия (½-½)</option>
-                                        </select>
-                                      </td>
-                                      <td>
-                                        <textarea 
-                                          placeholder="PGN..." 
-                                          value={editingGameData.pgn} 
-                                          onChange={(e) => setEditingGameData({ ...editingGameData, pgn: e.target.value })} 
-                                          style={{ width: '100%', padding: '4px', borderRadius: '4px', border: '1px solid #ccc', minHeight: '60px', fontFamily: 'monospace' }}
-                                        />
-                                      </td>
-                                      <td>
-                                        <button type="button" onClick={() => handleSaveEdit(game.id)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }}><i className="fas fa-check"></i></button>
-                                        <button type="button" onClick={handleCancelEdit} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><i className="fas fa-times"></i></button>
-                                      </td>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <td>{(game as any).round || (game as any).roundNumber}</td>
-                                      {tournament?.sport !== 'checkers' && <td>{(game as any).board || idx + 1}</td>}
-                                      <td>
-                                        {game.whiteUserId ? (
-                                          <Link to={`/profile/${game.whiteUserId}`} style={{ color: '#3b82f6', textDecoration: 'none' }}>
-                                            {game.whitePlayerName}
-                                          </Link>
-                                        ) : (
-                                          game.whitePlayerName || '—'
+                                        {tournament?.sport !== 'checkers' && (
+                                          <td>
+                                            <input
+                                              type="number"
+                                              min="1"
+                                              value={editingGameData.board}
+                                              onChange={(e) => setEditingGameData({ ...editingGameData, board: parseInt(e.target.value) || 1 })}
+                                              style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}
+                                            />
+                                          </td>
                                         )}
-                                      </td>
-                                      <td>
-                                        {game.blackUserId ? (
-                                          <Link to={`/profile/${game.blackUserId}`} style={{ color: '#3b82f6', textDecoration: 'none' }}>
-                                            {game.blackPlayerName}
-                                          </Link>
-                                        ) : (
-                                          game.blackPlayerName || '—'
-                                        )}
-                                      </td>
-                                      <td>
-                                        {game.result === 'WhiteWin' ? (
-                                          <span className={`${styles.resultBadge} ${styles.resultWhiteWin}`}>
-                                            <i className="fas fa-chess-king"></i> 1-0
-                                          </span>
-                                        ) : game.result === 'BlackWin' ? (
-                                          <span className={`${styles.resultBadge} ${styles.resultBlackWin}`}>
-                                            <i className="fas fa-chess-queen"></i> 0-1
-                                          </span>
-                                        ) : game.result === 'Draw' ? (
-                                          <span className={`${styles.resultBadge} ${styles.resultDraw}`}>
-                                            <i className="fas fa-handshake"></i> ½-½
-                                          </span>
-                                        ) : (
-                                          <span className={`${styles.resultBadge} ${styles.resultNotPlayed}`}>
-                                            <i className="fas fa-clock"></i> Очікується
-                                          </span>
-                                        )}
-                                      </td>
-                                      <td>
-                                        {isAdmin && (
-                                          <button onClick={() => handleEditClick(game)} style={{ padding: '4px 8px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                                            <i className="fas fa-edit"></i>
-                                          </button>
-                                        )}
-                                        {game.pgn && (
-                                          <button onClick={() => setViewingPgnGame(game)} style={{ 
-                                            padding: isAdmin ? '4px 8px' : '6px 16px', 
-                                            background: '#10b981', 
-                                            color: '#fff', 
-                                            border: 'none', 
-                                            borderRadius: '6px', 
-                                            cursor: 'pointer', 
-                                            marginLeft: isAdmin ? '4px' : '0',
-                                            fontSize: isAdmin ? '13px' : '14px',
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            gap: '6px'
-                                          }} title="Переглянути партію">
-                                            <i className="fas fa-eye"></i> {!isAdmin && 'Дивитись'}
-                                          </button>
-                                        )}
-                                      </td>
-                                    </>
-                                  )}
-                                </tr>
-                              ))
-                            ) : (
-                              <tr><td colSpan={isAdmin ? 6 : 5} style={{ textAlign: 'center', padding: '24px', color: '#666' }}>Партії не знайдені за вказаними фільтрами</td></tr>
-                            )}
-                          </tbody>
-                        </table>
+                                        <td>
+                                          <select value={editingGameData.whitePlayerId} onChange={(e) => setEditingGameData({ ...editingGameData, whitePlayerId: e.target.value })} style={{ padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}>
+                                            <option value="">-- {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'Гравець 1' : 'Білі'} --</option>
+                                            {sortedPlayers.map((p: any) => <option key={`w${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
+                                          </select>
+                                        </td>
+                                        <td>
+                                          <select value={editingGameData.blackPlayerId} onChange={(e) => setEditingGameData({ ...editingGameData, blackPlayerId: e.target.value })} style={{ padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}>
+                                            <option value="">-- {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'Гравець 2' : 'Чорні'} --</option>
+                                            {sortedPlayers.map((p: any) => <option key={`b${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
+                                          </select>
+                                        </td>
+                                        <td>
+                                          <select value={editingGameData.result} onChange={(e) => setEditingGameData({ ...editingGameData, result: e.target.value })} style={{ padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}>
+                                            <option value="WhiteWin">Перемога {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'Гравця 1' : 'Білих'} (1-0)</option>
+                                            <option value="BlackWin">Перемога {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'Гравця 2' : 'Чорних'} (0-1)</option>
+                                            <option value="Draw">Нічия (½-½)</option>
+                                          </select>
+                                        </td>
+                                        <td>
+                                          <textarea
+                                            placeholder="PGN..."
+                                            value={editingGameData.pgn}
+                                            onChange={(e) => setEditingGameData({ ...editingGameData, pgn: e.target.value })}
+                                            style={{ width: '100%', padding: '4px', borderRadius: '4px', border: '1px solid #ccc', minHeight: '60px', fontFamily: 'monospace' }}
+                                          />
+                                        </td>
+                                        <td>
+                                          <button type="button" onClick={() => handleSaveEdit(game.id)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }}><i className="fas fa-check"></i></button>
+                                          <button type="button" onClick={handleCancelEdit} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><i className="fas fa-times"></i></button>
+                                        </td>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <td>{(game as any).round || (game as any).roundNumber}</td>
+                                        {tournament?.sport !== 'checkers' && <td>{(game as any).board || idx + 1}</td>}
+                                        <td>
+                                          {game.whiteUserId ? (
+                                            <Link to={`/profile/${game.whiteUserId}`} style={{ color: '#3b82f6', textDecoration: 'none' }}>
+                                              {game.whitePlayerName}
+                                            </Link>
+                                          ) : (
+                                            game.whitePlayerName || '—'
+                                          )}
+                                        </td>
+                                        <td>
+                                          {game.blackUserId ? (
+                                            <Link to={`/profile/${game.blackUserId}`} style={{ color: '#3b82f6', textDecoration: 'none' }}>
+                                              {game.blackPlayerName}
+                                            </Link>
+                                          ) : (
+                                            game.blackPlayerName || '—'
+                                          )}
+                                        </td>
+                                        <td>
+                                          {game.result === 'WhiteWin' ? (
+                                            <span className={`${styles.resultBadge} ${styles.resultWhiteWin}`}>
+                                              <i className="fas fa-chess-king"></i> 1-0
+                                            </span>
+                                          ) : game.result === 'BlackWin' ? (
+                                            <span className={`${styles.resultBadge} ${styles.resultBlackWin}`}>
+                                              <i className="fas fa-chess-queen"></i> 0-1
+                                            </span>
+                                          ) : game.result === 'Draw' ? (
+                                            <span className={`${styles.resultBadge} ${styles.resultDraw}`}>
+                                              <i className="fas fa-handshake"></i> ½-½
+                                            </span>
+                                          ) : (
+                                            <span className={`${styles.resultBadge} ${styles.resultNotPlayed}`}>
+                                              <i className="fas fa-clock"></i> Очікується
+                                            </span>
+                                          )}
+                                        </td>
+                                        <td>
+                                          {isAdmin && (
+                                            <button onClick={() => handleEditClick(game)} style={{ padding: '4px 8px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                                              <i className="fas fa-edit"></i>
+                                            </button>
+                                          )}
+                                          {game.pgn && (
+                                            <button onClick={() => setViewingPgnGame(game)} style={{
+                                              padding: isAdmin ? '4px 8px' : '6px 16px',
+                                              background: '#10b981',
+                                              color: '#fff',
+                                              border: 'none',
+                                              borderRadius: '6px',
+                                              cursor: 'pointer',
+                                              marginLeft: isAdmin ? '4px' : '0',
+                                              fontSize: isAdmin ? '13px' : '14px',
+                                              display: 'inline-flex',
+                                              alignItems: 'center',
+                                              gap: '6px'
+                                            }} title="Переглянути партію">
+                                              <i className="fas fa-eye"></i> {!isAdmin && 'Дивитись'}
+                                            </button>
+                                          )}
+                                        </td>
+                                      </>
+                                    )}
+                                  </tr>
+                                ))
+                              ) : (
+                                <tr><td colSpan={isAdmin ? 6 : 5} style={{ textAlign: 'center', padding: '24px', color: '#666' }}>Партії не знайдені за вказаними фільтрами</td></tr>
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
-                  {activeTab === 'participants' && (
-                    <div className={styles.tabContent}>
-                      {isAdmin && (
-                        <>
-                          {(tournament?.sport === 'chess' || tournament?.sport === 'checkers') && (
-                            <div style={{ background: '#ebf5ff', padding: '24px', borderRadius: '12px', marginBottom: '16px', border: '1px solid #bfdbfe' }}>
-                              <h3 style={{ marginTop: 0, marginBottom: '8px', color: '#1e40af', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <i className="fas fa-file-excel"></i> Завантажити Excel з Chess-Results.com
-                              </h3>
-                              <p style={{ fontSize: '14px', color: '#1e3a8a', marginBottom: '16px' }}>
-                                Виберіть Excel-файл (.xlsx або .xls), завантажений з сайту chess-results.com (меню "Excel and Print"), щоб автоматично заповнити список учасників та їх результати.
-                              </p>
-                              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    {activeTab === 'participants' && (
+                      <div className={styles.tabContent}>
+                        {isAdmin && (
+                          <>
+                            {(tournament?.sport === 'chess' || tournament?.sport === 'checkers') && (
+                              <div style={{ background: '#ebf5ff', padding: '24px', borderRadius: '12px', marginBottom: '16px', border: '1px solid #bfdbfe' }}>
+                                <h3 style={{ marginTop: 0, marginBottom: '8px', color: '#1e40af', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <i className="fas fa-file-excel"></i> Завантажити Excel з Chess-Results.com
+                                </h3>
+                                <p style={{ fontSize: '14px', color: '#1e3a8a', marginBottom: '16px' }}>
+                                  Виберіть Excel-файл (.xlsx або .xls), завантажений з сайту chess-results.com (меню "Excel and Print"), щоб автоматично заповнити список учасників та їх результати.
+                                </p>
+                                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                  <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    accept=".xlsx, .xls"
+                                    onChange={handleImportData}
+                                    style={{ display: 'none' }}
+                                    id="excel-import-input"
+                                  />
+                                  <label
+                                    htmlFor="excel-import-input"
+                                    style={{
+                                      padding: '10px 20px',
+                                      background: isImporting ? '#94a3b8' : '#3b82f6',
+                                      color: '#fff',
+                                      border: 'none',
+                                      borderRadius: '6px',
+                                      cursor: isImporting ? 'not-allowed' : 'pointer',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '8px',
+                                      fontWeight: 'bold'
+                                    }}
+                                  >
+                                    {isImporting ? (
+                                      <><i className="fas fa-spinner fa-spin"></i> Обробка...</>
+                                    ) : (
+                                      <><i className="fas fa-upload"></i> Вибрати та завантажити файл</>
+                                    )}
+                                  </label>
+                                  {isImporting && <span style={{ color: '#1e40af', fontSize: '14px' }}>Це може зайняти кілька секунд...</span>}
+                                </div>
+                              </div>
+                            )}
+
+                            <div style={{ background: '#f5f5f5', padding: '24px', borderRadius: '12px', marginBottom: '24px' }}>
+                              <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#111' }}>[Admin] Додати учасника</h3>
+
+                              <div style={{ marginBottom: '20px', position: 'relative' }}>
+                                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Пошук гравця або користувача:</label>
                                 <input
-                                  type="file"
-                                  ref={fileInputRef}
-                                  accept=".xlsx, .xls"
-                                  onChange={handleImportData}
-                                  style={{ display: 'none' }}
-                                  id="excel-import-input"
+                                  type="text"
+                                  placeholder="Введіть ім'я, прізвище або email для пошуку в базі..."
+                                  value={searchQuery}
+                                  onChange={(e) => setSearchQuery(e.target.value)}
+                                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #ccc' }}
                                 />
-                                <label
-                                  htmlFor="excel-import-input"
-                                  style={{
-                                    padding: '10px 20px',
-                                    background: isImporting ? '#94a3b8' : '#3b82f6',
-                                    color: '#fff',
-                                    border: 'none',
+                                {isSearching && <div style={{ marginTop: '8px' }}>Пошук...</div>}
+                                {searchResults.length > 0 && (
+                                  <div style={{
+                                    position: 'absolute',
+                                    top: '100%',
+                                    left: 0,
+                                    right: 0,
+                                    background: '#fff',
+                                    border: '1px solid #ccc',
                                     borderRadius: '6px',
-                                    cursor: isImporting ? 'not-allowed' : 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '8px',
-                                    fontWeight: 'bold'
-                                  }}
-                                >
-                                  {isImporting ? (
-                                    <><i className="fas fa-spinner fa-spin"></i> Обробка...</>
-                                  ) : (
-                                    <><i className="fas fa-upload"></i> Вибрати та завантажити файл</>
-                                  )}
-                                </label>
-                                {isImporting && <span style={{ color: '#1e40af', fontSize: '14px' }}>Це може зайняти кілька секунд...</span>}
+                                    zIndex: 10,
+                                    maxHeight: '200px',
+                                    overflowY: 'auto',
+                                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                                  }}>
+                                    {searchResults.map((result, idx) => (
+                                      <div
+                                        key={`${result.type}-${result.id}-${idx}`}
+                                        onClick={() => handleSelectResult(result)}
+                                        style={{ padding: '10px', cursor: 'pointer', borderBottom: '1px solid #eee' }}
+                                        onMouseOver={(e) => (e.currentTarget.style.background = '#f0f0f0')}
+                                        onMouseOut={(e) => (e.currentTarget.style.background = '#fff')}
+                                      >
+                                        <span style={{
+                                          fontSize: '10px',
+                                          background: result.type === 'player' ? '#10b981' : '#3b82f6',
+                                          color: '#fff',
+                                          padding: '2px 6px',
+                                          borderRadius: '4px',
+                                          marginRight: '8px',
+                                          textTransform: 'uppercase'
+                                        }}>
+                                          {result.type === 'player' ? 'Гравець' : 'Користувач'}
+                                        </span>
+                                        <strong>{result.firstName} {result.patronymic} {result.lastName}</strong>
+                                        {result.email && <span style={{ color: '#666', marginLeft: '8px' }}>({result.email})</span>}
+                                        {result.group && <span style={{ color: '#666', marginLeft: '8px' }}>[{result.group}]</span>}
+                                        {result.studentId && <span style={{ color: '#666', marginLeft: '8px' }}>[ID: {result.studentId}]</span>}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+
+                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '16px' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                  <label style={{ marginBottom: '4px', fontSize: '12px' }}>Ім'я</label>
+                                  <input type="text" placeholder="Ім'я" value={newPlayer.firstName} onChange={(e) => setNewPlayer({ ...newPlayer, firstName: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                  <label style={{ marginBottom: '4px', fontSize: '12px' }}>По батькові</label>
+                                  <input type="text" placeholder="По батькові (опціонально)" value={newPlayer.patronymic} onChange={(e) => setNewPlayer({ ...newPlayer, patronymic: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                  <label style={{ marginBottom: '4px', fontSize: '12px' }}>Прізвище</label>
+                                  <input type="text" placeholder="Прізвище" value={newPlayer.lastName} onChange={(e) => setNewPlayer({ ...newPlayer, lastName: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                  <label style={{ marginBottom: '4px', fontSize: '12px' }}>Дата народження</label>
+                                  <input type="date" value={newPlayer.birthDate} onChange={(e) => setNewPlayer({ ...newPlayer, birthDate: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                  <label style={{ marginBottom: '4px', fontSize: '12px' }}>Група (напр. 211)</label>
+                                  <input type="text" placeholder="Група (напр. 211)" value={newPlayer.group} onChange={(e) => setNewPlayer({ ...newPlayer, group: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                  <label style={{ marginBottom: '4px', fontSize: '12px' }}>Студ. квиток</label>
+                                  <input type="text" placeholder="Студ. квиток (унікальний)" value={newPlayer.studentId} onChange={(e) => setNewPlayer({ ...newPlayer, studentId: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
+                                </div>
+                                {tournament?.sport === 'chess' && (
+                                  <>
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                      <label style={{ marginBottom: '4px', fontSize: '12px' }}>Рейтинг ELO</label>
+                                      <input type="number" placeholder="Рейтинг ELO" value={newPlayer.ratingELO} onChange={(e) => setNewPlayer({ ...newPlayer, ratingELO: parseInt(e.target.value) || 1500 })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                      <label style={{ marginBottom: '4px', fontSize: '12px' }}>FIDE ID (опціонально)</label>
+                                      <input type="text" placeholder="FIDE ID (опціонально)" value={newPlayer.fideId} onChange={(e) => setNewPlayer({ ...newPlayer, fideId: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                      <label style={{ marginBottom: '4px', fontSize: '12px' }}>Звання (напр. CM, FM, IM, GM) (опціонально)</label>
+                                      <input type="text" placeholder="Звання (напр. CM, FM, IM, GM) (опціонально)" value={newPlayer.title} onChange={(e) => setNewPlayer({ ...newPlayer, title: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
+                                    </div>
+                                  </>
+                                )}
+                                {tournament?.sport === 'armwrestling' && (
+                                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <label style={{ marginBottom: '4px', fontSize: '12px' }}>Вага (кг)</label>
+                                    <input type="number" step="0.1" placeholder="Вага" value={newPlayer.weight} onChange={(e) => setNewPlayer({ ...newPlayer, weight: parseFloat(e.target.value) || 0 })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
+                                  </div>
+                                )}
+                              </div>
+                              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                <button type="button" onClick={handleAddPlayer} style={{ padding: '10px 24px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
+                                  {newPlayer.existingPlayerId ? 'Додати існуючого гравця' : newPlayer.userId ? 'Створити профіль гравця та додати' : 'Створити гостя та додати'}
+                                </button>
+                                {(newPlayer.userId || newPlayer.existingPlayerId) && (
+                                  <button
+                                    onClick={() => setNewPlayer({ ...newPlayer, userId: null, existingPlayerId: null, firstName: '', lastName: '', group: '' })}
+                                    style={{ padding: '10px 24px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+                                  >
+                                    Скинути вибір
+                                  </button>
+                                )}
                               </div>
                             </div>
-                          )}
+                          </>
+                        )}
 
-                          <div style={{ background: '#f5f5f5', padding: '24px', borderRadius: '12px', marginBottom: '24px' }}>
-                            <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#111' }}>[Admin] Додати учасника</h3>
+                        <div className={styles.tableWrapper}>
+                          <table className={styles.dataTable}>
+                            <thead>
+                              <tr>
+                                <th>№</th>
+                                <th>Учасник</th>
+                                {tournament?.sport === 'chess' ? (
+                                  <>
+                                    <th>Рейтинг ELO</th>
+                                    <th>Титул</th>
+                                    <th>FIDE ID</th>
+                                  </>
+                                ) : (
+                                  <th>Очки</th>
+                                )}
+                                {isAdmin && <th>Дії</th>}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {sortedPlayers.length > 0 ? sortedPlayers.map((p: any, idx: number) => (
+                                <tr key={p.id}>
+                                  <td>{idx + 1}</td>
+                                  <td>
+                                    {p.userId ? (
+                                      <Link to={`/profile/${p.userId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
+                                        {p.playerName}
+                                      </Link>
+                                    ) : (
+                                      p.playerName
+                                    )}
+                                  </td>
+                                  {tournament?.sport === 'chess' ? (
+                                    <>
+                                      <td>{p.rating}</td>
+                                      <td>
+                                        {p.title ? (
+                                          <span className={styles.systemBadge} style={{ fontWeight: 'bold' }}>{p.title}</span>
+                                        ) : '—'}
+                                      </td>
+                                      <td>{p.fideId || '—'}</td>
+                                    </>
+                                  ) : (
+                                    <td>{p.points}</td>
+                                  )}
+                                  {isAdmin && (
+                                    <td>
+                                      <button onClick={() => handleRemoveParticipant(p.playerId, p.playerName)} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Видалити">
+                                        <i className="fas fa-trash"></i>
+                                      </button>
+                                    </td>
+                                  )}
+                                </tr>
+                              )) : (
+                                <tr><td colSpan={isAdmin ? 6 : 5}>Учасники не знайдені</td></tr>
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
 
-                          <div style={{ marginBottom: '20px', position: 'relative' }}>
-                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Пошук гравця або користувача:</label>
-                            <input
-                              type="text"
-                              placeholder="Введіть ім'я, прізвище або email для пошуку в базі..."
-                              value={searchQuery}
-                              onChange={(e) => setSearchQuery(e.target.value)}
-                              style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #ccc' }}
-                            />
-                            {isSearching && <div style={{ marginTop: '8px' }}>Пошук...</div>}
-                            {searchResults.length > 0 && (
-                              <div style={{
-                                position: 'absolute',
-                                top: '100%',
-                                left: 0,
-                                right: 0,
-                                background: '#fff',
-                                border: '1px solid #ccc',
-                                borderRadius: '6px',
-                                zIndex: 10,
-                                maxHeight: '200px',
-                                overflowY: 'auto',
-                                boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-                              }}>
-                                {searchResults.map((result, idx) => (
-                                  <div
-                                    key={`${result.type}-${result.id}-${idx}`}
-                                    onClick={() => handleSelectResult(result)}
-                                    style={{ padding: '10px', cursor: 'pointer', borderBottom: '1px solid #eee' }}
-                                    onMouseOver={(e) => (e.currentTarget.style.background = '#f0f0f0')}
-                                    onMouseOut={(e) => (e.currentTarget.style.background = '#fff')}
-                                  >
-                                    <span style={{
-                                      fontSize: '10px',
-                                      background: result.type === 'player' ? '#10b981' : '#3b82f6',
-                                      color: '#fff',
-                                      padding: '2px 6px',
-                                      borderRadius: '4px',
-                                      marginRight: '8px',
-                                      textTransform: 'uppercase'
-                                    }}>
-                                      {result.type === 'player' ? 'Гравець' : 'Користувач'}
-                                    </span>
-                                    <strong>{result.firstName} {result.patronymic} {result.lastName}</strong>
-                                    {result.email && <span style={{ color: '#666', marginLeft: '8px' }}>({result.email})</span>}
-                                    {result.group && <span style={{ color: '#666', marginLeft: '8px' }}>[{result.group}]</span>}
-                                    {result.studentId && <span style={{ color: '#666', marginLeft: '8px' }}>[ID: {result.studentId}]</span>}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '16px' }}>
-                             <div style={{ display: 'flex', flexDirection: 'column' }}>
-                               <label style={{ marginBottom: '4px', fontSize: '12px' }}>Ім'я</label>
-                               <input type="text" placeholder="Ім'я" value={newPlayer.firstName} onChange={(e) => setNewPlayer({ ...newPlayer, firstName: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
-                             </div>
-                             <div style={{ display: 'flex', flexDirection: 'column' }}>
-                               <label style={{ marginBottom: '4px', fontSize: '12px' }}>По батькові</label>
-                               <input type="text" placeholder="По батькові (опціонально)" value={newPlayer.patronymic} onChange={(e) => setNewPlayer({ ...newPlayer, patronymic: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
-                             </div>
-                             <div style={{ display: 'flex', flexDirection: 'column' }}>
-                               <label style={{ marginBottom: '4px', fontSize: '12px' }}>Прізвище</label>
-                               <input type="text" placeholder="Прізвище" value={newPlayer.lastName} onChange={(e) => setNewPlayer({ ...newPlayer, lastName: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
-                             </div>
-                             <div style={{ display: 'flex', flexDirection: 'column' }}>
-                               <label style={{ marginBottom: '4px', fontSize: '12px' }}>Дата народження</label>
-                               <input type="date" value={newPlayer.birthDate} onChange={(e) => setNewPlayer({ ...newPlayer, birthDate: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
-                             </div>
-                             <div style={{ display: 'flex', flexDirection: 'column' }}>
-                               <label style={{ marginBottom: '4px', fontSize: '12px' }}>Група (напр. 211)</label>
-                               <input type="text" placeholder="Група (напр. 211)" value={newPlayer.group} onChange={(e) => setNewPlayer({ ...newPlayer, group: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
-                             </div>
-                             <div style={{ display: 'flex', flexDirection: 'column' }}>
-                               <label style={{ marginBottom: '4px', fontSize: '12px' }}>Студ. квиток</label>
-                               <input type="text" placeholder="Студ. квиток (унікальний)" value={newPlayer.studentId} onChange={(e) => setNewPlayer({ ...newPlayer, studentId: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
-                             </div>
-                            {tournament?.sport === 'chess' && (
+                    {activeTab === 'schedule' && (
+                      <div className={styles.tabContent}>
+                        <div className={styles.infoGrid}>
+                          <div className={styles.infoSection}>
+                            <h3><i className="fas fa-calendar-day"></i> Розклад</h3>
+                            {details?.schedule ? (
+                              <p style={{ whiteSpace: 'pre-line' }}>{details.schedule}</p>
+                            ) : (
                               <>
-                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                  <label style={{ marginBottom: '4px', fontSize: '12px' }}>Рейтинг ELO</label>
-                                  <input type="number" placeholder="Рейтинг ELO" value={newPlayer.ratingELO} onChange={(e) => setNewPlayer({ ...newPlayer, ratingELO: parseInt(e.target.value) || 1500 })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                  <label style={{ marginBottom: '4px', fontSize: '12px' }}>FIDE ID (опціонально)</label>
-                                  <input type="text" placeholder="FIDE ID (опціонально)" value={newPlayer.fideId} onChange={(e) => setNewPlayer({ ...newPlayer, fideId: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                  <label style={{ marginBottom: '4px', fontSize: '12px' }}>Звання (напр. CM, FM, IM, GM) (опціонально)</label>
-                                  <input type="text" placeholder="Звання (напр. CM, FM, IM, GM) (опціонально)" value={newPlayer.title} onChange={(e) => setNewPlayer({ ...newPlayer, title: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
-                                </div>
+                                <p>Змагання проводяться згідно із розкладом, вказаним організаторами під час реєстрації або під час відкриття.</p>
+                                <br />
+                                <p>
+                                  <strong>Примірний розклад:</strong><br />
+                                  <strong>10:00</strong> - Реєстрація учасників<br />
+                                  <strong>11:00</strong> - Жеребкування та відкриття<br />
+                                  <strong>Далі:</strong> за календарем турів
+                                </p>
                               </>
                             )}
-                            {tournament?.sport === 'armwrestling' && (
-                              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                <label style={{ marginBottom: '4px', fontSize: '12px' }}>Вага (кг)</label>
-                                <input type="number" step="0.1" placeholder="Вага" value={newPlayer.weight} onChange={(e) => setNewPlayer({ ...newPlayer, weight: parseFloat(e.target.value) || 0 })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
-                              </div>
-                            )}
                           </div>
-                          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                            <button type="button" onClick={handleAddPlayer} style={{ padding: '10px 24px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
-                              {newPlayer.existingPlayerId ? 'Додати існуючого гравця' : newPlayer.userId ? 'Створити профіль гравця та додати' : 'Створити гостя та додати'}
-                            </button>
-                            {(newPlayer.userId || newPlayer.existingPlayerId) && (
-                              <button
-                                onClick={() => setNewPlayer({ ...newPlayer, userId: null, existingPlayerId: null, firstName: '', lastName: '', group: '' })}
-                                style={{ padding: '10px 24px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
-                              >
-                                Скинути вибір
-                              </button>
-                            )}
-                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </>
+              );
+            }
+            return null;
+          })()}
+
+          {/* Photo Gallery Section */}
+          {details?.photos && details.photos.length > 0 && (
+            <div className={styles.gallerySection}>
+              <div className={styles.galleryHeader}>
+                <i className="fas fa-images"></i>
+                <h2>Галерея змагань</h2>
+              </div>
+              <div className={styles.photoGrid}>
+                {details.photos.map((photo: any, index: number) => (
+                  <div
+                    key={photo.id}
+                    className={styles.galleryItem}
+                    onClick={() => setSelectedPhotoIndex(index)}
+                  >
+                    <img src={getImageUrl(photo.url)} alt={`Фото ${index + 1}`} loading="lazy" />
+                    <div className={styles.photoOverlay}>
+                      <i className="fas fa-search-plus"></i>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Lightbox / Fullscreen Preview */}
+          {selectedPhotoIndex !== null && details?.photos && (
+            <div className={styles.lightboxOverlay} onClick={() => setSelectedPhotoIndex(null)}>
+              <div className={styles.lightboxContent} onClick={(e) => e.stopPropagation()}>
+                <button className={styles.lightboxClose} onClick={() => setSelectedPhotoIndex(null)}>
+                  <i className="fas fa-times"></i>
+                </button>
+
+                <img
+                  src={getImageUrl(details.photos[selectedPhotoIndex].url)}
+                  alt="Tournament Fullscreen"
+                  className={styles.lightboxImage}
+                />
+
+                <div className={styles.lightboxNav}>
+                  <button
+                    className={styles.lightboxBtn}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedPhotoIndex((selectedPhotoIndex - 1 + details.photos.length) % details.photos.length);
+                    }}
+                  >
+                    <i className="fas fa-chevron-left"></i> Назад
+                  </button>
+                  <button
+                    className={styles.lightboxBtn}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedPhotoIndex((selectedPhotoIndex + 1) % details.photos.length);
+                    }}
+                  >
+                    Вперед <i className="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+          {isEditingTournament && (
+            <div className={styles.modalOverlay}>
+              <div className={styles.modalContent}>
+                <div className={styles.modalHeader}>
+                  <h2 style={{ margin: 0, fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <i className="fas fa-edit" style={{ color: '#3b82f6' }}></i>
+                    Редагувати змагання
+                  </h2>
+                  <button onClick={() => setIsEditingTournament(false)} className={styles.closeButton}>&times;</button>
+                </div>
+                <div className={styles.modalBody}>
+                  <div className={styles.editFormGrid}>
+                    <div className={styles.formGroup}>
+                      <label>Назва змагань</label>
+                      <input type="text" value={editTournamentData.name} onChange={(e) => setEditTournamentData({ ...editTournamentData, name: e.target.value })} />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label>Дата проведення</label>
+                      <input type="date" value={editTournamentData.date} onChange={(e) => setEditTournamentData({ ...editTournamentData, date: e.target.value })} />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label>Локація</label>
+                      <input type="text" value={editTournamentData.location} onChange={(e) => setEditTournamentData({ ...editTournamentData, location: e.target.value })} />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label>Рівень змагань</label>
+                      <select value={editTournamentData.level} onChange={(e) => setEditTournamentData({ ...editTournamentData, level: e.target.value as CompetitionLevel })}>
+                        <option value="CollegeGroup">Міжгрупові (коледж)</option>
+                        <option value="Regional">Обласні</option>
+                        <option value="National">Всеукраїнські</option>
+                      </select>
+                    </div>
+                    {(tournament?.sport === 'chess' || tournament?.sport === 'checkers') && (
+                      <>
+                        <div className={styles.formGroup}>
+                          <label>Система проведення</label>
+                          <select value={editTournamentData.system} onChange={(e) => setEditTournamentData({ ...editTournamentData, system: e.target.value as ChessSystem })}>
+                            <option value="Swiss">Швейцарська система</option>
+                            <option value="RoundRobin">Кругова система</option>
+                            <option value="Knockout">Олімпійська система</option>
+                          </select>
+                        </div>
+                        <div className={styles.formGroup}>
+                          <label>Контроль часу</label>
+                          <input type="text" placeholder="напр. 10хв + 5с" value={editTournamentData.timeControl} onChange={(e) => setEditTournamentData({ ...editTournamentData, timeControl: e.target.value })} />
                         </div>
                       </>
                     )}
-
-                      <div className={styles.tableWrapper}>
-                        <table className={styles.dataTable}>
-                          <thead>
-                            <tr>
-                              <th>№</th>
-                              <th>Учасник</th>
-                              {tournament?.sport === 'chess' ? (
-                                <>
-                                  <th>Рейтинг ELO</th>
-                                  <th>Титул</th>
-                                  <th>FIDE ID</th>
-                                </>
-                              ) : (
-                                <th>Очки</th>
-                              )}
-                              {isAdmin && <th>Дії</th>}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {sortedPlayers.length > 0 ? sortedPlayers.map((p: any, idx: number) => (
-                              <tr key={p.id}>
-                                <td>{idx + 1}</td>
-                                <td>
-                                  {p.userId ? (
-                                    <Link to={`/profile/${p.userId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
-                                      {p.playerName}
-                                    </Link>
-                                  ) : (
-                                    p.playerName
-                                  )}
-                                </td>
-                                {tournament?.sport === 'chess' ? (
-                                  <>
-                                    <td>{p.rating}</td>
-                                    <td>
-                                      {p.title ? (
-                                        <span className={styles.systemBadge} style={{ fontWeight: 'bold' }}>{p.title}</span>
-                                      ) : '—'}
-                                    </td>
-                                    <td>{p.fideId || '—'}</td>
-                                  </>
-                                ) : (
-                                  <td>{p.points}</td>
-                                )}
-                                {isAdmin && (
-                                  <td>
-                                    <button onClick={() => handleRemoveParticipant(p.playerId, p.playerName)} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Видалити">
-                                      <i className="fas fa-trash"></i>
-                                    </button>
-                                  </td>
-                                )}
-                              </tr>
-                            )) : (
-                              <tr><td colSpan={isAdmin ? 6 : 5}>Учасники не знайдені</td></tr>
-                            )}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  )}
-
-                  {activeTab === 'schedule' && (
-                    <div className={styles.tabContent}>
-                      <div className={styles.infoGrid}>
-                        <div className={styles.infoSection}>
-                          <h3><i className="fas fa-calendar-day"></i> Розклад</h3>
-                          {details?.schedule ? (
-                            <p style={{ whiteSpace: 'pre-line' }}>{details.schedule}</p>
-                          ) : (
-                            <>
-                              <p>Змагання проводяться згідно із розкладом, вказаним організаторами під час реєстрації або під час відкриття.</p>
-                              <br />
-                              <p>
-                                <strong>Примірний розклад:</strong><br />
-                                <strong>10:00</strong> - Реєстрація учасників<br />
-                                <strong>11:00</strong> - Жеребкування та відкриття<br />
-                                <strong>Далі:</strong> за календарем турів
-                              </p>
-                            </>
-                          )}
+                    <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                        <input
+                          type="checkbox"
+                          checked={editTournamentData.isTeam}
+                          onChange={(e) => setEditTournamentData({ ...editTournamentData, isTeam: e.target.checked })}
+                          style={{ width: '20px', height: '20px' }}
+                        />
+                        <div>
+                          <strong style={{ display: 'block' }}>Командні змагання</strong>
+                          <small style={{ color: '#64748b' }}>Активуйте, якщо матчі проводяться між командами (групами)</small>
                         </div>
-                      </div>
+                      </label>
                     </div>
-                  )}
-                </div>
-              </>
-            );
-          }
-          return null;
-        })()}
+                    <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                      <label>Судді</label>
+                      <textarea rows={3} placeholder="Введіть імена суддів..." value={editTournamentData.referees} onChange={(e) => setEditTournamentData({ ...editTournamentData, referees: e.target.value })} />
+                    </div>
+                    <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                      <label>Опис змагань</label>
+                      <textarea rows={3} value={editTournamentData.description} onChange={(e) => setEditTournamentData({ ...editTournamentData, description: e.target.value })} />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label>Правила</label>
+                      <textarea rows={5} placeholder="Введіть правила змагань..." value={editTournamentData.rules} onChange={(e) => setEditTournamentData({ ...editTournamentData, rules: e.target.value })} />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label>Призи</label>
+                      <textarea rows={5} placeholder="Опишіть призовий фонд..." value={editTournamentData.prizes} onChange={(e) => setEditTournamentData({ ...editTournamentData, prizes: e.target.value })} />
+                    </div>
+                    <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                      <label>Розклад змагань</label>
+                      <textarea rows={5} placeholder="Введіть детальний розклад (кожен пункт з нового рядка)..." value={editTournamentData.schedule} onChange={(e) => setEditTournamentData({ ...editTournamentData, schedule: e.target.value })} />
+                    </div>
 
-        {/* Photo Gallery Section */}
-        {details?.photos && details.photos.length > 0 && (
-          <div className={styles.gallerySection}>
-            <div className={styles.galleryHeader}>
-              <i className="fas fa-images"></i>
-              <h2>Галерея змагань</h2>
-            </div>
-            <div className={styles.photoGrid}>
-              {details.photos.map((photo: any, index: number) => (
-                <div 
-                  key={photo.id} 
-                  className={styles.galleryItem}
-                  onClick={() => setSelectedPhotoIndex(index)}
-                >
-                  <img src={getImageUrl(photo.url)} alt={`Фото ${index + 1}`} loading="lazy" />
-                  <div className={styles.photoOverlay}>
-                    <i className="fas fa-search-plus"></i>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+                    <div className={styles.photoManagementSection} style={{ gridColumn: '1 / -1' }}>
+                      <label><i className="fas fa-images"></i> Фотографії змагань</label>
 
-        {/* Lightbox / Fullscreen Preview */}
-        {selectedPhotoIndex !== null && details?.photos && (
-          <div className={styles.lightboxOverlay} onClick={() => setSelectedPhotoIndex(null)}>
-            <div className={styles.lightboxContent} onClick={(e) => e.stopPropagation()}>
-              <button className={styles.lightboxClose} onClick={() => setSelectedPhotoIndex(null)}>
-                <i className="fas fa-times"></i>
-              </button>
-              
-              <img 
-                src={getImageUrl(details.photos[selectedPhotoIndex].url)} 
-                alt="Tournament Fullscreen" 
-                className={styles.lightboxImage} 
-              />
-              
-              <div className={styles.lightboxNav}>
-                <button 
-                  className={styles.lightboxBtn}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedPhotoIndex((selectedPhotoIndex - 1 + details.photos.length) % details.photos.length);
-                  }}
-                >
-                  <i className="fas fa-chevron-left"></i> Назад
-                </button>
-                <button 
-                  className={styles.lightboxBtn}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedPhotoIndex((selectedPhotoIndex + 1) % details.photos.length);
-                  }}
-                >
-                  Вперед <i className="fas fa-chevron-right"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-        {isEditingTournament && (
-          <div className={styles.modalOverlay}>
-            <div className={styles.modalContent}>
-              <div className={styles.modalHeader}>
-                <h2 style={{ margin: 0, fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <i className="fas fa-edit" style={{ color: '#3b82f6' }}></i>
-                  Редагувати змагання
-                </h2>
-                <button onClick={() => setIsEditingTournament(false)} className={styles.closeButton}>&times;</button>
-              </div>
-              <div className={styles.modalBody}>
-                <div className={styles.editFormGrid}>
-                  <div className={styles.formGroup}>
-                    <label>Назва змагань</label>
-                    <input type="text" value={editTournamentData.name} onChange={(e) => setEditTournamentData({ ...editTournamentData, name: e.target.value })} />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>Дата проведення</label>
-                    <input type="date" value={editTournamentData.date} onChange={(e) => setEditTournamentData({ ...editTournamentData, date: e.target.value })} />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>Локація</label>
-                    <input type="text" value={editTournamentData.location} onChange={(e) => setEditTournamentData({ ...editTournamentData, location: e.target.value })} />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>Рівень змагань</label>
-                    <select value={editTournamentData.level} onChange={(e) => setEditTournamentData({ ...editTournamentData, level: e.target.value as CompetitionLevel })}>
-                      <option value="CollegeGroup">Міжгрупові (коледж)</option>
-                      <option value="Regional">Обласні</option>
-                      <option value="National">Всеукраїнські</option>
-                    </select>
-                  </div>
-                  {(tournament?.sport === 'chess' || tournament?.sport === 'checkers') && (
-                    <>
-                      <div className={styles.formGroup}>
-                        <label>Система проведення</label>
-                        <select value={editTournamentData.system} onChange={(e) => setEditTournamentData({ ...editTournamentData, system: e.target.value as ChessSystem })}>
-                          <option value="Swiss">Швейцарська система</option>
-                          <option value="RoundRobin">Кругова система</option>
-                          <option value="Knockout">Олімпійська система</option>
-                        </select>
+                      <div className={styles.photoUploadArea}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={handlePhotoUpload}>
+                        {isUploading ? (
+                          <div className={styles.uploadSpinner}><i className="fas fa-circle-notch fa-spin"></i> Завантаження...</div>
+                        ) : (
+                          <div className={styles.uploadPlaceholder}>
+                            <i className="fas fa-cloud-upload-alt"></i>
+                            <p>Перетягніть фото сюди або <span>виберіть файл</span></p>
+                            <input type="file" accept="image/*" onChange={handlePhotoUpload} className={styles.fileInput} />
+                          </div>
+                        )}
                       </div>
-                      <div className={styles.formGroup}>
-                        <label>Контроль часу</label>
-                        <input type="text" placeholder="напр. 10хв + 5с" value={editTournamentData.timeControl} onChange={(e) => setEditTournamentData({ ...editTournamentData, timeControl: e.target.value })} />
-                      </div>
-                    </>
-                  )}
-                  <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                      <input 
-                        type="checkbox" 
-                        checked={editTournamentData.isTeam} 
-                        onChange={(e) => setEditTournamentData({ ...editTournamentData, isTeam: e.target.checked })} 
-                        style={{ width: '20px', height: '20px' }}
-                      />
-                      <div>
-                        <strong style={{ display: 'block' }}>Командні змагання</strong>
-                        <small style={{ color: '#64748b' }}>Активуйте, якщо матчі проводяться між командами (групами)</small>
-                      </div>
-                    </label>
-                  </div>
-                  <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
-                    <label>Судді</label>
-                    <textarea rows={3} placeholder="Введіть імена суддів..." value={editTournamentData.referees} onChange={(e) => setEditTournamentData({ ...editTournamentData, referees: e.target.value })} />
-                  </div>
-                  <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
-                    <label>Опис змагань</label>
-                    <textarea rows={3} value={editTournamentData.description} onChange={(e) => setEditTournamentData({ ...editTournamentData, description: e.target.value })} />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>Правила</label>
-                    <textarea rows={5} placeholder="Введіть правила змагань..." value={editTournamentData.rules} onChange={(e) => setEditTournamentData({ ...editTournamentData, rules: e.target.value })} />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>Призи</label>
-                    <textarea rows={5} placeholder="Опишіть призовий фонд..." value={editTournamentData.prizes} onChange={(e) => setEditTournamentData({ ...editTournamentData, prizes: e.target.value })} />
-                  </div>
-                  <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
-                    <label>Розклад змагань</label>
-                    <textarea rows={5} placeholder="Введіть детальний розклад (кожен пункт з нового рядка)..." value={editTournamentData.schedule} onChange={(e) => setEditTournamentData({ ...editTournamentData, schedule: e.target.value })} />
-                  </div>
 
-                  <div className={styles.photoManagementSection} style={{ gridColumn: '1 / -1' }}>
-                    <label><i className="fas fa-images"></i> Фотографії змагань</label>
-
-                    <div className={styles.photoUploadArea}
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={handlePhotoUpload}>
-                      {isUploading ? (
-                        <div className={styles.uploadSpinner}><i className="fas fa-circle-notch fa-spin"></i> Завантаження...</div>
-                      ) : (
-                        <div className={styles.uploadPlaceholder}>
-                          <i className="fas fa-cloud-upload-alt"></i>
-                          <p>Перетягніть фото сюди або <span>виберіть файл</span></p>
-                          <input type="file" accept="image/*" onChange={handlePhotoUpload} className={styles.fileInput} />
+                      {details?.photos && details.photos.length > 0 && (
+                        <div className={styles.currentPhotosGrid}>
+                          {details.photos.map((photo: any) => (
+                            <div key={photo.id} className={styles.photoPreviewCard}>
+                              <img src={getImageUrl(photo.url)} alt="Tournament" />
+                              <button onClick={() => handleDeletePhoto(photo.id)} className={styles.deletePhotoBtn}>
+                                <i className="fas fa-times"></i>
+                              </button>
+                            </div>
+                          ))}
                         </div>
                       )}
                     </div>
-
-                    {details?.photos && details.photos.length > 0 && (
-                      <div className={styles.currentPhotosGrid}>
-                        {details.photos.map((photo: any) => (
-                          <div key={photo.id} className={styles.photoPreviewCard}>
-                            <img src={getImageUrl(photo.url)} alt="Tournament" />
-                            <button onClick={() => handleDeletePhoto(photo.id)} className={styles.deletePhotoBtn}>
-                              <i className="fas fa-times"></i>
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </div>
+                </div>
+                <div className={styles.modalFooter}>
+                  <button onClick={() => setIsEditingTournament(false)} className={styles.cancelBtn}>Скасувати</button>
+                  <button onClick={handleSaveTournament} className={styles.saveBtn}>Зберегти зміни</button>
+                </div>
               </div>
             </div>
-            <div className={styles.modalFooter}>
-              <button onClick={() => setIsEditingTournament(false)} className={styles.cancelBtn}>Скасувати</button>
-              <button onClick={handleSaveTournament} className={styles.saveBtn}>Зберегти зміни</button>
-            </div>
-          </div>
-        </div>
-      )}
+          )}
         </>
       </div>
     </div>

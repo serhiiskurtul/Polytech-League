@@ -430,20 +430,22 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px', alignItems: 'flex-end' }}>
                 <PlayerSearchInput 
                   label="Гравець 1"
-                  players={allPlayers}
+                  players={displayParticipants}
                   selectedId={newMatch.player1Id}
                   onSelect={(id) => setNewMatch({...newMatch, player1Id: id})}
                   onQuickAdd={(name) => handleQuickAddPlayer(name, 1)}
+                  placeholder="Оберіть учасника..."
                 />
 
                 <div style={{ textAlign: 'center', paddingBottom: '12px', fontWeight: 'bold', color: '#94a3b8' }}>VS</div>
 
                 <PlayerSearchInput 
                   label="Гравець 2"
-                  players={allPlayers}
+                  players={displayParticipants}
                   selectedId={newMatch.player2Id}
                   onSelect={(id) => setNewMatch({...newMatch, player2Id: id})}
                   onQuickAdd={(name) => handleQuickAddPlayer(name, 2)}
+                  placeholder="Оберіть учасника..."
                 />
 
                 <div className={styles.formGroup}>
@@ -609,12 +611,33 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
 
             <div className={styles.participantsList}>
               {displayParticipants.map(player => (
-                <div key={player.id} className={styles.participantItem} style={{ position: 'relative' }}>
-                  <div className={styles.playerAvatar}>
-                    {player.firstName[0]}{player.lastName[0]}
+                <div key={player.id} className={styles.participantItem} style={{ 
+                  position: 'relative', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  padding: '12px', 
+                  background: 'white', 
+                  borderRadius: '12px', 
+                  marginBottom: '8px',
+                  border: '1px solid #f1f5f9',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                }}>
+                  <div className={styles.playerAvatar} style={{ 
+                    width: '40px', 
+                    height: '40px', 
+                    borderRadius: '50%', 
+                    background: '#f1f5f9', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    fontWeight: 'bold',
+                    color: '#64748b',
+                    marginRight: '12px'
+                  }}>
+                    {(player.firstName?.[0] || '')}{(player.lastName?.[0] || '')}
                   </div>
-                  <div className={styles.playerInfo}>
-                    <div className={styles.playerName}>
+                  <div className={styles.playerInfo} style={{ flex: 1 }}>
+                    <div className={styles.playerName} style={{ fontWeight: '600', color: '#1e293b' }}>
                       {player.userId ? (
                         <a href={`/profile/${player.userId}`} style={{ color: 'inherit', textDecoration: 'none' }} target="_blank" rel="noreferrer">
                           {player.firstName} {player.lastName}
@@ -623,7 +646,9 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
                         `${player.firstName} ${player.lastName}`
                       )}
                     </div>
-                    <div className={styles.playerDetails}>{player.group} • Допущений</div>
+                    <div className={styles.playerDetails} style={{ fontSize: '12px', color: '#64748b' }}>
+                      {player.group || 'Гість'} {player.armwrestlingWeight ? `• ${player.armwrestlingWeight} кг` : ''}
+                    </div>
                   </div>
                   {isAdmin && (
                     <button 

@@ -179,6 +179,44 @@
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
 }
 
+.weightFilter {
+  position: relative;
+  flex: 1;
+  max-width: 250px;
+}
+
+.weightFilter i {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+}
+
+.weightSelect {
+  width: 100%;
+  padding: 12px 16px 12px 48px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  font-size: 15px;
+  color: #1e293b;
+  font-weight: 500;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+  transition: all 0.2s;
+}
+
+.weightSelect:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
 .resultsCount {
   font-size: 14px;
   color: #64748b;

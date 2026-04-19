@@ -181,6 +181,7 @@ public class PlayerService : IPlayerService
             var checkersAch = await _dbContext.CheckersEventParticipants.Include(p => p.Event).Where(p => playerIds.Contains(p.PlayerId)).ToListAsync(cancellationToken);
             var ttAch = await _dbContext.TableTennisEventParticipants.Include(p => p.Tournament).Where(p => playerIds.Contains(p.PlayerId)).ToListAsync(cancellationToken);
             var badmintonAch = await _dbContext.BadmintonEventParticipants.Include(p => p.Event).Where(p => playerIds.Contains(p.PlayerId)).ToListAsync(cancellationToken);
+            var armwAch = await _dbContext.ArmwrestlingEventParticipants.Include(p => p.Tournament).Where(p => playerIds.Contains(p.PlayerId)).ToListAsync(cancellationToken);
             
             var genericWinners = await _dbContext.Set<Event>()
                 .Where(e => (e.FirstPlaceId.HasValue && playerIds.Contains(e.FirstPlaceId.Value)) || 
@@ -236,9 +237,16 @@ public class PlayerService : IPlayerService
                     achievements.Add(new AchievementDto { TournamentName = a.Event!.Name, SportType = "badminton", Date = a.Event.Date, Rank = a.Rank, TournamentId = a.EventId });
                     sportTypes.Add("badminton");
                 }
+                foreach (var a in armwAch.Where(x => x.PlayerId == playerId && x.Tournament != null)) {
+                    achievements.Add(new AchievementDto { TournamentName = a.Tournament!.Name, SportType = "armwrestling", Date = a.Tournament.Date, Rank = a.Rank, TournamentId = a.TournamentId });
+                    sportTypes.Add("armwrestling");
+                }
                 foreach (var e in genericWinners.Where(x => x.FirstPlaceId == playerId || x.SecondPlaceId == playerId || x.ThirdPlaceId == playerId)) {
                     int r = (e.FirstPlaceId == playerId) ? 1 : ((e.SecondPlaceId == playerId) ? 2 : 3);
-                    achievements.Add(new AchievementDto { TournamentName = e.Name, SportType = "armwrestling", Date = e.Date, Rank = r, TournamentId = e.Id });
+                    if (!achievements.Any(a => a.TournamentId == e.Id && a.SportType == "armwrestling"))
+                    {
+                        achievements.Add(new AchievementDto { TournamentName = e.Name, SportType = "armwrestling", Date = e.Date, Rank = r, TournamentId = e.Id });
+                    }
                     sportTypes.Add("armwrestling");
                 }
 
@@ -302,6 +310,7 @@ public class PlayerService : IPlayerService
                 void AddStats(string sport, int p, int w) {
                     played += p; won += w;
                     if (p > 0) {
+                        sportTypes.Add(sport);
                         if (!sportStatsMap.ContainsKey(sport)) sportStatsMap[sport] = new SportStatsDto { SportType = sport };
                         var s = sportStatsMap[sport];
                         s.MatchesPlayed += p; s.WinsCount += w;
@@ -516,12 +525,30 @@ public class PlayerService : IPlayerService
 
         // 5. Armwrestling & Generic Individual Winners
         try {
+            var armwPerformances = await _dbContext.ArmwrestlingEventParticipants
+                .Include(p => p.Tournament)
+                .Where(p => p.PlayerId == playerId)
+                .ToListAsync(cancellationToken);
+
+            foreach (var p in armwPerformances) {
+                if (p.Tournament == null) continue;
+                int rank = p.Rank;
+                achievements.Add(new AchievementDto {
+                    TournamentName = p.Tournament.Name,
+                    SportType = "armwrestling",
+                    Date = p.Tournament.Date,
+                    Rank = rank,
+                    TournamentId = p.TournamentId,
+                    Result = rank > 0 ? $"{rank} місце" : "Учасник"
+                });
+            }
+
             var genericWinners = await _dbContext.Set<Event>()
                 .Where(e => e.FirstPlaceId == playerId || e.SecondPlaceId == playerId || e.ThirdPlaceId == playerId)
                 .ToListAsync(cancellationToken);
 
             foreach (var e in genericWinners) {
-                if (achievements.Any(a => a.TournamentName == e.Name && a.Date == e.Date)) continue;
+                if (achievements.Any(a => a.TournamentId == e.Id && a.SportType == "armwrestling")) continue;
                 int rank = e.FirstPlaceId == playerId ? 1 : (e.SecondPlaceId == playerId ? 2 : 3);
                 string sport = e is ArmwrestlingEvent ? "armwrestling" : "individual";
                 achievements.Add(new AchievementDto {
