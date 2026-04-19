@@ -39,6 +39,8 @@ public class PlayerDto
     public float? ArmwrestlingWeight { get; set; }
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public ArmwrestlingWeightClass? ArmwrestlingPreferredWeightClass { get; set; }
+    [JsonPropertyName("armwrestlingWeightClasses")]
+    public List<ArmwrestlingWeightClass> ArmwrestlingWeightClasses { get; set; } = new();
 
     // Team Sports
     public FutsalPosition? FutsalPosition { get; set; }

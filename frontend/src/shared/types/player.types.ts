@@ -28,6 +28,7 @@ export interface PlayerDto {
     // Armwrestling
     armwrestlingWeight?: number | null;
     armwrestlingPreferredWeightClass?: string | null;
+    armwrestlingWeightClasses?: string[];
 
     // Team Sports
     futsalPosition?: string | null;

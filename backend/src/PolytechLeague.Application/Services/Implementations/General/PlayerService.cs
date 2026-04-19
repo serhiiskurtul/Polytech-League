@@ -9,6 +9,7 @@ using PolytechLeague.Domain.Entities.Checkers;
 using PolytechLeague.Domain.Entities.TableTennis;
 using PolytechLeague.Domain.Entities.Badminton;
 using PolytechLeague.Domain.Entities.Armwrestling;
+using PolytechLeague.Domain.Entities.Armwrestling.Enums;
 using PolytechLeague.Domain.Entities.Futsal;
 using PolytechLeague.Domain.Entities.Volleyball;
 using PolytechLeague.Domain.Entities.Basketball3x3;
@@ -217,6 +218,27 @@ public class PlayerService : IPlayerService
             foreach (var player in players)
             {
                 var dto = player.ToDto();
+                var armwrestlingWeightClasses = new HashSet<PolytechLeague.Domain.Entities.Armwrestling.Enums.ArmwrestlingWeightClass>();
+                
+                // Infer weight class from player's weight if not set
+                if (player.ArmwrestlingWeight.HasValue)
+                {
+                    var inferredClass = player.ArmwrestlingWeight.Value switch
+                    {
+                        <= 60 => ArmwrestlingWeightClass.Under60kg,
+                        <= 70 => ArmwrestlingWeightClass.Under70kg,
+                        <= 80 => ArmwrestlingWeightClass.Under80kg,
+                        <= 90 => ArmwrestlingWeightClass.Under90kg,
+                        _ => ArmwrestlingWeightClass.Plus90kg
+                    };
+                    
+                    armwrestlingWeightClasses.Add(inferredClass);
+                    if (!dto.ArmwrestlingPreferredWeightClass.HasValue)
+                    {
+                        dto.ArmwrestlingPreferredWeightClass = inferredClass;
+                    }
+                }
+
                 var playerId = player.Id;
                 var achievements = new List<AchievementDto>();
                 var sportTypes = new HashSet<string>();
@@ -240,6 +262,14 @@ public class PlayerService : IPlayerService
                 foreach (var a in armwAch.Where(x => x.PlayerId == playerId && x.Tournament != null)) {
                     achievements.Add(new AchievementDto { TournamentName = a.Tournament!.Name, SportType = "armwrestling", Date = a.Tournament.Date, Rank = a.Rank, TournamentId = a.TournamentId });
                     sportTypes.Add("armwrestling");
+                    
+                    var wc = a.Tournament!.WeightClass;
+                    armwrestlingWeightClasses.Add(wc);
+                    
+                    if (!dto.ArmwrestlingPreferredWeightClass.HasValue)
+                    {
+                        dto.ArmwrestlingPreferredWeightClass = wc;
+                    }
                 }
                 foreach (var e in genericWinners.Where(x => x.FirstPlaceId == playerId || x.SecondPlaceId == playerId || x.ThirdPlaceId == playerId)) {
                     int r = (e.FirstPlaceId == playerId) ? 1 : ((e.SecondPlaceId == playerId) ? 2 : 3);
@@ -248,6 +278,14 @@ public class PlayerService : IPlayerService
                         achievements.Add(new AchievementDto { TournamentName = e.Name, SportType = "armwrestling", Date = e.Date, Rank = r, TournamentId = e.Id });
                     }
                     sportTypes.Add("armwrestling");
+                    if (e is ArmwrestlingEvent armwEvent)
+                    {
+                        armwrestlingWeightClasses.Add(armwEvent.WeightClass);
+                        if (!dto.ArmwrestlingPreferredWeightClass.HasValue)
+                        {
+                            dto.ArmwrestlingPreferredWeightClass = armwEvent.WeightClass;
+                        }
+                    }
                 }
 
                 // Team Sports
@@ -274,6 +312,7 @@ public class PlayerService : IPlayerService
 
                 dto.Achievements = achievements;
                 dto.Sports = sportTypes.ToList();
+                dto.ArmwrestlingWeightClasses = armwrestlingWeightClasses.ToList();
 
                 // Stats
                 int played = 0, won = 0;

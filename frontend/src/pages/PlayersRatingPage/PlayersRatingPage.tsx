@@ -90,7 +90,10 @@ const PlayersRatingPage = () => {
       
       // Filter by weight class for armwrestling
       if (activeTab.toLowerCase() === 'armwrestling' && selectedWeightClass !== 'all') {
-        result = result.filter(p => p.armwrestlingPreferredWeightClass === selectedWeightClass);
+        result = result.filter(p => 
+          p.armwrestlingPreferredWeightClass === selectedWeightClass || 
+          p.armwrestlingWeightClasses?.includes(selectedWeightClass)
+        );
       }
     }
 
@@ -113,7 +116,7 @@ const PlayersRatingPage = () => {
       }
       return (b.performanceScore || 0) - (a.performanceScore || 0);
     });
-  }, [players, activeTab, searchQuery]);
+  }, [players, activeTab, searchQuery, selectedWeightClass]);
 
   const getSportInfo = (sportKey: string) => {
     switch (sportKey.toLowerCase()) {
