@@ -18,10 +18,14 @@
   border-radius: 24px;
   width: 100%;
   max-width: 600px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
   padding: 32px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   border: 1px solid var(--border);
   animation: slideUp 0.3s ease;
+  position: relative;
 }
 
 .modalHeader {
@@ -50,6 +54,35 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  flex: 1;
+  overflow: hidden; /* Prevent form itself from scrolling */
+}
+
+.formBody {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+  padding-right: 8px; /* Space for scrollbar */
+  margin-right: -8px; 
+}
+
+/* Custom Scrollbar for formBody */
+.formBody::-webkit-scrollbar {
+  width: 6px;
+}
+
+.formBody::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.formBody::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 10px;
+}
+
+.formBody::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
 }
 
 .formGroup {
