@@ -13,6 +13,7 @@ const PlayersRatingPage = () => {
   const [activeTab, setActiveTab] = useState('Загальний');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedWeightClass, setSelectedWeightClass] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<'performance' | 'goals'>('performance');
   const [selectedPlayers, setSelectedPlayers] = useState<PlayerDto[]>([]);
 
   useEffect(() => {
@@ -79,6 +80,7 @@ const PlayersRatingPage = () => {
   // Reset filters when changing tab
   useEffect(() => {
     setSelectedWeightClass('all');
+    setSortBy('performance');
   }, [activeTab]);
 
   const filteredPlayers = useMemo(() => {
@@ -109,6 +111,10 @@ const PlayersRatingPage = () => {
 
     // Sorting
     return result.sort((a, b) => {
+      if (activeTab.toLowerCase() === 'futsal' && sortBy === 'goals') {
+        return (b.goalsScored || 0) - (a.goalsScored || 0);
+      }
+      
       if (activeTab !== 'Загальний') {
         const aSport = a.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase());
         const bSport = b.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase());
@@ -116,7 +122,7 @@ const PlayersRatingPage = () => {
       }
       return (b.performanceScore || 0) - (a.performanceScore || 0);
     });
-  }, [players, activeTab, searchQuery, selectedWeightClass]);
+  }, [players, activeTab, searchQuery, selectedWeightClass, sortBy]);
 
   const getSportInfo = (sportKey: string) => {
     switch (sportKey.toLowerCase()) {
@@ -188,6 +194,20 @@ const PlayersRatingPage = () => {
                   {armwrestlingWeightClasses.map(wc => (
                     <option key={wc.id} value={wc.id}>{wc.name}</option>
                   ))}
+                </select>
+              </div>
+            )}
+
+            {activeTab.toLowerCase() === 'futsal' && (
+              <div className={styles.weightFilter}>
+                <i className="fa-solid fa-sort"></i>
+                <select 
+                  value={sortBy} 
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  className={styles.weightSelect}
+                >
+                  <option value="performance">За рейтингом</option>
+                  <option value="goals">За голами</option>
                 </select>
               </div>
             )}
@@ -309,6 +329,11 @@ const PlayersRatingPage = () => {
                                   : player.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase())?.matchesPlayed || 0}
                               </span> ігор
                             </div>
+                            {(activeTab.toLowerCase() === 'futsal' || (activeTab === 'Загальний' && player.sports?.includes('futsal'))) && (
+                              <div className={`${styles.statMiniItem} ${sortBy === 'goals' ? styles.highlightStat : ''}`}>
+                                <span className={styles.statMiniVal}>{player.goalsScored || 0}</span> голів
+                              </div>
+                            )}
                             <div className={styles.statMiniItem}>
                               <span className={styles.statMiniVal}>
                                 {activeTab === 'Загальний' 
