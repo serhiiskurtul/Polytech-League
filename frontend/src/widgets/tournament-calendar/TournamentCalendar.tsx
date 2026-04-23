@@ -116,10 +116,6 @@ const TournamentCalendar = () => {
                       <i className="fas fa-map-marker-alt"></i>
                       <span>{tournament.location}</span>
                     </div>
-                    <div className={styles.detailItem}>
-                       <i className="fas fa-users"></i>
-                       <span>{tournament.isTeam ? `${tournament.teams} команд` : `${tournament.participants} учасників`}</span>
-                    </div>
                   </div>
 
                   <div className={styles.tagsContainer}>
