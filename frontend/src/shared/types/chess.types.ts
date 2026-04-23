@@ -76,6 +76,9 @@ export interface ChessEventResponse {
   headRefereeName?: string;
   referees?: string;
   schedule?: string;
+  registrationStart?: string;
+  registrationEnd?: string;
+  endDate?: string;
 }
 
 export interface ChessEventRequest {
@@ -97,6 +100,9 @@ export interface ChessEventRequest {
   firstPlaceId?: number | null;
   secondPlaceId?: number | null;
   thirdPlaceId?: number | null;
+  registrationStart?: string;
+  registrationEnd?: string;
+  endDate?: string;
 }
 
 // ChessPlayerDto removed in favor of unified PlayerDto

@@ -1,3 +1,16 @@
+/* Ряд з датою та часом */
+.dateTimeRow {
+  display: flex;
+  gap: 12px;
+}
+
+@media (max-width: 480px) {
+  .dateTimeRow {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
 /* Бейдж тривалості */
 .durationBadge {
   display: inline-block;

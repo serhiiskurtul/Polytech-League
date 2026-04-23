@@ -49,6 +49,9 @@ public class ArmwrestlingEventService(
         oldEntity.Date = newEntity.Date;
         oldEntity.Location = newEntity.Location;
         oldEntity.Description = newEntity.Description;
+        oldEntity.RegistrationStart = newEntity.RegistrationStart;
+        oldEntity.RegistrationEnd = newEntity.RegistrationEnd;
+        oldEntity.EndDate = newEntity.EndDate;
         oldEntity.Level = newEntity.Level;
         oldEntity.Hand = newEntity.Hand;
         oldEntity.WeightClass = newEntity.WeightClass;

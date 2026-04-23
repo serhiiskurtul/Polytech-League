@@ -68,6 +68,9 @@ export interface FutsalEventResponse {
   firstPlaceTeam?: FutsalTeamResponse | null;
   secondPlaceTeam?: FutsalTeamResponse | null;
   thirdPlaceTeam?: FutsalTeamResponse | null;
+  registrationStart?: string;
+  registrationEnd?: string;
+  endDate?: string;
 }
 
 export interface FutsalEventRequest {
@@ -87,4 +90,7 @@ export interface FutsalEventRequest {
   firstPlaceTeamId?: number | null;
   secondPlaceTeamId?: number | null;
   thirdPlaceTeamId?: number | null;
+  registrationStart?: string;
+  registrationEnd?: string;
+  endDate?: string;
 }

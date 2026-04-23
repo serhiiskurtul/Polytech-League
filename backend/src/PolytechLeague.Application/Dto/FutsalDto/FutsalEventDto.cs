@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Entities.Futsal;
 using PolytechLeague.Domain.Entities.Futsal.Enums;
+using PolytechLeague.Application.Dto.ChessDto;
 
 namespace PolytechLeague.Application.Dto.FutsalDto;
 
@@ -19,6 +20,9 @@ public class FutsalEventRequest
     public required FutsalTournamentType TournamentType { get; set; }
     
     public required string Description { get; set; }
+    public DateTime? RegistrationStart { get; set; }
+    public DateTime? RegistrationEnd { get; set; }
+    public DateTime? EndDate { get; set; }
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
     public string? HeadRefereeName { get; set; }
@@ -46,6 +50,9 @@ public class FutsalEventResponse
     public required FutsalTournamentType TournamentType { get; set; }
 
     public required string Description { get; set; }
+    public DateTime? RegistrationStart { get; set; }
+    public DateTime? RegistrationEnd { get; set; }
+    public DateTime? EndDate { get; set; }
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
     public string? HeadRefereeName { get; set; }
@@ -72,6 +79,9 @@ public static class FutsalEventDtoExtensions
             Level = request.Level,
             TournamentType = request.TournamentType,
             Description = request.Description,
+            RegistrationStart = request.RegistrationStart,
+            RegistrationEnd = request.RegistrationEnd,
+            EndDate = request.EndDate,
             Rules = request.Rules,
             Prizes = request.Prizes,
             HeadRefereeName = request.HeadRefereeName,
@@ -96,6 +106,9 @@ public static class FutsalEventDtoExtensions
             Level = entity.Level,
             TournamentType = entity.TournamentType,
             Description = entity.Description,
+            RegistrationStart = entity.RegistrationStart,
+            RegistrationEnd = entity.RegistrationEnd,
+            EndDate = entity.EndDate,
             Rules = entity.Rules,
             Prizes = entity.Prizes,
             HeadRefereeName = entity.HeadRefereeName,

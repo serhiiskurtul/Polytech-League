@@ -10,6 +10,9 @@ public abstract class Event
     public required ICollection<long> RefereeIds { get; set; }
     public required CompetitionLevel Level { get; set; }
     public required string Description { get; set; }
+    public DateTime? RegistrationStart { get; set; }
+    public DateTime? RegistrationEnd { get; set; }
+    public DateTime? EndDate { get; set; }
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
     public string? HeadRefereeName { get; set; }

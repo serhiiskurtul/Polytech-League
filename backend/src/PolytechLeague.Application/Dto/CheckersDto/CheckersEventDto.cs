@@ -19,6 +19,9 @@ public class CheckersEventRequest
     public required string Description { get; set; }
     public required string TimeControl { get; set; }
     public required int ParticipantsCount { get; set; }
+    public DateTime? RegistrationStart { get; set; }
+    public DateTime? RegistrationEnd { get; set; }
+    public DateTime? EndDate { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required CheckersSystem System { get; set; }
@@ -56,6 +59,9 @@ public class CheckersEventResponse
     public required string Description { get; set; }
     public required string TimeControl { get; set; }
     public required int ParticipantsCount { get; set; }
+    public DateTime? RegistrationStart { get; set; }
+    public DateTime? RegistrationEnd { get; set; }
+    public DateTime? EndDate { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required CheckersSystem System { get; set; }
@@ -97,6 +103,9 @@ public static class CheckersEventDtoExtension
             Description = checkersEventRequest.Description,
             TimeControl = checkersEventRequest.TimeControl,
             ParticipantsCount = checkersEventRequest.ParticipantsCount,
+            RegistrationStart = checkersEventRequest.RegistrationStart,
+            RegistrationEnd = checkersEventRequest.RegistrationEnd,
+            EndDate = checkersEventRequest.EndDate,
             System = checkersEventRequest.System,
             Variant = checkersEventRequest.Variant,
             Rules = checkersEventRequest.Rules,
@@ -128,6 +137,9 @@ public static class CheckersEventDtoExtension
             Description = checkersEvent.Description,
             TimeControl = checkersEvent.TimeControl,
             ParticipantsCount = checkersEvent.ParticipantsCount,
+            RegistrationStart = checkersEvent.RegistrationStart,
+            RegistrationEnd = checkersEvent.RegistrationEnd,
+            EndDate = checkersEvent.EndDate,
             System = checkersEvent.System,
             Variant = checkersEvent.Variant,
             Games = checkersEvent.Games?.Select(g => g.ToDto()).ToList() ?? [],

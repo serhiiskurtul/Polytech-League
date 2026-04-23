@@ -173,6 +173,9 @@ const TournamentViewPage = () => {
         headRefereeName: editTournamentData.headRefereeName,
         referees: editTournamentData.referees,
         schedule: editTournamentData.schedule,
+        registrationStart: editTournamentData.registrationStart,
+        registrationEnd: editTournamentData.registrationEnd,
+        endDate: editTournamentData.endDate,
       };
 
       if (isTeamSport) {
@@ -243,7 +246,10 @@ const TournamentViewPage = () => {
     headRefereeName: '',
     referees: '',
     schedule: '',
-    isTeam: false
+    isTeam: false,
+    registrationStart: '',
+    registrationEnd: '',
+    endDate: ''
   });
 
 
@@ -340,7 +346,10 @@ const TournamentViewPage = () => {
         headRefereeName: details.headRefereeName || '',
         referees: (details as any).referees || '',
         schedule: details.schedule || '',
-        isTeam: !!(details as any).isTeam
+        isTeam: !!(details as any).isTeam,
+        registrationStart: tournament?.registrationStart || details.registrationStart || '',
+        registrationEnd: tournament?.registrationEnd || details.registrationEnd || '',
+        endDate: tournament?.endDate || details.endDate || ''
       });
       setIsEditingTournament(true);
     }
@@ -417,6 +426,8 @@ const TournamentViewPage = () => {
         referees: editTournamentData.referees,
         schedule: editTournamentData.schedule,
         isTeam: editTournamentData.isTeam,
+        registrationStart: editTournamentData.registrationStart,
+        registrationEnd: editTournamentData.registrationEnd,
       };
 
       if (sportKey === 'checkers') {
@@ -1167,6 +1178,40 @@ const TournamentViewPage = () => {
               <div className={styles.infoSection}>
                 <h3><i className="fas fa-align-left"></i> Опис</h3>
                 <p>{tournament?.description}</p>
+              </div>
+
+              <div className={styles.infoSection}>
+                <h3><i className="fas fa-clock"></i> Розклад та Реєстрація</h3>
+                <div className={styles.refereeList}>
+                  <div className={styles.refereeItem}>
+                    <div className={styles.refereeAvatar}><i className="fas fa-calendar-plus"></i></div>
+                    <div>
+                      <strong>Початок реєстрації:</strong><br />
+                      <small>{tournament?.registrationStart ? new Date(tournament.registrationStart).toLocaleString('uk-UA') : 'Не вказано'}</small>
+                    </div>
+                  </div>
+                  <div className={styles.refereeItem}>
+                    <div className={styles.refereeAvatar}><i className="fas fa-calendar-times"></i></div>
+                    <div>
+                      <strong>Кінець реєстрації:</strong><br />
+                      <small>{tournament?.registrationEnd ? new Date(tournament.registrationEnd).toLocaleString('uk-UA') : 'Не вказано'}</small>
+                    </div>
+                  </div>
+                  <div className={styles.refereeItem}>
+                    <div className={styles.refereeAvatar}><i className="fas fa-play"></i></div>
+                    <div>
+                      <strong>Початок змагань:</strong><br />
+                      <small>{tournament?.date} {tournament?.time}</small>
+                    </div>
+                  </div>
+                  <div className={styles.refereeItem}>
+                    <div className={styles.refereeAvatar}><i className="fas fa-flag-checkered"></i></div>
+                    <div>
+                      <strong>Кінець змагань:</strong><br />
+                      <small>{tournament?.endDate ? new Date(tournament.endDate).toLocaleString('uk-UA') : 'Не вказано'}</small>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div className={styles.infoSection}>
                 <h3><i className="fas fa-trophy"></i> Призи</h3>
@@ -1976,7 +2021,19 @@ const TournamentViewPage = () => {
                     </div>
                     <div className={styles.formGroup}>
                       <label>Дата проведення</label>
-                      <input type="date" value={editTournamentData.date} onChange={(e) => setEditTournamentData({ ...editTournamentData, date: e.target.value })} />
+                      <input type="datetime-local" value={editTournamentData.date.includes('T') ? editTournamentData.date.substring(0, 16) : editTournamentData.date} onChange={(e) => setEditTournamentData({ ...editTournamentData, date: e.target.value })} />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label>Початок реєстрації</label>
+                      <input type="datetime-local" value={editTournamentData.registrationStart?.includes('T') ? editTournamentData.registrationStart.substring(0, 16) : editTournamentData.registrationStart} onChange={(e) => setEditTournamentData({ ...editTournamentData, registrationStart: e.target.value })} />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label>Кінець реєстрації</label>
+                      <input type="datetime-local" value={editTournamentData.registrationEnd?.includes('T') ? editTournamentData.registrationEnd.substring(0, 16) : editTournamentData.registrationEnd} onChange={(e) => setEditTournamentData({ ...editTournamentData, registrationEnd: e.target.value })} />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label>Кінець змагань</label>
+                      <input type="datetime-local" value={editTournamentData.endDate?.includes('T') ? editTournamentData.endDate.substring(0, 16) : editTournamentData.endDate} onChange={(e) => setEditTournamentData({ ...editTournamentData, endDate: e.target.value })} />
                     </div>
                     <div className={styles.formGroup}>
                       <label>Локація</label>

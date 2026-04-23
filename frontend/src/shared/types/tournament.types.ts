@@ -13,6 +13,9 @@ export interface Tournament {
   time?: string;
   rawDate?: string;
   currentRound?: string;
+  registrationStart?: string;
+  registrationEnd?: string;
+  endDate?: string;
 }
 
 export interface RecentMatch {

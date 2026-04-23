@@ -24,8 +24,13 @@ export interface TournamentFormData {
   maxTeams: number;
   minTeams: number;
   registrationDeadline: string;
+  registrationDeadlineTime: string;
+  registrationStartDate: string;
+  registrationStartTime: string;
   startDate: string;
+  startTime: string;
   endDate: string;
+  endTime: string;
   location: string;
   venue: string;
   rules: string;
@@ -63,8 +68,13 @@ export const useTournamentForm = () => {
     maxTeams: 32,
     minTeams: 2,
     registrationDeadline: '',
+    registrationDeadlineTime: '23:59',
+    registrationStartDate: '',
+    registrationStartTime: '00:00',
     startDate: '',
+    startTime: '10:00',
     endDate: '',
+    endTime: '20:00',
     location: '',
     venue: '',
     rules: '',
@@ -162,6 +172,15 @@ export const useTournamentForm = () => {
 
     setIsSubmitting(true);
     try {
+      // Helper to combine date and time strings into ISO string
+      const combineDateTime = (dateStr: string, timeStr: string) => {
+        if (!dateStr) return new Date().toISOString();
+        const [year, month, day] = dateStr.split('-');
+        const [hours, minutes] = timeStr.split(':');
+        const date = new Date(Number(year), Number(month) - 1, Number(day), Number(hours), Number(minutes));
+        return date.toISOString();
+      };
+
       // Fix inconsistency for basketball_3x3 vs basketball-3x3
       const sportKey = formData.sport === 'basketball-3x3' ? 'basketball_3x3' : formData.sport;
       const endpoint = TOURNAMENT_CREATE_ENDPOINTS[sportKey];
@@ -170,7 +189,7 @@ export const useTournamentForm = () => {
       // Базовий об'єкт, який спільний для всіх типів івентів у бекенді
       const basePayload = {
         name: formData.name,
-        date: formData.startDate ? new Date(formData.startDate).toISOString() : new Date().toISOString(), 
+        date: combineDateTime(formData.startDate, formData.startTime), 
         location: formData.location,
         description: formData.description,
         refereeIds: formData.refereeIds.map(id => Number(id)) || [],
@@ -179,6 +198,10 @@ export const useTournamentForm = () => {
         prizes: formData.prizes,
         schedule: formData.schedule,
         isTeam: formData.isTeam,
+        // Optional: registration period (if backend is ready)
+        registrationStart: combineDateTime(formData.registrationStartDate, formData.registrationStartTime),
+        registrationEnd: combineDateTime(formData.registrationDeadline, formData.registrationDeadlineTime),
+        endDate: formData.endDate ? combineDateTime(formData.endDate, formData.endTime) : null,
       };
 
       let payload: any = { ...basePayload };

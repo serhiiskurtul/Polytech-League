@@ -22,6 +22,9 @@ public class Basketball3x3EventService(
         oldEntity.Date = newEntity.Date;
         oldEntity.Location = newEntity.Location;
         oldEntity.Description = newEntity.Description;
+        oldEntity.RegistrationStart = newEntity.RegistrationStart;
+        oldEntity.RegistrationEnd = newEntity.RegistrationEnd;
+        oldEntity.EndDate = newEntity.EndDate;
         oldEntity.Level = newEntity.Level;
         oldEntity.TournamentType = newEntity.TournamentType;
         oldEntity.Rules = newEntity.Rules;

@@ -18,6 +18,9 @@ public class ChessEventRequest
     public required string Description { get; set; }
     public required string TimeControl { get; set; }
     public required int ParticipantsCount { get; set; }
+    public DateTime? RegistrationStart { get; set; }
+    public DateTime? RegistrationEnd { get; set; }
+    public DateTime? EndDate { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required ChessSystem System { get; set; }
@@ -52,6 +55,9 @@ public class ChessEventResponse
     public required string Description { get; set; }
     public required string TimeControl { get; set; }
     public required int ParticipantsCount { get; set; }
+    public DateTime? RegistrationStart { get; set; }
+    public DateTime? RegistrationEnd { get; set; }
+    public DateTime? EndDate { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required ChessSystem System { get; set; }
@@ -89,6 +95,9 @@ public static class ChessEventDtoExtension
             Description = chessEventRequest.Description,
             TimeControl = chessEventRequest.TimeControl,
             ParticipantsCount = chessEventRequest.ParticipantsCount,
+            RegistrationStart = chessEventRequest.RegistrationStart,
+            RegistrationEnd = chessEventRequest.RegistrationEnd,
+            EndDate = chessEventRequest.EndDate,
             System = chessEventRequest.System,
             Rules = chessEventRequest.Rules,
             Prizes = chessEventRequest.Prizes,
@@ -119,6 +128,9 @@ public static class ChessEventDtoExtension
             Description = chessEvent.Description,
             TimeControl = chessEvent.TimeControl,
             ParticipantsCount = chessEvent.ParticipantsCount,
+            RegistrationStart = chessEvent.RegistrationStart,
+            RegistrationEnd = chessEvent.RegistrationEnd,
+            EndDate = chessEvent.EndDate,
             System = chessEvent.System,
             Games = chessEvent.Games?.Select(g => g.ToDto()).ToList() ?? [],
             Participants = chessEvent.Players?.Select(p => p.ToDto()).ToList() ?? [],

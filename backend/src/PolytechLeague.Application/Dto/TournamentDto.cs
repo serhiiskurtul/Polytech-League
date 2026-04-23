@@ -15,7 +15,9 @@ public class TournamentDto
     public int Teams { get; set; }
     public string? Prize { get; set; }
     public string? Organizer { get; set; }
+    public string? RegistrationStart { get; set; }
     public string? RegistrationEnd { get; set; }
+    public string? EndDate { get; set; }
     public string? CurrentRound { get; set; }
     public bool Registered { get; set; }
     public bool Featured { get; set; }

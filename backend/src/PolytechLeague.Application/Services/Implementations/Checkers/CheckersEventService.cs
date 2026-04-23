@@ -26,6 +26,9 @@ public class CheckersEventService(
         oldEntity.Date = newEntity.Date;
         oldEntity.Location = newEntity.Location;
         oldEntity.Description = newEntity.Description;
+        oldEntity.RegistrationStart = newEntity.RegistrationStart;
+        oldEntity.RegistrationEnd = newEntity.RegistrationEnd;
+        oldEntity.EndDate = newEntity.EndDate;
         oldEntity.Level = newEntity.Level;
         oldEntity.TimeControl = newEntity.TimeControl;
         oldEntity.System = newEntity.System;

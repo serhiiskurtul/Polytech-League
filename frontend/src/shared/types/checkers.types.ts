@@ -61,6 +61,9 @@ export interface CheckersEventResponse {
   headRefereeName?: string;
   referees?: string;
   schedule?: string;
+  registrationStart?: string;
+  registrationEnd?: string;
+  endDate?: string;
 }
 
 export interface CheckersEventRequest {
@@ -83,6 +86,9 @@ export interface CheckersEventRequest {
   firstPlaceId?: number | null;
   secondPlaceId?: number | null;
   thirdPlaceId?: number | null;
+  registrationStart?: string;
+  registrationEnd?: string;
+  endDate?: string;
 }
 
 export interface CheckersEventParticipantDto {

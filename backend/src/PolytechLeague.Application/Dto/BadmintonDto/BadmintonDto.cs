@@ -20,6 +20,9 @@ public class BadmintonEventRequest
     public required BadmintonTournamentType TournamentType { get; set; }
     
     public required string Description { get; set; }
+    public DateTime? RegistrationStart { get; set; }
+    public DateTime? RegistrationEnd { get; set; }
+    public DateTime? EndDate { get; set; }
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
     public string? HeadRefereeName { get; set; }
@@ -77,6 +80,9 @@ public class BadmintonEventResponse
     public required BadmintonTournamentType TournamentType { get; set; }
 
     public required string Description { get; set; }
+    public DateTime? RegistrationStart { get; set; }
+    public DateTime? RegistrationEnd { get; set; }
+    public DateTime? EndDate { get; set; }
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
     public string? HeadRefereeName { get; set; }
@@ -164,6 +170,9 @@ public static class BadmintonDtoExtensions
             Level = request.Level,
             TournamentType = request.TournamentType,
             Description = request.Description,
+            RegistrationStart = request.RegistrationStart,
+            RegistrationEnd = request.RegistrationEnd,
+            EndDate = request.EndDate,
             Rules = request.Rules,
             Prizes = request.Prizes,
             HeadRefereeName = request.HeadRefereeName,
@@ -186,6 +195,9 @@ public static class BadmintonDtoExtensions
             Level = entity.Level,
             TournamentType = entity.TournamentType,
             Description = entity.Description,
+            RegistrationStart = entity.RegistrationStart,
+            RegistrationEnd = entity.RegistrationEnd,
+            EndDate = entity.EndDate,
             Rules = entity.Rules,
             Prizes = entity.Prizes,
             HeadRefereeName = entity.HeadRefereeName,

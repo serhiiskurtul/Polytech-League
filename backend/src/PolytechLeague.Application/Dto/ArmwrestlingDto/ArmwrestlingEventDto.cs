@@ -18,6 +18,9 @@ public class ArmwrestlingEventRequest
     public required CompetitionLevel Level { get; set; }
     
     public required string Description { get; set; }
+    public DateTime? RegistrationStart { get; set; }
+    public DateTime? RegistrationEnd { get; set; }
+    public DateTime? EndDate { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required ArmwrestlingHand Hand { get; set; }
@@ -56,6 +59,9 @@ public class ArmwrestlingEventResponse
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required CompetitionLevel Level { get; set; }
     public required string Description { get; set; }
+    public DateTime? RegistrationStart { get; set; }
+    public DateTime? RegistrationEnd { get; set; }
+    public DateTime? EndDate { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required ArmwrestlingHand Hand { get; set; }
@@ -98,6 +104,9 @@ public static class ArmwrestlingEventDtoExtensions
             RefereeIds = request.RefereeIds,
             Level = request.Level,
             Description = request.Description,
+            RegistrationStart = request.RegistrationStart,
+            RegistrationEnd = request.RegistrationEnd,
+            EndDate = request.EndDate,
             Hand = request.Hand,
             WeightClass = request.WeightClass,
             Category = request.Category,
@@ -127,6 +136,9 @@ public static class ArmwrestlingEventDtoExtensions
             RefereeIds = entity.RefereeIds,
             Level = entity.Level,
             Description = entity.Description,
+            RegistrationStart = entity.RegistrationStart,
+            RegistrationEnd = entity.RegistrationEnd,
+            EndDate = entity.EndDate,
             Hand = entity.Hand,
             WeightClass = entity.WeightClass,
             Category = entity.Category,

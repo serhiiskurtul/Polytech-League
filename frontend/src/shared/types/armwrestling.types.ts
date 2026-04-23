@@ -54,6 +54,9 @@ export interface ArmwrestlingEventResponse {
   firstPlace?: PlayerDto | null;
   secondPlace?: PlayerDto | null;
   thirdPlace?: PlayerDto | null;
+  registrationStart?: string;
+  registrationEnd?: string;
+  endDate?: string;
 }
 
 export interface ArmwrestlingEventRequest {
@@ -77,6 +80,9 @@ export interface ArmwrestlingEventRequest {
   firstPlaceId?: number | null;
   secondPlaceId?: number | null;
   thirdPlaceId?: number | null;
+  registrationStart?: string;
+  registrationEnd?: string;
+  endDate?: string;
 }
 
 export interface ArmwrestlingEventParticipantDto {
