@@ -2300,7 +2300,11 @@ const TournamentViewPage = () => {
                         <input
                           type="checkbox"
                           checked={editTournamentData.isPublic}
-                          onChange={(e) => setEditTournamentData({ ...editTournamentData, isPublic: e.target.checked })}
+                          onChange={(e) => setEditTournamentData({ 
+                            ...editTournamentData, 
+                            isPublic: e.target.checked,
+                            isModerated: e.target.checked ? false : editTournamentData.isModerated
+                          })}
                           style={{ width: '20px', height: '20px' }}
                         />
                         <div>
@@ -2313,7 +2317,11 @@ const TournamentViewPage = () => {
                         <input
                           type="checkbox"
                           checked={editTournamentData.isModerated}
-                          onChange={(e) => setEditTournamentData({ ...editTournamentData, isModerated: e.target.checked })}
+                          onChange={(e) => setEditTournamentData({ 
+                            ...editTournamentData, 
+                            isModerated: e.target.checked,
+                            isPublic: e.target.checked ? false : editTournamentData.isPublic
+                          })}
                           style={{ width: '20px', height: '20px' }}
                         />
                         <div>

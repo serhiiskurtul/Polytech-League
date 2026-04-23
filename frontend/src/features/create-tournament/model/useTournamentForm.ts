@@ -133,10 +133,23 @@ export const useTournamentForm = () => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
     
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    setFormData(prev => {
+      const newState = {
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
+      };
+
+      // Mutual exclusivity for isPublic and requireApproval
+      if (type === 'checkbox') {
+        if (name === 'isPublic' && checked) {
+          newState.requireApproval = false;
+        } else if (name === 'requireApproval' && checked) {
+          newState.isPublic = false;
+        }
+      }
+
+      return newState;
+    });
   };
 
   const handleCategoryToggle = (category: string) => {
