@@ -5,6 +5,7 @@ import { CompetitionLevel } from './chess.types';
 export type ArmwrestlingHand = "Left" | "Right" | "Both";
 export type ArmwrestlingWeightClass = "U70" | "U80" | "U90" | "U100" | "Over100" | "Absolute";
 export type ArmwrestlingCategory = "Men" | "Women" | "Juniors" | "Veterans";
+export type ArmwrestlingTournamentType = "SingleElimination" | "DoubleElimination";
 
 export interface ArmwrestlingMatchResponse {
   id: number;
@@ -43,6 +44,7 @@ export interface ArmwrestlingEventResponse {
   participantsCount: number;
   participants: ArmwrestlingEventParticipantResponse[];
   matches: ArmwrestlingMatchResponse[] | null;
+  tournamentType: ArmwrestlingTournamentType;
   rules?: string;
   prizes?: string;
   headRefereeName?: string;
@@ -65,6 +67,7 @@ export interface ArmwrestlingEventRequest {
   weightClass: ArmwrestlingWeightClass;
   category: ArmwrestlingCategory;
   participantsCount: number;
+  tournamentType: ArmwrestlingTournamentType;
   rules?: string;
   prizes?: string;
   headRefereeName?: string;

@@ -10,7 +10,8 @@ import {
   updateArmwrestlingMatch,
   updateArmwrestlingEvent,
   addParticipantToArmwrestlingEvent,
-  removeParticipantFromArmwrestlingEvent
+  removeParticipantFromArmwrestlingEvent,
+  deleteArmwrestlingMatch
 } from '@/shared/api/armwrestling.api';
 import ArmwrestlingBracket from './ArmwrestlingBracket';
 import TournamentPodium from './TournamentPodium';
@@ -239,6 +240,85 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
     }
   };
 
+  const handleDeleteMatch = async (matchId: number) => {
+    if (!window.confirm('Ви впевнені, що хочете видалити цей поєдинок?')) return;
+    
+    try {
+      await deleteArmwrestlingMatch(matchId);
+      onRefresh();
+    } catch (err) {
+      console.error(err);
+      alert('Помилка при видаленні матчу');
+    }
+  };
+
+  // derived participants state
+  const currentParticipants = (details.participants || []).map(p => {
+    const fullInfo = allPlayers.find(ap => ap.id === p.playerId);
+    if (fullInfo) return fullInfo;
+    return {
+      id: p.playerId,
+      userId: p.userId,
+      firstName: p.playerName?.split(' ')[0] || '',
+      lastName: p.playerName?.split(' ').slice(1).join(' ') || '',
+      group: 'Учасник'
+    } as PlayerDto;
+  });
+  
+  const matchParticipants = details.matches?.reduce((acc, m) => {
+    if (m.player1 && !acc.find(p => p.id === m.player1?.id)) acc.push(m.player1);
+    if (m.player2 && !acc.find(p => p.id === m.player2?.id)) acc.push(m.player2);
+    return acc;
+  }, [] as PlayerDto[]) || [];
+
+  const displayParticipants = currentParticipants.length > 0 ? currentParticipants : matchParticipants;
+
+  const STAGE_ORDER = [
+    'Раунд 1', 'Раунд 2', 'Раунд 3', 'Раунд 4', 'Раунд 5',
+    '1/16 Фіналу', '1/8 Фіналу', 'Чвертьфінал', 'Півфінал', 'Фінал',
+    'Lower Раунд 1', 'Lower Раунд 2', 'Lower Раунд 3', 'Lower Півфінал', 'Lower Фінал', 'Grand Final'
+  ];
+
+  const getEligiblePlayers = (stage: string) => {
+    if (!details.matches || details.matches.length === 0) {
+        return (stage === 'Раунд 1' || stage === '1/16 Фіналу') ? displayParticipants : [];
+    }
+
+    const idx = STAGE_ORDER.indexOf(stage);
+    if (idx <= 0) return displayParticipants;
+
+    // Logic for Single Elimination stages
+    const standardStages = ['1/16 Фіналу', '1/8 Фіналу', 'Чвертьфінал', 'Півфінал', 'Фінал'];
+    const sIdx = standardStages.indexOf(stage);
+    
+    if (sIdx > 0) {
+      const prevStage = standardStages[sIdx - 1];
+      const winners = details.matches
+        .filter(m => m.stage === prevStage && m.winnerId)
+        .map(m => m.winnerId!);
+      
+      // STRICT: Only allow winners from prev stage. If none, return empty list.
+      return displayParticipants.filter(p => winners.includes(p.id!));
+    }
+
+    // Logic for sequential rounds (Round 1 -> Round 2 ...)
+    const roundMatch = stage.match(/Раунд (\d+)/);
+    if (roundMatch) {
+      const rNum = parseInt(roundMatch[1]);
+      if (rNum > 1) {
+        const prevRound = `Раунд ${rNum - 1}`;
+        const winners = details.matches
+          .filter(m => m.stage === prevRound && m.winnerId)
+          .map(m => m.winnerId!);
+        return displayParticipants.filter(p => winners.includes(p.id!));
+      }
+    }
+
+    return displayParticipants;
+  };
+
+  const eligiblePlayers = getEligiblePlayers(newMatch.stage);
+
   const handleSaveWinners = async () => {
     try {
       await updateArmwrestlingEvent(details.id, {
@@ -314,32 +394,6 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
         alert('Помилка при видаленні учасника');
     }
   };
-
-  // Use participants from event details (linked Players)
-  // The backend now returns participants which we map to full PlayerDto using allPlayers if available
-  const currentParticipants = (details.participants || []).map(p => {
-    // If we have full player data in allPlayers, use it to get 'group' and other fields
-    const fullInfo = allPlayers.find(ap => ap.id === p.playerId);
-    if (fullInfo) return fullInfo;
-    
-    // Fallback if full info not loaded yet
-    return {
-      id: p.playerId,
-      userId: p.userId,
-      firstName: p.playerName?.split(' ')[0] || '',
-      lastName: p.playerName?.split(' ').slice(1).join(' ') || '',
-      group: 'Учасник'
-    } as PlayerDto;
-  });
-  
-  // Fallback to matches only if participants collection is truly empty
-  const matchParticipants = details.matches?.reduce((acc, m) => {
-    if (m.player1 && !acc.find(p => p.id === m.player1?.id)) acc.push(m.player1);
-    if (m.player2 && !acc.find(p => p.id === m.player2?.id)) acc.push(m.player2);
-    return acc;
-  }, [] as PlayerDto[]) || [];
-
-  const displayParticipants = currentParticipants.length > 0 ? currentParticipants : matchParticipants;
 
   return (
     <div className={styles.armwrestlingView}>
@@ -419,9 +473,9 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
         </div>
       )}
 
-      {/* Main Grid: Bracket & Info */}
-      <div className={styles.tournamentGrid}>
-        <div className={styles.mainContent}>
+      {/* Layout: Bracket at top, Participants/Referees at bottom */}
+      <div className={styles.armwrestlingLayout}>
+        <div className={styles.mainContent} style={{ width: '100%', maxWidth: '100%' }}>
           {isAdmin && (
             <div className={styles.adminForm} style={{ background: '#f8fafc', padding: '24px', borderRadius: '16px', marginBottom: '32px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
               <h4 style={{ marginTop: 0, marginBottom: '20px', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -430,22 +484,22 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px', alignItems: 'flex-end' }}>
                 <PlayerSearchInput 
                   label="Гравець 1"
-                  players={displayParticipants}
+                  players={eligiblePlayers}
                   selectedId={newMatch.player1Id}
                   onSelect={(id) => setNewMatch({...newMatch, player1Id: id})}
                   onQuickAdd={(name) => handleQuickAddPlayer(name, 1)}
-                  placeholder="Оберіть учасника..."
+                  placeholder={eligiblePlayers.length < displayParticipants.length ? "Тільки переможці минілого етапу..." : "Оберіть учасника..."}
                 />
 
                 <div style={{ textAlign: 'center', paddingBottom: '12px', fontWeight: 'bold', color: '#94a3b8' }}>VS</div>
 
                 <PlayerSearchInput 
                   label="Гравець 2"
-                  players={displayParticipants}
+                  players={eligiblePlayers}
                   selectedId={newMatch.player2Id}
                   onSelect={(id) => setNewMatch({...newMatch, player2Id: id})}
                   onQuickAdd={(name) => handleQuickAddPlayer(name, 2)}
-                  placeholder="Оберіть учасника..."
+                  placeholder={eligiblePlayers.length < displayParticipants.length ? "Тільки переможці минілого етапу..." : "Оберіть учасника..."}
                 />
 
                 <div className={styles.formGroup}>
@@ -465,6 +519,16 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
                     <option value="Чвертьфінал">Чвертьфінал</option>
                     <option value="Півфінал">Півфінал</option>
                     <option value="Фінал">Фінал</option>
+                    {details.tournamentType === 'DoubleElimination' && (
+                      <>
+                        <option value="Lower Раунд 1">Lower Раунд 1</option>
+                        <option value="Lower Раунд 2">Lower Раунд 2</option>
+                        <option value="Lower Раунд 3">Lower Раунд 3</option>
+                        <option value="Lower Півфінал">Lower Півфінал</option>
+                        <option value="Lower Фінал">Lower Фінал</option>
+                        <option value="Grand Final">Grand Final</option>
+                      </>
+                    )}
                   </select>
                 </div>
 
@@ -496,14 +560,21 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
           
           <ArmwrestlingBracket 
             matches={details.matches || []} 
+            tournamentType={details.tournamentType}
             isAdmin={isAdmin}
             onSetWinner={handleSetWinner}
+            onDeleteMatch={handleDeleteMatch}
           />
         </div>
 
-        <div className={styles.sidePanel}>
+        <div className={styles.sideInfoRow} style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
+          gap: '32px',
+          marginTop: '32px'
+        }}>
           {/* Participants Simplified List */}
-          <div className={styles.sideSection}>
+          <div className={styles.sideSection} style={{ background: 'white', padding: '24px', borderRadius: '20px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', border: '1px solid #f1f5f9' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
               <h3 style={{ margin: 0 }}><i className="fas fa-users"></i> Учасники</h3>
               {isAdmin && (
@@ -669,7 +740,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
           </div>
 
           {/* Referees */}
-          <div className={styles.sideSection}>
+          <div className={styles.sideSection} style={{ background: 'white', padding: '24px', borderRadius: '20px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', border: '1px solid #f1f5f9', height: 'fit-content' }}>
             <h3><i className="fas fa-user-shield"></i> Суддівська колегія</h3>
             <div className={styles.refereesBoard}>
               <div className={styles.headReferee}>

@@ -210,6 +210,7 @@ export const useTournamentForm = () => {
           payload.category = formData.armCategory;
           payload.timeControl = formData.timeControl;
           payload.participantsCount = formData.participantsCount;
+          payload.tournamentType = formData.tournamentType;
           break;
       }
 

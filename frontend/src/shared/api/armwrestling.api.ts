@@ -61,3 +61,7 @@ export const updateArmwrestlingParticipant = async (eventId: string | number, pl
     await api.put(`/armwrestling-events/${eventId}/participants/${playerId}`, data);
 };
 
+export const deleteArmwrestlingMatch = async (matchId: number): Promise<void> => {
+    await api.delete(`/armwrestling-matches/${matchId}`);
+};
+

@@ -195,6 +195,22 @@ const SettingsSection = ({ formData, handleInputChange }: SettingsSectionProps) 
                   ))}
                 </select>
               </div>
+
+              <div className={shared.formGroup}>
+                <label className={shared.formLabel}>
+                  <i className="fas fa-project-diagram"></i> Система проведення *
+                </label>
+                <select
+                  name="tournamentType"
+                  value={formData.tournamentType || 'SingleElimination'}
+                  onChange={handleInputChange}
+                  className={shared.formSelect}
+                  required
+                >
+                  <option value="SingleElimination">Oлімпійська система (Single Elimination)</option>
+                  <option value="DoubleElimination">Double Elimination (з вибуванням після двох поразок)</option>
+                </select>
+              </div>
             </>
           )}
         </div>

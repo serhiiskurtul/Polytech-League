@@ -1559,6 +1559,9 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<string>("TimeControl")
                         .HasColumnType("text");
 
+                    b.Property<int>("TournamentType")
+                        .HasColumnType("integer");
+
                     b.Property<int>("WeightClass")
                         .HasColumnType("integer")
                         .HasColumnName("weight_class");
