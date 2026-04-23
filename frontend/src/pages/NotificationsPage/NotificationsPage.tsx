@@ -1,24 +1,26 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './NotificationsPage.module.css';
-import { 
-  getMyNotifications, 
-  markAsRead as apiMarkAsRead, 
-  markAllAsRead as apiMarkAllAsRead, 
-  deleteNotification as apiDeleteNotification, 
-  clearReadNotifications as apiClearReadNotifications 
-} from '@/shared/api/notifications.api';
 import { Notification } from '@/shared/types/notification.types';
 import toast from 'react-hot-toast';
 import { MessengerView } from '@/widgets/chat-messenger/MessengerView';
 import { useChat } from '@/app/providers/ChatProvider';
-
+import { useNotifications } from '@/app/providers/NotificationProvider';
 
 const NotificationsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { unreadTotal } = useChat();
+  const { 
+    notifications, 
+    unreadCount, 
+    loading, 
+    markAsRead: contextMarkAsRead, 
+    markAllAsRead: contextMarkAllAsRead, 
+    deleteNotification: contextDeleteNotification, 
+    clearReadNotifications: contextClearReadNotifications 
+  } = useNotifications();
+
   const [filter, setFilter] = useState<'all' | 'unread' | 'read'>('all');
   const [activeTab, setActiveTab] = useState<'notifications' | 'messages'>('notifications');
 
@@ -32,24 +34,6 @@ const NotificationsPage = () => {
     }
   }, [location.search]);
 
-
-  const fetchNotifications = async () => {
-    try {
-      setLoading(true);
-      const data = await getMyNotifications();
-      setNotifications(data);
-    } catch (error) {
-      console.error('Failed to fetch notifications:', error);
-      toast.error('Помилка при завантаженні сповіщень');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchNotifications();
-  }, []);
-
   // Фільтрація сповіщень
   const filteredNotifications = notifications.filter(notification => {
     if (filter === 'all') return true;
@@ -59,10 +43,9 @@ const NotificationsPage = () => {
   });
 
   // Позначити всі як прочитані
-  const markAllAsRead = async () => {
+  const handleMarkAllAsRead = async () => {
     try {
-      await apiMarkAllAsRead();
-      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      await contextMarkAllAsRead();
       toast.success('Всі сповіщення позначено як прочитані');
     } catch (error) {
       toast.error('Не вдалося оновити сповіщення');
@@ -70,17 +53,14 @@ const NotificationsPage = () => {
   };
 
   // Позначити конкретне сповіщення як прочитане
-  const markAsRead = async (notification: Notification) => {
+  const handleMarkAsRead = async (notification: Notification) => {
     if (notification.isRead) {
       if (notification.link) navigate(notification.link);
       return;
     }
 
     try {
-      await apiMarkAsRead(notification.id);
-      setNotifications(prev => prev.map(n => 
-        n.id === notification.id ? { ...n, isRead: true } : n
-      ));
+      await contextMarkAsRead(notification.id);
       if (notification.link) navigate(notification.link);
     } catch (error) {
       console.error('Failed to mark as read:', error);
@@ -88,10 +68,9 @@ const NotificationsPage = () => {
   };
 
   // Видалити сповіщення
-  const deleteNotification = async (id: number) => {
+  const handleDeleteNotification = async (id: number) => {
     try {
-      await apiDeleteNotification(id);
-      setNotifications(prev => prev.filter(n => n.id !== id));
+      await contextDeleteNotification(id);
       toast.success('Сповіщення видалено');
     } catch (error) {
       toast.error('Не вдалося видалити сповіщення');
@@ -99,10 +78,9 @@ const NotificationsPage = () => {
   };
 
   // Очистити всі прочитані
-  const clearAllRead = async () => {
+  const handleClearAllRead = async () => {
     try {
-      await apiClearReadNotifications();
-      setNotifications(prev => prev.filter(n => !n.isRead));
+      await contextClearReadNotifications();
       toast.success('Прочитані сповіщення видалено');
     } catch (error) {
       toast.error('Не вдалося очистити сповіщення');
@@ -154,6 +132,7 @@ const NotificationsPage = () => {
             >
               <i className="fas fa-bell"></i>
               Сповіщення
+              {unreadCount > 0 && <span className={styles.tabBadge}>{unreadCount}</span>}
             </button>
             <button 
               className={`${styles.tabBtn} ${activeTab === 'messages' ? styles.active : ''}`}
@@ -161,16 +140,17 @@ const NotificationsPage = () => {
             >
               <i className="fas fa-comment-dots"></i>
               Повідомлення
+              {unreadTotal > 0 && <span className={styles.tabBadge}>{unreadTotal}</span>}
             </button>
           </div>
           
           {activeTab === 'notifications' && (
             <div className={styles.actions}>
-              <button className={styles.markAllBtn} onClick={markAllAsRead}>
+              <button className={styles.markAllBtn} onClick={handleMarkAllAsRead}>
                 <i className="fas fa-check-double"></i>
                 Прочитати все
               </button>
-              <button className={styles.clearReadBtn} onClick={clearAllRead}>
+              <button className={styles.clearReadBtn} onClick={handleClearAllRead}>
                 <i className="fas fa-broom"></i>
                 Очистити
               </button>
@@ -207,7 +187,7 @@ const NotificationsPage = () => {
                 <div 
                   key={notification.id} 
                   className={`${styles.notificationCard} ${!notification.isRead ? styles.unread : ''} ${notification.link ? styles.clickable : ''}`}
-                  onClick={() => markAsRead(notification)}
+                  onClick={() => handleMarkAsRead(notification)}
                 >
                   <div 
                     className={styles.notificationIcon}
@@ -230,7 +210,7 @@ const NotificationsPage = () => {
                       className={styles.deleteBtn}
                       onClick={(e) => {
                         e.stopPropagation();
-                        deleteNotification(notification.id);
+                        handleDeleteNotification(notification.id);
                       }}
                       title="Видалити"
                     >

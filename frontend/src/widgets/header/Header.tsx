@@ -2,37 +2,16 @@ import { Link } from "react-router-dom";
 import styles from './Header.module.css';
 import { Logo } from "@/shared/ui";
 import { useAuth } from "@/app/providers/AuthContext";
-import { useState, useEffect } from "react";
-import { getMyNotifications } from "@/shared/api/notifications.api";
-import { Notification } from "@/shared/types/notification.types";
+import { useState } from "react";
+import { useNotifications } from "@/app/providers/NotificationProvider";
 import { useChat } from "@/app/providers/ChatProvider";
 
 export default function Header() {
   const { user, isAuthenticated } = useAuth();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const { unreadCount } = useNotifications();
   const { unreadTotal } = useChat();
 
   const totalUnread = unreadCount + unreadTotal;
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      const fetchNotifications = async () => {
-        try {
-          const data = await getMyNotifications();
-          setNotifications(data);
-          setUnreadCount(data.filter(n => !n.isRead).length);
-        } catch (error) {
-          console.error('Failed to fetch notifications in header:', error);
-        }
-      };
-
-      fetchNotifications();
-      // Опитування кожні 60 секунд (опціонально)
-      const interval = setInterval(fetchNotifications, 60000);
-      return () => clearInterval(interval);
-    }
-  }, [isAuthenticated]);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const initials = user ? `${user.firstName[0] || ''}${user.lastName[0] || ''}`.toUpperCase() : '';
