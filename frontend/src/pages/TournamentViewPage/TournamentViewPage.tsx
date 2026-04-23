@@ -271,7 +271,8 @@ const TournamentViewPage = () => {
     registrationStart: '',
     registrationEnd: '',
     endDate: '',
-    isModerated: false
+    isModerated: false,
+    isPublic: true
   });
 
 
@@ -391,7 +392,8 @@ const TournamentViewPage = () => {
         registrationStart: formatDateForInput(tournament?.registrationStart || details.registrationStart),
         registrationEnd: formatDateForInput(tournament?.registrationEnd || details.registrationEnd),
         endDate: formatDateForInput(tournament?.endDate || details.endDate),
-        isModerated: !!details.isModerated
+        isModerated: !!details.isModerated,
+        isPublic: details.isPublic !== undefined ? !!details.isPublic : true
       });
       setIsEditingTournament(true);
     }
@@ -471,7 +473,8 @@ const TournamentViewPage = () => {
         registrationStart: formatToISO(editTournamentData.registrationStart),
         registrationEnd: formatToISO(editTournamentData.registrationEnd),
         endDate: formatToISO(editTournamentData.endDate),
-        isModerated: editTournamentData.isModerated
+        isModerated: editTournamentData.isModerated,
+        isPublic: editTournamentData.isPublic
       };
 
       if (sportKey === 'checkers') {
@@ -2293,6 +2296,19 @@ const TournamentViewPage = () => {
                         </div>
                       </label>
 
+                      <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f0f9ff', padding: '12px', borderRadius: '8px', border: '1px solid #bae6fd' }}>
+                        <input
+                          type="checkbox"
+                          checked={editTournamentData.isPublic}
+                          onChange={(e) => setEditTournamentData({ ...editTournamentData, isPublic: e.target.checked })}
+                          style={{ width: '20px', height: '20px' }}
+                        />
+                        <div>
+                          <strong style={{ display: 'block' }}>Відкрите змагання</strong>
+                          <small style={{ color: '#64748b' }}>Учасники додаються автоматично після реєстрації</small>
+                        </div>
+                      </label>
+
                       <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#fff7ed', padding: '12px', borderRadius: '8px', border: '1px solid #fed7aa' }}>
                         <input
                           type="checkbox"
@@ -2302,7 +2318,7 @@ const TournamentViewPage = () => {
                         />
                         <div>
                           <strong style={{ display: 'block' }}>Модерація заявок</strong>
-                          <small style={{ color: '#64748b' }}>Адміністратор має вручну підтверджувати кожну заявку</small>
+                          <small style={{ color: '#64748b' }}>Адміністратор має схвалити або відхилити кожну заявку</small>
                         </div>
                       </label>
                     </div>

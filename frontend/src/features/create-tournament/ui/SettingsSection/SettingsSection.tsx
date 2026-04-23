@@ -163,8 +163,8 @@ const SettingsSection = ({ formData, handleInputChange }: SettingsSectionProps) 
                 </div>
               </div>
               <div className={shared.checkboxText}>
-                <span className={shared.checkboxTitle}>Публічне змагання</span>
-                <span className={shared.checkboxDesc}>Змагання будуть видимими для всіх користувачів</span>
+                <span className={shared.checkboxTitle}>Відкрите змагання</span>
+                <span className={shared.checkboxDesc}>Користувачі стають учасниками одразу після реєстрації</span>
               </div>
             </label>
           </div>
@@ -183,8 +183,8 @@ const SettingsSection = ({ formData, handleInputChange }: SettingsSectionProps) 
                 </div>
               </div>
               <div className={shared.checkboxText}>
-                <span className={shared.checkboxTitle}>Підтвердження реєстрації</span>
-                <span className={shared.checkboxDesc}>Організатор повинен схвалити кожну заявку</span>
+                <span className={shared.checkboxTitle}>Модерація заявок</span>
+                <span className={shared.checkboxDesc}>Адміністратор повинен схвалити участь (до того часу гравця немає в списку)</span>
               </div>
             </label>
           </div>

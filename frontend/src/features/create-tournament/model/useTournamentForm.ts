@@ -198,6 +198,8 @@ export const useTournamentForm = () => {
         prizes: formData.prizes,
         schedule: formData.schedule,
         isTeam: formData.isTeam,
+        isPublic: formData.isPublic,
+        isModerated: formData.requireApproval,
         // Optional: registration period (if backend is ready)
         registrationStart: combineDateTime(formData.registrationStartDate, formData.registrationStartTime),
         registrationEnd: combineDateTime(formData.registrationDeadline, formData.registrationDeadlineTime),
