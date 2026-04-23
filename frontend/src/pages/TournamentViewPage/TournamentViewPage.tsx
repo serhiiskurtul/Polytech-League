@@ -1179,14 +1179,25 @@ const TournamentViewPage = () => {
                 <p style={{ whiteSpace: 'pre-line' }}>
                   {details?.rules ? details.rules : (
                     <>
-                      {(tournament?.sport === 'chess' || tournament?.sport === 'checkers') && (details as any)?.system && (
-                        <>• {getSystemLabel((details as any).system)}<br /></>
+                      {tournament?.sport === 'armwrestling' ? (
+                        <>
+                          • Заборонено відрив ліктя від підлокітника<br />
+                          • Заборонено торкання головою чи плечем захвату<br />
+                          • Перемога при торканні руки суперника валику<br />
+                          • Рішення судді є остаточними
+                        </>
+                      ) : (
+                        <>
+                          {(tournament?.sport === 'chess' || tournament?.sport === 'checkers') && (details as any)?.system && (
+                            <>• {getSystemLabel((details as any).system)}<br /></>
+                          )}
+                          {tournament?.sport !== 'armwrestling' && (
+                            <>• Контроль часу: {details?.timeControl || 'Не вказано'}<br /></>
+                          )}
+                          • Заборонені підказки та мобільні телефони<br />
+                          • Рішення судді остаточні
+                        </>
                       )}
-                      {tournament?.sport !== 'armwrestling' && (
-                        <>• Контроль часу: {details?.timeControl || 'Не вказано'}<br /></>
-                      )}
-                      • Заборонені підказки та мобільні телефони<br />
-                      • Рішення судді остаточні
                     </>
                   )}
                 </p>
@@ -1694,13 +1705,13 @@ const TournamentViewPage = () => {
                                     left: 0,
                                     right: 0,
                                     background: '#fff',
-                                    border: '1px solid #ccc',
-                                    borderRadius: '6px',
-                                    zIndex: 10,
-                                    maxHeight: '200px',
-                                    overflowY: 'auto',
-                                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-                                  }}>
+                                            border: '1px solid #ccc',
+                                            borderRadius: '6px',
+                                            zIndex: 10,
+                                            maxHeight: '200px',
+                                            overflowY: 'auto',
+                                            boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                                          }}>
                                     {searchResults.map((result, idx) => (
                                       <div
                                         key={`${result.type}-${result.id}-${idx}`}

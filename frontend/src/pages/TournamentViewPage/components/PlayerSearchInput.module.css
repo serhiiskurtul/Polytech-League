@@ -9,7 +9,7 @@
   font-size: 13px;
   font-weight: 600;
   color: #64748b;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .inputContainer {
@@ -22,11 +22,12 @@
   width: 100%;
   padding: 10px 36px 10px 12px;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
   background: white;
   transition: all 0.2s ease;
   color: #1e293b;
+  height: 42px;
 }
 
 .searchInput:focus {

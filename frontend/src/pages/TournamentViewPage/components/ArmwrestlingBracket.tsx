@@ -129,22 +129,22 @@ const ArmwrestlingBracket: React.FC<ArmwrestlingBracketProps> = ({
                 )}
               </div>
 
-              {/* Enhanced Connector lines */}
+              {/* Enhanced Connector lines - Back to Container for full-height rail */}
               {columnIndex < totalStages - 1 && (
-                <div className={styles.connectorWrapper} style={{ position: 'absolute', right: '-48px', height: '100%', width: '48px', pointerEvents: 'none' }}>
-                   {/* Horizontal line from match to vertical rail */}
-                   <div className={styles.connectorLine} style={{ width: '24px', height: '2px', top: '50%', right: '24px', background: '#cbd5e1', position: 'absolute' }}></div>
+                <div className={styles.connectorWrapper} style={{ position: 'absolute', right: '-48px', top: 0, bottom: 0, width: '48px', pointerEvents: 'none' }}>
+                   {/* Horizontal line from current match card center to rail */}
+                   <div className={styles.connectorLine} style={{ width: '24px', height: '2px', top: '50%', left: 0, background: '#cbd5e1', position: 'absolute' }}></div>
                    
-                   {/* Vertical line connecting pairs */}
+                   {/* Vertical rail connecting the pair */}
                    {matchIndex % 2 === 0 ? (
-                     <div className={styles.connectorLine} style={{ width: '2px', height: '50.5%', top: '50%', right: '24px', background: '#cbd5e1', position: 'absolute' }}></div>
+                     <div className={styles.connectorLine} style={{ width: '2px', height: '50%', top: '50%', left: '24px', background: '#cbd5e1', position: 'absolute' }}></div>
                    ) : (
-                     <div className={styles.connectorLine} style={{ width: '2px', height: '50.5%', bottom: '50%', right: '24px', background: '#cbd5e1', position: 'absolute' }}></div>
+                     <div className={styles.connectorLine} style={{ width: '2px', height: '50%', bottom: '50%', left: '24px', background: '#cbd5e1', position: 'absolute' }}></div>
                    )}
 
-                   {/* Line to next stage (only for even matches to represent the pair) */}
-                   {matchIndex % 2 === 0 && (
-                     <div className={styles.connectorLine} style={{ width: '24px', height: '2px', top: '100%', right: '0', background: '#cbd5e1', position: 'absolute' }}></div>
+                   {/* Line to next stage - ONLY at the boundary between match 0 and 1, and only if not the last stage */}
+                   {matchIndex % 2 === 0 && stages[winnersStages[columnIndex + 1]]?.length > 0 && (
+                     <div className={styles.connectorLine} style={{ width: '24px', height: '2px', top: '100%', left: '24px', background: '#cbd5e1', position: 'absolute' }}></div>
                    )}
                 </div>
               )}

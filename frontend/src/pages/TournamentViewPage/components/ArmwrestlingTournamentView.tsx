@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  ArmwrestlingEventResponse, 
-  ArmwrestlingMatchResponse 
+import {
+  ArmwrestlingEventResponse,
+  ArmwrestlingMatchResponse
 } from '@/shared/types/armwrestling.types';
 import { PlayerDto } from '@/shared/types/player.types';
 import { getAllPlayers, createPlayer, searchUsers } from '@/shared/api';
-import { 
+import {
   createArmwrestlingMatch,
   updateArmwrestlingMatch,
   updateArmwrestlingEvent,
@@ -36,15 +36,15 @@ type SearchResult = {
   rating?: number;
 };
 
-const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({ 
-  details, 
+const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
+  details,
   isAdmin,
   onRefresh
 }) => {
   const [allPlayers, setAllPlayers] = useState<PlayerDto[]>([]);
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [showSetWinners, setShowSetWinners] = useState(false);
-  
+
   const [winners, setWinners] = useState({
     firstPlaceId: details.firstPlace?.id || 0,
     secondPlaceId: details.secondPlace?.id || 0,
@@ -165,8 +165,8 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
     const lastName = parts.slice(1).join(' ') || 'Новий';
 
     // 1. Check if ANY player with this name already exists in DB
-    const existing = allPlayers.find(p => 
-      p.firstName.toLowerCase() === firstName.toLowerCase() && 
+    const existing = allPlayers.find(p =>
+      p.firstName.toLowerCase() === firstName.toLowerCase() &&
       p.lastName.toLowerCase() === lastName.toLowerCase()
     );
 
@@ -187,7 +187,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
       // 2. Add to event if not already there
       const isAlreadyInEvent = details.participants?.some((p: any) => (p.playerId || p.id) === playerId);
       if (!isAlreadyInEvent) {
-          await addParticipantToArmwrestlingEvent(details.id, { playerId, weight: 0, rank: 0 });
+        await addParticipantToArmwrestlingEvent(details.id, { playerId, weight: 0, rank: 0 });
       }
 
       await loadPlayers(playerNum === 1 ? { p1: playerId } : { p2: playerId });
@@ -242,7 +242,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
 
   const handleDeleteMatch = async (matchId: number) => {
     if (!window.confirm('Ви впевнені, що хочете видалити цей поєдинок?')) return;
-    
+
     try {
       await deleteArmwrestlingMatch(matchId);
       onRefresh();
@@ -264,7 +264,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
       group: 'Учасник'
     } as PlayerDto;
   });
-  
+
   const matchParticipants = details.matches?.reduce((acc, m) => {
     if (m.player1 && !acc.find(p => p.id === m.player1?.id)) acc.push(m.player1);
     if (m.player2 && !acc.find(p => p.id === m.player2?.id)) acc.push(m.player2);
@@ -281,7 +281,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
 
   const getEligiblePlayers = (stage: string) => {
     if (!details.matches || details.matches.length === 0) {
-        return (stage === 'Раунд 1' || stage === '1/16 Фіналу') ? displayParticipants : [];
+      return (stage === 'Раунд 1' || stage === '1/16 Фіналу') ? displayParticipants : [];
     }
 
     const idx = STAGE_ORDER.indexOf(stage);
@@ -290,13 +290,13 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
     // Logic for Single Elimination stages
     const standardStages = ['1/16 Фіналу', '1/8 Фіналу', 'Чвертьфінал', 'Півфінал', 'Фінал'];
     const sIdx = standardStages.indexOf(stage);
-    
+
     if (sIdx > 0) {
       const prevStage = standardStages[sIdx - 1];
       const winners = details.matches
         .filter(m => m.stage === prevStage && m.winnerId)
         .map(m => m.winnerId!);
-      
+
       // STRICT: Only allow winners from prev stage. If none, return empty list.
       return displayParticipants.filter(p => winners.includes(p.id!));
     }
@@ -338,60 +338,60 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
 
   const handleAddParticipant = async () => {
     if (!newParticipant.firstName || !newParticipant.lastName || !newParticipant.group) {
-        alert("Заповніть всі поля!");
-        return;
+      alert("Заповніть всі поля!");
+      return;
     }
 
     try {
-        let playerId = newParticipant.existingPlayerId;
+      let playerId = newParticipant.existingPlayerId;
 
-        if (!playerId) {
-            // Check if player is already in the tournament (by userId)
-            if (newParticipant.userId && details.participants?.some((p: any) => (p.userId === newParticipant.userId))) {
-              alert("Цей користувач вже бере участь у змаганні!");
-              return;
-            }
-
-            const created = await createPlayer({
-                firstName: newParticipant.firstName,
-                lastName: newParticipant.lastName,
-                group: newParticipant.group,
-                userId: newParticipant.userId,
-                city: 'Київ'
-            });
-            playerId = created.id!;
-            alert('Гравця створено та додано у базу!');
-        } else {
-            // Check if player is already in the tournament
-            const isAlreadyInEvent = details.participants?.some((p: any) => (p.playerId || p.id) === playerId);
-            if (isAlreadyInEvent) {
-                alert("Цей гравець вже бере участь у змаганні!");
-                return;
-            }
+      if (!playerId) {
+        // Check if player is already in the tournament (by userId)
+        if (newParticipant.userId && details.participants?.some((p: any) => (p.userId === newParticipant.userId))) {
+          alert("Цей користувач вже бере участь у змаганні!");
+          return;
         }
 
-        // Add link to event
-        await addParticipantToArmwrestlingEvent(details.id, { playerId: playerId!, weight: 0, rank: 0 });
-        alert('Учасника успішно додано до змагання!');
+        const created = await createPlayer({
+          firstName: newParticipant.firstName,
+          lastName: newParticipant.lastName,
+          group: newParticipant.group,
+          userId: newParticipant.userId,
+          city: 'Київ'
+        });
+        playerId = created.id!;
+        alert('Гравця створено та додано у базу!');
+      } else {
+        // Check if player is already in the tournament
+        const isAlreadyInEvent = details.participants?.some((p: any) => (p.playerId || p.id) === playerId);
+        if (isAlreadyInEvent) {
+          alert("Цей гравець вже бере участь у змаганні!");
+          return;
+        }
+      }
 
-        setShowAddPlayer(false);
-        setNewParticipant({ firstName: '', lastName: '', group: '', userId: null, existingPlayerId: null });
-        loadPlayers();
-        onRefresh();
+      // Add link to event
+      await addParticipantToArmwrestlingEvent(details.id, { playerId: playerId!, weight: 0, rank: 0 });
+      alert('Учасника успішно додано до змагання!');
+
+      setShowAddPlayer(false);
+      setNewParticipant({ firstName: '', lastName: '', group: '', userId: null, existingPlayerId: null });
+      loadPlayers();
+      onRefresh();
     } catch (err) {
-        console.error(err);
-        alert('Помилка при додаванні гравця');
+      console.error(err);
+      alert('Помилка при додаванні гравця');
     }
   };
 
   const handleRemoveParticipant = async (playerId: number, playerName: string) => {
     if (!window.confirm(`Видалити учасника ${playerName} зі змагання?`)) return;
     try {
-        await removeParticipantFromArmwrestlingEvent(details.id, playerId);
-        onRefresh();
+      await removeParticipantFromArmwrestlingEvent(details.id, playerId);
+      onRefresh();
     } catch (err) {
-        console.error(err);
-        alert('Помилка при видаленні учасника');
+      console.error(err);
+      alert('Помилка при видаленні учасника');
     }
   };
 
@@ -405,9 +405,9 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
         <div className={styles.categoryInfo}>
           <span className={styles.badge}>{details.level}</span>
           {isAdmin && (
-            <button 
+            <button
               type="button"
-              className={styles.actionBtn} 
+              className={styles.actionBtn}
               onClick={() => setShowSetWinners(!showSetWinners)}
             >
               <i className="fas fa-medal"></i> Встановити призерів
@@ -418,7 +418,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
 
       {/* Podium Display */}
       {(details.firstPlace || details.secondPlace || details.thirdPlace) && !showSetWinners && (
-        <TournamentPodium 
+        <TournamentPodium
           firstPlace={details.firstPlace}
           secondPlace={details.secondPlace}
           thirdPlace={details.thirdPlace}
@@ -428,48 +428,48 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
       {/* Admin Panel for Winners */}
       {isAdmin && showSetWinners && (
         <div className={styles.adminForm} style={{ background: '#fffbeb', padding: '24px', borderRadius: '16px', marginBottom: '32px', border: '1px solid #fcd34d' }}>
-           <h4 style={{ marginTop: 0, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-             <i className="fas fa-trophy" style={{ color: '#f59e0b' }}></i> Визначити призерів змагання
-           </h4>
-           <div className={styles.winnerSelectionGrid}>
-              <div className={styles.formGroup}>
-                <label>1 Місце (Золото)</label>
-                <select 
-                  value={winners.firstPlaceId} 
-                  onChange={(e) => setWinners({...winners, firstPlaceId: Number(e.target.value)})}
-                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
-                >
-                  <option key="default-gold" value={0}>Оберіть гравця...</option>
-                  {displayParticipants.map(p => <option key={`gold-${p.id}`} value={p.id}>{p.firstName} {p.lastName}</option>)}
-                </select>
-              </div>
-              <div className={styles.formGroup}>
-                <label>2 Місце (Срібло)</label>
-                <select 
-                  value={winners.secondPlaceId} 
-                  onChange={(e) => setWinners({...winners, secondPlaceId: Number(e.target.value)})}
-                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
-                >
-                  <option key="default-silver" value={0}>Оберіть гравця...</option>
-                  {displayParticipants.map(p => <option key={`silver-${p.id}`} value={p.id}>{p.firstName} {p.lastName}</option>)}
-                </select>
-              </div>
-              <div className={styles.formGroup}>
-                <label>3 Місце (Бронза)</label>
-                <select 
-                  value={winners.thirdPlaceId} 
-                  onChange={(e) => setWinners({...winners, thirdPlaceId: Number(e.target.value)})}
-                  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
-                >
-                  <option key="default-bronze" value={0}>Оберіть гравця...</option>
-                  {displayParticipants.map(p => <option key={`bronze-${p.id}`} value={p.id}>{p.firstName} {p.lastName}</option>)}
-                </select>
-              </div>
-           </div>
-           <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-             <button type="button" className={styles.cancelBtn} onClick={() => setShowSetWinners(false)}>Скасувати</button>
-             <button type="button" className={styles.saveBtn} onClick={handleSaveWinners}>Зберегти призерів</button>
-           </div>
+          <h4 style={{ marginTop: 0, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <i className="fas fa-trophy" style={{ color: '#f59e0b' }}></i> Визначити призерів змагання
+          </h4>
+          <div className={styles.winnerSelectionGrid}>
+            <div className={styles.formGroup}>
+              <label>1 Місце (Золото)</label>
+              <select
+                value={winners.firstPlaceId}
+                onChange={(e) => setWinners({ ...winners, firstPlaceId: Number(e.target.value) })}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+              >
+                <option key="default-gold" value={0}>Оберіть гравця...</option>
+                {displayParticipants.map(p => <option key={`gold-${p.id}`} value={p.id}>{p.firstName} {p.lastName}</option>)}
+              </select>
+            </div>
+            <div className={styles.formGroup}>
+              <label>2 Місце (Срібло)</label>
+              <select
+                value={winners.secondPlaceId}
+                onChange={(e) => setWinners({ ...winners, secondPlaceId: Number(e.target.value) })}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+              >
+                <option key="default-silver" value={0}>Оберіть гравця...</option>
+                {displayParticipants.map(p => <option key={`silver-${p.id}`} value={p.id}>{p.firstName} {p.lastName}</option>)}
+              </select>
+            </div>
+            <div className={styles.formGroup}>
+              <label>3 Місце (Бронза)</label>
+              <select
+                value={winners.thirdPlaceId}
+                onChange={(e) => setWinners({ ...winners, thirdPlaceId: Number(e.target.value) })}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+              >
+                <option key="default-bronze" value={0}>Оберіть гравця...</option>
+                {displayParticipants.map(p => <option key={`bronze-${p.id}`} value={p.id}>{p.firstName} {p.lastName}</option>)}
+              </select>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+            <button type="button" className={styles.cancelBtn} onClick={() => setShowSetWinners(false)}>Скасувати</button>
+            <button type="button" className={styles.saveBtn} onClick={handleSaveWinners}>Зберегти призерів</button>
+          </div>
         </div>
       )}
 
@@ -477,43 +477,45 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
       <div className={styles.armwrestlingLayout}>
         <div className={styles.mainContent} style={{ width: '100%', maxWidth: '100%' }}>
           {isAdmin && (
-            <div className={styles.adminForm} style={{ background: '#f8fafc', padding: '24px', borderRadius: '16px', marginBottom: '32px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-              <h4 style={{ marginTop: 0, marginBottom: '20px', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div className={styles.adminForm} style={{ background: '#f8fafc', padding: '28px', borderRadius: '20px', marginBottom: '32px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.05)' }}>
+              <h4 style={{ marginTop: 0, marginBottom: '24px', fontSize: '1.1rem', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <i className="fas fa-plus-circle" style={{ color: '#3b82f6' }}></i> Додати новий поєдинок
               </h4>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px', alignItems: 'flex-end' }}>
-                <PlayerSearchInput 
-                  label="Гравець 1"
-                  players={eligiblePlayers}
-                  selectedId={newMatch.player1Id}
-                  onSelect={(id) => setNewMatch({...newMatch, player1Id: id})}
-                  onQuickAdd={(name) => handleQuickAddPlayer(name, 1)}
-                  placeholder={eligiblePlayers.length < displayParticipants.length ? "Тільки переможці минілого етапу..." : "Оберіть учасника..."}
-                />
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr auto 2fr 1.5fr 80px auto', gap: '20px', alignItems: 'flex-end' }}>
+                <div>
+                  <PlayerSearchInput 
+                    label="Гравець 1"
+                    players={eligiblePlayers}
+                    selectedId={newMatch.player1Id}
+                    onSelect={(id) => setNewMatch({ ...newMatch, player1Id: id })}
+                    onQuickAdd={(name) => handleQuickAddPlayer(name, 1)}
+                    placeholder="Оберіть..."
+                  />
+                </div>
 
-                <div style={{ textAlign: 'center', paddingBottom: '12px', fontWeight: 'bold', color: '#94a3b8' }}>VS</div>
+                <div style={{ paddingBottom: '12px', fontWeight: '800', color: '#94a3b8', fontSize: '12px' }}>VS</div>
 
-                <PlayerSearchInput 
-                  label="Гравець 2"
-                  players={eligiblePlayers}
-                  selectedId={newMatch.player2Id}
-                  onSelect={(id) => setNewMatch({...newMatch, player2Id: id})}
-                  onQuickAdd={(name) => handleQuickAddPlayer(name, 2)}
-                  placeholder={eligiblePlayers.length < displayParticipants.length ? "Тільки переможці минілого етапу..." : "Оберіть учасника..."}
-                />
+                <div>
+                  <PlayerSearchInput 
+                    label="Гравець 2"
+                    players={eligiblePlayers}
+                    selectedId={newMatch.player2Id}
+                    onSelect={(id) => setNewMatch({ ...newMatch, player2Id: id })}
+                    onQuickAdd={(name) => handleQuickAddPlayer(name, 2)}
+                    placeholder="Оберіть..."
+                  />
+                </div>
 
-                <div className={styles.formGroup}>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#64748b', marginBottom: '6px' }}>Етап змагання</label>
-                  <select 
-                    value={newMatch.stage} 
-                    onChange={(e) => setNewMatch({...newMatch, stage: e.target.value})}
-                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white' }}
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#64748b', marginBottom: '8px' }}>Етап</label>
+                  <select
+                    value={newMatch.stage}
+                    onChange={(e) => setNewMatch({ ...newMatch, stage: e.target.value })}
+                    style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0', background: 'white', height: '42px', fontSize: '14px', color: '#1e293b' }}
                   >
                     <option value="Раунд 1">Раунд 1</option>
                     <option value="Раунд 2">Раунд 2</option>
                     <option value="Раунд 3">Раунд 3</option>
-                    <option value="Раунд 4">Раунд 4</option>
-                    <option value="Раунд 5">Раунд 5</option>
                     <option value="1/16 Фіналу">1/16 Фіналу</option>
                     <option value="1/8 Фіналу">1/8 Фіналу</option>
                     <option value="Чвертьфінал">Чвертьфінал</option>
@@ -523,7 +525,6 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
                       <>
                         <option value="Lower Раунд 1">Lower Раунд 1</option>
                         <option value="Lower Раунд 2">Lower Раунд 2</option>
-                        <option value="Lower Раунд 3">Lower Раунд 3</option>
                         <option value="Lower Півфінал">Lower Півфінал</option>
                         <option value="Lower Фінал">Lower Фінал</option>
                         <option value="Grand Final">Grand Final</option>
@@ -532,21 +533,21 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
                   </select>
                 </div>
 
-                <div className={styles.formGroup} style={{ width: '80px' }}>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#64748b', marginBottom: '6px' }}>Стіл</label>
-                  <input 
-                    type="number" 
-                    value={newMatch.tableNumber} 
-                    onChange={(e) => setNewMatch({...newMatch, tableNumber: Number(e.target.value)})}
-                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                <div style={{ width: '80px' }}>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#64748b', marginBottom: '8px' }}>Стіл</label>
+                  <input
+                    type="number"
+                    value={newMatch.tableNumber}
+                    onChange={(e) => setNewMatch({ ...newMatch, tableNumber: Number(e.target.value) })}
+                    style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0', height: '42px', fontSize: '14px', color: '#1e293b' }}
                   />
                 </div>
 
-                <button 
+                <button
                   type="button"
-                  className={styles.saveBtn} 
+                  className={styles.saveBtn}
                   onClick={handleCreateMatch}
-                  style={{ height: '42px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}
+                  style={{ height: '42px', padding: '0 24px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '10px', fontWeight: '700', cursor: 'pointer', transition: 'all 0.2s', fontSize: '14px' }}
                 >
                   Створити
                 </button>
@@ -557,9 +558,9 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
           <div className={styles.sectionHeader}>
             <h2><i className="fas fa-sitemap"></i> Сітка змагань</h2>
           </div>
-          
-          <ArmwrestlingBracket 
-            matches={details.matches || []} 
+
+          <ArmwrestlingBracket
+            matches={details.matches || []}
             tournamentType={details.tournamentType}
             isAdmin={isAdmin}
             onSetWinner={handleSetWinner}
@@ -567,9 +568,9 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
           />
         </div>
 
-        <div className={styles.sideInfoRow} style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
+        <div className={styles.sideInfoRow} style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
           gap: '32px',
           marginTop: '32px'
         }}>
@@ -578,16 +579,16 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
               <h3 style={{ margin: 0 }}><i className="fas fa-users"></i> Учасники</h3>
               {isAdmin && (
-                <button 
-                    type="button"
-                    onClick={() => {
-                      setShowAddPlayer(!showAddPlayer);
-                      setSearchQuery('');
-                      setSearchResults([]);
-                    }}
-                    style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', fontSize: '14px' }}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddPlayer(!showAddPlayer);
+                    setSearchQuery('');
+                    setSearchResults([]);
+                  }}
+                  style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', fontSize: '14px' }}
                 >
-                    {showAddPlayer ? 'Закрити' : '+ Додати'}
+                  {showAddPlayer ? 'Закрити' : '+ Додати'}
                 </button>
               )}
             </div>
@@ -644,32 +645,32 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
-                  <input 
-                      placeholder="Ім'я" 
-                      value={newParticipant.firstName} 
-                      onChange={(e) => setNewParticipant({...newParticipant, firstName: e.target.value})}
-                      style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}
+                  <input
+                    placeholder="Ім'я"
+                    value={newParticipant.firstName}
+                    onChange={(e) => setNewParticipant({ ...newParticipant, firstName: e.target.value })}
+                    style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}
                   />
-                  <input 
-                      placeholder="Прізвище" 
-                      value={newParticipant.lastName} 
-                      onChange={(e) => setNewParticipant({...newParticipant, lastName: e.target.value})}
-                      style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}
+                  <input
+                    placeholder="Прізвище"
+                    value={newParticipant.lastName}
+                    onChange={(e) => setNewParticipant({ ...newParticipant, lastName: e.target.value })}
+                    style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}
                   />
                 </div>
-                <input 
-                    placeholder="Група (напр. 211)" 
-                    value={newParticipant.group} 
-                    onChange={(e) => setNewParticipant({...newParticipant, group: e.target.value})}
-                    style={{ width: '100%', padding: '8px', marginBottom: '12px', borderRadius: '6px', border: '1px solid #ccc' }}
+                <input
+                  placeholder="Група (напр. 211)"
+                  value={newParticipant.group}
+                  onChange={(e) => setNewParticipant({ ...newParticipant, group: e.target.value })}
+                  style={{ width: '100%', padding: '8px', marginBottom: '12px', borderRadius: '6px', border: '1px solid #ccc' }}
                 />
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <button type="button" className={styles.saveBtn} style={{ flex: 1 }} onClick={handleAddParticipant}>
                     {newParticipant.existingPlayerId ? 'Додати існуючого' : 'Створити та додати'}
                   </button>
                   {(newParticipant.userId || newParticipant.existingPlayerId) && (
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={() => setNewParticipant({ firstName: '', lastName: '', group: '', userId: null, existingPlayerId: null })}
                       style={{ padding: '8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
                     >
@@ -682,24 +683,24 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
 
             <div className={styles.participantsList}>
               {displayParticipants.map(player => (
-                <div key={player.id} className={styles.participantItem} style={{ 
-                  position: 'relative', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  padding: '12px', 
-                  background: 'white', 
-                  borderRadius: '12px', 
+                <div key={player.id} className={styles.participantItem} style={{
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '12px',
+                  background: 'white',
+                  borderRadius: '12px',
                   marginBottom: '8px',
                   border: '1px solid #f1f5f9',
                   boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
                 }}>
-                  <div className={styles.playerAvatar} style={{ 
-                    width: '40px', 
-                    height: '40px', 
-                    borderRadius: '50%', 
-                    background: '#f1f5f9', 
-                    display: 'flex', 
-                    alignItems: 'center', 
+                  <div className={styles.playerAvatar} style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    background: '#f1f5f9',
+                    display: 'flex',
+                    alignItems: 'center',
                     justifyContent: 'center',
                     fontWeight: 'bold',
                     color: '#64748b',
@@ -722,7 +723,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
                     </div>
                   </div>
                   {isAdmin && (
-                    <button 
+                    <button
                       type="button"
                       onClick={() => handleRemoveParticipant(player.id!, `${player.firstName} ${player.lastName}`)}
                       style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '8px' }}
