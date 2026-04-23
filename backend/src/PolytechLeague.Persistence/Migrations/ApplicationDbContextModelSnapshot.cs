@@ -757,7 +757,8 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnName("description");
 
                     b.Property<DateTime?>("EndDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("end_date");
 
                     b.Property<long?>("FirstPlaceId")
                         .HasColumnType("bigint");
@@ -794,10 +795,12 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("RegistrationEnd")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("registration_end");
 
                     b.Property<DateTime?>("RegistrationStart")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("registration_start");
 
                     b.Property<string>("Rules")
                         .HasColumnType("text");

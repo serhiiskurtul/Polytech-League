@@ -163,7 +163,7 @@ const TournamentViewPage = () => {
       // Build clean base payload with common fields to avoid "Extra fields" 400 error
       const payload: any = {
         name: editTournamentData.name,
-        date: editTournamentData.date,
+        date: formatToISO(editTournamentData.date),
         location: editTournamentData.location,
         refereeIds: editTournamentData.refereeIds,
         level: editTournamentData.level,
@@ -173,9 +173,9 @@ const TournamentViewPage = () => {
         headRefereeName: editTournamentData.headRefereeName,
         referees: editTournamentData.referees,
         schedule: editTournamentData.schedule,
-        registrationStart: editTournamentData.registrationStart,
-        registrationEnd: editTournamentData.registrationEnd,
-        endDate: editTournamentData.endDate,
+        registrationStart: formatToISO(editTournamentData.registrationStart),
+        registrationEnd: formatToISO(editTournamentData.registrationEnd),
+        endDate: formatToISO(editTournamentData.endDate),
       };
 
       if (isTeamSport) {
@@ -301,7 +301,7 @@ const TournamentViewPage = () => {
           armwrestling: '/armwrestling-events',
           badminton: '/badminton-events'
         };
-        const s = (tournament?.sport || '').toLowerCase().replace(/-/g, '_').replace(/\\s/g, '');
+        const s = (tournament?.sport || '').toLowerCase().replace(/-/g, '_').replace(/\s/g, '');
         const endpoint = sportEndpointRecord[s] || sportEndpointRecord[tournament?.sport || ''];
 
         if (!endpoint) {
@@ -318,22 +318,41 @@ const TournamentViewPage = () => {
       }
     }
   };
+  
+  const formatDateForInput = (dateStr: string | undefined | null) => {
+    if (!dateStr) return '';
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return '';
+      
+      const pad = (num: number) => String(num).padStart(2, '0');
+      const year = d.getFullYear();
+      const month = pad(d.getMonth() + 1);
+      const day = pad(d.getDate());
+      const hours = pad(d.getHours());
+      const minutes = pad(d.getMinutes());
+      
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    } catch (e) {
+      return '';
+    }
+  };
+
+  const formatToISO = (dateStr: string | undefined | null) => {
+    if (!dateStr) return null;
+    try {
+      const d = new Date(dateStr);
+      return isNaN(d.getTime()) ? null : d.toISOString();
+    } catch (e) {
+      return null;
+    }
+  };
 
   const handleEditTournament = () => {
     if (details) {
-      // Use the actual backend date which is likely ISO string
-      let dateValue = '';
-      if (details.date) {
-        try {
-          dateValue = new Date(details.date).toISOString().split('T')[0];
-        } catch (e) {
-          dateValue = details.date.split(' ')[0];
-        }
-      }
-
       setEditTournamentData({
         name: tournament?.title || details.name,
-        date: dateValue,
+        date: formatDateForInput(details.date),
         location: tournament?.location || details.location,
         refereeIds: details.refereeIds || [],
         level: details.level || 'CollegeGroup',
@@ -347,9 +366,9 @@ const TournamentViewPage = () => {
         referees: (details as any).referees || '',
         schedule: details.schedule || '',
         isTeam: !!(details as any).isTeam,
-        registrationStart: tournament?.registrationStart || details.registrationStart || '',
-        registrationEnd: tournament?.registrationEnd || details.registrationEnd || '',
-        endDate: tournament?.endDate || details.endDate || ''
+        registrationStart: formatDateForInput(tournament?.registrationStart || details.registrationStart),
+        registrationEnd: formatDateForInput(tournament?.registrationEnd || details.registrationEnd),
+        endDate: formatDateForInput(tournament?.endDate || details.endDate)
       });
       setIsEditingTournament(true);
     }
@@ -415,7 +434,7 @@ const TournamentViewPage = () => {
       // Build clean base payload
       const payload: any = {
         name: editTournamentData.name,
-        date: editTournamentData.date,
+        date: formatToISO(editTournamentData.date),
         location: editTournamentData.location,
         refereeIds: editTournamentData.refereeIds,
         level: editTournamentData.level,
@@ -426,8 +445,9 @@ const TournamentViewPage = () => {
         referees: editTournamentData.referees,
         schedule: editTournamentData.schedule,
         isTeam: editTournamentData.isTeam,
-        registrationStart: editTournamentData.registrationStart,
-        registrationEnd: editTournamentData.registrationEnd,
+        registrationStart: formatToISO(editTournamentData.registrationStart),
+        registrationEnd: formatToISO(editTournamentData.registrationEnd),
+        endDate: formatToISO(editTournamentData.endDate),
       };
 
       if (sportKey === 'checkers') {
@@ -661,25 +681,6 @@ const TournamentViewPage = () => {
               firstPlaceId: d.firstPlace?.id || d.firstPlaceTeam?.id || 0,
               secondPlaceId: d.secondPlace?.id || d.secondPlaceTeam?.id || 0,
               thirdPlaceId: d.thirdPlace?.id || d.thirdPlaceTeam?.id || 0
-            });
-
-            // Sync editTournamentData for eventual updates
-            setEditTournamentData({
-              name: detailsData.name,
-              date: detailsData.date.split('T')[0],
-              location: detailsData.location,
-              refereeIds: detailsData.refereeIds,
-              level: detailsData.level,
-              description: detailsData.description,
-              timeControl: (detailsData as any).timeControl || '',
-              participantsCount: (detailsData as any).participantsCount || 0,
-              system: (detailsData as any).system || 'Swiss',
-              rules: detailsData.rules || '',
-              prizes: detailsData.prizes || '',
-              headRefereeName: detailsData.headRefereeName || '',
-              referees: (detailsData as any).referees || '',
-              schedule: detailsData.schedule || '',
-              isTeam: !!(detailsData as any).isTeam
             });
           }
         } catch (eventErr) {
@@ -1201,7 +1202,13 @@ const TournamentViewPage = () => {
                     <div className={styles.refereeAvatar}><i className="fas fa-play"></i></div>
                     <div>
                       <strong>Початок змагань:</strong><br />
-                      <small>{tournament?.date} {tournament?.time}</small>
+                      <small>{details?.date ? new Date(details.date).toLocaleString('uk-UA', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      }) : (tournament?.date + ' ' + (tournament?.time || ''))}</small>
                     </div>
                   </div>
                   <div className={styles.refereeItem}>

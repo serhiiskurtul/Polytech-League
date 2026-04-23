@@ -44,6 +44,27 @@ public class EventConfiguration : IEntityTypeConfiguration<Event>
             .IsRequired()
             .HasColumnType("bigint[]");
 
+        builder.Property(x => x.RegistrationStart)
+            .HasColumnName("registration_start")
+            .HasConversion(
+                v => v.HasValue ? v.Value.ToUniversalTime() : (DateTime?)null,
+                v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?)null
+            );
+
+        builder.Property(x => x.RegistrationEnd)
+            .HasColumnName("registration_end")
+            .HasConversion(
+                v => v.HasValue ? v.Value.ToUniversalTime() : (DateTime?)null,
+                v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?)null
+            );
+
+        builder.Property(x => x.EndDate)
+            .HasColumnName("end_date")
+            .HasConversion(
+                v => v.HasValue ? v.Value.ToUniversalTime() : (DateTime?)null,
+                v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?)null
+            );
+
         builder.HasMany(x => x.Photos)
             .WithOne(p => p.Event)
             .HasForeignKey(p => p.EventId)
