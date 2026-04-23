@@ -11,6 +11,8 @@ interface TournamentUI {
   isTeam?: boolean;
   currentRound?: string;
   progress?: number;
+  time?: string;
+  rawDate?: string;
 }
 
 interface TournamentCardProps {
@@ -104,7 +106,15 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
         <div className="tournament-details">
           <div className="detail-item">
             <i className="far fa-calendar"></i>
-            <span>{formatDate(tournament.date)}</span>
+            <span>
+              {tournament.rawDate ? new Date(tournament.rawDate).toLocaleString('uk-UA', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              }) : `${formatDate(tournament.date)} ${tournament.time || ''}`}
+            </span>
           </div>
           <div className="detail-item">
             <i className="fas fa-map-marker-alt"></i>
@@ -145,7 +155,15 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
           <div className="list-details">
             <div className="detail-item">
               <i className="far fa-calendar"></i>
-              <span>{formatDate(tournament.date)}</span>
+              <span>
+                {tournament.rawDate ? new Date(tournament.rawDate).toLocaleString('uk-UA', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                }) : `${formatDate(tournament.date)} ${tournament.time || ''}`}
+              </span>
             </div>
           </div>
         </div>

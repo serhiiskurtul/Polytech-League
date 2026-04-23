@@ -110,7 +110,15 @@ const TournamentCalendar = () => {
                   <div className={styles.tournamentDetails}>
                     <div className={styles.detailItem}>
                       <i className="far fa-calendar"></i>
-                      <span>{tournament.date} {tournament.time}</span>
+                      <span>
+                        {tournament.rawDate ? new Date(tournament.rawDate).toLocaleString('uk-UA', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        }) : `${tournament.date} ${tournament.time || ''}`}
+                      </span>
                     </div>
                     <div className={styles.detailItem}>
                       <i className="fas fa-map-marker-alt"></i>
