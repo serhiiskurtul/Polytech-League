@@ -193,10 +193,10 @@ const TournamentViewPage = () => {
         headRefereeName: editTournamentData.headRefereeName,
         referees: editTournamentData.referees,
         schedule: editTournamentData.schedule,
-        registrationStart: formatToISO(editTournamentData.registrationStart),
-        registrationEnd: formatToISO(editTournamentData.registrationEnd),
+        registrationStart: editTournamentData.level === 'CollegeGroup' ? formatToISO(editTournamentData.registrationStart) : null,
+        registrationEnd: editTournamentData.level === 'CollegeGroup' ? formatToISO(editTournamentData.registrationEnd) : null,
         endDate: formatToISO(editTournamentData.endDate),
-        isModerated: editTournamentData.isModerated
+        isModerated: editTournamentData.level === 'CollegeGroup' ? editTournamentData.isModerated : false
       };
 
       if (isTeamSport) {
@@ -470,11 +470,11 @@ const TournamentViewPage = () => {
         referees: editTournamentData.referees,
         schedule: editTournamentData.schedule,
         isTeam: editTournamentData.isTeam,
-        registrationStart: formatToISO(editTournamentData.registrationStart),
-        registrationEnd: formatToISO(editTournamentData.registrationEnd),
+        registrationStart: editTournamentData.level === 'CollegeGroup' ? formatToISO(editTournamentData.registrationStart) : null,
+        registrationEnd: editTournamentData.level === 'CollegeGroup' ? formatToISO(editTournamentData.registrationEnd) : null,
         endDate: formatToISO(editTournamentData.endDate),
-        isModerated: editTournamentData.isModerated,
-        isPublic: editTournamentData.isPublic
+        isModerated: editTournamentData.level === 'CollegeGroup' ? editTournamentData.isModerated : false,
+        isPublic: editTournamentData.level === 'CollegeGroup' ? editTournamentData.isPublic : false
       };
 
       if (sportKey === 'checkers') {
@@ -1354,22 +1354,26 @@ const TournamentViewPage = () => {
               </div>
 
               <div className={styles.infoSection}>
-                <h3><i className="fas fa-clock"></i> Розклад та Реєстрація</h3>
+                <h3><i className="fas fa-clock"></i> {details?.level === 'CollegeGroup' ? 'Розклад та Реєстрація' : 'Розклад'}</h3>
                 <div className={styles.refereeList}>
-                  <div className={styles.refereeItem}>
-                    <div className={styles.refereeAvatar}><i className="fas fa-calendar-plus"></i></div>
-                    <div>
-                      <strong>Початок реєстрації:</strong><br />
-                      <small>{tournament?.registrationStart ? new Date(tournament.registrationStart).toLocaleString('uk-UA') : 'Не вказано'}</small>
-                    </div>
-                  </div>
-                  <div className={styles.refereeItem}>
-                    <div className={styles.refereeAvatar}><i className="fas fa-calendar-times"></i></div>
-                    <div>
-                      <strong>Кінець реєстрації:</strong><br />
-                      <small>{tournament?.registrationEnd ? new Date(tournament.registrationEnd).toLocaleString('uk-UA') : 'Не вказано'}</small>
-                    </div>
-                  </div>
+                  {details?.level === 'CollegeGroup' && (
+                    <>
+                      <div className={styles.refereeItem}>
+                        <div className={styles.refereeAvatar}><i className="fas fa-calendar-plus"></i></div>
+                        <div>
+                          <strong>Початок реєстрації:</strong><br />
+                          <small>{tournament?.registrationStart ? new Date(tournament.registrationStart).toLocaleString('uk-UA') : 'Не вказано'}</small>
+                        </div>
+                      </div>
+                      <div className={styles.refereeItem}>
+                        <div className={styles.refereeAvatar}><i className="fas fa-calendar-times"></i></div>
+                        <div>
+                          <strong>Кінець реєстрації:</strong><br />
+                          <small>{tournament?.registrationEnd ? new Date(tournament.registrationEnd).toLocaleString('uk-UA') : 'Не вказано'}</small>
+                        </div>
+                      </div>
+                    </>
+                  )}
                   <div className={styles.refereeItem}>
                     <div className={styles.refereeAvatar}><i className="fas fa-play"></i></div>
                     <div>
