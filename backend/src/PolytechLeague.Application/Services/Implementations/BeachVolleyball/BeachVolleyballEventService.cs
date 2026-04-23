@@ -108,11 +108,13 @@ public class BeachVolleyballEventService(
             throw new InvalidOperationException("Player must have a group to register for inter-group competitions.");
         }
 
+        tournament.Teams ??= new List<BeachVolleyballTeam>();
+
         // Check if player is already in any team for this event
-        var alreadyRegistered = tournament.Teams!.Any(t => t.Players!.Any(p => p.Id == playerId));
+        var alreadyRegistered = tournament.Teams.Any(t => t.Players?.Any(p => p.Id == playerId) == true);
         if (alreadyRegistered) return;
 
-        var team = tournament.Teams!.FirstOrDefault(t => t.Name == groupName);
+        var team = tournament.Teams.FirstOrDefault(t => t.Name == groupName);
         if (team == null)
         {
             team = new BeachVolleyballTeam
@@ -121,7 +123,7 @@ public class BeachVolleyballEventService(
                 EventId = eventId,
                 Players = new List<Player>()
             };
-            tournament.Teams!.Add(team);
+            tournament.Teams.Add(team);
         }
 
         team.Players ??= new List<Player>();

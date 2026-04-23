@@ -677,9 +677,11 @@ const TournamentViewPage = () => {
       return;
     }
 
-    if (!currentUserPlayer) {
+    let activePlayer = currentUserPlayer;
+    if (!activePlayer) {
       try {
         const profile = await getProfile();
+        activePlayer = profile;
         setCurrentUserPlayer(profile);
         if (!profile) throw new Error();
       } catch (e) {
@@ -693,7 +695,7 @@ const TournamentViewPage = () => {
     try {
       setIsRegistering(true);
       const sportKey = tournament?.sport?.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') || '';
-      const playerId = currentUserPlayer!.id!;
+      const playerId = activePlayer!.id!;
 
       switch (sportKey) {
         case 'checkers': await registerForCheckersEvent(id, playerId); break;
