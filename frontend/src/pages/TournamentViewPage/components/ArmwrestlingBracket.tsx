@@ -44,13 +44,13 @@ const ArmwrestlingBracket: React.FC<ArmwrestlingBracketProps> = ({
         {stageName.includes('Lower') ? <i className="fas fa-arrow-down-left" style={{ color: '#ef4444', marginRight: '8px' }}></i> : null}
         {stageName}
       </h3>
-      <div className={styles.matchList} style={{ height: '100%', minHeight: '400px', justifyContent: 'space-around' }}>
+      <div className={styles.matchList}>
         {stages[stageName].map((match, matchIndex) => {
           const isWinner1 = match.winnerId === match.player1Id;
           const isWinner2 = match.winnerId === match.player2Id;
           
           return (
-            <div key={match.id} className={styles.matchBoxContainer} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div key={match.id} className={styles.matchBoxContainer}>
               <div className={styles.matchBox} style={{ position: 'relative' }}>
                 {isAdmin && onDeleteMatch && (
                   <button 
@@ -129,22 +129,70 @@ const ArmwrestlingBracket: React.FC<ArmwrestlingBracketProps> = ({
                 )}
               </div>
 
-              {/* Enhanced Connector lines - Back to Container for full-height rail */}
+              {/* Enhanced Connector lines - CSS-based alignment */}
               {columnIndex < totalStages - 1 && (
-                <div className={styles.connectorWrapper} style={{ position: 'absolute', right: '-48px', top: 0, bottom: 0, width: '48px', pointerEvents: 'none' }}>
+                <div className={styles.connectorWrapper} style={{ 
+                  position: 'absolute', 
+                  right: '-48px', 
+                  top: 0, 
+                  bottom: 0, 
+                  width: '48px', 
+                  pointerEvents: 'none' 
+                }}>
                    {/* Horizontal line from current match card center to rail */}
-                   <div className={styles.connectorLine} style={{ width: '24px', height: '2px', top: '50%', left: 0, background: '#cbd5e1', position: 'absolute' }}></div>
+                   <div style={{ 
+                     width: '24px', 
+                     height: '2px', 
+                     top: '50%', 
+                     left: 0, 
+                     background: '#94a3b8', 
+                     position: 'absolute' 
+                   }}></div>
                    
                    {/* Vertical rail connecting the pair */}
                    {matchIndex % 2 === 0 ? (
-                     <div className={styles.connectorLine} style={{ width: '2px', height: '50%', top: '50%', left: '24px', background: '#cbd5e1', position: 'absolute' }}></div>
+                     <div style={{ 
+                       width: '2px', 
+                       height: '50%', 
+                       top: '50%', 
+                       left: '24px', 
+                       background: '#94a3b8', 
+                       position: 'absolute'
+                     }}></div>
                    ) : (
-                     <div className={styles.connectorLine} style={{ width: '2px', height: '50%', bottom: '50%', left: '24px', background: '#cbd5e1', position: 'absolute' }}></div>
+                     <div style={{ 
+                       width: '2px', 
+                       height: '50%', 
+                       bottom: '50%', 
+                       left: '24px', 
+                       background: '#94a3b8', 
+                       position: 'absolute'
+                     }}></div>
                    )}
 
-                   {/* Line to next stage - ONLY at the boundary between match 0 and 1, and only if not the last stage */}
-                   {matchIndex % 2 === 0 && stages[winnersStages[columnIndex + 1]]?.length > 0 && (
-                     <div className={styles.connectorLine} style={{ width: '24px', height: '2px', top: '100%', left: '24px', background: '#cbd5e1', position: 'absolute' }}></div>
+                   {/* Line to next stage - Center of the pair to the next card center */}
+                   {matchIndex % 2 === 0 && stages[winnersStages[columnIndex + 1]]?.length > (matchIndex / 2) && (
+                     <div style={{ 
+                       width: '24px', 
+                       height: '2px', 
+                       top: '100%', 
+                       left: '24px', 
+                       background: '#94a3b8', 
+                       position: 'absolute',
+                       display: 'flex',
+                       alignItems: 'center',
+                       justifyContent: 'flex-end'
+                     }}>
+                       {/* Arrowhead */}
+                       <div style={{ 
+                         width: '6px', 
+                         height: '6px', 
+                         borderRight: '2px solid #94a3b8', 
+                         borderTop: '2px solid #94a3b8', 
+                         transform: 'rotate(45deg)',
+                         marginRight: '-1px'
+                       }}></div>
+                     </div>
                    )}
                 </div>
               )}
@@ -181,7 +229,7 @@ const ArmwrestlingBracket: React.FC<ArmwrestlingBracketProps> = ({
           )}
         </div>
       ) : (
-        <div className={styles.stagesRow}>
+        <div className={styles.stagesRow} style={{ display: 'flex', gap: '48px', flex: 1, minHeight: '800px' }}>
           {winnersStages.map((s, idx) => renderStage(s, idx, winnersStages.length))}
         </div>
       )}

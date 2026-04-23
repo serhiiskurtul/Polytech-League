@@ -998,13 +998,18 @@
 .matchList {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  gap: 24px;
+  justify-content: space-around;
+  flex: 1;
+  min-height: 400px;
 }
 
 .matchBoxContainer {
-  margin-bottom: 24px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
+  min-height: 120px;
 }
 
 .matchBox {
