@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useAuth } from '@/app/providers/AuthContext';
 import {
   getTournamentById,
@@ -222,7 +223,7 @@ const TournamentViewPage = () => {
         default: await updateChessEvent(id, payload as any);
       }
 
-      alert("Призерів успішно встановлено!");
+      toast.success("Призерів успішно встановлено!");
       setShowWinnersAdmin(false);
       fetchTournament(true);
     } catch (err) {
@@ -270,7 +271,7 @@ const TournamentViewPage = () => {
       } else if (tournament?.sport === 'checkers') {
         await importCheckersDataFromFile(id, file);
       }
-      alert('Дані успішно імпортовано з файлу!');
+      toast.success('Дані успішно імпортовано з файлу!');
       fetchTournament(true);
     } catch (err: any) {
       console.error(err);
@@ -310,7 +311,7 @@ const TournamentViewPage = () => {
         }
 
         await api.delete(`${endpoint}/${id}`);
-        alert('Змагання успішно видалено.');
+        toast.success('Змагання успішно видалено.');
         navigate('/tournaments');
       } catch (error) {
         console.error('Помилка при видаленні змагання:', error);
@@ -478,7 +479,7 @@ const TournamentViewPage = () => {
           participantsCount: editTournamentData.participantsCount
         } as any);
       }
-      alert("Дані змагань успішно оновлено!");
+      toast.success("Дані змагань успішно оновлено!");
       setIsEditingTournament(false);
       fetchTournament(true);
     } catch (err) {
@@ -542,7 +543,7 @@ const TournamentViewPage = () => {
         };
         await updateChessGame(gameId, payload);
       }
-      alert("Матч успішно оновлено!");
+      toast.success("Матч успішно оновлено!");
       setEditingGameId(null);
       fetchTournament(true);
     } catch (err) {
@@ -597,7 +598,7 @@ const TournamentViewPage = () => {
         await updateParticipantInEvent(id!, playerId, payload);
       }
 
-      alert("Дані учасника оновлено!");
+      toast.success("Дані учасника оновлено!");
       setEditingParticipantId(null);
       fetchTournament(true);
     } catch (err) {
@@ -629,7 +630,7 @@ const TournamentViewPage = () => {
             await removeParticipantFromEvent(id!, playerId);
         }
 
-        alert("Учасника видалено зі змагань!");
+        toast.success("Учасника видалено зі змагань!");
         fetchTournament(true);
       } catch (err) {
         console.error(err);
@@ -839,7 +840,7 @@ const TournamentViewPage = () => {
         default:
           await addParticipantToEvent(id!, { playerId: playerId, points: 0, rank: 0 });
       }
-      alert("Учасник успішно доданий до змагань!");
+      toast.success("Учасник успішно доданий до змагань!");
       setNewPlayer({ firstName: '', patronymic: '', lastName: '', group: '', studentId: '', birthDate: '', city: 'Чернівці', ratingELO: 1500, fideId: '', title: '', userId: null, existingPlayerId: null, weight: 0 });
       fetchTournament(true); // Refresh
     } catch (err) {
@@ -879,7 +880,7 @@ const TournamentViewPage = () => {
         };
         await createChessGame(payload);
       }
-      alert("Матч успішно доданий!");
+      toast.success("Матч успішно доданий!");
       setNewGame({ ...newGame, result: 'WhiteWin', board: newGame.board + 1, pgn: '' });
       fetchTournament(true); // Refresh
     } catch (err) {

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import {
   ArmwrestlingEventResponse,
   ArmwrestlingMatchResponse
@@ -376,7 +377,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
 
       // Add link to event
       await addParticipantToArmwrestlingEvent(details.id, { playerId: playerId!, weight: 0, rank: 0 });
-      alert('Учасника успішно додано до змагання!');
+      toast.success('Учасника успішно додано до змагання!');
 
       setShowAddPlayer(false);
       setNewParticipant({ firstName: '', lastName: '', group: '', userId: null, existingPlayerId: null });
