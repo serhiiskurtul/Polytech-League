@@ -64,6 +64,7 @@ ul {
   --shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
   --primary-rgb: 0, 102, 204;
   --accent-rgb: 244, 63, 94;
+  --container-max-width: 1600px;
 }
 
 .dark {
@@ -139,3 +140,35 @@ h3{
   margin: 0;
 }
 
+
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+}
+
+/* Адаптивна ширина для великих екранів та низького масштабу */
+@media (min-width: 1921px) {
+  :root {
+    --container-max-width: 1800px;
+  }
+}
+
+@media (min-width: 2561px) {
+  :root {
+    --container-max-width: 2200px;
+  }
+}
+
+@media (min-width: 3841px) {
+  :root {
+    --container-max-width: 3200px;
+  }
+}
