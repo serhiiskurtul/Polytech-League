@@ -146,6 +146,11 @@ public class TableTennisEventService(
         var tournament = await _dbcontext.TableTennisEvents.FindAsync([eventId], cancellationToken)
             ?? throw new PolytechLeague.Domain.Exceptions.EntityNotFoundException(nameof(TableTennisEvent), eventId);
 
+        if (tournament.Level != CompetitionLevel.CollegeGroup)
+        {
+            throw new InvalidOperationException("Self-registration is only allowed for college group tournaments.");
+        }
+
         var exists = await _dbcontext.Set<TableTennisEventParticipant>()
             .AnyAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
 

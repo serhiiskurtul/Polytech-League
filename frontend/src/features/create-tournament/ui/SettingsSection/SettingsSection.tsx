@@ -143,53 +143,55 @@ const SettingsSection = ({ formData, handleInputChange }: SettingsSectionProps) 
       </div>
 
       {/* Налаштування видимості */}
-      <div className={shared.formBlock}>
-        <h3 className={shared.blockTitle}>
-          <i className="fas fa-cog"></i> Налаштування доступу
-        </h3>
-        <div className={shared.formGrid}>
-          <div className={shared.checkboxGroup}>
-            <label className={shared.checkboxLabel}>
-              <div className={shared.checkboxWrapper}>
-                <input
-                  type="checkbox"
-                  name="isPublic"
-                  checked={formData.isPublic}
-                  onChange={handleInputChange}
-                  className={shared.hiddenCheckbox}
-                />
-                <div className={shared.customCheckbox}>
-                  <i className="fas fa-check"></i>
+      {formData.level === 'CollegeGroup' && (
+        <div className={shared.formBlock}>
+          <h3 className={shared.blockTitle}>
+            <i className="fas fa-cog"></i> Налаштування доступу
+          </h3>
+          <div className={shared.formGrid}>
+            <div className={shared.checkboxGroup}>
+              <label className={shared.checkboxLabel}>
+                <div className={shared.checkboxWrapper}>
+                  <input
+                    type="checkbox"
+                    name="isPublic"
+                    checked={formData.isPublic}
+                    onChange={handleInputChange}
+                    className={shared.hiddenCheckbox}
+                  />
+                  <div className={shared.customCheckbox}>
+                    <i className="fas fa-check"></i>
+                  </div>
                 </div>
-              </div>
-              <div className={shared.checkboxText}>
-                <span className={shared.checkboxTitle}>Відкрите змагання</span>
-                <span className={shared.checkboxDesc}>Користувачі стають учасниками одразу після реєстрації</span>
-              </div>
-            </label>
-          </div>
-          <div className={shared.checkboxGroup}>
-            <label className={shared.checkboxLabel}>
-              <div className={shared.checkboxWrapper}>
-                <input
-                  type="checkbox"
-                  name="requireApproval"
-                  checked={formData.requireApproval}
-                  onChange={handleInputChange}
-                  className={shared.hiddenCheckbox}
-                />
-                <div className={shared.customCheckbox}>
-                  <i className="fas fa-check"></i>
+                <div className={shared.checkboxText}>
+                  <span className={shared.checkboxTitle}>Відкрите змагання</span>
+                  <span className={shared.checkboxDesc}>Користувачі стають учасниками одразу після реєстрації</span>
                 </div>
-              </div>
-              <div className={shared.checkboxText}>
-                <span className={shared.checkboxTitle}>Модерація заявок</span>
-                <span className={shared.checkboxDesc}>Адміністратор повинен схвалити участь (до того часу гравця немає в списку)</span>
-              </div>
-            </label>
+              </label>
+            </div>
+            <div className={shared.checkboxGroup}>
+              <label className={shared.checkboxLabel}>
+                <div className={shared.checkboxWrapper}>
+                  <input
+                    type="checkbox"
+                    name="requireApproval"
+                    checked={formData.requireApproval}
+                    onChange={handleInputChange}
+                    className={shared.hiddenCheckbox}
+                  />
+                  <div className={shared.customCheckbox}>
+                    <i className="fas fa-check"></i>
+                  </div>
+                </div>
+                <div className={shared.checkboxText}>
+                  <span className={shared.checkboxTitle}>Модерація заявок</span>
+                  <span className={shared.checkboxDesc}>Адміністратор повинен схвалити участь (до того часу гравця немає в списку)</span>
+                </div>
+              </label>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </>
   );
 };

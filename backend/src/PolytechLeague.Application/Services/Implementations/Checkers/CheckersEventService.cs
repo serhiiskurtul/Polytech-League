@@ -269,6 +269,11 @@ public class CheckersEventService(
         var tournament = await _dbcontext.Set<CheckersEvent>().FindAsync([eventId], cancellationToken)
             ?? throw new EntityNotFoundException(nameof(CheckersEvent), eventId);
 
+        if (tournament.Level != CompetitionLevel.CollegeGroup)
+        {
+            throw new InvalidOperationException("Self-registration is only allowed for college group tournaments.");
+        }
+
         var exists = await _dbcontext.Set<CheckersEventParticipant>()
             .AnyAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
 

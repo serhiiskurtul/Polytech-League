@@ -1292,7 +1292,7 @@ const TournamentViewPage = () => {
                       </span>
                     </div>
                   ) : (
-                    isRegistrationOpen && !isAdmin ? (
+                    isRegistrationOpen && !isAdmin && details?.level === 'CollegeGroup' ? (
                       <button 
                         className={styles.registerButton} 
                         onClick={handleRegister}
@@ -1307,9 +1307,11 @@ const TournamentViewPage = () => {
                     ) : null
                   )
                 ) : (
-                  <Link to="/login" className={styles.registerButton}>
-                    <i className="fas fa-sign-in-alt"></i> Увійдіть, щоб зареєструватися
-                  </Link>
+                  details?.level === 'CollegeGroup' && (
+                    <Link to="/login" className={styles.registerButton}>
+                      <i className="fas fa-sign-in-alt"></i> Увійдіть, щоб зареєструватися
+                    </Link>
+                  )
                 )}
               </div>
             </div>
@@ -2237,14 +2239,18 @@ const TournamentViewPage = () => {
                       <label>Дата проведення</label>
                       <input type="datetime-local" value={editTournamentData.date.includes('T') ? editTournamentData.date.substring(0, 16) : editTournamentData.date} onChange={(e) => setEditTournamentData({ ...editTournamentData, date: e.target.value })} />
                     </div>
-                    <div className={styles.formGroup}>
-                      <label>Початок реєстрації</label>
-                      <input type="datetime-local" value={editTournamentData.registrationStart?.includes('T') ? editTournamentData.registrationStart.substring(0, 16) : editTournamentData.registrationStart} onChange={(e) => setEditTournamentData({ ...editTournamentData, registrationStart: e.target.value })} />
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label>Кінець реєстрації</label>
-                      <input type="datetime-local" value={editTournamentData.registrationEnd?.includes('T') ? editTournamentData.registrationEnd.substring(0, 16) : editTournamentData.registrationEnd} onChange={(e) => setEditTournamentData({ ...editTournamentData, registrationEnd: e.target.value })} />
-                    </div>
+                    {editTournamentData.level === 'CollegeGroup' && (
+                      <>
+                        <div className={styles.formGroup}>
+                          <label>Початок реєстрації</label>
+                          <input type="datetime-local" value={editTournamentData.registrationStart?.includes('T') ? editTournamentData.registrationStart.substring(0, 16) : editTournamentData.registrationStart} onChange={(e) => setEditTournamentData({ ...editTournamentData, registrationStart: e.target.value })} />
+                        </div>
+                        <div className={styles.formGroup}>
+                          <label>Кінець реєстрації</label>
+                          <input type="datetime-local" value={editTournamentData.registrationEnd?.includes('T') ? editTournamentData.registrationEnd.substring(0, 16) : editTournamentData.registrationEnd} onChange={(e) => setEditTournamentData({ ...editTournamentData, registrationEnd: e.target.value })} />
+                        </div>
+                      </>
+                    )}
                     <div className={styles.formGroup}>
                       <label>Кінець змагань</label>
                       <input type="datetime-local" value={editTournamentData.endDate?.includes('T') ? editTournamentData.endDate.substring(0, 16) : editTournamentData.endDate} onChange={(e) => setEditTournamentData({ ...editTournamentData, endDate: e.target.value })} />
@@ -2277,54 +2283,72 @@ const TournamentViewPage = () => {
                         </div>
                       </>
                     )}
-                    <div className={styles.formGroup} style={{ gridColumn: '1 / -1', display: 'flex', gap: '20px' }}>
-                      <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                        <input
-                          type="checkbox"
-                          checked={editTournamentData.isTeam}
-                          onChange={(e) => setEditTournamentData({ ...editTournamentData, isTeam: e.target.checked })}
-                          style={{ width: '20px', height: '20px' }}
-                        />
-                        <div>
-                          <strong style={{ display: 'block' }}>Командні змагання</strong>
-                          <small style={{ color: '#64748b' }}>Матчі проводяться між командами (групами)</small>
-                        </div>
-                      </label>
+                    {editTournamentData.level === 'CollegeGroup' && (
+                      <div className={styles.formGroup} style={{ gridColumn: '1 / -1', display: 'flex', gap: '20px' }}>
+                        <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                          <input
+                            type="checkbox"
+                            checked={editTournamentData.isTeam}
+                            onChange={(e) => setEditTournamentData({ ...editTournamentData, isTeam: e.target.checked })}
+                            style={{ width: '20px', height: '20px' }}
+                          />
+                          <div>
+                            <strong style={{ display: 'block' }}>Командні змагання</strong>
+                            <small style={{ color: '#64748b' }}>Матчі проводяться між командами (групами)</small>
+                          </div>
+                        </label>
 
-                      <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f0f9ff', padding: '12px', borderRadius: '8px', border: '1px solid #bae6fd' }}>
-                        <input
-                          type="checkbox"
-                          checked={editTournamentData.isPublic}
-                          onChange={(e) => setEditTournamentData({ 
-                            ...editTournamentData, 
-                            isPublic: e.target.checked,
-                            isModerated: e.target.checked ? false : editTournamentData.isModerated
-                          })}
-                          style={{ width: '20px', height: '20px' }}
-                        />
-                        <div>
-                          <strong style={{ display: 'block' }}>Відкрите змагання</strong>
-                          <small style={{ color: '#64748b' }}>Учасники додаються автоматично після реєстрації</small>
-                        </div>
-                      </label>
+                        <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f0f9ff', padding: '12px', borderRadius: '8px', border: '1px solid #bae6fd' }}>
+                          <input
+                            type="checkbox"
+                            checked={editTournamentData.isPublic}
+                            onChange={(e) => setEditTournamentData({ 
+                              ...editTournamentData, 
+                              isPublic: e.target.checked,
+                              isModerated: e.target.checked ? false : editTournamentData.isModerated
+                            })}
+                            style={{ width: '20px', height: '20px' }}
+                          />
+                          <div>
+                            <strong style={{ display: 'block' }}>Відкрите змагання</strong>
+                            <small style={{ color: '#64748b' }}>Учасники додаються автоматично після реєстрації</small>
+                          </div>
+                        </label>
 
-                      <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#fff7ed', padding: '12px', borderRadius: '8px', border: '1px solid #fed7aa' }}>
-                        <input
-                          type="checkbox"
-                          checked={editTournamentData.isModerated}
-                          onChange={(e) => setEditTournamentData({ 
-                            ...editTournamentData, 
-                            isModerated: e.target.checked,
-                            isPublic: e.target.checked ? false : editTournamentData.isPublic
-                          })}
-                          style={{ width: '20px', height: '20px' }}
-                        />
-                        <div>
-                          <strong style={{ display: 'block' }}>Модерація заявок</strong>
-                          <small style={{ color: '#64748b' }}>Адміністратор має схвалити або відхилити кожну заявку</small>
-                        </div>
-                      </label>
-                    </div>
+                        <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#fff7ed', padding: '12px', borderRadius: '8px', border: '1px solid #fed7aa' }}>
+                          <input
+                            type="checkbox"
+                            checked={editTournamentData.isModerated}
+                            onChange={(e) => setEditTournamentData({ 
+                              ...editTournamentData, 
+                              isModerated: e.target.checked,
+                              isPublic: e.target.checked ? false : editTournamentData.isPublic
+                            })}
+                            style={{ width: '20px', height: '20px' }}
+                          />
+                          <div>
+                            <strong style={{ display: 'block' }}>Модерація заявок</strong>
+                            <small style={{ color: '#64748b' }}>Адміністратор має схвалити або відхилити кожну заявку</small>
+                          </div>
+                        </label>
+                      </div>
+                    )}
+                    {editTournamentData.level !== 'CollegeGroup' && (
+                       <div className={styles.formGroup} style={{ gridColumn: '1 / -1', display: 'flex', gap: '20px' }}>
+                        <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                          <input
+                            type="checkbox"
+                            checked={editTournamentData.isTeam}
+                            onChange={(e) => setEditTournamentData({ ...editTournamentData, isTeam: e.target.checked })}
+                            style={{ width: '20px', height: '20px' }}
+                          />
+                          <div>
+                            <strong style={{ display: 'block' }}>Командні змагання</strong>
+                            <small style={{ color: '#64748b' }}>Матчі проводяться між командами (групами)</small>
+                          </div>
+                        </label>
+                       </div>
+                    )}
                     <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
                       <label>Судді</label>
                       <textarea rows={3} placeholder="Введіть імена суддів..." value={editTournamentData.referees} onChange={(e) => setEditTournamentData({ ...editTournamentData, referees: e.target.value })} />

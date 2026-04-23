@@ -18,54 +18,58 @@ const DatesLocationSection = ({ formData, handleInputChange, calculateDuration }
       
       <div className={shared.formGrid}>
         {/* Початок реєстрації */}
-        <div className={shared.formGroup}>
-          <label className={shared.formLabel}>
-            <i className="fas fa-sign-in-alt"></i> Початок реєстрації
-          </label>
-          <div className={styles.dateTimeRow}>
-            <input
-              type="date"
-              name="registrationStartDate"
-              value={formData.registrationStartDate}
-              onChange={handleInputChange}
-              className={shared.formInput}
-            />
-            <input
-              type="time"
-              name="registrationStartTime"
-              value={formData.registrationStartTime}
-              onChange={handleInputChange}
-              className={shared.formInput}
-              style={{ width: '120px' }}
-            />
-          </div>
-        </div>
+        {formData.level === 'CollegeGroup' && (
+          <>
+            <div className={shared.formGroup}>
+              <label className={shared.formLabel}>
+                <i className="fas fa-sign-in-alt"></i> Початок реєстрації
+              </label>
+              <div className={styles.dateTimeRow}>
+                <input
+                  type="date"
+                  name="registrationStartDate"
+                  value={formData.registrationStartDate}
+                  onChange={handleInputChange}
+                  className={shared.formInput}
+                />
+                <input
+                  type="time"
+                  name="registrationStartTime"
+                  value={formData.registrationStartTime}
+                  onChange={handleInputChange}
+                  className={shared.formInput}
+                  style={{ width: '120px' }}
+                />
+              </div>
+            </div>
 
-        {/* Кінець реєстрації */}
-        <div className={shared.formGroup}>
-          <label className={shared.formLabel}>
-            <i className="fas fa-user-clock"></i> Кінець реєстрації *
-          </label>
-          <div className={styles.dateTimeRow}>
-            <input
-              type="date"
-              name="registrationDeadline"
-              value={formData.registrationDeadline}
-              onChange={handleInputChange}
-              className={shared.formInput}
-              required
-            />
-            <input
-              type="time"
-              name="registrationDeadlineTime"
-              value={formData.registrationDeadlineTime}
-              onChange={handleInputChange}
-              className={shared.formInput}
-              required
-              style={{ width: '120px' }}
-            />
-          </div>
-        </div>
+            {/* Кінець реєстрації */}
+            <div className={shared.formGroup}>
+              <label className={shared.formLabel}>
+                <i className="fas fa-user-clock"></i> Кінець реєстрації *
+              </label>
+              <div className={styles.dateTimeRow}>
+                <input
+                  type="date"
+                  name="registrationDeadline"
+                  value={formData.registrationDeadline}
+                  onChange={handleInputChange}
+                  className={shared.formInput}
+                  required
+                />
+                <input
+                  type="time"
+                  name="registrationDeadlineTime"
+                  value={formData.registrationDeadlineTime}
+                  onChange={handleInputChange}
+                  className={shared.formInput}
+                  required
+                  style={{ width: '120px' }}
+                />
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Дата та час початку */}
         <div className={shared.formGroup}>
