@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
   ArmwrestlingEventResponse,
@@ -809,10 +810,10 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
                   </div>
                   <div className={styles.playerInfo} style={{ flex: 1 }}>
                     <div className={styles.playerName} style={{ fontWeight: '600', color: '#1e293b' }}>
-                      {player.userId ? (
-                        <a href={`/profile/${player.userId}`} style={{ color: 'inherit', textDecoration: 'none' }} target="_blank" rel="noreferrer">
+                      {player.id ? (
+                        <Link to={`/players/${player.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
                           {player.firstName} {player.lastName}
-                        </a>
+                        </Link>
                       ) : (
                         `${player.firstName} ${player.lastName}`
                       )}

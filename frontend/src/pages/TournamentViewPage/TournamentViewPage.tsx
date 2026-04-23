@@ -1292,7 +1292,7 @@ const TournamentViewPage = () => {
                       </span>
                     </div>
                   ) : (
-                    isRegistrationOpen ? (
+                    isRegistrationOpen && !isAdmin ? (
                       <button 
                         className={styles.registerButton} 
                         onClick={handleRegister}
@@ -1304,12 +1304,7 @@ const TournamentViewPage = () => {
                           <><i className="fas fa-user-plus"></i> Зареєструватися</>
                         )}
                       </button>
-                    ) : (
-                      <div className={styles.registrationClosed}>
-                        <i className="fas fa-lock"></i>
-                        <span>Реєстрація закрита</span>
-                      </div>
-                    )
+                    ) : null
                   )
                 ) : (
                   <Link to="/login" className={styles.registerButton}>
@@ -1627,8 +1622,8 @@ const TournamentViewPage = () => {
                                     <>
                                       <td>{p.rank || idx + 1}</td>
                                       <td>
-                                        {p.userId ? (
-                                          <Link to={`/profile/${p.userId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
+                                        {p.playerId ? (
+                                          <Link to={`/players/${p.playerId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
                                             {p.playerName}
                                           </Link>
                                         ) : (
@@ -2086,8 +2081,8 @@ const TournamentViewPage = () => {
                                 <tr key={p.id}>
                                   <td>{idx + 1}</td>
                                   <td>
-                                    {p.userId ? (
-                                      <Link to={`/profile/${p.userId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
+                                    {p.playerId ? (
+                                      <Link to={`/players/${p.playerId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
                                         {p.playerName}
                                       </Link>
                                     ) : (
