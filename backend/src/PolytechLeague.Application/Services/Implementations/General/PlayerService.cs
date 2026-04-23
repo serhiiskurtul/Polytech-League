@@ -408,7 +408,7 @@ public class PlayerService : IPlayerService
                         var s = sportStatsMap[sport];
                         s.MatchesPlayed += p; s.WinsCount += w;
                         
-                        int matchPts = p * 1;
+                        int matchPts = 0; // Removed participation points
                         int winPts = w * 2;
                         int totalPts = matchPts + winPts;
                         
@@ -420,7 +420,6 @@ public class PlayerService : IPlayerService
                             "armwrestling" => "Армрестлинг", "badminton" => "Бадмінтон", _ => sport
                         };
                         
-                        if (matchPts > 0) pointsBreakdown.Add(new PointEntryDto { Description = $"Участь у матчах ({sportName}): {p} ігор", Points = matchPts, Category = "Activity" });
                         if (winPts > 0) pointsBreakdown.Add(new PointEntryDto { Description = $"Перемоги ({sportName}): {w} ігор", Points = winPts, Category = "Activity" });
                     }
                 }
@@ -796,9 +795,8 @@ public class PlayerService : IPlayerService
 
         void AddActivityStats(string sportName, int p, int w) {
             if (p <= 0) return;
-            int pts = (p * 1) + (w * 2);
+            int pts = (w * 2);
             totalScore += pts;
-            pointsBreakdown.Add(new PointEntryDto { Description = $"Участь у матчах ({sportName}): {p} ігор", Points = p * 1, Category = "Activity" });
             if (w > 0) pointsBreakdown.Add(new PointEntryDto { Description = $"Перемоги ({sportName}): {w} ігор", Points = w * 2, Category = "Activity" });
         }
 
