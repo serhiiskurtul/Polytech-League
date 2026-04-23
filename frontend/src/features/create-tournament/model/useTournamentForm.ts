@@ -132,7 +132,7 @@ export const useTournamentForm = () => {
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
-    
+
     setFormData(prev => {
       const newState = {
         ...prev,
@@ -173,6 +173,10 @@ export const useTournamentForm = () => {
     if (formData.maxTeams < formData.minTeams) errors.push('Максимальна кількість команд не може бути меншою за мінімальну');
     if (selectedCategories.length === 0) errors.push('Оберіть хоча б одну категорію');
 
+    if (formData.level === 'CollegeGroup' && !formData.isPublic && !formData.requireApproval) {
+      errors.push('Оберіть тип реєстрації: Відкрите змагання або Модерація заявок');
+    }
+
     return errors;
   };
 
@@ -204,7 +208,7 @@ export const useTournamentForm = () => {
       // Базовий об'єкт, який спільний для всіх типів івентів у бекенді
       const basePayload = {
         name: formData.name,
-        date: combineDateTime(formData.startDate, formData.startTime), 
+        date: combineDateTime(formData.startDate, formData.startTime),
         location: formData.location,
         description: formData.description,
         refereeIds: formData.refereeIds.map(id => Number(id)) || [],

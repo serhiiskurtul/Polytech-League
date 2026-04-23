@@ -12,14 +12,24 @@ using PolytechLeague.Application.Dto.ArmwrestlingDto;
 
 namespace PolytechLeague.Application.Services.Implementations.Armwrestling;
 
-public class ArmwrestlingEventService(
-    ApplicationDbContext _dbcontext,
-    ILogger<AbstractEntityService<ArmwrestlingEvent>> _logger,
-    INotificationService _notificationService
-) :
-    AbstractEntityService<ArmwrestlingEvent>(_dbcontext, _logger, _notificationService),
+public class ArmwrestlingEventService :
+    AbstractEntityService<ArmwrestlingEvent>,
     IArmwrestlingEventService
 {
+    private readonly ApplicationDbContext _dbcontext;
+    private readonly ILogger<AbstractEntityService<ArmwrestlingEvent>> _logger;
+    private readonly INotificationService _notificationService;
+
+    public ArmwrestlingEventService(
+        ApplicationDbContext dbcontext,
+        ILogger<AbstractEntityService<ArmwrestlingEvent>> logger,
+        INotificationService notificationService
+    ) : base(dbcontext, logger, notificationService)
+    {
+        _dbcontext = dbcontext;
+        _logger = logger;
+        _notificationService = notificationService;
+    }
     public override async Task<ArmwrestlingEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)
     {
         _logger.LogDebug("Fetching ArmwrestlingEvent with id {Id} including matches and players", id);
@@ -99,10 +109,19 @@ public class ArmwrestlingEventService(
 
     public async Task AddParticipantAsync(long eventId, ArmwrestlingEventParticipantDto dto, CancellationToken cancellationToken)
     {
-        var alreadyExists = await _dbcontext.ArmwrestlingEventParticipants
+        var exists = await _dbcontext.ArmwrestlingEventParticipants
             .AnyAsync(p => p.TournamentId == eventId && p.PlayerId == dto.PlayerId, cancellationToken);
         
-        if (alreadyExists) return;
+        if (exists) return;
+ 
+        var player = await _dbcontext.Set<Player>()
+            .Include(p => p.User)
+            .FirstOrDefaultAsync(p => p.Id == dto.PlayerId, cancellationToken);
+            
+        if (player?.User?.Role == UserRole.Admin)
+        {
+            throw new InvalidOperationException("Administrators cannot be participants in tournaments.");
+        }
 
         var participant = new ArmwrestlingEventParticipant
         {
@@ -116,7 +135,6 @@ public class ArmwrestlingEventService(
 
         if (string.IsNullOrEmpty(participant.GroupName))
         {
-            var player = await _dbcontext.Set<Player>().FindAsync(dto.PlayerId);
             participant.GroupName = player?.Group;
         }
 
@@ -171,6 +189,16 @@ public class ArmwrestlingEventService(
             throw new InvalidOperationException("Self-registration is only allowed for college group tournaments.");
         }
 
+        var player = await _dbcontext.Set<Player>()
+            .Include(p => p.User)
+            .FirstOrDefaultAsync(p => p.Id == playerId, cancellationToken)
+            ?? throw new EntityNotFoundException(nameof(Player), playerId);
+
+        if (player.User?.Role == UserRole.Admin)
+        {
+            throw new InvalidOperationException("Administrators cannot register for tournaments.");
+        }
+
         var exists = await _dbcontext.ArmwrestlingEventParticipants
             .AnyAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
 
@@ -182,11 +210,9 @@ public class ArmwrestlingEventService(
         {
             TournamentId = eventId,
             PlayerId = playerId,
-            Status = status
+            Status = status,
+            GroupName = player.Group
         };
-
-        var player = await _dbcontext.Set<Player>().FindAsync([playerId], cancellationToken);
-        participant.GroupName = player?.Group;
 
         _dbcontext.ArmwrestlingEventParticipants.Add(participant);
         await _dbcontext.SaveChangesAsync(cancellationToken);

@@ -13,15 +13,27 @@ using PolytechLeague.Application.Utilities;
 
 namespace PolytechLeague.Application.Services.Implementations.Checkers;
 
-public class CheckersEventService(
-    ApplicationDbContext _dbcontext,
-    ILogger<AbstractEntityService<CheckersEvent>> _logger,
-    INotificationService _notificationService,
-    IExcelImportService _excelImportService
-) :
-    AbstractEntityService<CheckersEvent>(_dbcontext, _logger, _notificationService),
+public class CheckersEventService :
+    AbstractEntityService<CheckersEvent>,
     ICheckersEventService
 {
+    private readonly ApplicationDbContext _dbcontext;
+    private readonly ILogger<AbstractEntityService<CheckersEvent>> _logger;
+    private readonly INotificationService _notificationService;
+    private readonly IExcelImportService _excelImportService;
+
+    public CheckersEventService(
+        ApplicationDbContext dbcontext,
+        ILogger<AbstractEntityService<CheckersEvent>> logger,
+        INotificationService notificationService,
+        IExcelImportService excelImportService
+    ) : base(dbcontext, logger, notificationService)
+    {
+        _dbcontext = dbcontext;
+        _logger = logger;
+        _notificationService = notificationService;
+        _excelImportService = excelImportService;
+    }
     protected override void UpdateValues(CheckersEvent oldEntity, CheckersEvent newEntity)
     {
         oldEntity.Name = newEntity.Name;
@@ -81,15 +93,23 @@ public class CheckersEventService(
 
     public async Task AddParticipantAsync(long id, CheckersEventParticipantDto request, CancellationToken cancellationToken = default)
     {
-        var participant = await _dbcontext.Set<CheckersEventParticipant>()
-            .FirstOrDefaultAsync(p => p.TournamentId == id && p.PlayerId == request.PlayerId, cancellationToken);
+        var exists = await _dbcontext.Set<CheckersEventParticipant>()
+            .AnyAsync(p => p.TournamentId == id && p.PlayerId == request.PlayerId, cancellationToken);
         
-        if (participant != null) return;
+        if (exists) return;
+ 
+        var player = await _dbcontext.Set<Player>()
+            .Include(p => p.User)
+            .FirstOrDefaultAsync(p => p.Id == request.PlayerId, cancellationToken);
+            
+        if (player?.User?.Role == UserRole.Admin)
+        {
+            throw new InvalidOperationException("Administrators cannot be participants in tournaments.");
+        }
 
         var entity = request.FromDto(id);
         if (string.IsNullOrEmpty(entity.GroupName))
         {
-            var player = await _dbcontext.Set<Player>().FindAsync(request.PlayerId);
             entity.GroupName = player?.Group;
         }
         await _dbcontext.Set<CheckersEventParticipant>().AddAsync(entity, cancellationToken);
@@ -274,6 +294,16 @@ public class CheckersEventService(
             throw new InvalidOperationException("Self-registration is only allowed for college group tournaments.");
         }
 
+        var player = await _dbcontext.Set<Player>()
+            .Include(p => p.User)
+            .FirstOrDefaultAsync(p => p.Id == playerId, cancellationToken)
+            ?? throw new EntityNotFoundException(nameof(Player), playerId);
+
+        if (player.User?.Role == UserRole.Admin)
+        {
+            throw new InvalidOperationException("Administrators cannot register for tournaments.");
+        }
+
         var exists = await _dbcontext.Set<CheckersEventParticipant>()
             .AnyAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
 
@@ -285,11 +315,9 @@ public class CheckersEventService(
         {
             TournamentId = eventId,
             PlayerId = playerId,
-            Status = status
+            Status = status,
+            GroupName = player.Group
         };
-
-        var player = await _dbcontext.Set<Player>().FindAsync([playerId], cancellationToken);
-        participant.GroupName = player?.Group;
 
         _dbcontext.Set<CheckersEventParticipant>().Add(participant);
         await _dbcontext.SaveChangesAsync(cancellationToken);

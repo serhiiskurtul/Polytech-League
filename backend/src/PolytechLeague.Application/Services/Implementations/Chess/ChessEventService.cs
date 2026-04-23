@@ -12,15 +12,27 @@ using PolytechLeague.Application.Utilities;
 
 namespace PolytechLeague.Application.Services.Implementations.Chess;
 
-public class ChessEventService(
-    ApplicationDbContext _dbcontext,
-    ILogger<AbstractEntityService<ChessEvent>> _logger,
-    INotificationService _notificationService,
-    IExcelImportService _excelImportService
-) :
-    AbstractEntityService<ChessEvent>(_dbcontext, _logger, _notificationService),
+public class ChessEventService :
+    AbstractEntityService<ChessEvent>,
     IChessEventService
 {
+    private readonly ApplicationDbContext _dbcontext;
+    private readonly ILogger<AbstractEntityService<ChessEvent>> _logger;
+    private readonly INotificationService _notificationService;
+    private readonly IExcelImportService _excelImportService;
+
+    public ChessEventService(
+        ApplicationDbContext dbcontext,
+        ILogger<AbstractEntityService<ChessEvent>> logger,
+        INotificationService notificationService,
+        IExcelImportService excelImportService
+    ) : base(dbcontext, logger, notificationService)
+    {
+        _dbcontext = dbcontext;
+        _logger = logger;
+        _notificationService = notificationService;
+        _excelImportService = excelImportService;
+    }
     protected override void UpdateValues(ChessEvent oldEntity, ChessEvent newEntity)
     {
         oldEntity.Name = newEntity.Name;
@@ -53,17 +65,17 @@ public class ChessEventService(
     {
         return await _dbcontext.Set<ChessEvent>()
             .Include(e => e.Photos)
-            .Include(e => e.Players)
+            .Include(e => e.Players!)
                 .ThenInclude(p => p.Player)
-            .Include(e => e.Teams)
+            .Include(e => e.Teams!)
                 .ThenInclude(t => t.Players)
-            .Include(e => e.Games)
+            .Include(e => e.Games!)
                 .ThenInclude(g => g.WhitePlayer)
-            .Include(e => e.Games)
+            .Include(e => e.Games!)
                 .ThenInclude(g => g.BlackPlayer)
-            .Include(e => e.Games)
+            .Include(e => e.Games!)
                 .ThenInclude(g => g.WhiteTeam)
-            .Include(e => e.Games)
+            .Include(e => e.Games!)
                 .ThenInclude(g => g.BlackTeam)
             .Include(e => e.FirstPlace)
             .Include(e => e.SecondPlace)
@@ -82,6 +94,15 @@ public class ChessEventService(
 
         if (exists) return;
 
+        var player = await _dbcontext.Set<Player>()
+            .Include(p => p.User)
+            .FirstOrDefaultAsync(p => p.Id == dto.PlayerId, cancellationToken);
+            
+        if (player?.User?.Role == UserRole.Admin)
+        {
+            throw new InvalidOperationException("Administrators cannot be participants in tournaments.");
+        }
+
         var participant = new ChessEventParticipant
         {
             TournamentId = eventId,
@@ -94,7 +115,6 @@ public class ChessEventService(
 
         if (string.IsNullOrEmpty(participant.GroupName))
         {
-            var player = await _dbcontext.Set<Player>().FindAsync(dto.PlayerId);
             participant.GroupName = player?.Group;
         }
 
@@ -301,6 +321,16 @@ public class ChessEventService(
             throw new InvalidOperationException("Self-registration is only allowed for college group tournaments.");
         }
 
+        var player = await _dbcontext.Set<Player>()
+            .Include(p => p.User)
+            .FirstOrDefaultAsync(p => p.Id == playerId, cancellationToken)
+            ?? throw new EntityNotFoundException(nameof(Player), playerId);
+
+        if (player.User?.Role == UserRole.Admin)
+        {
+            throw new InvalidOperationException("Administrators cannot register for tournaments.");
+        }
+
         var exists = await _dbcontext.Set<ChessEventParticipant>()
             .AnyAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
 
@@ -312,11 +342,9 @@ public class ChessEventService(
         {
             TournamentId = eventId,
             PlayerId = playerId,
-            Status = status
+            Status = status,
+            GroupName = player.Group
         };
-
-        var player = await _dbcontext.Set<Player>().FindAsync([playerId], cancellationToken);
-        participant.GroupName = player?.Group;
 
         _dbcontext.Set<ChessEventParticipant>().Add(participant);
         await _dbcontext.SaveChangesAsync(cancellationToken);

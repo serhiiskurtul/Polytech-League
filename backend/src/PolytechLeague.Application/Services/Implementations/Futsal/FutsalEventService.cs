@@ -9,14 +9,24 @@ using PolytechLeague.Domain.Exceptions;
 
 namespace PolytechLeague.Application.Services.Implementations.Futsal;
 
-public class FutsalEventService(
-    ApplicationDbContext _dbcontext,
-    ILogger<AbstractEntityService<FutsalEvent>> _logger,
-    INotificationService _notificationService
-) :
-    AbstractEntityService<FutsalEvent>(_dbcontext, _logger, _notificationService),
+public class FutsalEventService :
+    AbstractEntityService<FutsalEvent>,
     IFutsalEventService
 {
+    private readonly ApplicationDbContext _dbcontext;
+    private readonly ILogger<AbstractEntityService<FutsalEvent>> _logger;
+    private readonly INotificationService _notificationService;
+
+    public FutsalEventService(
+        ApplicationDbContext dbcontext,
+        ILogger<AbstractEntityService<FutsalEvent>> logger,
+        INotificationService notificationService
+    ) : base(dbcontext, logger, notificationService)
+    {
+        _dbcontext = dbcontext;
+        _logger = logger;
+        _notificationService = notificationService;
+    }
     protected override void UpdateValues(FutsalEvent oldEntity, FutsalEvent newEntity)
     {
         oldEntity.Name = newEntity.Name;
@@ -103,8 +113,15 @@ public class FutsalEventService(
             throw new InvalidOperationException("Self-registration is only allowed for college group tournaments.");
         }
 
-        var player = await _dbcontext.Players.FindAsync([playerId], cancellationToken);
-        if (player == null) throw new PolytechLeague.Domain.Exceptions.EntityNotFoundException(nameof(Player), playerId);
+        var player = await _dbcontext.Players
+            .Include(p => p.User)
+            .FirstOrDefaultAsync(p => p.Id == playerId, cancellationToken)
+            ?? throw new PolytechLeague.Domain.Exceptions.EntityNotFoundException(nameof(Player), playerId);
+
+        if (player.User?.Role == UserRole.Admin)
+        {
+            throw new InvalidOperationException("Administrators cannot register for tournaments.");
+        }
 
         var groupName = player.Group;
         if (string.IsNullOrWhiteSpace(groupName))

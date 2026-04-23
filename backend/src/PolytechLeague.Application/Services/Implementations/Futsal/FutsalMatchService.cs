@@ -7,13 +7,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace PolytechLeague.Application.Services.Implementations.Futsal;
 
-public class FutsalMatchService(
-    ApplicationDbContext _dbcontext,
-    ILogger<AbstractEntityService<FutsalMatch>> _logger
-) :
-    AbstractEntityService<FutsalMatch>(_dbcontext, _logger),
+public class FutsalMatchService :
+    AbstractEntityService<FutsalMatch>,
     IFutsalMatchService
 {
+    private readonly ApplicationDbContext _dbcontext;
+    private readonly ILogger<AbstractEntityService<FutsalMatch>> _logger;
+
+    public FutsalMatchService(
+        ApplicationDbContext dbcontext,
+        ILogger<AbstractEntityService<FutsalMatch>> logger
+    ) : base(dbcontext, logger)
+    {
+        _dbcontext = dbcontext;
+        _logger = logger;
+    }
     public override async Task<FutsalMatch> CreateAsync(FutsalMatch entity, CancellationToken cancellationToken = default)
     {
         _logger.LogDebug("Creating futsal match with rosters.");

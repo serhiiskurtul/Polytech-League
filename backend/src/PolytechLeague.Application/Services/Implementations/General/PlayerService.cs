@@ -33,6 +33,8 @@ public class PlayerService : IPlayerService
     public async Task<IEnumerable<PlayerDto>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var players = await _dbContext.Players
+            .Include(p => p.User)
+            .Where(p => p.User == null || p.User.Role != UserRole.Admin)
             .ToListAsync(cancellationToken);
         return players.Select(p => p.ToDto());
     }
@@ -168,6 +170,8 @@ public class PlayerService : IPlayerService
     {
         var lowerQuery = query.ToLower();
         var players = await _dbContext.Players
+            .Include(p => p.User)
+            .Where(p => p.User == null || p.User.Role != UserRole.Admin)
             .Where(p => p.FirstName.ToLower().Contains(lowerQuery) || 
                         (p.Patronymic != null && p.Patronymic.ToLower().Contains(lowerQuery)) ||
                         p.LastName.ToLower().Contains(lowerQuery) ||
@@ -176,7 +180,10 @@ public class PlayerService : IPlayerService
             .ToListAsync(cancellationToken);
         
         // Also check if the query matches their calculated group name for other years
-        var allPlayers = await _dbContext.Players.ToListAsync(cancellationToken);
+        var allPlayers = await _dbContext.Players
+            .Include(p => p.User)
+            .Where(p => p.User == null || p.User.Role != UserRole.Admin)
+            .ToListAsync(cancellationToken);
         var filtered = allPlayers.Where(p => 
             p.FirstName.ToLower().Contains(lowerQuery) || 
             (p.Patronymic != null && p.Patronymic.ToLower().Contains(lowerQuery)) ||
@@ -193,7 +200,11 @@ public class PlayerService : IPlayerService
     {
         try 
         {
-            var players = await _dbContext.Players.Include(p => p.User).ToListAsync(cancellationToken);
+            var players = await _dbContext.Players
+                .Include(p => p.User)
+                .Where(p => p.User == null || p.User.Role != UserRole.Admin)
+                .ToListAsync(cancellationToken);
+            
             if (!players.Any()) return Enumerable.Empty<PlayerDto>();
 
             var playerIds = players.Select(p => p.Id).ToList();
