@@ -1,4 +1,5 @@
 import { PlayerDto } from './player.types';
+import { RegistrationStatus } from './tournament.types';
 
 export interface ChessTeamResponse {
   id: number;
@@ -30,6 +31,7 @@ export interface ChessEventParticipantResponse {
   fideId?: string | null;
   title?: string | null;
   groupName?: string | null;
+  status: RegistrationStatus;
 }
 
 export interface ChessGameResponse {
@@ -63,6 +65,7 @@ export interface ChessEventResponse {
   level: CompetitionLevel;
   description: string;
   timeControl: string;
+  isModerated: boolean;
   participantsCount: number;
   system: ChessSystem;
   games: ChessGameResponse[];
@@ -90,6 +93,7 @@ export interface ChessEventRequest {
   level: CompetitionLevel;
   description: string;
   timeControl: string;
+  isModerated: boolean;
   participantsCount: number;
   system: ChessSystem;
   rules?: string;
@@ -113,6 +117,7 @@ export interface ChessEventParticipantDto {
     points: number;
     rank: number;
     groupName?: string;
+    status: RegistrationStatus;
 }
 
 export interface ChessGameDto {

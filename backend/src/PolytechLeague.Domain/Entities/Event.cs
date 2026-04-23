@@ -19,6 +19,7 @@ public abstract class Event
     public string? Referees { get; set; }
     public string? Schedule { get; set; }
     public bool IsTeam { get; set; }
+    public bool IsModerated { get; set; } = false;
 
     public long? FirstPlaceId { get; set; }
     public Player? FirstPlace { get; set; }

@@ -1,4 +1,6 @@
 using PolytechLeague.Domain.Entities.TableTennis;
+using PolytechLeague.Domain.Entities.Shared;
+using System.Text.Json.Serialization;
 
 namespace PolytechLeague.Application.Dto.TableTennisDto;
 
@@ -12,6 +14,9 @@ public class TableTennisEventParticipantDto
     public double Points { get; set; }
     public int Rank { get; set; }
     public string? GroupName { get; set; }
+    
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public RegistrationStatus Status { get; set; }
 }
 
 public static class TableTennisEventParticipantDtoExtensions
@@ -27,7 +32,8 @@ public static class TableTennisEventParticipantDtoExtensions
             PlayerName = participant.Player != null ? $"{participant.Player.FirstName} {participant.Player.Patronymic ?? ""} {participant.Player.LastName}".Replace("  ", " ").Trim() : null,
             Points = participant.Points,
             Rank = participant.Rank,
-            GroupName = participant.GroupName ?? participant.Player?.Group
+            GroupName = participant.GroupName ?? participant.Player?.Group,
+            Status = participant.Status
         };
     }
 
@@ -39,7 +45,8 @@ public static class TableTennisEventParticipantDtoExtensions
             PlayerId = dto.PlayerId,
             Points = dto.Points,
             Rank = dto.Rank,
-            GroupName = dto.GroupName
+            GroupName = dto.GroupName,
+            Status = dto.Status
         };
     }
 }

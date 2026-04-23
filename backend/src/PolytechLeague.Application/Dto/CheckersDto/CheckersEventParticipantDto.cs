@@ -1,4 +1,6 @@
 using PolytechLeague.Domain.Entities.Checkers;
+using PolytechLeague.Domain.Entities.Shared;
+using System.Text.Json.Serialization;
 
 namespace PolytechLeague.Application.Dto.CheckersDto;
 
@@ -13,6 +15,9 @@ public class CheckersEventParticipantDto
     public int Rating { get; set; }
     public int Rank { get; set; }
     public string? GroupName { get; set; }
+    
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public RegistrationStatus Status { get; set; }
 }
 
 public static class CheckersEventParticipantDtoExtensions
@@ -29,7 +34,8 @@ public static class CheckersEventParticipantDtoExtensions
             Points = participant.Points,
             Rating = participant.StartingRating,
             Rank = participant.Rank,
-            GroupName = participant.GroupName ?? participant.Player?.Group
+            GroupName = participant.GroupName ?? participant.Player?.Group,
+            Status = participant.Status
         };
     }
 
@@ -42,7 +48,8 @@ public static class CheckersEventParticipantDtoExtensions
             StartingRating = dto.Rating,
             Points = dto.Points,
             Rank = dto.Rank,
-            GroupName = dto.GroupName
+            GroupName = dto.GroupName,
+            Status = dto.Status
         };
     }
 }

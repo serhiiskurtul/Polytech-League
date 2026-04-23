@@ -39,3 +39,9 @@ export interface PagedResponse<T> {
   pageSize: number;
   totalPages: number;
 }
+
+export enum RegistrationStatus {
+  Pending = 'Pending',
+  Approved = 'Approved',
+  Rejected = 'Rejected'
+}

@@ -46,4 +46,16 @@ export const removeParticipantFromBadmintonEvent = async (eventId: string | numb
 export const updateBadmintonParticipant = async (eventId: string | number, playerId: number, data: any): Promise<void> => {
   await api.put(`/badminton-events/${eventId}/participants/${playerId}`, data);
 };
+
+export const registerForBadmintonEvent = async (eventId: string | number, playerId: number): Promise<void> => {
+  await api.post(`/badminton-events/${eventId}/register?playerId=${playerId}`);
+};
+
+export const approveBadmintonParticipant = async (eventId: string | number, playerId: number): Promise<void> => {
+  await api.post(`/badminton-events/${eventId}/participants/${playerId}/approve`);
+};
+
+export const rejectBadmintonParticipant = async (eventId: string | number, playerId: number): Promise<void> => {
+  await api.post(`/badminton-events/${eventId}/participants/${playerId}/reject`);
+};
   

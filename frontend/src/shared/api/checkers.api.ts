@@ -71,3 +71,15 @@ export const importCheckersDataFromFile = async (eventId: number | string, file:
   });
 };
 
+export const registerForCheckersEvent = async (eventId: number | string, playerId: number): Promise<void> => {
+    await api.post(`/checkers-events/${eventId}/register?playerId=${playerId}`);
+};
+
+export const approveCheckersParticipant = async (eventId: number | string, playerId: number): Promise<void> => {
+    await api.post(`/checkers-events/${eventId}/participants/${playerId}/approve`);
+};
+
+export const rejectCheckersParticipant = async (eventId: number | string, playerId: number): Promise<void> => {
+    await api.post(`/checkers-events/${eventId}/participants/${playerId}/reject`);
+};
+

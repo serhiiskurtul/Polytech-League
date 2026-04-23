@@ -136,7 +136,7 @@ public class ExcelImportService : IExcelImportService
         for (int i = headerRowIdx + 1; i < table.Rows.Count; i++)
         {
             var row = table.Rows[i];
-            string name = row.ItemArray[nameIdx]?.ToString()?.Trim().TrimEnd(',') ?? "";
+            string name = row.ItemArray[nameIdx]?.ToString()?.Replace(",", " ").Trim() ?? "";
             if (string.IsNullOrEmpty(name)) continue;
 
             var player = new ExcelPlayer

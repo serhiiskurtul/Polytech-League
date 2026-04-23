@@ -75,3 +75,15 @@ export const importDataFromFile = async (eventId: number | string, file: File): 
         headers: { 'Content-Type': 'multipart/form-data' }
     });
 };
+
+export const registerForChessEvent = async (eventId: number | string, playerId: number): Promise<void> => {
+    await api.post(`/chess-events/${eventId}/register?playerId=${playerId}`);
+};
+
+export const approveChessParticipant = async (eventId: number | string, playerId: number): Promise<void> => {
+    await api.post(`/chess-events/${eventId}/participants/${playerId}/approve`);
+};
+
+export const rejectChessParticipant = async (eventId: number | string, playerId: number): Promise<void> => {
+    await api.post(`/chess-events/${eventId}/participants/${playerId}/reject`);
+};

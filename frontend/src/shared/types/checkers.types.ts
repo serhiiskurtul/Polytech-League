@@ -1,3 +1,4 @@
+import { RegistrationStatus } from './tournament.types';
 import { PlayerDto } from './player.types';
 
 export interface CheckersTeamResponse {
@@ -20,6 +21,7 @@ export interface CheckersEventParticipantResponse {
   rating: number;
   rank: number;
   groupName?: string | null;
+  status: RegistrationStatus;
 }
 
 export interface CheckersGameResponse {
@@ -97,6 +99,7 @@ export interface CheckersEventParticipantDto {
     points: number;
     rank: number;
     groupName?: string;
+    status: RegistrationStatus;
 }
 
 export interface CheckersGameDto {

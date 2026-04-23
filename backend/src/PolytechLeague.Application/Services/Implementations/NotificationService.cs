@@ -33,6 +33,27 @@ public class NotificationService(ApplicationDbContext _context) : INotificationS
         await _context.SaveChangesAsync();
     }
 
+    public async Task SendNotificationToAdminsAsync(string title, string message, NotificationType type, string? link = null)
+    {
+        var admins = await _context.Users
+            .Where(u => !u.IsDeleted && u.Role == UserRole.Admin)
+            .Select(u => u.Id)
+            .ToListAsync();
+
+        var notifications = admins.Select(adminId => new Notification
+        {
+            UserId = adminId,
+            Title = title,
+            Message = message,
+            Type = type,
+            Link = link,
+            CreatedAt = DateTime.UtcNow
+        });
+
+        _context.Notifications.AddRange(notifications);
+        await _context.SaveChangesAsync();
+    }
+
     public async Task SendNotificationToUserAsync(long userId, string title, string message, NotificationType type, string? link = null)
     {
         var userRole = await _context.Users

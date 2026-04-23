@@ -1,4 +1,5 @@
 using PolytechLeague.Persistence.Database;
+using PolytechLeague.Domain.Entities.Shared;
 using PolytechLeague.Domain.Entities.Chess;
 using Microsoft.Extensions.Logging;
 using PolytechLeague.Application.Services.Interfaces.Chess;
@@ -45,6 +46,7 @@ public class ChessEventService(
         oldEntity.SecondPlaceTeamId = newEntity.SecondPlaceTeamId;
         oldEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
         oldEntity.IsTeam = newEntity.IsTeam;
+        oldEntity.IsModerated = newEntity.IsModerated;
     }
 
     public override async Task<ChessEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)
@@ -86,7 +88,8 @@ public class ChessEventService(
             PlayerId = dto.PlayerId,
             Points = dto.Points,
             Rank = dto.Rank,
-            GroupName = dto.GroupName
+            GroupName = dto.GroupName,
+            Status = dto.Status
         };
 
         if (string.IsNullOrEmpty(participant.GroupName))
@@ -107,6 +110,7 @@ public class ChessEventService(
         {
             participant.Points = dto.Points;
             participant.Rank = dto.Rank;
+            participant.Status = dto.Status;
             // Removed Buchholz and SonnebornBerger from Entity since they are not mapped
             _dbcontext.Set<ChessEventParticipant>().Update(participant);
             await _dbcontext.SaveChangesAsync(cancellationToken);
@@ -239,7 +243,7 @@ public class ChessEventService(
             // 3. Create if not found
             if (player == null)
             {
-                names = sp.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                names = sp.FullName.Replace(",", " ").Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 var lastName = names.Length > 0 ? names[0] : "Невідомий";
                 var firstName = names.Length > 1 ? names[1] : "Гравець";
 
@@ -274,5 +278,89 @@ public class ChessEventService(
         }
 
         await _dbcontext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task RegisterPlayerAsync(long eventId, long playerId, CancellationToken cancellationToken = default)
+    {
+        var tournament = await _dbcontext.Set<ChessEvent>().FindAsync([eventId], cancellationToken)
+            ?? throw new EntityNotFoundException(nameof(ChessEvent), eventId);
+
+        var exists = await _dbcontext.Set<ChessEventParticipant>()
+            .AnyAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
+
+        if (exists) return;
+
+        var status = tournament.IsModerated ? RegistrationStatus.Pending : RegistrationStatus.Approved;
+
+        var participant = new ChessEventParticipant
+        {
+            TournamentId = eventId,
+            PlayerId = playerId,
+            Status = status
+        };
+
+        var player = await _dbcontext.Set<Player>().FindAsync([playerId], cancellationToken);
+        participant.GroupName = player?.Group;
+
+        _dbcontext.Set<ChessEventParticipant>().Add(participant);
+        await _dbcontext.SaveChangesAsync(cancellationToken);
+
+        if (tournament.IsModerated)
+        {
+            await _notificationService.SendNotificationToAdminsAsync(
+                "Новий запит на реєстрацію",
+                $"Гравець {player?.FirstName} {player?.LastName} хоче зареєструватися на {tournament.Name}",
+                NotificationType.Tournament,
+                $"/tournaments/{eventId}"
+            );
+        }
+    }
+
+    public async Task ApproveParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken = default)
+    {
+        var participant = await _dbcontext.Set<ChessEventParticipant>()
+            .FirstOrDefaultAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
+
+        if (participant != null)
+        {
+            participant.Status = RegistrationStatus.Approved;
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+
+            var player = await _dbcontext.Set<Player>().FindAsync([playerId], cancellationToken);
+            if (player?.UserId != null)
+            {
+                await _notificationService.SendNotificationToUserAsync(
+                    player.UserId.Value,
+                    "Реєстрація схвалена",
+                    $"Вашу заявку на участь у змаганні з шахів схвалено!",
+                    NotificationType.Tournament,
+                    $"/tournaments/{eventId}"
+                );
+            }
+        }
+    }
+
+    public async Task RejectParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken = default)
+    {
+        var participant = await _dbcontext.Set<ChessEventParticipant>()
+            .FirstOrDefaultAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
+
+        if (participant != null)
+        {
+            participant.Status = RegistrationStatus.Rejected;
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+
+            var player = await _dbcontext.Set<Player>().FindAsync([playerId], cancellationToken);
+            if (player?.UserId != null)
+            {
+                await _notificationService.SendNotificationToUserAsync(
+                    player.UserId.Value,
+                    "Реєстрація відхилена",
+                    $"Вашу заявку на участь у змаганні з шахів було відхилено.",
+                    NotificationType.Tournament,
+                    $"/tournaments/{eventId}"
+                );
+            }
+        }
     }
 }

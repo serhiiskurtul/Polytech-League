@@ -45,6 +45,7 @@ public class ArmwrestlingEventRequest
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public ArmwrestlingTournamentType TournamentType { get; set; } = ArmwrestlingTournamentType.SingleElimination;
+    public bool IsModerated { get; set; }
 }
 
 public class ArmwrestlingEventResponse
@@ -88,6 +89,7 @@ public class ArmwrestlingEventResponse
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public ArmwrestlingTournamentType TournamentType { get; set; }
+    public bool IsModerated { get; set; }
 
     public ICollection<ArmwrestlingEventParticipantDto> Participants { get; set; } = new List<ArmwrestlingEventParticipantDto>();
 }
@@ -120,7 +122,8 @@ public static class ArmwrestlingEventDtoExtensions
             FirstPlaceId = request.FirstPlaceId,
             SecondPlaceId = request.SecondPlaceId,
             ThirdPlaceId = request.ThirdPlaceId,
-            TournamentType = request.TournamentType
+            TournamentType = request.TournamentType,
+            IsModerated = request.IsModerated
         };
     }
 
@@ -153,7 +156,8 @@ public static class ArmwrestlingEventDtoExtensions
             FirstPlace = entity.FirstPlace?.ToDto(),
             SecondPlace = entity.SecondPlace?.ToDto(),
             ThirdPlace = entity.ThirdPlace?.ToDto(),
-            TournamentType = entity.TournamentType
+            TournamentType = entity.TournamentType,
+            IsModerated = entity.IsModerated
         };
 
         // Populate Participants from the actual participants collection

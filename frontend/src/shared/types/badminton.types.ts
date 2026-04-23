@@ -1,3 +1,4 @@
+import { RegistrationStatus } from './tournament.types';
 import { EventPhoto, CompetitionLevel } from './chess.types';
 import { PlayerDto } from './player.types';
 
@@ -93,6 +94,7 @@ export interface BadmintonEventParticipantDto {
   rank: number;
   userId?: number;
   groupName?: string;
+  status: RegistrationStatus;
 }
 
 export interface BadmintonEventRequest {

@@ -1,3 +1,4 @@
+import { RegistrationStatus } from './tournament.types';
 import { PlayerDto } from './player.types';
 import { EventPhoto } from './chess.types';
 import { CompetitionLevel } from './chess.types';
@@ -28,6 +29,7 @@ export interface ArmwrestlingEventParticipantResponse {
   weight: number;
   rank: number;
   groupName?: string | null;
+  status: RegistrationStatus;
 }
 
 export interface ArmwrestlingEventResponse {
@@ -91,4 +93,5 @@ export interface ArmwrestlingEventParticipantDto {
   weight: number;
   rank: number;
   groupName?: string;
+  status: RegistrationStatus;
 }

@@ -1,4 +1,6 @@
 using PolytechLeague.Domain.Entities.Chess;
+using PolytechLeague.Domain.Entities.Shared;
+using System.Text.Json.Serialization;
 
 namespace PolytechLeague.Application.Dto.ChessDto;
 
@@ -17,6 +19,9 @@ public class ChessEventParticipantDto
     public string? FideId { get; set; }
     public string? Title { get; set; }
     public string? GroupName { get; set; }
+    
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public RegistrationStatus Status { get; set; }
 }
 
 public static class ChessEventParticipantDtoExtensions
@@ -37,7 +42,8 @@ public static class ChessEventParticipantDtoExtensions
             SonnebornBerger = 0,
             FideId = participant.Player?.ChessFideId,
             Title = participant.Player?.ChessTitle,
-            GroupName = participant.GroupName ?? participant.Player?.Group
+            GroupName = participant.GroupName ?? participant.Player?.Group,
+            Status = participant.Status
         };
     }
 
@@ -49,7 +55,8 @@ public static class ChessEventParticipantDtoExtensions
             PlayerId = dto.PlayerId,
             Points = dto.Points,
             Rank = dto.Rank,
-            GroupName = dto.GroupName
+            GroupName = dto.GroupName,
+            Status = dto.Status
         };
     }
 }

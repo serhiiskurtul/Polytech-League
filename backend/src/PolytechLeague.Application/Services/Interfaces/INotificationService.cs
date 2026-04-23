@@ -9,6 +9,7 @@ public interface INotificationService
 {
     Task SendNotificationToAllAsync(string title, string message, NotificationType type, string? link = null);
     Task SendNotificationToUserAsync(long userId, string title, string message, NotificationType type, string? link = null);
+    Task SendNotificationToAdminsAsync(string title, string message, NotificationType type, string? link = null);
     Task<IEnumerable<NotificationDto>> GetUserNotificationsAsync(long userId);
     Task MarkAsReadAsync(long notificationId);
     Task MarkAllAsReadAsync(long userId);

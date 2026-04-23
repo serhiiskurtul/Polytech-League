@@ -25,3 +25,18 @@ export const updateTableTennisParticipant = async (eventId: string | number, pla
   const response = await api.put(`/table-tennis-events/${eventId}/participants/${playerId}`, dto);
   return response.data;
 };
+
+export const registerForTableTennisEvent = async (eventId: string | number, playerId: number) => {
+  const response = await api.post(`/table-tennis-events/${eventId}/register?playerId=${playerId}`);
+  return response.data;
+};
+
+export const approveTableTennisParticipant = async (eventId: string | number, playerId: number) => {
+  const response = await api.post(`/table-tennis-events/${eventId}/participants/${playerId}/approve`);
+  return response.data;
+};
+
+export const rejectTableTennisParticipant = async (eventId: string | number, playerId: number) => {
+  const response = await api.post(`/table-tennis-events/${eventId}/participants/${playerId}/reject`);
+  return response.data;
+};

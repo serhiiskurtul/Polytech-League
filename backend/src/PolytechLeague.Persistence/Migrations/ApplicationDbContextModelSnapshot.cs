@@ -33,6 +33,7 @@ namespace PolytechLeague.Persistence.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "futsal_position", new[] { "goalkeeper", "defender", "winger", "forward" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "game_result", new[] { "white_win", "black_win", "draw", "not_played" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "notification_type", new[] { "system", "tournament", "achievement", "match", "team" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "registration_status", new[] { "pending", "approved", "rejected" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "table_tennis_category", new[] { "men", "women", "mixed" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "table_tennis_hand", new[] { "left", "right", "both" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "table_tennis_tournament_type", new[] { "single_elimination", "double_elimination", "round_robin" });
@@ -53,6 +54,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.Property<int>("Rank")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
                         .HasColumnType("integer");
 
                     b.Property<double>("Weight")
@@ -129,6 +133,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("double precision");
 
                     b.Property<int>("Rank")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
                         .HasColumnType("integer");
 
                     b.HasKey("EventId", "PlayerId");
@@ -453,6 +460,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("starting_rating");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
                     b.Property<long>("TournamentId")
                         .HasColumnType("bigint");
 
@@ -596,6 +606,9 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<int>("Rank")
                         .HasColumnType("integer")
                         .HasColumnName("rank");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.HasKey("TournamentId", "PlayerId");
 
@@ -777,6 +790,9 @@ namespace PolytechLeague.Persistence.Migrations
 
                     b.Property<string>("HeadRefereeName")
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsModerated")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsTeam")
                         .HasColumnType("boolean");
@@ -1159,6 +1175,9 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<int>("Rank")
                         .HasColumnType("integer")
                         .HasColumnName("rank");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.HasKey("TournamentId", "PlayerId");
 

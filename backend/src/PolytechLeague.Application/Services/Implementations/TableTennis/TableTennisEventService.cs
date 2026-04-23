@@ -1,4 +1,5 @@
 using PolytechLeague.Domain.Entities.TableTennis;
+using PolytechLeague.Domain.Entities.Shared;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using PolytechLeague.Application.Services.Interfaces.TableTennis;
@@ -29,6 +30,7 @@ public class TableTennisEventService(
         oldEntity.Level = newEntity.Level;
         oldEntity.TournamentType = newEntity.TournamentType;
         oldEntity.Category = newEntity.Category;
+        oldEntity.IsModerated = newEntity.IsModerated;
         oldEntity.FirstPlaceId = newEntity.FirstPlaceId;
         oldEntity.SecondPlaceId = newEntity.SecondPlaceId;
         oldEntity.ThirdPlaceId = newEntity.ThirdPlaceId;
@@ -90,7 +92,8 @@ public class TableTennisEventService(
             PlayerId = dto.PlayerId,
             Points = dto.Points,
             Rank = dto.Rank,
-            GroupName = dto.GroupName
+            GroupName = dto.GroupName,
+            Status = dto.Status
         };
 
         if (string.IsNullOrEmpty(participant.GroupName))
@@ -110,6 +113,7 @@ public class TableTennisEventService(
         {
             participant.Points = dto.Points;
             participant.Rank = dto.Rank;
+            participant.Status = dto.Status;
             _dbcontext.Set<TableTennisEventParticipant>().Update(participant);
             await _dbcontext.SaveChangesAsync(cancellationToken);
         }
@@ -123,6 +127,90 @@ public class TableTennisEventService(
         {
             _dbcontext.Set<TableTennisEventParticipant>().Remove(participant);
             await _dbcontext.SaveChangesAsync(cancellationToken);
+        }
+    }
+
+    public async Task RegisterPlayerAsync(long eventId, long playerId, CancellationToken cancellationToken = default)
+    {
+        var tournament = await _dbcontext.TableTennisEvents.FindAsync([eventId], cancellationToken)
+            ?? throw new PolytechLeague.Domain.Exceptions.EntityNotFoundException(nameof(TableTennisEvent), eventId);
+
+        var exists = await _dbcontext.Set<TableTennisEventParticipant>()
+            .AnyAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
+
+        if (exists) return;
+
+        var status = tournament.IsModerated ? RegistrationStatus.Pending : RegistrationStatus.Approved;
+
+        var participant = new TableTennisEventParticipant
+        {
+            TournamentId = eventId,
+            PlayerId = playerId,
+            Status = status
+        };
+
+        var player = await _dbcontext.Set<Player>().FindAsync([playerId], cancellationToken);
+        participant.GroupName = player?.Group;
+
+        _dbcontext.Set<TableTennisEventParticipant>().Add(participant);
+        await _dbcontext.SaveChangesAsync(cancellationToken);
+
+        if (tournament.IsModerated)
+        {
+            await _notificationService.SendNotificationToAdminsAsync(
+                "Новий запит на реєстрацію",
+                $"Гравець {player?.FirstName} {player?.LastName} хоче зареєструватися на {tournament.Name}",
+                NotificationType.Tournament,
+                $"/tournaments/{eventId}"
+            );
+        }
+    }
+
+    public async Task ApproveParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken = default)
+    {
+        var participant = await _dbcontext.Set<TableTennisEventParticipant>()
+            .FirstOrDefaultAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
+
+        if (participant != null)
+        {
+            participant.Status = RegistrationStatus.Approved;
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+
+            var player = await _dbcontext.Set<Player>().FindAsync([playerId], cancellationToken);
+            if (player?.UserId != null)
+            {
+                await _notificationService.SendNotificationToUserAsync(
+                    player.UserId.Value,
+                    "Реєстрація схвалена",
+                    $"Вашу заявку на участь у змаганні з настільного тенісу схвалено!",
+                    NotificationType.Tournament,
+                    $"/tournaments/{eventId}"
+                );
+            }
+        }
+    }
+
+    public async Task RejectParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken = default)
+    {
+        var participant = await _dbcontext.Set<TableTennisEventParticipant>()
+            .FirstOrDefaultAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
+
+        if (participant != null)
+        {
+            participant.Status = RegistrationStatus.Rejected;
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+
+            var player = await _dbcontext.Set<Player>().FindAsync([playerId], cancellationToken);
+            if (player?.UserId != null)
+            {
+                await _notificationService.SendNotificationToUserAsync(
+                    player.UserId.Value,
+                    "Реєстрація відхилена",
+                    $"Вашу заявку на участь у змаганні з настільного тенісу було відхилено.",
+                    NotificationType.Tournament,
+                    $"/tournaments/{eventId}"
+                );
+            }
         }
     }
 }

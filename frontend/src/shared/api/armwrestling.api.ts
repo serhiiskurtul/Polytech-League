@@ -65,3 +65,15 @@ export const deleteArmwrestlingMatch = async (matchId: number): Promise<void> =>
     await api.delete(`/armwrestling-matches/${matchId}`);
 };
 
+export const registerForArmwrestlingEvent = async (eventId: string | number, playerId: number): Promise<void> => {
+    await api.post(`/armwrestling-events/${eventId}/register?playerId=${playerId}`);
+};
+
+export const approveArmwrestlingParticipant = async (eventId: string | number, playerId: number): Promise<void> => {
+    await api.post(`/armwrestling-events/${eventId}/participants/${playerId}/approve`);
+};
+
+export const rejectArmwrestlingParticipant = async (eventId: string | number, playerId: number): Promise<void> => {
+    await api.post(`/armwrestling-events/${eventId}/participants/${playerId}/reject`);
+};
+

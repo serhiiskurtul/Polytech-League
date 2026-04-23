@@ -117,7 +117,8 @@ public class ApplicationDbContext : DbContext
             .HasPostgresEnum<VolleyballPosition>()
             .HasPostgresEnum<BeachVolleyballTournamentType>()
             .HasPostgresEnum<BadmintonTournamentType>()
-            .HasPostgresEnum<NotificationType>();
+            .HasPostgresEnum<NotificationType>()
+            .HasPostgresEnum<RegistrationStatus>();
 
         modelBuilder.Entity<Person>().UseTptMappingStrategy();
         modelBuilder.Entity<Event>().UseTptMappingStrategy();

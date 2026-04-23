@@ -31,6 +31,7 @@ public class ChessEventRequest
     public string? Referees { get; set; }
     public string? Schedule { get; set; }
     public bool IsTeam { get; set; }
+    public bool IsModerated { get; set; }
 
     public long? FirstPlaceId { get; set; }
     public long? SecondPlaceId { get; set; }
@@ -71,6 +72,7 @@ public class ChessEventResponse
     public string? Referees { get; set; }
     public string? Schedule { get; set; }
     public bool IsTeam { get; set; }
+    public bool IsModerated { get; set; }
 
     public PlayerDto? FirstPlace { get; set; }
     public PlayerDto? SecondPlace { get; set; }
@@ -105,6 +107,7 @@ public static class ChessEventDtoExtension
             Referees = chessEventRequest.Referees,
             Schedule = chessEventRequest.Schedule,
             IsTeam = chessEventRequest.IsTeam,
+            IsModerated = chessEventRequest.IsModerated,
             FirstPlaceId = chessEventRequest.FirstPlaceId,
             SecondPlaceId = chessEventRequest.SecondPlaceId,
             ThirdPlaceId = chessEventRequest.ThirdPlaceId,
@@ -141,6 +144,7 @@ public static class ChessEventDtoExtension
             Referees = chessEvent.Referees,
             Schedule = chessEvent.Schedule,
             IsTeam = chessEvent.IsTeam,
+            IsModerated = chessEvent.IsModerated,
             FirstPlace = chessEvent.FirstPlace?.ToDto(),
             SecondPlace = chessEvent.SecondPlace?.ToDto(),
             ThirdPlace = chessEvent.ThirdPlace?.ToDto(),

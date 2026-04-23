@@ -82,6 +82,10 @@ public class PlayerService : IPlayerService
 
     public async Task<PlayerDto> CreateAsync(PlayerDto dto, CancellationToken cancellationToken = default)
     {
+        // Cleanup names
+        dto.FirstName = dto.FirstName?.Replace(",", "").Trim();
+        dto.LastName = dto.LastName?.Replace(",", "").Trim();
+
         // Try to prevent duplicates if specialty and enrollment year are provided or can be parsed
         if (dto.EnrollmentYear == 0 && !string.IsNullOrEmpty(dto.Group))
         {
@@ -126,6 +130,10 @@ public class PlayerService : IPlayerService
     {
         var player = await _dbContext.Players.FindAsync(new object[] { id }, cancellationToken);
         if (player == null) return;
+
+        // Cleanup names
+        dto.FirstName = dto.FirstName?.Replace(",", "").Trim();
+        dto.LastName = dto.LastName?.Replace(",", "").Trim();
 
         // Update basic info
         player.FirstName = dto.FirstName ?? player.FirstName;

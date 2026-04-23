@@ -31,6 +31,7 @@ public class TableTennisEventRequest
     public string? Referees { get; set; }
     public string? Schedule { get; set; }
     public bool IsTeam { get; set; }
+    public bool IsModerated { get; set; }
 }
 
 public class TableTennisEventResponse
@@ -66,6 +67,7 @@ public class TableTennisEventResponse
     public string? Referees { get; set; }
     public string? Schedule { get; set; }
     public bool IsTeam { get; set; }
+    public bool IsModerated { get; set; }
 }
 
 public static class TableTennisEventDtoExtensions
@@ -87,7 +89,8 @@ public static class TableTennisEventDtoExtensions
             HeadRefereeName = request.HeadRefereeName,
             Referees = request.Referees,
             Schedule = request.Schedule,
-            IsTeam = request.IsTeam
+            IsTeam = request.IsTeam,
+            IsModerated = request.IsModerated
         };
     }
 
@@ -116,7 +119,8 @@ public static class TableTennisEventDtoExtensions
             HeadRefereeName = entity.HeadRefereeName,
             Referees = entity.Referees,
             Schedule = entity.Schedule,
-            IsTeam = entity.IsTeam
+            IsTeam = entity.IsTeam,
+            IsModerated = entity.IsModerated
         };
     }
 }

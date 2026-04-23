@@ -16,9 +16,14 @@ import {
   searchUsers,
   getAllPlayers,
   createPlayer,
+  registerForChessEvent,
+  approveChessParticipant,
+  rejectChessParticipant,
   importDataFromFile,
+  getProfile
 } from '@/shared/api';
 import { PlayerDto } from '@/shared/types/player.types';
+import { RegistrationStatus } from '@/shared/types/tournament.types';
 import {
   getCheckersEventById,
   updateCheckersEvent,
@@ -28,7 +33,10 @@ import {
   createCheckersGame,
   uploadCheckersPhoto,
   deleteCheckersPhoto,
-  importCheckersDataFromFile
+  importCheckersDataFromFile,
+  registerForCheckersEvent,
+  approveCheckersParticipant,
+  rejectCheckersParticipant
 } from '@/shared/api/checkers.api';
 import {
   getArmwrestlingEventById,
@@ -36,6 +44,9 @@ import {
   addParticipantToArmwrestlingEvent,
   removeParticipantFromArmwrestlingEvent,
   updateArmwrestlingParticipant,
+  registerForArmwrestlingEvent,
+  approveArmwrestlingParticipant,
+  rejectArmwrestlingParticipant
 } from '@/shared/api/armwrestling.api';
 import { getVolleyballEventById, updateVolleyballEvent } from '@/shared/api/volleyball.api';
 import { getBeachVolleyballEventById, updateBeachVolleyballEvent } from '@/shared/api/beachVolleyball.api';
@@ -47,12 +58,18 @@ import {
   addParticipantToBadmintonEvent,
   removeParticipantFromBadmintonEvent,
   updateBadmintonParticipant,
+  registerForBadmintonEvent,
+  approveBadmintonParticipant,
+  rejectBadmintonParticipant
 } from '@/shared/api/badminton.api';
 import {
   getTableTennisEventById,
   addParticipantToTableTennisEvent,
   removeParticipantFromTableTennisEvent,
   updateTableTennisParticipant,
+  registerForTableTennisEvent,
+  approveTableTennisParticipant,
+  rejectTableTennisParticipant
 } from '@/shared/api/tabletennis.api';
 import ArmwrestlingTournamentView from './components/ArmwrestlingTournamentView';
 import TeamSportsTournamentView from './components/TeamSportsTournamentView';
@@ -92,6 +109,8 @@ const TournamentViewPage = () => {
   const [allPlayers, setAllPlayers] = useState<PlayerDto[]>([]);
   const [activeTab, setActiveTab] = useState<'standings' | 'games' | 'participants' | 'schedule'>('standings');
   const [isLoading, setIsLoading] = useState(true);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [currentUserPlayer, setCurrentUserPlayer] = useState<PlayerDto | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
 
@@ -141,7 +160,7 @@ const TournamentViewPage = () => {
   const [editingGameData, setEditingGameData] = useState<{ round: number; board: number; result: string; whitePlayerId: string; blackPlayerId: string, pgn: string }>({ round: 1, board: 1, result: 'WhiteWin', whitePlayerId: '', blackPlayerId: '', pgn: '' });
 
   const [editingParticipantId, setEditingParticipantId] = useState<number | null>(null);
-  const [editingParticipantData, setEditingParticipantData] = useState<{ points: number; rank: number; weight: number }>({ points: 0, rank: 0, weight: 0 });
+  const [editingParticipantData, setEditingParticipantData] = useState<{ points: number; rank: number; weight: number; status: RegistrationStatus }>({ points: 0, rank: 0, weight: 0, status: RegistrationStatus.Approved });
   const [gameFilters, setGameFilters] = useState({ round: '', board: '', participant: '', result: '' });
   const [isImporting, setIsImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -177,6 +196,7 @@ const TournamentViewPage = () => {
         registrationStart: formatToISO(editTournamentData.registrationStart),
         registrationEnd: formatToISO(editTournamentData.registrationEnd),
         endDate: formatToISO(editTournamentData.endDate),
+        isModerated: editTournamentData.isModerated
       };
 
       if (isTeamSport) {
@@ -250,7 +270,8 @@ const TournamentViewPage = () => {
     isTeam: false,
     registrationStart: '',
     registrationEnd: '',
-    endDate: ''
+    endDate: '',
+    isModerated: false
   });
 
 
@@ -369,7 +390,8 @@ const TournamentViewPage = () => {
         isTeam: !!(details as any).isTeam,
         registrationStart: formatDateForInput(tournament?.registrationStart || details.registrationStart),
         registrationEnd: formatDateForInput(tournament?.registrationEnd || details.registrationEnd),
-        endDate: formatDateForInput(tournament?.endDate || details.endDate)
+        endDate: formatDateForInput(tournament?.endDate || details.endDate),
+        isModerated: !!details.isModerated
       });
       setIsEditingTournament(true);
     }
@@ -449,6 +471,7 @@ const TournamentViewPage = () => {
         registrationStart: formatToISO(editTournamentData.registrationStart),
         registrationEnd: formatToISO(editTournamentData.registrationEnd),
         endDate: formatToISO(editTournamentData.endDate),
+        isModerated: editTournamentData.isModerated
       };
 
       if (sportKey === 'checkers') {
@@ -505,7 +528,8 @@ const TournamentViewPage = () => {
     setEditingParticipantData({
       points: p.points || 0,
       rank: p.rank || 0,
-      weight: p.weight || 0
+      weight: p.weight || 0,
+      status: p.status || RegistrationStatus.Approved
     });
   };
 
@@ -569,6 +593,7 @@ const TournamentViewPage = () => {
           playerId,
           points: editingParticipantData.points,
           rank: editingParticipantData.rank,
+          status: editingParticipantData.status
         };
         await updateParticipantInCheckersEvent(id!, playerId, payload);
       } else if (sportKey === 'armwrestling') {
@@ -576,24 +601,28 @@ const TournamentViewPage = () => {
           playerId,
           weight: (editingParticipantData as any).weight || 0,
           rank: editingParticipantData.rank,
+          status: editingParticipantData.status
         });
       } else if (sportKey === 'badminton') {
         await updateBadmintonParticipant(id!, playerId, {
           playerId,
           points: editingParticipantData.points,
           rank: editingParticipantData.rank,
+          status: editingParticipantData.status
         });
       } else if (sportKey === 'tabletennis' || sportKey === 'table_tennis') {
         await updateTableTennisParticipant(id!, playerId, {
           playerId,
           points: editingParticipantData.points,
           rank: editingParticipantData.rank,
+          status: editingParticipantData.status
         });
       } else {
         const payload: ChessEventParticipantDto = {
           playerId,
           points: editingParticipantData.points,
           rank: editingParticipantData.rank,
+          status: editingParticipantData.status
         };
         await updateParticipantInEvent(id!, playerId, payload);
       }
@@ -639,10 +668,96 @@ const TournamentViewPage = () => {
     }
   };
 
+  const handleRegister = async () => {
+    if (!id || !user) {
+      toast.error("Будь ласка, увійдіть в систему, щоб зареєструватися");
+      return;
+    }
+
+    if (!currentUserPlayer) {
+      try {
+        const profile = await getProfile();
+        setCurrentUserPlayer(profile);
+        if (!profile) throw new Error();
+      } catch (e) {
+        toast.error("Не вдалося отримати ваш спортивний профіль. Спробуйте пізніше або зверніться до адміністратора.");
+        return;
+      }
+    }
+
+    if (!window.confirm("Ви впевнені, що хочете зареєструватися на ці змагання?")) return;
+
+    try {
+      setIsRegistering(true);
+      const sportKey = tournament?.sport?.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') || '';
+      const playerId = currentUserPlayer!.id!;
+
+      switch (sportKey) {
+        case 'checkers': await registerForCheckersEvent(id, playerId); break;
+        case 'armwrestling': await registerForArmwrestlingEvent(id, playerId); break;
+        case 'badminton': await registerForBadmintonEvent(id, playerId); break;
+        case 'tabletennis':
+        case 'table_tennis': await registerForTableTennisEvent(id, playerId); break;
+        default: await registerForChessEvent(id, playerId);
+      }
+
+      toast.success("Ви успішно зареєструвалися!");
+      fetchTournament(true);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.response?.data?.message || "Помилка при реєстрації");
+    } finally {
+      setIsRegistering(false);
+    }
+  };
+
+  const handleApproveParticipant = async (playerId: number, playerName: string) => {
+    if (!window.confirm(`Схвалити участь ${playerName}?`)) return;
+    try {
+      const sportKey = tournament?.sport?.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') || '';
+      switch (sportKey) {
+        case 'checkers': await approveCheckersParticipant(id!, playerId); break;
+        case 'armwrestling': await approveArmwrestlingParticipant(id!, playerId); break;
+        case 'badminton': await approveBadmintonParticipant(id!, playerId); break;
+        case 'tabletennis':
+        case 'table_tennis': await approveTableTennisParticipant(id!, playerId); break;
+        default: await approveChessParticipant(id!, playerId);
+      }
+      toast.success("Учасника схвалено!");
+      fetchTournament(true);
+    } catch (err) {
+      console.error(err);
+      toast.error("Помилка при схваленні");
+    }
+  };
+
+  const handleRejectParticipant = async (playerId: number, playerName: string) => {
+    if (!window.confirm(`Відхилити участь ${playerName}?`)) return;
+    try {
+      const sportKey = tournament?.sport?.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') || '';
+      switch (sportKey) {
+        case 'checkers': await rejectCheckersParticipant(id!, playerId); break;
+        case 'armwrestling': await rejectArmwrestlingParticipant(id!, playerId); break;
+        case 'badminton': await rejectBadmintonParticipant(id!, playerId); break;
+        case 'tabletennis':
+        case 'table_tennis': await rejectTableTennisParticipant(id!, playerId); break;
+        default: await rejectChessParticipant(id!, playerId);
+      }
+      toast.success("Учасника відхилено");
+      fetchTournament(true);
+    } catch (err) {
+      console.error(err);
+      toast.error("Помилка при відхиленні");
+    }
+  };
+
   const fetchTournament = async (quiet = false) => {
     if (!id) return;
     if (!quiet) setIsLoading(true);
     try {
+      if (user && !currentUserPlayer) {
+        getProfile().then(setCurrentUserPlayer).catch(() => {});
+      }
       const data = await getTournamentById(id);
       setTournament(data);
 
@@ -825,20 +940,20 @@ const TournamentViewPage = () => {
 
       switch (sportKey) {
         case 'checkers':
-          await addParticipantToCheckersEvent(id!, { playerId: playerId, points: 0, rank: 0 });
+          await addParticipantToCheckersEvent(id!, { playerId: playerId, points: 0, rank: 0, status: RegistrationStatus.Approved });
           break;
         case 'armwrestling':
-          await addParticipantToArmwrestlingEvent(id!, { playerId: playerId, weight: newPlayer.weight || 0, rank: 0 });
+          await addParticipantToArmwrestlingEvent(id!, { playerId: playerId, weight: newPlayer.weight || 0, rank: 0, status: RegistrationStatus.Approved });
           break;
         case 'badminton':
-          await addParticipantToBadmintonEvent(id!, { playerId: playerId, points: 0, rank: 0 });
+          await addParticipantToBadmintonEvent(id!, { playerId: playerId, points: 0, rank: 0, status: RegistrationStatus.Approved });
           break;
         case 'tabletennis':
         case 'table_tennis':
-          await addParticipantToTableTennisEvent(id!, { playerId: playerId, points: 0, rank: 0 });
+          await addParticipantToTableTennisEvent(id!, { playerId: playerId, points: 0, rank: 0, status: RegistrationStatus.Approved });
           break;
         default:
-          await addParticipantToEvent(id!, { playerId: playerId, points: 0, rank: 0 });
+          await addParticipantToEvent(id!, { playerId: playerId, points: 0, rank: 0, status: RegistrationStatus.Approved });
       }
       toast.success("Учасник успішно доданий до змагань!");
       setNewPlayer({ firstName: '', patronymic: '', lastName: '', group: '', studentId: '', birthDate: '', city: 'Чернівці', ratingELO: 1500, fideId: '', title: '', userId: null, existingPlayerId: null, weight: 0 });
@@ -910,13 +1025,21 @@ const TournamentViewPage = () => {
     );
   }
 
-  const sortedPlayers = (tournament?.sport === 'chess' || tournament?.sport === 'checkers') && details?.players
-    ? [...details.players].sort((a, b) => {
-      if (b.points !== a.points) return b.points - a.points;
-      if (a.rank || b.rank) return (a.rank || 999) - (b.rank || 999);
-      return 0;
-    })
-    : (details as any)?.participants || (details as any)?.players || [];
+  const sortedPlayers = (() => {
+    const rawParticipants = details?.participants || details?.players || [];
+    const filtered = isAdmin 
+      ? rawParticipants 
+      : rawParticipants.filter((p: any) => p.status === RegistrationStatus.Approved || !p.status);
+
+    if (tournament?.sport === 'chess' || tournament?.sport === 'checkers') {
+      return [...filtered].sort((a: any, b: any) => {
+        if ((b.points || 0) !== (a.points || 0)) return (b.points || 0) - (a.points || 0);
+        if (a.rank || b.rank) return (a.rank || 999) - (b.rank || 999);
+        return 0;
+      });
+    }
+    return filtered;
+  })();
 
   const getLevelBadgeParams = (level?: string) => {
     switch (level) {
@@ -983,6 +1106,14 @@ const TournamentViewPage = () => {
       if (aR !== bR) return aR - bR;
       return (a.board || 0) - (b.board || 0);
     }) : [];
+
+  const now = new Date();
+  const regStart = tournament?.registrationStart ? new Date(tournament.registrationStart) : null;
+  const regEnd = tournament?.registrationEnd ? new Date(tournament.registrationEnd) : null;
+  const isRegistrationOpen = (!regStart || now >= regStart) && (!regEnd || now <= regEnd);
+  
+  const userRegistration = details?.participants?.find((p: any) => p.userId === user?.id);
+  const isUserRegistered = !!userRegistration;
 
   return (
     <div className={styles.tournamentViewPage}>
@@ -1104,7 +1235,7 @@ const TournamentViewPage = () => {
           )}
 
           <div className={styles.headerContent}>
-            <div>
+            <div className={styles.headerInfo}>
               <div className={styles.tournamentBadges}>
                 {details?.level && (
                   <span className={`${styles.levelBadge} ${badgeObj.className}`}>
@@ -1141,6 +1272,47 @@ const TournamentViewPage = () => {
                     <i className="fas fa-clock"></i>
                     <span>Контроль часу: {details.timeControl}</span>
                   </div>
+                )}
+              </div>
+              <div className={styles.headerActions}>
+                {user ? (
+                  isUserRegistered ? (
+                    <div className={`${styles.registrationStatus} ${styles[userRegistration.status?.toLowerCase()]}`}>
+                      <i className={
+                        userRegistration.status === RegistrationStatus.Approved ? "fas fa-check-circle" :
+                        userRegistration.status === RegistrationStatus.Pending ? "fas fa-clock" :
+                        "fas fa-times-circle"
+                      }></i>
+                      <span>
+                        {userRegistration.status === RegistrationStatus.Approved ? "Ви зареєстровані" :
+                         userRegistration.status === RegistrationStatus.Pending ? "Очікує підтвердження" :
+                         "Заявку відхилено"}
+                      </span>
+                    </div>
+                  ) : (
+                    isRegistrationOpen ? (
+                      <button 
+                        className={styles.registerButton} 
+                        onClick={handleRegister}
+                        disabled={isRegistering}
+                      >
+                        {isRegistering ? (
+                          <><i className="fas fa-spinner fa-spin"></i> Реєстрація...</>
+                        ) : (
+                          <><i className="fas fa-user-plus"></i> Зареєструватися</>
+                        )}
+                      </button>
+                    ) : (
+                      <div className={styles.registrationClosed}>
+                        <i className="fas fa-lock"></i>
+                        <span>Реєстрація закрита</span>
+                      </div>
+                    )
+                  )
+                ) : (
+                  <Link to="/login" className={styles.registerButton}>
+                    <i className="fas fa-sign-in-alt"></i> Увійдіть, щоб зареєструватися
+                  </Link>
                 )}
               </div>
             </div>
@@ -1460,6 +1632,11 @@ const TournamentViewPage = () => {
                                         ) : (
                                           <strong>{p.playerName}</strong>
                                         )}
+                                        {p.status && p.status !== RegistrationStatus.Approved && (
+                                          <span className={`${styles.statusBadge} ${styles[p.status.toLowerCase()]}`} style={{ marginLeft: '8px', fontSize: '10px', padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase', fontWeight: 'bold' }}>
+                                            {p.status === RegistrationStatus.Pending ? 'Очікує' : 'Відхилено'}
+                                          </span>
+                                        )}
                                       </td>
                                       <td>{p.groupName || '—'}</td>
                                       {tournament?.sport === 'chess' ? (
@@ -1471,6 +1648,12 @@ const TournamentViewPage = () => {
                                         <td><strong>{tournament?.sport === 'armwrestling' ? (p.weight + ' кг') : p.points}</strong></td>
                                       )}
                                       {isAdmin && <td>
+                                        {p.status === RegistrationStatus.Pending && (
+                                          <>
+                                            <button type="button" onClick={() => handleApproveParticipant(p.playerId, p.playerName)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }} title="Схвалити"><i className="fas fa-check"></i></button>
+                                            <button type="button" onClick={() => handleRejectParticipant(p.playerId, p.playerName)} style={{ padding: '4px 8px', background: '#f59e0b', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }} title="Відхилити"><i className="fas fa-user-slash"></i></button>
+                                          </>
+                                        )}
                                         <button type="button" onClick={() => handleEditParticipantClick(p)} style={{ padding: '4px 8px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }} title="Редагувати"><i className="fas fa-edit"></i></button>
                                         <button type="button" onClick={() => handleRemoveParticipant(p.playerId, p.playerName)} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Видалити"><i className="fas fa-trash"></i></button>
                                       </td>}
@@ -2097,8 +2280,8 @@ const TournamentViewPage = () => {
                         </div>
                       </>
                     )}
-                    <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                    <div className={styles.formGroup} style={{ gridColumn: '1 / -1', display: 'flex', gap: '20px' }}>
+                      <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                         <input
                           type="checkbox"
                           checked={editTournamentData.isTeam}
@@ -2107,7 +2290,20 @@ const TournamentViewPage = () => {
                         />
                         <div>
                           <strong style={{ display: 'block' }}>Командні змагання</strong>
-                          <small style={{ color: '#64748b' }}>Активуйте, якщо матчі проводяться між командами (групами)</small>
+                          <small style={{ color: '#64748b' }}>Матчі проводяться між командами (групами)</small>
+                        </div>
+                      </label>
+
+                      <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#fff7ed', padding: '12px', borderRadius: '8px', border: '1px solid #fed7aa' }}>
+                        <input
+                          type="checkbox"
+                          checked={editTournamentData.isModerated}
+                          onChange={(e) => setEditTournamentData({ ...editTournamentData, isModerated: e.target.checked })}
+                          style={{ width: '20px', height: '20px' }}
+                        />
+                        <div>
+                          <strong style={{ display: 'block' }}>Модерація заявок</strong>
+                          <small style={{ color: '#64748b' }}>Адміністратор має вручну підтверджувати кожну заявку</small>
                         </div>
                       </label>
                     </div>

@@ -89,4 +89,31 @@ public class ArmwrestlingEventsController(
         await redisService.RemoveGroupAsync("arm_events_group");
         return NoContent();
     }
+
+    [Authorize]
+    [HttpPost("{id}/register")]
+    public async Task<IActionResult> Register(long id, [FromQuery] long playerId, CancellationToken cancellationToken)
+    {
+        await armEventService.RegisterPlayerAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("arm_events_group");
+        return Ok();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{id}/participants/{playerId}/approve")]
+    public async Task<IActionResult> Approve(long id, long playerId, CancellationToken cancellationToken)
+    {
+        await armEventService.ApproveParticipantAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("arm_events_group");
+        return Ok();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{id}/participants/{playerId}/reject")]
+    public async Task<IActionResult> Reject(long id, long playerId, CancellationToken cancellationToken)
+    {
+        await armEventService.RejectParticipantAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("arm_events_group");
+        return Ok();
+    }
 }

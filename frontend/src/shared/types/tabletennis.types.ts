@@ -1,6 +1,6 @@
 import { PlayerDto } from './player.types';
-import { EventPhoto } from './chess.types';
-import { CompetitionLevel } from './chess.types';
+import { EventPhoto, CompetitionLevel } from './chess.types';
+import { RegistrationStatus } from './tournament.types';
 
 export interface TableTennisSetDto {
   id: number;
@@ -30,6 +30,7 @@ export interface TableTennisEventParticipantResponse {
   points: number;
   rank: number;
   groupName?: string | null;
+  status: RegistrationStatus;
 }
 
 export interface TableTennisEventResponse {
@@ -41,6 +42,7 @@ export interface TableTennisEventResponse {
   refereeIds: number[];
   level: CompetitionLevel;
   description: string;
+  isModerated: boolean;
   participantsCount: number;
   participants: TableTennisEventParticipantResponse[];
   matches: TableTennisMatchResponse[] | null;
@@ -61,6 +63,7 @@ export interface TableTennisEventRequest {
   refereeIds: number[];
   level: CompetitionLevel;
   description: string;
+  isModerated: boolean;
   participantsCount: number;
   rules?: string;
   prizes?: string;
@@ -77,4 +80,5 @@ export interface TableTennisEventParticipantDto {
   points: number;
   rank: number;
   groupName?: string;
+  status: RegistrationStatus;
 }

@@ -199,4 +199,34 @@ public class CheckersEventsController(ICheckersEventService checkersEventService
             return StatusCode(500, ex.Message);
         }
     }
+
+    [Authorize]
+    [HttpPost("{id}/register")]
+    public async Task<IActionResult> Register(long id, [FromQuery] long playerId, CancellationToken cancellationToken)
+    {
+        await checkersEventService.RegisterPlayerAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("checkers_events_all");
+        await redisService.RemoveDataAsync($"checkers_event_{id}");
+        return Ok();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{id}/participants/{playerId}/approve")]
+    public async Task<IActionResult> Approve(long id, long playerId, CancellationToken cancellationToken)
+    {
+        await checkersEventService.ApproveParticipantAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("checkers_events_all");
+        await redisService.RemoveDataAsync($"checkers_event_{id}");
+        return Ok();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{id}/participants/{playerId}/reject")]
+    public async Task<IActionResult> Reject(long id, long playerId, CancellationToken cancellationToken)
+    {
+        await checkersEventService.RejectParticipantAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("checkers_events_all");
+        await redisService.RemoveDataAsync($"checkers_event_{id}");
+        return Ok();
+    }
 }

@@ -29,6 +29,7 @@ public class BadmintonEventRequest
     public string? Referees { get; set; }
     public string? Schedule { get; set; }
     public bool IsTeam { get; set; }
+    public bool IsModerated { get; set; }
 
     public long? FirstPlaceTeamId { get; set; }
     public long? SecondPlaceTeamId { get; set; }
@@ -89,6 +90,7 @@ public class BadmintonEventResponse
     public string? Referees { get; set; }
     public string? Schedule { get; set; }
     public bool IsTeam { get; set; }
+    public bool IsModerated { get; set; }
 
     public PlayerDto? FirstPlace { get; set; }
     public PlayerDto? SecondPlace { get; set; }
@@ -178,7 +180,8 @@ public static class BadmintonDtoExtensions
             HeadRefereeName = request.HeadRefereeName,
             Referees = request.Referees,
             Schedule = request.Schedule,
-            IsTeam = request.IsTeam
+            IsTeam = request.IsTeam,
+            IsModerated = request.IsModerated
         };
     }
 
@@ -204,6 +207,7 @@ public static class BadmintonDtoExtensions
             Referees = entity.Referees,
             Schedule = entity.Schedule,
             IsTeam = entity.IsTeam,
+            IsModerated = entity.IsModerated,
             FirstPlace = entity.FirstPlace?.ToDto(),
             SecondPlace = entity.SecondPlace?.ToDto(),
             ThirdPlace = entity.ThirdPlace?.ToDto(),

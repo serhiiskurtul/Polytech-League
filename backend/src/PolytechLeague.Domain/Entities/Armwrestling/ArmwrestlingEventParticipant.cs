@@ -1,4 +1,5 @@
 using PolytechLeague.Domain.Entities;
+using PolytechLeague.Domain.Entities.Shared;
 
 namespace PolytechLeague.Domain.Entities.Armwrestling;
 
@@ -13,4 +14,5 @@ public class ArmwrestlingEventParticipant
     public double Weight { get; set; }
     public string? GroupName { get; set; }
     public int Rank { get; set; }
+    public RegistrationStatus Status { get; set; } = RegistrationStatus.Approved;
 }

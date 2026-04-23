@@ -1,4 +1,5 @@
 using PolytechLeague.Persistence.Database;
+using PolytechLeague.Domain.Entities.Shared;
 using PolytechLeague.Domain.Entities.Checkers;
 using PolytechLeague.Application.Dto.CheckersDto;
 using Microsoft.Extensions.Logging;
@@ -47,6 +48,7 @@ public class CheckersEventService(
         oldEntity.SecondPlaceTeamId = newEntity.SecondPlaceTeamId;
         oldEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
         oldEntity.IsTeam = newEntity.IsTeam;
+        oldEntity.IsModerated = newEntity.IsModerated;
     }
 
     public override async Task<CheckersEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)
@@ -103,6 +105,7 @@ public class CheckersEventService(
 
         participant.Points = request.Points;
         participant.Rank = request.Rank;
+        participant.Status = request.Status;
         _dbcontext.Set<CheckersEventParticipant>().Update(participant);
         await _dbcontext.SaveChangesAsync(cancellationToken);
     }
@@ -221,7 +224,7 @@ public class CheckersEventService(
             // 2. Create if not found
             if (player == null)
             {
-                names = sp.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                names = sp.FullName.Replace(",", " ").Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 var lastName = names.Length > 0 ? names[0] : "Невідомий";
                 var firstName = names.Length > 1 ? names[1] : "Гравець";
 
@@ -253,5 +256,89 @@ public class CheckersEventService(
         }
 
         await _dbcontext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task RegisterPlayerAsync(long eventId, long playerId, CancellationToken cancellationToken = default)
+    {
+        var tournament = await _dbcontext.Set<CheckersEvent>().FindAsync([eventId], cancellationToken)
+            ?? throw new EntityNotFoundException(nameof(CheckersEvent), eventId);
+
+        var exists = await _dbcontext.Set<CheckersEventParticipant>()
+            .AnyAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
+
+        if (exists) return;
+
+        var status = tournament.IsModerated ? RegistrationStatus.Pending : RegistrationStatus.Approved;
+
+        var participant = new CheckersEventParticipant
+        {
+            TournamentId = eventId,
+            PlayerId = playerId,
+            Status = status
+        };
+
+        var player = await _dbcontext.Set<Player>().FindAsync([playerId], cancellationToken);
+        participant.GroupName = player?.Group;
+
+        _dbcontext.Set<CheckersEventParticipant>().Add(participant);
+        await _dbcontext.SaveChangesAsync(cancellationToken);
+
+        if (tournament.IsModerated)
+        {
+            await _notificationService.SendNotificationToAdminsAsync(
+                "Новий запит на реєстрацію",
+                $"Гравець {player?.FirstName} {player?.LastName} хоче зареєструватися на {tournament.Name}",
+                NotificationType.Tournament,
+                $"/tournaments/{eventId}"
+            );
+        }
+    }
+
+    public async Task ApproveParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken = default)
+    {
+        var participant = await _dbcontext.Set<CheckersEventParticipant>()
+            .FirstOrDefaultAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
+
+        if (participant != null)
+        {
+            participant.Status = RegistrationStatus.Approved;
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+
+            var player = await _dbcontext.Set<Player>().FindAsync([playerId], cancellationToken);
+            if (player?.UserId != null)
+            {
+                await _notificationService.SendNotificationToUserAsync(
+                    player.UserId.Value,
+                    "Реєстрація схвалена",
+                    $"Вашу заявку на участь у змаганні з шашок схвалено!",
+                    NotificationType.Tournament,
+                    $"/tournaments/{eventId}"
+                );
+            }
+        }
+    }
+
+    public async Task RejectParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken = default)
+    {
+        var participant = await _dbcontext.Set<CheckersEventParticipant>()
+            .FirstOrDefaultAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
+
+        if (participant != null)
+        {
+            participant.Status = RegistrationStatus.Rejected;
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+
+            var player = await _dbcontext.Set<Player>().FindAsync([playerId], cancellationToken);
+            if (player?.UserId != null)
+            {
+                await _notificationService.SendNotificationToUserAsync(
+                    player.UserId.Value,
+                    "Реєстрація відхилена",
+                    $"Вашу заявку на участь у змаганні з шашок було відхилено.",
+                    NotificationType.Tournament,
+                    $"/tournaments/{eventId}"
+                );
+            }
+        }
     }
 }

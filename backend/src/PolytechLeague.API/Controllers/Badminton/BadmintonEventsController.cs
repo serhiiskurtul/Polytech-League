@@ -97,4 +97,31 @@ public class BadmintonEventsController(
         await redisService.RemoveGroupAsync("badminton_events_group");
         return Ok();
     }
+
+    [Authorize]
+    [HttpPost("{id}/register")]
+    public async Task<IActionResult> Register(long id, [FromQuery] long playerId, CancellationToken cancellationToken)
+    {
+        await badmintonEventService.RegisterPlayerAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("badminton_events_group");
+        return Ok();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{id}/participants/{playerId}/approve")]
+    public async Task<IActionResult> Approve(long id, long playerId, CancellationToken cancellationToken)
+    {
+        await badmintonEventService.ApproveParticipantAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("badminton_events_group");
+        return Ok();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{id}/participants/{playerId}/reject")]
+    public async Task<IActionResult> Reject(long id, long playerId, CancellationToken cancellationToken)
+    {
+        await badmintonEventService.RejectParticipantAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("badminton_events_group");
+        return Ok();
+    }
 }

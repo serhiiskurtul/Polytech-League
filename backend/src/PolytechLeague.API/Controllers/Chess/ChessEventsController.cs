@@ -204,4 +204,34 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
             return StatusCode(500, ex.Message);
         }
     }
+
+    [Authorize]
+    [HttpPost("{id}/register")]
+    public async Task<IActionResult> Register(long id, [FromQuery] long playerId, CancellationToken cancellationToken)
+    {
+        await chessEventService.RegisterPlayerAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("chess_events_all");
+        await redisService.RemoveDataAsync($"chess_event_{id}");
+        return Ok();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{id}/participants/{playerId}/approve")]
+    public async Task<IActionResult> Approve(long id, long playerId, CancellationToken cancellationToken)
+    {
+        await chessEventService.ApproveParticipantAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("chess_events_all");
+        await redisService.RemoveDataAsync($"chess_event_{id}");
+        return Ok();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{id}/participants/{playerId}/reject")]
+    public async Task<IActionResult> Reject(long id, long playerId, CancellationToken cancellationToken)
+    {
+        await chessEventService.RejectParticipantAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("chess_events_all");
+        await redisService.RemoveDataAsync($"chess_event_{id}");
+        return Ok();
+    }
 }

@@ -4,6 +4,7 @@ import {
   ArmwrestlingEventResponse,
   ArmwrestlingMatchResponse
 } from '@/shared/types/armwrestling.types';
+import { RegistrationStatus } from '@/shared/types/tournament.types';
 import { PlayerDto } from '@/shared/types/player.types';
 import { getAllPlayers, createPlayer, searchUsers } from '@/shared/api';
 import {
@@ -12,7 +13,9 @@ import {
   updateArmwrestlingEvent,
   addParticipantToArmwrestlingEvent,
   removeParticipantFromArmwrestlingEvent,
-  deleteArmwrestlingMatch
+  deleteArmwrestlingMatch,
+  approveArmwrestlingParticipant,
+  rejectArmwrestlingParticipant
 } from '@/shared/api/armwrestling.api';
 import ArmwrestlingBracket from './ArmwrestlingBracket';
 import TournamentPodium from './TournamentPodium';
@@ -191,7 +194,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
       // 2. Add to event if not already there
       const isAlreadyInEvent = details.participants?.some((p: any) => (p.playerId || p.id) === playerId);
       if (!isAlreadyInEvent) {
-        await addParticipantToArmwrestlingEvent(details.id, { playerId, weight: 0, rank: 0 });
+        await addParticipantToArmwrestlingEvent(details.id, { playerId, weight: 0, rank: 0, status: RegistrationStatus.Approved });
       }
 
       await loadPlayers(playerNum === 1 ? { p1: playerId } : { p2: playerId });
@@ -393,7 +396,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
       }
 
       // Add link to event
-      await addParticipantToArmwrestlingEvent(details.id, { playerId: playerId!, weight: 0, rank: 0 });
+      await addParticipantToArmwrestlingEvent(details.id, { playerId: playerId!, weight: 0, rank: 0, status: RegistrationStatus.Approved });
       toast.success('Учасника успішно додано до змагання!');
 
       setShowAddPlayer(false);
@@ -413,7 +416,31 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
       onRefresh();
     } catch (err) {
       console.error(err);
-      alert('Помилка при видаленні учасника');
+      toast.error('Помилка при видаленні учасника');
+    }
+  };
+
+  const handleApprove = async (playerId: number, playerName: string) => {
+    if (!window.confirm(`Схвалити участь ${playerName}?`)) return;
+    try {
+      await approveArmwrestlingParticipant(details.id, playerId);
+      toast.success("Учасника схвалено!");
+      onRefresh();
+    } catch (err) {
+      console.error(err);
+      toast.error("Помилка при схваленні");
+    }
+  };
+
+  const handleReject = async (playerId: number, playerName: string) => {
+    if (!window.confirm(`Відхилити участь ${playerName}?`)) return;
+    try {
+      await rejectArmwrestlingParticipant(details.id, playerId);
+      toast.success("Учасника відхилено");
+      onRefresh();
+    } catch (err) {
+      console.error(err);
+      toast.error("Помилка при відхиленні");
     }
   };
 
@@ -791,19 +818,46 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
                         `${player.firstName} ${player.lastName}`
                       )}
                     </div>
-                    <div className={styles.playerDetails} style={{ fontSize: '12px', color: '#64748b' }}>
+                    <div className={styles.playerDetails} style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '8px' }}>
                       {player.group || 'Гість'} {player.armwrestlingWeight ? `• ${player.armwrestlingWeight} кг` : ''}
+                      {((details.participants || []).find(p => p.playerId === player.id))?.status !== RegistrationStatus.Approved && (
+                        <span className={`${styles.statusBadge} ${styles[((details.participants || []).find(p => p.playerId === player.id))?.status?.toLowerCase() || 'pending']}`} style={{ fontSize: '10px', padding: '1px 5px', borderRadius: '4px', textTransform: 'uppercase', fontWeight: 'bold' }}>
+                          {((details.participants || []).find(p => p.playerId === player.id))?.status === RegistrationStatus.Pending ? 'Очікує' : 'Відхилено'}
+                        </span>
+                      )}
                     </div>
                   </div>
                   {isAdmin && (
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveParticipant(player.id!, `${player.firstName} ${player.lastName}`)}
-                      style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '8px' }}
-                      title="Видалити учасника"
-                    >
-                      <i className="fas fa-user-minus"></i>
-                    </button>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      {((details.participants || []).find(p => p.playerId === player.id))?.status === RegistrationStatus.Pending && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => handleApprove(player.id!, `${player.firstName} ${player.lastName}`)}
+                            style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', width: '30px', height: '30px', cursor: 'pointer' }}
+                            title="Схвалити"
+                          >
+                            <i className="fas fa-check"></i>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleReject(player.id!, `${player.firstName} ${player.lastName}`)}
+                            style={{ background: '#f59e0b', color: '#fff', border: 'none', borderRadius: '6px', width: '30px', height: '30px', cursor: 'pointer' }}
+                            title="Відхилити"
+                          >
+                            <i className="fas fa-user-slash"></i>
+                          </button>
+                        </>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveParticipant(player.id!, `${player.firstName} ${player.lastName}`)}
+                        style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '8px' }}
+                        title="Видалити учасника"
+                      >
+                        <i className="fas fa-user-minus"></i>
+                      </button>
+                    </div>
                   )}
                 </div>
               ))}
