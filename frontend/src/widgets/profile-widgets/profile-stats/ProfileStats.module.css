@@ -82,3 +82,86 @@
     grid-template-columns: 1fr;
   }
 }
+.sportRankings {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.subTitle {
+  font-size: 1.1rem;
+  color: #1e293b;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.subTitle i {
+  color: #f59e0b;
+}
+
+.sportGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.sportItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s;
+}
+
+.sportItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  border-color: #3b82f6;
+}
+
+.sportInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.sportInfo i {
+  color: #3b82f6;
+  width: 20px;
+  text-align: center;
+}
+
+.sportRank {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.rankNumber {
+  color: #1e293b;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.score {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.globalRankItem {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%) !important;
+  border: 1px solid #fcd34d !important;
+}
+
+.globalRankItem .rankNumber {
+  color: #b45309;
+  font-size: 1.2rem;
+}

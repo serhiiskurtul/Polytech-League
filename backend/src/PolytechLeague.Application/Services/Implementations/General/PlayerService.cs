@@ -39,19 +39,8 @@ public class PlayerService : IPlayerService
 
     public async Task<PlayerDto?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
     {
-        var player = await _dbContext.Players
-            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
-        if (player == null) return null;
-        
-        var dto = player.ToDto();
-        try {
-            await PopulateAchievementsAsync(dto, cancellationToken);
-            await PopulateStatsAsync(dto, cancellationToken);
-        } catch (Exception ex) {
-            // Log error but allow profile to load with empty stats
-            Console.WriteLine($"Error populating profile metrics: {ex.Message}");
-        }
-        return dto;
+        var allWithRankings = await GetAllWithRankingsAsync(cancellationToken);
+        return allWithRankings.FirstOrDefault(p => p.Id == id);
     }
 
     public async Task<string?> GetPhotoUrlByUserIdAsync(long userId, CancellationToken cancellationToken = default)
@@ -65,19 +54,8 @@ public class PlayerService : IPlayerService
 
     public async Task<PlayerDto?> GetByUserIdAsync(long userId, CancellationToken cancellationToken = default)
     {
-        var player = await _dbContext.Players
-            .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
-        if (player == null) return null;
-        
-        var dto = player.ToDto();
-        try {
-            await PopulateAchievementsAsync(dto, cancellationToken);
-            await PopulateStatsAsync(dto, cancellationToken);
-        } catch (Exception ex) {
-            // Log error but allow profile to load with empty stats
-            Console.WriteLine($"Error populating profile metrics: {ex.Message}");
-        }
-        return dto;
+        var allWithRankings = await GetAllWithRankingsAsync(cancellationToken);
+        return allWithRankings.FirstOrDefault(p => p.UserId == userId);
     }
 
     public async Task<PlayerDto> CreateAsync(PlayerDto dto, CancellationToken cancellationToken = default)
@@ -467,7 +445,36 @@ public class PlayerService : IPlayerService
                 playerDtos.Add(dto);
             }
 
-            return playerDtos.OrderByDescending(p => p.PerformanceScore).ToList();
+            var allRanked = playerDtos.OrderByDescending(p => p.PerformanceScore).ToList();
+            for (int i = 0; i < allRanked.Count; i++)
+            {
+                allRanked[i].GlobalRank = i + 1;
+            }
+
+            // Calculate sport-specific ranks
+            var allSportTypes = playerDtos.SelectMany(p => p.SportStats.Select(s => s.SportType)).Distinct().ToList();
+            foreach (var sport in allSportTypes)
+            {
+                var rankedForSport = playerDtos
+                    .Where(p => p.SportStats.Any(s => s.SportType == sport))
+                    .OrderByDescending(p => p.SportStats.First(s => s.SportType == sport).PerformanceScore)
+                    .ToList();
+
+                for (int i = 0; i < rankedForSport.Count; i++)
+                {
+                    var sportStat = rankedForSport[i].SportStats.First(s => s.SportType == sport);
+                    sportStat.Rank = i + 1;
+                }
+            }
+
+            _logger.LogInformation("Calculated rankings for {Count} players. First player: {Name} (Score: {Score}), Last player: {LastName} (Score: {LastScore})", 
+                allRanked.Count, 
+                allRanked.FirstOrDefault()?.LastName, 
+                allRanked.FirstOrDefault()?.PerformanceScore,
+                allRanked.LastOrDefault()?.LastName,
+                allRanked.LastOrDefault()?.PerformanceScore);
+
+            return allRanked;
         }
         catch (Exception ex)
         {

@@ -70,14 +70,17 @@ const ProfilePage = () => {
     bio: playerProfile?.bio || '-',
     badges: ['Студент', 'Учасник'],
     instagramUrl: playerProfile?.instagramUrl,
-    photoUrl: playerProfile?.photoUrl
+    photoUrl: playerProfile?.photoUrl,
+    globalRank: playerProfile?.globalRank
   };
 
   const stats = {
     matchesPlayed: playerProfile?.matchesPlayed || 0,
     wins: playerProfile?.winsCount || 0,
     eloRating: playerProfile?.chessRating || 0,
-    goalsScored: playerProfile?.goalsScored || 0
+    goalsScored: playerProfile?.goalsScored || 0,
+    globalRank: playerProfile?.globalRank,
+    sportStats: playerProfile?.sportStats
   };
 
   const handleEditProfile = () => {

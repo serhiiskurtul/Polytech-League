@@ -11,6 +11,7 @@ interface UserData {
   city: string;
   instagramUrl?: string | null;
   photoUrl?: string | null;
+  globalRank?: number;
 }
 
 interface ProfileHeaderProps {
@@ -48,18 +49,20 @@ const ProfileHeader = ({ userData, onEdit, onAvatarUpload, onLogout, onCompare, 
         <div className={styles.profileInfo}>
           <div className={styles.profileNameRow}>
             <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap' }}>
               <h1 className={styles.profileName}>{userData.name}</h1>
-              <div className={styles.profileBadges}>
-                {userData.badges.map((badge, index) => (
-                  <span key={index} className={`${styles.badge} ${
-                    index === 0 ? styles.badgePrimary : 
-                    index === 1 ? styles.badgeSuccess : 
-                    styles.badgeAccent
-                  }`}>
-                    {badge}
-                  </span>
-                ))}
-              </div>
+            </div>
+            <div className={styles.profileBadges}>
+              {userData.badges.map((badge, index) => (
+                <span key={index} className={`${styles.badge} ${
+                  index === 0 ? styles.badgePrimary : 
+                  index === 1 ? styles.badgeSuccess : 
+                  styles.badgeAccent
+                }`}>
+                  {badge}
+                </span>
+              ))}
+            </div>
             </div>
             <div className={styles.socialLinks}>
               {userData.instagramUrl && (

@@ -76,16 +76,19 @@ const PlayerViewPage = () => {
     city: playerProfile.city || '—',
     joinDate: '—', // Could fetch from user data if needed
     bio: playerProfile.bio || 'Інформація відсутня',
-    badges: ['Гравець', ...(playerProfile.sports || [])],
+    badges: ['Гравець'],
     instagramUrl: playerProfile.instagramUrl,
-    photoUrl: playerProfile.photoUrl
+    photoUrl: playerProfile.photoUrl,
+    globalRank: playerProfile.globalRank
   };
 
   const stats = {
     matchesPlayed: playerProfile.matchesPlayed || 0,
     wins: playerProfile.winsCount || 0,
     eloRating: playerProfile.chessRating || 0,
-    goalsScored: playerProfile.goalsScored || 0
+    goalsScored: playerProfile.goalsScored || 0,
+    globalRank: playerProfile.globalRank,
+    sportStats: playerProfile.sportStats
   };
 
   const handleCompare = () => {
