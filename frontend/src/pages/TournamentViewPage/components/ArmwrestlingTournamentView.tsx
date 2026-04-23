@@ -421,7 +421,6 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
   };
 
   const handleApprove = async (playerId: number, playerName: string) => {
-    if (!window.confirm(`Схвалити участь ${playerName}?`)) return;
     try {
       await approveArmwrestlingParticipant(details.id, playerId);
       toast.success("Учасника схвалено!");

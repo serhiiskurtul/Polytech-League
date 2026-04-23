@@ -712,7 +712,6 @@ const TournamentViewPage = () => {
   };
 
   const handleApproveParticipant = async (playerId: number, playerName: string) => {
-    if (!window.confirm(`Схвалити участь ${playerName}?`)) return;
     try {
       const sportKey = tournament?.sport?.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') || '';
       switch (sportKey) {
