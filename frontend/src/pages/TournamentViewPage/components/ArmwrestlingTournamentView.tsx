@@ -290,9 +290,9 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
     }
 
     const idx = STAGE_ORDER.indexOf(stage);
-    if (idx <= 0) return displayParticipants;
+    if (idx < 0 && !stage.startsWith('Раунд')) return displayParticipants;
 
-    // Logic for Single Elimination stages
+    // Logic for Single Elimination / Upper Bracket stages
     const standardStages = ['1/16 Фіналу', '1/8 Фіналу', 'Чвертьфінал', 'Півфінал', 'Фінал'];
     const sIdx = standardStages.indexOf(stage);
 
@@ -301,13 +301,11 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
       const winners = details.matches
         .filter(m => m.stage === prevStage && m.winnerId)
         .map(m => m.winnerId!);
-
-      // STRICT: Only allow winners from prev stage. If none, return empty list.
       return displayParticipants.filter(p => winners.includes(p.id!));
     }
 
     // Logic for sequential rounds (Round 1 -> Round 2 ...)
-    const roundMatch = stage.match(/Раунд (\d+)/);
+    const roundMatch = stage.match(/^Раунд (\d+)$/);
     if (roundMatch) {
       const rNum = parseInt(roundMatch[1]);
       if (rNum > 1) {
@@ -317,6 +315,23 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
           .map(m => m.winnerId!);
         return displayParticipants.filter(p => winners.includes(p.id!));
       }
+      return displayParticipants;
+    }
+
+    // Logic for Lower Bracket stages
+    const lowerStages = ['Lower Раунд 1', 'Lower Раунд 2', 'Lower Раунд 3', 'Lower Півфінал', 'Lower Фінал'];
+    const lIdx = lowerStages.indexOf(stage);
+    if (lIdx > 0) {
+      const prevStage = lowerStages[lIdx - 1];
+      const winners = details.matches
+        .filter(m => m.stage === prevStage && m.winnerId)
+        .map(m => m.winnerId!);
+      return displayParticipants.filter(p => winners.includes(p.id!));
+    }
+
+    // For Lower Round 1 or Grand Final, allow everyone for now to avoid complexity of loser-tracking
+    if (stage === 'Lower Раунд 1' || stage === 'Grand Final') {
+      return displayParticipants;
     }
 
     return displayParticipants;
@@ -537,6 +552,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
                         <>
                           <option value="Lower Раунд 1">Lower Раунд 1</option>
                           <option value="Lower Раунд 2">Lower Раунд 2</option>
+                          <option value="Lower Раунд 3">Lower Раунд 3</option>
                           <option value="Lower Півфінал">Lower Півфінал</option>
                           <option value="Lower Фінал">Lower Фінал</option>
                           <option value="Grand Final">Grand Final</option>
@@ -632,7 +648,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
           {/* Participants Simplified List */}
           <div className={styles.sideSection} style={{ background: 'white', padding: '24px', borderRadius: '20px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', border: '1px solid #f1f5f9' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-              <h3 style={{ margin: 0 }}><i className="fas fa-users"></i> Учасники</h3>
+              <h3 style={{ margin: 0 }}><i className="fas fa-users"></i> Учасники {displayParticipants.length > 0 && `(${displayParticipants.length})`}</h3>
               {isAdmin && (
                 <button
                   type="button"
