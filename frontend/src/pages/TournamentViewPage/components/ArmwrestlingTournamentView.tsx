@@ -69,6 +69,9 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [useStrictFiltering, setUseStrictFiltering] = useState(true);
+  const [roundNumber, setRoundNumber] = useState(1);
+  const [stageType, setStageType] = useState('Раунд');
 
   useEffect(() => {
     if (isAdmin) {
@@ -274,12 +277,13 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
   const displayParticipants = currentParticipants.length > 0 ? currentParticipants : matchParticipants;
 
   const STAGE_ORDER = [
-    'Раунд 1', 'Раунд 2', 'Раунд 3', 'Раунд 4', 'Раунд 5',
     '1/16 Фіналу', '1/8 Фіналу', 'Чвертьфінал', 'Півфінал', 'Фінал',
     'Lower Раунд 1', 'Lower Раунд 2', 'Lower Раунд 3', 'Lower Півфінал', 'Lower Фінал', 'Grand Final'
   ];
 
   const getEligiblePlayers = (stage: string) => {
+    if (!useStrictFiltering) return displayParticipants;
+    
     if (!details.matches || details.matches.length === 0) {
       return (stage === 'Раунд 1' || stage === '1/16 Фіналу') ? displayParticipants : [];
     }
@@ -506,31 +510,81 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
                   />
                 </div>
 
-                <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#64748b', marginBottom: '8px' }}>Етап</label>
-                  <select
-                    value={newMatch.stage}
-                    onChange={(e) => setNewMatch({ ...newMatch, stage: e.target.value })}
-                    style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0', background: 'white', height: '42px', fontSize: '14px', color: '#1e293b' }}
-                  >
-                    <option value="Раунд 1">Раунд 1</option>
-                    <option value="Раунд 2">Раунд 2</option>
-                    <option value="Раунд 3">Раунд 3</option>
-                    <option value="1/16 Фіналу">1/16 Фіналу</option>
-                    <option value="1/8 Фіналу">1/8 Фіналу</option>
-                    <option value="Чвертьфінал">Чвертьфінал</option>
-                    <option value="Півфінал">Півфінал</option>
-                    <option value="Фінал">Фінал</option>
-                    {details.tournamentType === 'DoubleElimination' && (
-                      <>
-                        <option value="Lower Раунд 1">Lower Раунд 1</option>
-                        <option value="Lower Раунд 2">Lower Раунд 2</option>
-                        <option value="Lower Півфінал">Lower Півфінал</option>
-                        <option value="Lower Фінал">Lower Фінал</option>
-                        <option value="Grand Final">Grand Final</option>
-                      </>
-                    )}
-                  </select>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <div style={{ flex: 2 }}>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#64748b', marginBottom: '8px' }}>Етап</label>
+                    <select
+                      value={stageType}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setStageType(val);
+                        if (val === 'Раунд') {
+                          setNewMatch({ ...newMatch, stage: `Раунд ${roundNumber}` });
+                        } else {
+                          setNewMatch({ ...newMatch, stage: val });
+                        }
+                      }}
+                      style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0', background: 'white', height: '42px', fontSize: '14px', color: '#1e293b' }}
+                    >
+                      <option value="Раунд">Раунд...</option>
+                      <option value="1/16 Фіналу">1/16 Фіналу</option>
+                      <option value="1/8 Фіналу">1/8 Фіналу</option>
+                      <option value="Чвертьфінал">Чвертьфінал</option>
+                      <option value="Півфінал">Півфінал</option>
+                      <option value="Фінал">Фінал</option>
+                      {details.tournamentType === 'DoubleElimination' && (
+                        <>
+                          <option value="Lower Раунд 1">Lower Раунд 1</option>
+                          <option value="Lower Раунд 2">Lower Раунд 2</option>
+                          <option value="Lower Півфінал">Lower Півфінал</option>
+                          <option value="Lower Фінал">Lower Фінал</option>
+                          <option value="Grand Final">Grand Final</option>
+                        </>
+                      )}
+                    </select>
+                  </div>
+                  {stageType === 'Раунд' && (
+                    <div style={{ width: '60px' }}>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#64748b', marginBottom: '8px' }}>№</label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={roundNumber}
+                        onChange={(e) => {
+                          const num = Number(e.target.value);
+                          setRoundNumber(num);
+                          setNewMatch({ ...newMatch, stage: `Раунд ${num}` });
+                        }}
+                        style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0', height: '42px', fontSize: '14px', color: '#1e293b' }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <label style={{ fontSize: '11px', fontWeight: 600, color: '#94a3b8', marginBottom: '4px', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    Фільтрація
+                    <div className={styles.tooltip}>
+                      <i className="fas fa-question-circle" style={{ cursor: 'help', color: '#cbd5e1' }}></i>
+                      <span className={styles.tooltipText}>
+                        Увімкнено: лише переможці попереднього етапу. <br/>
+                        Вимкнено: будь-які учасники (дозволяє перестрибувати раунди).
+                      </span>
+                    </div>
+                  </label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <label className={styles.switch}>
+                      <input 
+                        type="checkbox" 
+                        checked={useStrictFiltering} 
+                        onChange={(e) => setUseStrictFiltering(e.target.checked)}
+                      />
+                      <span className={styles.slider}></span>
+                    </label>
+                    <span style={{ fontSize: '11px', color: useStrictFiltering ? '#3b82f6' : '#64748b', fontWeight: '600' }}>
+                      {useStrictFiltering ? 'Увімк' : 'Вимк'}
+                    </span>
+                  </div>
                 </div>
 
                 <div style={{ width: '80px' }}>

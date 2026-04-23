@@ -10,11 +10,6 @@ interface ArmwrestlingBracketProps {
   onDeleteMatch?: (matchId: number) => void;
 }
 
-const STAGE_ORDER = [
-  'Раунд 1', 'Раунд 2', 'Раунд 3', 'Раунд 4', 'Раунд 5',
-  '1/16 Фіналу', '1/8 Фіналу', 'Чвертьфінал', 'Півфінал', 'Фінал',
-  'Lower Раунд 1', 'Lower Раунд 2', 'Lower Раунд 3', 'Lower Півфінал', 'Lower Фінал', 'Grand Final'
-];
 
 const ArmwrestlingBracket: React.FC<ArmwrestlingBracketProps> = ({
   matches,
@@ -33,9 +28,39 @@ const ArmwrestlingBracket: React.FC<ArmwrestlingBracketProps> = ({
 
   // Split matches into Winners and Losers for Double Elimination
   const isDouble = tournamentType === 'DoubleElimination';
+
+  // Dynamic sorting logic
+  const getStageRank = (stage: string) => {
+    if (stage === 'Grand Final') return 1000;
+    if (stage.startsWith('Lower')) {
+      const match = stage.match(/Lower Раунд (\d+)/);
+      if (match) return 500 + parseInt(match[1]);
+      if (stage === 'Lower Півфінал') return 590;
+      if (stage === 'Lower Фінал') return 595;
+      return 600;
+    }
+    
+    // Standard stages
+    const standardOrder: Record<string, number> = {
+      '1/16 Фіналу': 100,
+      '1/8 Фіналу': 110,
+      'Чвертьфінал': 120,
+      'Півфінал': 130,
+      'Фінал': 140
+    };
+    if (standardOrder[stage]) return standardOrder[stage];
+
+    // Rounds
+    const roundMatch = stage.match(/Раунд (\d+)/);
+    if (roundMatch) return parseInt(roundMatch[1]);
+
+    return 999; // Unknown
+  };
+
+  const allStages = Object.keys(stages).sort((a, b) => getStageRank(a) - getStageRank(b));
   
-  const winnersStages = STAGE_ORDER.filter(s => !s.startsWith('Lower') && s !== 'Grand Final' && stages[s]);
-  const losersStages = STAGE_ORDER.filter(s => s.startsWith('Lower') && stages[s]);
+  const winnersStages = allStages.filter(s => !s.startsWith('Lower') && s !== 'Grand Final');
+  const losersStages = allStages.filter(s => s.startsWith('Lower'));
   const grandFinalStage = stages['Grand Final'] ? ['Grand Final'] : [];
 
   const renderStage = (stageName: string, columnIndex: number, totalStages: number) => (
