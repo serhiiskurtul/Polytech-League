@@ -103,11 +103,17 @@ public class CheckersEventService(
 
         if (participant == null) throw new EntityNotFoundException("Учасника не знайдено", playerId);
 
+        var oldStatus = participant.Status;
         participant.Points = request.Points;
         participant.Rank = request.Rank;
         participant.Status = request.Status;
         _dbcontext.Set<CheckersEventParticipant>().Update(participant);
         await _dbcontext.SaveChangesAsync(cancellationToken);
+
+        if (oldStatus != request.Status && (request.Status == RegistrationStatus.Approved || request.Status == RegistrationStatus.Rejected))
+        {
+            await SendParticipantStatusNotificationAsync(id, playerId, request.Status, cancellationToken);
+        }
     }
 
     public async Task RemoveParticipantAsync(long id, long playerId, CancellationToken cancellationToken = default)
@@ -340,5 +346,24 @@ public class CheckersEventService(
                 );
             }
         }
+    }
+
+    private async Task SendParticipantStatusNotificationAsync(long eventId, long playerId, RegistrationStatus status, CancellationToken cancellationToken)
+    {
+        var player = await _dbcontext.Set<Player>().FindAsync([playerId], cancellationToken);
+        if (player?.UserId == null) return;
+
+        string title = status == RegistrationStatus.Approved ? "Реєстрація схвалена" : "Реєстрація відхилена";
+        string message = status == RegistrationStatus.Approved
+            ? "Вашу заявку на участь у змаганні з шашок схвалено!"
+            : "Вашу заявку на участь у змаганні з шашок було відхилено.";
+
+        await _notificationService.SendNotificationToUserAsync(
+            player.UserId.Value,
+            title,
+            message,
+            NotificationType.Tournament,
+            $"/tournaments/{eventId}"
+        );
     }
 }

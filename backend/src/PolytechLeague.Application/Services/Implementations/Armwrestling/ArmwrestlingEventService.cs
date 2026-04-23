@@ -122,6 +122,11 @@ public class ArmwrestlingEventService(
 
         _dbcontext.ArmwrestlingEventParticipants.Add(participant);
         await _dbcontext.SaveChangesAsync(cancellationToken);
+
+        if (dto.Status == RegistrationStatus.Approved || dto.Status == RegistrationStatus.Rejected)
+        {
+            await SendParticipantStatusNotificationAsync(eventId, dto.PlayerId, dto.Status, cancellationToken);
+        }
     }
 
     public async Task UpdateParticipantAsync(long eventId, long playerId, ArmwrestlingEventParticipantDto dto, CancellationToken cancellationToken)
@@ -130,11 +135,17 @@ public class ArmwrestlingEventService(
             .FirstOrDefaultAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
         if (participant != null)
         {
+            var oldStatus = participant.Status;
             participant.Weight = dto.Weight;
             participant.Rank = dto.Rank;
             participant.Status = dto.Status;
             _dbcontext.Set<ArmwrestlingEventParticipant>().Update(participant);
             await _dbcontext.SaveChangesAsync(cancellationToken);
+
+            if (oldStatus != dto.Status && (dto.Status == RegistrationStatus.Approved || dto.Status == RegistrationStatus.Rejected))
+            {
+                await SendParticipantStatusNotificationAsync(eventId, playerId, dto.Status, cancellationToken);
+            }
         }
     }
 
@@ -232,5 +243,24 @@ public class ArmwrestlingEventService(
                 );
             }
         }
+    }
+
+    private async Task SendParticipantStatusNotificationAsync(long eventId, long playerId, RegistrationStatus status, CancellationToken cancellationToken)
+    {
+        var player = await _dbcontext.Set<Player>().FindAsync([playerId], cancellationToken);
+        if (player?.UserId == null) return;
+
+        string title = status == RegistrationStatus.Approved ? "Реєстрація схвалена" : "Реєстрація відхилена";
+        string message = status == RegistrationStatus.Approved
+            ? "Вашу заявку на участь у змаганні з армреслінгу схвалено!"
+            : "Вашу заявку на участь у змаганні з армреслінгу було відхилено.";
+
+        await _notificationService.SendNotificationToUserAsync(
+            player.UserId.Value,
+            title,
+            message,
+            NotificationType.Tournament,
+            $"/tournaments/{eventId}"
+        );
     }
 }

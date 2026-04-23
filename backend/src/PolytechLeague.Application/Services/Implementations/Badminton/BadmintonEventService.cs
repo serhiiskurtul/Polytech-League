@@ -116,6 +116,11 @@ public class BadmintonEventService(
         }
         _dbcontext.BadmintonEventParticipants.Add(participant);
         await _dbcontext.SaveChangesAsync(cancellationToken);
+
+        if (dto.Status == RegistrationStatus.Approved || dto.Status == RegistrationStatus.Rejected)
+        {
+            await SendParticipantStatusNotificationAsync(eventId, dto.PlayerId, dto.Status, cancellationToken);
+        }
     }
 
     public async Task UpdateParticipantAsync(long eventId, long playerId, BadmintonEventParticipantDto dto, CancellationToken cancellationToken = default)
@@ -124,11 +129,17 @@ public class BadmintonEventService(
             .FirstOrDefaultAsync(p => p.EventId == eventId && p.PlayerId == playerId, cancellationToken);
         if (participant != null)
         {
+            var oldStatus = participant.Status;
             participant.Points = dto.Points;
             participant.Rank = dto.Rank;
             participant.Status = dto.Status;
             _dbcontext.BadmintonEventParticipants.Update(participant);
             await _dbcontext.SaveChangesAsync(cancellationToken);
+
+            if (oldStatus != dto.Status && (dto.Status == RegistrationStatus.Approved || dto.Status == RegistrationStatus.Rejected))
+            {
+                await SendParticipantStatusNotificationAsync(eventId, playerId, dto.Status, cancellationToken);
+            }
         }
     }
 
@@ -225,5 +236,24 @@ public class BadmintonEventService(
                 );
             }
         }
+    }
+
+    private async Task SendParticipantStatusNotificationAsync(long eventId, long playerId, RegistrationStatus status, CancellationToken cancellationToken)
+    {
+        var player = await _dbcontext.Set<Player>().FindAsync([playerId], cancellationToken);
+        if (player?.UserId == null) return;
+
+        string title = status == RegistrationStatus.Approved ? "Реєстрація схвалена" : "Реєстрація відхилена";
+        string message = status == RegistrationStatus.Approved
+            ? "Вашу заявку на участь у змаганні з бадмінтону схвалено!"
+            : "Вашу заявку на участь у змаганні з бадмінтону було відхилено.";
+
+        await _notificationService.SendNotificationToUserAsync(
+            player.UserId.Value,
+            title,
+            message,
+            NotificationType.Tournament,
+            $"/tournaments/{eventId}"
+        );
     }
 }

@@ -100,6 +100,11 @@ public class ChessEventService(
 
         _dbcontext.Set<ChessEventParticipant>().Add(participant);
         await _dbcontext.SaveChangesAsync(cancellationToken);
+
+        if (dto.Status == RegistrationStatus.Approved || dto.Status == RegistrationStatus.Rejected)
+        {
+            await SendParticipantStatusNotificationAsync(eventId, dto.PlayerId, dto.Status, cancellationToken);
+        }
     }
 
     public async Task UpdateParticipantAsync(long eventId, long playerId, PolytechLeague.Application.Dto.ChessDto.ChessEventParticipantDto dto, CancellationToken cancellationToken = default)
@@ -108,12 +113,18 @@ public class ChessEventService(
             .FirstOrDefaultAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
         if (participant != null)
         {
+            var oldStatus = participant.Status;
             participant.Points = dto.Points;
             participant.Rank = dto.Rank;
             participant.Status = dto.Status;
-            // Removed Buchholz and SonnebornBerger from Entity since they are not mapped
+            
             _dbcontext.Set<ChessEventParticipant>().Update(participant);
             await _dbcontext.SaveChangesAsync(cancellationToken);
+
+            if (oldStatus != dto.Status && (dto.Status == RegistrationStatus.Approved || dto.Status == RegistrationStatus.Rejected))
+            {
+                await SendParticipantStatusNotificationAsync(eventId, playerId, dto.Status, cancellationToken);
+            }
         }
     }
 
@@ -362,5 +373,24 @@ public class ChessEventService(
                 );
             }
         }
+    }
+
+    private async Task SendParticipantStatusNotificationAsync(long eventId, long playerId, RegistrationStatus status, CancellationToken cancellationToken)
+    {
+        var player = await _dbcontext.Set<Player>().FindAsync([playerId], cancellationToken);
+        if (player?.UserId == null) return;
+
+        string title = status == RegistrationStatus.Approved ? "Реєстрація схвалена" : "Реєстрація відхилена";
+        string message = status == RegistrationStatus.Approved
+            ? "Вашу заявку на участь у змаганні з шахів схвалено!"
+            : "Вашу заявку на участь у змаганні з шахів було відхилено.";
+
+        await _notificationService.SendNotificationToUserAsync(
+            player.UserId.Value,
+            title,
+            message,
+            NotificationType.Tournament,
+            $"/tournaments/{eventId}"
+        );
     }
 }
