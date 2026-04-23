@@ -84,4 +84,56 @@ public class BeachVolleyballEventService(
             );
         }
     }
+
+    public async Task RegisterPlayerAsync(long eventId, long playerId, CancellationToken cancellationToken = default)
+    {
+        var tournament = await _dbcontext.BeachVolleyballEvents
+            .Include(e => e.Teams!)
+            .ThenInclude(t => t.Players)
+            .FirstOrDefaultAsync(e => e.Id == eventId, cancellationToken);
+
+        if (tournament == null) throw new PolytechLeague.Domain.Exceptions.EntityNotFoundException(nameof(BeachVolleyballEvent), eventId);
+
+        if (tournament.Level != CompetitionLevel.CollegeGroup)
+        {
+            throw new InvalidOperationException("Self-registration is only allowed for college group tournaments.");
+        }
+
+        var player = await _dbcontext.Players.FindAsync([playerId], cancellationToken);
+        if (player == null) throw new PolytechLeague.Domain.Exceptions.EntityNotFoundException(nameof(Player), playerId);
+
+        var groupName = player.Group;
+        if (string.IsNullOrWhiteSpace(groupName))
+        {
+            throw new InvalidOperationException("Player must have a group to register for inter-group competitions.");
+        }
+
+        // Check if player is already in any team for this event
+        var alreadyRegistered = tournament.Teams!.Any(t => t.Players!.Any(p => p.Id == playerId));
+        if (alreadyRegistered) return;
+
+        var team = tournament.Teams!.FirstOrDefault(t => t.Name == groupName);
+        if (team == null)
+        {
+            team = new BeachVolleyballTeam
+            {
+                Name = groupName,
+                EventId = eventId,
+                Players = new List<Player>()
+            };
+            tournament.Teams!.Add(team);
+        }
+
+        team.Players ??= new List<Player>();
+        team.Players.Add(player);
+
+        await _dbcontext.SaveChangesAsync(cancellationToken);
+        
+        await _notificationService.SendNotificationToAdminsAsync(
+            "Нова реєстрація на пляжний волейбол",
+            $"Гравець {player.FirstName} {player.LastName} (група {groupName}) зареєструвався на {tournament.Name}",
+            NotificationType.Tournament,
+            $"/tournaments/{eventId}"
+        );
+    }
 }

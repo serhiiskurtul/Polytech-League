@@ -34,3 +34,7 @@ export const deleteBeachVolleyballMatch = async (id: number): Promise<void> => {
 export const updateBeachVolleyballTeam = async (id: number, data: any): Promise<void> => {
   await api.put(`/beach-volleyball-teams/${id}`, data);
 };
+
+export const registerForBeachVolleyballEvent = async (id: string | number, playerId: number): Promise<void> => {
+  await api.post(`/beach-volleyball-events/${id}/register?playerId=${playerId}`);
+};

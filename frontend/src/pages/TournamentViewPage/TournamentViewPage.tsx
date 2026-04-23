@@ -48,10 +48,10 @@ import {
   approveArmwrestlingParticipant,
   rejectArmwrestlingParticipant
 } from '@/shared/api/armwrestling.api';
-import { getVolleyballEventById, updateVolleyballEvent } from '@/shared/api/volleyball.api';
-import { getBeachVolleyballEventById, updateBeachVolleyballEvent } from '@/shared/api/beachVolleyball.api';
-import { getFutsalEventById, updateFutsalEvent } from '@/shared/api/futsal.api';
-import { getBasketball3x3EventById, updateBasketball3x3Event } from '@/shared/api/basketball3x3.api';
+import { getVolleyballEventById, updateVolleyballEvent, registerForVolleyballEvent } from '@/shared/api/volleyball.api';
+import { getBeachVolleyballEventById, updateBeachVolleyballEvent, registerForBeachVolleyballEvent } from '@/shared/api/beachVolleyball.api';
+import { getFutsalEventById, updateFutsalEvent, registerForFutsalEvent } from '@/shared/api/futsal.api';
+import { getBasketball3x3EventById, updateBasketball3x3Event, registerForBasketball3x3Event } from '@/shared/api/basketball3x3.api';
 import {
   getBadmintonEventById,
   updateBadmintonEvent,
@@ -701,6 +701,12 @@ const TournamentViewPage = () => {
         case 'badminton': await registerForBadmintonEvent(id, playerId); break;
         case 'tabletennis':
         case 'table_tennis': await registerForTableTennisEvent(id, playerId); break;
+        case 'futsal': await registerForFutsalEvent(id, playerId); break;
+        case 'volleyball': await registerForVolleyballEvent(id, playerId); break;
+        case 'basketball3x3':
+        case 'basketball_3x3': await registerForBasketball3x3Event(id, playerId); break;
+        case 'beachvolleyball':
+        case 'beach_volleyball': await registerForBeachVolleyballEvent(id, playerId); break;
         default: await registerForChessEvent(id, playerId);
       }
 

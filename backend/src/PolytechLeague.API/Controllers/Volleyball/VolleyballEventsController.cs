@@ -71,4 +71,13 @@ public class VolleyballEventsController(
 
         return NoContent();
     }
+
+    [Authorize]
+    [HttpPost("{id}/register")]
+    public async Task<IActionResult> Register(long id, [FromQuery] long playerId, CancellationToken cancellationToken)
+    {
+        await volleyballEventService.RegisterPlayerAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("volleyball_events_group");
+        return Ok();
+    }
 }

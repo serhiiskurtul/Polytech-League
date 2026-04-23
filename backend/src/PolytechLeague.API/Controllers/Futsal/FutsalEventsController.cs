@@ -71,4 +71,13 @@ public class FutsalEventsController(
 
         return NoContent();
     }
+
+    [Authorize]
+    [HttpPost("{id}/register")]
+    public async Task<IActionResult> Register(long id, [FromQuery] long playerId, CancellationToken cancellationToken)
+    {
+        await futsalEventService.RegisterPlayerAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("futsal_events_group");
+        return Ok();
+    }
 }

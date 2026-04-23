@@ -71,4 +71,13 @@ public class Basketball3x3EventsController(
 
         return NoContent();
     }
+
+    [Authorize]
+    [HttpPost("{id}/register")]
+    public async Task<IActionResult> Register(long id, [FromQuery] long playerId, CancellationToken cancellationToken)
+    {
+        await basketball3x3EventService.RegisterPlayerAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("basketball3x3_events_group");
+        return Ok();
+    }
 }

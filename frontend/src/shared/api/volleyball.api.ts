@@ -31,6 +31,10 @@ export const updateVolleyballTeam = async (id: number, data: any): Promise<void>
   await api.put(`/volleyball-teams/${id}`, data);
 };
 
+export const registerForVolleyballEvent = async (id: string | number, playerId: number): Promise<void> => {
+  await api.post(`/volleyball-events/${id}/register?playerId=${playerId}`);
+};
+
 export const deleteVolleyballMatch = async (id: number): Promise<void> => {
   await api.delete(`/volleyball-matches/${id}`);
 };
