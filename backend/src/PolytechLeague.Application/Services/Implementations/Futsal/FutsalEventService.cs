@@ -5,6 +5,7 @@ using PolytechLeague.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
 using PolytechLeague.Application.Services.Interfaces;
 using PolytechLeague.Domain.Entities;
+using PolytechLeague.Domain.Exceptions;
 
 namespace PolytechLeague.Application.Services.Implementations.Futsal;
 
@@ -140,5 +141,37 @@ public class FutsalEventService(
             NotificationType.Tournament,
             $"/tournaments/{eventId}"
         );
+    }
+
+    public override async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
+    {
+        // 0. Clear player references using raw SQL (as ExecuteUpdate doesn't support TPT hierarchies like Player)
+        await _dbcontext.Database.ExecuteSqlRawAsync(
+            $"UPDATE players SET futsal_team_id = NULL WHERE futsal_team_id IN (SELECT id FROM futsal_teams WHERE \"EventId\" = {id})", 
+            cancellationToken);
+
+        // 1. Fetch event with matches to handle Restrict constraints
+        var entity = await _dbcontext.FutsalEvents
+            .Include(e => e.Matches)
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+
+        if (entity == null) throw new EntityNotFoundException(nameof(FutsalEvent), id);
+
+        // 2. Clear winners (Restrict constraint)
+        entity.FirstPlaceTeamId = null;
+        entity.SecondPlaceTeamId = null;
+        entity.ThirdPlaceTeamId = null;
+        await _dbcontext.SaveChangesAsync(cancellationToken);
+
+        // 3. Delete matches explicitly (Restrict constraint on Teams)
+        if (entity.Matches != null && entity.Matches.Any())
+        {
+            _dbcontext.FutsalMatches.RemoveRange(entity.Matches);
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+        }
+
+        // 4. Finally delete the event
+        _dbcontext.FutsalEvents.Remove(entity);
+        await _dbcontext.SaveChangesAsync(cancellationToken);
     }
 }

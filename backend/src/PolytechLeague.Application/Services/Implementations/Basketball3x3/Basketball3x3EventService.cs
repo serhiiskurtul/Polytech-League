@@ -5,6 +5,7 @@ using PolytechLeague.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
 using PolytechLeague.Application.Services.Interfaces;
 using PolytechLeague.Domain.Entities;
+using PolytechLeague.Domain.Exceptions;
 
 namespace PolytechLeague.Application.Services.Implementations.Basketball3x3;
 
@@ -138,5 +139,37 @@ public class Basketball3x3EventService(
             NotificationType.Tournament,
             $"/tournaments/{eventId}"
         );
+    }
+
+    public override async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
+    {
+        // 0. Clear player references
+        await _dbcontext.Database.ExecuteSqlRawAsync(
+            $"UPDATE players SET basketball_team_id = NULL WHERE basketball_team_id IN (SELECT id FROM basketball3x3_teams WHERE \"EventId\" = {id})", 
+            cancellationToken);
+
+        // 1. Fetch event
+        var entity = await _dbcontext.Basketball3x3Events
+            .Include(e => e.Matches)
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+
+        if (entity == null) throw new EntityNotFoundException(nameof(Basketball3x3Event), id);
+
+        // 2. Clear winners
+        entity.FirstPlaceTeamId = null;
+        entity.SecondPlaceTeamId = null;
+        entity.ThirdPlaceTeamId = null;
+        await _dbcontext.SaveChangesAsync(cancellationToken);
+
+        // 3. Delete matches
+        if (entity.Matches != null && entity.Matches.Any())
+        {
+            _dbcontext.Basketball3x3Matches.RemoveRange(entity.Matches);
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+        }
+
+        // 4. Delete event
+        _dbcontext.Basketball3x3Events.Remove(entity);
+        await _dbcontext.SaveChangesAsync(cancellationToken);
     }
 }

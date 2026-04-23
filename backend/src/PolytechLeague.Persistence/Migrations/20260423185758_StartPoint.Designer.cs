@@ -12,8 +12,8 @@ using PolytechLeague.Persistence.Database;
 namespace PolytechLeague.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260405163226_UPDATE_PERSON_CONFIGURATION_BY_ADD_USERID_FIELD")]
-    partial class UPDATE_PERSON_CONFIGURATION_BY_ADD_USERID_FIELD
+    [Migration("20260423185758_StartPoint")]
+    partial class StartPoint
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,8 +23,8 @@ namespace PolytechLeague.Persistence.Migrations
                 .HasAnnotation("ProductVersion", "9.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "armwrestling_category", new[] { "men", "women" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "armwrestling_hand", new[] { "left", "right" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "armwrestling_category", new[] { "men", "women", "open" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "armwrestling_hand", new[] { "left", "right", "both" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "armwrestling_weight_class", new[] { "under60kg", "under70kg", "under80kg", "under90kg", "plus90kg" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "badminton_tournament_type", new[] { "single_elimination", "double_elimination", "round_robin", "groups_playoff", "swiss" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "basketball3x3tournament_type", new[] { "single_elimination", "double_elimination", "round_robin", "swiss", "groups_playoff" });
@@ -34,14 +34,43 @@ namespace PolytechLeague.Persistence.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "chess_system", new[] { "swiss", "round_robin", "knockout" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "competition_level", new[] { "college_group", "regional", "national" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "futsal_position", new[] { "goalkeeper", "defender", "winger", "forward" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "game_result", new[] { "white_win", "black_win", "draw" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "game_result", new[] { "white_win", "black_win", "draw", "not_played" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "notification_type", new[] { "system", "tournament", "achievement", "match", "team" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "registration_status", new[] { "pending", "approved", "rejected" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "table_tennis_category", new[] { "men", "women", "mixed" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "table_tennis_hand", new[] { "left", "right", "both" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "table_tennis_tournament_type", new[] { "single_elimination", "double_elimination", "round_robin" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "user_role", new[] { "user", "admin" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "user_role", new[] { "none", "user", "admin" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "volleyball_position", new[] { "setter", "outside_hitter", "middle_blocker", "opposite", "libero" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "volleyball_tournament_type", new[] { "single_elimination", "double_elimination", "round_robin", "swiss", "groups_playoff" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Armwrestling.ArmwrestlingEventParticipant", b =>
+                {
+                    b.Property<long>("TournamentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PlayerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("GroupName")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Rank")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("Weight")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("TournamentId", "PlayerId");
+
+                    b.HasIndex("PlayerId");
+
+                    b.ToTable("armwrestling_event_participants", (string)null);
+                });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Armwrestling.ArmwrestlingMatch", b =>
                 {
@@ -69,6 +98,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("character varying(50)")
                         .HasColumnName("stage");
 
+                    b.Property<int>("TableNumber")
+                        .HasColumnType("integer");
+
                     b.Property<long?>("WinnerId")
                         .HasColumnType("bigint")
                         .HasColumnName("winner_id");
@@ -91,11 +123,14 @@ namespace PolytechLeague.Persistence.Migrations
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Badminton.BadmintonEventParticipant", b =>
                 {
-                    b.Property<long>("TournamentId")
+                    b.Property<long>("EventId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("PlayerId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("GroupName")
+                        .HasColumnType("text");
 
                     b.Property<double>("Points")
                         .HasColumnType("double precision");
@@ -103,7 +138,10 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<int>("Rank")
                         .HasColumnType("integer");
 
-                    b.HasKey("TournamentId", "PlayerId");
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.HasKey("EventId", "PlayerId");
 
                     b.HasIndex("PlayerId");
 
@@ -118,13 +156,28 @@ namespace PolytechLeague.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<int?>("AwayScore")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("AwayTeamId")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("CourtNumber")
                         .HasColumnType("integer");
 
-                    b.Property<long>("Player1Id")
+                    b.Property<long>("EventId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("Player2Id")
+                    b.Property<int?>("HomeScore")
+                        .HasColumnType("integer");
+
+                    b.Property<long?>("HomeTeamId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("Player1Id")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("Player2Id")
                         .HasColumnType("bigint");
 
                     b.Property<int>("SetsToWin")
@@ -133,21 +186,27 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<string>("Stage")
                         .HasColumnType("text");
 
-                    b.Property<long>("TournamentId")
+                    b.Property<long?>("WinnerPlayerId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("WinnerId")
+                    b.Property<long?>("WinnerTeamId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AwayTeamId");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("HomeTeamId");
 
                     b.HasIndex("Player1Id");
 
                     b.HasIndex("Player2Id");
 
-                    b.HasIndex("TournamentId");
+                    b.HasIndex("WinnerPlayerId");
 
-                    b.HasIndex("WinnerId");
+                    b.HasIndex("WinnerTeamId");
 
                     b.ToTable("badminton_matches", (string)null);
                 });
@@ -177,6 +236,38 @@ namespace PolytechLeague.Persistence.Migrations
                     b.HasIndex("MatchId");
 
                     b.ToTable("badminton_sets", (string)null);
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Badminton.BadmintonTeam", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("EventId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long?>("Player1Id")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("Player2Id")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("Player1Id");
+
+                    b.HasIndex("Player2Id");
+
+                    b.ToTable("badminton_teams", (string)null);
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Basketball3x3.Basketball3x3Match", b =>
@@ -230,12 +321,17 @@ namespace PolytechLeague.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<long>("EventId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EventId");
 
                     b.ToTable("basketball3x3_teams", (string)null);
                 });
@@ -327,12 +423,17 @@ namespace PolytechLeague.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<long>("EventId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EventId");
 
                     b.ToTable("beach_volleyball_teams", (string)null);
                 });
@@ -345,34 +446,43 @@ namespace PolytechLeague.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<long>("CheckersEventId")
+                    b.Property<string>("GroupName")
+                        .HasColumnType("text");
+
+                    b.Property<long>("PlayerId")
                         .HasColumnType("bigint");
 
-                    b.Property<double>("PointsEarned")
+                    b.Property<double>("Points")
                         .HasColumnType("double precision")
-                        .HasColumnName("points_earned");
+                        .HasColumnName("points");
+
+                    b.Property<int>("Rank")
+                        .HasColumnType("integer");
 
                     b.Property<int>("StartingRating")
                         .HasColumnType("integer")
                         .HasColumnName("starting_rating");
 
-                    b.Property<long>("UserId")
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("TournamentId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CheckersEventId")
-                        .HasDatabaseName("IX_checkers_event_participants_event_id");
-
-                    b.HasIndex("UserId")
+                    b.HasIndex("PlayerId")
                         .HasDatabaseName("IX_checkers_event_participants_user_id");
 
-                    b.HasIndex("CheckersEventId", "PointsEarned")
-                        .HasDatabaseName("IX_checkers_event_participants_event_points");
+                    b.HasIndex("TournamentId")
+                        .HasDatabaseName("IX_checkers_event_participants_event_id");
 
-                    b.HasIndex("CheckersEventId", "UserId")
+                    b.HasIndex("TournamentId", "PlayerId")
                         .IsUnique()
                         .HasDatabaseName("IX_checkers_event_participants_event_user");
+
+                    b.HasIndex("TournamentId", "Points")
+                        .HasDatabaseName("IX_checkers_event_participants_event_points");
 
                     b.ToTable("checkers_event_participants", (string)null);
                 });
@@ -386,13 +496,17 @@ namespace PolytechLeague.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<long>("BlackPlayerId")
+                    b.Property<long?>("BlackPlayerId")
                         .HasColumnType("bigint")
                         .HasColumnName("black_player_id");
 
-                    b.Property<long>("CheckersEventId")
+                    b.Property<long?>("BlackTeamId")
                         .HasColumnType("bigint")
-                        .HasColumnName("checkers_event_id");
+                        .HasColumnName("black_team_id");
+
+                    b.Property<double?>("BlackTeamScore")
+                        .HasColumnType("double precision")
+                        .HasColumnName("black_team_score");
 
                     b.Property<DateTime?>("FinishedAt")
                         .HasColumnType("timestamp with time zone")
@@ -402,7 +516,7 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("result");
 
-                    b.Property<int>("RoundNumber")
+                    b.Property<int>("Round")
                         .HasColumnType("integer")
                         .HasColumnName("round_number");
 
@@ -410,32 +524,71 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("scheduled_at");
 
-                    b.Property<long>("WhitePlayerId")
+                    b.Property<long>("TournamentId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("checkers_event_id");
+
+                    b.Property<long?>("WhitePlayerId")
                         .HasColumnType("bigint")
                         .HasColumnName("white_player_id");
+
+                    b.Property<long?>("WhiteTeamId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("white_team_id");
+
+                    b.Property<double?>("WhiteTeamScore")
+                        .HasColumnType("double precision")
+                        .HasColumnName("white_team_score");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BlackPlayerId");
 
-                    b.HasIndex("CheckersEventId")
-                        .HasDatabaseName("IX_checkers_games_event_id");
+                    b.HasIndex("BlackTeamId");
 
                     b.HasIndex("Result")
                         .HasDatabaseName("IX_checkers_games_result");
 
+                    b.HasIndex("TournamentId")
+                        .HasDatabaseName("IX_checkers_games_event_id");
+
                     b.HasIndex("WhitePlayerId");
 
-                    b.HasIndex("CheckersEventId", "BlackPlayerId")
+                    b.HasIndex("WhiteTeamId");
+
+                    b.HasIndex("TournamentId", "BlackPlayerId")
                         .HasDatabaseName("IX_checkers_games_event_black");
 
-                    b.HasIndex("CheckersEventId", "RoundNumber")
+                    b.HasIndex("TournamentId", "Round")
                         .HasDatabaseName("IX_checkers_games_event_round");
 
-                    b.HasIndex("CheckersEventId", "WhitePlayerId")
+                    b.HasIndex("TournamentId", "WhitePlayerId")
                         .HasDatabaseName("IX_checkers_games_event_white");
 
                     b.ToTable("checkers_games", (string)null);
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersTeam", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("EventId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.ToTable("checkers_teams", (string)null);
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Chess.ChessEventParticipant", b =>
@@ -446,6 +599,9 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<long>("PlayerId")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("GroupName")
+                        .HasColumnType("text");
+
                     b.Property<double>("Points")
                         .HasColumnType("double precision")
                         .HasColumnName("points");
@@ -453,6 +609,9 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<int>("Rank")
                         .HasColumnType("integer")
                         .HasColumnName("rank");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.HasKey("TournamentId", "PlayerId");
 
@@ -477,13 +636,25 @@ namespace PolytechLeague.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<long>("BlackPlayerId")
+                    b.Property<long?>("BlackPlayerId")
                         .HasColumnType("bigint")
                         .HasColumnName("black_player_id");
+
+                    b.Property<long?>("BlackTeamId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("black_team_id");
+
+                    b.Property<double?>("BlackTeamScore")
+                        .HasColumnType("double precision")
+                        .HasColumnName("black_team_score");
 
                     b.Property<int>("Board")
                         .HasColumnType("integer")
                         .HasColumnName("board");
+
+                    b.Property<string>("Pgn")
+                        .HasColumnType("text")
+                        .HasColumnName("pgn");
 
                     b.Property<int>("Result")
                         .HasColumnType("integer")
@@ -497,13 +668,23 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("tournament_id");
 
-                    b.Property<long>("WhitePlayerId")
+                    b.Property<long?>("WhitePlayerId")
                         .HasColumnType("bigint")
                         .HasColumnName("white_player_id");
+
+                    b.Property<long?>("WhiteTeamId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("white_team_id");
+
+                    b.Property<double?>("WhiteTeamScore")
+                        .HasColumnType("double precision")
+                        .HasColumnName("white_team_score");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BlackPlayerId");
+
+                    b.HasIndex("BlackTeamId");
 
                     b.HasIndex("Result")
                         .HasDatabaseName("IX_chess_games_result");
@@ -512,6 +693,8 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasDatabaseName("IX_chess_games_tournament_id");
 
                     b.HasIndex("WhitePlayerId");
+
+                    b.HasIndex("WhiteTeamId");
 
                     b.HasIndex("TournamentId", "BlackPlayerId")
                         .HasDatabaseName("IX_chess_games_tournament_black");
@@ -523,6 +706,64 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasDatabaseName("IX_chess_games_tournament_white");
 
                     b.ToTable("chess_games", (string)null);
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Chess.ChessTeam", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("EventId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.ToTable("chess_teams", (string)null);
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Conversation", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("LastMessageAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_message_at");
+
+                    b.Property<long>("User1Id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("user1_id");
+
+                    b.Property<long>("User2Id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("user2_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("User2Id");
+
+                    b.HasIndex("User1Id", "User2Id")
+                        .IsUnique();
+
+                    b.ToTable("conversations", (string)null);
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Event", b =>
@@ -543,6 +784,22 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("description");
 
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("end_date");
+
+                    b.Property<long?>("FirstPlaceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("HeadRefereeName")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsModerated")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsTeam")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("Level")
                         .HasColumnType("integer")
                         .HasColumnName("level");
@@ -557,18 +814,50 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
+                    b.Property<string>("Prizes")
+                        .HasColumnType("text");
+
                     b.PrimitiveCollection<long[]>("RefereeIds")
                         .IsRequired()
                         .HasColumnType("bigint[]")
                         .HasColumnName("referee_ids");
+
+                    b.Property<string>("Referees")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("RegistrationEnd")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("registration_end");
+
+                    b.Property<DateTime?>("RegistrationStart")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("registration_start");
+
+                    b.Property<string>("Rules")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Schedule")
+                        .HasColumnType("text");
+
+                    b.Property<long?>("SecondPlaceId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ThirdPlaceId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Date")
                         .HasDatabaseName("IX_events_date");
 
+                    b.HasIndex("FirstPlaceId");
+
                     b.HasIndex("Level")
                         .HasDatabaseName("IX_events_level");
+
+                    b.HasIndex("SecondPlaceId");
+
+                    b.HasIndex("ThirdPlaceId");
 
                     b.ToTable("events", (string)null);
 
@@ -599,6 +888,34 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasDatabaseName("IX_event_photos_event_id");
 
                     b.ToTable("event_photos", (string)null);
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Futsal.FutsalGoal", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("GoalsCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
+
+                    b.Property<long>("MatchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PlayerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MatchId");
+
+                    b.HasIndex("PlayerId");
+
+                    b.ToTable("futsal_goals", (string)null);
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Futsal.FutsalMatch", b =>
@@ -652,14 +969,110 @@ namespace PolytechLeague.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<long>("EventId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<int>("Points")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("EventId");
+
                     b.ToTable("futsal_teams", (string)null);
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Message", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("content");
+
+                    b.Property<long>("ConversationId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("conversation_id");
+
+                    b.Property<bool>("IsRead")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_read");
+
+                    b.Property<long>("SenderId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("sender_id");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("sent_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConversationId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("messages", (string)null);
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Notification", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_read");
+
+                    b.Property<string>("Link")
+                        .HasColumnType("text")
+                        .HasColumnName("link");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("message");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("title");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer")
+                        .HasColumnName("type");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("notifications", (string)null);
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Person", b =>
@@ -684,6 +1097,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("last_name");
+
+                    b.Property<string>("Patronymic")
+                        .HasColumnType("text");
 
                     b.Property<string>("PhotoUrl")
                         .IsRequired()
@@ -750,6 +1166,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("player_id");
 
+                    b.Property<string>("GroupName")
+                        .HasColumnType("text");
+
                     b.Property<double>("Points")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("double precision")
@@ -759,6 +1178,9 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<int>("Rank")
                         .HasColumnType("integer")
                         .HasColumnName("rank");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.HasKey("TournamentId", "PlayerId");
 
@@ -1003,6 +1425,9 @@ namespace PolytechLeague.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<long>("EventId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -1010,7 +1435,159 @@ namespace PolytechLeague.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EventId");
+
                     b.ToTable("volleyball_teams", (string)null);
+                });
+
+            modelBuilder.Entity("badminton_match_away_roster", b =>
+                {
+                    b.Property<long>("BadmintonMatchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PlayerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("BadmintonMatchId", "PlayerId");
+
+                    b.HasIndex("PlayerId");
+
+                    b.ToTable("badminton_match_away_roster");
+                });
+
+            modelBuilder.Entity("badminton_match_home_roster", b =>
+                {
+                    b.Property<long>("BadmintonMatchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PlayerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("BadmintonMatchId", "PlayerId");
+
+                    b.HasIndex("PlayerId");
+
+                    b.ToTable("badminton_match_home_roster");
+                });
+
+            modelBuilder.Entity("basketball3x3_match_away_roster", b =>
+                {
+                    b.Property<long>("Basketball3x3MatchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PlayerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Basketball3x3MatchId", "PlayerId");
+
+                    b.HasIndex("PlayerId");
+
+                    b.ToTable("basketball3x3_match_away_roster");
+                });
+
+            modelBuilder.Entity("basketball3x3_match_home_roster", b =>
+                {
+                    b.Property<long>("Basketball3x3MatchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PlayerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Basketball3x3MatchId", "PlayerId");
+
+                    b.HasIndex("PlayerId");
+
+                    b.ToTable("basketball3x3_match_home_roster");
+                });
+
+            modelBuilder.Entity("beach_volleyball_match_away_roster", b =>
+                {
+                    b.Property<long>("BeachVolleyballMatchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PlayerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("BeachVolleyballMatchId", "PlayerId");
+
+                    b.HasIndex("PlayerId");
+
+                    b.ToTable("beach_volleyball_match_away_roster");
+                });
+
+            modelBuilder.Entity("beach_volleyball_match_home_roster", b =>
+                {
+                    b.Property<long>("BeachVolleyballMatchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PlayerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("BeachVolleyballMatchId", "PlayerId");
+
+                    b.HasIndex("PlayerId");
+
+                    b.ToTable("beach_volleyball_match_home_roster");
+                });
+
+            modelBuilder.Entity("futsal_match_away_roster", b =>
+                {
+                    b.Property<long>("FutsalMatchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PlayerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("FutsalMatchId", "PlayerId");
+
+                    b.HasIndex("PlayerId");
+
+                    b.ToTable("futsal_match_away_roster");
+                });
+
+            modelBuilder.Entity("futsal_match_home_roster", b =>
+                {
+                    b.Property<long>("FutsalMatchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PlayerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("FutsalMatchId", "PlayerId");
+
+                    b.HasIndex("PlayerId");
+
+                    b.ToTable("futsal_match_home_roster");
+                });
+
+            modelBuilder.Entity("volleyball_match_away_roster", b =>
+                {
+                    b.Property<long>("PlayerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("VolleyballMatchId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("PlayerId", "VolleyballMatchId");
+
+                    b.HasIndex("VolleyballMatchId");
+
+                    b.ToTable("volleyball_match_away_roster");
+                });
+
+            modelBuilder.Entity("volleyball_match_home_roster", b =>
+                {
+                    b.Property<long>("PlayerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("VolleyballMatchId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("PlayerId", "VolleyballMatchId");
+
+                    b.HasIndex("VolleyballMatchId");
+
+                    b.ToTable("volleyball_match_home_roster");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Armwrestling.ArmwrestlingEvent", b =>
@@ -1024,6 +1601,15 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<int>("Hand")
                         .HasColumnType("integer")
                         .HasColumnName("hand");
+
+                    b.Property<int>("ParticipantsCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TimeControl")
+                        .HasColumnType("text");
+
+                    b.Property<int>("TournamentType")
+                        .HasColumnType("integer");
 
                     b.Property<int>("WeightClass")
                         .HasColumnType("integer")
@@ -1045,8 +1631,23 @@ namespace PolytechLeague.Persistence.Migrations
                 {
                     b.HasBaseType("PolytechLeague.Domain.Entities.Event");
 
+                    b.Property<long?>("FirstPlaceTeamId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("SecondPlaceTeamId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ThirdPlaceTeamId")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("TournamentType")
                         .HasColumnType("integer");
+
+                    b.HasIndex("FirstPlaceTeamId");
+
+                    b.HasIndex("SecondPlaceTeamId");
+
+                    b.HasIndex("ThirdPlaceTeamId");
 
                     b.ToTable("badminton_events", (string)null);
                 });
@@ -1055,8 +1656,23 @@ namespace PolytechLeague.Persistence.Migrations
                 {
                     b.HasBaseType("PolytechLeague.Domain.Entities.Event");
 
+                    b.Property<long?>("FirstPlaceTeamId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("SecondPlaceTeamId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ThirdPlaceTeamId")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("TournamentType")
                         .HasColumnType("integer");
+
+                    b.HasIndex("FirstPlaceTeamId");
+
+                    b.HasIndex("SecondPlaceTeamId");
+
+                    b.HasIndex("ThirdPlaceTeamId");
 
                     b.ToTable("basketball3x3_events", (string)null);
                 });
@@ -1065,8 +1681,23 @@ namespace PolytechLeague.Persistence.Migrations
                 {
                     b.HasBaseType("PolytechLeague.Domain.Entities.Event");
 
+                    b.Property<long?>("FirstPlaceTeamId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("SecondPlaceTeamId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ThirdPlaceTeamId")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("TournamentType")
                         .HasColumnType("integer");
+
+                    b.HasIndex("FirstPlaceTeamId");
+
+                    b.HasIndex("SecondPlaceTeamId");
+
+                    b.HasIndex("ThirdPlaceTeamId");
 
                     b.ToTable("beach_volleyball_events", (string)null);
                 });
@@ -1078,13 +1709,22 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<long?>("FirstPlaceTeamId")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("ParticipantsCount")
                         .HasColumnType("integer")
                         .HasColumnName("participants_count");
 
+                    b.Property<long?>("SecondPlaceTeamId")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("System")
                         .HasColumnType("integer")
                         .HasColumnName("system");
+
+                    b.Property<long?>("ThirdPlaceTeamId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("TimeControl")
                         .IsRequired()
@@ -1098,8 +1738,14 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("variant");
 
+                    b.HasIndex("FirstPlaceTeamId");
+
+                    b.HasIndex("SecondPlaceTeamId");
+
                     b.HasIndex("System")
                         .HasDatabaseName("IX_checkers_events_system");
+
+                    b.HasIndex("ThirdPlaceTeamId");
 
                     b.HasIndex("Variant")
                         .HasDatabaseName("IX_checkers_events_variant");
@@ -1114,13 +1760,22 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<long?>("FirstPlaceTeamId")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("ParticipantsCount")
                         .HasColumnType("integer")
                         .HasColumnName("participants_count");
 
+                    b.Property<long?>("SecondPlaceTeamId")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("System")
                         .HasColumnType("integer")
                         .HasColumnName("system");
+
+                    b.Property<long?>("ThirdPlaceTeamId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("TimeControl")
                         .IsRequired()
@@ -1130,8 +1785,14 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.HasIndex("FirstPlaceTeamId");
+
+                    b.HasIndex("SecondPlaceTeamId");
+
                     b.HasIndex("System")
                         .HasDatabaseName("IX_chess_events_system");
+
+                    b.HasIndex("ThirdPlaceTeamId");
 
                     b.ToTable("chess_events", (string)null);
                 });
@@ -1140,8 +1801,23 @@ namespace PolytechLeague.Persistence.Migrations
                 {
                     b.HasBaseType("PolytechLeague.Domain.Entities.Event");
 
+                    b.Property<long?>("FirstPlaceTeamId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("SecondPlaceTeamId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ThirdPlaceTeamId")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("TournamentType")
                         .HasColumnType("integer");
+
+                    b.HasIndex("FirstPlaceTeamId");
+
+                    b.HasIndex("SecondPlaceTeamId");
+
+                    b.HasIndex("ThirdPlaceTeamId");
 
                     b.ToTable("futsal_events", (string)null);
                 });
@@ -1179,124 +1855,25 @@ namespace PolytechLeague.Persistence.Migrations
                 {
                     b.HasBaseType("PolytechLeague.Domain.Entities.Event");
 
+                    b.Property<long?>("FirstPlaceTeamId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("SecondPlaceTeamId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ThirdPlaceTeamId")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("TournamentType")
                         .HasColumnType("integer");
 
+                    b.HasIndex("FirstPlaceTeamId");
+
+                    b.HasIndex("SecondPlaceTeamId");
+
+                    b.HasIndex("ThirdPlaceTeamId");
+
                     b.ToTable("volleyball_events", (string)null);
-                });
-
-            modelBuilder.Entity("PolytechLeague.Domain.Entities.Armwrestling.ArmwrestlingPlayer", b =>
-                {
-                    b.HasBaseType("PolytechLeague.Domain.Entities.Person");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<float>("CurrentWeight")
-                        .HasColumnType("real")
-                        .HasColumnName("current_weight");
-
-                    b.Property<string>("Group")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("PreferredWeightClass")
-                        .HasColumnType("integer")
-                        .HasColumnName("preferred_weight_class");
-
-                    b.HasIndex("PreferredWeightClass")
-                        .HasDatabaseName("IX_arm_players_weight_class");
-
-                    b.ToTable("armwrestling_players", (string)null);
-                });
-
-            modelBuilder.Entity("PolytechLeague.Domain.Entities.Badminton.BadmintonPlayer", b =>
-                {
-                    b.HasBaseType("PolytechLeague.Domain.Entities.Person");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Group")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.ToTable("badminton_players", (string)null);
-                });
-
-            modelBuilder.Entity("PolytechLeague.Domain.Entities.Basketball3x3.Basketball3x3Player", b =>
-                {
-                    b.HasBaseType("PolytechLeague.Domain.Entities.Person");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Group")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int?>("ShirtNumber")
-                        .HasColumnType("integer");
-
-                    b.Property<long?>("TeamId")
-                        .HasColumnType("bigint");
-
-                    b.HasIndex("TeamId");
-
-                    b.ToTable("basketball3x3_players", (string)null);
-                });
-
-            modelBuilder.Entity("PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballPlayer", b =>
-                {
-                    b.HasBaseType("PolytechLeague.Domain.Entities.Person");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Group")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int?>("ShirtNumber")
-                        .HasColumnType("integer");
-
-                    b.Property<long?>("TeamId")
-                        .HasColumnType("bigint");
-
-                    b.HasIndex("TeamId");
-
-                    b.ToTable("beach_volleyball_players", (string)null);
-                });
-
-            modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersPlayer", b =>
-                {
-                    b.HasBaseType("PolytechLeague.Domain.Entities.Person");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Group")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("Rating")
-                        .HasColumnType("integer")
-                        .HasColumnName("rating");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("title");
-
-                    b.HasIndex("Rating")
-                        .HasDatabaseName("IX_checkers_players_rating");
-
-                    b.ToTable("checkers_players", (string)null);
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersReferee", b =>
@@ -1306,40 +1883,6 @@ namespace PolytechLeague.Persistence.Migrations
                     b.ToTable("checkers_referees", (string)null);
                 });
 
-            modelBuilder.Entity("PolytechLeague.Domain.Entities.Chess.ChessPlayer", b =>
-                {
-                    b.HasBaseType("PolytechLeague.Domain.Entities.Person");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("FideId")
-                        .HasColumnType("text")
-                        .HasColumnName("fide_id");
-
-                    b.Property<string>("Group")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("RatingELO")
-                        .HasColumnType("integer")
-                        .HasColumnName("rating_elo");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("text")
-                        .HasColumnName("title");
-
-                    b.HasIndex("FideId")
-                        .IsUnique()
-                        .HasDatabaseName("IX_chess_players_fide_id");
-
-                    b.HasIndex("RatingELO")
-                        .HasDatabaseName("IX_chess_players_rating_elo");
-
-                    b.ToTable("chess_players", (string)null);
-                });
-
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Chess.ChessReferee", b =>
                 {
                     b.HasBaseType("PolytechLeague.Domain.Entities.Person");
@@ -1347,84 +1890,158 @@ namespace PolytechLeague.Persistence.Migrations
                     b.ToTable("chess_referees", (string)null);
                 });
 
-            modelBuilder.Entity("PolytechLeague.Domain.Entities.Futsal.FutsalPlayer", b =>
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Player", b =>
                 {
                     b.HasBaseType("PolytechLeague.Domain.Entities.Person");
 
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int?>("ArmwrestlingPreferredWeightClass")
+                        .HasColumnType("integer")
+                        .HasColumnName("armwrestling_preferred_weight_class");
 
-                    b.Property<string>("Group")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<float?>("ArmwrestlingWeight")
+                        .HasColumnType("real")
+                        .HasColumnName("armwrestling_weight");
 
-                    b.Property<int>("Position")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("ShirtNumber")
-                        .HasColumnType("integer");
-
-                    b.Property<long?>("TeamId")
+                    b.Property<long?>("Basketball3x3TeamId")
                         .HasColumnType("bigint");
 
-                    b.HasIndex("TeamId");
-
-                    b.ToTable("futsal_players", (string)null);
-                });
-
-            modelBuilder.Entity("PolytechLeague.Domain.Entities.TableTennis.TableTennisPlayer", b =>
-                {
-                    b.HasBaseType("PolytechLeague.Domain.Entities.Person");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Group")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("PlayingHand")
+                    b.Property<int?>("BasketballShirtNumber")
                         .HasColumnType("integer")
-                        .HasColumnName("playing_hand");
+                        .HasColumnName("basketball_shirt_number");
 
-                    b.Property<int>("Rating")
-                        .ValueGeneratedOnAdd()
+                    b.Property<long?>("BasketballTeamId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("basketball_team_id");
+
+                    b.Property<int?>("BeachVolleyballShirtNumber")
                         .HasColumnType("integer")
-                        .HasDefaultValue(0)
-                        .HasColumnName("rating");
+                        .HasColumnName("beach_volleyball_shirt_number");
 
-                    b.HasIndex("Rating")
-                        .HasDatabaseName("IX_table_tennis_players_rating");
+                    b.Property<long?>("BeachVolleyballTeamId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("beach_volleyball_team_id");
 
-                    b.ToTable("table_tennis_players", (string)null);
-                });
-
-            modelBuilder.Entity("PolytechLeague.Domain.Entities.Volleyball.VolleyballPlayer", b =>
-                {
-                    b.HasBaseType("PolytechLeague.Domain.Entities.Person");
-
-                    b.Property<string>("City")
-                        .IsRequired()
+                    b.Property<string>("Bio")
                         .HasColumnType("text");
 
-                    b.Property<string>("Group")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int?>("CheckersRating")
+                        .HasColumnType("integer")
+                        .HasColumnName("checkers_rating");
 
-                    b.Property<int>("Position")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("ShirtNumber")
-                        .HasColumnType("integer");
-
-                    b.Property<long?>("TeamId")
+                    b.Property<long?>("CheckersTeamId")
                         .HasColumnType("bigint");
 
-                    b.HasIndex("TeamId");
+                    b.Property<string>("ChessFideId")
+                        .HasColumnType("text")
+                        .HasColumnName("chess_fide_id");
 
-                    b.ToTable("volleyball_players", (string)null);
+                    b.Property<int?>("ChessRating")
+                        .HasColumnType("integer")
+                        .HasColumnName("chess_rating");
+
+                    b.Property<long?>("ChessTeamId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ChessTitle")
+                        .HasColumnType("text")
+                        .HasColumnName("chess_title");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("city");
+
+                    b.Property<int>("EnrollmentYear")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Faculty")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("FutsalPosition")
+                        .HasColumnType("integer")
+                        .HasColumnName("futsal_position");
+
+                    b.Property<int?>("FutsalShirtNumber")
+                        .HasColumnType("integer")
+                        .HasColumnName("futsal_shirt_number");
+
+                    b.Property<long?>("FutsalTeamId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("futsal_team_id");
+
+                    b.Property<string>("Group")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("group");
+
+                    b.Property<int>("GroupNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("InstagramUrl")
+                        .HasColumnType("text");
+
+                    b.Property<int>("SpecialtyCode")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("StudentId")
+                        .HasColumnType("text")
+                        .HasColumnName("student_id");
+
+                    b.Property<int?>("TableTennisHand")
+                        .HasColumnType("integer")
+                        .HasColumnName("table_tennis_hand");
+
+                    b.Property<int?>("TableTennisRating")
+                        .HasColumnType("integer")
+                        .HasColumnName("table_tennis_rating");
+
+                    b.Property<int?>("VolleyballPosition")
+                        .HasColumnType("integer")
+                        .HasColumnName("volleyball_position");
+
+                    b.Property<int?>("VolleyballShirtNumber")
+                        .HasColumnType("integer")
+                        .HasColumnName("volleyball_shirt_number");
+
+                    b.Property<long?>("VolleyballTeamId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("volleyball_team_id");
+
+                    b.HasIndex("Basketball3x3TeamId");
+
+                    b.HasIndex("BeachVolleyballTeamId");
+
+                    b.HasIndex("CheckersTeamId");
+
+                    b.HasIndex("ChessTeamId");
+
+                    b.HasIndex("FutsalTeamId");
+
+                    b.HasIndex("StudentId")
+                        .IsUnique();
+
+                    b.HasIndex("VolleyballTeamId");
+
+                    b.ToTable("players", (string)null);
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Armwrestling.ArmwrestlingEventParticipant", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "Player")
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Armwrestling.ArmwrestlingEvent", "Tournament")
+                        .WithMany("Players")
+                        .HasForeignKey("TournamentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Player");
+
+                    b.Navigation("Tournament");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Armwrestling.ArmwrestlingMatch", b =>
@@ -1435,19 +2052,19 @@ namespace PolytechLeague.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PolytechLeague.Domain.Entities.Armwrestling.ArmwrestlingPlayer", "Player1")
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "Player1")
                         .WithMany()
                         .HasForeignKey("Player1Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("PolytechLeague.Domain.Entities.Armwrestling.ArmwrestlingPlayer", "Player2")
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "Player2")
                         .WithMany()
                         .HasForeignKey("Player2Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("PolytechLeague.Domain.Entities.Armwrestling.ArmwrestlingPlayer", "Winner")
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "Winner")
                         .WithMany()
                         .HasForeignKey("WinnerId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -1463,55 +2080,74 @@ namespace PolytechLeague.Persistence.Migrations
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Badminton.BadmintonEventParticipant", b =>
                 {
-                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonPlayer", "Player")
+                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonEvent", "Event")
+                        .WithMany("Participants")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "Player")
                         .WithMany()
                         .HasForeignKey("PlayerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonEvent", "Tournament")
-                        .WithMany("Participants")
-                        .HasForeignKey("TournamentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Event");
 
                     b.Navigation("Player");
-
-                    b.Navigation("Tournament");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Badminton.BadmintonMatch", b =>
                 {
-                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonPlayer", "Player1")
+                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonTeam", "AwayTeam")
                         .WithMany()
-                        .HasForeignKey("Player1Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("AwayTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonPlayer", "Player2")
-                        .WithMany()
-                        .HasForeignKey("Player2Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonEvent", "Tournament")
+                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonEvent", "Event")
                         .WithMany("Matches")
-                        .HasForeignKey("TournamentId")
+                        .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonPlayer", "Winner")
+                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonTeam", "HomeTeam")
                         .WithMany()
-                        .HasForeignKey("WinnerId")
+                        .HasForeignKey("HomeTeamId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "Player1")
+                        .WithMany()
+                        .HasForeignKey("Player1Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "Player2")
+                        .WithMany()
+                        .HasForeignKey("Player2Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "WinnerPlayer")
+                        .WithMany()
+                        .HasForeignKey("WinnerPlayerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonTeam", "WinnerTeam")
+                        .WithMany()
+                        .HasForeignKey("WinnerTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("AwayTeam");
+
+                    b.Navigation("Event");
+
+                    b.Navigation("HomeTeam");
 
                     b.Navigation("Player1");
 
                     b.Navigation("Player2");
 
-                    b.Navigation("Tournament");
+                    b.Navigation("WinnerPlayer");
 
-                    b.Navigation("Winner");
+                    b.Navigation("WinnerTeam");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Badminton.BadmintonSet", b =>
@@ -1523,6 +2159,30 @@ namespace PolytechLeague.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Match");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Badminton.BadmintonTeam", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonEvent", "Event")
+                        .WithMany("Teams")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "Player1")
+                        .WithMany()
+                        .HasForeignKey("Player1Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "Player2")
+                        .WithMany()
+                        .HasForeignKey("Player2Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Event");
+
+                    b.Navigation("Player1");
+
+                    b.Navigation("Player2");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Basketball3x3.Basketball3x3Match", b =>
@@ -1557,6 +2217,17 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Navigation("HomeTeam");
 
                     b.Navigation("WinnerTeam");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Basketball3x3.Basketball3x3Team", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Basketball3x3.Basketball3x3Event", "Event")
+                        .WithMany("Teams")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballMatch", b =>
@@ -1604,23 +2275,34 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Navigation("Match");
                 });
 
-            modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersEventParticipant", b =>
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballTeam", b =>
                 {
-                    b.HasOne("PolytechLeague.Domain.Entities.Checkers.CheckersEvent", "Event")
-                        .WithMany("Players")
-                        .HasForeignKey("CheckersEventId")
+                    b.HasOne("PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballEvent", "Event")
+                        .WithMany("Teams")
+                        .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PolytechLeague.Domain.Entities.User", "User")
+                    b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersEventParticipant", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "Player")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Checkers.CheckersEvent", "Event")
+                        .WithMany("Players")
+                        .HasForeignKey("TournamentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Event");
 
-                    b.Navigation("User");
+                    b.Navigation("Player");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersGame", b =>
@@ -1628,31 +2310,54 @@ namespace PolytechLeague.Persistence.Migrations
                     b.HasOne("PolytechLeague.Domain.Entities.Checkers.CheckersEventParticipant", "BlackPlayer")
                         .WithMany()
                         .HasForeignKey("BlackPlayerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Checkers.CheckersTeam", "BlackTeam")
+                        .WithMany()
+                        .HasForeignKey("BlackTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PolytechLeague.Domain.Entities.Checkers.CheckersEvent", "Event")
                         .WithMany("Games")
-                        .HasForeignKey("CheckersEventId")
+                        .HasForeignKey("TournamentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("PolytechLeague.Domain.Entities.Checkers.CheckersEventParticipant", "WhitePlayer")
                         .WithMany()
                         .HasForeignKey("WhitePlayerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Checkers.CheckersTeam", "WhiteTeam")
+                        .WithMany()
+                        .HasForeignKey("WhiteTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("BlackPlayer");
+
+                    b.Navigation("BlackTeam");
 
                     b.Navigation("Event");
 
                     b.Navigation("WhitePlayer");
+
+                    b.Navigation("WhiteTeam");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersTeam", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Checkers.CheckersEvent", "Event")
+                        .WithMany("Teams")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Chess.ChessEventParticipant", b =>
                 {
-                    b.HasOne("PolytechLeague.Domain.Entities.Chess.ChessPlayer", "Player")
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "Player")
                         .WithMany()
                         .HasForeignKey("PlayerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1671,11 +2376,15 @@ namespace PolytechLeague.Persistence.Migrations
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Chess.ChessGame", b =>
                 {
-                    b.HasOne("PolytechLeague.Domain.Entities.Chess.ChessPlayer", "BlackPlayer")
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "BlackPlayer")
                         .WithMany()
                         .HasForeignKey("BlackPlayerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Chess.ChessTeam", "BlackTeam")
+                        .WithMany()
+                        .HasForeignKey("BlackTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PolytechLeague.Domain.Entities.Chess.ChessEvent", "Tournament")
                         .WithMany("Games")
@@ -1683,17 +2392,76 @@ namespace PolytechLeague.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PolytechLeague.Domain.Entities.Chess.ChessPlayer", "WhitePlayer")
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "WhitePlayer")
                         .WithMany()
                         .HasForeignKey("WhitePlayerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Chess.ChessTeam", "WhiteTeam")
+                        .WithMany()
+                        .HasForeignKey("WhiteTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("BlackPlayer");
+
+                    b.Navigation("BlackTeam");
 
                     b.Navigation("Tournament");
 
                     b.Navigation("WhitePlayer");
+
+                    b.Navigation("WhiteTeam");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Chess.ChessTeam", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Chess.ChessEvent", "Event")
+                        .WithMany("Teams")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Conversation", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.User", "User1")
+                        .WithMany()
+                        .HasForeignKey("User1Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.User", "User2")
+                        .WithMany()
+                        .HasForeignKey("User2Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User1");
+
+                    b.Navigation("User2");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Event", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "FirstPlace")
+                        .WithMany()
+                        .HasForeignKey("FirstPlaceId");
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "SecondPlace")
+                        .WithMany()
+                        .HasForeignKey("SecondPlaceId");
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "ThirdPlace")
+                        .WithMany()
+                        .HasForeignKey("ThirdPlaceId");
+
+                    b.Navigation("FirstPlace");
+
+                    b.Navigation("SecondPlace");
+
+                    b.Navigation("ThirdPlace");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.EventPhotos", b =>
@@ -1705,6 +2473,25 @@ namespace PolytechLeague.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Futsal.FutsalGoal", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Futsal.FutsalMatch", "Match")
+                        .WithMany("Goals")
+                        .HasForeignKey("MatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "Player")
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Match");
+
+                    b.Navigation("Player");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Futsal.FutsalMatch", b =>
@@ -1741,6 +2528,47 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Navigation("WinnerTeam");
                 });
 
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Futsal.FutsalTeam", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Futsal.FutsalEvent", "Event")
+                        .WithMany("Teams")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Message", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Conversation", "Conversation")
+                        .WithMany("Messages")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Conversation");
+
+                    b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Notification", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.User", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Person", b =>
                 {
                     b.HasOne("PolytechLeague.Domain.Entities.User", "User")
@@ -1753,7 +2581,7 @@ namespace PolytechLeague.Persistence.Migrations
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.TableTennis.TableTennisEventParticipant", b =>
                 {
-                    b.HasOne("PolytechLeague.Domain.Entities.TableTennis.TableTennisPlayer", "Player")
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "Player")
                         .WithMany()
                         .HasForeignKey("PlayerId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1772,13 +2600,13 @@ namespace PolytechLeague.Persistence.Migrations
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.TableTennis.TableTennisMatch", b =>
                 {
-                    b.HasOne("PolytechLeague.Domain.Entities.TableTennis.TableTennisPlayer", "Player1")
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "Player1")
                         .WithMany()
                         .HasForeignKey("Player1Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("PolytechLeague.Domain.Entities.TableTennis.TableTennisPlayer", "Player2")
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "Player2")
                         .WithMany()
                         .HasForeignKey("Player2Id")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1790,7 +2618,7 @@ namespace PolytechLeague.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PolytechLeague.Domain.Entities.TableTennis.TableTennisPlayer", "Winner")
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "Winner")
                         .WithMany()
                         .HasForeignKey("WinnerId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -1860,6 +2688,167 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Navigation("Match");
                 });
 
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Volleyball.VolleyballTeam", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Volleyball.VolleyballEvent", "Event")
+                        .WithMany("Teams")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("badminton_match_away_roster", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonMatch", null)
+                        .WithMany()
+                        .HasForeignKey("BadmintonMatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", null)
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("badminton_match_home_roster", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonMatch", null)
+                        .WithMany()
+                        .HasForeignKey("BadmintonMatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", null)
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("basketball3x3_match_away_roster", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Basketball3x3.Basketball3x3Match", null)
+                        .WithMany()
+                        .HasForeignKey("Basketball3x3MatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", null)
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("basketball3x3_match_home_roster", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Basketball3x3.Basketball3x3Match", null)
+                        .WithMany()
+                        .HasForeignKey("Basketball3x3MatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", null)
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("beach_volleyball_match_away_roster", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballMatch", null)
+                        .WithMany()
+                        .HasForeignKey("BeachVolleyballMatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", null)
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("beach_volleyball_match_home_roster", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballMatch", null)
+                        .WithMany()
+                        .HasForeignKey("BeachVolleyballMatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", null)
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("futsal_match_away_roster", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Futsal.FutsalMatch", null)
+                        .WithMany()
+                        .HasForeignKey("FutsalMatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", null)
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("futsal_match_home_roster", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Futsal.FutsalMatch", null)
+                        .WithMany()
+                        .HasForeignKey("FutsalMatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", null)
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("volleyball_match_away_roster", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", null)
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Volleyball.VolleyballMatch", null)
+                        .WithMany()
+                        .HasForeignKey("VolleyballMatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("volleyball_match_home_roster", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", null)
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Volleyball.VolleyballMatch", null)
+                        .WithMany()
+                        .HasForeignKey("VolleyballMatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Armwrestling.ArmwrestlingEvent", b =>
                 {
                     b.HasOne("PolytechLeague.Domain.Entities.Event", null)
@@ -1871,56 +2860,176 @@ namespace PolytechLeague.Persistence.Migrations
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Badminton.BadmintonEvent", b =>
                 {
+                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonTeam", "FirstPlaceTeam")
+                        .WithMany()
+                        .HasForeignKey("FirstPlaceTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PolytechLeague.Domain.Entities.Event", null)
                         .WithOne()
                         .HasForeignKey("PolytechLeague.Domain.Entities.Badminton.BadmintonEvent", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonTeam", "SecondPlaceTeam")
+                        .WithMany()
+                        .HasForeignKey("SecondPlaceTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Badminton.BadmintonTeam", "ThirdPlaceTeam")
+                        .WithMany()
+                        .HasForeignKey("ThirdPlaceTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("FirstPlaceTeam");
+
+                    b.Navigation("SecondPlaceTeam");
+
+                    b.Navigation("ThirdPlaceTeam");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Basketball3x3.Basketball3x3Event", b =>
                 {
+                    b.HasOne("PolytechLeague.Domain.Entities.Basketball3x3.Basketball3x3Team", "FirstPlaceTeam")
+                        .WithMany()
+                        .HasForeignKey("FirstPlaceTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PolytechLeague.Domain.Entities.Event", null)
                         .WithOne()
                         .HasForeignKey("PolytechLeague.Domain.Entities.Basketball3x3.Basketball3x3Event", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Basketball3x3.Basketball3x3Team", "SecondPlaceTeam")
+                        .WithMany()
+                        .HasForeignKey("SecondPlaceTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Basketball3x3.Basketball3x3Team", "ThirdPlaceTeam")
+                        .WithMany()
+                        .HasForeignKey("ThirdPlaceTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("FirstPlaceTeam");
+
+                    b.Navigation("SecondPlaceTeam");
+
+                    b.Navigation("ThirdPlaceTeam");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballEvent", b =>
                 {
+                    b.HasOne("PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballTeam", "FirstPlaceTeam")
+                        .WithMany()
+                        .HasForeignKey("FirstPlaceTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PolytechLeague.Domain.Entities.Event", null)
                         .WithOne()
                         .HasForeignKey("PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballEvent", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballTeam", "SecondPlaceTeam")
+                        .WithMany()
+                        .HasForeignKey("SecondPlaceTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballTeam", "ThirdPlaceTeam")
+                        .WithMany()
+                        .HasForeignKey("ThirdPlaceTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("FirstPlaceTeam");
+
+                    b.Navigation("SecondPlaceTeam");
+
+                    b.Navigation("ThirdPlaceTeam");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersEvent", b =>
                 {
+                    b.HasOne("PolytechLeague.Domain.Entities.Checkers.CheckersTeam", "FirstPlaceTeam")
+                        .WithMany()
+                        .HasForeignKey("FirstPlaceTeamId");
+
                     b.HasOne("PolytechLeague.Domain.Entities.Event", null)
                         .WithOne()
                         .HasForeignKey("PolytechLeague.Domain.Entities.Checkers.CheckersEvent", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Checkers.CheckersTeam", "SecondPlaceTeam")
+                        .WithMany()
+                        .HasForeignKey("SecondPlaceTeamId");
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Checkers.CheckersTeam", "ThirdPlaceTeam")
+                        .WithMany()
+                        .HasForeignKey("ThirdPlaceTeamId");
+
+                    b.Navigation("FirstPlaceTeam");
+
+                    b.Navigation("SecondPlaceTeam");
+
+                    b.Navigation("ThirdPlaceTeam");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Chess.ChessEvent", b =>
                 {
+                    b.HasOne("PolytechLeague.Domain.Entities.Chess.ChessTeam", "FirstPlaceTeam")
+                        .WithMany()
+                        .HasForeignKey("FirstPlaceTeamId");
+
                     b.HasOne("PolytechLeague.Domain.Entities.Event", null)
                         .WithOne()
                         .HasForeignKey("PolytechLeague.Domain.Entities.Chess.ChessEvent", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Chess.ChessTeam", "SecondPlaceTeam")
+                        .WithMany()
+                        .HasForeignKey("SecondPlaceTeamId");
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Chess.ChessTeam", "ThirdPlaceTeam")
+                        .WithMany()
+                        .HasForeignKey("ThirdPlaceTeamId");
+
+                    b.Navigation("FirstPlaceTeam");
+
+                    b.Navigation("SecondPlaceTeam");
+
+                    b.Navigation("ThirdPlaceTeam");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Futsal.FutsalEvent", b =>
                 {
+                    b.HasOne("PolytechLeague.Domain.Entities.Futsal.FutsalTeam", "FirstPlaceTeam")
+                        .WithMany()
+                        .HasForeignKey("FirstPlaceTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PolytechLeague.Domain.Entities.Event", null)
                         .WithOne()
                         .HasForeignKey("PolytechLeague.Domain.Entities.Futsal.FutsalEvent", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Futsal.FutsalTeam", "SecondPlaceTeam")
+                        .WithMany()
+                        .HasForeignKey("SecondPlaceTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Futsal.FutsalTeam", "ThirdPlaceTeam")
+                        .WithMany()
+                        .HasForeignKey("ThirdPlaceTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("FirstPlaceTeam");
+
+                    b.Navigation("SecondPlaceTeam");
+
+                    b.Navigation("ThirdPlaceTeam");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.TableTennis.TableTennisEvent", b =>
@@ -1934,70 +3043,32 @@ namespace PolytechLeague.Persistence.Migrations
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Volleyball.VolleyballEvent", b =>
                 {
+                    b.HasOne("PolytechLeague.Domain.Entities.Volleyball.VolleyballTeam", "FirstPlaceTeam")
+                        .WithMany()
+                        .HasForeignKey("FirstPlaceTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PolytechLeague.Domain.Entities.Event", null)
                         .WithOne()
                         .HasForeignKey("PolytechLeague.Domain.Entities.Volleyball.VolleyballEvent", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
 
-            modelBuilder.Entity("PolytechLeague.Domain.Entities.Armwrestling.ArmwrestlingPlayer", b =>
-                {
-                    b.HasOne("PolytechLeague.Domain.Entities.Person", null)
-                        .WithOne()
-                        .HasForeignKey("PolytechLeague.Domain.Entities.Armwrestling.ArmwrestlingPlayer", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
+                    b.HasOne("PolytechLeague.Domain.Entities.Volleyball.VolleyballTeam", "SecondPlaceTeam")
+                        .WithMany()
+                        .HasForeignKey("SecondPlaceTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity("PolytechLeague.Domain.Entities.Badminton.BadmintonPlayer", b =>
-                {
-                    b.HasOne("PolytechLeague.Domain.Entities.Person", null)
-                        .WithOne()
-                        .HasForeignKey("PolytechLeague.Domain.Entities.Badminton.BadmintonPlayer", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
+                    b.HasOne("PolytechLeague.Domain.Entities.Volleyball.VolleyballTeam", "ThirdPlaceTeam")
+                        .WithMany()
+                        .HasForeignKey("ThirdPlaceTeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity("PolytechLeague.Domain.Entities.Basketball3x3.Basketball3x3Player", b =>
-                {
-                    b.HasOne("PolytechLeague.Domain.Entities.Person", null)
-                        .WithOne()
-                        .HasForeignKey("PolytechLeague.Domain.Entities.Basketball3x3.Basketball3x3Player", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("FirstPlaceTeam");
 
-                    b.HasOne("PolytechLeague.Domain.Entities.Basketball3x3.Basketball3x3Team", "Team")
-                        .WithMany("Players")
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                    b.Navigation("SecondPlaceTeam");
 
-                    b.Navigation("Team");
-                });
-
-            modelBuilder.Entity("PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballPlayer", b =>
-                {
-                    b.HasOne("PolytechLeague.Domain.Entities.Person", null)
-                        .WithOne()
-                        .HasForeignKey("PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballPlayer", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballTeam", "Team")
-                        .WithMany("Players")
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Team");
-                });
-
-            modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersPlayer", b =>
-                {
-                    b.HasOne("PolytechLeague.Domain.Entities.Person", null)
-                        .WithOne()
-                        .HasForeignKey("PolytechLeague.Domain.Entities.Checkers.CheckersPlayer", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("ThirdPlaceTeam");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersReferee", b =>
@@ -2005,15 +3076,6 @@ namespace PolytechLeague.Persistence.Migrations
                     b.HasOne("PolytechLeague.Domain.Entities.Person", null)
                         .WithOne()
                         .HasForeignKey("PolytechLeague.Domain.Entities.Checkers.CheckersReferee", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("PolytechLeague.Domain.Entities.Chess.ChessPlayer", b =>
-                {
-                    b.HasOne("PolytechLeague.Domain.Entities.Person", null)
-                        .WithOne()
-                        .HasForeignKey("PolytechLeague.Domain.Entities.Chess.ChessPlayer", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -2027,45 +3089,37 @@ namespace PolytechLeague.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("PolytechLeague.Domain.Entities.Futsal.FutsalPlayer", b =>
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Player", b =>
                 {
-                    b.HasOne("PolytechLeague.Domain.Entities.Person", null)
-                        .WithOne()
-                        .HasForeignKey("PolytechLeague.Domain.Entities.Futsal.FutsalPlayer", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PolytechLeague.Domain.Entities.Futsal.FutsalTeam", "Team")
+                    b.HasOne("PolytechLeague.Domain.Entities.Basketball3x3.Basketball3x3Team", null)
                         .WithMany("Players")
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("Basketball3x3TeamId");
 
-                    b.Navigation("Team");
-                });
-
-            modelBuilder.Entity("PolytechLeague.Domain.Entities.TableTennis.TableTennisPlayer", b =>
-                {
-                    b.HasOne("PolytechLeague.Domain.Entities.Person", null)
-                        .WithOne()
-                        .HasForeignKey("PolytechLeague.Domain.Entities.TableTennis.TableTennisPlayer", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("PolytechLeague.Domain.Entities.Volleyball.VolleyballPlayer", b =>
-                {
-                    b.HasOne("PolytechLeague.Domain.Entities.Person", null)
-                        .WithOne()
-                        .HasForeignKey("PolytechLeague.Domain.Entities.Volleyball.VolleyballPlayer", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PolytechLeague.Domain.Entities.Volleyball.VolleyballTeam", "Team")
+                    b.HasOne("PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballTeam", null)
                         .WithMany("Players")
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("BeachVolleyballTeamId");
 
-                    b.Navigation("Team");
+                    b.HasOne("PolytechLeague.Domain.Entities.Checkers.CheckersTeam", null)
+                        .WithMany("Players")
+                        .HasForeignKey("CheckersTeamId");
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Chess.ChessTeam", null)
+                        .WithMany("Players")
+                        .HasForeignKey("ChessTeamId");
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Futsal.FutsalTeam", null)
+                        .WithMany("Players")
+                        .HasForeignKey("FutsalTeamId");
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Person", null)
+                        .WithOne()
+                        .HasForeignKey("PolytechLeague.Domain.Entities.Player", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Volleyball.VolleyballTeam", null)
+                        .WithMany("Players")
+                        .HasForeignKey("VolleyballTeamId");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Badminton.BadmintonMatch", b =>
@@ -2088,9 +3142,29 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Navigation("Players");
                 });
 
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersTeam", b =>
+                {
+                    b.Navigation("Players");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Chess.ChessTeam", b =>
+                {
+                    b.Navigation("Players");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Conversation", b =>
+                {
+                    b.Navigation("Messages");
+                });
+
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Event", b =>
                 {
                     b.Navigation("Photos");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Futsal.FutsalMatch", b =>
+                {
+                    b.Navigation("Goals");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Futsal.FutsalTeam", b =>
@@ -2101,6 +3175,11 @@ namespace PolytechLeague.Persistence.Migrations
             modelBuilder.Entity("PolytechLeague.Domain.Entities.TableTennis.TableTennisMatch", b =>
                 {
                     b.Navigation("Sets");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.User", b =>
+                {
+                    b.Navigation("Notifications");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Volleyball.VolleyballMatch", b =>
@@ -2116,6 +3195,8 @@ namespace PolytechLeague.Persistence.Migrations
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Armwrestling.ArmwrestlingEvent", b =>
                 {
                     b.Navigation("Matches");
+
+                    b.Navigation("Players");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Badminton.BadmintonEvent", b =>
@@ -2123,16 +3204,22 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Navigation("Matches");
 
                     b.Navigation("Participants");
+
+                    b.Navigation("Teams");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Basketball3x3.Basketball3x3Event", b =>
                 {
                     b.Navigation("Matches");
+
+                    b.Navigation("Teams");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballEvent", b =>
                 {
                     b.Navigation("Matches");
+
+                    b.Navigation("Teams");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersEvent", b =>
@@ -2140,6 +3227,8 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Navigation("Games");
 
                     b.Navigation("Players");
+
+                    b.Navigation("Teams");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Chess.ChessEvent", b =>
@@ -2147,11 +3236,15 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Navigation("Games");
 
                     b.Navigation("Players");
+
+                    b.Navigation("Teams");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Futsal.FutsalEvent", b =>
                 {
                     b.Navigation("Matches");
+
+                    b.Navigation("Teams");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.TableTennis.TableTennisEvent", b =>
@@ -2164,6 +3257,8 @@ namespace PolytechLeague.Persistence.Migrations
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Volleyball.VolleyballEvent", b =>
                 {
                     b.Navigation("Matches");
+
+                    b.Navigation("Teams");
                 });
 #pragma warning restore 612, 618
         }

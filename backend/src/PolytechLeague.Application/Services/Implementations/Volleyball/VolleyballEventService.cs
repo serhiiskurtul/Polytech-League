@@ -5,6 +5,7 @@ using PolytechLeague.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
 using PolytechLeague.Application.Services.Interfaces;
 using PolytechLeague.Domain.Entities;
+using PolytechLeague.Domain.Exceptions;
 
 namespace PolytechLeague.Application.Services.Implementations.Volleyball;
 
@@ -137,5 +138,37 @@ public class VolleyballEventService(
             NotificationType.Tournament,
             $"/tournaments/{eventId}"
         );
+    }
+
+    public override async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
+    {
+        // 0. Clear player references
+        await _dbcontext.Database.ExecuteSqlRawAsync(
+            $"UPDATE players SET volleyball_team_id = NULL WHERE volleyball_team_id IN (SELECT id FROM volleyball_teams WHERE \"EventId\" = {id})", 
+            cancellationToken);
+
+        // 1. Fetch event
+        var entity = await _dbcontext.VolleyballEvents
+            .Include(e => e.Matches)
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+
+        if (entity == null) throw new EntityNotFoundException(nameof(VolleyballEvent), id);
+
+        // 2. Clear winners
+        entity.FirstPlaceTeamId = null;
+        entity.SecondPlaceTeamId = null;
+        entity.ThirdPlaceTeamId = null;
+        await _dbcontext.SaveChangesAsync(cancellationToken);
+
+        // 3. Delete matches
+        if (entity.Matches != null && entity.Matches.Any())
+        {
+            _dbcontext.VolleyballMatches.RemoveRange(entity.Matches);
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+        }
+
+        // 4. Delete event
+        _dbcontext.VolleyballEvents.Remove(entity);
+        await _dbcontext.SaveChangesAsync(cancellationToken);
     }
 }
