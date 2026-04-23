@@ -16,6 +16,9 @@ public class PlayerDto
     public string? LastName { get; set; }
     public DateOnly? BirthDate { get; set; }
     public string? Group { get; set; }
+    public int EnrollmentYear { get; set; }
+    public int SpecialtyCode { get; set; }
+    public int GroupNumber { get; set; }
     public string? StudentId { get; set; }
     public string? City { get; set; }
     public string? PhotoUrl { get; set; }
@@ -98,6 +101,9 @@ public static class PlayerDtoExtensions
             LastName = player.LastName,
             BirthDate = player.BirthDate,
             Group = player.Group,
+            EnrollmentYear = player.EnrollmentYear,
+            SpecialtyCode = player.SpecialtyCode,
+            GroupNumber = player.GroupNumber,
             StudentId = player.StudentId,
             City = player.City,
             PhotoUrl = player.PhotoUrl,
@@ -143,6 +149,9 @@ public static class PlayerDtoExtensions
             LastName = dto.LastName ?? string.Empty,
             BirthDate = dto.BirthDate ?? DateOnly.MinValue,
             Group = dto.Group ?? string.Empty,
+            EnrollmentYear = dto.EnrollmentYear,
+            SpecialtyCode = dto.SpecialtyCode,
+            GroupNumber = dto.GroupNumber,
             StudentId = dto.StudentId,
             City = dto.City ?? "Чернівці",
             PhotoUrl = dto.PhotoUrl ?? "",

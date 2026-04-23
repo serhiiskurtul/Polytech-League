@@ -12,4 +12,5 @@ public class TableTennisEventParticipant
 
     public double Points { get; set; } = 0;
     public int Rank { get; set; }
+    public string? GroupName { get; set; }
 }

@@ -89,8 +89,15 @@ public class TableTennisEventService(
             TournamentId = eventId,
             PlayerId = dto.PlayerId,
             Points = dto.Points,
-            Rank = dto.Rank
+            Rank = dto.Rank,
+            GroupName = dto.GroupName
         };
+
+        if (string.IsNullOrEmpty(participant.GroupName))
+        {
+            var player = await _dbcontext.Set<Player>().FindAsync(dto.PlayerId);
+            participant.GroupName = player?.Group;
+        }
         _dbcontext.Set<TableTennisEventParticipant>().Add(participant);
         await _dbcontext.SaveChangesAsync(cancellationToken);
     }

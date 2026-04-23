@@ -49,6 +49,9 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<long>("PlayerId")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("GroupName")
+                        .HasColumnType("text");
+
                     b.Property<int>("Rank")
                         .HasColumnType("integer");
 
@@ -118,6 +121,9 @@ namespace PolytechLeague.Persistence.Migrations
 
                     b.Property<long>("PlayerId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("GroupName")
+                        .HasColumnType("text");
 
                     b.Property<double>("Points")
                         .HasColumnType("double precision");
@@ -430,6 +436,9 @@ namespace PolytechLeague.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<string>("GroupName")
+                        .HasColumnType("text");
+
                     b.Property<long>("PlayerId")
                         .HasColumnType("bigint");
 
@@ -576,6 +585,9 @@ namespace PolytechLeague.Persistence.Migrations
 
                     b.Property<long>("PlayerId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("GroupName")
+                        .HasColumnType("text");
 
                     b.Property<double>("Points")
                         .HasColumnType("double precision")
@@ -1134,6 +1146,9 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<long>("PlayerId")
                         .HasColumnType("bigint")
                         .HasColumnName("player_id");
+
+                    b.Property<string>("GroupName")
+                        .HasColumnType("text");
 
                     b.Property<double>("Points")
                         .ValueGeneratedOnAdd()
@@ -1914,6 +1929,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("city");
 
+                    b.Property<int>("EnrollmentYear")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Faculty")
                         .HasColumnType("text");
 
@@ -1934,8 +1952,14 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("group");
 
+                    b.Property<int>("GroupNumber")
+                        .HasColumnType("integer");
+
                     b.Property<string>("InstagramUrl")
                         .HasColumnType("text");
+
+                    b.Property<int>("SpecialtyCode")
+                        .HasColumnType("integer");
 
                     b.Property<string>("StudentId")
                         .HasColumnType("text")

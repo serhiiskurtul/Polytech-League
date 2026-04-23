@@ -11,6 +11,7 @@ public class BadmintonEventParticipantDto
     public string? PlayerName { get; set; }
     public double Points { get; set; }
     public int Rank { get; set; }
+    public string? GroupName { get; set; }
 }
 
 public static class BadmintonEventParticipantDtoExtensions
@@ -25,7 +26,8 @@ public static class BadmintonEventParticipantDtoExtensions
             PlayerId = participant.PlayerId,
             PlayerName = participant.Player != null ? $"{participant.Player.FirstName} {participant.Player.Patronymic ?? ""} {participant.Player.LastName}".Replace("  ", " ").Trim() : null,
             Points = participant.Points,
-            Rank = participant.Rank
+            Rank = participant.Rank,
+            GroupName = participant.GroupName ?? participant.Player?.Group
         };
     }
 
@@ -36,7 +38,8 @@ public static class BadmintonEventParticipantDtoExtensions
             EventId = eventId,
             PlayerId = dto.PlayerId,
             Points = dto.Points,
-            Rank = dto.Rank
+            Rank = dto.Rank,
+            GroupName = dto.GroupName
         };
     }
 }

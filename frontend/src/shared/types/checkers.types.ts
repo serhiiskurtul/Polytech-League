@@ -19,6 +19,7 @@ export interface CheckersEventParticipantResponse {
   points: number;
   rating: number;
   rank: number;
+  groupName?: string | null;
 }
 
 export interface CheckersGameResponse {
@@ -95,6 +96,7 @@ export interface CheckersEventParticipantDto {
     playerId: number;
     points: number;
     rank: number;
+    groupName?: string;
 }
 
 export interface CheckersGameDto {

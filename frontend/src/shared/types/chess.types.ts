@@ -29,6 +29,7 @@ export interface ChessEventParticipantResponse {
   rank: number;
   fideId?: string | null;
   title?: string | null;
+  groupName?: string | null;
 }
 
 export interface ChessGameResponse {
@@ -111,6 +112,7 @@ export interface ChessEventParticipantDto {
     playerId: number;
     points: number;
     rank: number;
+    groupName?: string;
 }
 
 export interface ChessGameDto {

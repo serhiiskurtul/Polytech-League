@@ -12,6 +12,7 @@ public class CheckersEventParticipantDto
     public double Points { get; set; }
     public int Rating { get; set; }
     public int Rank { get; set; }
+    public string? GroupName { get; set; }
 }
 
 public static class CheckersEventParticipantDtoExtensions
@@ -27,7 +28,8 @@ public static class CheckersEventParticipantDtoExtensions
             PlayerName = participant.Player != null ? $"{participant.Player.FirstName} {participant.Player.Patronymic ?? ""} {participant.Player.LastName}".Replace("  ", " ").Trim() : null,
             Points = participant.Points,
             Rating = participant.StartingRating,
-            Rank = participant.Rank
+            Rank = participant.Rank,
+            GroupName = participant.GroupName ?? participant.Player?.Group
         };
     }
 
@@ -39,7 +41,8 @@ public static class CheckersEventParticipantDtoExtensions
             PlayerId = dto.PlayerId,
             StartingRating = dto.Rating,
             Points = dto.Points,
-            Rank = dto.Rank
+            Rank = dto.Rank,
+            GroupName = dto.GroupName
         };
     }
 }

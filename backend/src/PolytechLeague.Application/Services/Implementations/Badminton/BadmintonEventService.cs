@@ -107,6 +107,11 @@ public class BadmintonEventService(
         if (exists) return;
 
         var participant = dto.FromDto(eventId);
+        if (string.IsNullOrEmpty(participant.GroupName))
+        {
+            var player = await _dbcontext.Set<Player>().FindAsync(dto.PlayerId);
+            participant.GroupName = player?.Group;
+        }
         _dbcontext.BadmintonEventParticipants.Add(participant);
         await _dbcontext.SaveChangesAsync(cancellationToken);
     }

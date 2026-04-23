@@ -7,6 +7,7 @@ using PolytechLeague.Application.Services.Interfaces;
 using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Exceptions;
 using PolytechLeague.Application.Dto;
+using PolytechLeague.Application.Utilities;
 
 namespace PolytechLeague.Application.Services.Implementations.Chess;
 
@@ -84,8 +85,16 @@ public class ChessEventService(
             TournamentId = eventId,
             PlayerId = dto.PlayerId,
             Points = dto.Points,
-            Rank = dto.Rank
+            Rank = dto.Rank,
+            GroupName = dto.GroupName
         };
+
+        if (string.IsNullOrEmpty(participant.GroupName))
+        {
+            var player = await _dbcontext.Set<Player>().FindAsync(dto.PlayerId);
+            participant.GroupName = player?.Group;
+        }
+
         _dbcontext.Set<ChessEventParticipant>().Add(participant);
         await _dbcontext.SaveChangesAsync(cancellationToken);
     }
@@ -199,7 +208,7 @@ public class ChessEventService(
                     .FirstOrDefaultAsync(p => p.ChessFideId == sp.FideId, cancellationToken);
             }
 
-            // 2. Try match by Name
+            // 2. Try match by Name and Specialty
             if (player == null)
             {
                 names = sp.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -207,8 +216,23 @@ public class ChessEventService(
                 {
                     var lastName = names[0];
                     var firstName = names[1];
-                    player = await _dbcontext.Set<Player>()
-                        .FirstOrDefaultAsync(p => p.LastName.ToLower() == lastName.ToLower() && p.FirstName.ToLower() == firstName.ToLower(), cancellationToken);
+                    
+                    var query = _dbcontext.Set<Player>()
+                        .Where(p => p.LastName.ToLower() == lastName.ToLower() && p.FirstName.ToLower() == firstName.ToLower());
+
+                    if (!string.IsNullOrEmpty(sp.Group))
+                    {
+                        var parsed = GroupUtility.ParseGroup(sp.Group, DateTime.Now);
+                        if (parsed.specialty > 0)
+                        {
+                            player = await query.FirstOrDefaultAsync(p => p.SpecialtyCode == parsed.specialty && p.EnrollmentYear == parsed.enrollmentYear, cancellationToken);
+                        }
+                    }
+
+                    if (player == null)
+                    {
+                        player = await query.FirstOrDefaultAsync(cancellationToken);
+                    }
                 }
             }
 
@@ -219,12 +243,17 @@ public class ChessEventService(
                 var lastName = names.Length > 0 ? names[0] : "Невідомий";
                 var firstName = names.Length > 1 ? names[1] : "Гравець";
 
+                var parsed = !string.IsNullOrEmpty(sp.Group) ? GroupUtility.ParseGroup(sp.Group, DateTime.Now) : (specialty: 0, enrollmentYear: 0, groupNumber: 0);
+                
                 player = new Player
                 {
                     LastName = lastName,
                     FirstName = firstName,
                     City = "Чернівці",
-                    Group = "Unknown",
+                    Group = sp.Group ?? "Unknown",
+                    EnrollmentYear = parsed.enrollmentYear,
+                    SpecialtyCode = parsed.specialty,
+                    GroupNumber = parsed.groupNumber,
                     PhotoUrl = "/images/placeholders/user.png",
                     ChessFideId = sp.FideId,
                     ChessRating = sp.Rating,
@@ -239,7 +268,8 @@ public class ChessEventService(
             {
                 PlayerId = player.Id,
                 Points = sp.Points,
-                Rank = sp.Rank ?? 0
+                Rank = sp.Rank ?? 0,
+                GroupName = sp.Group ?? player.Group
             }, cancellationToken);
         }
 

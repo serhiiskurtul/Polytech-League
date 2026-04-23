@@ -107,8 +107,15 @@ public class ArmwrestlingEventService(
             TournamentId = eventId,
             PlayerId = dto.PlayerId,
             Weight = dto.Weight,
-            Rank = dto.Rank
+            Rank = dto.Rank,
+            GroupName = dto.GroupName
         };
+
+        if (string.IsNullOrEmpty(participant.GroupName))
+        {
+            var player = await _dbcontext.Set<Player>().FindAsync(dto.PlayerId);
+            participant.GroupName = player?.Group;
+        }
 
         _dbcontext.ArmwrestlingEventParticipants.Add(participant);
         await _dbcontext.SaveChangesAsync(cancellationToken);

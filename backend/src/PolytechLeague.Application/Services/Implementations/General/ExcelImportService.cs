@@ -72,6 +72,7 @@ public class ExcelImportService : IExcelImportService
         int rkIdx = -1;
         int rtgIdx = -1;
         int fideIdIdx = -1;
+        int groupIdx = -1;
 
         // 1. Find Header Row
         for (int i = 0; i < Math.Min(table.Rows.Count, 15); i++)
@@ -116,6 +117,10 @@ public class ExcelImportService : IExcelImportService
                     {
                         fideIdIdx = j;
                     }
+                    else if (cell.Contains("Group") || cell.Contains("Група") || cell.Contains("Club") || cell.Contains("Клуб"))
+                    {
+                        groupIdx = j;
+                    }
                 }
                 break;
             }
@@ -140,7 +145,8 @@ public class ExcelImportService : IExcelImportService
                 Rank = rkIdx != -1 ? TryParseInt(row.ItemArray[rkIdx]) : i - headerRowIdx,
                 Points = ptsIdx != -1 ? TryParseDouble(row.ItemArray[ptsIdx]) : 0,
                 Rating = rtgIdx != -1 ? TryParseInt(row.ItemArray[rtgIdx]) : null,
-                FideId = fideIdIdx != -1 ? row.ItemArray[fideIdIdx]?.ToString()?.Trim() : null
+                FideId = fideIdIdx != -1 ? row.ItemArray[fideIdIdx]?.ToString()?.Trim() : null,
+                Group = groupIdx != -1 ? row.ItemArray[groupIdx]?.ToString()?.Trim() : null
             };
 
             data.Players.Add(player);

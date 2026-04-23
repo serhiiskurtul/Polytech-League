@@ -16,6 +16,7 @@ public class ChessEventParticipantDto
     public double SonnebornBerger { get; set; }
     public string? FideId { get; set; }
     public string? Title { get; set; }
+    public string? GroupName { get; set; }
 }
 
 public static class ChessEventParticipantDtoExtensions
@@ -35,7 +36,8 @@ public static class ChessEventParticipantDtoExtensions
             Buchholz = 0,
             SonnebornBerger = 0,
             FideId = participant.Player?.ChessFideId,
-            Title = participant.Player?.ChessTitle
+            Title = participant.Player?.ChessTitle,
+            GroupName = participant.GroupName ?? participant.Player?.Group
         };
     }
 
@@ -46,7 +48,8 @@ public static class ChessEventParticipantDtoExtensions
             TournamentId = tournamentId,
             PlayerId = dto.PlayerId,
             Points = dto.Points,
-            Rank = dto.Rank
+            Rank = dto.Rank,
+            GroupName = dto.GroupName
         };
     }
 }

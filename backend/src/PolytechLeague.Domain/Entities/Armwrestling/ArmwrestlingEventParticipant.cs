@@ -11,5 +11,6 @@ public class ArmwrestlingEventParticipant
     public Player? Player { get; set; }
 
     public double Weight { get; set; }
+    public string? GroupName { get; set; }
     public int Rank { get; set; }
 }

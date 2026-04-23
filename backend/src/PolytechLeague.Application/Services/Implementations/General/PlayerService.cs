@@ -15,6 +15,7 @@ using PolytechLeague.Domain.Entities.Volleyball;
 using PolytechLeague.Domain.Entities.Basketball3x3;
 using PolytechLeague.Domain.Entities.BeachVolleyball;
 using PolytechLeague.Domain.Entities.Shared;
+using PolytechLeague.Application.Utilities;
 
 namespace PolytechLeague.Application.Services.Implementations.General;
 
@@ -81,7 +82,41 @@ public class PlayerService : IPlayerService
 
     public async Task<PlayerDto> CreateAsync(PlayerDto dto, CancellationToken cancellationToken = default)
     {
+        // Try to prevent duplicates if specialty and enrollment year are provided or can be parsed
+        if (dto.EnrollmentYear == 0 && !string.IsNullOrEmpty(dto.Group))
+        {
+            var parsed = GroupUtility.ParseGroup(dto.Group, DateTime.Now);
+            dto.SpecialtyCode = parsed.specialty;
+            dto.EnrollmentYear = parsed.enrollmentYear;
+            dto.GroupNumber = parsed.groupNumber;
+        }
+
+        if (dto.EnrollmentYear > 0)
+        {
+            var existing = await _dbContext.Players
+                .FirstOrDefaultAsync(p => p.FirstName.ToLower() == dto.FirstName!.ToLower() && 
+                                          p.LastName.ToLower() == dto.LastName!.ToLower() &&
+                                          p.SpecialtyCode == dto.SpecialtyCode &&
+                                          p.EnrollmentYear == dto.EnrollmentYear, cancellationToken);
+            
+            if (existing != null)
+            {
+                _logger.LogInformation("Found existing player {PlayerId} for {Name} in group {Group}", existing.Id, dto.LastName, dto.Group);
+                return existing.ToDto();
+            }
+        }
+
         var player = dto.FromDto();
+        
+        // Auto-populate group fields if not set but Group string is present
+        if (player.EnrollmentYear == 0 && !string.IsNullOrEmpty(player.Group))
+        {
+            var parsed = GroupUtility.ParseGroup(player.Group, DateTime.Now);
+            player.SpecialtyCode = parsed.specialty;
+            player.EnrollmentYear = parsed.enrollmentYear;
+            player.GroupNumber = parsed.groupNumber;
+        }
+
         await _dbContext.Players.AddAsync(player, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
         return player.ToDto();
@@ -154,7 +189,18 @@ public class PlayerService : IPlayerService
                         (p.StudentId != null && p.StudentId.ToLower().Contains(lowerQuery)))
             .ToListAsync(cancellationToken);
         
-        return players.Select(p => p.ToDto());
+        // Also check if the query matches their calculated group name for other years
+        var allPlayers = await _dbContext.Players.ToListAsync(cancellationToken);
+        var filtered = allPlayers.Where(p => 
+            p.FirstName.ToLower().Contains(lowerQuery) || 
+            (p.Patronymic != null && p.Patronymic.ToLower().Contains(lowerQuery)) ||
+            p.LastName.ToLower().Contains(lowerQuery) ||
+            p.Group.ToLower().Contains(lowerQuery) ||
+            (p.EnrollmentYear > 0 && GroupUtility.GetCurrentGroupName(p.SpecialtyCode, p.EnrollmentYear, p.GroupNumber).ToLower().Contains(lowerQuery)) ||
+            (p.StudentId != null && p.StudentId.ToLower().Contains(lowerQuery))
+        );
+        
+        return filtered.Select(p => p.ToDto());
     }
 
     public async Task<IEnumerable<PlayerDto>> GetAllWithRankingsAsync(CancellationToken cancellationToken = default)
@@ -190,10 +236,10 @@ public class PlayerService : IPlayerService
                             (e.ThirdPlaceId.HasValue && playerIds.Contains(e.ThirdPlaceId.Value)))
                 .ToListAsync(cancellationToken);
 
-            var futsalTeams = await _dbContext.FutsalTeams.Include(t => t.Event).Include(t => t.Players).Where(t => t.Players.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
-            var volleyballTeams = await _dbContext.VolleyballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => t.Players.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
-            var bballTeams = await _dbContext.Basketball3x3Teams.Include(t => t.Event).Include(t => t.Players).Where(t => t.Players.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
-            var beachVTeams = await _dbContext.BeachVolleyballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => t.Players.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
+            var futsalTeams = await _dbContext.FutsalTeams.Include(t => t.Event).Include(t => t.Players).Where(t => t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
+            var volleyballTeams = await _dbContext.VolleyballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
+            var bballTeams = await _dbContext.Basketball3x3Teams.Include(t => t.Event).Include(t => t.Players).Where(t => t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
+            var beachVTeams = await _dbContext.BeachVolleyballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
 
             // 3. Match Stats
             var cwS = await _dbContext.ChessGames.Where(g => g.WhitePlayerId.HasValue && playerIds.Contains(g.WhitePlayerId.Value)).GroupBy(g => g.WhitePlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.WhiteWin) }).ToListAsync(cancellationToken);
@@ -289,22 +335,22 @@ public class PlayerService : IPlayerService
                 }
 
                 // Team Sports
-                foreach (var t in futsalTeams.Where(x => x.Players.Any(p => p.Id == playerId) && x.Event != null)) {
+                foreach (var t in futsalTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
                     int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
                     achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "futsal", Date = t.Event.Date, Rank = r, TournamentId = t.EventId });
                     sportTypes.Add("futsal");
                 }
-                foreach (var t in volleyballTeams.Where(x => x.Players.Any(p => p.Id == playerId) && x.Event != null)) {
+                foreach (var t in volleyballTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
                     int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
                     achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "volleyball", Date = t.Event.Date, Rank = r, TournamentId = t.EventId });
                     sportTypes.Add("volleyball");
                 }
-                foreach (var t in bballTeams.Where(x => x.Players.Any(p => p.Id == playerId) && x.Event != null)) {
+                foreach (var t in bballTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
                     int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
                     achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "basketball_3x3", Date = t.Event.Date, Rank = r, TournamentId = t.EventId });
                     sportTypes.Add("basketball_3x3");
                 }
-                foreach (var t in beachVTeams.Where(x => x.Players.Any(p => p.Id == playerId) && x.Event != null)) {
+                foreach (var t in beachVTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
                     int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
                     achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "beach_volleyball", Date = t.Event.Date, Rank = r, TournamentId = t.EventId });
                     sportTypes.Add("beach_volleyball");

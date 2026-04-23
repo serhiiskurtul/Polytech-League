@@ -11,6 +11,7 @@ public class ArmwrestlingEventParticipantDto
     public string? PlayerName { get; set; }
     public double Weight { get; set; }
     public int Rank { get; set; }
+    public string? GroupName { get; set; }
 }
 
 public static class ArmwrestlingEventParticipantDtoExtensions
@@ -25,7 +26,20 @@ public static class ArmwrestlingEventParticipantDtoExtensions
             PlayerId = participant.PlayerId,
             PlayerName = participant.Player != null ? $"{participant.Player.FirstName} {participant.Player.Patronymic ?? ""} {participant.Player.LastName}".Replace("  ", " ").Trim() : null,
             Weight = participant.Weight,
-            Rank = participant.Rank
+            Rank = participant.Rank,
+            GroupName = participant.GroupName ?? participant.Player?.Group
+        };
+    }
+
+    public static ArmwrestlingEventParticipant FromDto(this ArmwrestlingEventParticipantDto dto, long tournamentId)
+    {
+        return new ArmwrestlingEventParticipant
+        {
+            TournamentId = tournamentId,
+            PlayerId = dto.PlayerId,
+            Weight = dto.Weight,
+            Rank = dto.Rank,
+            GroupName = dto.GroupName
         };
     }
 }

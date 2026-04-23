@@ -27,6 +27,7 @@ export interface ArmwrestlingEventParticipantResponse {
   playerName: string;
   weight: number;
   rank: number;
+  groupName?: string | null;
 }
 
 export interface ArmwrestlingEventResponse {
@@ -89,4 +90,5 @@ export interface ArmwrestlingEventParticipantDto {
   playerId: number;
   weight: number;
   rank: number;
+  groupName?: string;
 }

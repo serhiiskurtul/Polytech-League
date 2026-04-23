@@ -29,6 +29,7 @@ export interface TableTennisEventParticipantResponse {
   playerName: string;
   points: number;
   rank: number;
+  groupName?: string | null;
 }
 
 export interface TableTennisEventResponse {
@@ -75,4 +76,5 @@ export interface TableTennisEventParticipantDto {
   playerId: number;
   points: number;
   rank: number;
+  groupName?: string;
 }

@@ -259,13 +259,15 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
   // derived participants state
   const currentParticipants = (details.participants || []).map(p => {
     const fullInfo = allPlayers.find(ap => ap.id === p.playerId);
-    if (fullInfo) return fullInfo;
+    const groupToShow = p.groupName || fullInfo?.group || 'Учасник';
+    
+    if (fullInfo) return { ...fullInfo, group: groupToShow };
     return {
       id: p.playerId,
       userId: p.userId,
       firstName: p.playerName?.split(' ')[0] || '',
       lastName: p.playerName?.split(' ').slice(1).join(' ') || '',
-      group: 'Учасник'
+      group: groupToShow
     } as PlayerDto;
   });
 

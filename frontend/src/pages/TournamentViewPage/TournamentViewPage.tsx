@@ -1400,6 +1400,7 @@ const TournamentViewPage = () => {
                               <tr>
                                 <th>Місце</th>
                                 <th>Учасник</th>
+                                <th>Група</th>
                                 <th>Рейтинг</th>
                                 <th>Очки</th>
                                 {isAdmin && <th>Дії</th>}
@@ -1422,6 +1423,7 @@ const TournamentViewPage = () => {
                                           <span style={{ fontWeight: 'bold' }}>{p.playerName}</span>
                                         )}
                                       </td>
+                                      <td>{p.groupName || '—'}</td>
                                       {tournament?.sport === 'chess' ? (
                                         <>
                                           <td>{p.rating}</td>
@@ -1459,6 +1461,7 @@ const TournamentViewPage = () => {
                                           <strong>{p.playerName}</strong>
                                         )}
                                       </td>
+                                      <td>{p.groupName || '—'}</td>
                                       {tournament?.sport === 'chess' ? (
                                         <>
                                           <td>{p.rating}</td>
@@ -1880,6 +1883,7 @@ const TournamentViewPage = () => {
                               <tr>
                                 <th>№</th>
                                 <th>Учасник</th>
+                                <th>Група</th>
                                 {tournament?.sport === 'chess' ? (
                                   <>
                                     <th>Рейтинг ELO</th>
@@ -1903,6 +1907,13 @@ const TournamentViewPage = () => {
                                       </Link>
                                     ) : (
                                       p.playerName
+                                    )}
+                                  </td>
+                                  <td style={{ textAlign: 'center' }}>
+                                    {p.groupName ? (
+                                      <span className={styles.systemBadge}>{p.groupName}</span>
+                                    ) : (
+                                      '—'
                                     )}
                                   </td>
                                   {tournament?.sport === 'chess' ? (

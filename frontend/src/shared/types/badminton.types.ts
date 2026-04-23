@@ -92,6 +92,7 @@ export interface BadmintonEventParticipantDto {
   points: number;
   rank: number;
   userId?: number;
+  groupName?: string;
 }
 
 export interface BadmintonEventRequest {
