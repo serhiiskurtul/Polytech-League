@@ -5,9 +5,23 @@ import { CATEGORIES } from '../../model/constants';
 interface CategoriesSectionProps {
   selectedCategories: string[];
   handleCategoryToggle: (category: string) => void;
+  sport: string;
+  isTeam: boolean;
 }
 
-const CategoriesSection = ({ selectedCategories, handleCategoryToggle }: CategoriesSectionProps) => {
+const CategoriesSection = ({ selectedCategories, handleCategoryToggle, sport, isTeam }: CategoriesSectionProps) => {
+  const filteredCategories = CATEGORIES.filter(cat => {
+    if (cat === 'Змішані') {
+      const sportsWithoutMixed = [
+        'futsal', 'basketball-3x3', 'volleyball', 'beach-volleyball', 
+        'armwrestling', 'table_tennis', 'badminton'
+      ];
+      if (sportsWithoutMixed.includes(sport)) return false;
+      if ((sport === 'chess' || sport === 'checkers') && isTeam) return false;
+    }
+    return true;
+  });
+
   return (
     <div className={shared.formBlock}>
       <h3 className={shared.blockTitle}>
@@ -21,7 +35,7 @@ const CategoriesSection = ({ selectedCategories, handleCategoryToggle }: Categor
             <i className="fas fa-tags"></i> Категорії учасників *
           </label>
           <div className={styles.categoriesGrid}>
-            {CATEGORIES.map(category => (
+            {filteredCategories.map(category => (
               <button
                 key={category}
                 type="button"

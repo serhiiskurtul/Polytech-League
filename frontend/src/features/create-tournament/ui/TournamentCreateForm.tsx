@@ -41,7 +41,9 @@ const TournamentCreateForm = () => {
               
               <CategoriesSection 
                 selectedCategories={selectedCategories} 
-                handleCategoryToggle={handleCategoryToggle} 
+                handleCategoryToggle={handleCategoryToggle}
+                sport={formData.sport}
+                isTeam={formData.isTeam}
               />
 
               <SettingsSection 

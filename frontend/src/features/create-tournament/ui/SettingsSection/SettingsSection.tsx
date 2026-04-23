@@ -59,43 +59,6 @@ const SettingsSection = ({ formData, handleInputChange }: SettingsSectionProps) 
                 />
               </div>
 
-              <div className={shared.formGroup}>
-                <label className={shared.formLabel}>
-                  <i className="fas fa-project-diagram"></i> Система проведення *
-                </label>
-                <select
-                  name="system"
-                  value={formData.system}
-                  onChange={handleInputChange}
-                  className={shared.formSelect}
-                  required
-                >
-                  <option value="Swiss">Швейцарська система</option>
-                  <option value="RoundRobin">Кругова система</option>
-                  <option value="Knockout">Олімпійська система (Knockout)</option>
-                </select>
-              </div>
-
-              <div className={shared.formGroup} style={{ gridColumn: '1 / -1' }}>
-                <label className={shared.checkboxLabel}>
-                  <div className={shared.checkboxWrapper}>
-                    <input
-                      type="checkbox"
-                      name="isTeam"
-                      checked={formData.isTeam}
-                      onChange={handleInputChange}
-                      className={shared.hiddenCheckbox}
-                    />
-                    <div className={shared.customCheckbox}>
-                      <i className="fas fa-check"></i>
-                    </div>
-                  </div>
-                  <div className={shared.checkboxText}>
-                    <span className={shared.checkboxTitle}>Командні змагання</span>
-                    <span className={shared.checkboxDesc}>Змагання проводитимуться між командами, а не індивідуальними гравцями</span>
-                  </div>
-                </label>
-              </div>
 
               {formData.sport === 'checkers' && (
                 <div className={shared.formGroup}>
@@ -120,27 +83,6 @@ const SettingsSection = ({ formData, handleInputChange }: SettingsSectionProps) 
             </>
           )}
 
-          {/* Налаштування настільного тенісу */}
-          {formData.sport === 'table_tennis' && (
-            <div className={shared.formGroup}>
-              <label className={shared.formLabel}>
-                <i className="fas fa-users"></i> Категорія *
-              </label>
-              <select
-                name="category"
-                value={formData.category || "Men"}
-                onChange={handleInputChange}
-                className={shared.formSelect}
-                required
-              >
-                {TABLE_TENNIS_CATEGORIES.map(cat => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
 
           {/* Налаштування армреслінгу */}
           {formData.sport === 'armwrestling' && (
@@ -179,22 +121,6 @@ const SettingsSection = ({ formData, handleInputChange }: SettingsSectionProps) 
                 </select>
               </div>
 
-              <div className={shared.formGroup}>
-                <label className={shared.formLabel}>
-                  <i className="fas fa-users"></i> Категорія *
-                </label>
-                <select
-                  name="armCategory"
-                  value={formData.armCategory || 'Men'}
-                  onChange={handleInputChange}
-                  className={shared.formSelect}
-                  required
-                >
-                  {ARMWRESTLING_CATEGORIES.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
-              </div>
 
               <div className={shared.formGroup}>
                 <label className={shared.formLabel}>

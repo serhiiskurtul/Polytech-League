@@ -95,9 +95,15 @@ export const useTournamentForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    const categoryName = selectedCategories[0];
+    const mappedCategory = categoryName === 'Чоловіки' ? 'Men' : categoryName === 'Жінки' ? 'Women' : 'Mixed';
+    const mappedArmCategory = categoryName === 'Чоловіки' ? 'Men' : categoryName === 'Жінки' ? 'Women' : 'Open';
+
     setFormData(prev => ({
       ...prev,
-      categories: selectedCategories
+      categories: selectedCategories,
+      category: mappedCategory,
+      armCategory: mappedArmCategory
     }));
   }, [selectedCategories]);
 
@@ -124,11 +130,7 @@ export const useTournamentForm = () => {
   };
 
   const handleCategoryToggle = (category: string) => {
-    if (selectedCategories.includes(category)) {
-      setSelectedCategories(prev => prev.filter(c => c !== category));
-    } else {
-      setSelectedCategories(prev => [...prev, category]);
-    }
+    setSelectedCategories([category]);
   };
 
   const validateForm = () => {
@@ -160,7 +162,9 @@ export const useTournamentForm = () => {
 
     setIsSubmitting(true);
     try {
-      const endpoint = TOURNAMENT_CREATE_ENDPOINTS[formData.sport];
+      // Fix inconsistency for basketball_3x3 vs basketball-3x3
+      const sportKey = formData.sport === 'basketball-3x3' ? 'basketball_3x3' : formData.sport;
+      const endpoint = TOURNAMENT_CREATE_ENDPOINTS[sportKey];
       if (!endpoint) throw new Error('Невідомий вид спорту');
 
       // Базовий об'єкт, який спільний для всіх типів івентів у бекенді
@@ -180,7 +184,7 @@ export const useTournamentForm = () => {
       let payload: any = { ...basePayload };
 
       // Додаємо специфічні поля залежно від виду спорту
-      switch (formData.sport) {
+      switch (sportKey) {
         case 'futsal':
         case 'basketball_3x3':
         case 'volleyball':
