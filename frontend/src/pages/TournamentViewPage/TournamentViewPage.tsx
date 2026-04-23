@@ -64,6 +64,7 @@ import {
 } from '@/shared/api/badminton.api';
 import {
   getTableTennisEventById,
+  updateTableTennisEvent,
   addParticipantToTableTennisEvent,
   removeParticipantFromTableTennisEvent,
   updateTableTennisParticipant,
@@ -240,6 +241,12 @@ const TournamentViewPage = () => {
         case 'basketball_3x3':
         case 'basketball3x3': await updateBasketball3x3Event(id, payload as any); break;
         case 'badminton': await updateBadmintonEvent(id, payload as any); break;
+        case 'tabletennis':
+        case 'table_tennis': await updateTableTennisEvent(id, {
+          ...payload,
+          tournamentType: (details as any).tournamentType || 'RoundRobin',
+          category: (details as any).category || 'Men'
+        } as any); break;
         default: await updateChessEvent(id, payload as any);
       }
 
@@ -496,6 +503,12 @@ const TournamentViewPage = () => {
         await updateFn(id!, { ...payload, tournamentType: (details as any).tournamentType || 'RoundRobin' });
       } else if (sportKey === 'basketball_3x3' || sportKey === 'basketball3x3') {
         await updateBasketball3x3Event(id!, { ...payload, tournamentType: (details as any).tournamentType || 'RoundRobin' });
+      } else if (sportKey === 'tabletennis' || sportKey === 'table_tennis') {
+        await updateTableTennisEvent(id!, { 
+          ...payload, 
+          tournamentType: (details as any).tournamentType || 'RoundRobin',
+          category: (details as any).category || 'Men'
+        });
       } else {
         // Chess
         await updateChessEvent(id!, {
