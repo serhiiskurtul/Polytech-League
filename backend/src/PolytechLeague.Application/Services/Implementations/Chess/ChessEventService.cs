@@ -59,6 +59,7 @@ public class ChessEventService :
         oldEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
         oldEntity.IsTeam = newEntity.IsTeam;
         oldEntity.IsModerated = newEntity.IsModerated;
+        oldEntity.IsPublic = newEntity.IsPublic;
     }
 
     public override async Task<ChessEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)
@@ -304,7 +305,8 @@ public class ChessEventService :
                 PlayerId = player.Id,
                 Points = sp.Points,
                 Rank = sp.Rank ?? 0,
-                GroupName = sp.Group ?? player.Group
+                GroupName = sp.Group ?? player.Group,
+                Status = RegistrationStatus.Approved
             }, cancellationToken);
         }
 
@@ -336,7 +338,7 @@ public class ChessEventService :
 
         if (exists) return;
 
-        var status = tournament.IsModerated ? RegistrationStatus.Pending : RegistrationStatus.Approved;
+        var status = (tournament.IsModerated && !tournament.IsPublic) ? RegistrationStatus.Pending : RegistrationStatus.Approved;
 
         var participant = new ChessEventParticipant
         {

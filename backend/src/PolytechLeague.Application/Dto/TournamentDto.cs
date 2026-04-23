@@ -24,5 +24,6 @@ public class TournamentDto
     public bool IsTeam { get; set; }
     public string? Time { get; set; }
     public bool IsModerated { get; set; }
+    public bool IsPublic { get; set; }
     public DateTime RawDate { get; set; }
 }

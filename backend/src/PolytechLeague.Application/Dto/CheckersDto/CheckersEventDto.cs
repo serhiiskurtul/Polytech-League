@@ -36,6 +36,7 @@ public class CheckersEventRequest
     public string? Schedule { get; set; }
     public bool IsTeam { get; set; }
     public bool IsModerated { get; set; }
+    public bool IsPublic { get; set; }
 
     public long? FirstPlaceId { get; set; }
     public long? SecondPlaceId { get; set; }
@@ -81,6 +82,7 @@ public class CheckersEventResponse
     public string? Schedule { get; set; }
     public bool IsTeam { get; set; }
     public bool IsModerated { get; set; }
+    public bool IsPublic { get; set; }
 
     public PlayerDto? FirstPlace { get; set; }
     public PlayerDto? SecondPlace { get; set; }
@@ -117,6 +119,7 @@ public static class CheckersEventDtoExtension
             Schedule = checkersEventRequest.Schedule,
             IsTeam = checkersEventRequest.IsTeam,
             IsModerated = checkersEventRequest.IsModerated,
+            IsPublic = checkersEventRequest.IsPublic,
             FirstPlaceId = checkersEventRequest.FirstPlaceId,
             SecondPlaceId = checkersEventRequest.SecondPlaceId,
             ThirdPlaceId = checkersEventRequest.ThirdPlaceId,
@@ -155,6 +158,7 @@ public static class CheckersEventDtoExtension
             Schedule = checkersEvent.Schedule,
             IsTeam = checkersEvent.IsTeam,
             IsModerated = checkersEvent.IsModerated,
+            IsPublic = checkersEvent.IsPublic,
             FirstPlace = checkersEvent.FirstPlace?.ToDto(),
             SecondPlace = checkersEvent.SecondPlace?.ToDto(),
             ThirdPlace = checkersEvent.ThirdPlace?.ToDto(),

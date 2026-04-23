@@ -794,6 +794,9 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<bool>("IsModerated")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsTeam")
                         .HasColumnType("boolean");
 

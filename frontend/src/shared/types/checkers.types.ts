@@ -50,6 +50,8 @@ export interface CheckersEventResponse {
   description: string;
   timeControl: string;
   participantsCount: number;
+  isModerated: boolean;
+  isPublic: boolean;
   system: CheckersSystem;
   variant: CheckersVariant;
   games: CheckersGameResponse[];
@@ -80,6 +82,8 @@ export interface CheckersEventRequest {
   participantsCount: number;
   system: CheckersSystem;
   variant: CheckersVariant;
+  isModerated: boolean;
+  isPublic: boolean;
   rules?: string;
   prizes?: string;
   headRefereeName?: string;

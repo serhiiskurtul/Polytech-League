@@ -32,6 +32,7 @@ public class ChessEventRequest
     public string? Schedule { get; set; }
     public bool IsTeam { get; set; }
     public bool IsModerated { get; set; }
+    public bool IsPublic { get; set; }
 
     public long? FirstPlaceId { get; set; }
     public long? SecondPlaceId { get; set; }
@@ -73,6 +74,7 @@ public class ChessEventResponse
     public string? Schedule { get; set; }
     public bool IsTeam { get; set; }
     public bool IsModerated { get; set; }
+    public bool IsPublic { get; set; }
 
     public PlayerDto? FirstPlace { get; set; }
     public PlayerDto? SecondPlace { get; set; }
@@ -108,6 +110,7 @@ public static class ChessEventDtoExtension
             Schedule = chessEventRequest.Schedule,
             IsTeam = chessEventRequest.IsTeam,
             IsModerated = chessEventRequest.IsModerated,
+            IsPublic = chessEventRequest.IsPublic,
             FirstPlaceId = chessEventRequest.FirstPlaceId,
             SecondPlaceId = chessEventRequest.SecondPlaceId,
             ThirdPlaceId = chessEventRequest.ThirdPlaceId,
@@ -145,6 +148,7 @@ public static class ChessEventDtoExtension
             Schedule = chessEvent.Schedule,
             IsTeam = chessEvent.IsTeam,
             IsModerated = chessEvent.IsModerated,
+            IsPublic = chessEvent.IsPublic,
             FirstPlace = chessEvent.FirstPlace?.ToDto(),
             SecondPlace = chessEvent.SecondPlace?.ToDto(),
             ThirdPlace = chessEvent.ThirdPlace?.ToDto(),

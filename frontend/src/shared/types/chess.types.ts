@@ -66,6 +66,7 @@ export interface ChessEventResponse {
   description: string;
   timeControl: string;
   isModerated: boolean;
+  isPublic: boolean;
   participantsCount: number;
   system: ChessSystem;
   games: ChessGameResponse[];

@@ -46,6 +46,8 @@ export interface ArmwrestlingEventResponse {
   category: ArmwrestlingCategory;
   participantsCount: number;
   participants: ArmwrestlingEventParticipantResponse[];
+  isModerated: boolean;
+  isPublic: boolean;
   matches: ArmwrestlingMatchResponse[] | null;
   tournamentType: ArmwrestlingTournamentType;
   rules?: string;
@@ -74,6 +76,8 @@ export interface ArmwrestlingEventRequest {
   category: ArmwrestlingCategory;
   participantsCount: number;
   tournamentType: ArmwrestlingTournamentType;
+  isModerated: boolean;
+  isPublic: boolean;
   rules?: string;
   prizes?: string;
   headRefereeName?: string;

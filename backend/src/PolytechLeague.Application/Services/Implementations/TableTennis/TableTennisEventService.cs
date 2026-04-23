@@ -31,6 +31,7 @@ public class TableTennisEventService(
         oldEntity.TournamentType = newEntity.TournamentType;
         oldEntity.Category = newEntity.Category;
         oldEntity.IsModerated = newEntity.IsModerated;
+        oldEntity.IsPublic = newEntity.IsPublic;
         oldEntity.FirstPlaceId = newEntity.FirstPlaceId;
         oldEntity.SecondPlaceId = newEntity.SecondPlaceId;
         oldEntity.ThirdPlaceId = newEntity.ThirdPlaceId;
@@ -156,7 +157,7 @@ public class TableTennisEventService(
 
         if (exists) return;
 
-        var status = tournament.IsModerated ? RegistrationStatus.Pending : RegistrationStatus.Approved;
+        var status = (tournament.IsModerated && !tournament.IsPublic) ? RegistrationStatus.Pending : RegistrationStatus.Approved;
 
         var participant = new TableTennisEventParticipant
         {

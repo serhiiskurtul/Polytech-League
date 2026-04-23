@@ -75,6 +75,7 @@ public class ArmwrestlingEventService :
         oldEntity.TimeControl = newEntity.TimeControl;
         oldEntity.ParticipantsCount = newEntity.ParticipantsCount;
         oldEntity.IsModerated = newEntity.IsModerated;
+        oldEntity.IsPublic = newEntity.IsPublic;
         
         oldEntity.FirstPlaceId = newEntity.FirstPlaceId;
         oldEntity.SecondPlaceId = newEntity.SecondPlaceId;
@@ -204,7 +205,7 @@ public class ArmwrestlingEventService :
 
         if (exists) return;
 
-        var status = tournament.IsModerated ? RegistrationStatus.Pending : RegistrationStatus.Approved;
+        var status = (tournament.IsModerated && !tournament.IsPublic) ? RegistrationStatus.Pending : RegistrationStatus.Approved;
 
         var participant = new ArmwrestlingEventParticipant
         {

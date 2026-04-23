@@ -43,6 +43,7 @@ public class BadmintonEventService(
         oldEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
         oldEntity.IsTeam = newEntity.IsTeam;
         oldEntity.IsModerated = newEntity.IsModerated;
+        oldEntity.IsPublic = newEntity.IsPublic;
     }
 
     public override async Task<BadmintonEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)
@@ -169,7 +170,7 @@ public class BadmintonEventService(
 
         if (exists) return;
 
-        var status = tournament.IsModerated ? RegistrationStatus.Pending : RegistrationStatus.Approved;
+        var status = (tournament.IsModerated && !tournament.IsPublic) ? RegistrationStatus.Pending : RegistrationStatus.Approved;
 
         var participant = new BadmintonEventParticipant
         {

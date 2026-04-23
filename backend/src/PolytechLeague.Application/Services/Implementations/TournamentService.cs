@@ -95,6 +95,8 @@ public class TournamentService : ITournamentService
             Registered = false,
             Featured = false,
             IsTeam = e.IsTeam,
+            IsModerated = e.IsModerated,
+            IsPublic = e.IsPublic,
             Time = e.Date.ToString("HH:mm"),
             RawDate = e.Date
         }).ToList();
@@ -141,6 +143,8 @@ public class TournamentService : ITournamentService
             Registered = false,
             Featured = false,
             IsTeam = e.IsTeam,
+            IsModerated = e.IsModerated,
+            IsPublic = e.IsPublic,
             Time = e.Date.ToString("HH:mm"),
             RawDate = e.Date
         };

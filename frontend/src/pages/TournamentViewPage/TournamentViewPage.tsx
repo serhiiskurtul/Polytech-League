@@ -1395,6 +1395,33 @@ const TournamentViewPage = () => {
                       }) : (tournament?.date + ' ' + (tournament?.time || ''))}</small>
                     </div>
                   </div>
+                  {details?.level === 'CollegeGroup' && (
+                    <div className={styles.refereeItem}>
+                      <div className={styles.refereeAvatar}>
+                        <i className={details?.isPublic ? "fas fa-lock-open" : "fas fa-user-check"}></i>
+                      </div>
+                      <div>
+                        <strong>Тип реєстрації:</strong><br />
+                        <span style={{ 
+                          fontSize: '13px', 
+                          fontWeight: 'bold', 
+                          color: details?.isPublic ? '#10b981' : '#f59e0b',
+                          background: details?.isPublic ? '#ecfdf5' : '#fffbeb',
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          border: details?.isPublic ? '1px solid #bdf4e4' : '1px solid #fef3c7',
+                          display: 'inline-block',
+                          marginTop: '4px'
+                        }}>
+                          {details?.isPublic ? (
+                            <><i className="fas fa-globe"></i> Відкрите (миттєве підтвердження)</>
+                          ) : (
+                            <><i className="fas fa-shield-alt"></i> З модерацією заявок</>
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  )}
                   <div className={styles.refereeItem}>
                     <div className={styles.refereeAvatar}><i className="fas fa-flag-checkered"></i></div>
                     <div>
