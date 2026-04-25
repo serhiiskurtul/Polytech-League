@@ -45,6 +45,7 @@ public class FutsalEventService :
         oldEntity.FirstPlaceTeamId = newEntity.FirstPlaceTeamId;
         oldEntity.SecondPlaceTeamId = newEntity.SecondPlaceTeamId;
         oldEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
+        oldEntity.SeasonId = newEntity.SeasonId;
     }
 
     public override async Task<FutsalEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)

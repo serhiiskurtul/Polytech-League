@@ -197,7 +197,8 @@ const TournamentViewPage = () => {
         registrationStart: editTournamentData.level === 'CollegeGroup' ? formatToISO(editTournamentData.registrationStart) : null,
         registrationEnd: editTournamentData.level === 'CollegeGroup' ? formatToISO(editTournamentData.registrationEnd) : null,
         endDate: formatToISO(editTournamentData.endDate),
-        isModerated: editTournamentData.level === 'CollegeGroup' ? editTournamentData.isModerated : false
+        isModerated: editTournamentData.level === 'CollegeGroup' ? editTournamentData.isModerated : false,
+        seasonId: editTournamentData.seasonId || null
       };
 
       if (isTeamSport) {
@@ -481,7 +482,8 @@ const TournamentViewPage = () => {
         registrationEnd: editTournamentData.level === 'CollegeGroup' ? formatToISO(editTournamentData.registrationEnd) : null,
         endDate: formatToISO(editTournamentData.endDate),
         isModerated: editTournamentData.level === 'CollegeGroup' ? editTournamentData.isModerated : false,
-        isPublic: editTournamentData.level === 'CollegeGroup' ? editTournamentData.isPublic : false
+        isPublic: editTournamentData.level === 'CollegeGroup' ? editTournamentData.isPublic : false,
+        seasonId: editTournamentData.seasonId || null
       };
 
       if (sportKey === 'checkers') {
@@ -814,14 +816,39 @@ const TournamentViewPage = () => {
           setAllPlayers(playersData);
 
           // Initialize winners state
-          if (detailsData) {
-            const d = detailsData as any;
-            setWinners({
-              firstPlaceId: d.firstPlace?.id || d.firstPlaceTeam?.id || 0,
-              secondPlaceId: d.secondPlace?.id || d.secondPlaceTeam?.id || 0,
-              thirdPlaceId: d.thirdPlace?.id || d.thirdPlaceTeam?.id || 0
-            });
-          }
+            if (detailsData) {
+              const d = detailsData as any;
+              setWinners({
+                firstPlaceId: d.firstPlace?.id || d.firstPlaceTeam?.id || 0,
+                secondPlaceId: d.secondPlace?.id || d.secondPlaceTeam?.id || 0,
+                thirdPlaceId: d.thirdPlace?.id || d.thirdPlaceTeam?.id || 0
+              });
+
+              // Initialize editTournamentData to prevent 400 errors when saving winners
+              setEditTournamentData({
+                name: data.title || d.name || '',
+                date: formatDateForInput(d.date),
+                location: data.location || d.location || '',
+                refereeIds: d.refereeIds || [],
+                level: d.level || 'CollegeGroup',
+                description: data.description || d.description || '',
+                timeControl: d.timeControl || '',
+                participantsCount: d.participantsCount || 0,
+                system: d.system || 'Swiss',
+                rules: d.rules || '',
+                prizes: d.prizes || '',
+                headRefereeName: d.headRefereeName || '',
+                referees: d.referees || '',
+                schedule: d.schedule || '',
+                isTeam: !!d.isTeam,
+                registrationStart: formatDateForInput(data.registrationStart || d.registrationStart),
+                registrationEnd: formatDateForInput(data.registrationEnd || d.registrationEnd),
+                endDate: formatDateForInput(data.endDate || d.endDate),
+                isModerated: !!d.isModerated,
+                isPublic: d.isPublic !== undefined ? !!d.isPublic : true,
+                seasonId: d.seasonId || null
+              });
+            }
         } catch (eventErr) {
           console.error('Failed to fetch detailed event info:', eventErr);
         }

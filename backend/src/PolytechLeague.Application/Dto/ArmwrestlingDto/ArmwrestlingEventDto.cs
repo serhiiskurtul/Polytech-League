@@ -47,6 +47,7 @@ public class ArmwrestlingEventRequest
     public ArmwrestlingTournamentType TournamentType { get; set; } = ArmwrestlingTournamentType.SingleElimination;
     public bool IsModerated { get; set; }
     public bool IsPublic { get; set; }
+    public long? SeasonId { get; set; }
 }
 
 public class ArmwrestlingEventResponse
@@ -94,6 +95,7 @@ public class ArmwrestlingEventResponse
     public bool IsPublic { get; set; }
 
     public ICollection<ArmwrestlingEventParticipantDto> Participants { get; set; } = new List<ArmwrestlingEventParticipantDto>();
+    public long? SeasonId { get; set; }
 }
 
 public static class ArmwrestlingEventDtoExtensions
@@ -126,7 +128,8 @@ public static class ArmwrestlingEventDtoExtensions
             ThirdPlaceId = request.ThirdPlaceId,
             TournamentType = request.TournamentType,
             IsModerated = request.IsModerated,
-            IsPublic = request.IsPublic
+            IsPublic = request.IsPublic,
+            SeasonId = request.SeasonId
         };
     }
 
@@ -161,7 +164,8 @@ public static class ArmwrestlingEventDtoExtensions
             ThirdPlace = entity.ThirdPlace?.ToDto(),
             TournamentType = entity.TournamentType,
             IsModerated = entity.IsModerated,
-            IsPublic = entity.IsPublic
+            IsPublic = entity.IsPublic,
+            SeasonId = entity.SeasonId
         };
 
         // Populate Participants from the actual participants collection

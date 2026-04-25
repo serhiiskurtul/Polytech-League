@@ -80,6 +80,7 @@ public class ArmwrestlingEventService :
         oldEntity.FirstPlaceId = newEntity.FirstPlaceId;
         oldEntity.SecondPlaceId = newEntity.SecondPlaceId;
         oldEntity.ThirdPlaceId = newEntity.ThirdPlaceId;
+        oldEntity.SeasonId = newEntity.SeasonId;
     }
 
     protected override async Task OnCreatedAsync(ArmwrestlingEvent entity, CancellationToken cancellationToken)

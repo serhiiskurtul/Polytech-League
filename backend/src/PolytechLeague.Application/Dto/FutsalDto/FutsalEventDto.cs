@@ -28,10 +28,14 @@ public class FutsalEventRequest
     public string? HeadRefereeName { get; set; }
     public string? Referees { get; set; }
     public string? Schedule { get; set; }
+    public bool IsModerated { get; set; }
+    public bool IsPublic { get; set; }
+    public bool IsTeam { get; set; }
 
     public long? FirstPlaceTeamId { get; set; }
     public long? SecondPlaceTeamId { get; set; }
     public long? ThirdPlaceTeamId { get; set; }
+    public long? SeasonId { get; set; }
 }
 
 public class FutsalEventResponse
@@ -64,6 +68,7 @@ public class FutsalEventResponse
     public FutsalTeamResponse? ThirdPlaceTeam { get; set; }
     public ICollection<FutsalTeamResponse>? Teams { get; set; }
     public ICollection<FutsalMatchResponse>? Matches { get; set; }
+    public long? SeasonId { get; set; }
 }
 
 public static class FutsalEventDtoExtensions
@@ -87,9 +92,13 @@ public static class FutsalEventDtoExtensions
             HeadRefereeName = request.HeadRefereeName,
             Referees = request.Referees,
             Schedule = request.Schedule,
+            IsModerated = request.IsModerated,
+            IsPublic = request.IsPublic,
+            IsTeam = request.IsTeam,
             FirstPlaceTeamId = request.FirstPlaceTeamId,
             SecondPlaceTeamId = request.SecondPlaceTeamId,
-            ThirdPlaceTeamId = request.ThirdPlaceTeamId
+            ThirdPlaceTeamId = request.ThirdPlaceTeamId,
+            SeasonId = request.SeasonId
         };
     }
 
@@ -118,7 +127,8 @@ public static class FutsalEventDtoExtensions
             SecondPlaceTeam = entity.SecondPlaceTeam?.ToResponse(),
             ThirdPlaceTeam = entity.ThirdPlaceTeam?.ToResponse(),
             Teams = entity.Teams?.Select(t => t.ToResponse()).ToList(),
-            Matches = entity.Matches?.Select(m => m.ToResponse()).ToList()
+            Matches = entity.Matches?.Select(m => m.ToResponse()).ToList(),
+            SeasonId = entity.SeasonId
         };
     }
 }

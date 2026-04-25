@@ -11,6 +11,7 @@ public class Basketball3x3Team
     public Basketball3x3Event? Event { get; set; }
     
     public ICollection<Player>? Players { get; set; }
+    public int Rank { get; set; }
 
     [System.ComponentModel.DataAnnotations.Schema.NotMapped]
     public ICollection<long>? PlayerIds { get; set; }

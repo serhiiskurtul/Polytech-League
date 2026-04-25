@@ -1,0 +1,32 @@
+import api from './axiosInstance';
+import { Season, SeasonRatingResponse } from '@/shared/types/seasonRating.types';
+
+export const getSeasons = async (): Promise<Season[]> => {
+  const response = await api.get<Season[]>('/SeasonRating/seasons');
+  return response.data;
+};
+
+export const getCurrentSeason = async (): Promise<Season> => {
+  const response = await api.get<Season>('/SeasonRating/current');
+  return response.data;
+};
+
+export const getSeasonRating = async (seasonId: number): Promise<SeasonRatingResponse> => {
+  const response = await api.get<SeasonRatingResponse>(`/SeasonRating/${seasonId}`);
+  return response.data;
+};
+
+// Admin methods
+export const createSeason = async (season: Partial<Season>): Promise<Season> => {
+  const response = await api.post<Season>('/SeasonRating/seasons', season);
+  return response.data;
+};
+
+export const updateSeason = async (id: number, season: Partial<Season>): Promise<Season> => {
+  const response = await api.put<Season>(`/SeasonRating/seasons/${id}`, season);
+  return response.data;
+};
+
+export const deleteSeason = async (id: number): Promise<void> => {
+  await api.delete(`/SeasonRating/seasons/${id}`);
+};

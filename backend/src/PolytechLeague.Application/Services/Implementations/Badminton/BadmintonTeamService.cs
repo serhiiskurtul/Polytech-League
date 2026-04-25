@@ -8,15 +8,15 @@ using Microsoft.EntityFrameworkCore;
 namespace PolytechLeague.Application.Services.Implementations.Badminton;
 
 public class BadmintonTeamService(
-    ApplicationDbContext _dbcontext,
-    ILogger<AbstractEntityService<BadmintonTeam>> _logger
+    ApplicationDbContext context,
+    ILogger<AbstractEntityService<BadmintonTeam>> logger
 ) :
-    AbstractEntityService<BadmintonTeam>(_dbcontext, _logger),
+    AbstractEntityService<BadmintonTeam>(context, logger),
     IBadmintonTeamService
 {
     public override async Task<BadmintonTeam> CreateAsync(BadmintonTeam entity, CancellationToken cancellationToken = default)
     {
-        _logger.LogDebug("Creating badminton team with player mapping.");
+        logger.LogDebug("Creating badminton team with player mapping.");
         
         if (entity.PlayerIds != null && entity.PlayerIds.Count >= 2)
         {
@@ -25,15 +25,15 @@ public class BadmintonTeamService(
             entity.Player2Id = ids[1];
         }
 
-        _dbcontext.Set<BadmintonTeam>().Add(entity);
-        await _dbcontext.SaveChangesAsync(cancellationToken);
+        context.Set<BadmintonTeam>().Add(entity);
+        await context.SaveChangesAsync(cancellationToken);
         
         return entity;
     }
 
     public override async Task UpdateAsync(long id, BadmintonTeam newEntity, CancellationToken cancellationToken = default)
     {
-        var oldEntity = await _dbcontext.Set<BadmintonTeam>()
+        var oldEntity = await context.Set<BadmintonTeam>()
             .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
         
         if (oldEntity == null) return;
@@ -47,7 +47,7 @@ public class BadmintonTeamService(
             oldEntity.Player2Id = ids[1];
         }
 
-        await _dbcontext.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     protected override void UpdateValues(BadmintonTeam oldEntity, BadmintonTeam newEntity)

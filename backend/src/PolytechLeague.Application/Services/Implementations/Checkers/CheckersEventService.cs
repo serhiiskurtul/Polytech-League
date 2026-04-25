@@ -62,6 +62,7 @@ public class CheckersEventService :
         oldEntity.IsTeam = newEntity.IsTeam;
         oldEntity.IsModerated = newEntity.IsModerated;
         oldEntity.IsPublic = newEntity.IsPublic;
+        oldEntity.SeasonId = newEntity.SeasonId;
     }
 
     public override async Task<CheckersEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)

@@ -20,15 +20,22 @@ public class VolleyballEventRequest
     public required VolleyballTournamentType TournamentType { get; set; }
 
     public required string Description { get; set; }
+    public DateTime? RegistrationStart { get; set; }
+    public DateTime? RegistrationEnd { get; set; }
+    public DateTime? EndDate { get; set; }
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
     public string? HeadRefereeName { get; set; }
     public string? Referees { get; set; }
     public string? Schedule { get; set; }
+    public bool IsModerated { get; set; }
+    public bool IsPublic { get; set; }
+    public bool IsTeam { get; set; }
 
     public long? FirstPlaceTeamId { get; set; }
     public long? SecondPlaceTeamId { get; set; }
     public long? ThirdPlaceTeamId { get; set; }
+    public long? SeasonId { get; set; }
 }
 
 public class VolleyballEventResponse
@@ -58,6 +65,7 @@ public class VolleyballEventResponse
     public VolleyballTeamResponse? ThirdPlaceTeam { get; set; }
     public ICollection<VolleyballTeamResponse>? Teams { get; set; }
     public ICollection<VolleyballMatchResponse>? Matches { get; set; }
+    public long? SeasonId { get; set; }
 }
 
 public static class VolleyballEventDtoExtensions
@@ -73,14 +81,21 @@ public static class VolleyballEventDtoExtensions
             Level = request.Level,
             TournamentType = request.TournamentType,
             Description = request.Description,
+            RegistrationStart = request.RegistrationStart,
+            RegistrationEnd = request.RegistrationEnd,
+            EndDate = request.EndDate,
             Rules = request.Rules,
             Prizes = request.Prizes,
             HeadRefereeName = request.HeadRefereeName,
             Referees = request.Referees,
             Schedule = request.Schedule,
+            IsModerated = request.IsModerated,
+            IsPublic = request.IsPublic,
+            IsTeam = request.IsTeam,
             FirstPlaceTeamId = request.FirstPlaceTeamId,
             SecondPlaceTeamId = request.SecondPlaceTeamId,
-            ThirdPlaceTeamId = request.ThirdPlaceTeamId
+            ThirdPlaceTeamId = request.ThirdPlaceTeamId,
+            SeasonId = request.SeasonId
         };
     }
 
@@ -106,7 +121,8 @@ public static class VolleyballEventDtoExtensions
             SecondPlaceTeam = entity.SecondPlaceTeam?.ToResponse(),
             ThirdPlaceTeam = entity.ThirdPlaceTeam?.ToResponse(),
             Teams = entity.Teams?.Select(t => t.ToResponse()).ToList(),
-            Matches = entity.Matches?.Select(m => m.ToResponse()).ToList()
+            Matches = entity.Matches?.Select(m => m.ToResponse()).ToList(),
+            SeasonId = entity.SeasonId
         };
     }
 }

@@ -41,6 +41,7 @@ public class ChessEventRequest
     public long? FirstPlaceTeamId { get; set; }
     public long? SecondPlaceTeamId { get; set; }
     public long? ThirdPlaceTeamId { get; set; }
+    public long? SeasonId { get; set; }
 }
 
 public class ChessEventResponse
@@ -83,6 +84,7 @@ public class ChessEventResponse
     public ChessTeamResponse? FirstPlaceTeam { get; set; }
     public ChessTeamResponse? SecondPlaceTeam { get; set; }
     public ChessTeamResponse? ThirdPlaceTeam { get; set; }
+    public long? SeasonId { get; set; }
 }
 
 public static class ChessEventDtoExtension
@@ -116,7 +118,8 @@ public static class ChessEventDtoExtension
             ThirdPlaceId = chessEventRequest.ThirdPlaceId,
             FirstPlaceTeamId = chessEventRequest.FirstPlaceTeamId,
             SecondPlaceTeamId = chessEventRequest.SecondPlaceTeamId,
-            ThirdPlaceTeamId = chessEventRequest.ThirdPlaceTeamId
+            ThirdPlaceTeamId = chessEventRequest.ThirdPlaceTeamId,
+            SeasonId = chessEventRequest.SeasonId
         };
     }
 
@@ -154,7 +157,8 @@ public static class ChessEventDtoExtension
             ThirdPlace = chessEvent.ThirdPlace?.ToDto(),
             FirstPlaceTeam = chessEvent.FirstPlaceTeam?.ToResponse(),
             SecondPlaceTeam = chessEvent.SecondPlaceTeam?.ToResponse(),
-            ThirdPlaceTeam = chessEvent.ThirdPlaceTeam?.ToResponse()
+            ThirdPlaceTeam = chessEvent.ThirdPlaceTeam?.ToResponse(),
+            SeasonId = chessEvent.SeasonId
         };
     }
 }

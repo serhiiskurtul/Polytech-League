@@ -18,6 +18,9 @@ public class TableTennisEventRequest
     public required CompetitionLevel Level { get; set; }
     
     public required string Description { get; set; }
+    public DateTime? RegistrationStart { get; set; }
+    public DateTime? RegistrationEnd { get; set; }
+    public DateTime? EndDate { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required TableTennisTournamentType TournamentType { get; set; }
@@ -32,6 +35,8 @@ public class TableTennisEventRequest
     public string? Schedule { get; set; }
     public bool IsTeam { get; set; }
     public bool IsModerated { get; set; }
+    public bool IsPublic { get; set; }
+    public long? SeasonId { get; set; }
 }
 
 public class TableTennisEventResponse
@@ -68,6 +73,7 @@ public class TableTennisEventResponse
     public string? Schedule { get; set; }
     public bool IsTeam { get; set; }
     public bool IsModerated { get; set; }
+    public long? SeasonId { get; set; }
 }
 
 public static class TableTennisEventDtoExtensions
@@ -82,6 +88,9 @@ public static class TableTennisEventDtoExtensions
             RefereeIds = request.RefereeIds,
             Level = request.Level,
             Description = request.Description,
+            RegistrationStart = request.RegistrationStart,
+            RegistrationEnd = request.RegistrationEnd,
+            EndDate = request.EndDate,
             TournamentType = request.TournamentType,
             Category = request.Category,
             Rules = request.Rules,
@@ -90,7 +99,9 @@ public static class TableTennisEventDtoExtensions
             Referees = request.Referees,
             Schedule = request.Schedule,
             IsTeam = request.IsTeam,
-            IsModerated = request.IsModerated
+            IsModerated = request.IsModerated,
+            IsPublic = request.IsPublic,
+            SeasonId = request.SeasonId
         };
     }
 
@@ -120,7 +131,8 @@ public static class TableTennisEventDtoExtensions
             Referees = entity.Referees,
             Schedule = entity.Schedule,
             IsTeam = entity.IsTeam,
-            IsModerated = entity.IsModerated
+            IsModerated = entity.IsModerated,
+            SeasonId = entity.SeasonId
         };
     }
 }

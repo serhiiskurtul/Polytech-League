@@ -70,5 +70,6 @@ public class EventConfiguration : IEntityTypeConfiguration<Event>
             .HasForeignKey(p => p.EventId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.Property(x => x.SeasonId).HasColumnName("season_id");
     }
 }

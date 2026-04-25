@@ -2,6 +2,7 @@ using PolytechLeague.Application.JWT;
 using PolytechLeague.Application.Security;
 using PolytechLeague.Application.Services.Implementations.General;
 using PolytechLeague.Application.Services.Interfaces;
+using PolytechLeague.Application.Services;
 using PolytechLeague.Application.Services.Implementations;
 using PolytechLeague.Application.Services.Implementations.Chess;
 using PolytechLeague.Application.Services.Interfaces.Chess;
@@ -78,6 +79,7 @@ public static class ServiceExtension
         services.AddScoped<IBadmintonTeamService, BadmintonTeamService>();
         services.AddScoped<ITournamentService, TournamentService>();
         services.AddScoped<IFileService, FileService>();
+        services.AddScoped<ISeasonRatingService, SeasonRatingService>();
 
         return services;
     }

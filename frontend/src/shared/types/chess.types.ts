@@ -84,6 +84,7 @@ export interface ChessEventResponse {
   registrationStart?: string;
   registrationEnd?: string;
   endDate?: string;
+  seasonId?: number | null;
 }
 
 export interface ChessEventRequest {

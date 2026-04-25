@@ -62,8 +62,14 @@ export default function Header() {
             </li>
             <li>
               <Link to="/ratings" className={styles.navLink} onClick={closeMenu}>
-                <i className={`fas fa-chart-line ${styles.navIcon}`}></i>
-                <span>Рейтинги</span>
+                <i className={`fas fa-user-friends ${styles.navIcon}`}></i>
+                <span>Рейтинги гравців</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/group-ratings" className={styles.navLink} onClick={closeMenu}>
+                <i className={`fas fa-users ${styles.navIcon}`}></i>
+                <span>Рейтинги груп</span>
               </Link>
             </li>
           </ul>

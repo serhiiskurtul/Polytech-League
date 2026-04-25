@@ -326,6 +326,10 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<int>("Rank")
+                        .HasColumnType("integer")
+                        .HasColumnName("rank");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EventId");
@@ -427,6 +431,10 @@ namespace PolytechLeague.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
+
+                    b.Property<int>("Rank")
+                        .HasColumnType("integer")
+                        .HasColumnName("rank");
 
                     b.HasKey("Id");
 
@@ -839,6 +847,10 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<string>("Schedule")
                         .HasColumnType("text");
 
+                    b.Property<long?>("SeasonId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("season_id");
+
                     b.Property<long?>("SecondPlaceId")
                         .HasColumnType("bigint");
 
@@ -854,6 +866,8 @@ namespace PolytechLeague.Persistence.Migrations
 
                     b.HasIndex("Level")
                         .HasDatabaseName("IX_events_level");
+
+                    b.HasIndex("SeasonId");
 
                     b.HasIndex("SecondPlaceId");
 
@@ -978,7 +992,12 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("character varying(200)");
 
                     b.Property<int>("Points")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("points");
+
+                    b.Property<int>("Rank")
+                        .HasColumnType("integer")
+                        .HasColumnName("rank");
 
                     b.HasKey("Id");
 
@@ -1154,6 +1173,39 @@ namespace PolytechLeague.Persistence.Migrations
                         {
                             t.HasCheckConstraint("CK_RefreshToken_ExpiresAt", "expires_at >= now()");
                         });
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Season", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("end_date");
+
+                    b.Property<bool>("IsCurrent")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_current");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("start_date");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("seasons", (string)null);
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.TableTennis.TableTennisEventParticipant", b =>
@@ -1432,6 +1484,10 @@ namespace PolytechLeague.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
+
+                    b.Property<int>("Rank")
+                        .HasColumnType("integer")
+                        .HasColumnName("rank");
 
                     b.HasKey("Id");
 
@@ -2449,6 +2505,11 @@ namespace PolytechLeague.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("FirstPlaceId");
 
+                    b.HasOne("PolytechLeague.Domain.Entities.Season", "Season")
+                        .WithMany("Events")
+                        .HasForeignKey("SeasonId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("PolytechLeague.Domain.Entities.Player", "SecondPlace")
                         .WithMany()
                         .HasForeignKey("SecondPlaceId");
@@ -2458,6 +2519,8 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasForeignKey("ThirdPlaceId");
 
                     b.Navigation("FirstPlace");
+
+                    b.Navigation("Season");
 
                     b.Navigation("SecondPlace");
 
@@ -3170,6 +3233,11 @@ namespace PolytechLeague.Persistence.Migrations
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Futsal.FutsalTeam", b =>
                 {
                     b.Navigation("Players");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Season", b =>
+                {
+                    b.Navigation("Events");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.TableTennis.TableTennisMatch", b =>

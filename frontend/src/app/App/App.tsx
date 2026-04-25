@@ -18,6 +18,7 @@ import { PlayerViewPage } from '@/pages/PlayerViewPage';
 import { PlayerComparePage } from '@/pages/PlayerComparePage/index'; // Player comparison page
 import NotFoundPage from '@/pages/NotFoundPage/NotFoundPage';
 import InternalServerErrorPage from '@/pages/InternalServerErrorPage/InternalServerErrorPage';
+import { RatingsPage } from '@/pages/RatingsPage';
 import ProtectedRoute from '../providers/ProtectedRoute';
 import ScrollToTop from '../providers/ScrollToTop';
 import { Toaster } from 'react-hot-toast';
@@ -107,6 +108,17 @@ export default function App() {
           element={
             <ProtectedRoute requireAuth={false}>
               <PlayersRatingPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/group-ratings"
+          element={
+            <ProtectedRoute requireAuth={false}>
+              <div className="page-wrapper">
+                <RatingsPage />
+              </div>
             </ProtectedRoute>
           }
         />

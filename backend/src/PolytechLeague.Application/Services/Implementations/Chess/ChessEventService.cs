@@ -60,6 +60,7 @@ public class ChessEventService :
         oldEntity.IsTeam = newEntity.IsTeam;
         oldEntity.IsModerated = newEntity.IsModerated;
         oldEntity.IsPublic = newEntity.IsPublic;
+        oldEntity.SeasonId = newEntity.SeasonId;
     }
 
     public override async Task<ChessEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)

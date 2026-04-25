@@ -45,6 +45,7 @@ public class CheckersEventRequest
     public long? FirstPlaceTeamId { get; set; }
     public long? SecondPlaceTeamId { get; set; }
     public long? ThirdPlaceTeamId { get; set; }
+    public long? SeasonId { get; set; }
 }
 
 public class CheckersEventResponse
@@ -91,6 +92,7 @@ public class CheckersEventResponse
     public CheckersTeamResponse? FirstPlaceTeam { get; set; }
     public CheckersTeamResponse? SecondPlaceTeam { get; set; }
     public CheckersTeamResponse? ThirdPlaceTeam { get; set; }
+    public long? SeasonId { get; set; }
 }
 
 public static class CheckersEventDtoExtension
@@ -125,7 +127,8 @@ public static class CheckersEventDtoExtension
             ThirdPlaceId = checkersEventRequest.ThirdPlaceId,
             FirstPlaceTeamId = checkersEventRequest.FirstPlaceTeamId,
             SecondPlaceTeamId = checkersEventRequest.SecondPlaceTeamId,
-            ThirdPlaceTeamId = checkersEventRequest.ThirdPlaceTeamId
+            ThirdPlaceTeamId = checkersEventRequest.ThirdPlaceTeamId,
+            SeasonId = checkersEventRequest.SeasonId
         };
     }
 
@@ -164,7 +167,8 @@ public static class CheckersEventDtoExtension
             ThirdPlace = checkersEvent.ThirdPlace?.ToDto(),
             FirstPlaceTeam = checkersEvent.FirstPlaceTeam?.ToResponse(),
             SecondPlaceTeam = checkersEvent.SecondPlaceTeam?.ToResponse(),
-            ThirdPlaceTeam = checkersEvent.ThirdPlaceTeam?.ToResponse()
+            ThirdPlaceTeam = checkersEvent.ThirdPlaceTeam?.ToResponse(),
+            SeasonId = checkersEvent.SeasonId
         };
     }
 }

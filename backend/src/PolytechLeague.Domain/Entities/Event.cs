@@ -21,6 +21,8 @@ public abstract class Event
     public bool IsTeam { get; set; }
     public bool IsModerated { get; set; } = false;
     public bool IsPublic { get; set; } = true;
+    public long? SeasonId { get; set; }
+    public Season? Season { get; set; }
 
     public long? FirstPlaceId { get; set; }
     public Player? FirstPlace { get; set; }

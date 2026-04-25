@@ -13,5 +13,6 @@ public class BeachVolleyballTeamConfiguration : IEntityTypeConfiguration<BeachVo
         builder.HasKey(t => t.Id);
 
         builder.Property(t => t.Name).IsRequired().HasMaxLength(200);
+        builder.Property(t => t.Rank).HasColumnName("rank");
     }
 }

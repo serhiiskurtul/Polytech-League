@@ -12,6 +12,7 @@ public class FutsalTeam
     
     public ICollection<Player>? Players { get; set; }
     public int Points { get; set; }
+    public int Rank { get; set; }
 
     [System.ComponentModel.DataAnnotations.Schema.NotMapped]
     public ICollection<long>? PlayerIds { get; set; }
