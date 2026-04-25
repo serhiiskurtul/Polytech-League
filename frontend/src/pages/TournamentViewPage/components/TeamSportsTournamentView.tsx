@@ -354,7 +354,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       return { ...stats, points: finalPoints };
     });
 
-    return standings.sort((a: any, b: any) => {
+    const sortedStandings = standings.sort((a: any, b: any) => {
       // Priority 1: Points
       const aP = a.points;
       const bP = b.points;
@@ -368,6 +368,30 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       // Priority 3: Goals Scored
       return b.gf - a.gf;
     });
+
+    // Assign shared ranks (e.g. "1-2")
+    const standingsWithRanks = [];
+    let i = 0;
+    while (i < sortedStandings.length) {
+      let tieCount = 1;
+      while (i + tieCount < sortedStandings.length && 
+             sortedStandings[i + tieCount].points === sortedStandings[i].points &&
+             (sortedStandings[i + tieCount].gf - sortedStandings[i + tieCount].ga) === (sortedStandings[i].gf - sortedStandings[i].ga) &&
+             sortedStandings[i + tieCount].gf === sortedStandings[i].gf) {
+        tieCount++;
+      }
+
+      const rankStr = tieCount > 1 
+        ? `${i + 1}-${i + tieCount}` 
+        : (i + 1).toString();
+
+      for (let j = 0; j < tieCount; j++) {
+        standingsWithRanks.push({ ...sortedStandings[i + j], displayRank: rankStr });
+      }
+      i += tieCount;
+    }
+
+    return standingsWithRanks;
   };
 
   const standingsData = calculateStandings();
@@ -706,7 +730,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
               <tbody>
                 {standingsData.map((team: any, index: number) => (
                   <tr key={team.id}>
-                    <td>{index + 1}</td>
+                    <td>{team.displayRank}</td>
                     <td className={styles.tableName}>{team.name}</td>
                     <td>{team.gp}</td>
                     <td>{team.w}</td>
