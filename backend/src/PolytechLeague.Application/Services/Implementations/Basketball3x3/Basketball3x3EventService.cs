@@ -75,6 +75,24 @@ public class Basketball3x3EventService(
 
     protected override async Task OnUpdatedAsync(Basketball3x3Event oldEntity, Basketball3x3Event newEntity, CancellationToken cancellationToken)
     {
+        // Update ranks for teams based on winners
+        var eventWithTeams = await _dbcontext.Basketball3x3Events
+            .Include(e => e.Teams)
+            .FirstOrDefaultAsync(e => e.Id == newEntity.Id, cancellationToken);
+
+        if (eventWithTeams != null && eventWithTeams.Teams != null)
+        {
+            foreach (var team in eventWithTeams.Teams)
+            {
+                if (team.Id == newEntity.FirstPlaceTeamId) team.Rank = 1;
+                else if (team.Id == newEntity.SecondPlaceTeamId) team.Rank = 2;
+                else if (team.Id == newEntity.ThirdPlaceTeamId) team.Rank = 3;
+                else if (newEntity.FirstPlaceTeamId != null) team.Rank = 4; // Participation rank
+                else team.Rank = 0;
+            }
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+        }
+
         bool winnersSet = newEntity.FirstPlaceTeamId != null && newEntity.SecondPlaceTeamId != null && newEntity.ThirdPlaceTeamId != null;
         
         if (winnersSet)

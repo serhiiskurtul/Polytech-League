@@ -195,6 +195,23 @@ public class ChessEventService :
 
     protected override async Task OnUpdatedAsync(ChessEvent oldEntity, ChessEvent newEntity, CancellationToken cancellationToken)
     {
+        // Update ranks for participants based on winners
+        var eventWithParticipants = await _dbcontext.Set<ChessEvent>()
+            .Include(e => e.Players)
+            .FirstOrDefaultAsync(e => e.Id == newEntity.Id, cancellationToken);
+
+        if (eventWithParticipants != null && eventWithParticipants.Players != null)
+        {
+            foreach (var participant in eventWithParticipants.Players)
+            {
+                if (participant.PlayerId == newEntity.FirstPlaceId) participant.Rank = 1;
+                else if (participant.PlayerId == newEntity.SecondPlaceId) participant.Rank = 2;
+                else if (participant.PlayerId == newEntity.ThirdPlaceId) participant.Rank = 3;
+                else participant.Rank = 0;
+            }
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+        }
+
         bool individualWinnersSet = newEntity.FirstPlaceId != null && newEntity.SecondPlaceId != null && newEntity.ThirdPlaceId != null;
         bool teamWinnersSet = newEntity.FirstPlaceTeamId != null && newEntity.SecondPlaceTeamId != null && newEntity.ThirdPlaceTeamId != null;
         

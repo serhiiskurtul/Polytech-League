@@ -9,7 +9,7 @@ namespace PolytechLeague.Application.Services;
 public class SeasonRatingService : ISeasonRatingService
 {
     private readonly ApplicationDbContext _context;
-    private const int NON_PARTICIPATION_PENALTY = 25; // Очки за неявку
+    private const int DEFAULT_NON_PARTICIPATION_PENALTY = 25; // Очки за неявку за замовчуванням
 
     public SeasonRatingService(ApplicationDbContext context)
     {
@@ -39,13 +39,24 @@ public class SeasonRatingService : ISeasonRatingService
         var volleyballGroups = await _context.VolleyballTeams.Select(t => t.Name).Distinct().ToListAsync();
         var basketballGroups = await _context.Basketball3x3Teams.Select(t => t.Name).Distinct().ToListAsync();
         var beachVolleyballGroups = await _context.BeachVolleyballTeams.Select(t => t.Name).Distinct().ToListAsync();
-        
+        var chessGroups = await _context.ChessEventParticipants.Select(p => p.GroupName).Distinct().ToListAsync();
+        var checkersGroups = await _context.CheckersEventParticipants.Select(p => p.GroupName).Distinct().ToListAsync();
+        var armGroups = await _context.ArmwrestlingEventParticipants.Select(p => p.GroupName).Distinct().ToListAsync();
+        var ttGroups = await _context.TableTennisEventParticipants.Select(p => p.GroupName).Distinct().ToListAsync();
+        var badGroups = await _context.BadmintonEventParticipants.Select(p => p.GroupName).Distinct().ToListAsync();
+
         var allGroups = playerGroups
             .Union(futsalGroups)
             .Union(volleyballGroups)
             .Union(basketballGroups)
             .Union(beachVolleyballGroups)
-            .Where(g => !string.IsNullOrEmpty(g))
+            .Union(chessGroups)
+            .Union(checkersGroups)
+            .Union(armGroups)
+            .Union(ttGroups)
+            .Union(badGroups)
+            .Where(g => !string.IsNullOrEmpty(g) && g.Length >= 3 && char.IsDigit(g[0]) && char.IsDigit(g[1]) && char.IsDigit(g[2]))
+            .Select(g => g.Substring(0, 3)) // Normalize to first 3 digits
             .Distinct()
             .OrderBy(g => g)
             .ToList();
@@ -53,15 +64,17 @@ public class SeasonRatingService : ISeasonRatingService
         var rows = allGroups.Select(g => new GroupRatingRowDto
         {
             GroupName = g,
-            SportResults = sports.ToDictionary(s => s, s => new SportResultDto { Points = NON_PARTICIPATION_PENALTY, Rank = 0 }),
+            SportResults = sports.ToDictionary(s => s, s => new SportResultDto { Points = 0, Rank = "-" }),
             TotalPoints = 0,
-            TotalRank = 0
+            TotalRank = "-"
         }).ToList();
 
         // 1. Chess
         var chessEvents = await _context.ChessEvents
-            .Where(e => e.SeasonId == seasonId && e.Level == CompetitionLevel.CollegeGroup)
-            .Include(e => e.Players)
+            .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) 
+                        && e.Level == CompetitionLevel.CollegeGroup)
+            .Include(e => e.Players!)
+                .ThenInclude(p => p.Player)
             .ToListAsync();
         foreach (var e in chessEvents)
         {
@@ -73,9 +86,9 @@ public class SeasonRatingService : ISeasonRatingService
                 var row = rows.FirstOrDefault(r => r.GroupName.Equals(groupName, StringComparison.OrdinalIgnoreCase));
                 if (row != null && p.Rank > 0)
                 {
-                    if (row.SportResults["Шахи"].Rank == 0 || p.Rank < row.SportResults["Шахи"].Rank)
+                    if (row.SportResults["Шахи"].Rank == "-" || p.Rank < int.Parse(row.SportResults["Шахи"].Rank!))
                     {
-                        row.SportResults["Шахи"] = new SportResultDto { Rank = p.Rank, Points = p.Rank };
+                        row.SportResults["Шахи"] = new SportResultDto { Rank = p.Rank.ToString(), Points = p.Rank };
                     }
                 }
             }
@@ -83,8 +96,10 @@ public class SeasonRatingService : ISeasonRatingService
 
         // 2. Checkers
         var checkersEvents = await _context.CheckersEvents
-            .Where(e => e.SeasonId == seasonId && e.Level == CompetitionLevel.CollegeGroup)
-            .Include(e => e.Players)
+            .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) 
+                        && e.Level == CompetitionLevel.CollegeGroup)
+            .Include(e => e.Players!)
+                .ThenInclude(p => p.Player)
             .ToListAsync();
         foreach (var e in checkersEvents)
         {
@@ -96,9 +111,9 @@ public class SeasonRatingService : ISeasonRatingService
                 var row = rows.FirstOrDefault(r => r.GroupName.Equals(groupName, StringComparison.OrdinalIgnoreCase));
                 if (row != null && p.Rank > 0)
                 {
-                    if (row.SportResults["Шашки"].Rank == 0 || p.Rank < row.SportResults["Шашки"].Rank)
+                    if (row.SportResults["Шашки"].Rank == "-" || p.Rank < int.Parse(row.SportResults["Шашки"].Rank!))
                     {
-                        row.SportResults["Шашки"] = new SportResultDto { Rank = p.Rank, Points = p.Rank };
+                        row.SportResults["Шашки"] = new SportResultDto { Rank = p.Rank.ToString(), Points = p.Rank };
                     }
                 }
             }
@@ -106,7 +121,8 @@ public class SeasonRatingService : ISeasonRatingService
 
         // 3. Futsal
         var futsalEvents = await _context.FutsalEvents
-            .Where(e => e.SeasonId == seasonId && e.Level == CompetitionLevel.CollegeGroup)
+            .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) 
+                        && e.Level == CompetitionLevel.CollegeGroup)
             .Include(e => e.Teams)
             .ToListAsync();
         foreach (var e in futsalEvents)
@@ -117,9 +133,9 @@ public class SeasonRatingService : ISeasonRatingService
                 var row = rows.FirstOrDefault(r => r.GroupName.Equals(t.Name, StringComparison.OrdinalIgnoreCase));
                 if (row != null && t.Rank > 0)
                 {
-                    if (row.SportResults["Футзал"].Rank == 0 || t.Rank < row.SportResults["Футзал"].Rank)
+                    if (row.SportResults["Футзал"].Rank == "-" || t.Rank < int.Parse(row.SportResults["Футзал"].Rank!))
                     {
-                        row.SportResults["Футзал"] = new SportResultDto { Rank = t.Rank, Points = t.Rank };
+                        row.SportResults["Футзал"] = new SportResultDto { Rank = t.Rank.ToString(), Points = t.Rank };
                     }
                 }
             }
@@ -127,8 +143,10 @@ public class SeasonRatingService : ISeasonRatingService
 
         // 4. Armwrestling
         var armEvents = await _context.ArmwrestlingEvents
-            .Where(e => e.SeasonId == seasonId && e.Level == CompetitionLevel.CollegeGroup)
-            .Include(e => e.Players)
+            .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) 
+                        && e.Level == CompetitionLevel.CollegeGroup)
+            .Include(e => e.Players!)
+                .ThenInclude(p => p.Player)
             .ToListAsync();
         foreach (var e in armEvents)
         {
@@ -140,9 +158,9 @@ public class SeasonRatingService : ISeasonRatingService
                 var row = rows.FirstOrDefault(r => r.GroupName.Equals(groupName, StringComparison.OrdinalIgnoreCase));
                 if (row != null && p.Rank > 0)
                 {
-                    if (row.SportResults["Армреслінг"].Rank == 0 || p.Rank < row.SportResults["Армреслінг"].Rank)
+                    if (row.SportResults["Армреслінг"].Rank == "-" || p.Rank < int.Parse(row.SportResults["Армреслінг"].Rank!))
                     {
-                        row.SportResults["Армреслінг"] = new SportResultDto { Rank = p.Rank, Points = p.Rank };
+                        row.SportResults["Армреслінг"] = new SportResultDto { Rank = p.Rank.ToString(), Points = p.Rank };
                     }
                 }
             }
@@ -150,8 +168,10 @@ public class SeasonRatingService : ISeasonRatingService
 
         // 5. Table Tennis
         var ttEvents = await _context.TableTennisEvents
-            .Where(e => e.SeasonId == seasonId && e.Level == CompetitionLevel.CollegeGroup)
-            .Include(e => e.Participants)
+            .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) 
+                        && e.Level == CompetitionLevel.CollegeGroup)
+            .Include(e => e.Participants!)
+                .ThenInclude(p => p.Player)
             .ToListAsync();
         foreach (var e in ttEvents)
         {
@@ -163,9 +183,9 @@ public class SeasonRatingService : ISeasonRatingService
                 var row = rows.FirstOrDefault(r => r.GroupName.Equals(groupName, StringComparison.OrdinalIgnoreCase));
                 if (row != null && p.Rank > 0)
                 {
-                    if (row.SportResults["Настільний теніс"].Rank == 0 || p.Rank < row.SportResults["Настільний теніс"].Rank)
+                    if (row.SportResults["Настільний теніс"].Rank == "-" || p.Rank < int.Parse(row.SportResults["Настільний теніс"].Rank!))
                     {
-                        row.SportResults["Настільний теніс"] = new SportResultDto { Rank = p.Rank, Points = p.Rank };
+                        row.SportResults["Настільний теніс"] = new SportResultDto { Rank = p.Rank.ToString(), Points = p.Rank };
                     }
                 }
             }
@@ -173,8 +193,10 @@ public class SeasonRatingService : ISeasonRatingService
 
         // 6. Badminton
         var badEvents = await _context.BadmintonEvents
-            .Where(e => e.SeasonId == seasonId && e.Level == CompetitionLevel.CollegeGroup)
-            .Include(e => e.Participants)
+            .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) 
+                        && e.Level == CompetitionLevel.CollegeGroup)
+            .Include(e => e.Participants!)
+                .ThenInclude(p => p.Player)
             .ToListAsync();
         foreach (var e in badEvents)
         {
@@ -186,9 +208,9 @@ public class SeasonRatingService : ISeasonRatingService
                 var row = rows.FirstOrDefault(r => r.GroupName.Equals(groupName, StringComparison.OrdinalIgnoreCase));
                 if (row != null && p.Rank > 0)
                 {
-                    if (row.SportResults["Бадмінтон"].Rank == 0 || p.Rank < row.SportResults["Бадмінтон"].Rank)
+                    if (row.SportResults["Бадмінтон"].Rank == "-" || p.Rank < int.Parse(row.SportResults["Бадмінтон"].Rank!))
                     {
-                        row.SportResults["Бадмінтон"] = new SportResultDto { Rank = p.Rank, Points = p.Rank };
+                        row.SportResults["Бадмінтон"] = new SportResultDto { Rank = p.Rank.ToString(), Points = p.Rank };
                     }
                 }
             }
@@ -196,7 +218,8 @@ public class SeasonRatingService : ISeasonRatingService
 
         // 7. Volleyball
         var volEvents = await _context.VolleyballEvents
-            .Where(e => e.SeasonId == seasonId && e.Level == CompetitionLevel.CollegeGroup)
+            .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) 
+                        && e.Level == CompetitionLevel.CollegeGroup)
             .Include(e => e.Teams)
             .ToListAsync();
         foreach (var e in volEvents)
@@ -207,9 +230,9 @@ public class SeasonRatingService : ISeasonRatingService
                 var row = rows.FirstOrDefault(r => r.GroupName.Equals(t.Name, StringComparison.OrdinalIgnoreCase));
                 if (row != null && t.Rank > 0)
                 {
-                    if (row.SportResults["Волейбол"].Rank == 0 || t.Rank < row.SportResults["Волейбол"].Rank)
+                    if (row.SportResults["Волейбол"].Rank == "-" || t.Rank < int.Parse(row.SportResults["Волейбол"].Rank!))
                     {
-                        row.SportResults["Волейбол"] = new SportResultDto { Rank = t.Rank, Points = t.Rank };
+                        row.SportResults["Волейбол"] = new SportResultDto { Rank = t.Rank.ToString(), Points = t.Rank };
                     }
                 }
             }
@@ -217,7 +240,8 @@ public class SeasonRatingService : ISeasonRatingService
 
         // 8. Basketball 3x3
         var bballEvents = await _context.Basketball3x3Events
-            .Where(e => e.SeasonId == seasonId && e.Level == CompetitionLevel.CollegeGroup)
+            .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) 
+                        && e.Level == CompetitionLevel.CollegeGroup)
             .Include(e => e.Teams)
             .ToListAsync();
         foreach (var e in bballEvents)
@@ -228,9 +252,9 @@ public class SeasonRatingService : ISeasonRatingService
                 var row = rows.FirstOrDefault(r => r.GroupName.Equals(t.Name, StringComparison.OrdinalIgnoreCase));
                 if (row != null && t.Rank > 0)
                 {
-                    if (row.SportResults["Баскетбол 3x3"].Rank == 0 || t.Rank < row.SportResults["Баскетбол 3x3"].Rank)
+                    if (row.SportResults["Баскетбол 3x3"].Rank == "-" || t.Rank < int.Parse(row.SportResults["Баскетбол 3x3"].Rank!))
                     {
-                        row.SportResults["Баскетбол 3x3"] = new SportResultDto { Rank = t.Rank, Points = t.Rank };
+                        row.SportResults["Баскетбол 3x3"] = new SportResultDto { Rank = t.Rank.ToString(), Points = t.Rank };
                     }
                 }
             }
@@ -238,7 +262,8 @@ public class SeasonRatingService : ISeasonRatingService
 
         // 9. Beach Volleyball
         var bvolEvents = await _context.BeachVolleyballEvents
-            .Where(e => e.SeasonId == seasonId && e.Level == CompetitionLevel.CollegeGroup)
+            .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) 
+                        && e.Level == CompetitionLevel.CollegeGroup)
             .Include(e => e.Teams)
             .ToListAsync();
         foreach (var e in bvolEvents)
@@ -249,25 +274,50 @@ public class SeasonRatingService : ISeasonRatingService
                 var row = rows.FirstOrDefault(r => r.GroupName.Equals(t.Name, StringComparison.OrdinalIgnoreCase));
                 if (row != null && t.Rank > 0)
                 {
-                    if (row.SportResults["Пляжний волейбол"].Rank == 0 || t.Rank < row.SportResults["Пляжний волейбол"].Rank)
+                    if (row.SportResults["Пляжний волейбол"].Rank == "-" || t.Rank < int.Parse(row.SportResults["Пляжний волейбол"].Rank!))
                     {
-                        row.SportResults["Пляжний волейбол"] = new SportResultDto { Rank = t.Rank, Points = t.Rank };
+                        row.SportResults["Пляжний волейбол"] = new SportResultDto { Rank = t.Rank.ToString(), Points = t.Rank };
                     }
                 }
             }
         }
 
-        // Calculate Totals
+        // Calculate Totals and use dynamic penalty
+        int maxRanks = rows.Max(r => r.SportResults.Values.Max(v => v.Rank == "-" ? 0 : int.Parse(v.Rank!)));
+        int dynamicPenalty = Math.Max(DEFAULT_NON_PARTICIPATION_PENALTY, maxRanks + 1);
+
         foreach (var row in rows)
         {
+            foreach (var sport in sports)
+            {
+                if (row.SportResults[sport].Rank == "-")
+                {
+                    row.SportResults[sport].Points = dynamicPenalty;
+                }
+            }
             row.TotalPoints = row.SportResults.Values.Sum(v => v.Points);
         }
 
-        // Calculate Total Ranks (Lowest Points = 1st Rank)
+        // Calculate Total Ranks with shared places (e.g. "5-6")
         var orderedRows = rows.OrderBy(r => r.TotalPoints).ToList();
-        for (int i = 0; i < orderedRows.Count; i++)
+        int i = 0;
+        while (i < orderedRows.Count)
         {
-            orderedRows[i].TotalRank = i + 1;
+            int tieCount = 1;
+            while (i + tieCount < orderedRows.Count && orderedRows[i + tieCount].TotalPoints == orderedRows[i].TotalPoints)
+            {
+                tieCount++;
+            }
+
+            string rankStr = tieCount > 1 
+                ? $"{i + 1}-{i + tieCount}" 
+                : (i + 1).ToString();
+
+            for (int j = 0; j < tieCount; j++)
+            {
+                orderedRows[i + j].TotalRank = rankStr;
+            }
+            i += tieCount;
         }
 
         return new SeasonRatingDto

@@ -114,6 +114,7 @@ const TournamentViewPage = () => {
   const [currentUserPlayer, setCurrentUserPlayer] = useState<PlayerDto | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
+  const [seasons, setSeasons] = useState<any[]>([]);
 
   // Admin access check (0 = User, 1 = Admin)
   const isAdmin = user?.role === 1 || user?.role === '1' || user?.role === 'Admin';
@@ -280,7 +281,8 @@ const TournamentViewPage = () => {
     registrationEnd: '',
     endDate: '',
     isModerated: false,
-    isPublic: true
+    isPublic: true,
+    seasonId: null
   });
 
 
@@ -401,7 +403,8 @@ const TournamentViewPage = () => {
         registrationEnd: formatDateForInput(tournament?.registrationEnd || details.registrationEnd),
         endDate: formatDateForInput(tournament?.endDate || details.endDate),
         isModerated: !!details.isModerated,
-        isPublic: details.isPublic !== undefined ? !!details.isPublic : true
+        isPublic: details.isPublic !== undefined ? !!details.isPublic : true,
+        seasonId: details.seasonId || null
       });
       setIsEditingTournament(true);
     }
@@ -863,7 +866,17 @@ const TournamentViewPage = () => {
 
   useEffect(() => {
     fetchTournament();
-  }, [id]);
+    fetchSeasons();
+  }, [id, isAdmin]);
+
+  const fetchSeasons = async () => {
+    try {
+      const response = await api.get('/SeasonRating/seasons');
+      setSeasons(response.data);
+    } catch (error) {
+      console.error('Failed to fetch seasons:', error);
+    }
+  };
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
@@ -2344,6 +2357,15 @@ const TournamentViewPage = () => {
                         <option value="CollegeGroup">Міжгрупові (коледж)</option>
                         <option value="Regional">Обласні</option>
                         <option value="National">Всеукраїнські</option>
+                      </select>
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label>Сезон рейтингу</label>
+                      <select value={editTournamentData.seasonId || ''} onChange={(e) => setEditTournamentData({ ...editTournamentData, seasonId: Number(e.target.value) || null })}>
+                        <option value="">-- Оберіть сезон --</option>
+                        {seasons.map(s => (
+                          <option key={s.id} value={s.id}>Сезон {s.name} {s.isCurrent ? '(Поточний)' : ''}</option>
+                        ))}
                       </select>
                     </div>
                     {(tournament?.sport === 'chess' || tournament?.sport === 'checkers') && (

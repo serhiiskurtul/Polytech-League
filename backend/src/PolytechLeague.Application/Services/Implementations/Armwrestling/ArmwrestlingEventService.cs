@@ -95,6 +95,23 @@ public class ArmwrestlingEventService :
 
     protected override async Task OnUpdatedAsync(ArmwrestlingEvent oldEntity, ArmwrestlingEvent newEntity, CancellationToken cancellationToken)
     {
+        // Update ranks for participants based on winners
+        var eventWithParticipants = await _dbcontext.ArmwrestlingEvents
+            .Include(e => e.Players)
+            .FirstOrDefaultAsync(e => e.Id == newEntity.Id, cancellationToken);
+
+        if (eventWithParticipants != null && eventWithParticipants.Players != null)
+        {
+            foreach (var participant in eventWithParticipants.Players)
+            {
+                if (participant.PlayerId == newEntity.FirstPlaceId) participant.Rank = 1;
+                else if (participant.PlayerId == newEntity.SecondPlaceId) participant.Rank = 2;
+                else if (participant.PlayerId == newEntity.ThirdPlaceId) participant.Rank = 3;
+                else participant.Rank = 0;
+            }
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+        }
+
         // Перевірка чи були визначені призери (перехід від null до значення)
         bool winnersSet = newEntity.FirstPlaceId != null && newEntity.SecondPlaceId != null && newEntity.ThirdPlaceId != null;
         

@@ -13,11 +13,11 @@ public class GroupRatingRowDto
     public required string GroupName { get; set; }
     public required Dictionary<string, SportResultDto> SportResults { get; set; }
     public int TotalPoints { get; set; }
-    public int TotalRank { get; set; }
+    public string? TotalRank { get; set; }
 }
 
 public class SportResultDto
 {
     public int Points { get; set; } // Очки (usually same as rank)
-    public int Rank { get; set; }   // Місце
+    public string? Rank { get; set; }   // Місце
 }

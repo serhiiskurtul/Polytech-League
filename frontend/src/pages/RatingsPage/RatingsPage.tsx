@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './RatingsPage.module.css';
-import { getSeasons, getSeasonRating } from '@/shared/api/seasonRating.api';
+import { getSeasons, getSeasonRating, createSeason, updateSeason } from '@/shared/api/seasonRating.api';
 import { Season, SeasonRatingResponse } from '@/shared/types/seasonRating.types';
 import toast from 'react-hot-toast';
 import { jsPDF } from 'jspdf';
@@ -175,6 +175,14 @@ const RatingsPage: React.FC = () => {
 
           {ratingData && ratingData.rows.length > 0 && (
             <>
+              <div className={styles.legend}>
+                <div className={styles.legendItem}>
+                  <span className={`${styles.dot} ${styles.scoreDot}`}></span> О - Очки
+                </div>
+                <div className={styles.legendItem}>
+                  <span className={`${styles.dot} ${styles.rankDot}`}></span> М - Місце
+                </div>
+              </div>
               <button className={styles.exportBtn} onClick={exportToPDF}>
                 <i className="fas fa-file-pdf"></i> PDF
               </button>
