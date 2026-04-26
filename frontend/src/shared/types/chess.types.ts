@@ -23,6 +23,8 @@ export interface ChessEventParticipantResponse {
   chessEventId: number;
   playerId: number;
   playerName: string;
+  firstName?: string;
+  lastName?: string;
   points: number;
   buchholz: number;
   sonnebornBerger: number;
@@ -118,6 +120,8 @@ export interface ChessEventRequest {
 
 export interface ChessEventParticipantDto {
     playerId: number;
+    firstName?: string;
+    lastName?: string;
     points: number;
     rank: number;
     groupName?: string;

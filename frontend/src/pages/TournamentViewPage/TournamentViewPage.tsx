@@ -617,7 +617,10 @@ const TournamentViewPage = () => {
           playerId,
           points: editingParticipantData.points,
           rank: editingParticipantData.rank,
-          status: editingParticipantData.status
+          status: editingParticipantData.status,
+          firstName: editingParticipantData.firstName,
+          lastName: editingParticipantData.lastName,
+          groupName: editingParticipantData.groupName
         };
         await updateParticipantInCheckersEvent(id!, playerId, payload);
       } else if (sportKey === 'armwrestling') {
