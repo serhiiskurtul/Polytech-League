@@ -17,11 +17,13 @@ public class AuthController(IAuthService authService) : Controller
     {
         var tokens = await authService.AuthenticateAsync(authRequest);
 
+        var isProd = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT"));
+
         Response.Cookies.Append("access_token", tokens.AccessToken, new CookieOptions
         {
             HttpOnly = true,
-            Secure = false,
-            SameSite = SameSiteMode.Lax,
+            Secure = isProd,
+            SameSite = isProd ? SameSiteMode.None : SameSiteMode.Lax,
             Expires = DateTimeOffset.UtcNow.AddHours(1),
             Path = "/"
         });
@@ -32,9 +34,10 @@ public class AuthController(IAuthService authService) : Controller
             new CookieOptions
             {
                 HttpOnly = true,
-                Secure = false,
-                SameSite = SameSiteMode.Lax,
-                Expires = DateTimeOffset.UtcNow.AddDays(7)
+                Secure = isProd,
+                SameSite = isProd ? SameSiteMode.None : SameSiteMode.Lax,
+                Expires = DateTimeOffset.UtcNow.AddDays(7),
+                Path = "/"
             });
 
         return Ok();
