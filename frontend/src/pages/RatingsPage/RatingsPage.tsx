@@ -3,8 +3,6 @@ import styles from './RatingsPage.module.css';
 import { getSeasons, getSeasonRating, createSeason, updateSeason } from '@/shared/api/seasonRating.api';
 import { Season, SeasonRatingResponse } from '@/shared/types/seasonRating.types';
 import toast from 'react-hot-toast';
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
 const RatingsPage: React.FC = () => {
@@ -83,36 +81,6 @@ const RatingsPage: React.FC = () => {
     }
   };
 
-  const exportToPDF = () => {
-    if (!ratingData) return;
-
-    const doc = new jsPDF('l', 'mm', 'a4') as any;
-    const title = `Рейтинг груп - Сезон ${ratingData.seasonName}`;
-    
-    doc.setFontSize(18);
-    doc.text(title, 14, 20);
-
-    const headers = [['Група', ...ratingData.sports.flatMap(s => [`${s} (О)`, `${s} (М)`]), 'Всього (О)', 'Місце']];
-    const data = ratingData.rows.map(row => [
-      row.groupName,
-      ...ratingData.sports.flatMap(s => [
-        row.sportResults[s]?.points || '-',
-        row.sportResults[s]?.rank || '-'
-      ]),
-      row.totalPoints,
-      row.totalRank
-    ]);
-
-    doc.autoTable({
-      head: headers,
-      body: data,
-      startY: 30,
-      styles: { fontSize: 8, cellPadding: 2 },
-      headStyles: { fillColor: [59, 130, 246] },
-    });
-
-    doc.save(`Ratings_${ratingData.seasonName}.pdf`);
-  };
 
   const exportToExcel = () => {
     if (!ratingData) return;
@@ -156,9 +124,9 @@ const RatingsPage: React.FC = () => {
 
         <div className={styles.controls}>
           {seasons.length > 0 && (
-            <select 
-              className={styles.seasonSelect} 
-              value={selectedSeasonId || ''} 
+            <select
+              className={styles.seasonSelect}
+              value={selectedSeasonId || ''}
               onChange={handleSeasonChange}
             >
               {seasons.map(s => (
@@ -183,9 +151,6 @@ const RatingsPage: React.FC = () => {
                   <span className={`${styles.dot} ${styles.rankDot}`}></span> М - Місце
                 </div>
               </div>
-              <button className={styles.exportBtn} onClick={exportToPDF}>
-                <i className="fas fa-file-pdf"></i> PDF
-              </button>
               <button className={`${styles.exportBtn} ${styles.excel}`} onClick={exportToExcel}>
                 <i className="fas fa-file-excel"></i> Excel
               </button>
