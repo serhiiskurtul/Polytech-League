@@ -19,7 +19,8 @@ public class EmailSender(IOptions<EmailSettings> emailSettings, ILogger<EmailSen
         var client = new SmtpClient("smtp.gmail.com", 587)
         {
             EnableSsl = true,
-            Credentials = new NetworkCredential(emailSettings.Value.Email, emailSettings.Value.Password)
+            Credentials = new NetworkCredential(emailSettings.Value.Email, emailSettings.Value.Password),
+            Timeout = 10000 // 10 секунд таймаут
         };
 
         var mailSender = emailSettings.Value.Email;
@@ -32,13 +33,15 @@ public class EmailSender(IOptions<EmailSettings> emailSettings, ILogger<EmailSen
 
         try
         {
+            logger.LogInformation("Attempting to send email to {Email} via smtp.gmail.com:587...", email);
             await client.SendMailAsync(mailMessage, cancellationToken);
             logger.LogInformation("Email successfully sent to {Email}", email);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to send email to {Email}. [DEBUG] Verification code: {Message}", email, message);
-            // We don't rethrow to avoid 500 errors in the API, especially in dev
+            logger.LogError(ex, "Failed to send email to {Email}. Error: {Message}", email, ex.Message);
+            // Ми не прокидаємо помилку далі, щоб реєстрація могла продовжитись в Redis, 
+            // навіть якщо лист не пішов (це допоможе хоча б побачити код у логах)
         }
     }
 }
