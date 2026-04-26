@@ -114,6 +114,10 @@ const EmailVerification = () => {
             Ми надіслали 6-значний код на адресу: <br />
             <strong>{displayEmail}</strong>
           </p>
+          <div className={styles.spamNotice}>
+            <i className="fas fa-info-circle"></i>
+            <span>Якщо ви не бачите листа, перевірте папку <strong>"Спам"</strong></span>
+          </div>
         </div>
 
         <div className={styles.codeSection}>

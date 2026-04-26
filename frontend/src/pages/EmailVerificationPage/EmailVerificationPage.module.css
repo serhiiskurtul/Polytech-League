@@ -58,6 +58,29 @@
   color: var(--text);
 }
 
+.spamNotice {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--bg);
+  border-radius: 12px;
+  border: 1px dashed var(--border);
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.spamNotice i {
+  color: var(--primary);
+  font-size: 16px;
+}
+
+.spamNotice strong {
+  color: var(--text);
+}
+
 .codeSection {
   margin-bottom: 32px;
 }
