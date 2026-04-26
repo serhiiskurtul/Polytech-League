@@ -77,7 +77,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         const newConnection = new HubConnectionBuilder()
-            .withUrl(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/hubs/chat`, {
+            .withUrl(`${import.meta.env.VITE_API_URL || 'https://polytech-league-production.up.railway.app/api'}/hubs/chat`, {
                 accessTokenFactory: () => localStorage.getItem('access_token') || ''
             })
             .withAutomaticReconnect()

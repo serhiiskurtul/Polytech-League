@@ -31,7 +31,7 @@ const ProfileHeader = ({ userData, onEdit, onAvatarUpload, onLogout, onCompare, 
           <div className={styles.profileAvatar}>
             {userData.photoUrl ? (
               <img 
-                src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}${userData.photoUrl}`} 
+                src={`${import.meta.env.VITE_API_BASE_URL || 'https://polytech-league-production.up.railway.app'}${userData.photoUrl}`} 
                 alt={userData.name} 
                 className={styles.avatarImage} 
               />

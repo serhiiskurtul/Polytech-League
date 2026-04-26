@@ -89,7 +89,7 @@ export default function Header() {
                 <div className={styles.userAvatar}>
                   {user.photoUrl && user.photoUrl.trim() !== '' ? (
                     <img 
-                      src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}${user.photoUrl}`} 
+                      src={`${import.meta.env.VITE_API_BASE_URL || 'https://polytech-league-production.up.railway.app'}${user.photoUrl}`} 
                       alt={`${user.firstName} ${user.lastName}`} 
                       className={styles.avatarImg}
                     />
