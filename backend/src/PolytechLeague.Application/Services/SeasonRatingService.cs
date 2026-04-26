@@ -138,7 +138,16 @@ public class SeasonRatingService : ISeasonRatingService
                 var row = rows.FirstOrDefault(r => r.GroupName.Equals(normalizedTGroup, StringComparison.OrdinalIgnoreCase));
                 if (row != null)
                 {
-                    int rank = t.Rank > 0 ? t.Rank : 4;
+                    int rank = t.Rank;
+                    if (rank <= 0)
+                    {
+                        if (t.Id == e.FirstPlaceTeamId) rank = 1;
+                        else if (t.Id == e.SecondPlaceTeamId) rank = 2;
+                        else if (t.Id == e.ThirdPlaceTeamId) rank = 3;
+                        else if (e.FirstPlaceTeamId != null) rank = 4;
+                        else rank = 4;
+                    }
+                    
                     if (row.SportResults["Футзал"].Rank == "-" || rank < int.Parse(row.SportResults["Футзал"].Rank!))
                     {
                         row.SportResults["Футзал"] = new SportResultDto { Rank = rank.ToString(), Points = rank };
@@ -243,7 +252,16 @@ public class SeasonRatingService : ISeasonRatingService
                 var row = rows.FirstOrDefault(r => r.GroupName.Equals(normalizedTGroup, StringComparison.OrdinalIgnoreCase));
                 if (row != null)
                 {
-                    int rank = t.Rank > 0 ? t.Rank : 4;
+                    int rank = t.Rank;
+                    if (rank <= 0)
+                    {
+                        if (t.Id == e.FirstPlaceTeamId) rank = 1;
+                        else if (t.Id == e.SecondPlaceTeamId) rank = 2;
+                        else if (t.Id == e.ThirdPlaceTeamId) rank = 3;
+                        else if (e.FirstPlaceTeamId != null) rank = 4;
+                        else rank = 4;
+                    }
+                    
                     if (row.SportResults["Волейбол"].Rank == "-" || rank < int.Parse(row.SportResults["Волейбол"].Rank!))
                     {
                         row.SportResults["Волейбол"] = new SportResultDto { Rank = rank.ToString(), Points = rank };
@@ -267,7 +285,16 @@ public class SeasonRatingService : ISeasonRatingService
                 var row = rows.FirstOrDefault(r => r.GroupName.Equals(normalizedTGroup, StringComparison.OrdinalIgnoreCase));
                 if (row != null)
                 {
-                    int rank = t.Rank > 0 ? t.Rank : 4;
+                    int rank = t.Rank;
+                    if (rank <= 0)
+                    {
+                        if (t.Id == e.FirstPlaceTeamId) rank = 1;
+                        else if (t.Id == e.SecondPlaceTeamId) rank = 2;
+                        else if (t.Id == e.ThirdPlaceTeamId) rank = 3;
+                        else if (e.FirstPlaceTeamId != null) rank = 4;
+                        else rank = 4;
+                    }
+                    
                     if (row.SportResults["Баскетбол 3x3"].Rank == "-" || rank < int.Parse(row.SportResults["Баскетбол 3x3"].Rank!))
                     {
                         row.SportResults["Баскетбол 3x3"] = new SportResultDto { Rank = rank.ToString(), Points = rank };
@@ -291,7 +318,16 @@ public class SeasonRatingService : ISeasonRatingService
                 var row = rows.FirstOrDefault(r => r.GroupName.Equals(normalizedTGroup, StringComparison.OrdinalIgnoreCase));
                 if (row != null)
                 {
-                    int rank = t.Rank > 0 ? t.Rank : 4;
+                    int rank = t.Rank;
+                    if (rank <= 0)
+                    {
+                        if (t.Id == e.FirstPlaceTeamId) rank = 1;
+                        else if (t.Id == e.SecondPlaceTeamId) rank = 2;
+                        else if (t.Id == e.ThirdPlaceTeamId) rank = 3;
+                        else if (e.FirstPlaceTeamId != null) rank = 4;
+                        else rank = 4;
+                    }
+                    
                     if (row.SportResults["Пляжний волейбол"].Rank == "-" || rank < int.Parse(row.SportResults["Пляжний волейбол"].Rank!))
                     {
                         row.SportResults["Пляжний волейбол"] = new SportResultDto { Rank = rank.ToString(), Points = rank };
