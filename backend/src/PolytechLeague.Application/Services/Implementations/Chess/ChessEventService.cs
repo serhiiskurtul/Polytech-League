@@ -132,13 +132,25 @@ public class ChessEventService :
     public async Task UpdateParticipantAsync(long eventId, long playerId, PolytechLeague.Application.Dto.ChessDto.ChessEventParticipantDto dto, CancellationToken cancellationToken = default)
     {
         var participant = await _dbcontext.Set<ChessEventParticipant>()
+            .Include(p => p.Player)
             .FirstOrDefaultAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
+            
         if (participant != null)
         {
             var oldStatus = participant.Status;
             participant.Points = dto.Points;
             participant.Rank = dto.Rank;
             participant.Status = dto.Status;
+            participant.GroupName = dto.GroupName;
+
+            if (participant.Player != null)
+            {
+                if (!string.IsNullOrEmpty(dto.FirstName)) participant.Player.FirstName = dto.FirstName;
+                if (!string.IsNullOrEmpty(dto.LastName)) participant.Player.LastName = dto.LastName;
+                if (!string.IsNullOrEmpty(dto.GroupName)) participant.Player.Group = dto.GroupName;
+                
+                _dbcontext.Set<Player>().Update(participant.Player);
+            }
             
             _dbcontext.Set<ChessEventParticipant>().Update(participant);
             await _dbcontext.SaveChangesAsync(cancellationToken);

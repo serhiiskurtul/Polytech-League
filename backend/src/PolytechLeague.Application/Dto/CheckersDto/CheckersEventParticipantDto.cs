@@ -11,6 +11,8 @@ public class CheckersEventParticipantDto
     public long TournamentId { get; set; }
     public long PlayerId { get; set; }
     public string? PlayerName { get; set; }
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
     public double Points { get; set; }
     public int Rating { get; set; }
     public int Rank { get; set; }
@@ -31,6 +33,8 @@ public static class CheckersEventParticipantDtoExtensions
             TournamentId = participant.TournamentId,
             PlayerId = participant.PlayerId,
             PlayerName = participant.Player != null ? $"{participant.Player.FirstName} {participant.Player.Patronymic ?? ""} {participant.Player.LastName}".Replace("  ", " ").Trim() : null,
+            FirstName = participant.Player?.FirstName,
+            LastName = participant.Player?.LastName,
             Points = participant.Points,
             Rating = participant.StartingRating,
             Rank = participant.Rank,

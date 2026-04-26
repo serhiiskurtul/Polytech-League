@@ -11,6 +11,8 @@ public class ChessEventParticipantDto
     public long ChessEventId { get; set; }
     public long PlayerId { get; set; }
     public string? PlayerName { get; set; }
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
     public int Rating { get; set; }
     public double Points { get; set; }
     public int Rank { get; set; }
@@ -35,6 +37,8 @@ public static class ChessEventParticipantDtoExtensions
             ChessEventId = participant.TournamentId,
             PlayerId = participant.PlayerId,
             PlayerName = participant.Player != null ? $"{participant.Player.FirstName} {participant.Player.Patronymic ?? ""} {participant.Player.LastName}".Replace("  ", " ").Trim() : null,
+            FirstName = participant.Player?.FirstName,
+            LastName = participant.Player?.LastName,
             Rating = participant.Player?.ChessRating ?? 0,
             Points = participant.Points,
             Rank = participant.Rank,

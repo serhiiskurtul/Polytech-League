@@ -162,7 +162,7 @@ const TournamentViewPage = () => {
   const [editingGameData, setEditingGameData] = useState<{ round: number; board: number; result: string; whitePlayerId: string; blackPlayerId: string, pgn: string }>({ round: 1, board: 1, result: 'WhiteWin', whitePlayerId: '', blackPlayerId: '', pgn: '' });
 
   const [editingParticipantId, setEditingParticipantId] = useState<number | null>(null);
-  const [editingParticipantData, setEditingParticipantData] = useState<{ points: number; rank: number; weight: number; status: RegistrationStatus }>({ points: 0, rank: 0, weight: 0, status: RegistrationStatus.Approved });
+  const [editingParticipantData, setEditingParticipantData] = useState<{ points: number; rank: number; weight: number; status: RegistrationStatus; firstName: string; lastName: string; groupName: string }>({ points: 0, rank: 0, weight: 0, status: RegistrationStatus.Approved, firstName: '', lastName: '', groupName: '' });
   const [gameFilters, setGameFilters] = useState({ round: '', board: '', participant: '', result: '' });
   const [isImporting, setIsImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -550,7 +550,10 @@ const TournamentViewPage = () => {
       points: p.points || 0,
       rank: p.rank || 0,
       weight: p.weight || 0,
-      status: p.status || RegistrationStatus.Approved
+      status: p.status || RegistrationStatus.Approved,
+      firstName: p.firstName || '',
+      lastName: p.lastName || '',
+      groupName: p.groupName || ''
     });
   };
 
@@ -643,7 +646,10 @@ const TournamentViewPage = () => {
           playerId,
           points: editingParticipantData.points,
           rank: editingParticipantData.rank,
-          status: editingParticipantData.status
+          status: editingParticipantData.status,
+          firstName: editingParticipantData.firstName,
+          lastName: editingParticipantData.lastName,
+          groupName: editingParticipantData.groupName
         };
         await updateParticipantInEvent(id!, playerId, payload);
       }
@@ -1706,15 +1712,45 @@ const TournamentViewPage = () => {
                                         <input type="number" value={editingParticipantData.rank} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, rank: parseInt(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
                                       </td>
                                       <td>
-                                        {p.userId ? (
-                                          <Link to={`/profile/${p.userId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
-                                            {p.playerName}
-                                          </Link>
+                                        {(tournament?.sport === 'chess' || tournament?.sport === 'checkers') ? (
+                                          <div style={{ display: 'flex', gap: '4px' }}>
+                                            <input 
+                                              type="text" 
+                                              placeholder="Прізвище"
+                                              value={editingParticipantData.lastName} 
+                                              onChange={(e) => setEditingParticipantData({ ...editingParticipantData, lastName: e.target.value })} 
+                                              style={{ width: '100px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} 
+                                            />
+                                            <input 
+                                              type="text" 
+                                              placeholder="Ім'я"
+                                              value={editingParticipantData.firstName} 
+                                              onChange={(e) => setEditingParticipantData({ ...editingParticipantData, firstName: e.target.value })} 
+                                              style={{ width: '80px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} 
+                                            />
+                                          </div>
                                         ) : (
-                                          <span style={{ fontWeight: 'bold' }}>{p.playerName}</span>
+                                          p.userId ? (
+                                            <Link to={`/profile/${p.userId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
+                                              {p.playerName}
+                                            </Link>
+                                          ) : (
+                                            <span style={{ fontWeight: 'bold' }}>{p.playerName}</span>
+                                          )
                                         )}
                                       </td>
-                                      <td>{p.groupName || '—'}</td>
+                                      <td>
+                                        {(tournament?.sport === 'chess' || tournament?.sport === 'checkers') ? (
+                                          <input 
+                                            type="text" 
+                                            value={editingParticipantData.groupName} 
+                                            onChange={(e) => setEditingParticipantData({ ...editingParticipantData, groupName: e.target.value })} 
+                                            style={{ width: '80px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} 
+                                          />
+                                        ) : (
+                                          p.groupName || '—'
+                                        )}
+                                      </td>
                                       {tournament?.sport === 'chess' ? (
                                         <>
                                           <td>{p.rating}</td>

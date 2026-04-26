@@ -121,14 +121,26 @@ public class CheckersEventService :
     public async Task UpdateParticipantAsync(long id, long playerId, CheckersEventParticipantDto request, CancellationToken cancellationToken = default)
     {
         var participant = await _dbcontext.Set<CheckersEventParticipant>()
+            .Include(p => p.Player)
             .FirstOrDefaultAsync(p => p.TournamentId == id && p.PlayerId == playerId, cancellationToken);
-
+            
         if (participant == null) throw new EntityNotFoundException("Учасника не знайдено", playerId);
-
+ 
         var oldStatus = participant.Status;
         participant.Points = request.Points;
         participant.Rank = request.Rank;
         participant.Status = request.Status;
+        participant.GroupName = request.GroupName;
+
+        if (participant.Player != null)
+        {
+            if (!string.IsNullOrEmpty(request.FirstName)) participant.Player.FirstName = request.FirstName;
+            if (!string.IsNullOrEmpty(request.LastName)) participant.Player.LastName = request.LastName;
+            if (!string.IsNullOrEmpty(request.GroupName)) participant.Player.Group = request.GroupName;
+            
+            _dbcontext.Set<Player>().Update(participant.Player);
+        }
+
         _dbcontext.Set<CheckersEventParticipant>().Update(participant);
         await _dbcontext.SaveChangesAsync(cancellationToken);
 
