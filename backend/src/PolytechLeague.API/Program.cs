@@ -32,7 +32,8 @@ builder.Services.AddCors(options =>
         {
             policy.WithOrigins("http://localhost:5173", 
                                 "http://localhost:3000", 
-                                "http://localhost:5174")
+                                "http://localhost:5174",
+                                "https://polytech-league.vercel.app")
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials();
@@ -83,11 +84,14 @@ builder.Services
     .AddServices()
     .AddAuth(builder.Configuration);
 
-var redisConnectionString = builder.Configuration["RedisSettings:Redis"] ?? "localhost:6379";
 
-// Use abortConnect=false to prevent it from throwing on startup if Redis is down
-var multiplexer = ConnectionMultiplexer.Connect($"{redisConnectionString},abortConnect=false");
+var redisConnectionString = builder.Configuration["RedisSettings:Redis"];
+var options = ConfigurationOptions.Parse(redisConnectionString);
+options.Ssl = true;
+options.AbortOnConnectFail = false;
+var multiplexer = ConnectionMultiplexer.Connect(options);
 builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
+
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(nameof(JwtOptions)));
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(nameof(EmailSettings)));
