@@ -2,6 +2,7 @@ using PolytechLeague.Application.Dto.TableTennisDto;
 using PolytechLeague.Application.Services.Interfaces.TableTennis;
 using PolytechLeague.Domain.Params;
 using PolytechLeague.Domain.Entities.TableTennis;
+using PolytechLeague.Infrastructure.Redis;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,7 +10,7 @@ namespace PolytechLeague.API.Controllers.TableTennis;
 
 [ApiController]
 [Route("api/table-tennis-matches")]
-public class TableTennisMatchesController(ITableTennisMatchService ttMatchService) : Controller
+public class TableTennisMatchesController(ITableTennisMatchService ttMatchService, IRedisService redisService) : Controller
 {
     [AllowAnonymous]
     [HttpGet]
@@ -44,6 +45,10 @@ public class TableTennisMatchesController(ITableTennisMatchService ttMatchServic
     {
         var entity = request.FromRequest();
         await ttMatchService.CreateAsync(entity, cancellationToken);
+        
+        await redisService.RemoveGroupAsync("tt_events_all");
+        await redisService.RemoveDataAsync($"tt_event_v2_{request.TournamentId}");
+        
         return Created();
     }
 
@@ -56,6 +61,10 @@ public class TableTennisMatchesController(ITableTennisMatchService ttMatchServic
     {
         var entity = request.FromRequest();
         await ttMatchService.UpdateAsync(id, entity, cancellationToken);
+        
+        await redisService.RemoveGroupAsync("tt_events_all");
+        await redisService.RemoveDataAsync($"tt_event_v2_{request.TournamentId}");
+        
         return NoContent();
     }
 
@@ -63,7 +72,12 @@ public class TableTennisMatchesController(ITableTennisMatchService ttMatchServic
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> Delete([FromRoute] long id, CancellationToken cancellationToken)
     {
+        var entity = await ttMatchService.GetByIdAsync(id, cancellationToken);
         await ttMatchService.DeleteAsync(id, cancellationToken);
+        
+        await redisService.RemoveGroupAsync("tt_events_all");
+        await redisService.RemoveDataAsync($"tt_event_v2_{entity.TournamentId}");
+        
         return NoContent();
     }
 }

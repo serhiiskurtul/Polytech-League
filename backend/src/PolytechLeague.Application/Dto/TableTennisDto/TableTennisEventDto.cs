@@ -40,6 +40,16 @@ public class TableTennisEventRequest
     public long? SeasonId { get; set; }
 }
 
+public class TableTennisTeamResponse
+{
+    public long Id { get; set; }
+    public required string Name { get; set; }
+    public long EventId { get; set; }
+    public ICollection<PlayerDto>? Players { get; set; }
+    public int Points { get; set; }
+    public int Rank { get; set; }
+}
+
 public class TableTennisEventResponse
 {
     public long Id { get; set; }
@@ -64,14 +74,14 @@ public class TableTennisEventResponse
     public PlayerDto? SecondPlace { get; set; }
     public PlayerDto? ThirdPlace { get; set; }
 
-    public object? FirstPlaceTeam { get; set; }
-    public object? SecondPlaceTeam { get; set; }
-    public object? ThirdPlaceTeam { get; set; }
+    public TableTennisTeamResponse? FirstPlaceTeam { get; set; }
+    public TableTennisTeamResponse? SecondPlaceTeam { get; set; }
+    public TableTennisTeamResponse? ThirdPlaceTeam { get; set; }
 
     public ICollection<TableTennisMatchResponse>? Matches { get; set; }
     public int ParticipantsCount { get; set; }
     public ICollection<TableTennisEventParticipantDto>? Participants { get; set; }
-    public ICollection<object>? Teams { get; set; }
+    public ICollection<TableTennisTeamResponse>? Teams { get; set; }
 
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
@@ -129,13 +139,13 @@ public static class TableTennisEventDtoExtensions
             FirstPlace = entity.FirstPlace?.ToDto(),
             SecondPlace = entity.SecondPlace?.ToDto(),
             ThirdPlace = entity.ThirdPlace?.ToDto(),
-            FirstPlaceTeam = entity.FirstPlaceTeam,
-            SecondPlaceTeam = entity.SecondPlaceTeam,
-            ThirdPlaceTeam = entity.ThirdPlaceTeam,
+            FirstPlaceTeam = entity.FirstPlaceTeam?.ToResponse(),
+            SecondPlaceTeam = entity.SecondPlaceTeam?.ToResponse(),
+            ThirdPlaceTeam = entity.ThirdPlaceTeam?.ToResponse(),
             Matches = entity.Matches?.Select(m => m.ToResponse()).ToList(),
             ParticipantsCount = entity.Participants?.Count ?? 0,
             Participants = entity.Participants?.Select(p => p.ToDto()).ToList(),
-            Teams = entity.Teams?.Select(t => (object)t).ToList(),
+            Teams = entity.Teams?.Select(t => t.ToResponse()).ToList(),
             Rules = entity.Rules,
             Prizes = entity.Prizes,
             HeadRefereeName = entity.HeadRefereeName,
@@ -147,4 +157,16 @@ public static class TableTennisEventDtoExtensions
         };
     }
 
+    public static TableTennisTeamResponse ToResponse(this TableTennisTeam entity)
+    {
+        return new TableTennisTeamResponse
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            EventId = entity.EventId,
+            Players = entity.Players?.Select(p => p.ToDto()).ToList(),
+            Points = entity.Points,
+            Rank = entity.Rank
+        };
+    }
 }

@@ -37,9 +37,9 @@ public class TableTennisMatchResponse
     public long? Player2Id { get; set; }
     public PlayerDto? Player2 { get; set; }
     public long? HomeTeamId { get; set; }
-    public object? HomeTeam { get; set; } // Simplified for now
+    public TableTennisTeamResponse? HomeTeam { get; set; }
     public long? AwayTeamId { get; set; }
-    public object? AwayTeam { get; set; }
+    public TableTennisTeamResponse? AwayTeam { get; set; }
     public long? WinnerId { get; set; }
     public long? WinnerTeamId { get; set; }
     public int? HomeTeamScore { get; set; }
@@ -82,9 +82,9 @@ public static class TableTennisMatchDtoExtensions
             Player2Id = entity.Player2Id,
             Player2 = entity.Player2?.ToDto(),
             HomeTeamId = entity.HomeTeamId,
-            HomeTeam = entity.HomeTeam, // Will be serialized automatically
+            HomeTeam = entity.HomeTeam?.ToResponse(),
             AwayTeamId = entity.AwayTeamId,
-            AwayTeam = entity.AwayTeam,
+            AwayTeam = entity.AwayTeam?.ToResponse(),
             WinnerId = entity.WinnerId,
             WinnerTeamId = entity.WinnerTeamId,
             HomeTeamScore = entity.HomeTeamScore,
