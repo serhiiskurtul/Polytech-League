@@ -68,11 +68,21 @@ public class ExcelImportService : IExcelImportService
         int headerRowIdx = -1;
         int snrIdx = -1;
         int nameIdx = -1;
+        int firstNameIdx = -1;
+        int lastNameIdx = -1;
         int ptsIdx = -1;
         int rkIdx = -1;
         int rtgIdx = -1;
         int fideIdIdx = -1;
         int groupIdx = -1;
+        int titleIdx = -1;
+
+        var headerKeywords = new[] { 
+            "Name", "Ім'я", "Прізвище", "ПІБ", "Очки", "Pts.", "Rk.", "Ст.ном", "№", 
+            "Result", "Результат", "Рейтинг", "Rating", "Rank", "Points", "Score", 
+            "Бали", "FIDE", "ID", "Учасник", "Гравець", "Participant", "Player",
+            "Surname", "Last Name", "First Name", "Group", "Група", "Клас", "Клуб", "Club"
+        };
 
         // 1. Find Header Row
         // Increased to 100 rows to handle files with lots of metadata at the top
@@ -82,52 +92,90 @@ public class ExcelImportService : IExcelImportService
             var rowText = string.Join(" ", row.ItemArray.Select(c => c?.ToString() ?? ""));
 
             // Look for common headers (English/Ukrainian)
-            if (ContainsAny(rowText, new[] { "Name", "Ім'я", "Прізвище", "ПІБ", "Очки", "Pts.", "Rk.", "Ст.ном", "№", "Result", "Результат", "Рейтинг", "Rating" }))
+            if (ContainsAny(rowText, headerKeywords))
             {
-                headerRowIdx = i;
-                
+                int currentNameIdx = -1;
+                int currentFirstNameIdx = -1;
+                int currentLastNameIdx = -1;
+                int currentPtsIdx = -1;
+                int currentRkIdx = -1;
+                int currentRtgIdx = -1;
+                int currentFideIdIdx = -1;
+                int currentGroupIdx = -1;
+                int currentSnrIdx = -1;
+                int currentTitleIdx = -1;
+
                 // Identify columns
                 for (int j = 0; j < row.ItemArray.Length; j++)
                 {
                     string cell = row.ItemArray[j]?.ToString()?.Trim() ?? "";
                     if (string.IsNullOrEmpty(cell)) continue;
 
-                    if (cell.Equals("No.", StringComparison.OrdinalIgnoreCase) || cell.Contains("Ст.ном") || cell.Equals("№") || cell.Equals("N", StringComparison.OrdinalIgnoreCase))
+                    string cellLower = cell.ToLower();
+
+                    if (cellLower.Equals("no.") || cellLower.Contains("ст.ном") || cellLower.Equals("№") || cellLower.Equals("n") || cellLower.Equals("sno"))
                     {
-                         // In chess-results art=1, the first column is Rank, second is SNo. Both might be "Ст.ном" in UA.
-                         if (rkIdx == -1) rkIdx = j;
-                         else if (snrIdx == -1) snrIdx = j;
+                         if (currentRkIdx == -1) currentRkIdx = j;
+                         else if (currentSnrIdx == -1) currentSnrIdx = j;
                     }
-                    else if (cell.Equals("Name", StringComparison.OrdinalIgnoreCase) || cell.Contains("Ім'я") || cell.Contains("Прізвище") || cell.Contains("ПІБ") || cell.Contains("Учасник") || cell.Contains("Гравець"))
+                    else if (cellLower.Contains("ім'я") || cellLower.Contains("ім’я") || cellLower.Contains("імя") || cellLower.Contains("first name"))
                     {
-                        nameIdx = j;
+                        currentFirstNameIdx = j;
                     }
-                    else if (cell.Contains("Pts.") || cell.Contains("Очки") || cell.Contains("Боли") || cell.Contains("Бали") || cell.Equals("О", StringComparison.OrdinalIgnoreCase) || cell.Equals("Б", StringComparison.OrdinalIgnoreCase) || cell.Contains("Result"))
+                    else if (cellLower.Contains("прізвище") || cellLower.Contains("last name") || cellLower.Contains("surname"))
                     {
-                        ptsIdx = j;
+                        currentLastNameIdx = j;
                     }
-                    else if (cell.Contains("Rk.") || cell.Contains("Місце") || cell.Contains("Поз") || cell.Contains("Rank"))
+                    else if (cellLower.Equals("name") || cellLower.Contains("піб") || cellLower.Contains("учасник") || cellLower.Contains("гравець") || cellLower.Contains("player") || cellLower.Contains("participant"))
                     {
-                        rkIdx = j;
+                        currentNameIdx = j;
                     }
-                    else if (cell.Contains("Rtg") || cell.Contains("Рейт") || cell.Contains("Elo") || cell.Contains("Рейтинг"))
+                    else if (cellLower.Contains("pts.") || cellLower.Contains("очки") || cellLower.Contains("боли") || cellLower.Contains("бали") || cellLower.Contains("points") || cellLower.Contains("score") || cellLower.Equals("о") || cellLower.Equals("б") || cellLower.Contains("result"))
                     {
-                        rtgIdx = j;
+                        currentPtsIdx = j;
                     }
-                    else if (cell.Contains("FideID") || cell.Contains("Код FIDE"))
+                    else if (cellLower.Contains("rk.") || cellLower.Contains("місце") || cellLower.Contains("поз") || cellLower.Contains("rank"))
                     {
-                        fideIdIdx = j;
+                        currentRkIdx = j;
                     }
-                    else if (cell.Contains("Group") || cell.Contains("Група") || cell.Contains("Club") || cell.Contains("Клуб") || cell.Contains("Клас") || cell.Contains("Спец"))
+                    else if (cellLower.Contains("rtg") || cellLower.Contains("рейт") || cellLower.Contains("elo") || cellLower.Contains("рейтинг"))
                     {
-                        groupIdx = j;
+                        currentRtgIdx = j;
+                    }
+                    else if (cellLower.Contains("fideid") || cellLower.Contains("код fide") || cellLower.Contains("fide"))
+                    {
+                        currentFideIdIdx = j;
+                    }
+                    else if (cellLower.Contains("group") || cellLower.Contains("група") || cellLower.Contains("club") || cellLower.Contains("клуб") || cellLower.Contains("клас") || cellLower.Contains("спец"))
+                    {
+                        currentGroupIdx = j;
+                    }
+                    else if (cellLower.Contains("title") || cellLower.Contains("зван") || cellLower.Contains("титул"))
+                    {
+                        currentTitleIdx = j;
                     }
                 }
-                break;
+
+                // A valid header row MUST have at least a Name column or both First/Last name columns
+                if (currentNameIdx != -1 || (currentFirstNameIdx != -1 && currentLastNameIdx != -1))
+                {
+                    headerRowIdx = i;
+                    nameIdx = currentNameIdx;
+                    firstNameIdx = currentFirstNameIdx;
+                    lastNameIdx = currentLastNameIdx;
+                    ptsIdx = currentPtsIdx;
+                    rkIdx = currentRkIdx;
+                    rtgIdx = currentRtgIdx;
+                    fideIdIdx = currentFideIdIdx;
+                    groupIdx = currentGroupIdx;
+                    snrIdx = currentSnrIdx;
+                    titleIdx = currentTitleIdx;
+                    break;
+                }
             }
         }
 
-        if (headerRowIdx == -1 || nameIdx == -1)
+        if (headerRowIdx == -1 || (nameIdx == -1 && (firstNameIdx == -1 || lastNameIdx == -1)))
         {
              _logger.LogWarning("Could not find headers in Excel file. RowChecked: {Rows}", table.Rows.Count);
              return;
@@ -137,7 +185,29 @@ public class ExcelImportService : IExcelImportService
         for (int i = headerRowIdx + 1; i < table.Rows.Count; i++)
         {
             var row = table.Rows[i];
-            string name = row.ItemArray[nameIdx]?.ToString()?.Replace(",", " ").Trim() ?? "";
+            
+            string name = "";
+            if (nameIdx != -1)
+            {
+                name = row.ItemArray[nameIdx]?.ToString()?.Replace(",", " ").Trim() ?? "";
+            }
+
+            if (firstNameIdx != -1 && lastNameIdx != -1)
+            {
+                string fn = row.ItemArray[firstNameIdx]?.ToString()?.Trim() ?? "";
+                string ln = row.ItemArray[lastNameIdx]?.ToString()?.Trim() ?? "";
+                
+                if (string.IsNullOrEmpty(name))
+                {
+                    name = $"{ln} {fn}".Trim();
+                }
+                else if (!name.Contains(fn) || !name.Contains(ln))
+                {
+                    // Prefer combined if we have both and nameIdx was just one of them
+                    name = $"{ln} {fn}".Trim();
+                }
+            }
+
             if (string.IsNullOrEmpty(name)) continue;
 
             var player = new ExcelPlayer
@@ -147,7 +217,8 @@ public class ExcelImportService : IExcelImportService
                 Points = ptsIdx != -1 ? TryParseDouble(row.ItemArray[ptsIdx]) : 0,
                 Rating = rtgIdx != -1 ? TryParseInt(row.ItemArray[rtgIdx]) : null,
                 FideId = fideIdIdx != -1 ? row.ItemArray[fideIdIdx]?.ToString()?.Trim() : null,
-                Group = groupIdx != -1 ? row.ItemArray[groupIdx]?.ToString()?.Trim() : null
+                Group = groupIdx != -1 ? row.ItemArray[groupIdx]?.ToString()?.Trim() : null,
+                Title = titleIdx != -1 ? row.ItemArray[titleIdx]?.ToString()?.Trim() : null
             };
 
             data.Players.Add(player);
