@@ -16,18 +16,19 @@ public class CheckersEventRequest
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required CompetitionLevel Level { get; set; }
 
-    public required string Description { get; set; }
-    public required string TimeControl { get; set; }
-    public required int ParticipantsCount { get; set; }
+    public string? Description { get; set; }
+    public string? TimeControl { get; set; }
+    public int ParticipantsCount { get; set; }
     public DateTime? RegistrationStart { get; set; }
     public DateTime? RegistrationEnd { get; set; }
     public DateTime? EndDate { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required CheckersSystem System { get; set; }
+    public CheckersSystem? System { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required CheckersVariant Variant { get; set; }
+    public CheckersVariant Variant { get; set; }
+
 
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
@@ -59,18 +60,19 @@ public class CheckersEventResponse
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required CompetitionLevel Level { get; set; }
-    public required string Description { get; set; }
-    public required string TimeControl { get; set; }
-    public required int ParticipantsCount { get; set; }
+    public string? Description { get; set; }
+    public string? TimeControl { get; set; }
+    public int ParticipantsCount { get; set; }
     public DateTime? RegistrationStart { get; set; }
     public DateTime? RegistrationEnd { get; set; }
     public DateTime? EndDate { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required CheckersSystem System { get; set; }
+    public CheckersSystem? System { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required CheckersVariant Variant { get; set; }
+    public CheckersVariant? Variant { get; set; }
+
 
     public required ICollection<CheckersGameDto> Games { get; set; }
     public required ICollection<CheckersEventParticipantDto> Participants { get; set; }

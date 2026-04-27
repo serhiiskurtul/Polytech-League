@@ -4,7 +4,8 @@ namespace PolytechLeague.Domain.Entities.Futsal;
 
 public class FutsalEvent : Event
 {
-    public FutsalTournamentType TournamentType { get; set; }
+    public FutsalTournamentType? TournamentType { get; set; }
+
     public ICollection<FutsalMatch>? Matches { get; set; }
     public ICollection<FutsalTeam>? Teams { get; set; }
     

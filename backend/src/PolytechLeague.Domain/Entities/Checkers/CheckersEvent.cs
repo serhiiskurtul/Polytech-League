@@ -2,10 +2,11 @@ namespace PolytechLeague.Domain.Entities.Checkers;
 
 public class CheckersEvent : Event
 {
-    public required string TimeControl { get; set; }
-    public required int ParticipantsCount { get; set; }
-    public required CheckersSystem System { get; set; }
-    public required CheckersVariant Variant { get; set; }
+    public string? TimeControl { get; set; }
+    public int ParticipantsCount { get; set; }
+    public CheckersSystem? System { get; set; }
+    public CheckersVariant Variant { get; set; }
+
     public ICollection<CheckersGame>? Games { get; set; }
     public ICollection<CheckersEventParticipant>? Players { get; set; }
     public ICollection<CheckersTeam>? Teams { get; set; }

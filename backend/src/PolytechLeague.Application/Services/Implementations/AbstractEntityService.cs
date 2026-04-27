@@ -10,11 +10,16 @@ using PolytechLeague.Domain.Entities;
 namespace PolytechLeague.Application.Services.Implementations;
 
 public abstract class AbstractEntityService<TEntity>(
-    ApplicationDbContext _dbcontext,
-    ILogger<AbstractEntityService<TEntity>> _logger,
-    INotificationService? _notificationService = null) 
+    ApplicationDbContext dbcontext,
+    ILogger<AbstractEntityService<TEntity>> logger,
+    INotificationService? notificationService = null) 
     : IAbstractEntityService<TEntity> where TEntity : class
 {
+    protected readonly ApplicationDbContext _dbcontext = dbcontext;
+    protected readonly ILogger<AbstractEntityService<TEntity>> _logger = logger;
+    protected readonly INotificationService? _notificationService = notificationService;
+
+
     protected virtual Task OnCreatedAsync(TEntity entity, CancellationToken cancellationToken) => Task.CompletedTask;
     protected virtual Task OnUpdatedAsync(TEntity oldEntity, TEntity newEntity, CancellationToken cancellationToken) => Task.CompletedTask;
 

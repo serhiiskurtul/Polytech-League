@@ -17,9 +17,10 @@ public class BadmintonEventRequest
     public required CompetitionLevel Level { get; set; }
     
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required BadmintonTournamentType TournamentType { get; set; }
+    public BadmintonTournamentType? TournamentType { get; set; }
     
-    public required string Description { get; set; }
+    public string? Description { get; set; }
+
     public DateTime? RegistrationStart { get; set; }
     public DateTime? RegistrationEnd { get; set; }
     public DateTime? EndDate { get; set; }
@@ -80,9 +81,10 @@ public class BadmintonEventResponse
     public required CompetitionLevel Level { get; set; }
     
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required BadmintonTournamentType TournamentType { get; set; }
+    public BadmintonTournamentType? TournamentType { get; set; }
 
-    public required string Description { get; set; }
+    public string? Description { get; set; }
+
     public DateTime? RegistrationStart { get; set; }
     public DateTime? RegistrationEnd { get; set; }
     public DateTime? EndDate { get; set; }

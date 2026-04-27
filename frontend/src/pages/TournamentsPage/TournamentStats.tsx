@@ -8,9 +8,12 @@ interface Stats {
 
 interface TournamentStatsProps {
   stats: Stats;
+  isAdmin?: boolean;
 }
 
-const TournamentStats = ({ stats }: TournamentStatsProps) => {
+
+const TournamentStats = ({ stats, isAdmin }: TournamentStatsProps) => {
+
   return (
     <div className="tournament-stats">
       <div className="stat-card">
@@ -44,15 +47,18 @@ const TournamentStats = ({ stats }: TournamentStatsProps) => {
       </div>
 
 
-      <div className="stat-card">
-        <div className="stat-icon" style={{ backgroundColor: 'rgba(139, 92, 246, 0.1)' }}>
-          <i className="fas fa-user-check" style={{ color: '#8b5cf6' }}></i>
+      {!isAdmin && (
+        <div className="stat-card">
+          <div className="stat-icon" style={{ backgroundColor: 'rgba(139, 92, 246, 0.1)' }}>
+            <i className="fas fa-user-check" style={{ color: '#8b5cf6' }}></i>
+          </div>
+          <div className="stat-info">
+            <div className="stat-value">{stats.registeredCount}</div>
+            <div className="stat-label">Ваших реєстрацій</div>
+          </div>
         </div>
-        <div className="stat-info">
-          <div className="stat-value">{stats.registeredCount}</div>
-          <div className="stat-label">Ваших реєстрацій</div>
-        </div>
-      </div>
+      )}
+
     </div>
   );
 };

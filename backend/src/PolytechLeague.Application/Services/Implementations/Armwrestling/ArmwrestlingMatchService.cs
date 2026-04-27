@@ -9,11 +9,12 @@ using PolytechLeague.Domain.Exceptions;
 namespace PolytechLeague.Application.Services.Implementations.Armwrestling;
 
 public class ArmwrestlingMatchService(
-    ApplicationDbContext _dbcontext,
-    ILogger<AbstractEntityService<ArmwrestlingMatch>> _logger
+    ApplicationDbContext dbcontext,
+    ILogger<AbstractEntityService<ArmwrestlingMatch>> logger
 ) :
-    AbstractEntityService<ArmwrestlingMatch>(_dbcontext, _logger),
+    AbstractEntityService<ArmwrestlingMatch>(dbcontext, logger),
     IArmwrestlingMatchService
+
 {
     public override async Task<IEnumerable<ArmwrestlingMatch>> GetAllAsync(
         FilterParams? filterParams = null,

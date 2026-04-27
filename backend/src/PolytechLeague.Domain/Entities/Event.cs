@@ -9,7 +9,8 @@ public abstract class Event
     public ICollection<EventPhotos>? Photos { get; set; }
     public required ICollection<long> RefereeIds { get; set; }
     public required CompetitionLevel Level { get; set; }
-    public required string Description { get; set; }
+    public string? Description { get; set; }
+
     public DateTime? RegistrationStart { get; set; }
     public DateTime? RegistrationEnd { get; set; }
     public DateTime? EndDate { get; set; }

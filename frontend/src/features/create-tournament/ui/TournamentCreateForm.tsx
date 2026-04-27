@@ -8,7 +8,7 @@ import CategoriesSection from './CategoriesSection/CategoriesSection';
 import SettingsSection from './SettingsSection/SettingsSection';
 import FormActions from './FormActions/FormActions';
 import PreviewSection from './PreviewSection/PreviewSection';
-import StatsCard from './StatsCard/StatsCard';
+
 
 const TournamentCreateForm = () => {
   const {
@@ -63,11 +63,7 @@ const TournamentCreateForm = () => {
               selectedCategories={selectedCategories} 
             />
             
-            <StatsCard 
-              formData={formData} 
-              selectedCategories={selectedCategories} 
-              calculateDuration={calculateDuration} 
-            />
+
           </div>
         </div>
     </div>

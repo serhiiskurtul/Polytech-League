@@ -4,7 +4,8 @@ namespace PolytechLeague.Domain.Entities.TableTennis;
 
 public class TableTennisEvent : Event
 {
-    public TableTennisTournamentType TournamentType { get; set; }
+    public TableTennisTournamentType? TournamentType { get; set; }
+
     public TableTennisCategory Category { get; set; }
     
     public ICollection<TableTennisMatch>? Matches { get; set; }

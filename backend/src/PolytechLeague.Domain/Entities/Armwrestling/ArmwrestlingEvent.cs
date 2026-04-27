@@ -9,7 +9,8 @@ public class ArmwrestlingEvent : Event
     public ArmwrestlingCategory Category { get; set; }
     public string? TimeControl { get; set; }
     public int ParticipantsCount { get; set; }
-    public ArmwrestlingTournamentType TournamentType { get; set; } = ArmwrestlingTournamentType.SingleElimination;
+    public ArmwrestlingTournamentType? TournamentType { get; set; } = ArmwrestlingTournamentType.SingleElimination;
+
     
     public ICollection<ArmwrestlingEventParticipant>? Players { get; set; }
     public ICollection<ArmwrestlingMatch>? Matches { get; set; }

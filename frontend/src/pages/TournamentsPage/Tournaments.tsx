@@ -187,7 +187,8 @@ const Tournaments = () => {
         )}
       </header>
 
-      <TournamentStats stats={stats} />
+      <TournamentStats stats={stats} isAdmin={isAdmin} />
+
 
       <TournamentFilters 
         activeStatus={activeStatus}

@@ -17,16 +17,17 @@ public class TableTennisEventRequest
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required CompetitionLevel Level { get; set; }
     
-    public required string Description { get; set; }
+    public string? Description { get; set; }
     public DateTime? RegistrationStart { get; set; }
     public DateTime? RegistrationEnd { get; set; }
     public DateTime? EndDate { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required TableTennisTournamentType TournamentType { get; set; }
+    public TableTennisTournamentType? TournamentType { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required TableTennisCategory Category { get; set; }
+    public TableTennisCategory Category { get; set; }
+
 
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
@@ -50,13 +51,14 @@ public class TableTennisEventResponse
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required CompetitionLevel Level { get; set; }
-    public required string Description { get; set; }
+    public string? Description { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required TableTennisTournamentType TournamentType { get; set; }
+    public TableTennisTournamentType? TournamentType { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required TableTennisCategory Category { get; set; }
+    public TableTennisCategory? Category { get; set; }
+
     
     public PlayerDto? FirstPlace { get; set; }
     public PlayerDto? SecondPlace { get; set; }

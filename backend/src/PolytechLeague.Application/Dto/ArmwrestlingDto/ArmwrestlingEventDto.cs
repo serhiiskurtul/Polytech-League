@@ -17,7 +17,8 @@ public class ArmwrestlingEventRequest
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required CompetitionLevel Level { get; set; }
     
-    public required string Description { get; set; }
+    public string? Description { get; set; }
+
     public DateTime? RegistrationStart { get; set; }
     public DateTime? RegistrationEnd { get; set; }
     public DateTime? EndDate { get; set; }
@@ -44,7 +45,8 @@ public class ArmwrestlingEventRequest
     public long? ThirdPlaceId { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public ArmwrestlingTournamentType TournamentType { get; set; } = ArmwrestlingTournamentType.SingleElimination;
+    public ArmwrestlingTournamentType? TournamentType { get; set; } = ArmwrestlingTournamentType.SingleElimination;
+
     public bool IsModerated { get; set; }
     public bool IsPublic { get; set; }
     public long? SeasonId { get; set; }
@@ -61,7 +63,8 @@ public class ArmwrestlingEventResponse
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required CompetitionLevel Level { get; set; }
-    public required string Description { get; set; }
+    public string? Description { get; set; }
+
     public DateTime? RegistrationStart { get; set; }
     public DateTime? RegistrationEnd { get; set; }
     public DateTime? EndDate { get; set; }

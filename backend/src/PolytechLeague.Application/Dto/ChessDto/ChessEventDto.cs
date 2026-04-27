@@ -15,15 +15,16 @@ public class ChessEventRequest
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required CompetitionLevel Level { get; set; }
     
-    public required string Description { get; set; }
-    public required string TimeControl { get; set; }
-    public required int ParticipantsCount { get; set; }
+    public string? Description { get; set; }
+    public string? TimeControl { get; set; }
+    public int ParticipantsCount { get; set; }
     public DateTime? RegistrationStart { get; set; }
     public DateTime? RegistrationEnd { get; set; }
     public DateTime? EndDate { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required ChessSystem System { get; set; }
+    public ChessSystem? System { get; set; }
+
     
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
@@ -55,15 +56,16 @@ public class ChessEventResponse
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required CompetitionLevel Level { get; set; }
-    public required string Description { get; set; }
-    public required string TimeControl { get; set; }
-    public required int ParticipantsCount { get; set; }
+    public string? Description { get; set; }
+    public string? TimeControl { get; set; }
+    public int ParticipantsCount { get; set; }
     public DateTime? RegistrationStart { get; set; }
     public DateTime? RegistrationEnd { get; set; }
     public DateTime? EndDate { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required ChessSystem System { get; set; }
+    public ChessSystem? System { get; set; }
+
     public required ICollection<ChessGameDto> Games { get; set; }
     public required ICollection<ChessEventParticipantDto> Participants { get; set; }
     public ICollection<ChessTeamResponse>? Teams { get; set; }
