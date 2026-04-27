@@ -36,6 +36,9 @@ public class TableTennisEventService(
         oldEntity.FirstPlaceId = newEntity.FirstPlaceId;
         oldEntity.SecondPlaceId = newEntity.SecondPlaceId;
         oldEntity.ThirdPlaceId = newEntity.ThirdPlaceId;
+        oldEntity.FirstPlaceTeamId = newEntity.FirstPlaceTeamId;
+        oldEntity.SecondPlaceTeamId = newEntity.SecondPlaceTeamId;
+        oldEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
         oldEntity.SeasonId = newEntity.SeasonId;
 
         oldEntity.UpdatedAt = DateTime.UtcNow;

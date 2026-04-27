@@ -180,7 +180,7 @@ const TournamentViewPage = () => {
     try {
       const sportRaw = tournament?.sport || '';
       const sportKey = sportRaw.toLowerCase().replace(/-/g, '_').replace(/\s/g, '');
-      const isTeamSport = ['futsal', 'volleyball', 'beach_volleyball', 'basketball_3x3', 'badminton'].includes(sportKey);
+      const isTeamSport = !!(details as any).isTeam || ['futsal', 'volleyball', 'beach_volleyball', 'basketball_3x3', 'badminton'].includes(sportKey);
 
       // Build clean base payload with common fields to avoid "Extra fields" 400 error
       const payload: any = {
@@ -1243,12 +1243,12 @@ const TournamentViewPage = () => {
                     style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
                   >
                     <option key="default-first" value="0">-- Оберіть переможця --</option>
-                    {sortedPlayers?.map((p: any) => (
+                    {!isTeamSport && sortedPlayers?.map((p: any) => (
                       <option key={`first-p-${p.playerId}`} value={p.playerId}>
                         {p.playerName} { (['chess', 'checkers', 'tabletennis', 'badminton'].includes(tournament?.sport)) && (p.points !== undefined) ? `(${p.points} очок)` : ''}
                       </option>
                     ))}
-                    {details?.teams?.map((t: any) => (
+                    {isTeamSport && details?.teams?.map((t: any) => (
                       <option key={`first-t-${t.id}`} value={t.id}>{t.name}</option>
                     ))}
                   </select>
@@ -1264,12 +1264,12 @@ const TournamentViewPage = () => {
                     style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
                   >
                     <option key="default-second" value="0">-- Оберіть переможця --</option>
-                    {sortedPlayers?.map((p: any) => (
+                    {!isTeamSport && sortedPlayers?.map((p: any) => (
                       <option key={`second-p-${p.playerId}`} value={p.playerId}>
                         {p.playerName} { (['chess', 'checkers', 'tabletennis', 'badminton'].includes(tournament?.sport)) && (p.points !== undefined) ? `(${p.points} очок)` : ''}
                       </option>
                     ))}
-                    {details?.teams?.map((t: any) => (
+                    {isTeamSport && details?.teams?.map((t: any) => (
                       <option key={`second-t-${t.id}`} value={t.id}>{t.name}</option>
                     ))}
                   </select>
@@ -1285,12 +1285,12 @@ const TournamentViewPage = () => {
                     style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
                   >
                     <option key="default-third" value="0">-- Оберіть переможця --</option>
-                    {sortedPlayers?.map((p: any) => (
+                    {!isTeamSport && sortedPlayers?.map((p: any) => (
                       <option key={`third-p-${p.playerId}`} value={p.playerId}>
                         {p.playerName} { (['chess', 'checkers', 'tabletennis', 'badminton'].includes(tournament?.sport)) && (p.points !== undefined) ? `(${p.points} очок)` : ''}
                       </option>
                     ))}
-                    {details?.teams?.map((t: any) => (
+                    {isTeamSport && details?.teams?.map((t: any) => (
                       <option key={`third-t-${t.id}`} value={t.id}>{t.name}</option>
                     ))}
                   </select>
