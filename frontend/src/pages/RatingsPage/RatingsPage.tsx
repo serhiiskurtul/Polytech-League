@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './RatingsPage.module.css';
-import { getSeasons, getSeasonRating, createSeason, updateSeason } from '@/shared/api/seasonRating.api';
+import { getSeasons, getSeasonRating, createSeason, updateSeason, deleteSeason } from '@/shared/api/seasonRating.api';
+
 import { Season, SeasonRatingResponse } from '@/shared/types/seasonRating.types';
 import toast from 'react-hot-toast';
 import * as XLSX from 'xlsx';
@@ -82,6 +83,18 @@ const RatingsPage: React.FC = () => {
       toast.error('Помилка при збереженні сезону');
     }
   };
+
+  const handleDeleteSeason = async (id: number) => {
+    if (!window.confirm('Ви впевнені, що хочете видалити цей сезон? Усі дані про змагання залишаться, але вони більше не будуть прив\'язані до цього сезону.')) return;
+    try {
+      await deleteSeason(id);
+      toast.success('Сезон видалено');
+      fetchSeasons();
+    } catch (error) {
+      toast.error('Помилка при видаленні сезону');
+    }
+  };
+
 
 
   const exportToExcel = () => {
@@ -228,8 +241,42 @@ const RatingsPage: React.FC = () => {
       {showSeasonModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.modal}>
-            <h2>{editingSeason ? 'Редагувати сезон' : 'Створити новий сезон'}</h2>
-            <form onSubmit={handleCreateSeason}>
+            <div className={styles.modalHeader}>
+              <h2>Керування сезонами</h2>
+              <button className={styles.closeBtn} onClick={() => setShowSeasonModal(false)}>
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+
+            <div className={styles.seasonsList}>
+              <h3>Список сезонів</h3>
+              <div className={styles.listContainer}>
+                {seasons.map(s => (
+                  <div key={s.id} className={`${styles.seasonItem} ${editingSeason?.id === s.id ? styles.editing : ''}`}>
+                    <div className={styles.seasonInfo}>
+                      <span className={styles.seasonName}>{s.name}</span>
+                      {s.isCurrent && <span className={styles.currentBadge}>Поточний</span>}
+                      {s.spartakiadNumber && <span className={styles.spartakiadInfo}>{s.spartakiadNumber}-та Спартакіада</span>}
+                    </div>
+                    <div className={styles.seasonActions}>
+                      <button onClick={() => setEditingSeason(s)} className={styles.editBtn} title="Редагувати">
+                        <i className="fas fa-edit"></i>
+                      </button>
+                      <button onClick={() => handleDeleteSeason(s.id)} className={styles.deleteBtn} title="Видалити">
+                        <i className="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.divider}></div>
+
+            <div className={styles.formSection}>
+              <h3>{editingSeason ? 'Редагувати сезон' : 'Додати новий сезон'}</h3>
+              <form onSubmit={handleCreateSeason} key={editingSeason?.id || 'new'}>
+
               <div className={styles.formGroup}>
                 <label>Назва сезону (напр. 2023-2024)</label>
                 <input name="name" required defaultValue={editingSeason?.name} placeholder="2023-2024" />
@@ -253,13 +300,21 @@ const RatingsPage: React.FC = () => {
 
 
               <div className={styles.modalActions}>
-                <button type="button" onClick={() => setShowSeasonModal(false)} className={styles.cancelBtn}>Скасувати</button>
-                <button type="submit" className={styles.saveBtn}>Зберегти</button>
+                {editingSeason && (
+                  <button type="button" onClick={() => setEditingSeason(null)} className={styles.cancelBtn}>
+                    Скасувати редагування
+                  </button>
+                )}
+                <button type="submit" className={styles.saveBtn}>
+                  {editingSeason ? 'Оновити сезон' : 'Створити сезон'}
+                </button>
               </div>
             </form>
           </div>
         </div>
+      </div>
       )}
+
     </div>
   );
 };
