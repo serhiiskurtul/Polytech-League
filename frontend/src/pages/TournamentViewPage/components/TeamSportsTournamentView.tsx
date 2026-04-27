@@ -27,6 +27,7 @@ import {
   createChessTeam,
   createCheckersTeam,
   createTableTennisTeam,
+  createPlayer,
   updateVolleyballTeam,
   updateBeachVolleyballTeam,
   updateFutsalTeam,
@@ -88,6 +89,10 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const [isScorersModalOpen, setIsScorersModalOpen] = useState(false);
   const [selectedMatchForScorers, setSelectedMatchForScorers] = useState<any>(null);
   const [tempScorers, setTempScorers] = useState<{[playerId: number]: number}>({});
+
+  // Quick Add Player State
+  const [isQuickAddMode, setIsQuickAddMode] = useState(false);
+  const [quickAddForm, setQuickAddForm] = useState({ firstName: '', lastName: '', group: '' });
 
   useEffect(() => {
     if (isAdmin) {
@@ -574,6 +579,36 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     }
   };
 
+  const handleQuickAddPlayer = async () => {
+    if (!quickAddForm.firstName || !quickAddForm.lastName || !quickAddForm.group) {
+      alert('Будь ласка, заповніть усі поля');
+      return;
+    }
+
+    try {
+      const newPlayer = await createPlayer({
+        firstName: quickAddForm.firstName,
+        lastName: quickAddForm.lastName,
+        group: quickAddForm.group,
+        city: 'Чернівці'
+      } as PlayerDto);
+
+      // Add to team
+      await handleTogglePlayerInTeam(editingTeamId!, newPlayer.id!);
+      
+      // Refresh players list
+      await loadAllPlayers();
+      
+      // Reset form
+      setQuickAddForm({ firstName: '', lastName: '', group: '' });
+      setIsQuickAddMode(false);
+      setSearchQuery('');
+    } catch (err) {
+      console.error('Quick Add Error:', err);
+      alert('Помилка при швидкому додаванні гравця');
+    }
+  };
+
   const getSportLabel = () => {
     switch (sport) {
       case 'volleyball': return 'Волейбол';
@@ -918,41 +953,119 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
       {/* Team Roster Management Modal */}
       {isTeamRosterModalOpen && editingTeamId && (
-        <div className={styles.rosterModalOverlay} onClick={() => { setIsTeamRosterModalOpen(false); setEditingTeamId(null); }}>
+        <div className={styles.rosterModalOverlay} onClick={() => { setIsTeamRosterModalOpen(false); setEditingTeamId(null); setIsQuickAddMode(false); }}>
           <div className={`${styles.rosterModal} ${styles.glassModal}`} onClick={e => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h3>Управління складом: {details.teams.find((t: any) => t.id === editingTeamId)?.name}</h3>
-              <button className={styles.closeButton} onClick={() => { setIsTeamRosterModalOpen(false); setEditingTeamId(null); }}>&times;</button>
+              <button className={styles.closeButton} onClick={() => { setIsTeamRosterModalOpen(false); setEditingTeamId(null); setIsQuickAddMode(false); }}>&times;</button>
             </div>
-            <div className={styles.searchBox} style={{padding: '20px 40px 0 40px'}}>
-                <input 
-                    type="text" 
-                    placeholder="Пошук гравця..." 
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    style={{width: '100%', padding: '12px 18px', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.1)'}}
-                />
-            </div>
-            <div className={styles.modalBody} style={{maxHeight: '400px'}}>
-                <div className={styles.playersList}>
-                    {filteredPlayers.map(player => {
-                        const team = details.teams.find((t: any) => t.id === editingTeamId);
-                        const isSelected = team.players?.some((p: any) => p.id === player.id);
-                        
-                        return (
-                            <div key={player.id} className={`${styles.playerPickItem} ${isSelected ? styles.selected : ''}`} onClick={() => handleTogglePlayerInTeam(editingTeamId, player.id!)}>
-                                <div className={styles.pickInfo}>
-                                    <span className={styles.pName}>{player.lastName} {player.firstName}</span>
-                                    <span className={styles.pGroup}>{player.group}</span>
-                                </div>
-                                <div className={styles.pickStatus}>
-                                    {isSelected ? <i className="fas fa-check-circle"></i> : <i className="far fa-circle"></i>}
-                                </div>
-                            </div>
-                        );
-                    })}
+            
+            {!isQuickAddMode ? (
+              <>
+                <div className={styles.searchBox} style={{padding: '20px 40px 0 40px', display: 'flex', gap: '10px'}}>
+                    <input 
+                        type="text" 
+                        placeholder="Пошук гравця..." 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        style={{flex: 1, padding: '12px 18px', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.1)'}}
+                    />
+                    <button 
+                      className={styles.quickAddToggleBtn}
+                      onClick={() => {
+                        setIsQuickAddMode(true);
+                        // Try to parse search query if it looks like Name Surname
+                        const parts = searchQuery.trim().split(/\s+/);
+                        if (parts.length >= 2) {
+                          setQuickAddForm({ ...quickAddForm, lastName: parts[0], firstName: parts[1] });
+                        } else if (parts.length === 1) {
+                          setQuickAddForm({ ...quickAddForm, lastName: parts[0] });
+                        }
+                      }}
+                      title="Додати нового гравця вручну"
+                    >
+                      <i className="fas fa-user-plus"></i>
+                    </button>
                 </div>
-            </div>
+                <div className={styles.modalBody} style={{maxHeight: '400px'}}>
+                    <div className={styles.playersList}>
+                        {filteredPlayers.map(player => {
+                            const team = details.teams.find((t: any) => t.id === editingTeamId);
+                            const isSelected = team.players?.some((p: any) => p.id === player.id);
+                            
+                            return (
+                                <div key={player.id} className={`${styles.playerPickItem} ${isSelected ? styles.selected : ''}`} onClick={() => handleTogglePlayerInTeam(editingTeamId, player.id!)}>
+                                    <div className={styles.pickInfo}>
+                                        <span className={styles.pName}>{player.lastName} {player.firstName}</span>
+                                        <span className={styles.pGroup}>{player.group}</span>
+                                    </div>
+                                    <div className={styles.pickStatus}>
+                                        {isSelected ? <i className="fas fa-check-circle"></i> : <i className="far fa-circle"></i>}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                        {filteredPlayers.length === 0 && (
+                          <div className={styles.noPlayersHint} style={{textAlign: 'center', padding: '20px'}}>
+                            Гравців не знайдено. 
+                            <button 
+                              className={styles.linkButton} 
+                              onClick={() => {
+                                setIsQuickAddMode(true);
+                                const parts = searchQuery.trim().split(/\s+/);
+                                if (parts.length >= 2) {
+                                  setQuickAddForm({ ...quickAddForm, lastName: parts[0], firstName: parts[1] });
+                                } else if (parts.length === 1) {
+                                  setQuickAddForm({ ...quickAddForm, lastName: parts[0] });
+                                }
+                              }}
+                            >
+                              Додати {searchQuery} як нового гравця?
+                            </button>
+                          </div>
+                        )}
+                    </div>
+                </div>
+              </>
+            ) : (
+              <div className={styles.modalBody}>
+                <div className={styles.quickAddForm}>
+                  <div className={styles.formRow}>
+                    <div className={styles.formGroup}>
+                      <label>Прізвище</label>
+                      <input 
+                        type="text" 
+                        value={quickAddForm.lastName} 
+                        onChange={e => setQuickAddForm({...quickAddForm, lastName: e.target.value})}
+                        placeholder="напр. Іванов"
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label>Ім'я</label>
+                      <input 
+                        type="text" 
+                        value={quickAddForm.firstName} 
+                        onChange={e => setQuickAddForm({...quickAddForm, firstName: e.target.value})}
+                        placeholder="напр. Іван"
+                      />
+                    </div>
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label>Група / Статус</label>
+                    <input 
+                      type="text" 
+                      value={quickAddForm.group} 
+                      onChange={e => setQuickAddForm({...quickAddForm, group: e.target.value})}
+                      placeholder="напр. 321 або Випускник"
+                    />
+                  </div>
+                  <div className={styles.modalFooter} style={{padding: '20px 0 0 0', display: 'flex', gap: '12px', background: 'transparent', borderTop: 'none'}}>
+                    <button className={styles.cancelBtn} onClick={() => setIsQuickAddMode(false)}>Назад до пошуку</button>
+                    <button className={styles.saveBtn} onClick={handleQuickAddPlayer} style={{flex: 1}}>Створити та додати</button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
