@@ -168,19 +168,12 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
     {
         if (string.IsNullOrEmpty(url)) return BadRequest("URL is required");
 
-        try
-        {
-            await chessEventService.ImportDataFromUrlAsync(id, url, cancellationToken);
+        await chessEventService.ImportDataFromUrlAsync(id, url, cancellationToken);
 
-            await redisService.RemoveDataAsync($"chess_event_{id}");
-            await redisService.RemoveGroupAsync("chess_events_all");
+        await redisService.RemoveDataAsync($"chess_event_{id}");
+        await redisService.RemoveGroupAsync("chess_events_all");
 
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
+        return Ok();
     }
 
     [Authorize(Policy = "Admin")]
@@ -189,20 +182,13 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
     {
         if (file == null || file.Length == 0) return BadRequest("File is required");
 
-        try
-        {
-            using var stream = file.OpenReadStream();
-            await chessEventService.ImportDataFromFileAsync(id, stream, cancellationToken);
+        using var stream = file.OpenReadStream();
+        await chessEventService.ImportDataFromFileAsync(id, stream, cancellationToken);
 
-            await redisService.RemoveDataAsync($"chess_event_{id}");
-            await redisService.RemoveGroupAsync("chess_events_all");
+        await redisService.RemoveDataAsync($"chess_event_{id}");
+        await redisService.RemoveGroupAsync("chess_events_all");
 
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
+        return Ok();
     }
 
     [Authorize]

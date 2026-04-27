@@ -48,7 +48,7 @@ public class UserService : AbstractEntityService<User>, IUserService
 
         var user = await _dbcontext.Set<User>()
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Email == email, cancellationToken);
+            .FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower(), cancellationToken);
 
         if (user is null)
         {
@@ -68,7 +68,7 @@ public class UserService : AbstractEntityService<User>, IUserService
         user.Password = _passwordEncoder.Encode(user.Password);
 
         var findUser = await _dbcontext.Set<User>().FirstOrDefaultAsync(
-            u => u.Email == user.Email &&
+            u => u.Email.ToLower() == user.Email.ToLower() &&
             !u.IsDeleted, cancellationToken);
 
         if (findUser != null)
@@ -108,7 +108,7 @@ public class UserService : AbstractEntityService<User>, IUserService
         _logger.LogInformation("Confirming email for {Email}", email);
 
         var user = await _dbcontext.Set<User>()
-            .FirstOrDefaultAsync(u => u.Email == email && !u.IsDeleted, cancellationToken);
+            .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower() && !u.IsDeleted, cancellationToken);
 
         if (user is null)
         {

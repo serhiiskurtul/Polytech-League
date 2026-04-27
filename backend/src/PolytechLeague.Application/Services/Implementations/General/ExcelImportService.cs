@@ -75,13 +75,13 @@ public class ExcelImportService : IExcelImportService
         int groupIdx = -1;
 
         // 1. Find Header Row
-        for (int i = 0; i < Math.Min(table.Rows.Count, 15); i++)
+        for (int i = 0; i < Math.Min(table.Rows.Count, 30); i++)
         {
             var row = table.Rows[i];
             var rowText = string.Join(" ", row.ItemArray.Select(c => c?.ToString() ?? ""));
 
             // Look for common headers (English/Ukrainian)
-            if (ContainsAny(rowText, new[] { "Name", "Ім'я", "Очки", "Pts.", "Rk.", "Ст.ном", "№" }))
+            if (ContainsAny(rowText, new[] { "Name", "Ім'я", "Прізвище", "ПІБ", "Очки", "Pts.", "Rk.", "Ст.ном", "№", "Result", "Результат" }))
             {
                 headerRowIdx = i;
                 
@@ -91,25 +91,25 @@ public class ExcelImportService : IExcelImportService
                     string cell = row.ItemArray[j]?.ToString()?.Trim() ?? "";
                     if (string.IsNullOrEmpty(cell)) continue;
 
-                    if (cell.Equals("No.", StringComparison.OrdinalIgnoreCase) || cell.Contains("Ст.ном") || cell.Equals("№"))
+                    if (cell.Equals("No.", StringComparison.OrdinalIgnoreCase) || cell.Contains("Ст.ном") || cell.Equals("№") || cell.Equals("N", StringComparison.OrdinalIgnoreCase))
                     {
                          // In chess-results art=1, the first column is Rank, second is SNo. Both might be "Ст.ном" in UA.
                          if (rkIdx == -1) rkIdx = j;
                          else if (snrIdx == -1) snrIdx = j;
                     }
-                    else if (cell.Equals("Name", StringComparison.OrdinalIgnoreCase) || cell.Contains("Ім'я"))
+                    else if (cell.Equals("Name", StringComparison.OrdinalIgnoreCase) || cell.Contains("Ім'я") || cell.Contains("Прізвище") || cell.Contains("ПІБ") || cell.Contains("Учасник") || cell.Contains("Гравець"))
                     {
                         nameIdx = j;
                     }
-                    else if (cell.Contains("Pts.") || cell.Contains("Очки"))
+                    else if (cell.Contains("Pts.") || cell.Contains("Очки") || cell.Contains("Боли") || cell.Contains("Бали") || cell.Equals("О", StringComparison.OrdinalIgnoreCase) || cell.Equals("Б", StringComparison.OrdinalIgnoreCase) || cell.Contains("Result"))
                     {
                         ptsIdx = j;
                     }
-                    else if (cell.Contains("Rk.") || cell.Contains("Місце"))
+                    else if (cell.Contains("Rk.") || cell.Contains("Місце") || cell.Contains("Поз") || cell.Contains("Rank"))
                     {
                         rkIdx = j;
                     }
-                    else if (cell.Contains("Rtg") || cell.Contains("Рейт"))
+                    else if (cell.Contains("Rtg") || cell.Contains("Рейт") || cell.Contains("Elo"))
                     {
                         rtgIdx = j;
                     }
@@ -117,7 +117,7 @@ public class ExcelImportService : IExcelImportService
                     {
                         fideIdIdx = j;
                     }
-                    else if (cell.Contains("Group") || cell.Contains("Група") || cell.Contains("Club") || cell.Contains("Клуб"))
+                    else if (cell.Contains("Group") || cell.Contains("Група") || cell.Contains("Club") || cell.Contains("Клуб") || cell.Contains("Клас") || cell.Contains("Спец"))
                     {
                         groupIdx = j;
                     }

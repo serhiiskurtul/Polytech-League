@@ -102,7 +102,8 @@ public class ChessEventService :
             
         if (player?.User?.Role == UserRole.Admin)
         {
-            throw new InvalidOperationException("Administrators cannot be participants in tournaments.");
+            _logger.LogWarning("Skipping player {PlayerId} because they are an administrator.", dto.PlayerId);
+            return;
         }
 
         var participant = new ChessEventParticipant
@@ -259,7 +260,7 @@ public class ChessEventService :
 
         if (data.Players.Count == 0)
         {
-            throw new Exception("Не вдалося знайти список учасників або дані в Excel. Перевірте посилання.");
+            throw new InvalidOperationException("Не вдалося знайти список учасників або дані в Excel. Перевірте, чи файл містить заголовки 'Name', 'Ім'я', 'Прізвище' тощо.");
         }
 
         foreach (var sp in data.Players)
