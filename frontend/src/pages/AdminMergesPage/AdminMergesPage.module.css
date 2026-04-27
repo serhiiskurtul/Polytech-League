@@ -1,0 +1,126 @@
+.requestList {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.requestCard {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.2s;
+}
+
+.requestCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
+.requestInfo {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    flex: 1;
+}
+
+.party {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.subValue {
+    font-size: 14px;
+    color: #4b5563;
+}
+
+.arrow {
+    font-size: 20px;
+    color: #9ca3af;
+}
+
+.actions {
+    display: flex;
+    gap: 12px;
+}
+
+.approveBtn {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s;
+}
+
+.approveBtn:hover {
+    background: #059669;
+}
+
+.rejectBtn {
+    background: white;
+    color: #ef4444;
+    border: 1px solid #ef4444;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.rejectBtn:hover {
+    background: #fef2f2;
+}
+
+@media (max-width: 768px) {
+    .requestCard {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+    
+    .requestInfo {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .arrow {
+        transform: rotate(90deg);
+    }
+    
+    .actions {
+        width: 100%;
+    }
+    
+    .approveBtn, .rejectBtn {
+        flex: 1;
+        justify-content: center;
+    }
+}

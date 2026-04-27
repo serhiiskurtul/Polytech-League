@@ -49,3 +49,27 @@ export const getPlayersRankings = async (): Promise<PlayerDto[]> => {
     const response = await api.get<PlayerDto[]>('/players/rankings');
     return response.data;
 };
+
+// Profile Merging
+export const checkArchivalMatches = async (firstName: string, lastName: string, group: string): Promise<PlayerDto[]> => {
+    const response = await api.get<PlayerDto[]>(`/players/check-archival?firstName=${firstName}&lastName=${lastName}&group=${group}`);
+    return response.data;
+};
+
+export const createMergeRequest = async (targetPlayerId: number): Promise<void> => {
+    await api.post(`/players/merge-request?targetPlayerId=${targetPlayerId}`);
+};
+
+export const getPendingMergeRequests = async (): Promise<any[]> => {
+    const response = await api.get<any[]>('/players/merge-requests');
+    return response.data;
+};
+
+export const approveMergeRequest = async (id: number): Promise<void> => {
+    await api.post(`/players/merge-requests/${id}/approve`);
+};
+
+export const rejectMergeRequest = async (id: number, comment: string): Promise<void> => {
+    await api.post(`/players/merge-requests/${id}/reject?comment=${comment}`);
+};
+

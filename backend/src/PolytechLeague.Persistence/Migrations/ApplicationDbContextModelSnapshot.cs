@@ -1138,6 +1138,38 @@ namespace PolytechLeague.Persistence.Migrations
                     b.UseTptMappingStrategy();
                 });
 
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.ProfileMergeRequest", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AdminComment")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("TargetPlayerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TargetPlayerId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ProfileMergeRequests");
+                });
+
             modelBuilder.Entity("PolytechLeague.Domain.Entities.RefreshToken", b =>
                 {
                     b.Property<long>("Id")
@@ -2638,6 +2670,25 @@ namespace PolytechLeague.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.ProfileMergeRequest", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "TargetPlayer")
+                        .WithMany()
+                        .HasForeignKey("TargetPlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TargetPlayer");
 
                     b.Navigation("User");
                 });

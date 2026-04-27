@@ -139,4 +139,46 @@ public class PlayersController : ControllerBase
             return StatusCode(500, ex.Message);
         }
     }
+
+    [Authorize]
+    [HttpGet("check-archival")]
+    public async Task<ActionResult<IEnumerable<PlayerDto>>> CheckArchival([FromQuery] string firstName, [FromQuery] string lastName, [FromQuery] string group, CancellationToken cancellationToken)
+    {
+        var matches = await _playerService.FindPotentialArchivalMatchesAsync(firstName, lastName, group, cancellationToken);
+        return Ok(matches);
+    }
+
+    [Authorize]
+    [HttpPost("merge-request")]
+    public async Task<IActionResult> CreateMergeRequest([FromQuery] long targetPlayerId, CancellationToken cancellationToken)
+    {
+        var userId = User.GetUserId();
+        await _playerService.CreateMergeRequestAsync(userId, targetPlayerId, cancellationToken);
+        return Ok();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpGet("merge-requests")]
+    public async Task<ActionResult<IEnumerable<ProfileMergeRequestDto>>> GetMergeRequests(CancellationToken cancellationToken)
+    {
+        var requests = await _playerService.GetPendingMergeRequestsAsync(cancellationToken);
+        return Ok(requests);
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("merge-requests/{id}/approve")]
+    public async Task<IActionResult> ApproveMergeRequest(long id, CancellationToken cancellationToken)
+    {
+        await _playerService.ApproveMergeRequestAsync(id, cancellationToken);
+        return Ok();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("merge-requests/{id}/reject")]
+    public async Task<IActionResult> RejectMergeRequest(long id, [FromQuery] string comment, CancellationToken cancellationToken)
+    {
+        await _playerService.RejectMergeRequestAsync(id, comment, cancellationToken);
+        return Ok();
+    }
 }
+

@@ -19,6 +19,8 @@ import { PlayerComparePage } from '@/pages/PlayerComparePage/index'; // Player c
 import NotFoundPage from '@/pages/NotFoundPage/NotFoundPage';
 import InternalServerErrorPage from '@/pages/InternalServerErrorPage/InternalServerErrorPage';
 import { RatingsPage } from '@/pages/RatingsPage';
+import { AdminMergesPage } from '@/pages/AdminMergesPage/AdminMergesPage';
+
 import ProtectedRoute from '../providers/ProtectedRoute';
 import ScrollToTop from '../providers/ScrollToTop';
 import { Toaster } from 'react-hot-toast';
@@ -175,7 +177,6 @@ export default function App() {
           }
         />
 
-        {/* Створення змагань */}
         <Route
           path="/create-tournament"
           element={
@@ -184,6 +185,16 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/admin/merges"
+          element={
+            <ProtectedRoute requireAuth={true} adminOnly={true}>
+              <AdminMergesPage />
+            </ProtectedRoute>
+          }
+        />
+
 
         {/* Помилки */}
         <Route path="/404" element={<NotFoundPage />} />

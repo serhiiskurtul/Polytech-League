@@ -23,11 +23,13 @@ public class PlayerService : IPlayerService
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly ILogger<PlayerService> _logger;
+    private readonly INotificationService _notificationService;
 
-    public PlayerService(ApplicationDbContext dbContext, ILogger<PlayerService> logger)
+    public PlayerService(ApplicationDbContext dbContext, ILogger<PlayerService> logger, INotificationService notificationService)
     {
         _dbContext = dbContext;
         _logger = logger;
+        _notificationService = notificationService;
     }
 
     public async Task<IEnumerable<PlayerDto>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -880,4 +882,199 @@ public class PlayerService : IPlayerService
         if (rank == 2 || rank == 3) return "Призер";
         return "Учасник";
     }
+
+    // Profile Merging Logic
+    public async Task<IEnumerable<PlayerDto>> FindPotentialArchivalMatchesAsync(string firstName, string lastName, string group, CancellationToken cancellationToken = default)
+    {
+        var matches = await _dbContext.Players
+            .Where(p => p.UserId == null && 
+                        p.FirstName.ToLower() == firstName.ToLower() && 
+                        p.LastName.ToLower() == lastName.ToLower())
+            .ToListAsync(cancellationToken);
+
+        return matches.Select(p => p.ToDto());
+    }
+
+    public async Task CreateMergeRequestAsync(long userId, long targetPlayerId, CancellationToken cancellationToken = default)
+    {
+        var existingRequest = await _dbContext.ProfileMergeRequests
+            .FirstOrDefaultAsync(r => r.UserId == userId && r.TargetPlayerId == targetPlayerId && r.Status == RegistrationStatus.Pending, cancellationToken);
+
+        if (existingRequest != null) return;
+
+        var request = new ProfileMergeRequest
+        {
+            UserId = userId,
+            TargetPlayerId = targetPlayerId,
+            Status = RegistrationStatus.Pending
+        };
+
+        _dbContext.ProfileMergeRequests.Add(request);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        var user = await _dbContext.Users.FindAsync(new object[] { userId }, cancellationToken);
+        var player = await _dbContext.Players.FindAsync(new object[] { targetPlayerId }, cancellationToken);
+
+        await _notificationService.SendNotificationToAdminsAsync(
+            "Запит на об'єднання профілю",
+            $"Користувач {user?.FirstName} {user?.LastName} стверджує, що він — це гравець {player?.FirstName} {player?.LastName} ({player?.Group}).",
+            NotificationType.System,
+            $"/admin/merges"
+        );
+    }
+
+    public async Task<IEnumerable<ProfileMergeRequestDto>> GetPendingMergeRequestsAsync(CancellationToken cancellationToken = default)
+    {
+        var requests = await _dbContext.ProfileMergeRequests
+            .Include(r => r.User)
+            .Include(r => r.TargetPlayer)
+            .Where(r => r.Status == RegistrationStatus.Pending)
+            .ToListAsync(cancellationToken);
+
+        return requests.Select(r => new ProfileMergeRequestDto
+        {
+            Id = r.Id,
+            UserId = r.UserId,
+            UserFullName = $"{r.User?.FirstName} {r.User?.LastName}",
+            TargetPlayerId = r.TargetPlayerId,
+            TargetPlayerName = $"{r.TargetPlayer?.FirstName} {r.TargetPlayer?.LastName}",
+            TargetPlayerGroup = r.TargetPlayer?.Group,
+            Status = r.Status,
+            CreatedAt = r.CreatedAt,
+            AdminComment = r.AdminComment
+        });
+    }
+
+    public async Task ApproveMergeRequestAsync(long requestId, CancellationToken cancellationToken = default)
+    {
+        var request = await _dbContext.ProfileMergeRequests
+            .Include(r => r.User)
+            .Include(r => r.TargetPlayer)
+            .FirstOrDefaultAsync(r => r.Id == requestId, cancellationToken);
+
+        if (request == null || request.Status != RegistrationStatus.Pending) return;
+
+        var targetPlayer = request.TargetPlayer;
+        if (targetPlayer == null) return;
+
+        // 1. Check if user already has a Player profile (likely created automatically by GetProfile)
+        var currentPlayer = await _dbContext.Players
+            .FirstOrDefaultAsync(p => p.UserId == request.UserId, cancellationToken);
+
+        if (currentPlayer != null && currentPlayer.Id != targetPlayer.Id)
+        {
+            // MOVE ALL DATA FROM currentPlayer TO targetPlayer
+            await MergePlayersDataAsync(currentPlayer.Id, targetPlayer.Id, cancellationToken);
+            
+            // Delete the temporary current player
+            _dbContext.Players.Remove(currentPlayer);
+        }
+
+        // 2. Link User to the Archival Player
+        targetPlayer.UserId = request.UserId;
+        request.Status = RegistrationStatus.Approved;
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        await _notificationService.SendNotificationToUserAsync(
+            request.UserId,
+            "Запит схвалено",
+            "Ваш запит на об'єднання профілю було схвалено. Тепер ваша історія досягнень доступна у вашому аккаунті.",
+            NotificationType.System
+        );
+    }
+
+    public async Task RejectMergeRequestAsync(long requestId, string comment, CancellationToken cancellationToken = default)
+    {
+        var request = await _dbContext.ProfileMergeRequests.FindAsync(new object[] { requestId }, cancellationToken);
+        if (request == null) return;
+
+        request.Status = RegistrationStatus.Rejected;
+        request.AdminComment = comment;
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        await _notificationService.SendNotificationToUserAsync(
+            request.UserId,
+            "Запит відхилено",
+            $"Ваш запит на об'єднання профілю було відхилено. Причина: {comment}",
+            NotificationType.System
+        );
+    }
+
+    private async Task MergePlayersDataAsync(long sourceId, long targetId, CancellationToken cancellationToken)
+    {
+        // Update all related tables - Reassigning everything from the "new" profile back to the "archival" one
+        
+        // Chess
+        var chessPart = await _dbContext.ChessEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var p in chessPart) p.PlayerId = targetId;
+        
+        var chessGamesW = await _dbContext.ChessGames.Where(g => g.WhitePlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var g in chessGamesW) g.WhitePlayerId = targetId;
+        
+        var chessGamesB = await _dbContext.ChessGames.Where(g => g.BlackPlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var g in chessGamesB) g.BlackPlayerId = targetId;
+
+        // Checkers
+        var checkersPart = await _dbContext.CheckersEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var p in checkersPart) p.PlayerId = targetId;
+        
+        var checkersGamesW = await _dbContext.CheckersGames.Where(g => g.WhitePlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var g in checkersGamesW) g.WhitePlayerId = targetId;
+        
+        var checkersGamesB = await _dbContext.CheckersGames.Where(g => g.BlackPlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var g in checkersGamesB) g.BlackPlayerId = targetId;
+
+        // Table Tennis
+        var ttPart = await _dbContext.TableTennisEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var p in ttPart) p.PlayerId = targetId;
+        
+        var ttMatches1 = await _dbContext.TableTennisMatches.Where(m => m.Player1Id == sourceId).ToListAsync(cancellationToken);
+        foreach (var m in ttMatches1) m.Player1Id = targetId;
+        
+        var ttMatches2 = await _dbContext.TableTennisMatches.Where(m => m.Player2Id == sourceId).ToListAsync(cancellationToken);
+        foreach (var m in ttMatches2) m.Player2Id = targetId;
+        
+        var ttWinner = await _dbContext.TableTennisMatches.Where(m => m.WinnerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var m in ttWinner) m.WinnerId = targetId;
+
+        // Armwrestling
+        var armPart = await _dbContext.ArmwrestlingEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var p in armPart) p.PlayerId = targetId;
+        
+        var armMatches1 = await _dbContext.ArmwrestlingMatches.Where(m => m.Player1Id == sourceId).ToListAsync(cancellationToken);
+        foreach (var m in armMatches1) m.Player1Id = targetId;
+        
+        var armMatches2 = await _dbContext.ArmwrestlingMatches.Where(m => m.Player2Id == sourceId).ToListAsync(cancellationToken);
+        foreach (var m in armMatches2) m.Player2Id = targetId;
+        
+        var armWinner = await _dbContext.ArmwrestlingMatches.Where(m => m.WinnerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var m in armWinner) m.WinnerId = targetId;
+
+        // Badminton
+        var badPart = await _dbContext.BadmintonEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var p in badPart) p.PlayerId = targetId;
+        
+        var badMatches1 = await _dbContext.BadmintonMatches.Where(m => m.Player1Id == sourceId).ToListAsync(cancellationToken);
+        foreach (var m in badMatches1) m.Player1Id = targetId;
+        
+        var badMatches2 = await _dbContext.BadmintonMatches.Where(m => m.Player2Id == sourceId).ToListAsync(cancellationToken);
+        foreach (var m in badMatches2) m.Player2Id = targetId;
+
+        // Futsal Goals
+        var goals = await _dbContext.FutsalGoals.Where(g => g.PlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var g in goals) g.PlayerId = targetId;
+
+        // General Event Winners
+        var events1 = await _dbContext.Set<Event>().Where(e => e.FirstPlaceId == sourceId).ToListAsync(cancellationToken);
+        foreach (var e in events1) e.FirstPlaceId = targetId;
+        
+        var events2 = await _dbContext.Set<Event>().Where(e => e.SecondPlaceId == sourceId).ToListAsync(cancellationToken);
+        foreach (var e in events2) e.SecondPlaceId = targetId;
+        
+        var events3 = await _dbContext.Set<Event>().Where(e => e.ThirdPlaceId == sourceId).ToListAsync(cancellationToken);
+        foreach (var e in events3) e.ThirdPlaceId = targetId;
+    }
 }
+

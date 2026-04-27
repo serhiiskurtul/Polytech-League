@@ -8,7 +8,8 @@ import EditProfileModal from '@/widgets/profile-widgets/edit-profile-modal/EditP
 import styles from './ProfilePage.module.css';
 import { useAuth } from '@/app/providers/AuthContext';
 import { PlayerDto } from '@/shared/types/player.types';
-import { updatePlayer, getProfile, uploadAvatar } from '@/shared/api/players.api';
+import { updatePlayer, getProfile, uploadAvatar, checkArchivalMatches, createMergeRequest } from '@/shared/api/players.api';
+
 import { toast } from 'react-hot-toast';
 
 interface UserData {
@@ -42,7 +43,10 @@ const ProfilePage = () => {
   const [playerProfile, setPlayerProfile] = useState<PlayerDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [archivalMatches, setArchivalMatches] = useState<PlayerDto[]>([]);
+  const [isMergeRequestSent, setIsMergeRequestSent] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -59,6 +63,34 @@ const ProfilePage = () => {
 
     fetchProfile();
   }, []);
+
+  useEffect(() => {
+    if (playerProfile && user && archivalMatches.length === 0 && !isMergeRequestSent) {
+      // If profile is fresh (Group is Guest) or just has no achievements, check for historical data
+      const checkHistory = async () => {
+        try {
+          const matches = await checkArchivalMatches(user.firstName, user.lastName, playerProfile.group || '');
+          // Filter out current profile
+          setArchivalMatches(matches.filter(m => m.id !== playerProfile.id));
+        } catch (error) {
+          console.error("Failed to check archival matches:", error);
+        }
+      };
+      checkHistory();
+    }
+  }, [playerProfile, user]);
+
+  const handleRequestMerge = async (targetId: number) => {
+    try {
+      await createMergeRequest(targetId);
+      setIsMergeRequestSent(true);
+      setArchivalMatches([]);
+      toast.success('Запит на об\'єднання надіслано адміністратору');
+    } catch (error) {
+      toast.error('Не вдалося надіслати запит');
+    }
+  };
+
 
   const userData = {
     name: user ? `${user.firstName} ${user.lastName}` : 'Користувач',
@@ -165,7 +197,53 @@ const ProfilePage = () => {
           onLogout={logout}
         />
         
+        {archivalMatches.length > 0 && (
+          <div className={`${styles.card} ${styles.archivalMatchCard}`} style={{ borderLeft: '4px solid #3b82f6', background: '#eff6ff' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <div style={{ fontSize: '24px', color: '#3b82f6' }}>
+                <i className="fas fa-history"></i>
+              </div>
+              <div style={{ flex: 1 }}>
+                <h4 style={{ margin: 0, color: '#1e40af' }}>Ми знайшли ваші можливі архівні досягнення!</h4>
+                <p style={{ margin: '5px 0 0 0', fontSize: '14px', color: '#1e3a8a' }}>
+                  В системі є профіль "{archivalMatches[0].firstName} {archivalMatches[0].lastName}" (Група: {archivalMatches[0].group}), який не прив'язаний до аккаунту. Це ви?
+                </p>
+              </div>
+              <button 
+                onClick={() => handleRequestMerge(archivalMatches[0].id!)}
+                className="btn-primary"
+                style={{ padding: '8px 16px', fontSize: '13px' }}
+              >
+                Так, це я
+              </button>
+              <button 
+                onClick={() => setArchivalMatches([])}
+                style={{ background: 'transparent', border: 'none', color: '#6b7280', cursor: 'pointer' }}
+              >
+                Ні
+              </button>
+            </div>
+          </div>
+        )}
+
+        {isMergeRequestSent && (
+          <div className={`${styles.card}`} style={{ borderLeft: '4px solid #10b981', background: '#ecfdf5' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <div style={{ fontSize: '24px', color: '#10b981' }}>
+                <i className="fas fa-clock"></i>
+              </div>
+              <div>
+                <h4 style={{ margin: 0, color: '#065f46' }}>Запит на об'єднання профілю надіслано</h4>
+                <p style={{ margin: '5px 0 0 0', fontSize: '14px', color: '#064e3b' }}>
+                  Адміністратор перевірить ваші дані. Після схвалення ваші старі досягнення з'являться тут.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+        
         <div className={styles.profileContent}>
+
           <div className={styles.mainContent}>
             <UserAchievements achievements={playerProfile?.achievements || []} />
             <ProfileStats stats={stats} />
