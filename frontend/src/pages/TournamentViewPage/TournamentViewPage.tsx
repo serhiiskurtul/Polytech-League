@@ -1193,8 +1193,8 @@ const TournamentViewPage = () => {
       {viewingPgnGame && (
         <ChessGameViewerModal
           pgn={viewingPgnGame.pgn || ''}
-          whitePlayer={viewingPgnGame.whitePlayerName || 'Білі'}
-          blackPlayer={viewingPgnGame.blackPlayerName || 'Чорні'}
+          whitePlayer={viewingPgnGame.whitePlayerName || (tournament?.sport === 'chess' ? 'Білі' : 'Гравець 1')}
+          blackPlayer={viewingPgnGame.blackPlayerName || (tournament?.sport === 'chess' ? 'Чорні' : 'Гравець 2')}
           onClose={() => setViewingPgnGame(null)}
         />
       )}
@@ -1837,20 +1837,22 @@ const TournamentViewPage = () => {
                       <div className={styles.tabContent}>
                         {isAdmin && (
                           <div style={{ background: '#f5f5f5', padding: '16px', borderRadius: '12px', marginBottom: '24px' }}>
-                            <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#111' }}>[Admin] Додати партію (результат)</h3>
+                            <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#111' }}>
+                              [Admin] Додати {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'матч' : 'партію'} (результат)
+                            </h3>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
                               <input type="number" min="1" placeholder="Тур" title="Номер туру" value={newGame.round} onChange={(e) => setNewGame({ ...newGame, round: parseInt(e.target.value) || 1 })} style={{ width: '60px', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
                               <input type="number" min="1" placeholder="Дошка" title="Номер дошки" value={newGame.board} onChange={(e) => setNewGame({ ...newGame, board: parseInt(e.target.value) || 1 })} style={{ width: '60px', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
 
                               <select value={newGame.whitePlayerId} onChange={(e) => setNewGame({ ...newGame, whitePlayerId: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}>
-                                <option value="">-- Білі --</option>
+                                <option value="">-- {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'Гравець 1' : 'Білі'} --</option>
                                 {sortedPlayers.map((p: any) => <option key={`w${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
                               </select>
 
                               <strong style={{ margin: '0 8px' }}> - </strong>
 
                               <select value={newGame.blackPlayerId} onChange={(e) => setNewGame({ ...newGame, blackPlayerId: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}>
-                                <option value="">-- Чорні --</option>
+                                <option value="">-- {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'Гравець 2' : 'Чорні'} --</option>
                                 {sortedPlayers.map((p: any) => <option key={`b${p.playerId}`} value={p.playerId}>{p.playerName}</option>)}
                               </select>
 
@@ -1863,15 +1865,17 @@ const TournamentViewPage = () => {
                               <button type="button" onClick={handleAddGame} style={{ padding: '8px 16px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>Зберегти</button>
                             </div>
 
-                            <div style={{ marginTop: '16px' }}>
-                              <label style={{ display: 'block', fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>PGN (опціонально)</label>
-                              <textarea
-                                placeholder="Вставте PGN партії сюди..."
-                                value={newGame.pgn}
-                                onChange={(e) => setNewGame({ ...newGame, pgn: e.target.value })}
-                                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #ccc', minHeight: '80px', fontFamily: 'monospace' }}
-                              />
-                            </div>
+                            {tournament?.sport === 'chess' && (
+                              <div style={{ marginTop: '16px' }}>
+                                <label style={{ display: 'block', fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>PGN (опціонально)</label>
+                                <textarea
+                                  placeholder="Вставте PGN партії сюди..."
+                                  value={newGame.pgn}
+                                  onChange={(e) => setNewGame({ ...newGame, pgn: e.target.value })}
+                                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #ccc', minHeight: '80px', fontFamily: 'monospace' }}
+                                />
+                              </div>
+                            )}
                           </div>
                         )}
 
@@ -1880,10 +1884,12 @@ const TournamentViewPage = () => {
                             <label style={{ fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>Тур</label>
                             <input type="number" placeholder="Усі" value={gameFilters.round} onChange={(e) => setGameFilters({ ...gameFilters, round: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', width: '80px' }} />
                           </div>
-                          <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <label style={{ fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>Дошка</label>
-                            <input type="number" placeholder="Усі" value={gameFilters.board} onChange={(e) => setGameFilters({ ...gameFilters, board: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', width: '80px' }} />
-                          </div>
+                           <div style={{ display: 'flex', flexDirection: 'column' }}>
+                             <label style={{ fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>
+                               {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? 'Стіл' : tournament?.sport === 'badminton' ? 'Корт' : 'Дошка'}
+                             </label>
+                             <input type="number" placeholder="Усі" value={gameFilters.board} onChange={(e) => setGameFilters({ ...gameFilters, board: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', width: '80px' }} />
+                           </div>
                           <div style={{ display: 'flex', flexDirection: 'column' }}>
                             <label style={{ fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>Учасник (ім'я)</label>
                             <input type="text" placeholder="Пошук..." value={gameFilters.participant} onChange={(e) => setGameFilters({ ...gameFilters, participant: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', minWidth: '200px' }} />
@@ -1892,8 +1898,8 @@ const TournamentViewPage = () => {
                             <label style={{ fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>Результат</label>
                             <select value={gameFilters.result} onChange={(e) => setGameFilters({ ...gameFilters, result: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}>
                               <option value="">Усі результати</option>
-                              <option value="WhiteWin">Перемога Білих (1-0)</option>
-                              <option value="BlackWin">Перемога Чорних (0-1)</option>
+                              <option value="WhiteWin">Перемога {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'Гравця 1' : 'Білих'} (1-0)</option>
+                              <option value="BlackWin">Перемога {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'Гравця 2' : 'Чорних'} (0-1)</option>
                               <option value="Draw">Нічия (½-½)</option>
                             </select>
                           </div>
@@ -1965,14 +1971,16 @@ const TournamentViewPage = () => {
                                             <option value="Draw">Нічия (½-½)</option>
                                           </select>
                                         </td>
-                                        <td>
-                                          <textarea
-                                            placeholder="PGN..."
-                                            value={editingGameData.pgn}
-                                            onChange={(e) => setEditingGameData({ ...editingGameData, pgn: e.target.value })}
-                                            style={{ width: '100%', padding: '4px', borderRadius: '4px', border: '1px solid #ccc', minHeight: '60px', fontFamily: 'monospace' }}
-                                          />
-                                        </td>
+                                        {tournament?.sport === 'chess' && (
+                                          <td>
+                                            <textarea
+                                              placeholder="PGN..."
+                                              value={editingGameData.pgn}
+                                              onChange={(e) => setEditingGameData({ ...editingGameData, pgn: e.target.value })}
+                                              style={{ width: '100%', padding: '4px', borderRadius: '4px', border: '1px solid #ccc', minHeight: '60px', fontFamily: 'monospace' }}
+                                            />
+                                          </td>
+                                        )}
                                         <td>
                                           <button type="button" onClick={() => handleSaveEdit(game.id)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }}><i className="fas fa-check"></i></button>
                                           <button type="button" onClick={handleCancelEdit} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><i className="fas fa-times"></i></button>
@@ -2003,11 +2011,11 @@ const TournamentViewPage = () => {
                                         <td>
                                           {game.result === 'WhiteWin' ? (
                                             <span className={`${styles.resultBadge} ${styles.resultWhiteWin}`}>
-                                              <i className="fas fa-chess-king"></i> 1-0
+                                              <i className={tournament?.sport === 'chess' || tournament?.sport === 'checkers' ? "fas fa-chess-king" : "fas fa-trophy"}></i> 1-0
                                             </span>
                                           ) : game.result === 'BlackWin' ? (
                                             <span className={`${styles.resultBadge} ${styles.resultBlackWin}`}>
-                                              <i className="fas fa-chess-queen"></i> 0-1
+                                              <i className={tournament?.sport === 'chess' || tournament?.sport === 'checkers' ? "fas fa-chess-queen" : "fas fa-trophy"}></i> 0-1
                                             </span>
                                           ) : game.result === 'Draw' ? (
                                             <span className={`${styles.resultBadge} ${styles.resultDraw}`}>
@@ -2038,7 +2046,8 @@ const TournamentViewPage = () => {
                                               display: 'inline-flex',
                                               alignItems: 'center',
                                               gap: '6px'
-                                            }} title="Переглянути партію">
+                                            }} title={`Переглянути ${tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'badminton' ? 'матч' : 'партію'}`}>
+
                                               <i className="fas fa-eye"></i> {!isAdmin && 'Дивитись'}
                                             </button>
                                           )}
