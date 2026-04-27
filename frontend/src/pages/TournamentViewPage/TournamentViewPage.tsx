@@ -1243,7 +1243,7 @@ const TournamentViewPage = () => {
                     style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
                   >
                     <option key="default-first" value="0">-- Оберіть переможця --</option>
-                    {(details?.players || details?.participants || [])?.map((p: any) => (
+                    {sortedPlayers?.map((p: any) => (
                       <option key={`first-p-${p.playerId}`} value={p.playerId}>
                         {p.playerName} { (['chess', 'checkers', 'tabletennis', 'badminton'].includes(tournament?.sport)) && (p.points !== undefined) ? `(${p.points} очок)` : ''}
                       </option>
@@ -1264,7 +1264,7 @@ const TournamentViewPage = () => {
                     style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
                   >
                     <option key="default-second" value="0">-- Оберіть переможця --</option>
-                    {(details?.players || details?.participants || [])?.map((p: any) => (
+                    {sortedPlayers?.map((p: any) => (
                       <option key={`second-p-${p.playerId}`} value={p.playerId}>
                         {p.playerName} { (['chess', 'checkers', 'tabletennis', 'badminton'].includes(tournament?.sport)) && (p.points !== undefined) ? `(${p.points} очок)` : ''}
                       </option>
@@ -1285,7 +1285,7 @@ const TournamentViewPage = () => {
                     style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
                   >
                     <option key="default-third" value="0">-- Оберіть переможця --</option>
-                    {(details?.players || details?.participants || [])?.map((p: any) => (
+                    {sortedPlayers?.map((p: any) => (
                       <option key={`third-p-${p.playerId}`} value={p.playerId}>
                         {p.playerName} { (['chess', 'checkers', 'tabletennis', 'badminton'].includes(tournament?.sport)) && (p.points !== undefined) ? `(${p.points} очок)` : ''}
                       </option>
