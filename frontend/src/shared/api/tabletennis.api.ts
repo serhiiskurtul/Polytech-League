@@ -40,3 +40,34 @@ export const rejectTableTennisParticipant = async (eventId: string | number, pla
   const response = await api.post(`/table-tennis-events/${eventId}/participants/${playerId}/reject`);
   return response.data;
 };
+// Matches
+export const createTableTennisMatch = async (data: any) => {
+  const response = await api.post('/table-tennis-matches', data);
+  return response.data;
+};
+
+export const updateTableTennisMatch = async (id: number, data: any) => {
+  const response = await api.put(`/table-tennis-matches/${id}`, data);
+  return response.data;
+};
+
+export const deleteTableTennisMatch = async (id: number) => {
+  const response = await api.delete(`/table-tennis-matches/${id}`);
+  return response.data;
+};
+
+// Teams
+export const createTableTennisTeam = async (data: any) => {
+  const response = await api.post('/table-tennis-teams', data);
+  return response.data;
+};
+
+export const updateTableTennisTeam = async (id: number, data: any) => {
+  const response = await api.put(`/table-tennis-teams/${id}`, data);
+  return response.data;
+};
+
+export const deleteTableTennisTeam = async (id: number) => {
+  const response = await api.delete(`/table-tennis-teams/${id}`);
+  return response.data;
+};

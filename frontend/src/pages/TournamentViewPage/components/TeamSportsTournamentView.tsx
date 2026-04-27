@@ -10,6 +10,7 @@ import {
   updateBadmintonMatch,
   updateChessGame,
   updateCheckersGame,
+  updateTableTennisMatch,
   createVolleyballMatch,
   createBeachVolleyballMatch,
   createFutsalMatch,
@@ -17,6 +18,7 @@ import {
   createBadmintonMatch,
   createChessGame,
   createCheckersGame,
+  createTableTennisMatch,
   createVolleyballTeam,
   createBeachVolleyballTeam,
   createFutsalTeam,
@@ -24,6 +26,7 @@ import {
   createBadmintonTeam,
   createChessTeam,
   createCheckersTeam,
+  createTableTennisTeam,
   updateVolleyballTeam,
   updateBeachVolleyballTeam,
   updateFutsalTeam,
@@ -31,18 +34,20 @@ import {
   updateBadmintonTeam,
   updateChessTeam,
   updateCheckersTeam,
+  updateTableTennisTeam,
   deleteVolleyballMatch,
   deleteBeachVolleyballMatch,
   deleteFutsalMatch,
   deleteBasketball3x3Match,
   deleteBadmintonMatch,
   deleteChessGame,
-  deleteCheckersGame
+  deleteCheckersGame,
+  deleteTableTennisMatch
 } from '@/shared/api';
 import TournamentPodium from './TournamentPodium';
 import styles from '../TournamentViewPage.module.css';
 
-type Sport = 'volleyball' | 'beach_volleyball' | 'beach-volleyball' | 'futsal' | 'basketball_3x3' | 'basketball3x3' | 'basketball-3x3' | 'badminton' | 'chess' | 'checkers';
+type Sport = 'volleyball' | 'beach_volleyball' | 'beach-volleyball' | 'futsal' | 'basketball_3x3' | 'basketball3x3' | 'basketball-3x3' | 'badminton' | 'chess' | 'checkers' | 'tabletennis' | 'table_tennis' | 'table-tennis';
 
 interface TeamSportsTournamentViewProps {
   sport: Sport;
@@ -108,8 +113,12 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       case 'badminton': return updateBadmintonMatch;
       case 'chess': return updateChessGame;
       case 'checkers': return updateCheckersGame;
+      case 'tabletennis':
+      case 'table_tennis':
+      case 'table-tennis': return updateTableTennisMatch;
       default: return updateVolleyballMatch;
     }
+
   };
 
   const handleUpdateScore = async (matchId: number, homeScore: number, awayScore: number) => {
@@ -167,7 +176,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           eventId: details.id,
           homeTeamId: match.homeTeamId,
           awayTeamId: match.awayTeamId,
-          homeTeamScore: finalHomeScore, // For Futsal, Basketball
+          homeTeamScore: finalHomeScore, // For Futsal, Basketball, Table Tennis
           awayTeamScore: finalAwayScore,
           homeScore: finalHomeScore,     // For Badminton
           awayScore: finalAwayScore,
@@ -177,6 +186,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           awayRosterIds: match.awayRoster?.map((p: any) => p.id) || match.awayRosterIds || []
         };
       }
+
 
       await updateApi(matchId, payload);
       onRefresh();
@@ -249,8 +259,12 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         case 'badminton': deleteApi = deleteBadmintonMatch; break;
         case 'chess': deleteApi = (id: number) => deleteChessGame(id, details.id); break;
         case 'checkers': deleteApi = (id: number) => deleteCheckersGame(id, details.id); break;
+        case 'tabletennis':
+        case 'table_tennis':
+        case 'table-tennis': deleteApi = deleteTableTennisMatch; break;
         default: deleteApi = deleteVolleyballMatch;
       }
+
 
       await deleteApi(matchId);
       onRefresh();
@@ -269,8 +283,12 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       case 'badminton': return updateBadmintonTeam;
       case 'chess': return updateChessTeam;
       case 'checkers': return updateCheckersTeam;
+      case 'tabletennis':
+      case 'table_tennis':
+      case 'table-tennis': return updateTableTennisTeam;
       default: return updateVolleyballTeam;
     }
+
   };
 
   const handleUpdateTeamPoints = async (teamId: number, points: number) => {
@@ -455,8 +473,21 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
             result: 'NotPlayed'
           };
           break;
+        case 'tabletennis':
+        case 'table_tennis':
+        case 'table-tennis':
+          createApi = createTableTennisMatch;
+          payload = {
+            tournamentId: details.id,
+            homeTeamId: parseInt(newMatchForm.homeTeamId),
+            awayTeamId: parseInt(newMatchForm.awayTeamId),
+            stage: newMatchForm.stage,
+            setsToWin: details.setsToWin || 3
+          };
+          break;
         default: createApi = createVolleyballMatch;
       }
+
 
       await createApi(payload);
       setIsCreateMatchModalOpen(false);
@@ -489,8 +520,12 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         case 'badminton': createApi = createBadmintonTeam; break;
         case 'chess': createApi = createChessTeam; break;
         case 'checkers': createApi = createCheckersTeam; break;
+        case 'tabletennis':
+        case 'table_tennis':
+        case 'table-tennis': createApi = createTableTennisTeam; break;
         default: createApi = createVolleyballTeam;
       }
+
 
       await createApi(payload);
 
@@ -524,8 +559,12 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         case 'badminton': updateApi = updateBadmintonTeam; break;
         case 'chess': updateApi = updateChessTeam; break;
         case 'checkers': updateApi = updateCheckersTeam; break;
+        case 'tabletennis':
+        case 'table_tennis':
+        case 'table-tennis': updateApi = updateTableTennisTeam; break;
         default: updateApi = updateVolleyballTeam;
       }
+
 
       await updateApi(teamId, { ...team, playerIds: newPlayerIds });
       onRefresh();
@@ -547,8 +586,12 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       case 'badminton': return 'Бадмінтон';
       case 'chess': return 'Шахи';
       case 'checkers': return 'Шашки';
+      case 'tabletennis':
+      case 'table_tennis':
+      case 'table-tennis': return 'Настільний Теніс';
       default: return 'Спорт';
     }
+
   };
 
   const filteredPlayers = allPlayers.filter(p => 

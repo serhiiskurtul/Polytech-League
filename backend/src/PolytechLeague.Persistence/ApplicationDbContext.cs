@@ -62,8 +62,10 @@ public class ApplicationDbContext : DbContext
     public DbSet<CheckersTeam> CheckersTeams { get; set; }
     public DbSet<TableTennisEvent> TableTennisEvents { get; set; }
     public DbSet<TableTennisEventParticipant> TableTennisEventParticipants { get; set; }
+    public DbSet<TableTennisTeam> TableTennisTeams { get; set; }
     public DbSet<TableTennisMatch> TableTennisMatches { get; set; }
     public DbSet<TableTennisSet> TableTennisSets { get; set; }
+
 
     // Armwrestling
     public DbSet<ArmwrestlingEvent> ArmwrestlingEvents { get; set; }
@@ -156,8 +158,10 @@ public class ApplicationDbContext : DbContext
         // Table Tennis configurations
         modelBuilder.ApplyConfiguration(new TableTennisEventConfiguration());
         modelBuilder.ApplyConfiguration(new TableTennisEventParticipantConfiguration());
+        modelBuilder.ApplyConfiguration(new TableTennisTeamConfiguration());
         modelBuilder.ApplyConfiguration(new TableTennisMatchConfiguration());
         modelBuilder.ApplyConfiguration(new TableTennisSetConfiguration());
+
 
         // Armwrestling configurations
         modelBuilder.ApplyConfiguration(new ArmwrestlingEventConfiguration());

@@ -1,0 +1,8 @@
+using PolytechLeague.Domain.Entities.TableTennis;
+
+namespace PolytechLeague.Application.Services.Interfaces.TableTennis;
+
+public interface ITableTennisTeamService : IAbstractEntityService<TableTennisTeam>
+
+{
+}

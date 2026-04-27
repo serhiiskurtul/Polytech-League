@@ -17,9 +17,15 @@ public class TableTennisMatchService(
         oldEntity.TournamentId = newEntity.TournamentId;
         oldEntity.Player1Id = newEntity.Player1Id;
         oldEntity.Player2Id = newEntity.Player2Id;
+        oldEntity.HomeTeamId = newEntity.HomeTeamId;
+        oldEntity.AwayTeamId = newEntity.AwayTeamId;
         oldEntity.WinnerId = newEntity.WinnerId;
+        oldEntity.WinnerTeamId = newEntity.WinnerTeamId;
+        oldEntity.HomeTeamScore = newEntity.HomeTeamScore;
+        oldEntity.AwayTeamScore = newEntity.AwayTeamScore;
         oldEntity.Stage = newEntity.Stage;
         oldEntity.TableNumber = newEntity.TableNumber;
         oldEntity.SetsToWin = newEntity.SetsToWin;
     }
+
 }

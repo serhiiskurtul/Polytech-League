@@ -35,7 +35,11 @@ public class VolleyballEventService(
         oldEntity.FirstPlaceTeamId = newEntity.FirstPlaceTeamId;
         oldEntity.SecondPlaceTeamId = newEntity.SecondPlaceTeamId;
         oldEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
+        oldEntity.IsModerated = newEntity.IsModerated;
+        oldEntity.IsPublic = newEntity.IsPublic;
+        oldEntity.IsTeam = newEntity.IsTeam;
         oldEntity.SeasonId = newEntity.SeasonId;
+
     }
 
     public override async Task<VolleyballEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)

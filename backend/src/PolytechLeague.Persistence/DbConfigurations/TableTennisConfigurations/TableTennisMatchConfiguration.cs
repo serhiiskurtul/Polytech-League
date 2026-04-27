@@ -19,15 +19,28 @@ public class TableTennisMatchConfiguration : IEntityTypeConfiguration<TableTenni
             .IsRequired();
 
         builder.Property(x => x.Player1Id)
-            .HasColumnName("player1_id")
-            .IsRequired();
+            .HasColumnName("player1_id");
 
         builder.Property(x => x.Player2Id)
-            .HasColumnName("player2_id")
-            .IsRequired();
+            .HasColumnName("player2_id");
+
+        builder.Property(x => x.HomeTeamId)
+            .HasColumnName("home_team_id");
+
+        builder.Property(x => x.AwayTeamId)
+            .HasColumnName("away_team_id");
 
         builder.Property(x => x.WinnerId)
             .HasColumnName("winner_id");
+
+        builder.Property(x => x.WinnerTeamId)
+            .HasColumnName("winner_team_id");
+
+        builder.Property(x => x.HomeTeamScore)
+            .HasColumnName("home_team_score");
+
+        builder.Property(x => x.AwayTeamScore)
+            .HasColumnName("away_team_score");
 
         builder.Property(x => x.Stage)
             .HasColumnName("stage");
@@ -61,14 +74,30 @@ public class TableTennisMatchConfiguration : IEntityTypeConfiguration<TableTenni
             .HasForeignKey(m => m.Player2Id)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasOne(m => m.HomeTeam)
+            .WithMany()
+            .HasForeignKey(m => m.HomeTeamId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(m => m.AwayTeam)
+            .WithMany()
+            .HasForeignKey(m => m.AwayTeamId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasOne(m => m.Winner)
             .WithMany()
             .HasForeignKey(m => m.WinnerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(m => m.WinnerTeam)
+            .WithMany()
+            .HasForeignKey(m => m.WinnerTeamId)
             .OnDelete(DeleteBehavior.Restrict);
             
         builder.HasMany(m => m.Sets)
             .WithOne(s => s.Match)
             .HasForeignKey(s => s.MatchId)
             .OnDelete(DeleteBehavior.Cascade);
+
     }
 }

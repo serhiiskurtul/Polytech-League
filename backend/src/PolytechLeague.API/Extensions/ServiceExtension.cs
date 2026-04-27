@@ -52,6 +52,8 @@ public static class ServiceExtension
         services.AddScoped<ITableTennisEventService, TableTennisEventService>();
         services.AddScoped<ITableTennisMatchService, TableTennisMatchService>();
         services.AddScoped<ITableTennisSetService, TableTennisSetService>();
+        services.AddScoped<ITableTennisTeamService, TableTennisTeamService>();
+
         services.AddScoped<IArmwrestlingEventService, ArmwrestlingEventService>();
         services.AddScoped<IArmwrestlingMatchService, ArmwrestlingMatchService>();
         services.AddScoped<IFutsalTeamService, FutsalTeamService>();

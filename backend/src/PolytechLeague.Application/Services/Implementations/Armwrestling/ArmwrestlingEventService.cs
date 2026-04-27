@@ -76,8 +76,10 @@ public class ArmwrestlingEventService :
         oldEntity.ParticipantsCount = newEntity.ParticipantsCount;
         oldEntity.IsModerated = newEntity.IsModerated;
         oldEntity.IsPublic = newEntity.IsPublic;
+        oldEntity.IsTeam = newEntity.IsTeam;
         
         oldEntity.FirstPlaceId = newEntity.FirstPlaceId;
+
         oldEntity.SecondPlaceId = newEntity.SecondPlaceId;
         oldEntity.ThirdPlaceId = newEntity.ThirdPlaceId;
         oldEntity.SeasonId = newEntity.SeasonId;

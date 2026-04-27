@@ -32,10 +32,12 @@ public class TableTennisEventService(
         oldEntity.Category = newEntity.Category;
         oldEntity.IsModerated = newEntity.IsModerated;
         oldEntity.IsPublic = newEntity.IsPublic;
+        oldEntity.IsTeam = newEntity.IsTeam;
         oldEntity.FirstPlaceId = newEntity.FirstPlaceId;
         oldEntity.SecondPlaceId = newEntity.SecondPlaceId;
         oldEntity.ThirdPlaceId = newEntity.ThirdPlaceId;
         oldEntity.SeasonId = newEntity.SeasonId;
+
         oldEntity.UpdatedAt = DateTime.UtcNow;
     }
 
@@ -46,10 +48,19 @@ public class TableTennisEventService(
             .Include(e => e.FirstPlace)
             .Include(e => e.SecondPlace)
             .Include(e => e.ThirdPlace)
+            .Include(e => e.FirstPlaceTeam)
+            .Include(e => e.SecondPlaceTeam)
+            .Include(e => e.ThirdPlaceTeam)
+            .Include(e => e.Teams!)
+                .ThenInclude(t => t.Players)
             .Include(e => e.Matches!)
                 .ThenInclude(m => m.Player1)
             .Include(e => e.Matches!)
                 .ThenInclude(m => m.Player2)
+            .Include(e => e.Matches!)
+                .ThenInclude(m => m.HomeTeam)
+            .Include(e => e.Matches!)
+                .ThenInclude(m => m.AwayTeam)
             .Include(e => e.Participants!)
                 .ThenInclude(p => p.Player)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken)
@@ -68,9 +79,28 @@ public class TableTennisEventService(
 
     protected override async Task OnUpdatedAsync(TableTennisEvent oldEntity, TableTennisEvent newEntity, CancellationToken cancellationToken)
     {
-        bool winnersSet = newEntity.FirstPlaceId != null && newEntity.SecondPlaceId != null && newEntity.ThirdPlaceId != null;
+        // Update ranks for teams based on winners
+        var eventWithTeams = await _dbcontext.TableTennisEvents
+            .Include(e => e.Teams)
+            .FirstOrDefaultAsync(e => e.Id == newEntity.Id, cancellationToken);
+
+        if (eventWithTeams != null && eventWithTeams.Teams != null)
+        {
+            foreach (var team in eventWithTeams.Teams)
+            {
+                if (team.Id == newEntity.FirstPlaceTeamId) team.Rank = 1;
+                else if (team.Id == newEntity.SecondPlaceTeamId) team.Rank = 2;
+                else if (team.Id == newEntity.ThirdPlaceTeamId) team.Rank = 3;
+                else if (newEntity.FirstPlaceTeamId != null) team.Rank = 4;
+                else team.Rank = 0;
+            }
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+        }
+
+        bool individualWinnersSet = newEntity.FirstPlaceId != null && newEntity.SecondPlaceId != null && newEntity.ThirdPlaceId != null;
+        bool teamWinnersSet = newEntity.FirstPlaceTeamId != null && newEntity.SecondPlaceTeamId != null && newEntity.ThirdPlaceTeamId != null;
         
-        if (winnersSet)
+        if (individualWinnersSet || teamWinnersSet)
         {
             await _notificationService.SendNotificationToAllAsync(
                 "Змагання завершено!",
@@ -80,6 +110,7 @@ public class TableTennisEventService(
             );
         }
     }
+
 
     public async Task AddParticipantAsync(long eventId, TableTennisEventParticipantDto dto, CancellationToken cancellationToken = default)
     {

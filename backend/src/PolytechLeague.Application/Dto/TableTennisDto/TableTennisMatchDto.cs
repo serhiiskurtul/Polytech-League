@@ -1,4 +1,6 @@
 using PolytechLeague.Domain.Entities.TableTennis;
+using PolytechLeague.Application.Dto.GeneralDto;
+
 
 namespace PolytechLeague.Application.Dto.TableTennisDto;
 
@@ -13,9 +15,14 @@ public class TableTennisSetDto
 public class TableTennisMatchRequest
 {
     public long TournamentId { get; set; }
-    public long Player1Id { get; set; }
-    public long Player2Id { get; set; }
+    public long? Player1Id { get; set; }
+    public long? Player2Id { get; set; }
+    public long? HomeTeamId { get; set; }
+    public long? AwayTeamId { get; set; }
     public long? WinnerId { get; set; }
+    public long? WinnerTeamId { get; set; }
+    public int? HomeTeamScore { get; set; }
+    public int? AwayTeamScore { get; set; }
     public string? Stage { get; set; }
     public int TableNumber { get; set; }
     public int SetsToWin { get; set; }
@@ -25,9 +32,18 @@ public class TableTennisMatchResponse
 {
     public long Id { get; set; }
     public long TournamentId { get; set; }
-    public long Player1Id { get; set; }
-    public long Player2Id { get; set; }
+    public long? Player1Id { get; set; }
+    public PlayerDto? Player1 { get; set; }
+    public long? Player2Id { get; set; }
+    public PlayerDto? Player2 { get; set; }
+    public long? HomeTeamId { get; set; }
+    public object? HomeTeam { get; set; } // Simplified for now
+    public long? AwayTeamId { get; set; }
+    public object? AwayTeam { get; set; }
     public long? WinnerId { get; set; }
+    public long? WinnerTeamId { get; set; }
+    public int? HomeTeamScore { get; set; }
+    public int? AwayTeamScore { get; set; }
     public string? Stage { get; set; }
     public int TableNumber { get; set; }
     public int SetsToWin { get; set; }
@@ -43,7 +59,12 @@ public static class TableTennisMatchDtoExtensions
             TournamentId = request.TournamentId,
             Player1Id = request.Player1Id,
             Player2Id = request.Player2Id,
+            HomeTeamId = request.HomeTeamId,
+            AwayTeamId = request.AwayTeamId,
             WinnerId = request.WinnerId,
+            WinnerTeamId = request.WinnerTeamId,
+            HomeTeamScore = request.HomeTeamScore,
+            AwayTeamScore = request.AwayTeamScore,
             Stage = request.Stage,
             TableNumber = request.TableNumber,
             SetsToWin = request.SetsToWin
@@ -57,14 +78,24 @@ public static class TableTennisMatchDtoExtensions
             Id = entity.Id,
             TournamentId = entity.TournamentId,
             Player1Id = entity.Player1Id,
+            Player1 = entity.Player1?.ToDto(),
             Player2Id = entity.Player2Id,
+            Player2 = entity.Player2?.ToDto(),
+            HomeTeamId = entity.HomeTeamId,
+            HomeTeam = entity.HomeTeam, // Will be serialized automatically
+            AwayTeamId = entity.AwayTeamId,
+            AwayTeam = entity.AwayTeam,
             WinnerId = entity.WinnerId,
+            WinnerTeamId = entity.WinnerTeamId,
+            HomeTeamScore = entity.HomeTeamScore,
+            AwayTeamScore = entity.AwayTeamScore,
             Stage = entity.Stage,
             TableNumber = entity.TableNumber,
             SetsToWin = entity.SetsToWin,
             Sets = entity.Sets?.Select(s => s.ToDto()).ToList()
         };
     }
+
 
     public static TableTennisSetDto ToDto(this TableTennisSet entity)
     {

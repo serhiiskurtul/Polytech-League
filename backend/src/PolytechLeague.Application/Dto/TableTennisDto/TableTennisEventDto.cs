@@ -64,9 +64,14 @@ public class TableTennisEventResponse
     public PlayerDto? SecondPlace { get; set; }
     public PlayerDto? ThirdPlace { get; set; }
 
+    public object? FirstPlaceTeam { get; set; }
+    public object? SecondPlaceTeam { get; set; }
+    public object? ThirdPlaceTeam { get; set; }
+
     public ICollection<TableTennisMatchResponse>? Matches { get; set; }
     public int ParticipantsCount { get; set; }
     public ICollection<TableTennisEventParticipantDto>? Participants { get; set; }
+    public ICollection<object>? Teams { get; set; }
 
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
@@ -124,9 +129,13 @@ public static class TableTennisEventDtoExtensions
             FirstPlace = entity.FirstPlace?.ToDto(),
             SecondPlace = entity.SecondPlace?.ToDto(),
             ThirdPlace = entity.ThirdPlace?.ToDto(),
+            FirstPlaceTeam = entity.FirstPlaceTeam,
+            SecondPlaceTeam = entity.SecondPlaceTeam,
+            ThirdPlaceTeam = entity.ThirdPlaceTeam,
             Matches = entity.Matches?.Select(m => m.ToResponse()).ToList(),
             ParticipantsCount = entity.Participants?.Count ?? 0,
             Participants = entity.Participants?.Select(p => p.ToDto()).ToList(),
+            Teams = entity.Teams?.Select(t => (object)t).ToList(),
             Rules = entity.Rules,
             Prizes = entity.Prizes,
             HeadRefereeName = entity.HeadRefereeName,
@@ -137,4 +146,5 @@ public static class TableTennisEventDtoExtensions
             SeasonId = entity.SeasonId
         };
     }
+
 }

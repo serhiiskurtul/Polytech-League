@@ -28,6 +28,15 @@ public class TableTennisEventConfiguration : IEntityTypeConfiguration<TableTenni
         builder.Property(x => x.UpdatedAt)
             .HasColumnName("updated_at");
 
+        builder.Property(x => x.FirstPlaceTeamId)
+            .HasColumnName("first_place_team_id");
+
+        builder.Property(x => x.SecondPlaceTeamId)
+            .HasColumnName("second_place_team_id");
+
+        builder.Property(x => x.ThirdPlaceTeamId)
+            .HasColumnName("third_place_team_id");
+
         builder.HasMany(x => x.Matches)
             .WithOne(m => m.Tournament)
             .HasForeignKey(m => m.TournamentId)
@@ -37,5 +46,26 @@ public class TableTennisEventConfiguration : IEntityTypeConfiguration<TableTenni
             .WithOne(p => p.Tournament)
             .HasForeignKey(p => p.TournamentId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(x => x.Teams)
+            .WithOne(t => t.Event)
+            .HasForeignKey(t => t.EventId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(x => x.FirstPlaceTeam)
+            .WithMany()
+            .HasForeignKey(x => x.FirstPlaceTeamId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(x => x.SecondPlaceTeam)
+            .WithMany()
+            .HasForeignKey(x => x.SecondPlaceTeamId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(x => x.ThirdPlaceTeam)
+            .WithMany()
+            .HasForeignKey(x => x.ThirdPlaceTeamId)
+            .OnDelete(DeleteBehavior.Restrict);
+
     }
 }
