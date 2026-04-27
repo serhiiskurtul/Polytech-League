@@ -4,7 +4,8 @@ namespace PolytechLeague.Domain.Entities.BeachVolleyball;
 
 public class BeachVolleyballEvent : Event
 {
-    public BeachVolleyballTournamentType TournamentType { get; set; }
+    public BeachVolleyballTournamentType? TournamentType { get; set; }
+
     public ICollection<BeachVolleyballMatch>? Matches { get; set; }
     public ICollection<BeachVolleyballTeam>? Teams { get; set; }
 

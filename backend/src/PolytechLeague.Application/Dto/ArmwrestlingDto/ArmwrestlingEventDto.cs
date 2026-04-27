@@ -93,7 +93,8 @@ public class ArmwrestlingEventResponse
     public PlayerDto? ThirdPlace { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public ArmwrestlingTournamentType TournamentType { get; set; }
+    public ArmwrestlingTournamentType? TournamentType { get; set; }
+
     public bool IsModerated { get; set; }
     public bool IsPublic { get; set; }
 
