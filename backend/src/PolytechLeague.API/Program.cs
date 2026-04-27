@@ -12,6 +12,8 @@ using Serilog;
 using PolytechLeague.API.Middlewares;
 using Microsoft.OpenApi.Models;
 using PolytechLeague.API.Hubs;
+using Microsoft.EntityFrameworkCore;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -156,7 +158,26 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHub<ChatHub>("/hubs/chat");
 
+// Автоматичне застосування міграцій при старті (корисно для Railway)
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<PolytechLeague.Persistence.Database.ApplicationDbContext>();
+        if (context.Database.GetPendingMigrations().Any())
+        {
+            context.Database.Migrate();
+        }
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Помилка під час застосування міграцій бази даних.");
+    }
+}
 
 app.Run();
+
 
 public partial class Program { }
