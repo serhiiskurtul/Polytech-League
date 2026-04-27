@@ -127,6 +127,10 @@ public class ExcelImportService : IExcelImportService
                          if (currentRkIdx == -1) currentRkIdx = j;
                          else if (currentSnrIdx == -1) currentSnrIdx = j;
                     }
+                    else if (cellLower.Equals("name") || cellLower.Contains("піб") || cellLower.Contains("учасник") || cellLower.Contains("гравець") || cellLower.Contains("player") || cellLower.Contains("participant") || cellLower.Equals("имя") || cellLower.Equals("імя") || cellLower.Equals("ім'я"))
+                    {
+                        currentNameIdx = j;
+                    }
                     else if (cellLower.Contains("ім'я") || cellLower.Contains("ім’я") || cellLower.Contains("імя") || cellLower.Contains("имя") || cellLower.Contains("first name"))
                     {
                         currentFirstNameIdx = j;
@@ -134,10 +138,6 @@ public class ExcelImportService : IExcelImportService
                     else if (cellLower.Contains("прізвище") || cellLower.Contains("last name") || cellLower.Contains("surname"))
                     {
                         currentLastNameIdx = j;
-                    }
-                    else if (cellLower.Equals("name") || cellLower.Contains("піб") || cellLower.Contains("учасник") || cellLower.Contains("гравець") || cellLower.Contains("player") || cellLower.Contains("participant") || cellLower.Contains("имя") || cellLower.Contains("імя"))
-                    {
-                        currentNameIdx = j;
                     }
                     else if (cellLower.Contains("pts.") || cellLower.Contains("очки") || cellLower.Contains("боли") || cellLower.Contains("бали") || cellLower.Contains("points") || cellLower.Contains("score") || cellLower.Equals("о") || cellLower.Equals("б") || cellLower.Contains("result"))
                     {
