@@ -89,7 +89,7 @@ public class ExcelImportService : IExcelImportService
             "Result", "Результат", "Рейтинг", "Rating", "Rank", "Points", "Score", 
             "Бали", "FIDE", "ID", "Учасник", "Гравець", "Participant", "Player",
             "Surname", "Last Name", "First Name", "Group", "Група", "Клас", "Клуб", "Club", "Учасники",
-            "F.I.O.", "Ф.И.О.", "П.І.Б.", "FIO", "ФИО"
+            "F.I.O.", "Ф.И.О.", "П.І.Б.", "FIO", "ФИО", "Имя"
         };
 
         // 1. Find Header Row
@@ -127,7 +127,7 @@ public class ExcelImportService : IExcelImportService
                          if (currentRkIdx == -1) currentRkIdx = j;
                          else if (currentSnrIdx == -1) currentSnrIdx = j;
                     }
-                    else if (cellLower.Contains("ім'я") || cellLower.Contains("ім’я") || cellLower.Contains("імя") || cellLower.Contains("first name"))
+                    else if (cellLower.Contains("ім'я") || cellLower.Contains("ім’я") || cellLower.Contains("імя") || cellLower.Contains("имя") || cellLower.Contains("first name"))
                     {
                         currentFirstNameIdx = j;
                     }
@@ -135,7 +135,7 @@ public class ExcelImportService : IExcelImportService
                     {
                         currentLastNameIdx = j;
                     }
-                    else if (cellLower.Equals("name") || cellLower.Contains("піб") || cellLower.Contains("учасник") || cellLower.Contains("гравець") || cellLower.Contains("player") || cellLower.Contains("participant"))
+                    else if (cellLower.Equals("name") || cellLower.Contains("піб") || cellLower.Contains("учасник") || cellLower.Contains("гравець") || cellLower.Contains("player") || cellLower.Contains("participant") || cellLower.Contains("имя") || cellLower.Contains("імя"))
                     {
                         currentNameIdx = j;
                     }
