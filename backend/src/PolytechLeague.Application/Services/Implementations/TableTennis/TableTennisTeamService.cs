@@ -29,21 +29,20 @@ public class TableTennisTeamService(
         return await base.CreateAsync(entity, cancellationToken);
     }
 
-    public override async Task UpdateAsync(long id, TableTennisTeam newEntity, CancellationToken cancellationToken = default)
+    protected override void UpdateValues(TableTennisTeam oldEntity, TableTennisTeam newEntity)
     {
-        var oldEntity = await _dbcontext.TableTennisTeams
-            .Include(t => t.Players)
-            .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
-        
-        if (oldEntity == null) throw new PolytechLeague.Domain.Exceptions.EntityNotFoundException(nameof(TableTennisTeam), id);
-
-        UpdateValues(oldEntity, newEntity);
+        oldEntity.Name = newEntity.Name;
+        oldEntity.Points = newEntity.Points;
+        oldEntity.Rank = newEntity.Rank;
 
         if (newEntity.PlayerIds != null)
         {
-            var players = await _dbcontext.Players
+            // Explicitly load the collection to ensure EF knows about existing relationships
+            _dbcontext.Entry(oldEntity).Collection(t => t.Players).Load();
+            
+            var players = _dbcontext.Players
                 .Where(p => newEntity.PlayerIds.Contains(p.Id))
-                .ToListAsync(cancellationToken);
+                .ToList();
             
             oldEntity.Players ??= new List<Player>();
 
@@ -63,15 +62,6 @@ public class TableTennisTeamService(
                 }
             }
         }
-
-        await _dbcontext.SaveChangesAsync(cancellationToken);
-    }
-
-    protected override void UpdateValues(TableTennisTeam oldEntity, TableTennisTeam newEntity)
-    {
-        oldEntity.Name = newEntity.Name;
-        oldEntity.Points = newEntity.Points;
-        oldEntity.Rank = newEntity.Rank;
     }
 
     public override async Task<TableTennisTeam> GetByIdAsync(long id, CancellationToken cancellationToken = default)
