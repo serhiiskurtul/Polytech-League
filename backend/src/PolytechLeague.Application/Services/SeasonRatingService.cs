@@ -337,7 +337,11 @@ public class SeasonRatingService : ISeasonRatingService
         }
 
         // Calculate Totals and use dynamic penalty
-        int maxRanks = rows.Max(r => r.SportResults.Values.Max(v => v.Rank == "-" ? 0 : int.Parse(v.Rank!)));
+        int maxRanks = 0;
+        if (rows.Any())
+        {
+            maxRanks = rows.Max(r => r.SportResults.Values.Max(v => v.Rank == "-" ? 0 : int.Parse(v.Rank!)));
+        }
         int dynamicPenalty = Math.Max(DEFAULT_NON_PARTICIPATION_PENALTY, maxRanks + 1);
 
         foreach (var row in rows)

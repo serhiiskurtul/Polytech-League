@@ -88,7 +88,8 @@ public class ExcelImportService : IExcelImportService
             "Name", "Ім'я", "Прізвище", "ПІБ", "Очки", "Pts.", "Rk.", "Ст.ном", "№", 
             "Result", "Результат", "Рейтинг", "Rating", "Rank", "Points", "Score", 
             "Бали", "FIDE", "ID", "Учасник", "Гравець", "Participant", "Player",
-            "Surname", "Last Name", "First Name", "Group", "Група", "Клас", "Клуб", "Club", "Учасники"
+            "Surname", "Last Name", "First Name", "Group", "Група", "Клас", "Клуб", "Club", "Учасники",
+            "F.I.O.", "Ф.И.О.", "П.І.Б.", "FIO", "ФИО"
         };
 
         // 1. Find Header Row
@@ -101,6 +102,7 @@ public class ExcelImportService : IExcelImportService
             // Look for common headers (English/Ukrainian)
             if (ContainsAny(rowText, headerKeywords))
             {
+                _logger.LogInformation("Potential header found at row {RowIdx}: {RowText}", i, rowText);
                 int currentNameIdx = -1;
                 int currentFirstNameIdx = -1;
                 int currentLastNameIdx = -1;
@@ -186,6 +188,13 @@ public class ExcelImportService : IExcelImportService
         if (headerRowIdx == -1 || (nameIdx == -1 && (firstNameIdx == -1 || lastNameIdx == -1)))
         {
              _logger.LogWarning("Could not find headers in sheet {Sheet}. RowChecked: {Rows}", table.TableName, table.Rows.Count);
+             // DEBUG: Log the first 5 rows to see what's going on
+             for (int i = 0; i < Math.Min(table.Rows.Count, 5); i++)
+             {
+                 var row = table.Rows[i];
+                 var rowText = string.Join(" | ", row.ItemArray.Select(c => c?.ToString() ?? ""));
+                 _logger.LogInformation("Row {RowIdx}: {RowText}", i, rowText);
+             }
              return;
         }
 
