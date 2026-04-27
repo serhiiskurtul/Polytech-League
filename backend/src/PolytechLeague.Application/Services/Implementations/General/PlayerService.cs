@@ -299,23 +299,23 @@ public class PlayerService : IPlayerService
                 var sportTypes = new HashSet<string>();
 
                 foreach (var a in chessAch.Where(x => x.PlayerId == playerId && x.Tournament != null)) {
-                    achievements.Add(new AchievementDto { TournamentName = a.Tournament!.Name, SportType = "chess", Date = a.Tournament.Date, Rank = a.Rank, TournamentId = a.TournamentId });
+                    achievements.Add(new AchievementDto { TournamentName = a.Tournament!.Name, SportType = "chess", Date = a.Tournament.Date, Rank = a.Rank, TournamentId = a.TournamentId, Result = GetResultLabel(a.Rank) });
                     sportTypes.Add("chess");
                 }
                 foreach (var a in checkersAch.Where(x => x.PlayerId == playerId && x.Event != null)) {
-                    achievements.Add(new AchievementDto { TournamentName = a.Event!.Name, SportType = "checkers", Date = a.Event.Date, Rank = a.Rank, TournamentId = a.TournamentId });
+                    achievements.Add(new AchievementDto { TournamentName = a.Event!.Name, SportType = "checkers", Date = a.Event.Date, Rank = a.Rank, TournamentId = a.TournamentId, Result = GetResultLabel(a.Rank) });
                     sportTypes.Add("checkers");
                 }
                 foreach (var a in ttAch.Where(x => x.PlayerId == playerId && x.Tournament != null)) {
-                    achievements.Add(new AchievementDto { TournamentName = a.Tournament!.Name, SportType = "table_tennis", Date = a.Tournament.Date, Rank = a.Rank, TournamentId = a.TournamentId });
+                    achievements.Add(new AchievementDto { TournamentName = a.Tournament!.Name, SportType = "table_tennis", Date = a.Tournament.Date, Rank = a.Rank, TournamentId = a.TournamentId, Result = GetResultLabel(a.Rank) });
                     sportTypes.Add("table_tennis");
                 }
                 foreach (var a in badmintonAch.Where(x => x.PlayerId == playerId && x.Event != null)) {
-                    achievements.Add(new AchievementDto { TournamentName = a.Event!.Name, SportType = "badminton", Date = a.Event.Date, Rank = a.Rank, TournamentId = a.EventId });
+                    achievements.Add(new AchievementDto { TournamentName = a.Event!.Name, SportType = "badminton", Date = a.Event.Date, Rank = a.Rank, TournamentId = a.EventId, Result = GetResultLabel(a.Rank) });
                     sportTypes.Add("badminton");
                 }
                 foreach (var a in armwAch.Where(x => x.PlayerId == playerId && x.Tournament != null)) {
-                    achievements.Add(new AchievementDto { TournamentName = a.Tournament!.Name, SportType = "armwrestling", Date = a.Tournament.Date, Rank = a.Rank, TournamentId = a.TournamentId });
+                    achievements.Add(new AchievementDto { TournamentName = a.Tournament!.Name, SportType = "armwrestling", Date = a.Tournament.Date, Rank = a.Rank, TournamentId = a.TournamentId, Result = GetResultLabel(a.Rank) });
                     sportTypes.Add("armwrestling");
                     
                     var wc = a.Tournament!.WeightClass;
@@ -344,7 +344,7 @@ public class PlayerService : IPlayerService
 
                     if (!achievements.Any(a => a.TournamentId == e.Id && a.SportType == sportType))
                     {
-                        achievements.Add(new AchievementDto { TournamentName = e.Name, SportType = sportType, Date = e.Date, Rank = r, TournamentId = e.Id });
+                        achievements.Add(new AchievementDto { TournamentName = e.Name, SportType = sportType, Date = e.Date, Rank = r, TournamentId = e.Id, Result = GetResultLabel(r) });
                         sportTypes.Add(sportType);
                     }
                     
@@ -361,22 +361,22 @@ public class PlayerService : IPlayerService
                 // Team Sports
                 foreach (var t in futsalTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
                     int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "futsal", Date = t.Event.Date, Rank = r, TournamentId = t.EventId });
+                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "futsal", Date = t.Event.Date, Rank = r, TournamentId = t.EventId, Result = GetResultLabel(r) });
                     sportTypes.Add("futsal");
                 }
                 foreach (var t in volleyballTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
                     int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "volleyball", Date = t.Event.Date, Rank = r, TournamentId = t.EventId });
+                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "volleyball", Date = t.Event.Date, Rank = r, TournamentId = t.EventId, Result = GetResultLabel(r) });
                     sportTypes.Add("volleyball");
                 }
                 foreach (var t in bballTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
                     int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "basketball_3x3", Date = t.Event.Date, Rank = r, TournamentId = t.EventId });
+                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "basketball_3x3", Date = t.Event.Date, Rank = r, TournamentId = t.EventId, Result = GetResultLabel(r) });
                     sportTypes.Add("basketball_3x3");
                 }
                 foreach (var t in beachVTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
                     int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "beach_volleyball", Date = t.Event.Date, Rank = r, TournamentId = t.EventId });
+                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "beach_volleyball", Date = t.Event.Date, Rank = r, TournamentId = t.EventId, Result = GetResultLabel(r) });
                     sportTypes.Add("beach_volleyball");
                 }
 
@@ -872,5 +872,12 @@ public class PlayerService : IPlayerService
         dto.GoalsScored = futsalGoals;
         dto.PerformanceScore = (int)Math.Round(totalScore);
         dto.PointsBreakdown = pointsBreakdown.OrderByDescending(x => x.Points).ToList();
+    }
+
+    private string GetResultLabel(int? rank)
+    {
+        if (rank == 1) return "Переможець";
+        if (rank == 2 || rank == 3) return "Призер";
+        return "Учасник";
     }
 }
