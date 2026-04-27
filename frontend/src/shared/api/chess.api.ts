@@ -87,3 +87,7 @@ export const approveChessParticipant = async (eventId: number | string, playerId
 export const rejectChessParticipant = async (eventId: number | string, playerId: number): Promise<void> => {
     await api.post(`/chess-events/${eventId}/participants/${playerId}/reject`);
 };
+
+export const deleteChessTeam = async (id: number): Promise<void> => {
+    await api.delete(`/chess-teams/${id}`);
+};

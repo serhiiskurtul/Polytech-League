@@ -83,3 +83,7 @@ export const rejectCheckersParticipant = async (eventId: number | string, player
     await api.post(`/checkers-events/${eventId}/participants/${playerId}/reject`);
 };
 
+export const deleteCheckersTeam = async (id: number): Promise<void> => {
+    await api.delete(`/checkers-teams/${id}`);
+};
+

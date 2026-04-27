@@ -2509,3 +2509,28 @@ input:checked + .slider:before {
   background: #e5e7eb;
 }
 
+.teamActions {
+  display: flex;
+  gap: 8px;
+}
+
+.deleteTeamBtn {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deleteTeamBtn:hover {
+  background: #ef4444;
+  color: white;
+  transform: translateY(-2px);
+}
+

@@ -38,3 +38,7 @@ export const updateFutsalTeam = async (id: number, data: any): Promise<void> => 
 export const registerForFutsalEvent = async (id: string | number, playerId: number): Promise<void> => {
   await api.post(`/futsal-events/${id}/register?playerId=${playerId}`);
 };
+
+export const deleteFutsalTeam = async (id: number): Promise<void> => {
+  await api.delete(`/futsal-teams/${id}`);
+};

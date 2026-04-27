@@ -38,3 +38,7 @@ export const registerForVolleyballEvent = async (id: string | number, playerId: 
 export const deleteVolleyballMatch = async (id: number): Promise<void> => {
   await api.delete(`/volleyball-matches/${id}`);
 };
+
+export const deleteVolleyballTeam = async (id: number): Promise<void> => {
+  await api.delete(`/volleyball-teams/${id}`);
+};

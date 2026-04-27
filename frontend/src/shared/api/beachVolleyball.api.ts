@@ -38,3 +38,7 @@ export const updateBeachVolleyballTeam = async (id: number, data: any): Promise<
 export const registerForBeachVolleyballEvent = async (id: string | number, playerId: number): Promise<void> => {
   await api.post(`/beach-volleyball-events/${id}/register?playerId=${playerId}`);
 };
+
+export const deleteBeachVolleyballTeam = async (id: number): Promise<void> => {
+  await api.delete(`/beach-volleyball-teams/${id}`);
+};

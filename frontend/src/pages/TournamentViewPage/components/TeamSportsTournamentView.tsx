@@ -36,14 +36,16 @@ import {
   updateChessTeam,
   updateCheckersTeam,
   updateTableTennisTeam,
-  deleteVolleyballMatch,
-  deleteBeachVolleyballMatch,
-  deleteFutsalMatch,
-  deleteBasketball3x3Match,
-  deleteBadmintonMatch,
-  deleteChessGame,
   deleteCheckersGame,
-  deleteTableTennisMatch
+  deleteTableTennisMatch,
+  deleteVolleyballTeam,
+  deleteBeachVolleyballTeam,
+  deleteFutsalTeam,
+  deleteBasketball3x3Team,
+  deleteBadmintonTeam,
+  deleteChessTeam,
+  deleteCheckersTeam,
+  deleteTableTennisTeam
 } from '@/shared/api';
 import TournamentPodium from './TournamentPodium';
 import styles from '../TournamentViewPage.module.css';
@@ -609,6 +611,35 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     }
   };
 
+  const handleDeleteTeam = async (teamId: number, teamName: string) => {
+    if (!window.confirm(`Ви впевнені, що хочете видалити команду "${teamName}"? Цю дію неможливо скасувати.`)) {
+      return;
+    }
+
+    try {
+      let deleteApi;
+      switch (sport) {
+        case 'volleyball': deleteApi = deleteVolleyballTeam; break;
+        case 'beach_volleyball': deleteApi = deleteBeachVolleyballTeam; break;
+        case 'futsal': deleteApi = deleteFutsalTeam; break;
+        case 'basketball_3x3': deleteApi = deleteBasketball3x3Team; break;
+        case 'badminton': deleteApi = deleteBadmintonTeam; break;
+        case 'chess': deleteApi = deleteChessTeam; break;
+        case 'checkers': deleteApi = deleteCheckersTeam; break;
+        case 'tabletennis':
+        case 'table_tennis':
+        case 'table-tennis': deleteApi = deleteTableTennisTeam; break;
+        default: deleteApi = deleteVolleyballTeam;
+      }
+
+      await deleteApi(teamId);
+      onRefresh();
+    } catch (err) {
+      console.error(err);
+      alert('Помилка при видаленні команди');
+    }
+  };
+
   const getSportLabel = () => {
     switch (sport) {
       case 'volleyball': return 'Волейбол';
@@ -846,9 +877,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                     <p>{team.players?.length || 0} гравців</p>
                   </div>
                   {isAdmin && (
-                    <button className={styles.editTeamBtn} onClick={() => { setEditingTeamId(team.id); setIsTeamRosterModalOpen(true); }}>
-                      <i className="fas fa-user-edit"></i> Склад
-                    </button>
+                    <div className={styles.teamActions}>
+                      <button className={styles.editTeamBtn} onClick={() => { setEditingTeamId(team.id); setIsTeamRosterModalOpen(true); }}>
+                        <i className="fas fa-user-edit"></i> Склад
+                      </button>
+                      <button className={styles.deleteTeamBtn} onClick={() => handleDeleteTeam(team.id, team.name)} title="Видалити команду">
+                        <i className="fas fa-trash"></i>
+                      </button>
+                    </div>
                   )}
                 </div>
                 <div className={styles.teamPlayersPreview}>

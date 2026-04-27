@@ -38,3 +38,7 @@ export const updateBasketball3x3Team = async (id: number, data: any): Promise<vo
 export const registerForBasketball3x3Event = async (id: string | number, playerId: number): Promise<void> => {
   await api.post(`/basketball3x3-events/${id}/register?playerId=${playerId}`);
 };
+
+export const deleteBasketball3x3Team = async (id: number): Promise<void> => {
+  await api.delete(`/basketball3x3-teams/${id}`);
+};
