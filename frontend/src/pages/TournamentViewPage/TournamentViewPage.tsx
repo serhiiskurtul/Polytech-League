@@ -199,6 +199,7 @@ const TournamentViewPage = () => {
         registrationEnd: editTournamentData.level === 'CollegeGroup' ? formatToISO(editTournamentData.registrationEnd) : null,
         endDate: formatToISO(editTournamentData.endDate),
         isModerated: editTournamentData.level === 'CollegeGroup' ? editTournamentData.isModerated : false,
+        isTeam: !!(details as any).isTeam,
         seasonId: editTournamentData.seasonId || null
       };
 
