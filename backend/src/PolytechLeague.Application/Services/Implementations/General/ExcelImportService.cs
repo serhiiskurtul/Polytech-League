@@ -54,10 +54,17 @@ public class ExcelImportService : IExcelImportService
         });
 
         var data = new ScrapedTournamentExcelData();
-        if (result.Tables.Count > 0)
+        _logger.LogInformation("Excel file opened. Found {TableCount} sheets.", result.Tables.Count);
+
+        foreach (DataTable table in result.Tables)
         {
-            var table = result.Tables[0];
+            _logger.LogInformation("Checking sheet: {TableName} with {RowCount} rows.", table.TableName, table.Rows.Count);
             ParseTable(table, data);
+            if (data.Players.Count > 0)
+            {
+                _logger.LogInformation("Found {PlayerCount} players in sheet {TableName}.", data.Players.Count, table.TableName);
+                break;
+            }
         }
 
         return data;
@@ -81,7 +88,7 @@ public class ExcelImportService : IExcelImportService
             "Name", "Ім'я", "Прізвище", "ПІБ", "Очки", "Pts.", "Rk.", "Ст.ном", "№", 
             "Result", "Результат", "Рейтинг", "Rating", "Rank", "Points", "Score", 
             "Бали", "FIDE", "ID", "Учасник", "Гравець", "Participant", "Player",
-            "Surname", "Last Name", "First Name", "Group", "Група", "Клас", "Клуб", "Club"
+            "Surname", "Last Name", "First Name", "Group", "Група", "Клас", "Клуб", "Club", "Учасники"
         };
 
         // 1. Find Header Row
@@ -170,6 +177,7 @@ public class ExcelImportService : IExcelImportService
                     groupIdx = currentGroupIdx;
                     snrIdx = currentSnrIdx;
                     titleIdx = currentTitleIdx;
+                    _logger.LogInformation("Header row found at index {Index} in sheet {Sheet}. NameIdx: {NameIdx}, First: {F}, Last: {L}", i, table.TableName, currentNameIdx, currentFirstNameIdx, currentLastNameIdx);
                     break;
                 }
             }
@@ -177,7 +185,7 @@ public class ExcelImportService : IExcelImportService
 
         if (headerRowIdx == -1 || (nameIdx == -1 && (firstNameIdx == -1 || lastNameIdx == -1)))
         {
-             _logger.LogWarning("Could not find headers in Excel file. RowChecked: {Rows}", table.Rows.Count);
+             _logger.LogWarning("Could not find headers in sheet {Sheet}. RowChecked: {Rows}", table.TableName, table.Rows.Count);
              return;
         }
 
