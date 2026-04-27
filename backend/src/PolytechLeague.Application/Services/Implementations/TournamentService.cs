@@ -27,11 +27,23 @@ public class TournamentService : ITournamentService
         int page = 1, 
         int pageSize = 10,
         string? status = null,
-        string? sport = null)
+        string? sport = null,
+        string? level = null)
+
     {
         var query = _context.Set<PolytechLeague.Domain.Entities.Event>()
             .Include(e => e.Photos)
             .AsQueryable();
+
+        // Server-side filtering by level
+        if (!string.IsNullOrEmpty(level) && level != "all")
+        {
+            if (Enum.TryParse<PolytechLeague.Domain.Entities.CompetitionLevel>(level, true, out var levelEnum))
+            {
+                query = query.Where(e => e.Level == levelEnum);
+            }
+        }
+
 
         // Server-side filtering by sport
         if (!string.IsNullOrEmpty(sport) && sport != "all")

@@ -114,15 +114,17 @@ const BasicInfoSection = ({ formData, handleInputChange }: BasicInfoSectionProps
         {formData.sport !== 'armwrestling' && (
         <div className={shared.formGroup}>
           <label className={shared.formLabel}>
-            <i className="fas fa-chess-board"></i> Система проведення *
+            <i className="fas fa-chess-board"></i> Система проведення
           </label>
+
           <select
             name={['chess', 'checkers'].includes(formData.sport) ? 'system' : formData.sport === 'table_tennis' ? 'tournamentType' : 'type'}
             value={['chess', 'checkers'].includes(formData.sport) ? formData.system : formData.sport === 'table_tennis' ? formData.tournamentType : formData.type}
             onChange={handleInputChange}
             className={shared.formSelect}
-            required
           >
+            <option value="">Не вказано</option>
+
             {formData.sport === 'chess' 
               ? CHESS_SYSTEMS.map(type => (
                   <option key={type.id} value={type.id}>{type.name} - {type.description}</option>
@@ -153,8 +155,9 @@ const BasicInfoSection = ({ formData, handleInputChange }: BasicInfoSectionProps
         {/* Опис */}
         <div className={shared.formGroup}>
           <label className={shared.formLabel}>
-            <i className="fas fa-align-left"></i> Опис змагання *
+            <i className="fas fa-align-left"></i> Опис змагання
           </label>
+
           <textarea
             name="description"
             value={formData.description}
@@ -162,8 +165,8 @@ const BasicInfoSection = ({ formData, handleInputChange }: BasicInfoSectionProps
             className={shared.formTextarea}
             placeholder="Розкажіть про формат, учасників та важливі деталі..."
             rows={4}
-            required
           />
+
         </div>
       </div>
     </div>

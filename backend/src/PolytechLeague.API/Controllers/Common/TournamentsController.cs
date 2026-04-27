@@ -20,11 +20,13 @@ public class TournamentsController : ControllerBase
         int page = 1, 
         int pageSize = 10,
         string? status = null,
-        string? sport = null)
+        string? sport = null,
+        string? level = null)
     {
-        var tournaments = await _tournamentService.GetAllTournamentsAsync(page, pageSize, status, sport);
+        var tournaments = await _tournamentService.GetAllTournamentsAsync(page, pageSize, status, sport, level);
         return Ok(tournaments);
     }
+
 
     [HttpGet("{id}")]
     public async Task<ActionResult<TournamentDto>> GetTournamentById(long id)

@@ -5,7 +5,8 @@ export const getTournaments = async (
     page: number = 1, 
     pageSize: number = 10,
     status?: string,
-    sport?: string
+    sport?: string,
+    level?: string
 ): Promise<PagedResponse<Tournament>> => {
     try {
         const response = await api.get<PagedResponse<Tournament>>('/tournaments', {
@@ -13,7 +14,8 @@ export const getTournaments = async (
                 page, 
                 pageSize,
                 status: status !== 'all' ? status : undefined,
-                sport: sport !== 'all' ? sport : undefined
+                sport: sport !== 'all' ? sport : undefined,
+                level: level !== 'all' ? level : undefined
             }
         });
         return response.data;
@@ -22,6 +24,7 @@ export const getTournaments = async (
         throw error;
     }
 };
+
 
 export const getRecentResults = async (count: number = 4, sport?: string): Promise<RecentMatch[]> => {
     try {

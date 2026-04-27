@@ -35,7 +35,9 @@ const Tournaments = () => {
   });
   const [activeStatus, setActiveStatus] = useState('all');
   const [activeSport, setActiveSport] = useState(sportFromUrl || 'all');
+  const [activeLevel, setActiveLevel] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+
   const [sortBy, setSortBy] = useState('date');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [isLoading, setIsLoading] = useState(false);
@@ -87,6 +89,12 @@ const Tournaments = () => {
     setPagination(prev => ({ ...prev, page: 1 }));
   };
 
+  const handleLevelChange = (level: string) => {
+    setActiveLevel(level);
+    setPagination(prev => ({ ...prev, page: 1 }));
+  };
+
+
   // Обробка пошуку
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -102,8 +110,9 @@ const Tournaments = () => {
   const fetchTournamentsData = async (page: number) => {
     setIsLoading(true);
     try {
-      const response = await getTournaments(page, pagination.pageSize, activeStatus, activeSport);
+      const response = await getTournaments(page, pagination.pageSize, activeStatus, activeSport, activeLevel);
       setTournaments(response.items as TournamentUI[]);
+
       setPagination(prev => ({
         ...prev,
         page: response.page,
@@ -128,12 +137,15 @@ const Tournaments = () => {
 
   useEffect(() => {
     fetchTournamentsData(pagination.page);
-  }, [pagination.page, activeStatus, activeSport]);
+  }, [pagination.page, activeStatus, activeSport, activeLevel]);
+
 
   const handleResetFilters = () => {
     setActiveStatus('all');
     setActiveSport('all');
+    setActiveLevel('all');
     setSearchQuery('');
+
     setPagination(prev => ({ ...prev, page: 1 }));
   };
 
@@ -180,9 +192,12 @@ const Tournaments = () => {
       <TournamentFilters 
         activeStatus={activeStatus}
         activeSport={activeSport}
+        activeLevel={activeLevel}
         onStatusChange={handleStatusChange}
         onSportChange={handleSportChange}
+        onLevelChange={handleLevelChange}
       />
+
 
       <div className="tournaments-controls">
         <div className="search-container">
@@ -197,8 +212,9 @@ const Tournaments = () => {
         </div>
 
         <div className="controls-right">
-          {(activeStatus !== 'all' || activeSport !== 'all' || searchQuery !== '') && (
+          {(activeStatus !== 'all' || activeSport !== 'all' || activeLevel !== 'all' || searchQuery !== '') && (
             <button className="btn btn-outline reset-filters-btn" onClick={handleResetFilters}>
+
               <i className="fas fa-times"></i> Скинути
             </button>
           )}

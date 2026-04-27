@@ -15,11 +15,15 @@ interface Sport {
 interface TournamentFiltersProps {
   activeStatus: string;
   activeSport: string;
+  activeLevel: string;
   onStatusChange: (id: string) => void;
   onSportChange: (id: string) => void;
+  onLevelChange: (id: string) => void;
 }
 
-const TournamentFilters = ({ activeStatus, activeSport, onStatusChange, onSportChange }: TournamentFiltersProps) => {
+
+const TournamentFilters = ({ activeStatus, activeSport, activeLevel, onStatusChange, onSportChange, onLevelChange }: TournamentFiltersProps) => {
+
   const filters: Filter[] = [
     { id: 'all', label: 'Всі змагання', icon: 'fas fa-trophy' },
     { id: 'ongoing', label: 'Тривають', icon: 'fas fa-play-circle', color: '#10b981' },
@@ -38,6 +42,14 @@ const TournamentFilters = ({ activeStatus, activeSport, onStatusChange, onSportC
     { id: 'badminton', label: 'Бадмінтон', icon: 'fas fa-feather-alt' },
     { id: 'armwrestling', label: 'Армреслінг', icon: 'fas fa-fist-raised' }
   ];
+
+  const levels = [
+    { id: 'all', label: 'Всі категорії', icon: 'fas fa-globe' },
+    { id: 'CollegeGroup', label: 'Міжгрупові', icon: 'fas fa-users' },
+    { id: 'Regional', label: 'Регіональні', icon: 'fas fa-map-marked-alt' },
+    { id: 'National', label: 'Всеукраїнські', icon: 'fas fa-flag' }
+  ];
+
 
   return (
     <div className="tournament-filters">
@@ -88,7 +100,26 @@ const TournamentFilters = ({ activeStatus, activeSport, onStatusChange, onSportC
           ))}
         </div>
       </div>
+
+      <div className="filter-section">
+        <h3 className="filter-title">Категорія</h3>
+        <div className="filter-group">
+          {levels.map(level => (
+            <button
+              key={level.id}
+              className={`filter-btn ${activeLevel === level.id ? 'active' : ''}`}
+              onClick={() => onLevelChange(level.id)}
+            >
+              <div className="filter-btn-content">
+                <i className={level.icon}></i>
+                <span>{level.label}</span>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
+
   );
 };
 

@@ -247,9 +247,10 @@ const RatingsPage: React.FC = () => {
                 <label>Встановити як поточний сезон</label>
               </div>
               <div className={styles.formGroup}>
-                <label>Номер Спартакіади (напр. 65)</label>
-                <input name="spartakiadNumber" type="number" defaultValue={editingSeason?.spartakiadNumber} placeholder="65" />
+                <label>Номер Спартакіади</label>
+                <input name="spartakiadNumber" type="number" defaultValue={editingSeason?.spartakiadNumber} />
               </div>
+
 
               <div className={styles.modalActions}>
                 <button type="button" onClick={() => setShowSeasonModal(false)} className={styles.cancelBtn}>Скасувати</button>
