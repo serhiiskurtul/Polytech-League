@@ -328,11 +328,26 @@ public class PlayerService : IPlayerService
                 }
                 foreach (var e in genericWinners.Where(x => x.FirstPlaceId == playerId || x.SecondPlaceId == playerId || x.ThirdPlaceId == playerId)) {
                     int r = (e.FirstPlaceId == playerId) ? 1 : ((e.SecondPlaceId == playerId) ? 2 : 3);
-                    if (!achievements.Any(a => a.TournamentId == e.Id && a.SportType == "armwrestling"))
+                    
+                    string sportType = e switch {
+                        ChessEvent => "chess",
+                        CheckersEvent => "checkers",
+                        FutsalEvent => "futsal",
+                        VolleyballEvent => "volleyball",
+                        Basketball3x3Event => "basketball_3x3",
+                        BeachVolleyballEvent => "beach_volleyball",
+                        ArmwrestlingEvent => "armwrestling",
+                        TableTennisEvent => "table_tennis",
+                        BadmintonEvent => "badminton",
+                        _ => "other"
+                    };
+
+                    if (!achievements.Any(a => a.TournamentId == e.Id && a.SportType == sportType))
                     {
-                        achievements.Add(new AchievementDto { TournamentName = e.Name, SportType = "armwrestling", Date = e.Date, Rank = r, TournamentId = e.Id });
+                        achievements.Add(new AchievementDto { TournamentName = e.Name, SportType = sportType, Date = e.Date, Rank = r, TournamentId = e.Id });
+                        sportTypes.Add(sportType);
                     }
-                    sportTypes.Add("armwrestling");
+                    
                     if (e is ArmwrestlingEvent armwEvent)
                     {
                         armwrestlingWeightClasses.Add(armwEvent.WeightClass);
