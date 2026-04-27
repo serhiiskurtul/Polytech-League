@@ -62,8 +62,10 @@ const RatingsPage: React.FC = () => {
       name: formData.get('name') as string,
       startDate: new Date(formData.get('startDate') as string).toISOString(),
       endDate: new Date(formData.get('endDate') as string).toISOString(),
-      isCurrent: formData.get('isCurrent') === 'on'
+      isCurrent: formData.get('isCurrent') === 'on',
+      spartakiadNumber: formData.get('spartakiadNumber') ? Number(formData.get('spartakiadNumber')) : undefined
     };
+
 
     try {
       if (editingSeason) {
@@ -118,9 +120,17 @@ const RatingsPage: React.FC = () => {
     <div className={styles.container}>
       <header className={styles.header}>
         <div className={styles.titleSection}>
-          <h1>Рейтинги груп</h1>
+          <h1>
+            Рейтинги груп 
+            {ratingData?.spartakiadNumber && (
+              <span className={styles.spartakiadBadge}>
+                {ratingData.spartakiadNumber}-та Спартакіада
+              </span>
+            )}
+          </h1>
           <p>Підсумкова таблиця спартакіади коледжу</p>
         </div>
+
 
         <div className={styles.controls}>
           {seasons.length > 0 && (
@@ -236,6 +246,11 @@ const RatingsPage: React.FC = () => {
                 <input name="isCurrent" type="checkbox" defaultChecked={editingSeason?.isCurrent} />
                 <label>Встановити як поточний сезон</label>
               </div>
+              <div className={styles.formGroup}>
+                <label>Номер Спартакіади (напр. 65)</label>
+                <input name="spartakiadNumber" type="number" defaultValue={editingSeason?.spartakiadNumber} placeholder="65" />
+              </div>
+
               <div className={styles.modalActions}>
                 <button type="button" onClick={() => setShowSeasonModal(false)} className={styles.cancelBtn}>Скасувати</button>
                 <button type="submit" className={styles.saveBtn}>Зберегти</button>

@@ -4,9 +4,11 @@ public class SeasonRatingDto
 {
     public long SeasonId { get; set; }
     public required string SeasonName { get; set; }
+    public int? SpartakiadNumber { get; set; }
     public required List<string> Sports { get; set; }
     public required List<GroupRatingRowDto> Rows { get; set; }
 }
+
 
 public class GroupRatingRowDto
 {

@@ -7,4 +7,6 @@ public class SeasonDto
     public bool IsCurrent { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
+    public int? SpartakiadNumber { get; set; }
 }
+

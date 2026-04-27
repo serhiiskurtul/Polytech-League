@@ -4,7 +4,9 @@ export interface Season {
   isCurrent: boolean;
   startDate: string;
   endDate: string;
+  spartakiadNumber?: number;
 }
+
 
 export interface SportResult {
   points: number;
@@ -21,6 +23,8 @@ export interface GroupRatingRow {
 export interface SeasonRatingResponse {
   seasonId: number;
   seasonName: string;
+  spartakiadNumber?: number;
   sports: string[];
   rows: GroupRatingRow[];
 }
+

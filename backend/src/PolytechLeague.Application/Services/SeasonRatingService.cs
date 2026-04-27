@@ -382,6 +382,7 @@ public class SeasonRatingService : ISeasonRatingService
         {
             SeasonId = season.Id,
             SeasonName = season.Name,
+            SpartakiadNumber = season.SpartakiadNumber,
             Sports = sports,
             Rows = orderedRows
         };
@@ -397,7 +398,8 @@ public class SeasonRatingService : ISeasonRatingService
                 Name = s.Name,
                 IsCurrent = s.IsCurrent,
                 StartDate = s.StartDate,
-                EndDate = s.EndDate
+                EndDate = s.EndDate,
+                SpartakiadNumber = s.SpartakiadNumber
             }).ToListAsync();
     }
 
@@ -411,7 +413,8 @@ public class SeasonRatingService : ISeasonRatingService
             Name = season.Name,
             IsCurrent = season.IsCurrent,
             StartDate = season.StartDate,
-            EndDate = season.EndDate
+            EndDate = season.EndDate,
+            SpartakiadNumber = season.SpartakiadNumber
         };
     }
 
@@ -428,8 +431,10 @@ public class SeasonRatingService : ISeasonRatingService
             Name = dto.Name,
             IsCurrent = dto.IsCurrent,
             StartDate = dto.StartDate,
-            EndDate = dto.EndDate
+            EndDate = dto.EndDate,
+            SpartakiadNumber = dto.SpartakiadNumber
         };
+
         _context.Seasons.Add(season);
         await _context.SaveChangesAsync();
         dto.Id = season.Id;
@@ -451,6 +456,8 @@ public class SeasonRatingService : ISeasonRatingService
         season.IsCurrent = dto.IsCurrent;
         season.StartDate = dto.StartDate;
         season.EndDate = dto.EndDate;
+        season.SpartakiadNumber = dto.SpartakiadNumber;
+
         
         await _context.SaveChangesAsync();
         return dto;
