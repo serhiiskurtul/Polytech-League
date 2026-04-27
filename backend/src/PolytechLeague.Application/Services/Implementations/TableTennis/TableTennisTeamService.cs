@@ -4,6 +4,7 @@ using PolytechLeague.Application.Services.Interfaces.TableTennis;
 using PolytechLeague.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
 using PolytechLeague.Application.Services.Interfaces;
+using PolytechLeague.Domain.Entities;
 
 namespace PolytechLeague.Application.Services.Implementations.TableTennis;
 
@@ -44,7 +45,10 @@ public class TableTennisTeamService(
                 .Where(p => newEntity.PlayerIds.Contains(p.Id))
                 .ToList();
             
-            oldEntity.Players ??= new List<Player>();
+            if (oldEntity.Players == null)
+            {
+                oldEntity.Players = new List<Player>();
+            }
 
             // Remove players not in the new list
             var toRemove = oldEntity.Players.Where(p => !newEntity.PlayerIds.Contains(p.Id)).ToList();
