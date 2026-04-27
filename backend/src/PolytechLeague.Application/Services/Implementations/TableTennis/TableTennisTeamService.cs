@@ -15,19 +15,47 @@ public class TableTennisTeamService(
     AbstractEntityService<TableTennisTeam>(_dbcontext, _logger, _notificationService),
     ITableTennisTeamService
 {
+    public override async Task<TableTennisTeam> CreateAsync(TableTennisTeam entity, CancellationToken cancellationToken = default)
+    {
+        if (entity.PlayerIds != null)
+        {
+            var players = await _dbcontext.Players
+                .Where(p => entity.PlayerIds.Contains(p.Id))
+                .ToListAsync(cancellationToken);
+            
+            entity.Players = players;
+        }
+
+        return await base.CreateAsync(entity, cancellationToken);
+    }
+
+    public override async Task UpdateAsync(long id, TableTennisTeam newEntity, CancellationToken cancellationToken = default)
+    {
+        var oldEntity = await _dbcontext.TableTennisTeams
+            .Include(t => t.Players)
+            .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
+        
+        if (oldEntity == null) throw new PolytechLeague.Domain.Exceptions.EntityNotFoundException(nameof(TableTennisTeam), id);
+
+        UpdateValues(oldEntity, newEntity);
+
+        if (newEntity.PlayerIds != null)
+        {
+            var players = await _dbcontext.Set<Player>()
+                .Where(p => newEntity.PlayerIds.Contains(p.Id))
+                .ToListAsync(cancellationToken);
+            
+            oldEntity.Players = players;
+        }
+
+        await _dbcontext.SaveChangesAsync(cancellationToken);
+    }
+
     protected override void UpdateValues(TableTennisTeam oldEntity, TableTennisTeam newEntity)
     {
         oldEntity.Name = newEntity.Name;
         oldEntity.Points = newEntity.Points;
         oldEntity.Rank = newEntity.Rank;
-
-        if (newEntity.PlayerIds != null)
-        {
-            var existingPlayers = _dbcontext.Players
-                .Where(p => newEntity.PlayerIds.Contains(p.Id))
-                .ToList();
-            oldEntity.Players = existingPlayers;
-        }
     }
 
     public override async Task<TableTennisTeam> GetByIdAsync(long id, CancellationToken cancellationToken = default)
