@@ -1244,7 +1244,9 @@ const TournamentViewPage = () => {
                   >
                     <option key="default-first" value="0">-- Оберіть переможця --</option>
                     {(details?.players || details?.participants || [])?.map((p: any) => (
-                      <option key={`first-p-${p.playerId}`} value={p.playerId}>{p.playerName} {p.points !== undefined ? `(${p.points} очок)` : ''}</option>
+                      <option key={`first-p-${p.playerId}`} value={p.playerId}>
+                        {p.playerName} { (['chess', 'checkers', 'tabletennis', 'badminton'].includes(tournament?.sport)) && (p.points !== undefined) ? `(${p.points} очок)` : ''}
+                      </option>
                     ))}
                     {details?.teams?.map((t: any) => (
                       <option key={`first-t-${t.id}`} value={t.id}>{t.name}</option>
@@ -1263,7 +1265,9 @@ const TournamentViewPage = () => {
                   >
                     <option key="default-second" value="0">-- Оберіть переможця --</option>
                     {(details?.players || details?.participants || [])?.map((p: any) => (
-                      <option key={`second-p-${p.playerId}`} value={p.playerId}>{p.playerName} {p.points !== undefined ? `(${p.points} очок)` : ''}</option>
+                      <option key={`second-p-${p.playerId}`} value={p.playerId}>
+                        {p.playerName} { (['chess', 'checkers', 'tabletennis', 'badminton'].includes(tournament?.sport)) && (p.points !== undefined) ? `(${p.points} очок)` : ''}
+                      </option>
                     ))}
                     {details?.teams?.map((t: any) => (
                       <option key={`second-t-${t.id}`} value={t.id}>{t.name}</option>
@@ -1282,7 +1286,9 @@ const TournamentViewPage = () => {
                   >
                     <option key="default-third" value="0">-- Оберіть переможця --</option>
                     {(details?.players || details?.participants || [])?.map((p: any) => (
-                      <option key={`third-p-${p.playerId}`} value={p.playerId}>{p.playerName} {p.points !== undefined ? `(${p.points} очок)` : ''}</option>
+                      <option key={`third-p-${p.playerId}`} value={p.playerId}>
+                        {p.playerName} { (['chess', 'checkers', 'tabletennis', 'badminton'].includes(tournament?.sport)) && (p.points !== undefined) ? `(${p.points} очок)` : ''}
+                      </option>
                     ))}
                     {details?.teams?.map((t: any) => (
                       <option key={`third-t-${t.id}`} value={t.id}>{t.name}</option>
