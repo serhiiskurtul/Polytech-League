@@ -573,7 +573,16 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       }
 
 
-      await updateApi(teamId, { ...team, playerIds: newPlayerIds });
+      const payload = {
+        id: team.id,
+        name: team.name,
+        eventId: team.eventId,
+        points: team.points,
+        rank: team.rank,
+        playerIds: newPlayerIds
+      };
+
+      await updateApi(teamId, payload);
       onRefresh();
     } catch (err) {
       console.error(err);

@@ -41,11 +41,27 @@ public class TableTennisTeamService(
 
         if (newEntity.PlayerIds != null)
         {
-            var players = await _dbcontext.Set<Player>()
+            var players = await _dbcontext.Players
                 .Where(p => newEntity.PlayerIds.Contains(p.Id))
                 .ToListAsync(cancellationToken);
             
-            oldEntity.Players = players;
+            oldEntity.Players ??= new List<Player>();
+
+            // Remove players not in the new list
+            var toRemove = oldEntity.Players.Where(p => !newEntity.PlayerIds.Contains(p.Id)).ToList();
+            foreach (var p in toRemove)
+            {
+                oldEntity.Players.Remove(p);
+            }
+
+            // Add new players not already in the collection
+            foreach (var p in players)
+            {
+                if (oldEntity.Players.All(ep => ep.Id != p.Id))
+                {
+                    oldEntity.Players.Add(p);
+                }
+            }
         }
 
         await _dbcontext.SaveChangesAsync(cancellationToken);
