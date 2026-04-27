@@ -75,13 +75,14 @@ public class ExcelImportService : IExcelImportService
         int groupIdx = -1;
 
         // 1. Find Header Row
-        for (int i = 0; i < Math.Min(table.Rows.Count, 30); i++)
+        // Increased to 100 rows to handle files with lots of metadata at the top
+        for (int i = 0; i < Math.Min(table.Rows.Count, 100); i++)
         {
             var row = table.Rows[i];
             var rowText = string.Join(" ", row.ItemArray.Select(c => c?.ToString() ?? ""));
 
             // Look for common headers (English/Ukrainian)
-            if (ContainsAny(rowText, new[] { "Name", "Ім'я", "Прізвище", "ПІБ", "Очки", "Pts.", "Rk.", "Ст.ном", "№", "Result", "Результат" }))
+            if (ContainsAny(rowText, new[] { "Name", "Ім'я", "Прізвище", "ПІБ", "Очки", "Pts.", "Rk.", "Ст.ном", "№", "Result", "Результат", "Рейтинг", "Rating" }))
             {
                 headerRowIdx = i;
                 
@@ -109,7 +110,7 @@ public class ExcelImportService : IExcelImportService
                     {
                         rkIdx = j;
                     }
-                    else if (cell.Contains("Rtg") || cell.Contains("Рейт") || cell.Contains("Elo"))
+                    else if (cell.Contains("Rtg") || cell.Contains("Рейт") || cell.Contains("Elo") || cell.Contains("Рейтинг"))
                     {
                         rtgIdx = j;
                     }
