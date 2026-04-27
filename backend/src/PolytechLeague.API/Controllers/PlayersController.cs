@@ -70,6 +70,18 @@ public class PlayersController : ControllerBase
         return Ok(new { photoUrl });
     }
 
+    [Authorize]
+    [HttpPut("profile")]
+    public async Task<IActionResult> UpdateProfile([FromBody] PlayerDto dto, CancellationToken cancellationToken)
+    {
+        var userId = User.GetUserId();
+        var player = await _playerService.GetByUserIdAsync(userId, cancellationToken);
+        if (player == null) return NotFound("Player profile not found");
+        
+        await _playerService.UpdateAsync(player.Id ?? 0, dto, cancellationToken);
+        return NoContent();
+    }
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PlayerDto>>> GetAll(CancellationToken cancellationToken)
     {
@@ -85,6 +97,7 @@ public class PlayersController : ControllerBase
         return Ok(player);
     }
 
+    [Authorize(Policy = "Admin")]
     [HttpPost]
     public async Task<ActionResult<PlayerDto>> Create(PlayerDto dto, CancellationToken cancellationToken)
     {
@@ -92,6 +105,7 @@ public class PlayersController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
+    [Authorize(Policy = "Admin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(long id, PlayerDto dto, CancellationToken cancellationToken)
     {
@@ -99,6 +113,7 @@ public class PlayersController : ControllerBase
         return NoContent();
     }
 
+    [Authorize(Policy = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(long id, CancellationToken cancellationToken)
     {

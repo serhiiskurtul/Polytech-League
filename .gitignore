@@ -410,3 +410,7 @@ docker/.env
 /src/.vscode
 /backend/src/PolytechLeague.API/.idea
 /design
+
+# Secrets and local settings
+backend/src/PolytechLeague.API/appsettings.Development.json
+frontend/.env.development
