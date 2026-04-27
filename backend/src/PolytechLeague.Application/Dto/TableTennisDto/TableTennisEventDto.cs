@@ -38,6 +38,13 @@ public class TableTennisEventRequest
     public bool IsModerated { get; set; }
     public bool IsPublic { get; set; }
     public long? SeasonId { get; set; }
+
+    public long? FirstPlaceId { get; set; }
+    public long? SecondPlaceId { get; set; }
+    public long? ThirdPlaceId { get; set; }
+    public long? FirstPlaceTeamId { get; set; }
+    public long? SecondPlaceTeamId { get; set; }
+    public long? ThirdPlaceTeamId { get; set; }
 }
 
 public class TableTennisTeamResponse
@@ -118,7 +125,13 @@ public static class TableTennisEventDtoExtensions
             IsTeam = request.IsTeam,
             IsModerated = request.IsModerated,
             IsPublic = request.IsPublic,
-            SeasonId = request.SeasonId
+            SeasonId = request.SeasonId,
+            FirstPlaceId = request.FirstPlaceId,
+            SecondPlaceId = request.SecondPlaceId,
+            ThirdPlaceId = request.ThirdPlaceId,
+            FirstPlaceTeamId = request.FirstPlaceTeamId,
+            SecondPlaceTeamId = request.SecondPlaceTeamId,
+            ThirdPlaceTeamId = request.ThirdPlaceTeamId
         };
     }
 
