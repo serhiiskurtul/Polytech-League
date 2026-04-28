@@ -115,6 +115,7 @@ export interface ChessEventRequest {
   registrationEnd?: string;
   endDate?: string;
   seasonId?: number | null;
+  category?: TournamentCategory;
 }
 
 // ChessPlayerDto removed in favor of unified PlayerDto

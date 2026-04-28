@@ -162,7 +162,7 @@ const TournamentViewPage = () => {
   const [editingGameData, setEditingGameData] = useState<{ round: number; board: number; result: string; whitePlayerId: string; blackPlayerId: string, pgn: string }>({ round: 1, board: 1, result: 'WhiteWin', whitePlayerId: '', blackPlayerId: '', pgn: '' });
 
   const [editingParticipantId, setEditingParticipantId] = useState<number | null>(null);
-  const [editingParticipantData, setEditingParticipantData] = useState<{ points: number; rank: number; weight: number; status: RegistrationStatus; firstName: string; lastName: string; groupName: string }>({ points: 0, rank: 0, weight: 0, status: RegistrationStatus.Approved, firstName: '', lastName: '', groupName: '' });
+  const [editingParticipantData, setEditingParticipantData] = useState<{ points: number; rank: number; weight: number; rating?: number; status: RegistrationStatus; firstName: string; lastName: string; groupName: string }>({ points: 0, rank: 0, weight: 0, rating: 0, status: RegistrationStatus.Approved, firstName: '', lastName: '', groupName: '' });
   const [gameFilters, setGameFilters] = useState({ round: '', board: '', participant: '', result: '' });
   const [isImporting, setIsImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);

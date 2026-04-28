@@ -1,4 +1,4 @@
-import { RegistrationStatus } from './tournament.types';
+import { RegistrationStatus, TournamentCategory } from './tournament.types';
 import { PlayerDto } from './player.types';
 
 export interface CheckersTeamResponse {
@@ -98,6 +98,8 @@ export interface CheckersEventRequest {
   registrationStart?: string;
   registrationEnd?: string;
   endDate?: string;
+  seasonId?: number | null;
+  category?: TournamentCategory;
 }
 
 export interface CheckersEventParticipantDto {
