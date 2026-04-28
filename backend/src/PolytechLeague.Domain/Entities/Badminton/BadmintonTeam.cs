@@ -5,7 +5,7 @@ namespace PolytechLeague.Domain.Entities.Badminton;
 public class BadmintonTeam
 {
     public long Id { get; set; }
-    public string? Name { get; set; } // Can be empty, e.g. "Ivanov/Petrov"
+    public string? Name { get; set; }
 
     public long? Player1Id { get; set; }
     public Player? Player1 { get; set; }

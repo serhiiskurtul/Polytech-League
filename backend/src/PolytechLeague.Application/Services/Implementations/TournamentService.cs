@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PolytechLeague.Application.Dto;
 using PolytechLeague.Application.Services.Interfaces;
 using PolytechLeague.Persistence.Database;
+using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Entities.Futsal;
 using PolytechLeague.Domain.Entities.Basketball3x3;
 using PolytechLeague.Domain.Entities.Volleyball;
@@ -267,8 +268,9 @@ public class TournamentService : ITournamentService
         var activeTournamentsCount = await _context.Set<PolytechLeague.Domain.Entities.Event>()
             .CountAsync(e => e.Date >= startOfSeason);
 
-        var registeredPlayersCount = await _context.Set<PolytechLeague.Domain.Entities.Player>()
-            .CountAsync();
+        var registeredPlayersCount = await _context.Players
+            .Include(p => p.User)
+            .CountAsync(p => p.User == null || p.User.Role != UserRole.Admin);
 
         // Count total matches across all sport tables
         int totalMatches = 0;
