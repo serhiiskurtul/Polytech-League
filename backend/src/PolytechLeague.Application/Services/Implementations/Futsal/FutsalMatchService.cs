@@ -128,5 +128,8 @@ public class FutsalMatchService :
         oldEntity.AwayTeamScore = newEntity.AwayTeamScore;
         oldEntity.WinnerTeamId = newEntity.WinnerTeamId;
         oldEntity.Stage = newEntity.Stage;
+        oldEntity.HomeGoalkeeperId = newEntity.HomeGoalkeeperId;
+        oldEntity.AwayGoalkeeperId = newEntity.AwayGoalkeeperId;
     }
 }
+

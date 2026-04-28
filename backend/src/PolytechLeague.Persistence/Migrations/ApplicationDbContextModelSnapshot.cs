@@ -945,6 +945,9 @@ namespace PolytechLeague.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<long?>("AwayGoalkeeperId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("AwayTeamId")
                         .HasColumnType("bigint");
 
@@ -952,6 +955,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("integer");
 
                     b.Property<long>("EventId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("HomeGoalkeeperId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("HomeTeamId")
@@ -969,9 +975,13 @@ namespace PolytechLeague.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AwayGoalkeeperId");
+
                     b.HasIndex("AwayTeamId");
 
                     b.HasIndex("EventId");
+
+                    b.HasIndex("HomeGoalkeeperId");
 
                     b.HasIndex("HomeTeamId");
 
@@ -2684,6 +2694,10 @@ namespace PolytechLeague.Persistence.Migrations
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Futsal.FutsalMatch", b =>
                 {
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "AwayGoalkeeper")
+                        .WithMany()
+                        .HasForeignKey("AwayGoalkeeperId");
+
                     b.HasOne("PolytechLeague.Domain.Entities.Futsal.FutsalTeam", "AwayTeam")
                         .WithMany()
                         .HasForeignKey("AwayTeamId")
@@ -2696,6 +2710,10 @@ namespace PolytechLeague.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "HomeGoalkeeper")
+                        .WithMany()
+                        .HasForeignKey("HomeGoalkeeperId");
+
                     b.HasOne("PolytechLeague.Domain.Entities.Futsal.FutsalTeam", "HomeTeam")
                         .WithMany()
                         .HasForeignKey("HomeTeamId")
@@ -2707,9 +2725,13 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasForeignKey("WinnerTeamId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.Navigation("AwayGoalkeeper");
+
                     b.Navigation("AwayTeam");
 
                     b.Navigation("Event");
+
+                    b.Navigation("HomeGoalkeeper");
 
                     b.Navigation("HomeTeam");
 

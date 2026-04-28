@@ -14,6 +14,8 @@ public class FutsalMatchRequest
     public long? WinnerTeamId { get; set; }
     public ICollection<long>? HomeRosterIds { get; set; }
     public ICollection<long>? AwayRosterIds { get; set; }
+    public long? HomeGoalkeeperId { get; set; }
+    public long? AwayGoalkeeperId { get; set; }
     public ICollection<FutsalGoalRequest>? Goals { get; set; }
 }
 
@@ -39,6 +41,10 @@ public class FutsalMatchResponse
     
     public ICollection<PlayerDto>? HomeRoster { get; set; }
     public ICollection<PlayerDto>? AwayRoster { get; set; }
+    public long? HomeGoalkeeperId { get; set; }
+    public PlayerDto? HomeGoalkeeper { get; set; }
+    public long? AwayGoalkeeperId { get; set; }
+    public PlayerDto? AwayGoalkeeper { get; set; }
     public ICollection<FutsalGoalResponse>? Goals { get; set; }
 }
 
@@ -57,6 +63,8 @@ public static class FutsalMatchDtoExtensions
             Stage = request.Stage,
             HomeRosterIds = request.HomeRosterIds,
             AwayRosterIds = request.AwayRosterIds,
+            HomeGoalkeeperId = request.HomeGoalkeeperId,
+            AwayGoalkeeperId = request.AwayGoalkeeperId,
             Goals = request.Goals?.Select(g => g.FromRequest(0)).ToList() // MatchId will be set in service
         };
     }
@@ -78,6 +86,10 @@ public static class FutsalMatchDtoExtensions
             Stage = entity.Stage,
             HomeRoster = entity.HomeRoster?.Select(p => p.ToDto()).ToList(),
             AwayRoster = entity.AwayRoster?.Select(p => p.ToDto()).ToList(),
+            HomeGoalkeeperId = entity.HomeGoalkeeperId,
+            HomeGoalkeeper = entity.HomeGoalkeeper?.ToDto(),
+            AwayGoalkeeperId = entity.AwayGoalkeeperId,
+            AwayGoalkeeper = entity.AwayGoalkeeper?.ToDto(),
             Goals = entity.Goals?.Select(g => g.ToResponse()).ToList()
         };
     }

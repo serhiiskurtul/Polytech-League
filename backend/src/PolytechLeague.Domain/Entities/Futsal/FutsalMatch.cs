@@ -30,4 +30,10 @@ public class FutsalMatch
     public ICollection<long>? AwayRosterIds { get; set; }
 
     public virtual ICollection<FutsalGoal>? Goals { get; set; }
+    
+    public long? HomeGoalkeeperId { get; set; }
+    public Player? HomeGoalkeeper { get; set; }
+    public long? AwayGoalkeeperId { get; set; }
+    public Player? AwayGoalkeeper { get; set; }
 }
+

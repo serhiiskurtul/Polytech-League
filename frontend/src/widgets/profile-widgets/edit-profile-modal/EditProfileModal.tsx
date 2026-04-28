@@ -19,7 +19,10 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
     city: initialData.city || '',
     bio: initialData.bio || '',
     instagramUrl: initialData.instagramUrl || '',
-    isExternal: initialData.isExternal || false
+    isExternal: initialData.isExternal || false,
+    futsalShirtNumber: initialData.futsalShirtNumber || '',
+    volleyballShirtNumber: initialData.volleyballShirtNumber || '',
+    basketballShirtNumber: initialData.basketballShirtNumber || ''
   });
 
   const [loading, setLoading] = useState(false);
@@ -134,6 +137,50 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
                 />
               </div>
             </div>
+            
+            {/* Conditional Shirt Numbers based on participation */}
+            <div className={styles.shirtNumbersGrid}>
+              {initialData.sports?.includes('futsal') && (
+                <div className={styles.formGroup}>
+                  <label htmlFor="futsalShirtNumber">Номер у футзалі</label>
+                  <input
+                    type="number"
+                    id="futsalShirtNumber"
+                    name="futsalShirtNumber"
+                    value={formData.futsalShirtNumber}
+                    onChange={handleChange}
+                    placeholder="№"
+                  />
+                </div>
+              )}
+              {initialData.sports?.includes('volleyball') && (
+                <div className={styles.formGroup}>
+                  <label htmlFor="volleyballShirtNumber">Номер у волейболі</label>
+                  <input
+                    type="number"
+                    id="volleyballShirtNumber"
+                    name="volleyballShirtNumber"
+                    value={formData.volleyballShirtNumber}
+                    onChange={handleChange}
+                    placeholder="№"
+                  />
+                </div>
+              )}
+              {initialData.sports?.includes('basketball_3x3') && (
+                <div className={styles.formGroup}>
+                  <label htmlFor="basketballShirtNumber">Номер у баскетболі</label>
+                  <input
+                    type="number"
+                    id="basketballShirtNumber"
+                    name="basketballShirtNumber"
+                    value={formData.basketballShirtNumber}
+                    onChange={handleChange}
+                    placeholder="№"
+                  />
+                </div>
+              )}
+            </div>
+
 
             {isAdmin && (
               <div className={styles.formGroup} style={{ flexDirection: 'row', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
