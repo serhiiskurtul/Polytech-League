@@ -49,7 +49,7 @@ public class FutsalEventService :
         oldEntity.IsPublic = newEntity.IsPublic;
         oldEntity.IsTeam = newEntity.IsTeam;
         oldEntity.SeasonId = newEntity.SeasonId;
-
+        oldEntity.Category = newEntity.Category;
     }
 
     public override async Task<FutsalEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)

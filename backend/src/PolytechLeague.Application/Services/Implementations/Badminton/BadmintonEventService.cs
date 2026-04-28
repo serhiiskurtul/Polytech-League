@@ -45,6 +45,7 @@ public class BadmintonEventService(
         oldEntity.IsModerated = newEntity.IsModerated;
         oldEntity.IsPublic = newEntity.IsPublic;
         oldEntity.SeasonId = newEntity.SeasonId;
+        oldEntity.Category = newEntity.Category;
     }
 
     public override async Task<BadmintonEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)

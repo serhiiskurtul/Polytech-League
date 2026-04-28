@@ -283,7 +283,8 @@ const TournamentViewPage = () => {
     endDate: '',
     isModerated: false,
     isPublic: true,
-    seasonId: null
+    seasonId: null,
+    category: 'Mixed'
   });
 
 
@@ -405,7 +406,8 @@ const TournamentViewPage = () => {
         endDate: formatDateForInput(tournament?.endDate || details.endDate),
         isModerated: !!details.isModerated,
         isPublic: details.isPublic !== undefined ? !!details.isPublic : true,
-        seasonId: details.seasonId || null
+        seasonId: details.seasonId || null,
+        category: (details as any).category || (tournament?.category as any) || 'Mixed'
       });
       setIsEditingTournament(true);
     }
@@ -487,7 +489,8 @@ const TournamentViewPage = () => {
         endDate: formatToISO(editTournamentData.endDate),
         isModerated: editTournamentData.level === 'CollegeGroup' ? editTournamentData.isModerated : false,
         isPublic: editTournamentData.level === 'CollegeGroup' ? editTournamentData.isPublic : false,
-        seasonId: editTournamentData.seasonId || null
+        seasonId: editTournamentData.seasonId || null,
+        category: editTournamentData.category || 'Mixed'
       };
 
       if (sportKey === 'checkers') {
@@ -512,8 +515,7 @@ const TournamentViewPage = () => {
       } else if (sportKey === 'tabletennis' || sportKey === 'table_tennis') {
         await updateTableTennisEvent(id!, { 
           ...payload, 
-          tournamentType: (details as any).tournamentType || 'RoundRobin',
-          category: (details as any).category || 'Men'
+          tournamentType: (details as any).tournamentType || 'RoundRobin'
         });
       } else {
         // Chess
@@ -1620,17 +1622,17 @@ const TournamentViewPage = () => {
                       tournament?.sport === 'badminton' ? "fas fa-shuttlecock" : 
                       tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? "fas fa-table-tennis" : 
                       tournament?.sport === 'armwrestling' ? "fas fa-hand-rock" : 
-                      "fas fa-clock"
+                      "fas fa-venus-mars"
                     }></i>
                   </div>
                   <div className={styles.statValue}>
-                    {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'armwrestling'
-                      ? ((details as any)?.category === 'Men' ? 'Чоловіки' : (details as any)?.category === 'Women' ? 'Жінки' : (details as any)?.category === 'Mixed' ? 'Змішані' : (details as any)?.category || '-')
-                      : details?.timeControl || (tournament?.sport === 'badminton' ? 'За регламентом' : '-')}
+                    {((details as any)?.category === 'Men' ? 'Чоловіки' : 
+                      (details as any)?.category === 'Women' ? 'Жінки' : 
+                      (details as any)?.category === 'Mixed' ? 'Змішане' : 
+                      (tournament?.category === 'Чоловіки' ? 'Чоловіки' : 
+                       tournament?.category === 'Жінки' ? 'Жінки' : 'Змішане'))}
                   </div>
-                  <div className={styles.statLabel}>
-                    {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' || tournament?.sport === 'armwrestling' ? 'Категорія' : tournament?.sport === 'badminton' ? 'Формат' : 'Контроль часу'}
-                  </div>
+                  <div className={styles.statLabel}>Категорія</div>
                 </div>
                 <div className={styles.statCard}>
                   <div className={styles.statIcon}><i className="fas fa-chart-line"></i></div>
@@ -2449,6 +2451,14 @@ const TournamentViewPage = () => {
                         {seasons.map(s => (
                           <option key={s.id} value={s.id}>Сезон {s.name} {s.isCurrent ? '(Поточний)' : ''}</option>
                         ))}
+                      </select>
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label>Категорія (стать)</label>
+                      <select value={editTournamentData.category} onChange={(e) => setEditTournamentData({ ...editTournamentData, category: e.target.value as any })}>
+                        <option value="Men">Чоловіки</option>
+                        <option value="Women">Жінки</option>
+                        <option value="Mixed">Змішане (Mixed)</option>
                       </select>
                     </div>
                     {(tournament?.sport === 'chess' || tournament?.sport === 'checkers') && (

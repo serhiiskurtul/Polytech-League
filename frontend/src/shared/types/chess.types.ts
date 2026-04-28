@@ -1,5 +1,5 @@
 import { PlayerDto } from './player.types';
-import { RegistrationStatus } from './tournament.types';
+import { RegistrationStatus, TournamentCategory } from './tournament.types';
 
 export interface ChessTeamResponse {
   id: number;
@@ -87,6 +87,7 @@ export interface ChessEventResponse {
   registrationEnd?: string;
   endDate?: string;
   seasonId?: number | null;
+  category?: TournamentCategory;
 }
 
 export interface ChessEventRequest {

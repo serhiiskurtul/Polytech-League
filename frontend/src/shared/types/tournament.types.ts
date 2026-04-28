@@ -48,3 +48,5 @@ export enum RegistrationStatus {
   Approved = 'Approved',
   Rejected = 'Rejected'
 }
+
+export type TournamentCategory = 'Men' | 'Women' | 'Mixed';

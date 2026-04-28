@@ -40,7 +40,7 @@ public class Basketball3x3EventService(
         oldEntity.IsPublic = newEntity.IsPublic;
         oldEntity.IsTeam = newEntity.IsTeam;
         oldEntity.SeasonId = newEntity.SeasonId;
-
+        oldEntity.Category = newEntity.Category;
     }
 
     public override async Task<Basketball3x3Event> GetByIdAsync(long id, CancellationToken cancellationToken = default)
