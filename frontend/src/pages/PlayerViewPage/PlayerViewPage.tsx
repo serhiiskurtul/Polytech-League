@@ -23,9 +23,12 @@ const PlayerViewPage = () => {
   const [error, setError] = useState<string | null>(null);
   const { setActiveConversationId, refreshConversations } = useChat();
   const { user } = useAuth();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const isAdmin = user?.role === 1 || user?.role === '1' || user?.role === 'Admin';
 
 
   useEffect(() => {
+
     const fetchPlayer = async () => {
       if (!id) return;
       
@@ -114,10 +117,8 @@ const PlayerViewPage = () => {
     }
   };
 
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const isAdmin = user?.role === 1 || user?.role === '1' || user?.role === 'Admin';
-
   const handleSaveProfile = async (data: Partial<PlayerDto>) => {
+
     if (!playerProfile?.id) return;
     try {
       await updatePlayer(playerProfile.id, { ...playerProfile, ...data });
