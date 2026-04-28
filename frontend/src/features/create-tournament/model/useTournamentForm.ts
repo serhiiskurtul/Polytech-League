@@ -161,7 +161,6 @@ export const useTournamentForm = () => {
 
     if (!formData.sport) errors.push('Оберіть вид спорту');
     if (!formData.name.trim()) errors.push('Назва турніру обов\'язкова');
-    if (!formData.description.trim()) errors.push('Опис турніру обов\'язковий');
     if (!formData.startDate) errors.push('Дата початку обов\'язкова');
     if (formData.level === 'CollegeGroup') {
       if (!formData.registrationDeadline) errors.push('Термін реєстрації обов\'язковий');
@@ -175,12 +174,6 @@ export const useTournamentForm = () => {
 
     if (formData.level === 'CollegeGroup' && !formData.isPublic && !formData.requireApproval) {
       errors.push('Оберіть тип реєстрації: Відкрите змагання або Модерація заявок');
-    }
-
-    if (['chess', 'checkers'].includes(formData.sport)) {
-      if (!formData.system) errors.push('Система проведення обов\'язкова');
-    } else {
-      if (!formData.tournamentType) errors.push('Система проведення обов\'язкова');
     }
 
     return errors;
@@ -216,7 +209,7 @@ export const useTournamentForm = () => {
         name: formData.name,
         date: combineDateTime(formData.startDate, formData.startTime),
         location: formData.location,
-        description: formData.description,
+        description: formData.description || null,
         refereeIds: formData.refereeIds.map(id => Number(id)) || [],
         level: formData.level,
         rules: formData.rules,
@@ -240,31 +233,31 @@ export const useTournamentForm = () => {
         case 'volleyball':
         case 'beach_volleyball':
         case 'badminton':
-          payload.tournamentType = formData.tournamentType;
+          payload.tournamentType = formData.tournamentType || null;
           break;
 
         case 'chess':
         case 'checkers':
-          payload.timeControl = formData.timeControl;
+          payload.timeControl = formData.timeControl || null;
           payload.participantsCount = formData.participantsCount;
-          payload.system = formData.system;
+          payload.system = formData.system || null;
           if (formData.sport === 'checkers') {
-            payload.variant = formData.variant;
+            payload.variant = formData.variant || null;
           }
           break;
 
         case 'table_tennis':
-          payload.tournamentType = formData.tournamentType;
+          payload.tournamentType = formData.tournamentType || null;
           payload.category = formData.category;
           break;
 
         case 'armwrestling':
-          payload.hand = formData.armHand;
-          payload.weightClass = formData.armWeightClass;
-          payload.category = formData.armCategory;
-          payload.timeControl = formData.timeControl;
+          payload.hand = formData.armHand || null;
+          payload.weightClass = formData.armWeightClass || null;
+          payload.category = formData.armCategory || null;
+          payload.timeControl = formData.timeControl || null;
           payload.participantsCount = formData.participantsCount;
-          payload.tournamentType = formData.tournamentType;
+          payload.tournamentType = formData.tournamentType || null;
           break;
       }
 

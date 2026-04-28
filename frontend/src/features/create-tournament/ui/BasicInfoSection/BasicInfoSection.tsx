@@ -114,7 +114,7 @@ const BasicInfoSection = ({ formData, handleInputChange }: BasicInfoSectionProps
         {formData.sport !== 'armwrestling' && (
         <div className={shared.formGroup}>
           <label className={shared.formLabel}>
-            <i className="fas fa-chess-board"></i> Система проведення *
+            <i className="fas fa-chess-board"></i> Система проведення
           </label>
 
           <select
@@ -155,7 +155,7 @@ const BasicInfoSection = ({ formData, handleInputChange }: BasicInfoSectionProps
         {/* Опис */}
         <div className={shared.formGroup}>
           <label className={shared.formLabel}>
-            <i className="fas fa-align-left"></i> Опис змагання *
+            <i className="fas fa-align-left"></i> Опис змагання
           </label>
 
           <textarea
