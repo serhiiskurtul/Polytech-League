@@ -33,8 +33,8 @@ public class EventConfiguration : IEntityTypeConfiguration<Event>
             .IsRequired();
 
         builder.Property(x => x.Description)
-            .HasColumnName("description")
-            .IsRequired();
+            .HasColumnName("description");
+
 
         builder.Property(x => x.Level)
             .HasColumnName("level")

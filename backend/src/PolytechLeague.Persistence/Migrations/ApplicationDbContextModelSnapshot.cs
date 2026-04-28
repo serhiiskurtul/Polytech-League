@@ -788,7 +788,6 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnName("date");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("description");
 
