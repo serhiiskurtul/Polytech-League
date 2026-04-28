@@ -1710,8 +1710,14 @@ const TournamentViewPage = () => {
                                 <th>Місце</th>
                                 <th>Учасник</th>
                                 <th>Група</th>
-                                <th>Рейтинг</th>
-                                <th>Очки</th>
+                                {tournament?.sport?.toLowerCase() === 'chess' ? (
+                                  <>
+                                    <th>Рейтинг</th>
+                                    <th>Очки</th>
+                                  </>
+                                ) : (
+                                  <th>Очки</th>
+                                )}
                                 {isAdmin && <th>Дії</th>}
                               </tr>
                             </thead>
@@ -1724,7 +1730,7 @@ const TournamentViewPage = () => {
                                         <input type="number" value={editingParticipantData.rank} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, rank: parseInt(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
                                       </td>
                                       <td>
-                                        {(tournament?.sport === 'chess' || tournament?.sport === 'checkers') ? (
+                                        {(tournament?.sport?.toLowerCase() === 'chess' || tournament?.sport?.toLowerCase() === 'checkers') ? (
                                           <div style={{ display: 'flex', gap: '4px' }}>
                                             <input 
                                               type="text" 
@@ -1752,7 +1758,7 @@ const TournamentViewPage = () => {
                                         )}
                                       </td>
                                       <td>
-                                        {(tournament?.sport === 'chess' || tournament?.sport === 'checkers') ? (
+                                        {(tournament?.sport?.toLowerCase() === 'chess' || tournament?.sport?.toLowerCase() === 'checkers') ? (
                                           <input 
                                             type="text" 
                                             value={editingParticipantData.groupName} 
@@ -1763,16 +1769,18 @@ const TournamentViewPage = () => {
                                           p.groupName || '—'
                                         )}
                                       </td>
-                                      {tournament?.sport === 'chess' ? (
+                                      {tournament?.sport?.toLowerCase() === 'chess' ? (
                                         <>
-                                          <td>{p.rating}</td>
+                                          <td>
+                                            <input type="number" step="1" value={editingParticipantData.rating || 0} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, rating: parseFloat(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
+                                          </td>
                                           <td>
                                             <input type="number" step="0.5" value={editingParticipantData.points} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, points: parseFloat(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
                                           </td>
                                         </>
                                       ) : (
                                         <>
-                                          {tournament?.sport === 'armwrestling' ? (
+                                          {tournament?.sport?.toLowerCase() === 'armwrestling' ? (
                                             <td>
                                               <input type="number" step="0.1" value={editingParticipantData.weight} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, weight: parseFloat(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
                                             </td>
@@ -1806,13 +1814,13 @@ const TournamentViewPage = () => {
                                         )}
                                       </td>
                                       <td>{p.groupName || '—'}</td>
-                                      {tournament?.sport === 'chess' ? (
+                                      {tournament?.sport?.toLowerCase() === 'chess' ? (
                                         <>
                                           <td>{p.rating}</td>
                                           <td><strong>{p.points}</strong></td>
                                         </>
                                       ) : (
-                                        <td><strong>{tournament?.sport === 'armwrestling' ? (p.weight + ' кг') : p.points}</strong></td>
+                                        <td><strong>{tournament?.sport?.toLowerCase() === 'armwrestling' ? (p.weight + ' кг') : p.points}</strong></td>
                                       )}
                                       {isAdmin && <td>
                                         {p.status === RegistrationStatus.Pending && (
