@@ -20,9 +20,10 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
     bio: initialData.bio || '',
     instagramUrl: initialData.instagramUrl || '',
     isExternal: initialData.isExternal || false,
-    futsalShirtNumber: initialData.futsalShirtNumber || '',
-    volleyballShirtNumber: initialData.volleyballShirtNumber || '',
-    basketballShirtNumber: initialData.basketballShirtNumber || ''
+    futsalShirtNumber: initialData.futsalShirtNumber !== null && initialData.futsalShirtNumber !== undefined ? initialData.futsalShirtNumber : '',
+    volleyballShirtNumber: initialData.volleyballShirtNumber !== null && initialData.volleyballShirtNumber !== undefined ? initialData.volleyballShirtNumber : '',
+    basketballShirtNumber: initialData.basketballShirtNumber !== null && initialData.basketballShirtNumber !== undefined ? initialData.basketballShirtNumber : ''
+
   });
 
   const [loading, setLoading] = useState(false);
@@ -42,10 +43,11 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
 
     const sanitizedData = {
       ...formData,
-      futsalShirtNumber: formData.futsalShirtNumber === '' ? null : parseInt(formData.futsalShirtNumber.toString()),
-      volleyballShirtNumber: formData.volleyballShirtNumber === '' ? null : parseInt(formData.volleyballShirtNumber.toString()),
-      basketballShirtNumber: formData.basketballShirtNumber === '' ? null : parseInt(formData.basketballShirtNumber.toString()),
+      futsalShirtNumber: (formData.futsalShirtNumber === '' || formData.futsalShirtNumber === null) ? null : parseInt(formData.futsalShirtNumber.toString()),
+      volleyballShirtNumber: (formData.volleyballShirtNumber === '' || formData.volleyballShirtNumber === null) ? null : parseInt(formData.volleyballShirtNumber.toString()),
+      basketballShirtNumber: (formData.basketballShirtNumber === '' || formData.basketballShirtNumber === null) ? null : parseInt(formData.basketballShirtNumber.toString()),
     };
+
 
     try {
       await onSave(sanitizedData);

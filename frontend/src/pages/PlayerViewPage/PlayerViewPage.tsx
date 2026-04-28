@@ -118,10 +118,27 @@ const PlayerViewPage = () => {
   };
 
   const handleSaveProfile = async (data: Partial<PlayerDto>) => {
-
     if (!playerProfile?.id) return;
     try {
-      await updatePlayer(playerProfile.id, { ...playerProfile, ...data });
+      // Create a clean update payload by excluding read-only/calculated fields
+      // This prevents 400 errors from backend validation of complex nested objects
+      const { 
+        achievements, 
+        sportStats, 
+        pointsBreakdown, 
+        globalRank, 
+        performanceScore, 
+        winsCount, 
+        matchesPlayed, 
+        goalsScored,
+        sports,
+        armwrestlingWeightClasses,
+        ...updatableFields 
+      } = playerProfile as any;
+
+      const payload = { ...updatableFields, ...data };
+      
+      await updatePlayer(playerProfile.id, payload);
       const updatedProfile = await getPlayerById(id!);
       setPlayerProfile(updatedProfile);
       toast.success('Профіль успішно оновлено');
@@ -130,6 +147,7 @@ const PlayerViewPage = () => {
       toast.error('Не вдалося оновити профіль');
     }
   };
+
 
   return (
     <div className={styles.playerViewPage}>
