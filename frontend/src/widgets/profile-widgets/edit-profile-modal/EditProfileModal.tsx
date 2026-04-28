@@ -7,10 +7,12 @@ interface EditProfileModalProps {
   onClose: () => void;
   onSave: (data: Partial<PlayerDto>) => Promise<void>;
   initialData: PlayerDto;
+  isAdmin?: boolean;
 }
 
-const EditProfileModal = ({ isOpen, onClose, onSave, initialData }: EditProfileModalProps) => {
+const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: EditProfileModalProps) => {
   const [formData, setFormData] = useState({
+
     group: initialData.group || '',
     studentId: initialData.studentId || '',
     faculty: initialData.faculty || '',
@@ -50,55 +52,60 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData }: EditProfileM
         
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.formBody}>
-            <div className={styles.formGroup}>
-              <label htmlFor="group">Група</label>
-              <input
-                type="text"
-                id="group"
-                name="group"
-                value={formData.group}
-                onChange={handleChange}
-                placeholder="Наприклад: ІТ-41"
-              />
-            </div>
+            {!isAdmin && (
+              <>
+                <div className={styles.formGroup}>
+                  <label htmlFor="group">Група</label>
+                  <input
+                    type="text"
+                    id="group"
+                    name="group"
+                    value={formData.group}
+                    onChange={handleChange}
+                    placeholder="Наприклад: ІТ-41"
+                  />
+                </div>
 
-            <div className={styles.formGroup}>
-              <label htmlFor="studentId">Студентський квиток (ID)</label>
-              <input
-                type="text"
-                id="studentId"
-                name="studentId"
-                value={formData.studentId}
-                onChange={handleChange}
-                placeholder="Наприклад: KB 12345678"
-              />
-            </div>
+                <div className={styles.formGroup}>
+                  <label htmlFor="studentId">Студентський квиток (ID)</label>
+                  <input
+                    type="text"
+                    id="studentId"
+                    name="studentId"
+                    value={formData.studentId}
+                    onChange={handleChange}
+                    placeholder="Наприклад: KB 12345678"
+                  />
+                </div>
+                
+                <div className={styles.formGroup}>
+                  <label htmlFor="faculty">Факультет</label>
+                  <input
+                    type="text"
+                    id="faculty"
+                    name="faculty"
+                    value={formData.faculty}
+                    onChange={handleChange}
+                    placeholder="Наприклад: ФІОТ"
+                  />
+                </div>
+                
+                <div className={styles.formGroup}>
+                  <label htmlFor="city">Місто</label>
+                  <input
+                    type="text"
+                    id="city"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    placeholder="Наприклад: Київ"
+                  />
+                </div>
+              </>
+            )}
             
             <div className={styles.formGroup}>
-              <label htmlFor="faculty">Факультет</label>
-              <input
-                type="text"
-                id="faculty"
-                name="faculty"
-                value={formData.faculty}
-                onChange={handleChange}
-                placeholder="Наприклад: ФІОТ"
-              />
-            </div>
-            
-            <div className={styles.formGroup}>
-              <label htmlFor="city">Місто</label>
-              <input
-                type="text"
-                id="city"
-                name="city"
-                value={formData.city}
-                onChange={handleChange}
-                placeholder="Наприклад: Київ"
-              />
-            </div>
-            
-            <div className={styles.formGroup}>
+
               <label htmlFor="bio">Про себе</label>
               <textarea
                 id="bio"

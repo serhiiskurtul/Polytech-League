@@ -16,6 +16,7 @@ interface UserData {
 
 interface ProfileHeaderProps {
   userData: UserData;
+  isAdmin?: boolean;
   onEdit?: () => void;
   onAvatarUpload?: () => void;
   onLogout?: () => void;
@@ -23,7 +24,7 @@ interface ProfileHeaderProps {
   onMessage?: () => void;
 }
 
-const ProfileHeader = ({ userData, onEdit, onAvatarUpload, onLogout, onCompare, onMessage }: ProfileHeaderProps) => {
+const ProfileHeader = ({ userData, isAdmin, onEdit, onAvatarUpload, onLogout, onCompare, onMessage }: ProfileHeaderProps) => {
   return (
     <div className={styles.profileHeader}>
       <div className={styles.profileHeaderCard}>
@@ -55,6 +56,7 @@ const ProfileHeader = ({ userData, onEdit, onAvatarUpload, onLogout, onCompare, 
             <div className={styles.profileBadges}>
               {userData.badges.map((badge, index) => (
                 <span key={index} className={`${styles.badge} ${
+                  badge === 'Адміністратор' ? styles.badgeAccent :
                   index === 0 ? styles.badgePrimary : 
                   index === 1 ? styles.badgeSuccess : 
                   styles.badgeAccent
@@ -77,7 +79,7 @@ const ProfileHeader = ({ userData, onEdit, onAvatarUpload, onLogout, onCompare, 
                   <i className="fas fa-edit"></i> Редагувати профіль
                 </button>
               )}
-              {onCompare && (
+              {!isAdmin && onCompare && (
                 <button className={styles.compareBtn} onClick={onCompare}>
                   <i className="fas fa-arrows-left-right"></i> Порівняти
                 </button>
@@ -99,28 +101,31 @@ const ProfileHeader = ({ userData, onEdit, onAvatarUpload, onLogout, onCompare, 
             {userData.bio}
           </p>
           
-          <div className={styles.profileDetails}>
-            <div className={styles.detailItem}>
-              <span className={styles.detailLabel}><i className="fas fa-users-rectangle"></i> Група</span>
-              <span className={styles.detailValue}>{userData.group}</span>
+          {!isAdmin && (
+            <div className={styles.profileDetails}>
+              <div className={styles.detailItem}>
+                <span className={styles.detailLabel}><i className="fas fa-users-rectangle"></i> Група</span>
+                <span className={styles.detailValue}>{userData.group}</span>
+              </div>
+              <div className={styles.detailItem}>
+                <span className={styles.detailLabel}><i className="fas fa-id-card"></i> Студ. квиток</span>
+                <span className={styles.detailValue}>{userData.studentId}</span>
+              </div>
+              <div className={styles.detailItem}>
+                <span className={styles.detailLabel}><i className="fas fa-graduation-cap"></i> Факультет</span>
+                <span className={styles.detailValue}>{userData.faculty}</span>
+              </div>
+              <div className={styles.detailItem}>
+                <span className={styles.detailLabel}><i className="fas fa-map-marker-alt"></i> Місто</span>
+                <span className={styles.detailValue}>{userData.city}</span>
+              </div>
             </div>
-            <div className={styles.detailItem}>
-              <span className={styles.detailLabel}><i className="fas fa-id-card"></i> Студ. квиток</span>
-              <span className={styles.detailValue}>{userData.studentId}</span>
-            </div>
-            <div className={styles.detailItem}>
-              <span className={styles.detailLabel}><i className="fas fa-graduation-cap"></i> Факультет</span>
-              <span className={styles.detailValue}>{userData.faculty}</span>
-            </div>
-            <div className={styles.detailItem}>
-              <span className={styles.detailLabel}><i className="fas fa-map-marker-alt"></i> Місто</span>
-              <span className={styles.detailValue}>{userData.city}</span>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
+
 
 export default ProfileHeader;

@@ -92,6 +92,8 @@ const ProfilePage = () => {
   };
 
 
+  const isAdmin = user?.role === 1 || user?.role === '1' || user?.role === 'Admin';
+  
   const userData = {
     name: user ? `${user.firstName} ${user.lastName}` : 'Користувач',
     group: playerProfile?.group || '-',
@@ -100,7 +102,7 @@ const ProfilePage = () => {
     phone: '-', 
     city: playerProfile?.city || '-',
     bio: playerProfile?.bio || '-',
-    badges: ['Студент', 'Учасник'],
+    badges: isAdmin ? ['Адміністратор'] : ['Студент', 'Учасник'],
     instagramUrl: playerProfile?.instagramUrl,
     photoUrl: playerProfile?.photoUrl,
     globalRank: playerProfile?.globalRank
@@ -192,12 +194,13 @@ const ProfilePage = () => {
       <div className={styles.container}>
         <ProfileHeader 
           userData={userData} 
+          isAdmin={isAdmin}
           onEdit={handleEditProfile}
           onAvatarUpload={handleAvatarUpload}
           onLogout={logout}
         />
         
-        {archivalMatches.length > 0 && (
+        {archivalMatches.length > 0 && !isAdmin && (
           <div className={`${styles.card} ${styles.archivalMatchCard}`} style={{ borderLeft: '4px solid #3b82f6', background: '#eff6ff' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
               <div style={{ fontSize: '24px', color: '#3b82f6' }}>
@@ -242,14 +245,16 @@ const ProfilePage = () => {
           </div>
         )}
         
-        <div className={styles.profileContent}>
-
-          <div className={styles.mainContent}>
-            <UserAchievements achievements={playerProfile?.achievements || []} />
-            <ProfileStats stats={stats} />
+        {!isAdmin && (
+          <div className={styles.profileContent}>
+            <div className={styles.mainContent}>
+              <UserAchievements achievements={playerProfile?.achievements || []} />
+              <ProfileStats stats={stats} />
+            </div>
           </div>
-        </div>
+        )}
       </div>
+
 
       <input 
         type="file" 
@@ -265,8 +270,10 @@ const ProfilePage = () => {
           onClose={() => setIsEditModalOpen(false)}
           onSave={handleSaveProfile}
           initialData={playerProfile}
+          isAdmin={isAdmin}
         />
       )}
+
     </div>
   );
 };
