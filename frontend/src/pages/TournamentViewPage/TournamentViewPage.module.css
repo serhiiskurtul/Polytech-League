@@ -531,10 +531,11 @@
       font-size: 13px;
   }
 
-  .dataTable th:nth-child(n+4),
-  .dataTable td:nth-child(n+4) {
-    display: none; /* Hide less important columns on mobile */
+  /* Allow all columns to be visible and use horizontal scroll if needed */
+  .tableWrapper {
+    -webkit-overflow-scrolling: touch;
   }
+
 }
 
 @media (max-width: 480px) {
