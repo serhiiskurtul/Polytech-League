@@ -12,7 +12,11 @@ interface UserData {
   instagramUrl?: string | null;
   photoUrl?: string | null;
   globalRank?: number;
+  futsalShirtNumber?: number | null;
+  volleyballShirtNumber?: number | null;
+  basketballShirtNumber?: number | null;
 }
+
 
 interface ProfileHeaderProps {
   userData: UserData;
@@ -119,6 +123,24 @@ const ProfileHeader = ({ userData, isAdmin, onEdit, onAvatarUpload, onLogout, on
                 <span className={styles.detailLabel}><i className="fas fa-map-marker-alt"></i> Місто</span>
                 <span className={styles.detailValue}>{userData.city}</span>
               </div>
+              {userData.futsalShirtNumber !== null && userData.futsalShirtNumber !== undefined && (
+                <div className={styles.detailItem}>
+                  <span className={styles.detailLabel}><i className="fas fa-tshirt" style={{ color: '#e11d48' }}></i> № Футзал</span>
+                  <span className={styles.detailValue} style={{ fontWeight: 'bold' }}>{userData.futsalShirtNumber}</span>
+                </div>
+              )}
+              {userData.volleyballShirtNumber !== null && userData.volleyballShirtNumber !== undefined && (
+                <div className={styles.detailItem}>
+                  <span className={styles.detailLabel}><i className="fas fa-tshirt" style={{ color: '#2563eb' }}></i> № Волейбол</span>
+                  <span className={styles.detailValue} style={{ fontWeight: 'bold' }}>{userData.volleyballShirtNumber}</span>
+                </div>
+              )}
+              {userData.basketballShirtNumber !== null && userData.basketballShirtNumber !== undefined && (
+                <div className={styles.detailItem}>
+                  <span className={styles.detailLabel}><i className="fas fa-tshirt" style={{ color: '#f59e0b' }}></i> № Баскетбол</span>
+                  <span className={styles.detailValue} style={{ fontWeight: 'bold' }}>{userData.basketballShirtNumber}</span>
+                </div>
+              )}
             </div>
           )}
         </div>

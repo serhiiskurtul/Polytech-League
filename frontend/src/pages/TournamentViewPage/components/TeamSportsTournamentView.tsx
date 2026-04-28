@@ -823,7 +823,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                            )}
                            {match.goals?.filter((g: any) => match.homeRoster?.some((p: any) => p.id === g.playerId)).map((g: any) => (
                               <span key={g.id} className={styles.scorerItem}>
-                                {g.player?.lastName} ({g.goalsCount})
+                                {g.player?.futsalShirtNumber ? `№${g.player.futsalShirtNumber} ` : ''}{g.player?.lastName} ({g.goalsCount})
                               </span>
                            ))}
                         </div>
@@ -835,7 +835,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                            )}
                            {match.goals?.filter((g: any) => match.awayRoster?.some((p: any) => p.id === g.playerId)).map((g: any) => (
                               <span key={g.id} className={styles.scorerItem}>
-                                {g.player?.lastName} ({g.goalsCount})
+                                {g.player?.futsalShirtNumber ? `№${g.player.futsalShirtNumber} ` : ''}{g.player?.lastName} ({g.goalsCount})
                               </span>
                            ))}
                         </div>
@@ -1160,7 +1160,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                           ? selectedMatchForScorers.homeRoster 
                           : details.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players || []
                       ).map((p: any) => (
-                        <option key={p.id} value={p.id}>{p.lastName} {p.firstName}</option>
+                        <option key={p.id} value={p.id}>
+                          {p.futsalShirtNumber ? `№${p.futsalShirtNumber} ` : ''}{p.lastName} {p.firstName}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -1170,7 +1172,10 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         : details.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players || []
                     ).map((player: any) => (
                       <div key={player.id} className={styles.scorerInputItem}>
-                        <span className={styles.playerNameMini}>{player.lastName} {player.firstName[0]}.</span>
+                        <span className={styles.playerNameMini}>
+                          {player.futsalShirtNumber ? `№${player.futsalShirtNumber} ` : ''}
+                          {player.lastName} {player.firstName[0]}.
+                        </span>
                         <input 
                           type="number" 
                           min="0"
@@ -1205,7 +1210,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                           ? selectedMatchForScorers.awayRoster 
                           : details.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players || []
                       ).map((p: any) => (
-                        <option key={p.id} value={p.id}>{p.lastName} {p.firstName}</option>
+                        <option key={p.id} value={p.id}>
+                          {p.futsalShirtNumber ? `№${p.futsalShirtNumber} ` : ''}{p.lastName} {p.firstName}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -1215,7 +1222,10 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         : details.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players || []
                     ).map((player: any) => (
                       <div key={player.id} className={styles.scorerInputItem}>
-                        <span className={styles.playerNameMini}>{player.lastName} {player.firstName[0]}.</span>
+                        <span className={styles.playerNameMini}>
+                          {player.futsalShirtNumber ? `№${player.futsalShirtNumber} ` : ''}
+                          {player.lastName} {player.firstName[0]}.
+                        </span>
                         <input 
                           type="number" 
                           min="0"
