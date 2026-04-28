@@ -251,7 +251,8 @@ public class PlayerService : IPlayerService
             var volleyballTeams = await _dbContext.VolleyballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
             var bballTeams = await _dbContext.Basketball3x3Teams.Include(t => t.Event).Include(t => t.Players).Where(t => t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
             var beachVTeams = await _dbContext.BeachVolleyballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
-
+            var ttTeams = await _dbContext.TableTennisTeams.Include(t => t.Event).Include(t => t.Players).Where(t => t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
+            var badTeams = await _dbContext.BadmintonTeams.Include(t => t.Event).Where(t => (t.Player1Id.HasValue && playerIds.Contains(t.Player1Id.Value)) || (t.Player2Id.HasValue && playerIds.Contains(t.Player2Id.Value))).ToListAsync(cancellationToken);
             // 3. Match Stats
             var cwS = await _dbContext.ChessGames.Where(g => g.WhitePlayerId.HasValue && playerIds.Contains(g.WhitePlayerId.Value)).GroupBy(g => g.WhitePlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.WhiteWin) }).ToListAsync(cancellationToken);
             var cbS = await _dbContext.ChessGames.Where(g => g.BlackPlayerId.HasValue && playerIds.Contains(g.BlackPlayerId.Value)).GroupBy(g => g.BlackPlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.BlackWin) }).ToListAsync(cancellationToken);
@@ -381,6 +382,16 @@ public class PlayerService : IPlayerService
                     int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
                     achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "beach_volleyball", Date = t.Event.Date, Rank = r, TournamentId = t.EventId, Result = GetResultLabel(r) });
                     sportTypes.Add("beach_volleyball");
+                }
+                foreach (var t in ttTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
+                    int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
+                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "table_tennis", Date = t.Event.Date, Rank = r, TournamentId = t.EventId, Result = GetResultLabel(r) });
+                    sportTypes.Add("table_tennis");
+                }
+                foreach (var t in badTeams.Where(x => (x.Player1Id == playerId || x.Player2Id == playerId) && x.Event != null && x.EventId.HasValue)) {
+                    int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
+                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "badminton", Date = t.Event.Date, Rank = r, TournamentId = t.EventId.Value, Result = GetResultLabel(r) });
+                    sportTypes.Add("badminton");
                 }
 
                 dto.Achievements = achievements;
@@ -769,6 +780,28 @@ public class PlayerService : IPlayerService
                 if (t.Event == null) continue;
                 int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
                 achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "beach_volleyball", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId, Result = rank > 0 ? $"{rank} місце ({t.Name})" : $"Учасник ({t.Name})" });
+            }
+
+            // Table Tennis Teams
+            var ttTeams = await _dbContext.TableTennisTeams
+                .Include(t => t.Event)
+                .Where(t => t.Players != null && t.Players.Any(pl => pl.Id == playerId))
+                .ToListAsync(cancellationToken);
+            foreach (var t in ttTeams) {
+                if (t.Event == null) continue;
+                int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
+                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "table_tennis", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId, Result = rank > 0 ? $"{rank} місце ({t.Name})" : $"Учасник ({t.Name})" });
+            }
+
+            // Badminton Teams
+            var badTeams = await _dbContext.BadmintonTeams
+                .Include(t => t.Event)
+                .Where(t => t.Player1Id == playerId || t.Player2Id == playerId)
+                .ToListAsync(cancellationToken);
+            foreach (var t in badTeams) {
+                if (t.Event == null || !t.EventId.HasValue) continue;
+                int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
+                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "badminton", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId.Value, Result = rank > 0 ? $"{rank} місце ({t.Name})" : $"Учасник ({t.Name})" });
             }
         } catch (Exception ex) {
             _logger.LogError(ex, "Error populating other team achievements for player {PlayerId}", playerId);
