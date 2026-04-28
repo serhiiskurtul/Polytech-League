@@ -39,8 +39,16 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    const sanitizedData = {
+      ...formData,
+      futsalShirtNumber: formData.futsalShirtNumber === '' ? null : parseInt(formData.futsalShirtNumber.toString()),
+      volleyballShirtNumber: formData.volleyballShirtNumber === '' ? null : parseInt(formData.volleyballShirtNumber.toString()),
+      basketballShirtNumber: formData.basketballShirtNumber === '' ? null : parseInt(formData.basketballShirtNumber.toString()),
+    };
+
     try {
-      await onSave(formData);
+      await onSave(sanitizedData);
       onClose();
     } catch (error) {
       console.error('Failed to save profile:', error);
@@ -48,6 +56,7 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
       setLoading(false);
     }
   };
+
 
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
