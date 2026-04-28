@@ -167,7 +167,10 @@ public class PlayerService : IPlayerService
         if (dto.BeachVolleyballShirtNumber.HasValue) player.BeachVolleyballShirtNumber = dto.BeachVolleyballShirtNumber;
         if (dto.BeachVolleyballTeamId.HasValue) player.BeachVolleyballTeamId = dto.BeachVolleyballTeamId;
 
+        player.IsExternal = dto.IsExternal;
+
         await _dbContext.SaveChangesAsync(cancellationToken);
+
     }
 
     public async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
@@ -217,7 +220,9 @@ public class PlayerService : IPlayerService
             var players = await _dbContext.Players
                 .Include(p => p.User)
                 .Where(p => p.User == null || p.User.Role != UserRole.Admin)
+                .Where(p => !p.IsExternal)
                 .ToListAsync(cancellationToken);
+
             
             if (!players.Any()) return Enumerable.Empty<PlayerDto>();
 

@@ -18,16 +18,20 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
     faculty: initialData.faculty || '',
     city: initialData.city || '',
     bio: initialData.bio || '',
-    instagramUrl: initialData.instagramUrl || ''
+    instagramUrl: initialData.instagramUrl || '',
+    isExternal: initialData.isExternal || false
   });
+
   const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, value, type } = e.target as HTMLInputElement;
+    const val = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
+    setFormData(prev => ({ ...prev, [name]: val }));
   };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,7 +134,24 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
                 />
               </div>
             </div>
+
+            {isAdmin && (
+              <div className={styles.formGroup} style={{ flexDirection: 'row', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
+                <input
+                  type="checkbox"
+                  id="isExternal"
+                  name="isExternal"
+                  checked={formData.isExternal}
+                  onChange={handleChange}
+                  style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+                />
+                <label htmlFor="isExternal" style={{ margin: 0, cursor: 'pointer', fontWeight: '600', color: '#e11d48' }}>
+                  Студент іншого закладу (не показувати в рейтингу)
+                </label>
+              </div>
+            )}
           </div>
+
           
           <div className={styles.modalActions}>
             <button type="button" className={styles.cancelBtn} onClick={onClose} disabled={loading}>

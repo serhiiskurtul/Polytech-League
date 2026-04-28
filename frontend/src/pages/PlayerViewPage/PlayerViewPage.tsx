@@ -7,7 +7,8 @@ import {
 } from '@/widgets/profile-widgets';
 import styles from './PlayerViewPage.module.css';
 import { PlayerDto } from '@/shared/types/player.types';
-import { getPlayerById } from '@/shared/api/players.api';
+import { getPlayerById, updatePlayer } from '@/shared/api/players.api';
+import EditProfileModal from '@/widgets/profile-widgets/edit-profile-modal/EditProfileModal';
 import { toast } from 'react-hot-toast';
 import { useChat } from '@/app/providers/ChatProvider';
 import { chatApi } from '@/shared/api/chat.api';
@@ -76,11 +77,12 @@ const PlayerViewPage = () => {
     city: playerProfile.city || '—',
     joinDate: '—', // Could fetch from user data if needed
     bio: playerProfile.bio || 'Інформація відсутня',
-    badges: ['Гравець'],
+    badges: playerProfile.isExternal ? ['Гість'] : ['Гравець'],
     instagramUrl: playerProfile.instagramUrl,
     photoUrl: playerProfile.photoUrl,
     globalRank: playerProfile.globalRank
   };
+
 
   const stats = {
     matchesPlayed: playerProfile.matchesPlayed || 0,
@@ -112,6 +114,22 @@ const PlayerViewPage = () => {
     }
   };
 
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const isAdmin = user?.role === 1 || user?.role === '1' || user?.role === 'Admin';
+
+  const handleSaveProfile = async (data: Partial<PlayerDto>) => {
+    if (!playerProfile?.id) return;
+    try {
+      await updatePlayer(playerProfile.id, { ...playerProfile, ...data });
+      const updatedProfile = await getPlayerById(id!);
+      setPlayerProfile(updatedProfile);
+      toast.success('Профіль успішно оновлено');
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      toast.error('Не вдалося оновити профіль');
+    }
+  };
+
   return (
     <div className={styles.playerViewPage}>
       <div className={styles.container}>
@@ -119,6 +137,8 @@ const PlayerViewPage = () => {
           userData={userData} 
           onCompare={handleCompare} 
           onMessage={user?.id !== playerProfile?.userId ? handleMessage : undefined} 
+          onEdit={isAdmin ? () => setIsEditModalOpen(true) : undefined}
+          isAdmin={playerProfile.isExternal} // Show as external if flagged
         />
         
         <div className={styles.profileContent}>
@@ -128,8 +148,19 @@ const PlayerViewPage = () => {
           </div>
         </div>
       </div>
+
+      {playerProfile && (
+        <EditProfileModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={handleSaveProfile}
+          initialData={playerProfile}
+          isAdmin={isAdmin}
+        />
+      )}
     </div>
   );
 };
+
 
 export default PlayerViewPage;

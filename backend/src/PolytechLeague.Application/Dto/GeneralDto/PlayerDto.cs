@@ -60,6 +60,8 @@ public class PlayerDto
     public int? BeachVolleyballShirtNumber { get; set; }
     public long? BeachVolleyballTeamId { get; set; }
 
+    public bool IsExternal { get; set; }
+
     public List<AchievementDto> Achievements { get; set; } = new();
     public List<string> Sports { get; set; } = new();
 
@@ -130,6 +132,7 @@ public static class PlayerDtoExtensions
             BasketballTeamId = player.BasketballTeamId,
             BeachVolleyballShirtNumber = player.BeachVolleyballShirtNumber,
             BeachVolleyballTeamId = player.BeachVolleyballTeamId,
+            IsExternal = player.IsExternal,
             Achievements = new List<AchievementDto>(),
             MatchesPlayed = 0,
             WinsCount = 0,
@@ -177,7 +180,9 @@ public static class PlayerDtoExtensions
             BasketballShirtNumber = dto.BasketballShirtNumber,
             BasketballTeamId = dto.BasketballTeamId,
             BeachVolleyballShirtNumber = dto.BeachVolleyballShirtNumber,
-            BeachVolleyballTeamId = dto.BeachVolleyballTeamId
+            BeachVolleyballTeamId = dto.BeachVolleyballTeamId,
+            IsExternal = dto.IsExternal
         };
     }
 }
+

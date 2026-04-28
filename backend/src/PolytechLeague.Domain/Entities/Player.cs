@@ -47,4 +47,6 @@ public class Player : Person
 
     public int? BeachVolleyballShirtNumber { get; set; }
     public long? BeachVolleyballTeamId { get; set; }
+
+    public bool IsExternal { get; set; } = false;
 }

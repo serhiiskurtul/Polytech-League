@@ -2159,6 +2159,9 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<string>("InstagramUrl")
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsExternal")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("SpecialtyCode")
                         .HasColumnType("integer");
 
