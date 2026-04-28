@@ -6,7 +6,6 @@ public class ArmwrestlingEvent : Event
 {
     public ArmwrestlingHand Hand { get; set; }
     public ArmwrestlingWeightClass WeightClass { get; set; }
-    public ArmwrestlingCategory Category { get; set; }
     public string? TimeControl { get; set; }
     public int ParticipantsCount { get; set; }
     public ArmwrestlingTournamentType? TournamentType { get; set; } = ArmwrestlingTournamentType.SingleElimination;

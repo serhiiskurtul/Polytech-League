@@ -366,6 +366,33 @@
   font-weight: 600;
 }
 
+.tournament-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.badge-item {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge-level {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--primary);
+}
+
+.badge-category {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+}
+
 .tournament-title {
   font-size: 20px;
   font-weight: 700;
@@ -554,6 +581,22 @@
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+.tournament-level-badge, .tournament-category-badge {
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+}
+
+.tournament-level-badge {
+  color: var(--primary);
+}
+
+.tournament-category-badge {
+  color: #8b5cf6;
 }
 
 .list-details {

@@ -12,6 +12,7 @@ public class EventConfiguration : IEntityTypeConfiguration<Event>
 
         builder.HasIndex(x => x.Date).HasDatabaseName("IX_events_date");
         builder.HasIndex(x => x.Level).HasDatabaseName("IX_events_level");
+        builder.HasIndex(x => x.Category).HasDatabaseName("IX_events_category");
 
         builder.Property(x => x.Id).HasColumnName("id");
 
@@ -37,6 +38,10 @@ public class EventConfiguration : IEntityTypeConfiguration<Event>
 
         builder.Property(x => x.Level)
             .HasColumnName("level")
+            .IsRequired();
+            
+        builder.Property(x => x.Category)
+            .HasColumnName("category")
             .IsRequired();
 
         builder.Property(x => x.RefereeIds)

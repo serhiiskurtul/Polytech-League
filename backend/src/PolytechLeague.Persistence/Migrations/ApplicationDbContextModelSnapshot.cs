@@ -20,7 +20,6 @@ namespace PolytechLeague.Persistence.Migrations
                 .HasAnnotation("ProductVersion", "9.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "armwrestling_category", new[] { "men", "women", "open" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "armwrestling_hand", new[] { "left", "right", "both" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "armwrestling_weight_class", new[] { "under60kg", "under70kg", "under80kg", "under90kg", "plus90kg" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "badminton_tournament_type", new[] { "single_elimination", "double_elimination", "round_robin", "groups_playoff", "swiss" });
@@ -30,11 +29,11 @@ namespace PolytechLeague.Persistence.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "checkers_variant", new[] { "russian", "international", "english" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "chess_system", new[] { "swiss", "round_robin", "knockout" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "competition_level", new[] { "college_group", "regional", "national" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "event_category", new[] { "men", "women", "mixed" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "futsal_position", new[] { "goalkeeper", "defender", "winger", "forward" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "game_result", new[] { "white_win", "black_win", "draw", "not_played" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "notification_type", new[] { "system", "tournament", "achievement", "match", "team" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "registration_status", new[] { "pending", "approved", "rejected" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "table_tennis_category", new[] { "men", "women", "mixed" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "table_tennis_hand", new[] { "left", "right", "both" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "table_tennis_tournament_type", new[] { "single_elimination", "double_elimination", "round_robin" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "user_role", new[] { "none", "user", "admin" });
@@ -780,6 +779,10 @@ namespace PolytechLeague.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<int>("Category")
+                        .HasColumnType("integer")
+                        .HasColumnName("category");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date");
@@ -858,6 +861,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Category")
+                        .HasDatabaseName("IX_events_category");
 
                     b.HasIndex("Date")
                         .HasDatabaseName("IX_events_date");
@@ -1763,10 +1769,6 @@ namespace PolytechLeague.Persistence.Migrations
                 {
                     b.HasBaseType("PolytechLeague.Domain.Entities.Event");
 
-                    b.Property<int>("Category")
-                        .HasColumnType("integer")
-                        .HasColumnName("category");
-
                     b.Property<int>("Hand")
                         .HasColumnType("integer")
                         .HasColumnName("hand");
@@ -1783,9 +1785,6 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<int>("WeightClass")
                         .HasColumnType("integer")
                         .HasColumnName("weight_class");
-
-                    b.HasIndex("Category")
-                        .HasDatabaseName("IX_arm_events_category");
 
                     b.HasIndex("Hand")
                         .HasDatabaseName("IX_arm_events_hand");
@@ -1995,10 +1994,6 @@ namespace PolytechLeague.Persistence.Migrations
                 {
                     b.HasBaseType("PolytechLeague.Domain.Entities.Event");
 
-                    b.Property<int>("Category")
-                        .HasColumnType("integer")
-                        .HasColumnName("category");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -2022,9 +2017,6 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
-
-                    b.HasIndex("Category")
-                        .HasDatabaseName("IX_tt_events_category");
 
                     b.HasIndex("FirstPlaceTeamId");
 

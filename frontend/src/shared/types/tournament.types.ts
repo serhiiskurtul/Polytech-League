@@ -17,7 +17,8 @@ export interface Tournament {
   registrationEnd?: string;
   endDate?: string;
   isModerated?: boolean;
-  isPublic?: boolean;
+  level: string;
+  category: string;
 }
 
 export interface RecentMatch {

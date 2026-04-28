@@ -96,7 +96,9 @@ public class TournamentService : ITournamentService
             Status = GetStatus(e.Date),
             Date = e.Date.ToString("dd.MM.yyyy"),
             Location = e.Location,
-            Description = e.Description,
+            Description = e.Description ?? string.Empty,
+            Level = GetLevelName(e.Level),
+            Category = GetCategoryName(e.Category),
             Participants = 0,
             Teams = 0,
             Prize = "Призи та кубки",
@@ -143,9 +145,11 @@ public class TournamentService : ITournamentService
             Title = e.Name,
             Sport = GetSportName(e),
             Status = GetStatus(e.Date),
-            Date = e.Date.ToString("dd.MM.yyyy"),
+            Date = e.Date.ToString("dd MMMM, yyyy", new System.Globalization.CultureInfo("uk-UA")),
             Location = e.Location,
-            Description = e.Description,
+            Description = e.Description ?? string.Empty,
+            Level = GetLevelName(e.Level),
+            Category = GetCategoryName(e.Category),
             Participants = 0, // Need to implement counting
             Teams = 0, // Need to implement counting
             Prize = "Призи та кубки",
@@ -543,5 +547,27 @@ public class TournamentService : ITournamentService
             .OrderByDescending(r => DateTime.ParseExact(r.Date, "dd.MM.yyyy", null))
             .Take(count)
             .ToList();
+    }
+
+    private string GetLevelName(CompetitionLevel level)
+    {
+        return level switch
+        {
+            CompetitionLevel.CollegeGroup => "Міжгруповий",
+            CompetitionLevel.Regional => "Регіональний",
+            CompetitionLevel.National => "Всеукраїнський",
+            _ => "Невідомо"
+        };
+    }
+
+    private string GetCategoryName(EventCategory category)
+    {
+        return category switch
+        {
+            EventCategory.Men => "Чоловіки",
+            EventCategory.Women => "Жінки",
+            EventCategory.Mixed => "Змішаний",
+            _ => "Змішаний"
+        };
     }
 }

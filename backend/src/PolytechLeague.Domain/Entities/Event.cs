@@ -9,6 +9,7 @@ public abstract class Event
     public ICollection<EventPhotos>? Photos { get; set; }
     public required ICollection<long> RefereeIds { get; set; }
     public required CompetitionLevel Level { get; set; }
+    public EventCategory Category { get; set; } = EventCategory.Mixed;
     public string? Description { get; set; }
 
     public DateTime? RegistrationStart { get; set; }
@@ -38,6 +39,13 @@ public enum CompetitionLevel
     CollegeGroup,   // між групами коледжу
     Regional,       // обласні змагання
     National        // всеукраїнські
+}
+
+public enum EventCategory
+{
+    Men,
+    Women,
+    Mixed
 }
 
 

@@ -11,14 +11,9 @@ public class TableTennisEventConfiguration : IEntityTypeConfiguration<TableTenni
         builder.ToTable("table_tennis_events");
 
         builder.HasIndex(x => x.TournamentType).HasDatabaseName("IX_tt_events_type");
-        builder.HasIndex(x => x.Category).HasDatabaseName("IX_tt_events_category");
 
         builder.Property(x => x.TournamentType)
             .HasColumnName("tournament_type")
-            .IsRequired();
-
-        builder.Property(x => x.Category)
-            .HasColumnName("category")
             .IsRequired();
 
         builder.Property(x => x.CreatedAt)

@@ -26,7 +26,7 @@ public class TableTennisEventRequest
     public TableTennisTournamentType? TournamentType { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public TableTennisCategory Category { get; set; }
+    public EventCategory Category { get; set; }
 
 
     public string? Rules { get; set; }
@@ -74,7 +74,7 @@ public class TableTennisEventResponse
     public TableTennisTournamentType? TournamentType { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public TableTennisCategory? Category { get; set; }
+    public EventCategory? Category { get; set; }
 
     
     public PlayerDto? FirstPlace { get; set; }

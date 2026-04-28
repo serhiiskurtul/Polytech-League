@@ -13,6 +13,8 @@ interface TournamentUI {
   progress?: number;
   time?: string;
   rawDate?: string;
+  level: string;
+  category: string;
 }
 
 interface TournamentCardProps {
@@ -101,6 +103,17 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
 
         <h3 className="tournament-title">{tournament.title}</h3>
         
+        <div className="tournament-badges">
+          <div className="badge-item badge-level">
+            <i className="fas fa-layer-group"></i>
+            <span>{tournament.level}</span>
+          </div>
+          <div className="badge-item badge-category">
+            <i className="fas fa-users"></i>
+            <span>{tournament.category}</span>
+          </div>
+        </div>
+
         <p className="tournament-description">{tournament.description}</p>
 
         <div className="tournament-details">
@@ -148,6 +161,12 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
               </span>
               <span className="tournament-location">
                 <i className="fas fa-map-marker-alt"></i> {tournament.location}
+              </span>
+              <span className="tournament-level-badge">
+                 <i className="fas fa-layer-group"></i> {tournament.level}
+              </span>
+              <span className="tournament-category-badge">
+                 <i className="fas fa-users"></i> {tournament.category}
               </span>
             </div>
           </div>

@@ -11,6 +11,8 @@ public class TournamentDto
     public required string Date { get; set; }
     public required string Location { get; set; }
     public required string Description { get; set; }
+    public required string Level { get; set; }
+    public required string Category { get; set; }
     public int Participants { get; set; }
     public int Teams { get; set; }
     public string? Prize { get; set; }

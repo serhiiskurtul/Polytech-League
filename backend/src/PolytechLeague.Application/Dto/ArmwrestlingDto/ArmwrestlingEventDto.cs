@@ -30,7 +30,7 @@ public class ArmwrestlingEventRequest
     public required ArmwrestlingWeightClass WeightClass { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required ArmwrestlingCategory Category { get; set; }
+    public required EventCategory Category { get; set; }
 
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
@@ -76,7 +76,7 @@ public class ArmwrestlingEventResponse
     public required ArmwrestlingWeightClass WeightClass { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required ArmwrestlingCategory Category { get; set; }
+    public required EventCategory Category { get; set; }
     
     public ICollection<ArmwrestlingMatchResponse>? Matches { get; set; }
 
