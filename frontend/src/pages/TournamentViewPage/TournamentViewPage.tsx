@@ -135,6 +135,13 @@ const TournamentViewPage = () => {
     faculty?: string;
   };
 
+  // Centralized sport checks
+  const sportKey = tournament?.sport?.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') || '';
+  const isChess = sportKey === 'chess';
+  const isCheckers = sportKey === 'checkers';
+  const isBadminton = sportKey === 'badminton';
+  const isTableTennis = sportKey === 'tabletennis' || sportKey === 'table_tennis';
+
   // Admin Form States
   const [newPlayer, setNewPlayer] = useState({
     firstName: '',
@@ -1710,7 +1717,7 @@ const TournamentViewPage = () => {
                                 <th>Місце</th>
                                 <th>Учасник</th>
                                 <th>Група</th>
-                                {tournament?.sport?.toLowerCase() === 'chess' ? (
+                                {isChess ? (
                                   <>
                                     <th>Рейтинг</th>
                                     <th>Очки</th>
@@ -1780,7 +1787,7 @@ const TournamentViewPage = () => {
                                         </>
                                       ) : (
                                         <>
-                                          {tournament?.sport?.toLowerCase() === 'armwrestling' ? (
+                                          {sportKey === 'armwrestling' ? (
                                             <td>
                                               <input type="number" step="0.1" value={editingParticipantData.weight} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, weight: parseFloat(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
                                             </td>
@@ -1814,13 +1821,13 @@ const TournamentViewPage = () => {
                                         )}
                                       </td>
                                       <td>{p.groupName || '—'}</td>
-                                      {tournament?.sport?.toLowerCase() === 'chess' ? (
+                                      {isChess ? (
                                         <>
-                                          <td>{p.rating}</td>
-                                          <td><strong>{p.points}</strong></td>
+                                          <td>{p.rating ?? 0}</td>
+                                          <td><strong>{p.points ?? 0}</strong></td>
                                         </>
                                       ) : (
-                                        <td><strong>{tournament?.sport?.toLowerCase() === 'armwrestling' ? (p.weight + ' кг') : p.points}</strong></td>
+                                        <td><strong>{p.points ?? 0}</strong></td>
                                       )}
                                       {isAdmin && <td>
                                         {p.status === RegistrationStatus.Pending && (
