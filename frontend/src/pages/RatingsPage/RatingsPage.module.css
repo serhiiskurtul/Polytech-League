@@ -132,7 +132,22 @@
   border-radius: 24px;
   border: 1px solid var(--border);
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   box-shadow: var(--shadow);
+}
+
+.tableContainer::-webkit-scrollbar {
+  height: 6px;
+}
+
+.tableContainer::-webkit-scrollbar-track {
+  background: rgba(var(--primary-rgb), 0.02);
+  border-radius: 0 0 24px 24px;
+}
+
+.tableContainer::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
 }
 
 .table {

@@ -1741,6 +1741,28 @@
   border: 1px solid var(--border);
 }
 
+.tableWrapper::-webkit-scrollbar,
+.standingsTable::-webkit-scrollbar {
+  height: 6px;
+}
+
+.tableWrapper::-webkit-scrollbar-track,
+.standingsTable::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 0 0 16px 16px;
+}
+
+.tableWrapper::-webkit-scrollbar-thumb,
+.standingsTable::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.tableWrapper::-webkit-scrollbar-thumb:hover,
+.standingsTable::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
 .leagueTable,
 .dataTable {
   width: 100%;
