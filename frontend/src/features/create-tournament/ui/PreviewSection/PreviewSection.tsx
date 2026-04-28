@@ -33,14 +33,14 @@ const PreviewSection = ({ formData, selectedCategories }: PreviewSectionProps) =
       const wc = ARMWRESTLING_WEIGHT_CLASSES.find(w => w.id === formData.armWeightClass);
       return `${hand?.name || ''} · ${wc?.name || ''}`;
     } else if (formData.sport === 'basketball-3x3') {
-      const type = BASKETBALL3X3_TOURNAMENT_TYPES.find(t => t.id === formData.type);
-      return type ? type.name : formData.type;
+      const type = BASKETBALL3X3_TOURNAMENT_TYPES.find(t => t.id === formData.tournamentType);
+      return type ? type.name : formData.tournamentType;
     } else if (formData.sport === 'badminton') {
-      const type = BADMINTON_TOURNAMENT_TYPES.find(t => t.id === formData.type);
-      return type ? type.name : formData.type;
+      const type = BADMINTON_TOURNAMENT_TYPES.find(t => t.id === formData.tournamentType);
+      return type ? type.name : formData.tournamentType;
     } else {
-      const type = TOURNAMENT_TYPES.find(t => t.id === formData.type);
-      return type ? type.name : formData.type;
+      const type = TOURNAMENT_TYPES.find(t => t.id === formData.tournamentType);
+      return type ? type.name : formData.tournamentType;
     }
   };
 

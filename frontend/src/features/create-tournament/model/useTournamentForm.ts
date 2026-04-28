@@ -86,13 +86,13 @@ export const useTournamentForm = () => {
     // Шахові / шашкові специфічні поля
     date: '',
     timeControl: '10+5',
-    system: 'Swiss',
+    system: '',
     variant: 'International', // Для шашок
     participantsCount: 32,
     refereeIds: [],
     level: 'CollegeGroup',
-    // Настільний теніс специфічні поля
-    tournamentType: 'SingleElimination',
+    // Настільний теніс та інші специфічні поля
+    tournamentType: '',
     category: 'Men',
     // Армреслінг специфічні поля
     armHand: 'Right',
@@ -175,6 +175,12 @@ export const useTournamentForm = () => {
 
     if (formData.level === 'CollegeGroup' && !formData.isPublic && !formData.requireApproval) {
       errors.push('Оберіть тип реєстрації: Відкрите змагання або Модерація заявок');
+    }
+
+    if (['chess', 'checkers'].includes(formData.sport)) {
+      if (!formData.system) errors.push('Система проведення обов\'язкова');
+    } else {
+      if (!formData.tournamentType) errors.push('Система проведення обов\'язкова');
     }
 
     return errors;

@@ -128,11 +128,12 @@ const SettingsSection = ({ formData, handleInputChange }: SettingsSectionProps) 
                 </label>
                 <select
                   name="tournamentType"
-                  value={formData.tournamentType || 'SingleElimination'}
+                  value={formData.tournamentType}
                   onChange={handleInputChange}
                   className={shared.formSelect}
                   required
                 >
+                  <option value="">Не вказано</option>
                   <option value="SingleElimination">Oлімпійська система (Single Elimination)</option>
                   <option value="DoubleElimination">Double Elimination (з вибуванням після двох поразок)</option>
                 </select>
