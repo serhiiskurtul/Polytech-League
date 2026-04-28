@@ -1730,26 +1730,38 @@
 }
 
 /* Standings */
-.leagueTable {
+.tableWrapper,
+.standingsTable {
   width: 100%;
-  border-collapse: collapse;
-  background: white;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 20px;
   border-radius: 16px;
-  overflow: hidden;
   box-shadow: var(--shadow);
   border: 1px solid var(--border);
 }
 
-.leagueTable th {
+.leagueTable,
+.dataTable {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+  background: white;
+}
+
+.leagueTable th,
+.dataTable th {
   background: #f8fafc;
   padding: 16px;
   text-align: left;
   font-weight: 700;
   color: #475569;
   border-bottom: 2px solid #e2e8f0;
+  white-space: nowrap;
 }
 
-.leagueTable td {
+.leagueTable td,
+.dataTable td {
   padding: 16px;
   border-bottom: 1px solid #f1f5f9;
 }
