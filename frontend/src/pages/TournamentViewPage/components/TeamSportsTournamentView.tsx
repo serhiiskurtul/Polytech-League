@@ -572,44 +572,6 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     }
   };
 
-  const handleSetCaptain = async (teamId: number, captainId: number | null) => {
-    try {
-      const team = details.teams.find((t: any) => t.id === teamId);
-      if (!team) return;
-
-      const payload = {
-        ...team,
-        captainId: captainId,
-        playerIds: team.players?.map((p: any) => p.id) || []
-      };
-
-      await updateFutsalTeam(teamId, payload);
-      onRefresh();
-    } catch (err) {
-      console.error('Set Captain Error:', err);
-      alert('Помилка при призначенні капітана');
-    }
-  };
-
-  const handleSetGoalkeeper = async (teamId: number, goalkeeperId: number | null) => {
-    try {
-      const team = details.teams.find((t: any) => t.id === teamId);
-      if (!team) return;
-
-      const payload = {
-        ...team,
-        goalkeeperId: goalkeeperId,
-        playerIds: team.players?.map((p: any) => p.id) || []
-      };
-
-      await updateFutsalTeam(teamId, payload);
-      onRefresh();
-    } catch (err) {
-      console.error('Set Goalkeeper Error:', err);
-      alert('Помилка при призначенні воротаря');
-    }
-  };
-
   const handleTogglePlayerInTeam = async (teamId: number, playerId: number) => {
     try {
       const team = details.teams.find((t: any) => t.id === teamId);
