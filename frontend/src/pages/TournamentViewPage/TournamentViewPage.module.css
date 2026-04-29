@@ -2808,11 +2808,17 @@ input:checked + .slider:before {
   overflow-x: auto;
 }
 
+.stagesRow {
+  display: flex;
+  gap: 100px;
+  min-height: 800px;
+  align-items: stretch;
+}
+
 .bracketColumn {
   min-width: 300px;
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
 .stageHeader {
@@ -2836,8 +2842,11 @@ input:checked + .slider:before {
 .matchList {
   display: flex;
   flex-direction: column;
-  gap: 48px; /* Increased vertical distance */
+  justify-content: center; /* Center matches vertically */
+  gap: 48px;
   padding: 20px;
+  flex: 1; /* Take full height to allow centering */
+  min-height: 600px; /* Base height for the bracket */
 }
 
 .matchBoxContainer {
@@ -2969,62 +2978,73 @@ input:checked + .slider:before {
   color: #3b82f6;
 }
 
-/* Connectors */
-.futsalConnector {
+/* New Paired Connectors */
+.matchPairContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.pairMatches {
+  display: flex;
+  flex-direction: column;
+  gap: 48px; /* Vertical gap between matches in a pair */
+  flex: 1;
+}
+
+.pairConnector {
   position: absolute;
-  right: -60px;
-  top: 50%;
-  width: 60px;
+  right: -80px;
+  width: 80px;
+  height: calc(100% - 100px); /* Subtracting half heights of cards approx */
+  display: flex;
+  align-items: center;
   pointer-events: none;
-  z-index: 1;
 }
 
-.futsalLineHorizontal {
-  width: 30px;
-  height: 2px;
-  background: #cbd5e1;
+.connectorFork {
   position: absolute;
-  top: 0;
   left: 0;
+  top: 0;
+  bottom: 0;
+  width: 30px;
+  border: 2px solid #cbd5e1;
+  border-left: none;
+  border-radius: 0 12px 12px 0;
 }
 
-.futsalLineVertical {
-  width: 2px;
-  background: #cbd5e1;
+.connectorArrow {
   position: absolute;
   left: 30px;
-}
-
-.topMatch .futsalLineVertical {
-  height: calc(50% + 44px); /* Gap + Half card height */
-  top: 0;
-}
-
-.bottomMatch .futsalLineVertical {
-  height: calc(50% + 44px);
-  bottom: 0;
-}
-
-.futsalArrowJoin {
-  width: 30px;
+  right: 0;
   height: 2px;
   background: #cbd5e1;
-  position: absolute;
-  top: calc(50% + 44px); /* Middle of the fork */
-  left: 30px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
 }
 
-.futsalArrowJoin::after {
+.connectorArrow::after {
   content: "";
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   border-right: 2px solid #cbd5e1;
   border-top: 2px solid #cbd5e1;
   transform: rotate(45deg);
   margin-right: -1px;
+}
+
+/* Fallback for single match in a column (no pair) */
+.pairMatches:only-child .pairConnector {
+  height: 0;
+}
+.pairMatches:only-child .connectorFork {
+  width: 30px;
+  height: 2px;
+  border: none;
+  background: #cbd5e1;
+  top: 50%;
 }
 
 /* Third Place Section */

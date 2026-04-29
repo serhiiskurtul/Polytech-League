@@ -45,7 +45,6 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
     return acc;
   }, {} as Record<string, FutsalMatchResponse[]>);
 
-  // Extract 3rd place matches to render them separately
   const thirdPlaceMatches = groupedMatches['Матч за 3-тє місце'] || [];
   const otherStages = Object.keys(groupedMatches)
     .filter(s => s !== 'Матч за 3-тє місце')
@@ -93,7 +92,7 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
                <div className={styles.futsalTeamHeader}>
                  <span className={styles.futsalTeamName}>{match.homeTeam?.name || 'TBD'}</span>
                  {onViewRoster && (
-                   <button className={styles.rosterMiniBtn} onClick={(e) => { e.stopPropagation(); onViewRoster(match.homeTeamId); }} title="Переглянути склад">
+                   <button className={styles.rosterMiniBtn} onClick={(e) => { e.stopPropagation(); onViewRoster(match.homeTeamId); }}>
                      <i className="fas fa-users"></i>
                    </button>
                  )}
@@ -116,7 +115,7 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
                <div className={styles.futsalTeamHeader}>
                  <span className={styles.futsalTeamName}>{match.awayTeam?.name || 'TBD'}</span>
                  {onViewRoster && (
-                   <button className={styles.rosterMiniBtn} onClick={(e) => { e.stopPropagation(); onViewRoster(match.awayTeamId); }} title="Переглянути склад">
+                   <button className={styles.rosterMiniBtn} onClick={(e) => { e.stopPropagation(); onViewRoster(match.awayTeamId); }}>
                      <i className="fas fa-users"></i>
                    </button>
                  )}
@@ -145,40 +144,49 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
   return (
     <div className={styles.futsalBracketWrapper}>
       <div className={styles.stagesRow}>
-        {otherStages.map((stageName, stageIdx) => (
-          <div key={stageName} className={styles.bracketColumn}>
-            <div className={styles.stageHeader}>
-              <span className={styles.stageNameBadge}>{stageName}</span>
-            </div>
-            
-            <div className={styles.matchList}>
-              {groupedMatches[stageName].map((match, matchIdx) => (
-                <div key={match.id} className={styles.matchBoxContainer}>
-                  {renderMatchCard(match)}
-                  
-                  {/* Connectors to Next Stage */}
-                  {stageIdx < otherStages.length - 1 && (
-                    <div className={`${styles.futsalConnector} ${matchIdx % 2 === 0 ? styles.topMatch : styles.bottomMatch}`}>
-                      <div className={styles.futsalLineHorizontal}></div>
-                      <div className={styles.futsalLineVertical}></div>
-                      {matchIdx % 2 === 0 && <div className={styles.futsalArrowJoin}></div>}
-                    </div>
-                  )}
-                </div>
-              ))}
+        {otherStages.map((stageName, stageIdx) => {
+          const stageMatches = groupedMatches[stageName];
+          // Pair matches for connectors
+          const pairs: FutsalMatchResponse[][] = [];
+          for (let i = 0; i < stageMatches.length; i += 2) {
+            pairs.push(stageMatches.slice(i, i + 2));
+          }
 
-              {/* Manual 3rd Place Rendering for the Final Column */}
-              {stageName === 'Фінал' && thirdPlaceMatches.length > 0 && (
-                <div className={styles.thirdPlaceSection}>
-                   <div className={styles.stageHeader} style={{ marginTop: '40px' }}>
-                      <span className={`${styles.stageNameBadge} ${styles.thirdPlaceBadge}`}>Матч за 3-тє місце</span>
-                   </div>
-                   {thirdPlaceMatches.map(m => renderMatchCard(m))}
-                </div>
-              )}
+          return (
+            <div key={stageName} className={styles.bracketColumn}>
+              <div className={styles.stageHeader}>
+                <span className={styles.stageNameBadge}>{stageName}</span>
+              </div>
+              
+              <div className={styles.matchList}>
+                {pairs.map((pair, pIdx) => (
+                  <div key={pIdx} className={styles.matchPairContainer}>
+                    <div className={styles.pairMatches}>
+                      {pair.map(match => renderMatchCard(match))}
+                    </div>
+                    
+                    {/* Pair Connector to Next Stage */}
+                    {stageIdx < otherStages.length - 1 && stageName !== 'Фінал' && (
+                      <div className={styles.pairConnector}>
+                        <div className={styles.connectorFork}></div>
+                        <div className={styles.connectorArrow}></div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                {stageName === 'Фінал' && thirdPlaceMatches.length > 0 && (
+                  <div className={styles.thirdPlaceSection}>
+                     <div className={styles.stageHeader} style={{ marginTop: '40px' }}>
+                        <span className={`${styles.stageNameBadge} ${styles.thirdPlaceBadge}`}>Матч за 3-тє місце</span>
+                     </div>
+                     {thirdPlaceMatches.map(m => renderMatchCard(m))}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {matches.length === 0 && (
