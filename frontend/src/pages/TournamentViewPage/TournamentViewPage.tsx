@@ -1663,7 +1663,7 @@ const TournamentViewPage = () => {
             const isTeamFromDetails = !!(details as any)?.isTeam;
             const mandatoryTeamSports = ['volleyball', 'beach_volleyball', 'futsal', 'basketball_3x3', 'basketball3x3'];
 
-            if (isTeamFromDetails === true || (isTeamFromDetails === false && mandatoryTeamSports.includes(s) && (details as any).isTeam === undefined)) {
+            if (details && (isTeamFromDetails === true || (isTeamFromDetails === false && mandatoryTeamSports.includes(s) && (details as any).isTeam === undefined))) {
               return (
                 <TeamSportsTournamentView
                   sport={s as any}
