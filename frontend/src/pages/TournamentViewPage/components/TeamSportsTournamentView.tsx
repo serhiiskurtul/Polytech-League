@@ -628,7 +628,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         eventId: team.eventId,
         points: team.points,
         rank: team.rank,
-        playerIds: newPlayerIds
+        playerIds: newPlayerIds,
+        captainId: newPlayerIds.includes(team.captainId) ? team.captainId : null,
+        goalkeeperId: newPlayerIds.includes(team.goalkeeperId) ? team.goalkeeperId : null
       };
 
       await updateApi(teamId, payload);
