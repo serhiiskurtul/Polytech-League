@@ -101,6 +101,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const [tempScorers, setTempScorers] = useState<{[playerId: number]: number}>({});
   const [matchGoalkeepers, setMatchGoalkeepers] = useState<{home: string, away: string}>({ home: '', away: '' });
   const [matchCaptains, setMatchCaptains] = useState<{home: string, away: string}>({ home: '', away: '' });
+  const [matchScores, setMatchScores] = useState<{home: number, away: number}>({ home: 0, away: 0 });
 
   // Quick Add Player State
   const [isQuickAddMode, setIsQuickAddMode] = useState(false);
@@ -241,6 +242,10 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       home: match.homeCaptainId?.toString() || homeTeam?.captainId?.toString() || '',
       away: match.awayCaptainId?.toString() || awayTeam?.captainId?.toString() || ''
     });
+    setMatchScores({
+      home: match.homeTeamScore ?? 0,
+      away: match.awayTeamScore ?? 0
+    });
     setIsScorersModalOpen(true);
   };
 
@@ -260,8 +265,6 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         eventId: details.id,
         homeTeamId: selectedMatchForScorers.homeTeamId,
         awayTeamId: selectedMatchForScorers.awayTeamId,
-        homeTeamScore: selectedMatchForScorers.homeTeamScore,
-        awayTeamScore: selectedMatchForScorers.awayTeamScore,
         stage: selectedMatchForScorers.stage,
         // Update rosters to match team players if they were empty
         homeRosterIds: selectedMatchForScorers.homeRoster?.length > 0 
@@ -270,10 +273,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         awayRosterIds: selectedMatchForScorers.awayRoster?.length > 0 
             ? selectedMatchForScorers.awayRoster.map((p: any) => p.id) 
             : details.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players?.map((p: any) => p.id) || [],
-        homeGoalkeeperId: matchGoalkeepers.home ? parseInt(matchGoalkeepers.home) : null,
-        awayGoalkeeperId: matchGoalkeepers.away ? parseInt(matchGoalkeepers.away) : null,
-        homeCaptainId: matchCaptains.home ? parseInt(matchCaptains.home) : null,
-        awayCaptainId: matchCaptains.away ? parseInt(matchCaptains.away) : null,
+        homeGoalkeeperId: parseInt(matchGoalkeepers.home) || null,
+        awayGoalkeeperId: parseInt(matchGoalkeepers.away) || null,
+        homeCaptainId: parseInt(matchCaptains.home) || null,
+        awayCaptainId: parseInt(matchCaptains.away) || null,
+        homeTeamScore: matchScores.home,
+        awayTeamScore: matchScores.away,
+        homeScore: matchScores.home,
+        awayScore: matchScores.away,
         goals: goalsPayload
       };
 
@@ -1494,6 +1501,31 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
             </div>
             
             <div className={styles.modalBody}>
+              {/* Score Input Section */}
+              <div className={styles.scoreEditSection} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '32px', marginBottom: '32px', padding: '24px', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+                 <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '8px', textTransform: 'uppercase' }}>{selectedMatchForScorers.homeTeam?.name}</div>
+                    <input 
+                      type="number" 
+                      min="0"
+                      style={{ width: '80px', height: '60px', fontSize: '32px', fontWeight: 800, textAlign: 'center', borderRadius: '12px', border: '2px solid #3b82f6', color: '#1e293b' }}
+                      value={matchScores.home}
+                      onChange={e => setMatchScores({...matchScores, home: parseInt(e.target.value) || 0})}
+                    />
+                 </div>
+                 <div style={{ fontSize: '24px', fontWeight: 800, color: '#cbd5e1', paddingTop: '20px' }}>:</div>
+                 <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '8px', textTransform: 'uppercase' }}>{selectedMatchForScorers.awayTeam?.name}</div>
+                    <input 
+                      type="number" 
+                      min="0"
+                      style={{ width: '80px', height: '60px', fontSize: '32px', fontWeight: 800, textAlign: 'center', borderRadius: '12px', border: '2px solid #3b82f6', color: '#1e293b' }}
+                      value={matchScores.away}
+                      onChange={e => setMatchScores({...matchScores, away: parseInt(e.target.value) || 0})}
+                    />
+                 </div>
+              </div>
+
               <div className={styles.scorersGrid}>
                 {/* Home Team Scorers */}
                 <div className={styles.teamScorersSection}>

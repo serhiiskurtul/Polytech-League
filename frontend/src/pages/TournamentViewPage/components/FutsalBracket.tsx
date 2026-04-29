@@ -54,6 +54,8 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
               {groupedMatches[stageName].map((match, matchIdx) => {
                 const isHomeWinner = (match.homeTeamScore || 0) > (match.awayTeamScore || 0);
                 const isAwayWinner = (match.awayTeamScore || 0) > (match.homeTeamScore || 0);
+                const isDraw = (match.homeTeamScore !== null && match.awayTeamScore !== null) && 
+                               (match.homeTeamScore === match.awayTeamScore);
 
                 return (
                   <div key={match.id} className={styles.matchBoxContainer}>
@@ -68,7 +70,7 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
                       )}
                       
                       {/* Team 1 */}
-                      <div className={`${styles.futsalTeamRow} ${isHomeWinner ? styles.futsalWinner : ''}`}>
+                      <div className={`${styles.futsalTeamRow} ${isHomeWinner ? styles.futsalWinner : isDraw ? styles.futsalDraw : ''}`}>
                         <div className={styles.futsalTeamInfo}>
                            <span className={styles.futsalTeamName}>{match.homeTeam?.name || 'TBD'}</span>
                            <span className={styles.futsalTeamGroup}>Unknown</span>
@@ -82,7 +84,7 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
                       <div className={styles.futsalVsDivider}>vs</div>
 
                       {/* Team 2 */}
-                      <div className={`${styles.futsalTeamRow} ${isAwayWinner ? styles.futsalWinner : ''}`}>
+                      <div className={`${styles.futsalTeamRow} ${isAwayWinner ? styles.futsalWinner : isDraw ? styles.futsalDraw : ''}`}>
                         <div className={styles.futsalTeamInfo}>
                            <span className={styles.futsalTeamName}>{match.awayTeam?.name || 'TBD'}</span>
                            <span className={styles.futsalTeamGroup}>Unknown</span>
