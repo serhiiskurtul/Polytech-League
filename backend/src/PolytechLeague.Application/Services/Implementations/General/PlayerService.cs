@@ -430,11 +430,10 @@ public class PlayerService : IPlayerService
                 foreach (var sport in sportTypes) sportStatsMap[sport] = new SportStatsDto { SportType = sport };
 
                 foreach (var ach in achievements) {
-                    double pts = (ach.Rank == 1) ? 100 : (ach.Rank == 2 ? 50 : (ach.Rank == 3 ? 30 : 0));
-                    if (pts <= 0) continue;
-                    
+                    double pts = 0;
                     double mult = 1.0;
                     string levelName = "Міжгрупові";
+                    
                     if (allEvents.TryGetValue(ach.TournamentId, out var lvl)) {
                         if (levelMultipliers.TryGetValue(lvl, out var m)) mult = m;
                         levelName = lvl switch {
@@ -442,13 +441,29 @@ public class PlayerService : IPlayerService
                             CompetitionLevel.National => "Всеукраїнські",
                             _ => "Міжгрупові"
                         };
+                        
+                        // Participation points ONLY for CollegeGroup level
+                        if (lvl == CompetitionLevel.CollegeGroup) {
+                            pts = 10;
+                        }
+                    } else {
+                        // Fallback if event level is unknown
+                        pts = 10; 
                     }
+
+                    if (ach.Rank == 1) pts += 100;
+                    else if (ach.Rank == 2) pts += 50;
+                    else if (ach.Rank == 3) pts += 30;
+                    
+                    if (pts <= 0) continue;
                     var finalPts = (int)Math.Round(pts * mult);
                     totalScore += finalPts;
                     if (sportStatsMap.TryGetValue(ach.SportType, out var s)) s.PerformanceScore += finalPts;
                     
                     pointsBreakdown.Add(new PointEntryDto {
-                        Description = $"{ach.Rank} місце: {ach.TournamentName} ({levelName})",
+                        Description = ach.Rank > 0 
+                            ? $"{ach.Rank} місце: {ach.TournamentName} ({levelName})" 
+                            : $"Участь: {ach.TournamentName} ({levelName})",
                         Points = finalPts,
                         Category = "Achievements"
                     });
