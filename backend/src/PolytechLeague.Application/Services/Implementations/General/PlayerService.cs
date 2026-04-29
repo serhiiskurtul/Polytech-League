@@ -236,7 +236,18 @@ public class PlayerService : IPlayerService
             };
 
             var allEventsQuery = _dbContext.Set<Event>().AsQueryable();
-            if (seasonId.HasValue) allEventsQuery = allEventsQuery.Where(e => e.SeasonId == seasonId.Value);
+            if (seasonId.HasValue) 
+            {
+                var season = await _dbContext.Seasons.FindAsync(new object[] { seasonId.Value }, cancellationToken);
+                if (season != null)
+                {
+                    allEventsQuery = allEventsQuery.Where(e => e.SeasonId == seasonId.Value || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate));
+                }
+                else
+                {
+                    allEventsQuery = allEventsQuery.Where(e => e.SeasonId == seasonId.Value);
+                }
+            }
 
             var allEvents = await allEventsQuery
                 .Select(e => new { e.Id, e.Level })
@@ -252,7 +263,7 @@ public class PlayerService : IPlayerService
             var armwAch = await _dbContext.ArmwrestlingEventParticipants.Include(p => p.Tournament).Where(p => playerIds.Contains(p.PlayerId) && eventIds.Contains(p.TournamentId)).ToListAsync(cancellationToken);
             
             var genericWinners = await _dbContext.Set<Event>()
-                .Where(e => (!seasonId.HasValue || e.SeasonId == seasonId.Value) && 
+                .Where(e => eventIds.Contains(e.Id) && 
                             ((e.FirstPlaceId.HasValue && playerIds.Contains(e.FirstPlaceId.Value)) || 
                              (e.SecondPlaceId.HasValue && playerIds.Contains(e.SecondPlaceId.Value)) || 
                              (e.ThirdPlaceId.HasValue && playerIds.Contains(e.ThirdPlaceId.Value))))
