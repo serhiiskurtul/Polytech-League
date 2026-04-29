@@ -48,7 +48,9 @@ import {
   deleteTableTennisTeam
 } from '@/shared/api';
 import TournamentPodium from './TournamentPodium';
+import FutsalBracket from './FutsalBracket';
 import styles from '../TournamentViewPage.module.css';
+import { Link } from 'react-router-dom';
 
 type Sport = 'volleyball' | 'beach_volleyball' | 'beach-volleyball' | 'futsal' | 'basketball_3x3' | 'basketball3x3' | 'basketball-3x3' | 'badminton' | 'chess' | 'checkers' | 'tabletennis' | 'table_tennis' | 'table-tennis';
 
@@ -65,7 +67,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   isAdmin,
   onRefresh
 }) => {
-  const [activeTab, setActiveTab] = useState<'standings' | 'matches' | 'teams' | 'info'>('matches');
+  const [activeTab, setActiveTab] = useState<'standings' | 'matches' | 'teams' | 'info' | 'bracket'>('matches');
   const [allPlayers, setAllPlayers] = useState<PlayerDto[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -766,6 +768,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         <div className={styles.tabsNav}>
           <button className={activeTab === 'matches' ? styles.activeTab : ''} onClick={() => setActiveTab('matches')}>Матчі</button>
           <button className={activeTab === 'standings' ? styles.activeTab : ''} onClick={() => setActiveTab('standings')}>Таблиця</button>
+          {(sport === 'futsal' || sport === 'футзал') && (
+            <button className={activeTab === 'bracket' ? styles.activeTab : ''} onClick={() => setActiveTab('bracket')}>Сітка</button>
+          )}
           <button className={activeTab === 'teams' ? styles.activeTab : ''} onClick={() => setActiveTab('teams')}>Команди</button>
           {isAdmin && activeTab === 'matches' && (
             <button className={styles.addMatchGlobalBtn} onClick={() => setIsCreateMatchModalOpen(true)}>
@@ -976,6 +981,15 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
               </tbody>
             </table>
           </div>
+        )}
+
+        {activeTab === 'bracket' && (sport === 'futsal' || sport === 'футзал') && (
+          <FutsalBracket 
+            matches={details.matches || details.games || []}
+            isAdmin={isAdmin}
+            onDeleteMatch={handleDeleteMatch}
+            onOpenScorers={handleOpenScorers}
+          />
         )}
 
          {activeTab === 'teams' && (
