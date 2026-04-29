@@ -8,6 +8,7 @@ interface FutsalBracketProps {
   onDeleteMatch?: (matchId: number) => void;
   onOpenScorers?: (match: FutsalMatchResponse) => void;
   onViewRoster?: (teamId: number) => void;
+  onViewInfo?: (match: FutsalMatchResponse) => void;
   teams?: any[]; // For name lookup
 }
 
@@ -17,6 +18,7 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
   onDeleteMatch,
   onOpenScorers,
   onViewRoster,
+  onViewInfo,
   teams = []
 }) => {
   const STAGE_ORDER = [
@@ -77,7 +79,11 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
 
                 return (
                   <div key={match.id} className={styles.matchBoxContainer}>
-                    <div className={styles.futsalMatchCard}>
+                    <div 
+                      className={styles.futsalMatchCard} 
+                      onClick={() => onViewInfo && onViewInfo(match)}
+                      style={{ cursor: onViewInfo ? 'pointer' : 'default' }}
+                    >
                       {isAdmin && onDeleteMatch && (
                         <button 
                           className={styles.cardDeleteBtn}

@@ -111,6 +111,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const [roundNumber, setRoundNumber] = useState(1);
   const [stageType, setStageType] = useState('Груповий етап');
   const [useStrictFiltering, setUseStrictFiltering] = useState(true);
+  const [selectedMatchForInfo, setSelectedMatchForInfo] = useState<any>(null);
+  const [isMatchInfoModalOpen, setIsMatchInfoModalOpen] = useState(false);
 
   useEffect(() => {
     if (isAdmin) {
@@ -739,7 +741,6 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         case 'table-tennis': deleteApi = deleteTableTennisTeam; break;
         default: deleteApi = deleteVolleyballTeam;
       }
-
       await deleteApi(teamId);
       onRefresh();
     } catch (err) {
@@ -749,58 +750,41 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   };
 
   const STAGE_ORDER = [
-    '1/16 Фіналу', '1/8 Фіналу', 'Чвертьфінал', 'Півфінал', 'Фінал'
+    '1/16 Фіналу', '1/8 Фіналу', 'Чвертьфінал', 'Півфінал', 'Матч за 3-тє місце', 'Фінал'
   ];
 
   const getEligibleTeams = (stage: string) => {
     const allTeams = details.teams || [];
     if (!useStrictFiltering || sport !== 'futsal') return allTeams;
     
-    const allMatches = details.matches || details.games || [];
-    if (allMatches.length === 0) {
-      return (stage === 'Раунд 1' || stage === '1/16 Фіналу' || stage === 'Груповий етап') ? allTeams : [];
-    }
+    const currentStageIdx = STAGE_ORDER.indexOf(stage);
+    if (currentStageIdx <= 0) return allTeams;
 
-    const idx = STAGE_ORDER.indexOf(stage);
+    const prevStage = STAGE_ORDER[currentStageIdx - 1];
+    const matches = details.matches || details.games || [];
     
-    // Logic for standard stages (Quarterfinal, Semifinal, etc.)
-    if (idx > 0) {
-      const prevStage = STAGE_ORDER[idx - 1];
-      const winners = allMatches
-        .filter((m: any) => m.stage === prevStage)
-        .map((m: any) => {
-          const hScore = m.homeTeamScore || 0;
-          const aScore = m.awayTeamScore || 0;
-          if (hScore > aScore) return m.homeTeamId;
-          if (aScore > hScore) return m.awayTeamId;
-          return null;
-        })
-        .filter((id: any) => id !== null);
-      return allTeams.filter((t: any) => winners.includes(t.id));
-    }
-
-    // Logic for sequential rounds (Round 1 -> Round 2 ...)
-    const roundMatch = stage.match(/^Раунд (\d+)$/);
-    if (roundMatch) {
-      const rNum = parseInt(roundMatch[1]);
-      if (rNum > 1) {
-        const prevRound = `Раунд ${rNum - 1}`;
-        const winners = allMatches
-          .filter((m: any) => m.stage === prevRound)
-          .map((m: any) => {
-            const hScore = m.homeTeamScore || 0;
-            const aScore = m.awayTeamScore || 0;
+    // For 3rd place match, we need losers of the previous stage (Semifinal)
+    const isThirdPlaceMatch = stage === 'Матч за 3-тє місце';
+    
+    const winnersOfPrevStage = matches
+      .filter((m: any) => m.stage === prevStage)
+      .map((m: any) => {
+        const hScore = m.homeTeamScore ?? 0;
+        const aScore = m.awayTeamScore ?? 0;
+        if (isThirdPlaceMatch) {
+            // Get Losers
+            if (hScore < aScore) return m.homeTeamId;
+            if (aScore < hScore) return m.awayTeamId;
+        } else {
+            // Get Winners
             if (hScore > aScore) return m.homeTeamId;
             if (aScore > hScore) return m.awayTeamId;
-            return null;
-          })
-          .filter((id: any) => id !== null);
-        return allTeams.filter((t: any) => winners.includes(t.id));
-      }
-      return allTeams;
-    }
+        }
+        return null;
+      })
+      .filter((id: any) => id !== null);
 
-    return allTeams;
+    return allTeams.filter((t: any) => winnersOfPrevStage.includes(t.id));
   };
 
   const eligibleTeams = getEligibleTeams(newMatchForm.stage);
@@ -935,6 +919,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                             <option value="1/8 Фіналу">1/8 Фіналу</option>
                             <option value="Чвертьфінал">Чвертьфінал</option>
                             <option value="Півфінал">Півфінал</option>
+                            <option value="Матч за 3-тє місце">Матч за 3-тє місце</option>
                             <option value="Фінал">Фінал</option>
                         </select>
                     </div>
@@ -1172,6 +1157,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
             onDeleteMatch={handleDeleteMatch}
             onOpenScorers={handleOpenScorers}
             onViewRoster={(teamId) => { setEditingTeamId(teamId); setIsTeamRosterModalOpen(true); }}
+            onViewInfo={(match) => { setSelectedMatchForInfo(match); setIsMatchInfoModalOpen(true); }}
             teams={details.teams || []}
           />
         )}
@@ -1668,6 +1654,87 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
               <div className={styles.modalFooter} style={{padding: '24px 0 0 0', background: 'transparent', borderTop: 'none'}}>
                 <button className={styles.saveBtn} onClick={handleSaveScorers}>Зберегти зміни</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Match Info Modal (View Only) */}
+      {isMatchInfoModalOpen && selectedMatchForInfo && (
+        <div className={styles.rosterModalOverlay} onClick={() => setIsMatchInfoModalOpen(false)}>
+          <div className={`${styles.rosterModal} ${styles.glassModal}`} style={{maxWidth: '700px'}} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3>Інформація про матч</h3>
+              <button className={styles.closeButton} onClick={() => setIsMatchInfoModalOpen(false)}>&times;</button>
+            </div>
+            
+            <div className={styles.modalBody}>
+              <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px' }}>{selectedMatchForInfo.stage}</div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '40px', marginTop: '20px' }}>
+                  <div style={{ textAlign: 'center', flex: 1 }}>
+                    <div style={{ fontSize: '24px', fontWeight: 800, color: '#1e293b' }}>{selectedMatchForInfo.homeTeam?.name}</div>
+                  </div>
+                  <div style={{ fontSize: '48px', fontWeight: 900, color: '#3b82f6', display: 'flex', gap: '20px' }}>
+                    <span>{selectedMatchForInfo.homeTeamScore ?? 0}</span>
+                    <span style={{ color: '#cbd5e1' }}>:</span>
+                    <span>{selectedMatchForInfo.awayTeamScore ?? 0}</span>
+                  </div>
+                  <div style={{ textAlign: 'center', flex: 1 }}>
+                    <div style={{ fontSize: '24px', fontWeight: 800, color: '#1e293b' }}>{selectedMatchForInfo.awayTeam?.name}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.scorersGrid}>
+                {/* Home Info */}
+                <div className={styles.teamScorersSection}>
+                  <div style={{ marginBottom: '16px' }}>
+                    <h5 style={{ color: '#3b82f6' }}>Автори голів</h5>
+                    {selectedMatchForInfo.goals?.filter((g: any) => selectedMatchForInfo.homeRoster?.some((p: any) => p.id === g.playerId) || details.teams.find((t: any) => t.id === selectedMatchForInfo.homeTeamId)?.players?.some((p: any) => p.id === g.playerId)).map((g: any) => (
+                      <div key={g.id} style={{ fontSize: '14px', margin: '4px 0', fontWeight: 600 }}>
+                        ⚽ {g.player?.lastName || details.teams.find((t: any) => t.id === selectedMatchForInfo.homeTeamId)?.players?.find((p: any) => p.id === g.playerId)?.lastName} - {g.goalsCount}
+                      </div>
+                    ))}
+                  </div>
+                  <h5 style={{ marginTop: '20px' }}>Склад команди</h5>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    {(selectedMatchForInfo.homeRoster?.length > 0 
+                        ? selectedMatchForInfo.homeRoster 
+                        : details.teams?.find((t: any) => t.id === selectedMatchForInfo.homeTeamId)?.players || []
+                    ).map((p: any) => (
+                      <span key={p.id} style={{ background: '#f1f5f9', padding: '4px 10px', borderRadius: '8px', fontSize: '12px', fontWeight: 600 }}>
+                        {p.lastName} {p.id === selectedMatchForInfo.homeCaptainId && <b style={{color: '#f59e0b'}}>(C)</b>} {p.id === selectedMatchForInfo.homeGoalkeeperId && <b style={{color: '#3b82f6'}}>(GK)</b>}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className={styles.scorersDivider}></div>
+
+                {/* Away Info */}
+                <div className={styles.teamScorersSection}>
+                  <div style={{ marginBottom: '16px' }}>
+                    <h5 style={{ color: '#3b82f6' }}>Автори голів</h5>
+                    {selectedMatchForInfo.goals?.filter((g: any) => selectedMatchForInfo.awayRoster?.some((p: any) => p.id === g.playerId) || details.teams.find((t: any) => t.id === selectedMatchForInfo.awayTeamId)?.players?.some((p: any) => p.id === g.playerId)).map((g: any) => (
+                      <div key={g.id} style={{ fontSize: '14px', margin: '4px 0', fontWeight: 600 }}>
+                        ⚽ {g.player?.lastName || details.teams.find((t: any) => t.id === selectedMatchForInfo.awayTeamId)?.players?.find((p: any) => p.id === g.playerId)?.lastName} - {g.goalsCount}
+                      </div>
+                    ))}
+                  </div>
+                  <h5 style={{ marginTop: '20px' }}>Склад команди</h5>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    {(selectedMatchForInfo.awayRoster?.length > 0 
+                        ? selectedMatchForInfo.awayRoster 
+                        : details.teams?.find((t: any) => t.id === selectedMatchForInfo.awayTeamId)?.players || []
+                    ).map((p: any) => (
+                      <span key={p.id} style={{ background: '#f1f5f9', padding: '4px 10px', borderRadius: '8px', fontSize: '12px', fontWeight: 600 }}>
+                        {p.lastName} {p.id === selectedMatchForInfo.awayCaptainId && <b style={{color: '#f59e0b'}}>(C)</b>} {p.id === selectedMatchForInfo.awayGoalkeeperId && <b style={{color: '#3b82f6'}}>(GK)</b>}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>

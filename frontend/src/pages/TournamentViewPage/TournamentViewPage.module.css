@@ -2973,10 +2973,11 @@ input:checked + .slider:before {
 .futsalConnector {
   position: absolute;
   right: -48px;
-  top: 0;
-  bottom: 0;
+  top: 50%;
   width: 48px;
+  height: 100%;
   pointer-events: none;
+  z-index: 1;
 }
 
 .futsalLineHorizontal {
@@ -2984,25 +2985,25 @@ input:checked + .slider:before {
   height: 2px;
   background: #cbd5e1;
   position: absolute;
-  top: 50%;
+  top: 0;
   left: 0;
 }
 
 .futsalLineVerticalDown {
   width: 2px;
-  height: 50%;
+  height: calc(50% + 48px); /* Height to reach the middle of the pair gap */
   background: #cbd5e1;
   position: absolute;
-  top: 50%;
+  top: 0;
   left: 24px;
 }
 
 .futsalLineVerticalUp {
   width: 2px;
-  height: 50%;
+  height: calc(50% + 48px);
   background: #cbd5e1;
   position: absolute;
-  bottom: 50%;
+  bottom: 0;
   left: 24px;
 }
 
@@ -3011,11 +3012,16 @@ input:checked + .slider:before {
   height: 2px;
   background: #cbd5e1;
   position: absolute;
-  top: 100%;
+  top: calc(50% + 24px); /* Position between the matches */
   left: 24px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
+}
+
+/* Specific fix for the arrow meeting the next round */
+.matchBoxContainer:nth-child(odd) .futsalArrowHead {
+  top: calc(50% + 48px);
 }
 
 .futsalArrowHead::after {
