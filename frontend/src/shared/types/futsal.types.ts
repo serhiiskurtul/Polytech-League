@@ -43,6 +43,10 @@ export interface FutsalMatchResponse {
   
   homeRoster?: PlayerDto[];
   awayRoster?: PlayerDto[];
+  homeGoalkeeperId?: number | null;
+  awayGoalkeeperId?: number | null;
+  homeCaptainId?: number | null;
+  awayCaptainId?: number | null;
   goals?: FutsalGoal[];
 }
 

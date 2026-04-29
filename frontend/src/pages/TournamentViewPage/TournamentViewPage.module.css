@@ -2804,8 +2804,46 @@ input:checked + .slider:before {
 
 /* Futsal Bracket & Match Cards */
 .futsalBracketWrapper {
-  padding: 20px 0;
+  padding: 40px 0;
   overflow-x: auto;
+}
+
+.bracketColumn {
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stageHeader {
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.stageNameBadge {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.matchList {
+  display: flex;
+  flex-direction: column;
+  gap: 48px; /* Increased vertical distance */
+  padding: 20px;
+}
+
+.matchBoxContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .futsalMatchCard {
@@ -3034,5 +3072,47 @@ input:checked + .slider:before {
 
 .futsalAdminPanel input:checked + .sliderMini:before {
   transform: translateX(14px);
+}
+
+.futsalTeamHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rosterMiniBtn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 2px;
+  font-size: 10px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rosterMiniBtn:hover {
+  color: #3b82f6;
+  transform: scale(1.2);
+}
+
+.futsalTeamRoles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.roleBadge {
+  font-size: 9px;
+  color: #64748b;
+  display: flex;
+  gap: 4px;
+}
+
+.roleBadge b {
+  color: #475569;
 }
 

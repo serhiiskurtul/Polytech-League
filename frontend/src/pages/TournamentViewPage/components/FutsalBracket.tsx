@@ -7,13 +7,17 @@ interface FutsalBracketProps {
   isAdmin?: boolean;
   onDeleteMatch?: (matchId: number) => void;
   onOpenScorers?: (match: FutsalMatchResponse) => void;
+  onViewRoster?: (teamId: number) => void;
+  teams?: any[]; // For name lookup
 }
 
 const FutsalBracket: React.FC<FutsalBracketProps> = ({
   matches,
   isAdmin,
   onDeleteMatch,
-  onOpenScorers
+  onOpenScorers,
+  onViewRoster,
+  teams = []
 }) => {
   const STAGE_ORDER = [
     'Груповий етап',
@@ -41,6 +45,15 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
 
   const sortedStages = Object.keys(groupedMatches).sort((a, b) => getStageRank(a) - getStageRank(b));
 
+  const getPlayerName = (teamId: number, playerId: number | null | undefined) => {
+    if (!playerId) return null;
+    const team = teams.find(t => t.id === teamId);
+    if (!team) return null;
+    const player = team.players?.find((p: any) => p.id === playerId);
+    if (!player) return null;
+    return `${player.lastName} ${player.firstName[0]}.`;
+  };
+
   return (
     <div className={styles.futsalBracketWrapper}>
       <div className={styles.stagesRow}>
@@ -57,6 +70,11 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
                 const isDraw = (match.homeTeamScore !== null && match.awayTeamScore !== null) && 
                                (match.homeTeamScore === match.awayTeamScore);
 
+                const homeCaptain = getPlayerName(match.homeTeamId, match.homeCaptainId);
+                const homeGK = getPlayerName(match.homeTeamId, match.homeGoalkeeperId);
+                const awayCaptain = getPlayerName(match.awayTeamId, match.awayCaptainId);
+                const awayGK = getPlayerName(match.awayTeamId, match.awayGoalkeeperId);
+
                 return (
                   <div key={match.id} className={styles.matchBoxContainer}>
                     <div className={styles.futsalMatchCard}>
@@ -64,6 +82,7 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
                         <button 
                           className={styles.cardDeleteBtn}
                           onClick={() => onDeleteMatch(match.id)}
+                          title="Видалити матч"
                         >
                           <i className="fas fa-trash"></i>
                         </button>
@@ -72,8 +91,18 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
                       {/* Team 1 */}
                       <div className={`${styles.futsalTeamRow} ${isHomeWinner ? styles.futsalWinner : isDraw ? styles.futsalDraw : ''}`}>
                         <div className={styles.futsalTeamInfo}>
-                           <span className={styles.futsalTeamName}>{match.homeTeam?.name || 'TBD'}</span>
-                           <span className={styles.futsalTeamGroup}>Unknown</span>
+                           <div className={styles.futsalTeamHeader}>
+                             <span className={styles.futsalTeamName}>{match.homeTeam?.name || 'TBD'}</span>
+                             {onViewRoster && (
+                               <button className={styles.rosterMiniBtn} onClick={() => onViewRoster(match.homeTeamId)} title="Переглянути склад">
+                                 <i className="fas fa-users"></i>
+                               </button>
+                             )}
+                           </div>
+                           <div className={styles.futsalTeamRoles}>
+                             {homeCaptain && <span className={styles.roleBadge} title="Капітан"><b>C:</b> {homeCaptain}</span>}
+                             {homeGK && <span className={styles.roleBadge} title="Воротар"><b>GK:</b> {homeGK}</span>}
+                           </div>
                         </div>
                         <div className={styles.futsalTeamScore}>
                           {match.homeTeamScore ?? '-'}
@@ -86,8 +115,18 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
                       {/* Team 2 */}
                       <div className={`${styles.futsalTeamRow} ${isAwayWinner ? styles.futsalWinner : isDraw ? styles.futsalDraw : ''}`}>
                         <div className={styles.futsalTeamInfo}>
-                           <span className={styles.futsalTeamName}>{match.awayTeam?.name || 'TBD'}</span>
-                           <span className={styles.futsalTeamGroup}>Unknown</span>
+                           <div className={styles.futsalTeamHeader}>
+                             <span className={styles.futsalTeamName}>{match.awayTeam?.name || 'TBD'}</span>
+                             {onViewRoster && (
+                               <button className={styles.rosterMiniBtn} onClick={() => onViewRoster(match.awayTeamId)} title="Переглянути склад">
+                                 <i className="fas fa-users"></i>
+                               </button>
+                             )}
+                           </div>
+                           <div className={styles.futsalTeamRoles}>
+                             {awayCaptain && <span className={styles.roleBadge} title="Капітан"><b>C:</b> {awayCaptain}</span>}
+                             {awayGK && <span className={styles.roleBadge} title="Воротар"><b>GK:</b> {awayGK}</span>}
+                           </div>
                         </div>
                         <div className={styles.futsalTeamScore}>
                           {match.awayTeamScore ?? '-'}
@@ -102,7 +141,7 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
                       )}
                     </div>
 
-                    {/* Connectors with Arrow */}
+                    {/* Connectors */}
                     {stageIdx < sortedStages.length - 1 && (
                       <div className={styles.futsalConnector}>
                         <div className={styles.futsalLineHorizontal}></div>

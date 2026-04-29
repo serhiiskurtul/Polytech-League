@@ -957,7 +957,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
                     <div className={styles.panelGroup} style={{ width: 'auto' }}>
                         <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            Фільтрація <i className="fas fa-question-circle" style={{ fontSize: '10px', color: '#94a3b8' }}></i>
+                            Фільтрація <i className="fas fa-question-circle" style={{ fontSize: '10px', color: '#94a3b8', cursor: 'help' }} title="Якщо увімкнено, при створенні матчу можна вибрати лише ті команди, які виграли на попередньому етапі (1/16 -> 1/8 -> Чвертьфінал і т.д.)"></i>
                         </label>
                         <div className={styles.panelFilterToggle}>
                             <label className={styles.switchMini}>
@@ -1171,6 +1171,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
             isAdmin={isAdmin}
             onDeleteMatch={handleDeleteMatch}
             onOpenScorers={handleOpenScorers}
+            onViewRoster={(teamId) => { setEditingTeamId(teamId); setIsTeamRosterModalOpen(true); }}
+            teams={details.teams || []}
           />
         )}
 
