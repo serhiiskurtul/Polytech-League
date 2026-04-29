@@ -73,7 +73,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   isAdmin,
   onRefresh
 }) => {
-  const [activeTab, setActiveTab] = useState<'standings' | 'matches' | 'teams' | 'info' | 'bracket'>('matches');
+  const [activeTab, setActiveTab] = useState<'standings' | 'matches' | 'teams' | 'info' | 'bracket'>((sport === 'futsal' || sport === 'футзал') ? 'bracket' : 'matches');
   const [allPlayers, setAllPlayers] = useState<PlayerDto[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -540,7 +540,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
       await createApi(payload);
       setIsCreateMatchModalOpen(false);
-      setNewMatchForm({ homeTeamId: '', awayTeamId: '', stage: 'Груповий етап' });
+      setNewMatchForm(prev => ({ ...prev, homeTeamId: '', awayTeamId: '' }));
       onRefresh();
     } catch (err) {
       console.error(err);
@@ -836,7 +836,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           <i className="fas fa-trophy"></i> {getSportLabel()}
         </div>
         <div className={styles.tabsNav}>
-          <button className={activeTab === 'matches' ? styles.activeTab : ''} onClick={() => setActiveTab('matches')}>Матчі</button>
+          {!(sport === 'futsal' || sport === 'футзал') && (
+            <button className={activeTab === 'matches' ? styles.activeTab : ''} onClick={() => setActiveTab('matches')}>Матчі</button>
+          )}
           <button className={activeTab === 'standings' ? styles.activeTab : ''} onClick={() => setActiveTab('standings')}>Таблиця</button>
           {(sport === 'futsal' || sport === 'футзал') && (
             <button className={activeTab === 'bracket' ? styles.activeTab : ''} onClick={() => setActiveTab('bracket')}>Сітка</button>

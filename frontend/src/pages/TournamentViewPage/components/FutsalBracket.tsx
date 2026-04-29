@@ -124,7 +124,7 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
       {matches.length === 0 && (
         <div className={styles.emptyBracket}>
           <i className="fas fa-sitemap"></i>
-          <p>Турнірна сітка порожня. Додайте поєдинки в адмін-панелі вище.</p>
+          <p>Турнірна сітка порожня.</p>
         </div>
       )}
     </div>
