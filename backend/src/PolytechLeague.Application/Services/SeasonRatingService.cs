@@ -9,7 +9,6 @@ namespace PolytechLeague.Application.Services;
 public class SeasonRatingService : ISeasonRatingService
 {
     private readonly ApplicationDbContext _context;
-    private const int DEFAULT_NON_PARTICIPATION_PENALTY = 25; // Очки за неявку за замовчуванням
 
     public SeasonRatingService(ApplicationDbContext context)
     {
@@ -336,23 +335,30 @@ public class SeasonRatingService : ISeasonRatingService
             }
         }
 
-        // Calculate Totals and use dynamic penalty
-        int maxRanks = 0;
-        if (rows.Any())
+        // Calculate Totals and use "last place + 1" penalty per sport
+        foreach (var sport in sports)
         {
-            maxRanks = rows.Max(r => r.SportResults.Values.Max(v => v.Rank == "-" ? 0 : int.Parse(v.Rank!)));
-        }
-        int dynamicPenalty = Math.Max(DEFAULT_NON_PARTICIPATION_PENALTY, maxRanks + 1);
+            int maxRankInSport = rows
+                .Select(r => r.SportResults[sport].Rank)
+                .Where(rank => rank != "-")
+                .Select(rank => int.Parse(rank))
+                .DefaultIfEmpty(0)
+                .Max();
+            
+            // Penalty is last place + 1. If no one participated, it defaults to 1 (or we could keep a small default)
+            int penaltyForSport = maxRankInSport + 1;
 
-        foreach (var row in rows)
-        {
-            foreach (var sport in sports)
+            foreach (var row in rows)
             {
                 if (row.SportResults[sport].Rank == "-")
                 {
-                    row.SportResults[sport].Points = dynamicPenalty;
+                    row.SportResults[sport].Points = penaltyForSport;
                 }
             }
+        }
+
+        foreach (var row in rows)
+        {
             row.TotalPoints = row.SportResults.Values.Sum(v => v.Points);
         }
 
