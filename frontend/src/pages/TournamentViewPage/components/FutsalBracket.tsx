@@ -45,7 +45,11 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
     return acc;
   }, {} as Record<string, FutsalMatchResponse[]>);
 
-  const sortedStages = Object.keys(groupedMatches).sort((a, b) => getStageRank(a) - getStageRank(b));
+  // Extract 3rd place matches to render them separately
+  const thirdPlaceMatches = groupedMatches['Матч за 3-тє місце'] || [];
+  const otherStages = Object.keys(groupedMatches)
+    .filter(s => s !== 'Матч за 3-тє місце')
+    .sort((a, b) => getStageRank(a) - getStageRank(b));
 
   const getPlayerName = (teamId: number, playerId: number | null | undefined) => {
     if (!playerId) return null;
@@ -56,118 +60,127 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
     return `${player.lastName} ${player.firstName[0]}.`;
   };
 
+  const renderMatchCard = (match: FutsalMatchResponse) => {
+    const isHomeWinner = (match.homeTeamScore || 0) > (match.awayTeamScore || 0);
+    const isAwayWinner = (match.awayTeamScore || 0) > (match.homeTeamScore || 0);
+    const isDraw = (match.homeTeamScore !== null && match.awayTeamScore !== null) && 
+                   (match.homeTeamScore === match.awayTeamScore);
+
+    const homeCaptain = getPlayerName(match.homeTeamId, match.homeCaptainId);
+    const homeGK = getPlayerName(match.homeTeamId, match.homeGoalkeeperId);
+    const awayCaptain = getPlayerName(match.awayTeamId, match.awayCaptainId);
+    const awayGK = getPlayerName(match.awayTeamId, match.awayGoalkeeperId);
+
+    return (
+      <div key={match.id} className={styles.futsalMatchCardContainer}>
+        <div 
+          className={styles.futsalMatchCard} 
+          onClick={() => onViewInfo && onViewInfo(match)}
+          style={{ cursor: onViewInfo ? 'pointer' : 'default' }}
+        >
+          {isAdmin && onDeleteMatch && (
+            <button 
+              className={styles.cardDeleteBtn}
+              onClick={(e) => { e.stopPropagation(); onDeleteMatch(match.id); }}
+              title="Видалити матч"
+            >
+              <i className="fas fa-trash"></i>
+            </button>
+          )}
+          
+          <div className={`${styles.futsalTeamRow} ${isHomeWinner ? styles.futsalWinner : isDraw ? styles.futsalDraw : ''}`}>
+            <div className={styles.futsalTeamInfo}>
+               <div className={styles.futsalTeamHeader}>
+                 <span className={styles.futsalTeamName}>{match.homeTeam?.name || 'TBD'}</span>
+                 {onViewRoster && (
+                   <button className={styles.rosterMiniBtn} onClick={(e) => { e.stopPropagation(); onViewRoster(match.homeTeamId); }} title="Переглянути склад">
+                     <i className="fas fa-users"></i>
+                   </button>
+                 )}
+               </div>
+               <div className={styles.futsalTeamRoles}>
+                 {homeCaptain && <span className={styles.roleBadge}><b>C:</b> {homeCaptain}</span>}
+                 {homeGK && <span className={styles.roleBadge}><b>GK:</b> {homeGK}</span>}
+               </div>
+            </div>
+            <div className={styles.futsalTeamScore}>
+              {match.homeTeamScore ?? '-'}
+              {isHomeWinner && <i className="fas fa-trophy"></i>}
+            </div>
+          </div>
+
+          <div className={styles.futsalVsDivider}>vs</div>
+
+          <div className={`${styles.futsalTeamRow} ${isAwayWinner ? styles.futsalWinner : isDraw ? styles.futsalDraw : ''}`}>
+            <div className={styles.futsalTeamInfo}>
+               <div className={styles.futsalTeamHeader}>
+                 <span className={styles.futsalTeamName}>{match.awayTeam?.name || 'TBD'}</span>
+                 {onViewRoster && (
+                   <button className={styles.rosterMiniBtn} onClick={(e) => { e.stopPropagation(); onViewRoster(match.awayTeamId); }} title="Переглянути склад">
+                     <i className="fas fa-users"></i>
+                   </button>
+                 )}
+               </div>
+               <div className={styles.futsalTeamRoles}>
+                 {awayCaptain && <span className={styles.roleBadge}><b>C:</b> {awayCaptain}</span>}
+                 {awayGK && <span className={styles.roleBadge}><b>GK:</b> {awayGK}</span>}
+               </div>
+            </div>
+            <div className={styles.futsalTeamScore}>
+              {match.awayTeamScore ?? '-'}
+              {isAwayWinner && <i className="fas fa-trophy"></i>}
+            </div>
+          </div>
+
+          {isAdmin && onOpenScorers && (
+            <button className={styles.futsalProtocolBtn} onClick={(e) => { e.stopPropagation(); onOpenScorers(match); }}>
+               <i className="fas fa-file-alt"></i> Протокол
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className={styles.futsalBracketWrapper}>
       <div className={styles.stagesRow}>
-        {sortedStages.map((stageName, stageIdx) => (
+        {otherStages.map((stageName, stageIdx) => (
           <div key={stageName} className={styles.bracketColumn}>
             <div className={styles.stageHeader}>
               <span className={styles.stageNameBadge}>{stageName}</span>
             </div>
             
             <div className={styles.matchList}>
-              {groupedMatches[stageName].map((match, matchIdx) => {
-                const isHomeWinner = (match.homeTeamScore || 0) > (match.awayTeamScore || 0);
-                const isAwayWinner = (match.awayTeamScore || 0) > (match.homeTeamScore || 0);
-                const isDraw = (match.homeTeamScore !== null && match.awayTeamScore !== null) && 
-                               (match.homeTeamScore === match.awayTeamScore);
-
-                const homeCaptain = getPlayerName(match.homeTeamId, match.homeCaptainId);
-                const homeGK = getPlayerName(match.homeTeamId, match.homeGoalkeeperId);
-                const awayCaptain = getPlayerName(match.awayTeamId, match.awayCaptainId);
-                const awayGK = getPlayerName(match.awayTeamId, match.awayGoalkeeperId);
-
-                return (
-                  <div key={match.id} className={styles.matchBoxContainer}>
-                    <div 
-                      className={styles.futsalMatchCard} 
-                      onClick={() => onViewInfo && onViewInfo(match)}
-                      style={{ cursor: onViewInfo ? 'pointer' : 'default' }}
-                    >
-                      {isAdmin && onDeleteMatch && (
-                        <button 
-                          className={styles.cardDeleteBtn}
-                          onClick={() => onDeleteMatch(match.id)}
-                          title="Видалити матч"
-                        >
-                          <i className="fas fa-trash"></i>
-                        </button>
-                      )}
-                      
-                      {/* Team 1 */}
-                      <div className={`${styles.futsalTeamRow} ${isHomeWinner ? styles.futsalWinner : isDraw ? styles.futsalDraw : ''}`}>
-                        <div className={styles.futsalTeamInfo}>
-                           <div className={styles.futsalTeamHeader}>
-                             <span className={styles.futsalTeamName}>{match.homeTeam?.name || 'TBD'}</span>
-                             {onViewRoster && (
-                               <button className={styles.rosterMiniBtn} onClick={() => onViewRoster(match.homeTeamId)} title="Переглянути склад">
-                                 <i className="fas fa-users"></i>
-                               </button>
-                             )}
-                           </div>
-                           <div className={styles.futsalTeamRoles}>
-                             {homeCaptain && <span className={styles.roleBadge} title="Капітан"><b>C:</b> {homeCaptain}</span>}
-                             {homeGK && <span className={styles.roleBadge} title="Воротар"><b>GK:</b> {homeGK}</span>}
-                           </div>
-                        </div>
-                        <div className={styles.futsalTeamScore}>
-                          {match.homeTeamScore ?? '-'}
-                          {isHomeWinner && <i className="fas fa-trophy"></i>}
-                        </div>
-                      </div>
-
-                      <div className={styles.futsalVsDivider}>vs</div>
-
-                      {/* Team 2 */}
-                      <div className={`${styles.futsalTeamRow} ${isAwayWinner ? styles.futsalWinner : isDraw ? styles.futsalDraw : ''}`}>
-                        <div className={styles.futsalTeamInfo}>
-                           <div className={styles.futsalTeamHeader}>
-                             <span className={styles.futsalTeamName}>{match.awayTeam?.name || 'TBD'}</span>
-                             {onViewRoster && (
-                               <button className={styles.rosterMiniBtn} onClick={() => onViewRoster(match.awayTeamId)} title="Переглянути склад">
-                                 <i className="fas fa-users"></i>
-                               </button>
-                             )}
-                           </div>
-                           <div className={styles.futsalTeamRoles}>
-                             {awayCaptain && <span className={styles.roleBadge} title="Капітан"><b>C:</b> {awayCaptain}</span>}
-                             {awayGK && <span className={styles.roleBadge} title="Воротар"><b>GK:</b> {awayGK}</span>}
-                           </div>
-                        </div>
-                        <div className={styles.futsalTeamScore}>
-                          {match.awayTeamScore ?? '-'}
-                          {isAwayWinner && <i className="fas fa-trophy"></i>}
-                        </div>
-                      </div>
-
-                      {isAdmin && onOpenScorers && (
-                        <button className={styles.futsalProtocolBtn} onClick={() => onOpenScorers(match)}>
-                           <i className="fas fa-file-alt"></i> Протокол
-                        </button>
-                      )}
+              {groupedMatches[stageName].map((match, matchIdx) => (
+                <div key={match.id} className={styles.matchBoxContainer}>
+                  {renderMatchCard(match)}
+                  
+                  {/* Connectors to Next Stage */}
+                  {stageIdx < otherStages.length - 1 && (
+                    <div className={`${styles.futsalConnector} ${matchIdx % 2 === 0 ? styles.topMatch : styles.bottomMatch}`}>
+                      <div className={styles.futsalLineHorizontal}></div>
+                      <div className={styles.futsalLineVertical}></div>
+                      {matchIdx % 2 === 0 && <div className={styles.futsalArrowJoin}></div>}
                     </div>
+                  )}
+                </div>
+              ))}
 
-                    {/* Connectors */}
-                    {stageIdx < sortedStages.length - 1 && (
-                      <div className={styles.futsalConnector}>
-                        <div className={styles.futsalLineHorizontal}></div>
-                        {matchIdx % 2 === 0 ? (
-                           <div className={styles.futsalLineVerticalDown}></div>
-                        ) : (
-                           <div className={styles.futsalLineVerticalUp}></div>
-                        )}
-                        {matchIdx % 2 === 0 && (
-                          <div className={styles.futsalArrowHead}></div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+              {/* Manual 3rd Place Rendering for the Final Column */}
+              {stageName === 'Фінал' && thirdPlaceMatches.length > 0 && (
+                <div className={styles.thirdPlaceSection}>
+                   <div className={styles.stageHeader} style={{ marginTop: '40px' }}>
+                      <span className={`${styles.stageNameBadge} ${styles.thirdPlaceBadge}`}>Матч за 3-тє місце</span>
+                   </div>
+                   {thirdPlaceMatches.map(m => renderMatchCard(m))}
+                </div>
+              )}
             </div>
           </div>
         ))}
       </div>
+
       {matches.length === 0 && (
         <div className={styles.emptyBracket}>
           <i className="fas fa-sitemap"></i>

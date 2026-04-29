@@ -2972,16 +2972,15 @@ input:checked + .slider:before {
 /* Connectors */
 .futsalConnector {
   position: absolute;
-  right: -48px;
+  right: -60px;
   top: 50%;
-  width: 48px;
-  height: 100%;
+  width: 60px;
   pointer-events: none;
   z-index: 1;
 }
 
 .futsalLineHorizontal {
-  width: 24px;
+  width: 30px;
   height: 2px;
   background: #cbd5e1;
   position: absolute;
@@ -2989,42 +2988,36 @@ input:checked + .slider:before {
   left: 0;
 }
 
-.futsalLineVerticalDown {
+.futsalLineVertical {
   width: 2px;
-  height: calc(50% + 48px); /* Height to reach the middle of the pair gap */
   background: #cbd5e1;
   position: absolute;
+  left: 30px;
+}
+
+.topMatch .futsalLineVertical {
+  height: calc(50% + 44px); /* Gap + Half card height */
   top: 0;
-  left: 24px;
 }
 
-.futsalLineVerticalUp {
-  width: 2px;
-  height: calc(50% + 48px);
-  background: #cbd5e1;
-  position: absolute;
+.bottomMatch .futsalLineVertical {
+  height: calc(50% + 44px);
   bottom: 0;
-  left: 24px;
 }
 
-.futsalArrowHead {
-  width: 24px;
+.futsalArrowJoin {
+  width: 30px;
   height: 2px;
   background: #cbd5e1;
   position: absolute;
-  top: calc(50% + 24px); /* Position between the matches */
-  left: 24px;
+  top: calc(50% + 44px); /* Middle of the fork */
+  left: 30px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
 }
 
-/* Specific fix for the arrow meeting the next round */
-.matchBoxContainer:nth-child(odd) .futsalArrowHead {
-  top: calc(50% + 48px);
-}
-
-.futsalArrowHead::after {
+.futsalArrowJoin::after {
   content: "";
   width: 6px;
   height: 6px;
@@ -3032,6 +3025,22 @@ input:checked + .slider:before {
   border-top: 2px solid #cbd5e1;
   transform: rotate(45deg);
   margin-right: -1px;
+}
+
+/* Third Place Section */
+.thirdPlaceSection {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-top: 1px dashed #cbd5e1;
+  margin-top: 20px;
+  padding-top: 20px;
+}
+
+.thirdPlaceBadge {
+  background: linear-gradient(135deg, #475569 0%, #64748b 100%) !important;
+  font-size: 11px !important;
 }
 
 /* Mini Switch */
