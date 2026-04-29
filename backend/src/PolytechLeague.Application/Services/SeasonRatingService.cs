@@ -335,24 +335,16 @@ public class SeasonRatingService : ISeasonRatingService
             }
         }
 
-        // Calculate Totals and use "last place + 1" penalty per sport
+        // Calculate Totals and use "total registered teams + 1" penalty per sport for those who didn't participate
+        int penaltyForNonParticipation = rows.Count + 1;
+
         foreach (var sport in sports)
         {
-            int maxRankInSport = rows
-                .Select(r => r.SportResults[sport].Rank)
-                .Where(rank => rank != "-")
-                .Select(rank => int.Parse(rank))
-                .DefaultIfEmpty(0)
-                .Max();
-            
-            // Penalty is last place + 1. If no one participated, it defaults to 1 (or we could keep a small default)
-            int penaltyForSport = maxRankInSport + 1;
-
             foreach (var row in rows)
             {
                 if (row.SportResults[sport].Rank == "-")
                 {
-                    row.SportResults[sport].Points = penaltyForSport;
+                    row.SportResults[sport].Points = penaltyForNonParticipation;
                 }
             }
         }
