@@ -39,7 +39,7 @@ public class TableTennisTeamService(
         if (newEntity.PlayerIds != null)
         {
             // Explicitly load the collection to ensure EF knows about existing relationships
-            _dbcontext.Entry(oldEntity).Collection(t => t.Players).Load();
+            _dbcontext.Entry(oldEntity).Collection(t => t.Players!).Load();
             
             var players = _dbcontext.Players
                 .Where(p => newEntity.PlayerIds.Contains(p.Id))

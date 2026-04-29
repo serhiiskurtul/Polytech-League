@@ -2,7 +2,9 @@ import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import styles from './PlayersRatingPage.module.css';
 import { getPlayersRankings } from '../../shared/api/players.api';
+import { getSeasons } from '../../shared/api/seasonRating.api';
 import { PlayerDto } from '../../shared/types/player.types';
+import { Season } from '../../shared/types/seasonRating.types';
 
 const PlayersRatingPage = () => {
   const [searchParams] = useSearchParams();
@@ -15,6 +17,9 @@ const PlayersRatingPage = () => {
   const [selectedWeightClass, setSelectedWeightClass] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'performance' | 'goals'>('performance');
   const [selectedPlayers, setSelectedPlayers] = useState<PlayerDto[]>([]);
+  
+  const [seasons, setSeasons] = useState<Season[]>([]);
+  const [selectedSeasonId, setSelectedSeasonId] = useState<string>('all');
 
   useEffect(() => {
     if (players.length > 0 && p1Id && selectedPlayers.length === 0) {
@@ -39,11 +44,26 @@ const PlayersRatingPage = () => {
   };
 
   useEffect(() => {
+    const fetchSeasons = async () => {
+      try {
+        const data = await getSeasons();
+        setSeasons(data);
+        const current = data.find(s => s.isCurrent);
+        if (current) setSelectedSeasonId(current.id.toString());
+      } catch (err) {
+        console.error('Error fetching seasons:', err);
+      }
+    };
+    fetchSeasons();
+  }, []);
+
+  useEffect(() => {
     const fetchRankings = async () => {
       setLoading(true);
       setError(null);
       try {
-        const data = await getPlayersRankings();
+        const sid = selectedSeasonId === 'all' ? undefined : selectedSeasonId;
+        const data = await getPlayersRankings(sid);
         setPlayers(data);
       } catch (err: any) {
         console.error('Error fetching rankings:', err);
@@ -53,7 +73,7 @@ const PlayersRatingPage = () => {
       }
     };
     fetchRankings();
-  }, []);
+  }, [selectedSeasonId]);
 
   const sportsTabs = [
     { id: 'all', name: 'Загальний', icon: 'fa-globe', key: 'Загальний' },
@@ -211,6 +231,20 @@ const PlayersRatingPage = () => {
                 </select>
               </div>
             )}
+
+            <div className={styles.weightFilter}>
+              <i className="fa-solid fa-calendar-days"></i>
+              <select 
+                value={selectedSeasonId} 
+                onChange={(e) => setSelectedSeasonId(e.target.value)}
+                className={styles.weightSelect}
+              >
+                <option value="all">За весь час</option>
+                {seasons.map(s => (
+                  <option key={s.id} value={s.id}>{s.name} {s.isCurrent ? '(Поточний)' : ''}</option>
+                ))}
+              </select>
+            </div>
 
             <div className={styles.resultsCount}>
               Знайдено: <strong>{filteredPlayers.length}</strong> гравців

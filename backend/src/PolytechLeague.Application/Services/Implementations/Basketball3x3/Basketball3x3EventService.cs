@@ -69,7 +69,7 @@ public class Basketball3x3EventService(
 
     protected override async Task OnCreatedAsync(Basketball3x3Event entity, CancellationToken cancellationToken)
     {
-        await _notificationService.SendNotificationToAllAsync(
+        await _notificationService?.SendNotificationToAllAsync(
             "Нове змагання!",
             $"Створено нове змагання з баскетболу 3х3: {entity.Name}",
             NotificationType.Tournament,
@@ -101,7 +101,7 @@ public class Basketball3x3EventService(
         
         if (winnersSet)
         {
-            await _notificationService.SendNotificationToAllAsync(
+            await _notificationService?.SendNotificationToAllAsync(
                 "Змагання завершено!",
                 $"Визначено переможців у змаганні з баскетболу 3х3: {newEntity.Name}",
                 NotificationType.Tournament,
@@ -156,7 +156,7 @@ public class Basketball3x3EventService(
 
         await _dbcontext.SaveChangesAsync(cancellationToken);
         
-        await _notificationService.SendNotificationToAdminsAsync(
+        await _notificationService?.SendNotificationToAdminsAsync(
             "Нова реєстрація на баскетбол 3х3",
             $"Гравець {player.FirstName} {player.LastName} (група {groupName}) зареєструвався на {tournament.Name}",
             NotificationType.Tournament,

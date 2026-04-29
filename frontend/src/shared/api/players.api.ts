@@ -45,8 +45,9 @@ export const uploadAvatar = async (file: File): Promise<string> => {
     return response.data.photoUrl;
 };
 
-export const getPlayersRankings = async (): Promise<PlayerDto[]> => {
-    const response = await api.get<PlayerDto[]>('/players/rankings');
+export const getPlayersRankings = async (seasonId?: number | string): Promise<PlayerDto[]> => {
+    const url = seasonId ? `/players/rankings?seasonId=${seasonId}` : '/players/rankings';
+    const response = await api.get<PlayerDto[]>(url);
     return response.data;
 };
 

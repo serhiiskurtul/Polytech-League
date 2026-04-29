@@ -129,10 +129,10 @@ public class PlayersController : ControllerBase
     }
 
     [HttpGet("rankings")]
-    public async Task<ActionResult<IEnumerable<PlayerDto>>> GetRankings(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<PlayerDto>>> GetRankings([FromQuery] long? seasonId, CancellationToken cancellationToken)
     {
         try {
-            var results = await _playerService.GetAllWithRankingsAsync(cancellationToken);
+            var results = await _playerService.GetAllWithRankingsAsync(seasonId, cancellationToken);
             return Ok(results);
         } catch (Exception ex) {
             Console.WriteLine($"CONTROLLER RANKINGS ERROR: {ex.Message}");
