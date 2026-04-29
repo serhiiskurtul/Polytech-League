@@ -2716,11 +2716,13 @@ namespace PolytechLeague.Persistence.Migrations
                 {
                     b.HasOne("PolytechLeague.Domain.Entities.Player", "AwayCaptain")
                         .WithMany()
-                        .HasForeignKey("AwayCaptainId");
+                        .HasForeignKey("AwayCaptainId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PolytechLeague.Domain.Entities.Player", "AwayGoalkeeper")
                         .WithMany()
-                        .HasForeignKey("AwayGoalkeeperId");
+                        .HasForeignKey("AwayGoalkeeperId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PolytechLeague.Domain.Entities.Futsal.FutsalTeam", "AwayTeam")
                         .WithMany()
@@ -2736,11 +2738,13 @@ namespace PolytechLeague.Persistence.Migrations
 
                     b.HasOne("PolytechLeague.Domain.Entities.Player", "HomeCaptain")
                         .WithMany()
-                        .HasForeignKey("HomeCaptainId");
+                        .HasForeignKey("HomeCaptainId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PolytechLeague.Domain.Entities.Player", "HomeGoalkeeper")
                         .WithMany()
-                        .HasForeignKey("HomeGoalkeeperId");
+                        .HasForeignKey("HomeGoalkeeperId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PolytechLeague.Domain.Entities.Futsal.FutsalTeam", "HomeTeam")
                         .WithMany()
