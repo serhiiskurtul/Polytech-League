@@ -945,6 +945,9 @@ namespace PolytechLeague.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<long?>("AwayCaptainId")
+                        .HasColumnType("bigint");
+
                     b.Property<long?>("AwayGoalkeeperId")
                         .HasColumnType("bigint");
 
@@ -955,6 +958,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("integer");
 
                     b.Property<long>("EventId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("HomeCaptainId")
                         .HasColumnType("bigint");
 
                     b.Property<long?>("HomeGoalkeeperId")
@@ -975,11 +981,15 @@ namespace PolytechLeague.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AwayCaptainId");
+
                     b.HasIndex("AwayGoalkeeperId");
 
                     b.HasIndex("AwayTeamId");
 
                     b.HasIndex("EventId");
+
+                    b.HasIndex("HomeCaptainId");
 
                     b.HasIndex("HomeGoalkeeperId");
 
@@ -1004,6 +1014,9 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<long>("EventId")
                         .HasColumnType("bigint");
 
+                    b.Property<long?>("GoalkeeperId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -1022,6 +1035,8 @@ namespace PolytechLeague.Persistence.Migrations
                     b.HasIndex("CaptainId");
 
                     b.HasIndex("EventId");
+
+                    b.HasIndex("GoalkeeperId");
 
                     b.ToTable("futsal_teams", (string)null);
                 });
@@ -2699,6 +2714,10 @@ namespace PolytechLeague.Persistence.Migrations
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Futsal.FutsalMatch", b =>
                 {
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "AwayCaptain")
+                        .WithMany()
+                        .HasForeignKey("AwayCaptainId");
+
                     b.HasOne("PolytechLeague.Domain.Entities.Player", "AwayGoalkeeper")
                         .WithMany()
                         .HasForeignKey("AwayGoalkeeperId");
@@ -2715,6 +2734,10 @@ namespace PolytechLeague.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "HomeCaptain")
+                        .WithMany()
+                        .HasForeignKey("HomeCaptainId");
+
                     b.HasOne("PolytechLeague.Domain.Entities.Player", "HomeGoalkeeper")
                         .WithMany()
                         .HasForeignKey("HomeGoalkeeperId");
@@ -2730,11 +2753,15 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasForeignKey("WinnerTeamId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.Navigation("AwayCaptain");
+
                     b.Navigation("AwayGoalkeeper");
 
                     b.Navigation("AwayTeam");
 
                     b.Navigation("Event");
+
+                    b.Navigation("HomeCaptain");
 
                     b.Navigation("HomeGoalkeeper");
 
@@ -2756,9 +2783,16 @@ namespace PolytechLeague.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "Goalkeeper")
+                        .WithMany()
+                        .HasForeignKey("GoalkeeperId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Captain");
 
                     b.Navigation("Event");
+
+                    b.Navigation("Goalkeeper");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Message", b =>

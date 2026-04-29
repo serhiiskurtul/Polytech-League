@@ -42,5 +42,6 @@ public class FutsalTeamService(
         oldEntity.Name = newEntity.Name;
         oldEntity.Points = newEntity.Points;
         oldEntity.CaptainId = newEntity.CaptainId;
+        oldEntity.GoalkeeperId = newEntity.GoalkeeperId;
     }
 }

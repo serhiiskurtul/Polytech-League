@@ -1651,7 +1651,15 @@ const TournamentViewPage = () => {
           </div>
 
           {(() => {
-            const s = tournament?.sport.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') || '';
+            const rawSport = (tournament?.sport || '').toLowerCase().replace(/-/g, '_').replace(/\s/g, '');
+            const sportMap: Record<string, string> = {
+              'футзал': 'futsal',
+              'волейбол': 'volleyball',
+              'пляжний_волейбол': 'beach_volleyball',
+              'баскетбол_3х3': 'basketball_3x3',
+              'бадмінтон': 'badminton'
+            };
+            const s = sportMap[rawSport] || rawSport;
             const isTeamFromDetails = !!(details as any)?.isTeam;
             const mandatoryTeamSports = ['volleyball', 'beach_volleyball', 'futsal', 'basketball_3x3', 'basketball3x3'];
 

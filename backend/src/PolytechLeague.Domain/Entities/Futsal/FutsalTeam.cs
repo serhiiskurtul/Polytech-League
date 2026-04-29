@@ -13,6 +13,8 @@ public class FutsalTeam
     public ICollection<Player>? Players { get; set; }
     public long? CaptainId { get; set; }
     public Player? Captain { get; set; }
+    public long? GoalkeeperId { get; set; }
+    public Player? Goalkeeper { get; set; }
     public int Points { get; set; }
     public int Rank { get; set; }
 

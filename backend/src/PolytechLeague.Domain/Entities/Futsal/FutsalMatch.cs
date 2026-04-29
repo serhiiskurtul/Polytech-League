@@ -35,5 +35,10 @@ public class FutsalMatch
     public Player? HomeGoalkeeper { get; set; }
     public long? AwayGoalkeeperId { get; set; }
     public Player? AwayGoalkeeper { get; set; }
+
+    public long? HomeCaptainId { get; set; }
+    public Player? HomeCaptain { get; set; }
+    public long? AwayCaptainId { get; set; }
+    public Player? AwayCaptain { get; set; }
 }
 

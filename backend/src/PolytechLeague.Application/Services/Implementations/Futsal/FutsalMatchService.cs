@@ -26,6 +26,23 @@ public class FutsalMatchService :
     {
         _logger.LogDebug("Creating futsal match with rosters.");
         await MapRoster(entity, cancellationToken);
+
+        // Fill default captain and goalkeeper from teams if not provided
+        var homeTeam = await _dbcontext.FutsalTeams.FindAsync(new object[] { entity.HomeTeamId }, cancellationToken);
+        var awayTeam = await _dbcontext.FutsalTeams.FindAsync(new object[] { entity.AwayTeamId }, cancellationToken);
+
+        if (homeTeam != null)
+        {
+            entity.HomeCaptainId ??= homeTeam.CaptainId;
+            entity.HomeGoalkeeperId ??= homeTeam.GoalkeeperId;
+        }
+
+        if (awayTeam != null)
+        {
+            entity.AwayCaptainId ??= awayTeam.CaptainId;
+            entity.AwayGoalkeeperId ??= awayTeam.GoalkeeperId;
+        }
+
         _dbcontext.FutsalMatches.Add(entity);
         await _dbcontext.SaveChangesAsync(cancellationToken);
         return entity;
@@ -130,6 +147,8 @@ public class FutsalMatchService :
         oldEntity.Stage = newEntity.Stage;
         oldEntity.HomeGoalkeeperId = newEntity.HomeGoalkeeperId;
         oldEntity.AwayGoalkeeperId = newEntity.AwayGoalkeeperId;
+        oldEntity.HomeCaptainId = newEntity.HomeCaptainId;
+        oldEntity.AwayCaptainId = newEntity.AwayCaptainId;
     }
 }
 

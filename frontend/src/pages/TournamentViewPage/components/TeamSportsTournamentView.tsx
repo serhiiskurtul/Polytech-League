@@ -92,6 +92,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const [selectedMatchForScorers, setSelectedMatchForScorers] = useState<any>(null);
   const [tempScorers, setTempScorers] = useState<{[playerId: number]: number}>({});
   const [matchGoalkeepers, setMatchGoalkeepers] = useState<{home: string, away: string}>({ home: '', away: '' });
+  const [matchCaptains, setMatchCaptains] = useState<{home: string, away: string}>({ home: '', away: '' });
 
   // Quick Add Player State
   const [isQuickAddMode, setIsQuickAddMode] = useState(false);
@@ -178,7 +179,6 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           board: match.board || 1
         };
       } else {
-        // Futsal, Basketball, etc.
         payload = {
           id: matchId,
           eventId: details.id,
@@ -191,7 +191,11 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           stage: match.stage,
           setsToWin: match.setsToWin || details.setsToWin || 2,
           homeRosterIds: match.homeRoster?.map((p: any) => p.id) || match.homeRosterIds || [],
-          awayRosterIds: match.awayRoster?.map((p: any) => p.id) || match.awayRosterIds || []
+          awayRosterIds: match.awayRoster?.map((p: any) => p.id) || match.awayRosterIds || [],
+          homeGoalkeeperId: match.homeGoalkeeperId,
+          awayGoalkeeperId: match.awayGoalkeeperId,
+          homeCaptainId: match.homeCaptainId,
+          awayCaptainId: match.awayCaptainId
         };
       }
 
@@ -211,9 +215,18 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       initialScorers[g.playerId] = g.goalsCount;
     });
     setTempScorers(initialScorers);
+    
+    // Default match goalkeepers to team defaults if not set for the match
+    const homeTeam = details.teams?.find((t: any) => t.id === match.homeTeamId);
+    const awayTeam = details.teams?.find((t: any) => t.id === match.awayTeamId);
+
     setMatchGoalkeepers({
-      home: match.homeGoalkeeperId?.toString() || '',
-      away: match.awayGoalkeeperId?.toString() || ''
+      home: match.homeGoalkeeperId?.toString() || homeTeam?.goalkeeperId?.toString() || '',
+      away: match.awayGoalkeeperId?.toString() || awayTeam?.goalkeeperId?.toString() || ''
+    });
+    setMatchCaptains({
+      home: match.homeCaptainId?.toString() || homeTeam?.captainId?.toString() || '',
+      away: match.awayCaptainId?.toString() || awayTeam?.captainId?.toString() || ''
     });
     setIsScorersModalOpen(true);
   };
@@ -246,6 +259,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
             : details.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players?.map((p: any) => p.id) || [],
         homeGoalkeeperId: matchGoalkeepers.home ? parseInt(matchGoalkeepers.home) : null,
         awayGoalkeeperId: matchGoalkeepers.away ? parseInt(matchGoalkeepers.away) : null,
+        homeCaptainId: matchCaptains.home ? parseInt(matchCaptains.home) : null,
+        awayCaptainId: matchCaptains.away ? parseInt(matchCaptains.away) : null,
         goals: goalsPayload
       };
 
@@ -451,7 +466,11 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         stage: newMatchForm.stage,
         setsToWin: details.setsToWin || 2,
         homeRosterIds: homeTeam?.players?.map((p: any) => p.id) || [],
-        awayRosterIds: awayTeam?.players?.map((p: any) => p.id) || []
+        awayRosterIds: awayTeam?.players?.map((p: any) => p.id) || [],
+        homeGoalkeeperId: homeTeam?.goalkeeperId,
+        awayGoalkeeperId: awayTeam?.goalkeeperId,
+        homeCaptainId: homeTeam?.captainId,
+        awayCaptainId: awayTeam?.captainId
       };
 
       switch (sport) {
@@ -610,6 +629,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         points: team.points,
         rank: team.rank,
         captainId: playerId,
+        goalkeeperId: team.goalkeeperId,
         playerIds: team.players?.map((p: any) => p.id) || []
       };
 
@@ -618,6 +638,30 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     } catch (err) {
       console.error(err);
       alert('Помилка при призначенні капітана');
+    }
+  };
+
+  const handleSetGoalkeeper = async (teamId: number, playerId: number | null) => {
+    try {
+      const team = details.teams.find((t: any) => t.id === teamId);
+      const updateApi = getTeamUpdateApi();
+      
+      const payload = {
+        id: team.id,
+        name: team.name,
+        eventId: team.eventId,
+        points: team.points,
+        rank: team.rank,
+        captainId: team.captainId,
+        goalkeeperId: playerId,
+        playerIds: team.players?.map((p: any) => p.id) || []
+      };
+
+      await updateApi(teamId, payload);
+      onRefresh();
+    } catch (err) {
+      console.error(err);
+      alert('Помилка при призначенні воротаря');
     }
   };
 
@@ -682,22 +726,29 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
   const getSportLabel = () => {
     switch (sport) {
-      case 'volleyball': return 'Волейбол';
+      case 'volleyball':
+      case 'волейбол': return 'Волейбол';
       case 'beach_volleyball':
-      case 'beach-volleyball': return 'Пляжний Волейбол';
-      case 'futsal': return 'Футзал';
+      case 'beach-volleyball':
+      case 'пляжний_волейбол': return 'Пляжний Волейбол';
+      case 'futsal':
+      case 'футзал': return 'Футзал';
       case 'basketball_3x3':
       case 'basketball3x3':
-      case 'basketball-3x3': return 'Баскетбол 3х3';
-      case 'badminton': return 'Бадмінтон';
-      case 'chess': return 'Шахи';
-      case 'checkers': return 'Шашки';
+      case 'basketball-3x3':
+      case 'баскетбол_3х3': return 'Баскетбол 3х3';
+      case 'badminton':
+      case 'бадмінтон': return 'Бадмінтон';
+      case 'chess':
+      case 'шахи': return 'Шахи';
+      case 'checkers':
+      case 'шашки': return 'Шашки';
       case 'tabletennis':
       case 'table_tennis':
-      case 'table-tennis': return 'Настільний Теніс';
+      case 'table-tennis':
+      case 'настільний_теніс': return 'Настільний Теніс';
       default: return 'Спорт';
     }
-
   };
 
   const filteredPlayers = allPlayers.filter(p => 
@@ -816,7 +867,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
                   {isAdmin && (
                     <div className={styles.matchActions}>
-                      {(sport === 'futsal') && (
+                      {(sport === 'futsal' || sport === 'футзал') && (
                         <button 
                           className={styles.scorersBtn}
                           onClick={() => handleOpenScorers(match)}
@@ -836,9 +887,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   )}
                   
                    {/* Goals summary for non-admins or small preview */}
-                   {(match.goals?.length > 0 || match.homeGoalkeeper || match.awayGoalkeeper) && (
+                   {(match.goals?.length > 0 || match.homeGoalkeeper || match.awayGoalkeeper || match.homeCaptain || match.awayCaptain) && (
                      <div className={styles.scorersPreview}>
                         <div className={styles.scorersColumn}>
+                           {match.homeCaptain && (
+                             <span className={styles.captainBadge} title="Капітан">
+                               <i className="fas fa-copyright"></i> {match.homeCaptain.lastName}
+                             </span>
+                           )}
                            {match.homeGoalkeeper && (
                              <span className={styles.goalkeeperBadge} title="Воротар">
                                <i className="fas fa-hands"></i> {match.homeGoalkeeper.lastName}
@@ -851,6 +907,11 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                            ))}
                         </div>
                         <div className={styles.scorersColumn}>
+                           {match.awayCaptain && (
+                             <span className={styles.captainBadge} title="Капітан">
+                               <i className="fas fa-copyright"></i> {match.awayCaptain.lastName}
+                             </span>
+                           )}
                            {match.awayGoalkeeper && (
                              <span className={styles.goalkeeperBadge} title="Воротар">
                                <i className="fas fa-hands"></i> {match.awayGoalkeeper.lastName}
@@ -940,8 +1001,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                 </div>
                 <div className={styles.teamPlayersPreview}>
                   {team.players?.slice(0, 5).map((p: any) => (
-                    <div key={p.id} className={`${styles.pMiniTag} ${team.captainId === p.id ? styles.captainTag : ''}`}>
-                      {team.captainId === p.id && <i className="fas fa-copyright" style={{marginRight: '4px', fontSize: '10px'}}></i>}
+                    <div key={p.id} className={`${styles.pMiniTag} ${team.captainId === p.id ? styles.captainTag : ''} ${team.goalkeeperId === p.id ? styles.goalkeeperTag : ''}`}>
+                      {team.captainId === p.id && <i className="fas fa-copyright" style={{marginRight: '4px', fontSize: '10px'}} title="Капітан"></i>}
+                      {team.goalkeeperId === p.id && <i className="fas fa-hands" style={{marginRight: '4px', fontSize: '10px'}} title="Воротар"></i>}
                       {p.lastName} {p.firstName[0]}.
                     </div>
                   ))}
@@ -1088,17 +1150,29 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                                         <span className={styles.pGroup}>{player.group}</span>
                                     </div>
                                     <div className={styles.pickStatus}>
-                                        {isSelected && (
-                                          <button 
-                                            className={`${styles.captainToggleBtn} ${team.captainId === player.id ? styles.isCaptain : ''}`}
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              handleSetCaptain(editingTeamId, team.captainId === player.id ? null : player.id!);
-                                            }}
-                                            title={team.captainId === player.id ? "Прибрати капітана" : "Призначити капітаном"}
-                                          >
-                                            ©
-                                          </button>
+                                        {(isSelected && (sport === 'futsal' || sport === 'футзал')) && (
+                                          <div className={styles.roleToggles}>
+                                            <button 
+                                              className={`${styles.roleToggleBtn} ${team.captainId === player.id ? styles.isCaptain : ''}`}
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleSetCaptain(editingTeamId, team.captainId === player.id ? null : player.id!);
+                                              }}
+                                              title={team.captainId === player.id ? "Прибрати капітана" : "Призначити капітаном"}
+                                            >
+                                              <i className="fas fa-copyright"></i>
+                                            </button>
+                                            <button 
+                                              className={`${styles.roleToggleBtn} ${team.goalkeeperId === player.id ? styles.isGoalkeeper : ''}`}
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleSetGoalkeeper(editingTeamId, team.goalkeeperId === player.id ? null : player.id!);
+                                              }}
+                                              title={team.goalkeeperId === player.id ? "Прибрати воротаря" : "Призначити воротарем"}
+                                            >
+                                              <i className="fas fa-hands"></i>
+                                            </button>
+                                          </div>
                                         )}
                                         <div style={{display: 'inline-block', marginLeft: '10px'}} onClick={() => handleTogglePlayerInTeam(editingTeamId, player.id!)}>
                                           {isSelected ? <i className="fas fa-check-circle"></i> : <i className="far fa-circle"></i>}
@@ -1186,23 +1260,41 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                 {/* Home Team Scorers */}
                 <div className={styles.teamScorersSection}>
                   <h5>{selectedMatchForScorers.homeTeam?.name}</h5>
-                  <div className={styles.goalkeeperSelect} style={{marginBottom: '16px'}}>
-                    <label style={{fontSize: '12px', color: '#666', display: 'block', marginBottom: '4px'}}>Воротар (опціонально)</label>
-                    <select 
-                      value={matchGoalkeepers.home} 
-                      onChange={e => setMatchGoalkeepers({...matchGoalkeepers, home: e.target.value})}
-                      style={{width: '100%', padding: '6px', borderRadius: '8px', border: '1px solid #ddd'}}
-                    >
-                      <option value="">-- Оберіть воротаря --</option>
-                      {(selectedMatchForScorers.homeRoster?.length > 0 
-                          ? selectedMatchForScorers.homeRoster 
-                          : details.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players || []
-                      ).map((p: any) => (
-                        <option key={p.id} value={p.id}>
-                          {p.futsalShirtNumber ? `№${p.futsalShirtNumber} ` : ''}{p.lastName} {p.firstName}
-                        </option>
-                      ))}
-                    </select>
+                  <div className={styles.matchRoleSelects}>
+                    <div className={styles.goalkeeperSelect}>
+                      <label>Воротар</label>
+                      <select 
+                        value={matchGoalkeepers.home} 
+                        onChange={e => setMatchGoalkeepers({...matchGoalkeepers, home: e.target.value})}
+                      >
+                        <option value="">-- Оберіть воротаря --</option>
+                        {(selectedMatchForScorers.homeRoster?.length > 0 
+                            ? selectedMatchForScorers.homeRoster 
+                            : details.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players || []
+                        ).map((p: any) => (
+                          <option key={p.id} value={p.id}>
+                            {p.futsalShirtNumber ? `№${p.futsalShirtNumber} ` : ''}{p.lastName} {p.firstName}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className={styles.goalkeeperSelect}>
+                      <label>Капітан</label>
+                      <select 
+                        value={matchCaptains.home} 
+                        onChange={e => setMatchCaptains({...matchCaptains, home: e.target.value})}
+                      >
+                        <option value="">-- Оберіть капітана --</option>
+                        {(selectedMatchForScorers.homeRoster?.length > 0 
+                            ? selectedMatchForScorers.homeRoster 
+                            : details.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players || []
+                        ).map((p: any) => (
+                          <option key={p.id} value={p.id}>
+                            {p.futsalShirtNumber ? `№${p.futsalShirtNumber} ` : ''}{p.lastName} {p.firstName}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                   <div className={styles.scorersList}>
                     {(selectedMatchForScorers.homeRoster?.length > 0 
@@ -1236,23 +1328,41 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                 {/* Away Team Scorers */}
                 <div className={styles.teamScorersSection}>
                   <h5>{selectedMatchForScorers.awayTeam?.name}</h5>
-                  <div className={styles.goalkeeperSelect} style={{marginBottom: '16px'}}>
-                    <label style={{fontSize: '12px', color: '#666', display: 'block', marginBottom: '4px'}}>Воротар (опціонально)</label>
-                    <select 
-                      value={matchGoalkeepers.away} 
-                      onChange={e => setMatchGoalkeepers({...matchGoalkeepers, away: e.target.value})}
-                      style={{width: '100%', padding: '6px', borderRadius: '8px', border: '1px solid #ddd'}}
-                    >
-                      <option value="">-- Оберіть воротаря --</option>
-                      {(selectedMatchForScorers.awayRoster?.length > 0 
-                          ? selectedMatchForScorers.awayRoster 
-                          : details.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players || []
-                      ).map((p: any) => (
-                        <option key={p.id} value={p.id}>
-                          {p.futsalShirtNumber ? `№${p.futsalShirtNumber} ` : ''}{p.lastName} {p.firstName}
-                        </option>
-                      ))}
-                    </select>
+                  <div className={styles.matchRoleSelects}>
+                    <div className={styles.goalkeeperSelect}>
+                      <label>Воротар</label>
+                      <select 
+                        value={matchGoalkeepers.away} 
+                        onChange={e => setMatchGoalkeepers({...matchGoalkeepers, away: e.target.value})}
+                      >
+                        <option value="">-- Оберіть воротаря --</option>
+                        {(selectedMatchForScorers.awayRoster?.length > 0 
+                            ? selectedMatchForScorers.awayRoster 
+                            : details.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players || []
+                        ).map((p: any) => (
+                          <option key={p.id} value={p.id}>
+                            {p.futsalShirtNumber ? `№${p.futsalShirtNumber} ` : ''}{p.lastName} {p.firstName}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className={styles.goalkeeperSelect}>
+                      <label>Капітан</label>
+                      <select 
+                        value={matchCaptains.away} 
+                        onChange={e => setMatchCaptains({...matchCaptains, away: e.target.value})}
+                      >
+                        <option value="">-- Оберіть капітана --</option>
+                        {(selectedMatchForScorers.awayRoster?.length > 0 
+                            ? selectedMatchForScorers.awayRoster 
+                            : details.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players || []
+                        ).map((p: any) => (
+                          <option key={p.id} value={p.id}>
+                            {p.futsalShirtNumber ? `№${p.futsalShirtNumber} ` : ''}{p.lastName} {p.firstName}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                   <div className={styles.scorersList}>
                     {(selectedMatchForScorers.awayRoster?.length > 0 

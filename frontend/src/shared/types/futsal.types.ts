@@ -4,6 +4,10 @@ import { PlayerDto } from './player.types';
 export interface FutsalTeamResponse {
   id: number;
   name: string;
+  players?: PlayerDto[];
+  captainId?: number | null;
+  goalkeeperId?: number | null;
+  points?: number;
 }
 
 export interface FutsalGoal {

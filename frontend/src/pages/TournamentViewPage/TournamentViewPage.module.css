@@ -2587,7 +2587,12 @@ input:checked + .slider:before {
   transform: translateY(-2px);
 }
 
-.captainToggleBtn {
+.roleToggles {
+  display: flex;
+  gap: 6px;
+}
+
+.roleToggleBtn {
   background: #f1f5f9;
   color: #94a3b8;
   border: 1px solid #e2e8f0;
@@ -2603,16 +2608,22 @@ input:checked + .slider:before {
   font-size: 14px;
 }
 
-.captainToggleBtn:hover {
+.roleToggleBtn:hover {
   border-color: var(--primary);
   color: var(--primary);
   background: var(--primary-light);
 }
 
-.captainToggleBtn.isCaptain {
+.roleToggleBtn.isCaptain {
   background: var(--primary);
   color: white;
   border-color: var(--primary);
+}
+
+.roleToggleBtn.isGoalkeeper {
+  background: var(--success);
+  color: white;
+  border-color: var(--success);
 }
 
 .captainTag {
@@ -2620,5 +2631,77 @@ input:checked + .slider:before {
   color: var(--primary) !important;
   border-color: var(--primary) !important;
   font-weight: 700 !important;
+}
+
+.goalkeeperTag {
+  background: var(--success-light) !important;
+  color: var(--success) !important;
+  border-color: var(--success) !important;
+  font-weight: 700 !important;
+}
+
+/* Match Scorers Modal Enhanced Styles */
+.matchRoleSelects {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.goalkeeperSelect label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.goalkeeperSelect select {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: white;
+  font-size: 14px;
+  color: #1f2937;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.goalkeeperSelect select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+  outline: none;
+}
+
+.captainBadge,
+.goalkeeperBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  width: fit-content;
+}
+
+.captainBadge {
+  background: var(--primary-light);
+  color: var(--primary);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.goalkeeperBadge {
+  background: var(--success-light);
+  color: var(--success);
+  border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
