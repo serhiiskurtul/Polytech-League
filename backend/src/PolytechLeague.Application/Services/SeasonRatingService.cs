@@ -340,11 +340,16 @@ public class SeasonRatingService : ISeasonRatingService
 
         foreach (var sport in sports)
         {
-            foreach (var row in rows)
+            // Only apply penalty if at least one team participated in this sport during this season
+            bool anyParticipation = rows.Any(r => r.SportResults[sport].Rank != "-");
+            if (anyParticipation)
             {
-                if (row.SportResults[sport].Rank == "-")
+                foreach (var row in rows)
                 {
-                    row.SportResults[sport].Points = penaltyForNonParticipation;
+                    if (row.SportResults[sport].Rank == "-")
+                    {
+                        row.SportResults[sport].Points = penaltyForNonParticipation;
+                    }
                 }
             }
         }
