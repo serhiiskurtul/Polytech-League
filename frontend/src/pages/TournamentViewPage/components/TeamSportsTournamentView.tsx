@@ -36,8 +36,14 @@ import {
   updateChessTeam,
   updateCheckersTeam,
   updateTableTennisTeam,
+  deleteChessGame,
   deleteCheckersGame,
   deleteTableTennisMatch,
+  deleteVolleyballMatch,
+  deleteBeachVolleyballMatch,
+  deleteFutsalMatch,
+  deleteBasketball3x3Match,
+  deleteBadmintonMatch,
   deleteVolleyballTeam,
   deleteBeachVolleyballTeam,
   deleteFutsalTeam,
@@ -52,7 +58,7 @@ import FutsalBracket from './FutsalBracket';
 import styles from '../TournamentViewPage.module.css';
 import { Link } from 'react-router-dom';
 
-type Sport = 'volleyball' | 'beach_volleyball' | 'beach-volleyball' | 'futsal' | 'basketball_3x3' | 'basketball3x3' | 'basketball-3x3' | 'badminton' | 'chess' | 'checkers' | 'tabletennis' | 'table_tennis' | 'table-tennis';
+type Sport = 'volleyball' | 'волейбол' | 'beach_volleyball' | 'beach-volleyball' | 'пляжний_волейбол' | 'futsal' | 'футзал' | 'basketball_3x3' | 'basketball3x3' | 'basketball-3x3' | 'баскетбол_3х3' | 'badminton' | 'бадмінтон' | 'chess' | 'шахи' | 'checkers' | 'шашки' | 'tabletennis' | 'table_tennis' | 'table-tennis' | 'настільний_теніс';
 
 interface TeamSportsTournamentViewProps {
   sport: Sport;
