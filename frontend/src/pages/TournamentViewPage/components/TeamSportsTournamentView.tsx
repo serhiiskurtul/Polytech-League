@@ -106,6 +106,11 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const [isQuickAddMode, setIsQuickAddMode] = useState(false);
   const [quickAddForm, setQuickAddForm] = useState({ firstName: '', lastName: '', group: '' });
 
+  // Olympic Filtering State
+  const [roundNumber, setRoundNumber] = useState(1);
+  const [stageType, setStageType] = useState('Груповий етап');
+  const [useStrictFiltering, setUseStrictFiltering] = useState(true);
+
   useEffect(() => {
     if (isAdmin) {
       loadAllPlayers();
@@ -732,6 +737,63 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     }
   };
 
+  const STAGE_ORDER = [
+    '1/16 Фіналу', '1/8 Фіналу', 'Чвертьфінал', 'Півфінал', 'Фінал'
+  ];
+
+  const getEligibleTeams = (stage: string) => {
+    const allTeams = details.teams || [];
+    if (!useStrictFiltering || sport !== 'futsal') return allTeams;
+    
+    const allMatches = details.matches || details.games || [];
+    if (allMatches.length === 0) {
+      return (stage === 'Раунд 1' || stage === '1/16 Фіналу' || stage === 'Груповий етап') ? allTeams : [];
+    }
+
+    const idx = STAGE_ORDER.indexOf(stage);
+    
+    // Logic for standard stages (Quarterfinal, Semifinal, etc.)
+    if (idx > 0) {
+      const prevStage = STAGE_ORDER[idx - 1];
+      const winners = allMatches
+        .filter((m: any) => m.stage === prevStage)
+        .map((m: any) => {
+          const hScore = m.homeTeamScore || 0;
+          const aScore = m.awayTeamScore || 0;
+          if (hScore > aScore) return m.homeTeamId;
+          if (aScore > hScore) return m.awayTeamId;
+          return null;
+        })
+        .filter((id: any) => id !== null);
+      return allTeams.filter((t: any) => winners.includes(t.id));
+    }
+
+    // Logic for sequential rounds (Round 1 -> Round 2 ...)
+    const roundMatch = stage.match(/^Раунд (\d+)$/);
+    if (roundMatch) {
+      const rNum = parseInt(roundMatch[1]);
+      if (rNum > 1) {
+        const prevRound = `Раунд ${rNum - 1}`;
+        const winners = allMatches
+          .filter((m: any) => m.stage === prevRound)
+          .map((m: any) => {
+            const hScore = m.homeTeamScore || 0;
+            const aScore = m.awayTeamScore || 0;
+            if (hScore > aScore) return m.homeTeamId;
+            if (aScore > hScore) return m.awayTeamId;
+            return null;
+          })
+          .filter((id: any) => id !== null);
+        return allTeams.filter((t: any) => winners.includes(t.id));
+      }
+      return allTeams;
+    }
+
+    return allTeams;
+  };
+
+  const eligibleTeams = getEligibleTeams(newMatchForm.stage);
+
   const getSportLabel = () => {
     switch (sport) {
       case 'volleyball':
@@ -1050,42 +1112,93 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
             <div className={styles.modalBody}>
               <div className={styles.createMatchForm}>
                 <div className={styles.formGroup}>
-                  <label>Команда 1</label>
+                  <label>Етап змагання</label>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <select 
+                        style={{ flex: 2, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                        value={stageType} 
+                        onChange={e => {
+                            const val = e.target.value;
+                            setStageType(val);
+                            if (val === 'Раунд') {
+                                setNewMatchForm({...newMatchForm, stage: `Раунд ${roundNumber}`});
+                            } else {
+                                setNewMatchForm({...newMatchForm, stage: val});
+                            }
+                        }}
+                    >
+                        <option value="Груповий етап">Груповий етап</option>
+                        <option value="Раунд">Раунд...</option>
+                        <option value="1/16 Фіналу">1/16 Фіналу</option>
+                        <option value="1/8 Фіналу">1/8 Фіналу</option>
+                        <option value="Чвертьфінал">Чвертьфінал</option>
+                        <option value="Півфінал">Півфінал</option>
+                        <option value="Фінал">Фінал</option>
+                    </select>
+                    {stageType === 'Раунд' && (
+                        <input 
+                            type="number" 
+                            min="1" 
+                            style={{ flex: 1, width: '60px', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                            value={roundNumber}
+                            onChange={e => {
+                                const num = parseInt(e.target.value) || 1;
+                                setRoundNumber(num);
+                                setNewMatchForm({...newMatchForm, stage: `Раунд ${num}`});
+                            }}
+                        />
+                    )}
+                  </div>
+                </div>
+
+                {(sport === 'futsal' || sport === 'футзал') && (
+                  <div className={styles.formGroup} style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#64748b' }}>
+                      <i className="fas fa-filter"></i> Розумна фільтрація
+                    </label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '8px' }}>
+                      <label className={styles.switch}>
+                        <input 
+                          type="checkbox" 
+                          checked={useStrictFiltering} 
+                          onChange={(e) => setUseStrictFiltering(e.target.checked)}
+                        />
+                        <span className={styles.slider}></span>
+                      </label>
+                      <span style={{ fontSize: '12px', color: '#94a3b8' }}>
+                        {useStrictFiltering ? 'Показувати лише переможців попереднього етапу' : 'Показувати всі команди'}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                <div className={styles.formGroup}>
+                  <label>Команда 1 (Господарі)</label>
                   <select 
                     value={newMatchForm.homeTeamId} 
                     onChange={e => setNewMatchForm({...newMatchForm, homeTeamId: e.target.value})}
                   >
                     <option value="">-- Оберіть команду --</option>
-                    {details.teams?.map((t: any) => (
+                    {eligibleTeams.map((t: any) => (
                       <option key={t.id} value={t.id}>{t.name}</option>
                     ))}
                   </select>
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label>Команда 2</label>
+                  <label>Команда 2 (Гості)</label>
                   <select 
                     value={newMatchForm.awayTeamId} 
                     onChange={e => setNewMatchForm({...newMatchForm, awayTeamId: e.target.value})}
                   >
                     <option value="">-- Оберіть команду --</option>
-                    {details.teams?.map((t: any) => (
+                    {eligibleTeams.map((t: any) => (
                       <option key={t.id} value={t.id}>{t.name}</option>
                     ))}
                   </select>
                 </div>
 
-                <div className={styles.formGroup}>
-                  <label>Етап змагання</label>
-                  <input 
-                    type="text" 
-                    value={newMatchForm.stage} 
-                    onChange={e => setNewMatchForm({...newMatchForm, stage: e.target.value})}
-                    placeholder="напр. Груповий етап, Фінал..."
-                  />
-                </div>
-
-                <button className={styles.saveBtn} onClick={handleCreateMatch}>
+                <button className={styles.saveBtn} onClick={handleCreateMatch} style={{ marginTop: '10px' }}>
                   Створити матч
                 </button>
               </div>
