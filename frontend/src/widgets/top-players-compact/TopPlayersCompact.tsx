@@ -140,9 +140,6 @@ const TopPlayersCompact = () => {
                   <div className={styles.ratingValue}>
                     {player.performanceScore}
                   </div>
-                  <div className={`${styles.ratingChange} ${styles.positive}`}>
-                    <i className="fas fa-caret-up"></i> New
-                  </div>
                 </div>
               </div>
             ))
