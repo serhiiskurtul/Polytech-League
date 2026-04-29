@@ -15,75 +15,83 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
   onDeleteMatch,
   onOpenScorers
 }) => {
-  // Group matches by stage
-  const stages = matches.reduce((acc, match) => {
-    const stage = match.stage || 'Раунд 1';
+  // Sort stages based on standard olympic order
+  const STAGE_ORDER = [
+    'Груповий етап',
+    '1/16 Фіналу',
+    '1/8 Фіналу',
+    'Чвертьфінал',
+    'Півфінал',
+    'Фінал'
+  ];
+
+  const getStageRank = (stage: string) => {
+    const idx = STAGE_ORDER.indexOf(stage);
+    if (idx !== -1) return idx;
+    
+    const roundMatch = stage.match(/Раунд (\d+)/);
+    if (roundMatch) return -10 + parseInt(roundMatch[1]);
+    
+    return 999;
+  };
+
+  // Group and sort matches
+  const groupedMatches = matches.reduce((acc, match) => {
+    const stage = match.stage || 'Груповий етап';
     if (!acc[stage]) acc[stage] = [];
     acc[stage].push(match);
     return acc;
   }, {} as Record<string, FutsalMatchResponse[]>);
 
-  // Dynamic sorting logic
-  const getStageRank = (stage: string) => {
-    const standardOrder: Record<string, number> = {
-      '1/16 Фіналу': 100,
-      '1/8 Фіналу': 110,
-      'Чвертьфінал': 120,
-      'Півфінал': 130,
-      'Фінал': 140
-    };
-    if (standardOrder[stage]) return standardOrder[stage];
+  const sortedStages = Object.keys(groupedMatches).sort((a, b) => getStageRank(a) - getStageRank(b));
 
-    const roundMatch = stage.match(/Раунд (\d+)/);
-    if (roundMatch) return parseInt(roundMatch[1]);
-
-    return 999;
-  };
-
-  const allStages = Object.keys(stages).sort((a, b) => getStageRank(a) - getStageRank(b));
-
-  const renderStage = (stageName: string, columnIndex: number, totalStages: number) => (
+  const renderStage = (stageName: string, stageIdx: number, totalStages: number) => (
     <div key={stageName} className={styles.bracketColumn}>
-      <h3 className={styles.stageTitle}>{stageName}</h3>
+      <div className={styles.stageHeader}>
+        <span className={styles.stageNameBadge}>{stageName}</span>
+        <span className={styles.stageMatchCount}>{groupedMatches[stageName].length} матчів</span>
+      </div>
+      
       <div className={styles.matchList}>
-        {stages[stageName].map((match, matchIndex) => {
+        {groupedMatches[stageName].map((match, matchIdx) => {
           const isHomeWinner = (match.homeTeamScore || 0) > (match.awayTeamScore || 0);
           const isAwayWinner = (match.awayTeamScore || 0) > (match.homeTeamScore || 0);
-          
+          const isPlayed = match.homeTeamScore !== null && match.awayTeamScore !== null;
+
           return (
             <div key={match.id} className={styles.matchBoxContainer}>
-              <div className={styles.matchBox} style={{ minWidth: '220px' }}>
+              <div className={`${styles.matchBox} ${isAdmin ? styles.adminNode : ''}`}>
                 {isAdmin && onDeleteMatch && (
                   <button 
-                    className={styles.deleteMatchBtn} 
+                    className={styles.deleteMatchBtn}
                     onClick={() => onDeleteMatch(match.id)}
-                    title="Видалити матч"
+                    title="Видалити"
                     style={{
-                      position: 'absolute',
-                      top: '-10px',
-                      right: '-10px',
-                      width: '24px',
-                      height: '24px',
-                      borderRadius: '50%',
-                      background: '#fee2e2',
-                      color: '#ef4444',
-                      border: '1px solid #fecaca',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '10px',
-                      cursor: 'pointer',
-                      zIndex: 10
+                        position: 'absolute',
+                        top: '-10px',
+                        right: '-10px',
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '50%',
+                        background: '#fee2e2',
+                        color: '#ef4444',
+                        border: '1px solid #fecaca',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '12px',
+                        cursor: 'pointer',
+                        zIndex: 10
                     }}
                   >
                     <i className="fas fa-trash"></i>
                   </button>
                 )}
-
-                {/* Team 1 (Home) */}
+                
+                {/* Home Team */}
                 <div className={`${styles.playerRow} ${isHomeWinner ? styles.winner : ''}`}>
                   <div className={styles.playerInfo}>
-                    <div 
+                     <div 
                         className={styles.teamAvatarMini} 
                         style={{ 
                             width: '24px', 
@@ -99,11 +107,9 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
                             marginRight: '8px'
                         }}
                     >
-                        {match.homeTeam?.name?.[0] || 'T'}
-                    </div>
-                    <span className={styles.playerName} style={{ fontSize: '13px' }}>
-                      {match.homeTeam?.name || 'Home'}
-                    </span>
+                         {match.homeTeam?.name?.[0] || 'H'}
+                     </div>
+                     <span className={styles.playerName}>{match.homeTeam?.name || 'TBD'}</span>
                   </div>
                   <div className={styles.matchScoreBadge} style={{ fontWeight: 800, fontSize: '14px', marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     {match.homeTeamScore ?? 0}
@@ -111,12 +117,12 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
                   </div>
                 </div>
 
-                <div className={styles.matchVs} style={{ margin: '4px 0', fontSize: '10px', opacity: 0.5 }}>VS</div>
+                <div className={styles.matchVs}>VS</div>
 
-                {/* Team 2 (Away) */}
+                {/* Away Team */}
                 <div className={`${styles.playerRow} ${isAwayWinner ? styles.winner : ''}`}>
                   <div className={styles.playerInfo}>
-                    <div 
+                     <div 
                         className={styles.teamAvatarMini} 
                         style={{ 
                             width: '24px', 
@@ -132,11 +138,9 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
                             marginRight: '8px'
                         }}
                     >
-                        {match.awayTeam?.name?.[0] || 'T'}
-                    </div>
-                    <span className={styles.playerName} style={{ fontSize: '13px' }}>
-                      {match.awayTeam?.name || 'Away'}
-                    </span>
+                         {match.awayTeam?.name?.[0] || 'A'}
+                     </div>
+                     <span className={styles.playerName}>{match.awayTeam?.name || 'TBD'}</span>
                   </div>
                   <div className={styles.matchScoreBadge} style={{ fontWeight: 800, fontSize: '14px', marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     {match.awayTeamScore ?? 0}
@@ -145,7 +149,7 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
                 </div>
 
                 {isAdmin && onOpenScorers && (
-                   <button 
+                  <button 
                     className={styles.bracketScorersBtn}
                     onClick={() => onOpenScorers(match)}
                     style={{
@@ -164,14 +168,14 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
                         justifyContent: 'center',
                         gap: '6px'
                     }}
-                   >
-                     <i className="fas fa-futbol"></i> Результати
-                   </button>
+                  >
+                    <i className="fas fa-futbol"></i> Протокол
+                  </button>
                 )}
               </div>
 
-              {/* Connector lines */}
-              {columnIndex < totalStages - 1 && (
+              {/* Connector lines (same as Armwrestling) */}
+              {stageIdx < totalStages - 1 && (
                 <div className={styles.connectorWrapper} style={{ 
                   position: 'absolute', 
                   right: '-48px', 
@@ -189,7 +193,7 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
                      position: 'absolute' 
                    }}></div>
                    
-                   {matchIndex % 2 === 0 ? (
+                   {matchIdx % 2 === 0 ? (
                      <div style={{ 
                        width: '2px', 
                        height: '50%', 
@@ -209,7 +213,7 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
                      }}></div>
                    )}
 
-                   {matchIndex % 2 === 0 && stages[allStages[columnIndex + 1]]?.length > (matchIndex / 2) && (
+                   {matchIdx % 2 === 0 && groupedMatches[sortedStages[stageIdx + 1]]?.length > (matchIdx / 2) && (
                      <div style={{ 
                        width: '24px', 
                        height: '2px', 
@@ -243,7 +247,7 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
   return (
     <div className={styles.bracketContainer}>
       <div className={styles.stagesRow} style={{ display: 'flex', gap: '48px', flex: 1, minHeight: '600px', overflowX: 'auto', padding: '20px 0' }}>
-        {allStages.map((s, idx) => renderStage(s, idx, allStages.length))}
+        {sortedStages.map((s, idx) => renderStage(s, idx, sortedStages.length))}
       </div>
 
       {matches.length === 0 && (
