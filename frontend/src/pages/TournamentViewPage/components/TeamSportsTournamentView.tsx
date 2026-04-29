@@ -405,10 +405,12 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         }
       });
 
-      // Traditional points calculation if not overridden or added to override
-      // Priority: Manual Points > Auto-calculated Points
+      // Traditional points calculation
       const autoPoints = stats.w * 3 + stats.d * 1;
-      const finalPoints = (stats.manualPoints !== undefined && stats.manualPoints !== null) 
+      
+      // Only use manual points if they are greater than 0, otherwise prefer auto-calculated points 
+      // if any games have been played.
+      const finalPoints = (stats.manualPoints > 0 && stats.gp === 0) 
         ? stats.manualPoints 
         : autoPoints;
       
@@ -867,6 +869,107 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
       {/* Main Content Areas */}
       <div className={styles.tabContent}>
+        {/* Futsal Admin Panel (Horizontal) */}
+        {isAdmin && activeTab === 'bracket' && (sport === 'futsal' || sport === 'футзал') && (
+            <div className={styles.futsalAdminPanel}>
+                <div className={styles.panelHeader}>
+                    <i className="fas fa-plus-circle"></i> Додати новий поєдинок
+                </div>
+                <div className={styles.panelForm}>
+                    <div className={styles.panelGroup}>
+                        <label>Команда 1</label>
+                        <select 
+                            value={newMatchForm.homeTeamId} 
+                            onChange={e => setNewMatchForm({...newMatchForm, homeTeamId: e.target.value})}
+                        >
+                            <option value="">Оберіть...</option>
+                            {eligibleTeams.map((t: any) => (
+                                <option key={t.id} value={t.id}>{t.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    
+                    <div className={styles.panelVs}>vs</div>
+
+                    <div className={styles.panelGroup}>
+                        <label>Команда 2</label>
+                        <select 
+                            value={newMatchForm.awayTeamId} 
+                            onChange={e => setNewMatchForm({...newMatchForm, awayTeamId: e.target.value})}
+                        >
+                            <option value="">Оберіть...</option>
+                            {eligibleTeams.map((t: any) => (
+                                <option key={t.id} value={t.id}>{t.name}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className={styles.panelGroup} style={{ width: '160px' }}>
+                        <label>Етап</label>
+                        <select 
+                            value={stageType} 
+                            onChange={e => {
+                                const val = e.target.value;
+                                setStageType(val);
+                                if (val === 'Раунд') {
+                                    setNewMatchForm({...newMatchForm, stage: `Раунд ${roundNumber}`});
+                                } else {
+                                    setNewMatchForm({...newMatchForm, stage: val});
+                                }
+                            }}
+                        >
+                            <option value="Груповий етап">Груповий етап</option>
+                            <option value="Раунд">Раунд...</option>
+                            <option value="1/16 Фіналу">1/16 Фіналу</option>
+                            <option value="1/8 Фіналу">1/8 Фіналу</option>
+                            <option value="Чвертьфінал">Чвертьфінал</option>
+                            <option value="Півфінал">Півфінал</option>
+                            <option value="Фінал">Фінал</option>
+                        </select>
+                    </div>
+
+                    {stageType === 'Раунд' && (
+                        <div className={styles.panelGroup} style={{ width: '80px' }}>
+                            <label>№</label>
+                            <input 
+                                type="number" 
+                                min="1"
+                                value={roundNumber}
+                                onChange={e => {
+                                    const num = parseInt(e.target.value) || 1;
+                                    setRoundNumber(num);
+                                    setNewMatchForm({...newMatchForm, stage: `Раунд ${num}`});
+                                }}
+                            />
+                        </div>
+                    )}
+
+                    <div className={styles.panelGroup} style={{ width: 'auto' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            Фільтрація <i className="fas fa-question-circle" style={{ fontSize: '10px', color: '#94a3b8' }}></i>
+                        </label>
+                        <div className={styles.panelFilterToggle}>
+                            <label className={styles.switchMini}>
+                                <input 
+                                    type="checkbox" 
+                                    checked={useStrictFiltering} 
+                                    onChange={(e) => setUseStrictFiltering(e.target.checked)}
+                                />
+                                <span className={styles.sliderMini}></span>
+                            </label>
+                            <span style={{ fontSize: '11px', fontWeight: 600, color: useStrictFiltering ? '#3b82f6' : '#94a3b8' }}>
+                                {useStrictFiltering ? 'Увімк' : 'Вимк'}
+                            </span>
+                        </div>
+                    </div>
+
+                    <button className={styles.panelCreateBtn} onClick={handleCreateMatch}>
+                        Створити
+                    </button>
+                </div>
+            </div>
+        )}
+
         {activeTab === 'matches' && (
           <div className={styles.matchesGrid}>
             {(details.matches || details.games)?.map((match: any) => {

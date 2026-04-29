@@ -2705,3 +2705,329 @@ input:checked + .slider:before {
   border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
+/* Futsal Admin Panel (Horizontal) */
+.futsalAdminPanel {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.panelHeader {
+  font-size: 14px;
+  font-weight: 800;
+  color: #334155;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.panelHeader i {
+  color: #3b82f6;
+}
+
+.panelForm {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.panelGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 120px;
+}
+
+.panelGroup label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  margin-left: 4px;
+}
+
+.panelGroup select, 
+.panelGroup input {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  font-size: 14px;
+  color: #1e293b;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.panelGroup select:focus, 
+.panelGroup input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.panelVs {
+  padding-bottom: 12px;
+  font-weight: 800;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.panelFilterToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+}
+
+.panelCreateBtn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 0 32px;
+  height: 42px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.panelCreateBtn:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
+/* Futsal Bracket & Match Cards */
+.futsalBracketWrapper {
+  padding: 20px 0;
+  overflow-x: auto;
+}
+
+.futsalMatchCard {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  border-radius: 20px;
+  padding: 16px;
+  width: 240px;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s ease;
+}
+
+.futsalMatchCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.cardDeleteBtn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  background: #fee2e2;
+  color: #ef4444;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  z-index: 5;
+}
+
+.futsalTeamRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #f8fafc;
+  margin-bottom: 6px;
+}
+
+.futsalWinner {
+  background: #dcfce7 !important;
+  border: 1px solid #86efac;
+}
+
+.futsalTeamName {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  display: block;
+}
+
+.futsalTeamGroup {
+  font-size: 10px;
+  color: #94a3b8;
+  background: white;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-left: 4px;
+}
+
+.futsalTeamScore {
+  font-size: 14px;
+  font-weight: 800;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.futsalWinner .futsalTeamName {
+  color: #166534;
+}
+
+.futsalWinner .futsalTeamScore {
+  color: #15803d;
+}
+
+.futsalTeamScore i {
+  font-size: 12px;
+  color: #f59e0b;
+}
+
+.futsalVsDivider {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 800;
+  color: #cbd5e1;
+  margin: 4px 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.futsalProtocolBtn {
+  width: 100%;
+  margin-top: 10px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.futsalProtocolBtn:hover {
+  background: #f1f5f9;
+  color: #3b82f6;
+}
+
+/* Connectors */
+.futsalConnector {
+  position: absolute;
+  right: -48px;
+  top: 0;
+  bottom: 0;
+  width: 48px;
+  pointer-events: none;
+}
+
+.futsalLineHorizontal {
+  width: 24px;
+  height: 2px;
+  background: #cbd5e1;
+  position: absolute;
+  top: 50%;
+  left: 0;
+}
+
+.futsalLineVerticalDown {
+  width: 2px;
+  height: 50%;
+  background: #cbd5e1;
+  position: absolute;
+  top: 50%;
+  left: 24px;
+}
+
+.futsalLineVerticalUp {
+  width: 2px;
+  height: 50%;
+  background: #cbd5e1;
+  position: absolute;
+  bottom: 50%;
+  left: 24px;
+}
+
+.futsalArrowHead {
+  width: 24px;
+  height: 2px;
+  background: #cbd5e1;
+  position: absolute;
+  top: 100%;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.futsalArrowHead::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid #cbd5e1;
+  border-top: 2px solid #cbd5e1;
+  transform: rotate(45deg);
+  margin-right: -1px;
+}
+
+/* Mini Switch */
+.switchMini {
+  position: relative;
+  display: inline-block;
+  width: 32px;
+  height: 18px;
+}
+
+.switchMini input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.sliderMini {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #cbd5e1;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.sliderMini:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+.futsalAdminPanel input:checked + .sliderMini {
+  background-color: #3b82f6;
+}
+
+.futsalAdminPanel input:checked + .sliderMini:before {
+  transform: translateX(14px);
+}
+
