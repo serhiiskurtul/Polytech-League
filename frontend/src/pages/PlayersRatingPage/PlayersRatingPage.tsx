@@ -311,14 +311,16 @@ const PlayersRatingPage = () => {
 
                         <div className={styles.cell}>
                           <div className={styles.sportsList}>
-                            {player.sports?.map(s => {
-                              const info = getSportInfo(s);
-                              return (
-                                <div key={s} className={styles.sportBadgeSmall} title={s} style={{ backgroundColor: info.color + '22', color: info.color }}>
-                                  {info.icon}
-                                </div>
-                              );
-                            })}
+                            {player.sports
+                              ?.filter(s => activeTab === 'Загальний' || s.toLowerCase() === activeTab.toLowerCase())
+                              .map(s => {
+                                const info = getSportInfo(s);
+                                return (
+                                  <div key={s} className={styles.sportBadgeSmall} title={s} style={{ backgroundColor: info.color + '22', color: info.color }}>
+                                    {info.icon}
+                                  </div>
+                                );
+                              })}
                             {(!player.sports || player.sports.length === 0) && <span className={styles.emptyVal}>—</span>}
                           </div>
                         </div>
@@ -338,7 +340,9 @@ const PlayersRatingPage = () => {
                                 <div className={`${styles.breakdownTooltip} ${index < 3 ? styles.tooltipDown : ''}`}>
                                   <div className={styles.breakdownHeader}>Деталізація балів</div>
                                   <div className={styles.breakdownList}>
-                                    {player.pointsBreakdown.map((entry, i) => (
+                                    {player.pointsBreakdown
+                                      .filter(entry => activeTab === 'Загальний' || entry.sportType?.toLowerCase() === activeTab.toLowerCase())
+                                      .map((entry, i) => (
                                       <div key={i} className={styles.breakdownItem}>
                                         <span className={styles.breakdownDesc}>{entry.description}</span>
                                         <span className={styles.breakdownPoints}>+{entry.points}</span>
@@ -346,7 +350,9 @@ const PlayersRatingPage = () => {
                                     ))}
                                   </div>
                                   <div className={styles.breakdownTotal}>
-                                    Разом: {player.performanceScore} очок
+                                    Разом: {activeTab === 'Загальний' 
+                                      ? player.performanceScore 
+                                      : player.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase())?.performanceScore || 0} очок
                                   </div>
                                 </div>
                               </div>

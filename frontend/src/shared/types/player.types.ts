@@ -69,6 +69,7 @@ export interface PointEntryDto {
     description: string;
     points: number;
     category: string;
+    sportType?: string;
 }
 
 export interface AchievementDto {

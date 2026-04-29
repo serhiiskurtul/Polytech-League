@@ -465,7 +465,8 @@ public class PlayerService : IPlayerService
                             ? $"{ach.Rank} місце: {ach.TournamentName} ({levelName})" 
                             : $"Участь: {ach.TournamentName} ({levelName})",
                         Points = finalPts,
-                        Category = "Achievements"
+                        Category = "Achievements",
+                        SportType = ach.SportType
                     });
                 }
 
@@ -489,7 +490,7 @@ public class PlayerService : IPlayerService
                             "armwrestling" => "Армрестлинг", "badminton" => "Бадмінтон", _ => sport
                         };
                         
-                        if (winPts > 0) pointsBreakdown.Add(new PointEntryDto { Description = $"Перемоги ({sportName}): {w} ігор", Points = winPts, Category = "Activity" });
+                        if (winPts > 0) pointsBreakdown.Add(new PointEntryDto { Description = $"Перемоги ({sportName}): {w} ігор", Points = winPts, Category = "Activity", SportType = sport });
                     }
                 }
 
@@ -523,7 +524,8 @@ public class PlayerService : IPlayerService
                     pointsBreakdown.Add(new PointEntryDto { 
                         Description = $"Забиті голи (Футзал): {pGoals} голів", 
                         Points = goalPts, 
-                        Category = "Goals" 
+                        Category = "Goals",
+                        SportType = "futsal"
                     });
                 }
 

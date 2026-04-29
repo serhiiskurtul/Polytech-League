@@ -80,6 +80,7 @@ public class PointEntryDto
     public string Description { get; set; } = string.Empty;
     public int Points { get; set; }
     public string Category { get; set; } = string.Empty;
+    public string SportType { get; set; } = string.Empty;
 }
 
 public class SportStatsDto
