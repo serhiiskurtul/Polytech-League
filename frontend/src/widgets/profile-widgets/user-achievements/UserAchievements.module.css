@@ -180,3 +180,10 @@
   border: 1px dashed var(--border);
   border-radius: 12px;
 }
+
+.captainLabel {
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 1.1rem;
+  margin-right: 4px;
+}

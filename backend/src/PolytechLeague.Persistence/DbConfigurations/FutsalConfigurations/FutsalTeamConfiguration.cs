@@ -15,5 +15,10 @@ public class FutsalTeamConfiguration : IEntityTypeConfiguration<FutsalTeam>
         builder.Property(t => t.Name).IsRequired().HasMaxLength(200);
         builder.Property(t => t.Points).HasColumnName("points");
         builder.Property(t => t.Rank).HasColumnName("rank");
+
+        builder.HasOne(t => t.Captain)
+            .WithMany()
+            .HasForeignKey(t => t.CaptainId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -998,6 +998,9 @@ namespace PolytechLeague.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<long?>("CaptainId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("EventId")
                         .HasColumnType("bigint");
 
@@ -1015,6 +1018,8 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnName("rank");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CaptainId");
 
                     b.HasIndex("EventId");
 
@@ -2740,11 +2745,18 @@ namespace PolytechLeague.Persistence.Migrations
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Futsal.FutsalTeam", b =>
                 {
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "Captain")
+                        .WithMany()
+                        .HasForeignKey("CaptainId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PolytechLeague.Domain.Entities.Futsal.FutsalEvent", "Event")
                         .WithMany("Teams")
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Captain");
 
                     b.Navigation("Event");
                 });

@@ -78,4 +78,5 @@ export interface AchievementDto {
     rank: number;
     result: string;
     tournamentId?: number;
+    isCaptain?: boolean;
 }

@@ -389,7 +389,7 @@ public class PlayerService : IPlayerService
                 // Team Sports
                 foreach (var t in futsalTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
                     int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "futsal", Date = t.Event.Date, Rank = r, TournamentId = t.EventId, Result = GetResultLabel(r) });
+                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "futsal", Date = t.Event.Date, Rank = r, TournamentId = t.EventId, Result = GetResultLabel(r), IsCaptain = t.CaptainId == playerId });
                     sportTypes.Add("futsal");
                 }
                 foreach (var t in volleyballTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
@@ -764,6 +764,7 @@ public class PlayerService : IPlayerService
                     Date = team.Event.Date,
                     Rank = rank,
                     TournamentId = team.EventId,
+                    IsCaptain = team.CaptainId == playerId,
                     Result = rank > 0 ? $"{rank} місце (команда {team.Name})" : $"Учасник (команда {team.Name})"
                 });
             }

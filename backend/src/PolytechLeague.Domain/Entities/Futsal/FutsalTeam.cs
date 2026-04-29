@@ -11,6 +11,8 @@ public class FutsalTeam
     public FutsalEvent? Event { get; set; }
     
     public ICollection<Player>? Players { get; set; }
+    public long? CaptainId { get; set; }
+    public Player? Captain { get; set; }
     public int Points { get; set; }
     public int Rank { get; set; }
 

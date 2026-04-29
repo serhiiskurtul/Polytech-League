@@ -2587,3 +2587,38 @@ input:checked + .slider:before {
   transform: translateY(-2px);
 }
 
+.captainToggleBtn {
+  background: #f1f5f9;
+  color: #94a3b8;
+  border: 1px solid #e2e8f0;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.captainToggleBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
+.captainToggleBtn.isCaptain {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.captainTag {
+  background: var(--primary-light) !important;
+  color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  font-weight: 700 !important;
+}
+

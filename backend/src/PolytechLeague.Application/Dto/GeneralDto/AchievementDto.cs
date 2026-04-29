@@ -8,4 +8,5 @@ public class AchievementDto
     public DateTime Date { get; set; }
     public int? Rank { get; set; }
     public long TournamentId { get; set; }
+    public bool IsCaptain { get; set; }
 }

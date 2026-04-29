@@ -598,6 +598,29 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     }
   };
 
+  const handleSetCaptain = async (teamId: number, playerId: number | null) => {
+    try {
+      const team = details.teams.find((t: any) => t.id === teamId);
+      const updateApi = getTeamUpdateApi();
+      
+      const payload = {
+        id: team.id,
+        name: team.name,
+        eventId: team.eventId,
+        points: team.points,
+        rank: team.rank,
+        captainId: playerId,
+        playerIds: team.players?.map((p: any) => p.id) || []
+      };
+
+      await updateApi(teamId, payload);
+      onRefresh();
+    } catch (err) {
+      console.error(err);
+      alert('Помилка при призначенні капітана');
+    }
+  };
+
   const handleQuickAddPlayer = async () => {
     if (!quickAddForm.firstName || !quickAddForm.lastName || !quickAddForm.group) {
       alert('Будь ласка, заповніть усі поля');
@@ -917,7 +940,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                 </div>
                 <div className={styles.teamPlayersPreview}>
                   {team.players?.slice(0, 5).map((p: any) => (
-                    <div key={p.id} className={styles.pMiniTag}>
+                    <div key={p.id} className={`${styles.pMiniTag} ${team.captainId === p.id ? styles.captainTag : ''}`}>
+                      {team.captainId === p.id && <i className="fas fa-copyright" style={{marginRight: '4px', fontSize: '10px'}}></i>}
                       {p.lastName} {p.firstName[0]}.
                     </div>
                   ))}
@@ -1058,13 +1082,27 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                             const isSelected = team.players?.some((p: any) => p.id === player.id);
                             
                             return (
-                                <div key={player.id} className={`${styles.playerPickItem} ${isSelected ? styles.selected : ''}`} onClick={() => handleTogglePlayerInTeam(editingTeamId, player.id!)}>
-                                    <div className={styles.pickInfo}>
+                                <div key={player.id} className={`${styles.playerPickItem} ${isSelected ? styles.selected : ''}`}>
+                                    <div className={styles.pickInfo} onClick={() => handleTogglePlayerInTeam(editingTeamId, player.id!)}>
                                         <span className={styles.pName}>{player.lastName} {player.firstName}</span>
                                         <span className={styles.pGroup}>{player.group}</span>
                                     </div>
                                     <div className={styles.pickStatus}>
-                                        {isSelected ? <i className="fas fa-check-circle"></i> : <i className="far fa-circle"></i>}
+                                        {isSelected && (
+                                          <button 
+                                            className={`${styles.captainToggleBtn} ${team.captainId === player.id ? styles.isCaptain : ''}`}
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleSetCaptain(editingTeamId, team.captainId === player.id ? null : player.id!);
+                                            }}
+                                            title={team.captainId === player.id ? "Прибрати капітана" : "Призначити капітаном"}
+                                          >
+                                            ©
+                                          </button>
+                                        )}
+                                        <div style={{display: 'inline-block', marginLeft: '10px'}} onClick={() => handleTogglePlayerInTeam(editingTeamId, player.id!)}>
+                                          {isSelected ? <i className="fas fa-check-circle"></i> : <i className="far fa-circle"></i>}
+                                        </div>
                                     </div>
                                 </div>
                             );

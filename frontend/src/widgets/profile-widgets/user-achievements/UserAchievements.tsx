@@ -8,6 +8,7 @@ interface Achievement {
   result?: string;
   date: string;
   rank?: number;
+  isCaptain?: boolean;
 }
 
 interface UserAchievementsProps {
@@ -70,6 +71,7 @@ const UserAchievements = ({ achievements }: UserAchievementsProps) => {
               <div className={styles.achievementInfo}>
                 <div className={styles.achievementName}>{achievement.tournamentName}</div>
                 <div className={styles.achievementResult}>
+                  {achievement.isCaptain && <span className={styles.captainLabel} title="Капітан команди">© </span>}
                   {achievement.result?.replace(`${achievement.rank} місце `, '').replace(`${achievement.rank} місце`, '') || 'Учасник'}
                 </div>
                 <div className={styles.achievementDate}>
