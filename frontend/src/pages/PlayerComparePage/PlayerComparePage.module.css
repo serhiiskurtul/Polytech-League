@@ -12,8 +12,45 @@
 .header {
   display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: space-between;
   margin-bottom: 40px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.controlsRow {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.seasonSelector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: white;
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.seasonSelector label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.seasonSelect {
+  background: none;
+  border: none;
+  color: #1e293b;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  outline: none;
+  padding-right: 10px;
 }
 
 .backBtnSmall {

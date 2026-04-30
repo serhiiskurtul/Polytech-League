@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import styles from './PlayerComparePage.module.css';
 import { getPlayerById, getPlayersRankings } from '../../shared/api/players.api';
+import { getSeasons } from '../../shared/api/seasonRating.api';
 import { PlayerDto } from '../../shared/types/player.types';
+import { Season } from '../../shared/types/seasonRating.types';
 import { getPhotoUrl } from '../../shared/utils/photo.utils';
 
 export const PlayerComparePage = () => {
@@ -15,6 +17,31 @@ export const PlayerComparePage = () => {
   const [player2, setPlayer2] = useState<PlayerDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  const [seasons, setSeasons] = useState<Season[]>([]);
+  const [selectedSeasonId, setSelectedSeasonId] = useState<number | null>(null);
+  const [loadingSeasons, setLoadingSeasons] = useState(true);
+
+  // Initial fetch of seasons
+  useEffect(() => {
+    const fetchSeasons = async () => {
+      try {
+        const data = await getSeasons();
+        setSeasons(data);
+        const current = data.find(s => s.isCurrent);
+        if (current) {
+          setSelectedSeasonId(current.id);
+        } else if (data.length > 0) {
+          setSelectedSeasonId(data[0].id);
+        }
+      } catch (err) {
+        console.error('Failed to fetch seasons:', err);
+      } finally {
+        setLoadingSeasons(false);
+      }
+    };
+    fetchSeasons();
+  }, []);
 
   useEffect(() => {
     const fetchPlayers = async () => {
@@ -26,16 +53,34 @@ export const PlayerComparePage = () => {
 
       setLoading(true);
       try {
-        // Fetch rankings to get performance score (calculated leaderboard data)
-        const rankings = await getPlayersRankings();
+        // Fetch rankings for the selected season (or global if null)
+        const rankings = await getPlayersRankings(selectedSeasonId || undefined);
         
         const findAndEnrich = async (id: string) => {
           const detail = await getPlayerById(id);
           const rankingInfo = rankings.find(p => p.id === Number(id));
           if (rankingInfo) {
-            detail.performanceScore = rankingInfo.performanceScore;
+            // Enrich with season-specific stats from rankings
+            return {
+              ...detail,
+              performanceScore: rankingInfo.performanceScore,
+              matchesPlayed: rankingInfo.matchesPlayed,
+              winsCount: rankingInfo.winsCount,
+              goalsScored: rankingInfo.goalsScored,
+              competitionsCount: rankingInfo.competitionsCount,
+              globalRank: rankingInfo.globalRank
+            };
           }
-          return detail;
+          // If not in rankings for this season, reset stats
+          return {
+            ...detail,
+            performanceScore: 0,
+            matchesPlayed: 0,
+            winsCount: 0,
+            goalsScored: 0,
+            competitionsCount: 0,
+            globalRank: undefined
+          };
         };
 
         const data1 = await findAndEnrich(p1Id);
@@ -53,8 +98,10 @@ export const PlayerComparePage = () => {
       }
     };
 
-    fetchPlayers();
-  }, [p1Id, p2Id]);
+    if (!loadingSeasons) {
+      fetchPlayers();
+    }
+  }, [p1Id, p2Id, selectedSeasonId, loadingSeasons]);
 
 
   const calculateWinRate = (player: PlayerDto | null) => {
@@ -91,10 +138,28 @@ export const PlayerComparePage = () => {
     <div className={styles.page}>
       <div className={styles.container}>
         <header className={styles.header}>
-          <button onClick={() => navigate(-1)} className={styles.backBtnSmall}>
-            <i className="fa-solid fa-arrow-left"></i> Назад
-          </button>
-          <h1 className={styles.title}>Порівняння гравців</h1>
+          <div className={styles.controlsRow}>
+            <button onClick={() => navigate(-1)} className={styles.backBtnSmall}>
+              <i className="fa-solid fa-arrow-left"></i> Назад
+            </button>
+            <h1 className={styles.title}>Порівняння гравців</h1>
+          </div>
+
+          <div className={styles.seasonSelector}>
+            <label>Сезон:</label>
+            <select 
+              value={selectedSeasonId || ''} 
+              onChange={(e) => setSelectedSeasonId(Number(e.target.value) || null)}
+              className={styles.seasonSelect}
+            >
+              <option value="">Всі сезони</option>
+              {seasons.map(s => (
+                <option key={s.id} value={s.id}>
+                  {s.name} {s.isCurrent ? '(Поточний)' : ''}
+                </option>
+              ))}
+            </select>
+          </div>
         </header>
 
         <div className={styles.comparisonGrid}>
@@ -183,9 +248,11 @@ const PlayerCard = ({ player, color }: { player: PlayerDto, color: string }) => 
       <div className={styles.cardInfo}>
         <h3 className={styles.cardName}>{player.firstName} {player.lastName}</h3>
         <p className={styles.cardGroup}>{player.group}</p>
-        <div className={styles.cardRank}>
-          <i className="fa-solid fa-award"></i> {player.faculty || 'Студент'}
-        </div>
+        {player.faculty && (
+          <div className={styles.cardRank}>
+            <i className="fa-solid fa-award"></i> {player.faculty}
+          </div>
+        )}
       </div>
     </div>
   );
