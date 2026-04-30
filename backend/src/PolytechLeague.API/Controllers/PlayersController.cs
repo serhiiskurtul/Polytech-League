@@ -26,20 +26,27 @@ public class PlayersController : ControllerBase
     public async Task<ActionResult<PlayerDto>> GetProfile(CancellationToken cancellationToken)
     {
         var userId = User.GetUserId();
+        var user = await _userService.GetByIdAsync(userId, cancellationToken);
         var player = await _playerService.GetByUserIdAsync(userId, cancellationToken);
 
         if (player == null)
         {
-            var user = await _userService.GetByIdAsync(userId, cancellationToken);
             player = new PlayerDto
             {
                 UserId = userId,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Group = "Гість", // Default value
-                City = "Київ"
+                City = "Київ",
+                PhotoUrl = user.PhotoUrl
             };
             player = await _playerService.CreateAsync(player, cancellationToken);
+        }
+        else if (string.IsNullOrEmpty(player.PhotoUrl) && !string.IsNullOrEmpty(user.PhotoUrl))
+        {
+            // Sync photo from user to player if missing
+            player.PhotoUrl = user.PhotoUrl;
+            await _playerService.UpdateAsync(player.Id ?? 0, player, cancellationToken);
         }
 
         return Ok(player);
