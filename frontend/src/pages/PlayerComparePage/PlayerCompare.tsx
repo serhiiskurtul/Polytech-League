@@ -147,11 +147,17 @@ export const PlayerComparePage = () => {
                 suffix="%"
                 isBetterHigh={true}
               />
-              <StatRow 
-                label="Забито голів" 
-                val1={player1.goalsScored} 
-                val2={player2?.goalsScored}
-              />
+               <StatRow 
+                 label="Забито голів" 
+                 val1={player1.goalsScored} 
+                 val2={player2?.goalsScored}
+               />
+               <StatRow 
+                 label="Участь у змаганнях" 
+                 val1={player1.competitionsCount} 
+                 val2={player2?.competitionsCount}
+                 suffix=" турнірів"
+               />
             </div>
           </div>
         </div>

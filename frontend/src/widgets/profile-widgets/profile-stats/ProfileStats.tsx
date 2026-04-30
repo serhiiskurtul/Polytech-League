@@ -9,6 +9,7 @@ interface SportStat {
 interface Stats {
   matchesPlayed: number;
   wins: number;
+  competitionsCount: number;
   eloRating: number;
   goalsScored: number;
   globalRank?: number;
@@ -64,6 +65,10 @@ const ProfileStats = ({ stats }: ProfileStatsProps) => {
         <div className={styles.statCard}>
           <div className={styles.statValue}>{stats.wins}</div>
           <div className={styles.statLabel}>Перемог</div>
+        </div>
+        <div className={styles.statCard}>
+          <div className={styles.statValue}>{stats.competitionsCount}</div>
+          <div className={styles.statLabel}>Змагань</div>
         </div>
         {stats.eloRating > 0 && (
           <div className={styles.statCard}>

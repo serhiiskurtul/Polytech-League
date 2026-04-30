@@ -126,6 +126,7 @@ const ProfilePage = () => {
   const stats = {
     matchesPlayed: playerProfile?.matchesPlayed || 0,
     wins: playerProfile?.winsCount || 0,
+    competitionsCount: playerProfile?.competitionsCount || 0,
     eloRating: playerProfile?.chessRating || 0,
     goalsScored: playerProfile?.goalsScored || 0,
     globalRank: playerProfile?.globalRank,

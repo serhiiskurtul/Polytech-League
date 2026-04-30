@@ -477,6 +477,7 @@ public class PlayerService : IPlayerService
                 dto.Achievements = achievements;
                 dto.Sports = sportTypes.ToList();
                 dto.ArmwrestlingWeightClasses = armwrestlingWeightClasses.ToList();
+                dto.CompetitionsCount = achievements.Select(a => a.TournamentId).Distinct().Count();
 
                 // Stats
                 int played = 0, won = 0;
@@ -905,11 +906,8 @@ public class PlayerService : IPlayerService
             _logger.LogError(ex, "Error populating other team achievements for player {PlayerId}", playerId);
         }
 
-        dto.Achievements = achievements
-            .OrderByDescending(a => a.Rank > 0 && a.Rank <= 3) // Podium first
-            .ThenBy(a => a.Rank > 0 ? a.Rank : 999) // 1, 2, 3... then others
-            .ThenByDescending(a => a.Date)
-            .ToList();
+        dto.Achievements = achievements.OrderByDescending(a => a.Date).ToList();
+        dto.CompetitionsCount = achievements.Select(a => a.TournamentId).Distinct().Count();
     }
 
     private async Task PopulateStatsAsync(PlayerDto dto, CancellationToken cancellationToken)
