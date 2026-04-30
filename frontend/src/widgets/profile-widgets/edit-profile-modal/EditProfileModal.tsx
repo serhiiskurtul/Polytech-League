@@ -193,21 +193,8 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
             </div>
 
 
-            {isAdmin && (
-              <div className={styles.formGroup} style={{ flexDirection: 'row', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
-                <input
-                  type="checkbox"
-                  id="isExternal"
-                  name="isExternal"
-                  checked={formData.isExternal}
-                  onChange={handleChange}
-                  style={{ width: '20px', height: '20px', cursor: 'pointer' }}
-                />
-                <label htmlFor="isExternal" style={{ margin: 0, cursor: 'pointer', fontWeight: '600', color: '#e11d48' }}>
-                  Студент іншого закладу (не показувати в рейтингу)
-                </label>
-              </div>
-            )}
+            {/* isExternal removed as requested */}
+
           </div>
 
           

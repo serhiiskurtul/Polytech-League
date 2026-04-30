@@ -8,7 +8,7 @@ import EditProfileModal from '@/widgets/profile-widgets/edit-profile-modal/EditP
 import styles from './ProfilePage.module.css';
 import { useAuth } from '@/app/providers/AuthContext';
 import { PlayerDto } from '@/shared/types/player.types';
-import { updatePlayer, getProfile, uploadAvatar, checkArchivalMatches, createMergeRequest } from '@/shared/api/players.api';
+import { updatePlayer, updateProfile, getProfile, uploadAvatar, checkArchivalMatches, createMergeRequest } from '@/shared/api/players.api';
 
 import { toast } from 'react-hot-toast';
 
@@ -124,7 +124,8 @@ const ProfilePage = () => {
   const handleSaveProfile = async (data: Partial<PlayerDto>) => {
     if (!playerProfile?.id) return;
     try {
-      await updatePlayer(playerProfile.id, { ...playerProfile, ...data });
+      // Use the dedicated profile update endpoint which doesn't require direct ID access
+      await updateProfile({ ...playerProfile, ...data });
       const updatedProfile = await getProfile();
       setPlayerProfile(updatedProfile);
       toast.success('Профіль успішно оновлено');

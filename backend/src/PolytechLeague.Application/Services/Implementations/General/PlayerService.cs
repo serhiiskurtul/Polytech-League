@@ -118,15 +118,22 @@ public class PlayerService : IPlayerService
         dto.LastName = dto.LastName?.Replace(",", "").Trim();
 
         // Update basic info
-        player.FirstName = dto.FirstName ?? player.FirstName;
+        if (!string.IsNullOrWhiteSpace(dto.FirstName)) player.FirstName = dto.FirstName;
         player.Patronymic = dto.Patronymic ?? player.Patronymic;
-        player.LastName = dto.LastName ?? player.LastName;
-        player.Group = dto.Group ?? player.Group;
-        player.StudentId = dto.StudentId ?? player.StudentId;
+        if (!string.IsNullOrWhiteSpace(dto.LastName)) player.LastName = dto.LastName;
+        
+        player.Group = string.IsNullOrWhiteSpace(dto.Group) ? player.Group : dto.Group;
+        
+        // Handle StudentId: treat empty/whitespace as null to avoid unique index issues with multiple empty strings
+        if (dto.StudentId != null)
+        {
+            player.StudentId = string.IsNullOrWhiteSpace(dto.StudentId) ? null : dto.StudentId.Trim();
+        }
+        
         player.City = dto.City ?? player.City;
         player.UserId = dto.UserId ?? player.UserId;
         player.Faculty = dto.Faculty ?? player.Faculty;
-        player.Bio = dto.Bio ?? player.Bio;
+        player.Bio = dto.Bio; // Allow clearing bio
         player.InstagramUrl = dto.InstagramUrl ?? player.InstagramUrl;
         player.PhotoUrl = dto.PhotoUrl ?? player.PhotoUrl;
 
@@ -169,7 +176,16 @@ public class PlayerService : IPlayerService
 
         player.IsExternal = dto.IsExternal;
 
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        try 
+        {
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating player {PlayerId}: {Message}", id, ex.Message);
+            throw; // Re-throw to let the controller handle it (it will return 500 but now we have logs)
+        }
+
 
     }
 
