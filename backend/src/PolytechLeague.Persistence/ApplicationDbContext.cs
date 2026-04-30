@@ -38,6 +38,7 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<User> Users { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<Event> Events { get; set; }
     public DbSet<EventPhotos> EventPhotos { get; set; }
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<Conversation> Conversations { get; set; }
