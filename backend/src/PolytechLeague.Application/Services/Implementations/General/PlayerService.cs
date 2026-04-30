@@ -44,7 +44,18 @@ public class PlayerService : IPlayerService
     public async Task<PlayerDto?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
     {
         var allWithRankings = await GetAllWithRankingsAsync(null, cancellationToken);
-        return allWithRankings.FirstOrDefault(p => p.Id == id);
+        var ranked = allWithRankings.FirstOrDefault(p => p.Id == id);
+        if (ranked != null) return ranked;
+
+        // Fallback for players not in rankings (Admins, External)
+        var player = await _dbContext.Players
+            .Include(p => p.User)
+            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+            
+        if (player == null) return null;
+        var dto = player.ToDto();
+        await PopulateAchievementsAsync(dto, cancellationToken);
+        return dto;
     }
 
     public async Task<string?> GetPhotoUrlByUserIdAsync(long userId, CancellationToken cancellationToken = default)
@@ -59,8 +70,20 @@ public class PlayerService : IPlayerService
     public async Task<PlayerDto?> GetByUserIdAsync(long userId, CancellationToken cancellationToken = default)
     {
         var allWithRankings = await GetAllWithRankingsAsync(null, cancellationToken);
-        return allWithRankings.FirstOrDefault(p => p.UserId == userId);
+        var ranked = allWithRankings.FirstOrDefault(p => p.UserId == userId);
+        if (ranked != null) return ranked;
+
+        // Fallback for players not in rankings (Admins, External)
+        var player = await _dbContext.Players
+            .Include(p => p.User)
+            .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
+            
+        if (player == null) return null;
+        var dto = player.ToDto();
+        await PopulateAchievementsAsync(dto, cancellationToken);
+        return dto;
     }
+
 
     public async Task<PlayerDto> CreateAsync(PlayerDto dto, CancellationToken cancellationToken = default)
     {
