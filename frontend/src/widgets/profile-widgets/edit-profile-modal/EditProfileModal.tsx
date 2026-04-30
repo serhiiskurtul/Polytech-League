@@ -11,8 +11,7 @@ interface EditProfileModalProps {
 }
 
 const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: EditProfileModalProps) => {
-  const [formData, setFormData] = useState({
-
+  const [formData, setFormData] = React.useState({
     group: initialData.group || '',
     studentId: initialData.studentId || '',
     faculty: initialData.faculty || '',
@@ -23,10 +22,27 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
     futsalShirtNumber: initialData.futsalShirtNumber !== null && initialData.futsalShirtNumber !== undefined ? initialData.futsalShirtNumber : '',
     volleyballShirtNumber: initialData.volleyballShirtNumber !== null && initialData.volleyballShirtNumber !== undefined ? initialData.volleyballShirtNumber : '',
     basketballShirtNumber: initialData.basketballShirtNumber !== null && initialData.basketballShirtNumber !== undefined ? initialData.basketballShirtNumber : ''
-
   });
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = React.useState(false);
+
+  // Sync state with initialData when modal opens or initialData changes
+  React.useEffect(() => {
+    if (isOpen) {
+      setFormData({
+        group: initialData.group || '',
+        studentId: initialData.studentId || '',
+        faculty: initialData.faculty || '',
+        city: initialData.city || '',
+        bio: initialData.bio || '',
+        instagramUrl: initialData.instagramUrl || '',
+        isExternal: initialData.isExternal || false,
+        futsalShirtNumber: initialData.futsalShirtNumber !== null && initialData.futsalShirtNumber !== undefined ? initialData.futsalShirtNumber : '',
+        volleyballShirtNumber: initialData.volleyballShirtNumber !== null && initialData.volleyballShirtNumber !== undefined ? initialData.volleyballShirtNumber : '',
+        basketballShirtNumber: initialData.basketballShirtNumber !== null && initialData.basketballShirtNumber !== undefined ? initialData.basketballShirtNumber : ''
+      });
+    }
+  }, [isOpen, initialData]);
 
   if (!isOpen) return null;
 
@@ -123,8 +139,7 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
             )}
             
             <div className={styles.formGroup}>
-
-              <label htmlFor="bio">Про себе</label>
+              <label htmlFor="bio"><i className="fas fa-info-circle"></i> Про себе</label>
               <textarea
                 id="bio"
                 name="bio"

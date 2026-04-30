@@ -162,8 +162,13 @@ public class PlayerService : IPlayerService
         if (dto.City != null) player.City = dto.City;
         if (dto.UserId != null) player.UserId = dto.UserId;
         if (dto.Faculty != null) player.Faculty = dto.Faculty;
+        
+        _logger.LogInformation("Updating Bio for player {Id}. Old: {Old}, New: {New}", id, player.Bio, dto.Bio);
         if (dto.Bio != null) player.Bio = dto.Bio; 
+        
+        _logger.LogInformation("Updating InstagramUrl for player {Id}. Old: {Old}, New: {New}", id, player.InstagramUrl, dto.InstagramUrl);
         if (dto.InstagramUrl != null) player.InstagramUrl = dto.InstagramUrl;
+        
         if (dto.PhotoUrl != null) player.PhotoUrl = dto.PhotoUrl;
 
         // Sync name and photo to User entity if it exists
@@ -178,6 +183,9 @@ public class PlayerService : IPlayerService
                 _dbContext.Users.Update(user);
             }
         }
+
+        // Explicitly mark player as updated to ensure TPT fields are saved
+        _dbContext.Players.Update(player);
 
 
 
