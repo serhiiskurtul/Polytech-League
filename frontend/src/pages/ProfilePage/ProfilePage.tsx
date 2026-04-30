@@ -101,14 +101,15 @@ const ProfilePage = () => {
     faculty: playerProfile?.faculty || '-',
     phone: '-', 
     city: playerProfile?.city || '-',
-    bio: playerProfile?.bio || '',
+    bio: playerProfile?.bio ?? '',
     badges: isAdmin ? ['Адміністратор'] : ['Студент', 'Учасник'],
-    instagramUrl: playerProfile?.instagramUrl 
+    instagramUrl: playerProfile?.instagramUrl && playerProfile.instagramUrl.trim() !== ''
       ? (playerProfile.instagramUrl.startsWith('http') 
           ? playerProfile.instagramUrl 
-          : `https://instagram.com/${playerProfile.instagramUrl.replace('@', '')}`)
+          : `https://instagram.com/${playerProfile.instagramUrl.replace('@', '').trim()}`)
       : null,
     photoUrl: playerProfile?.photoUrl,
+
     globalRank: playerProfile?.globalRank
   };
 

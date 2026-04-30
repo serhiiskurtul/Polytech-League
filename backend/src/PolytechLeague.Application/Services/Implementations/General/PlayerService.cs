@@ -133,19 +133,25 @@ public class PlayerService : IPlayerService
 
     public async Task UpdateAsync(long id, PlayerDto dto, CancellationToken cancellationToken = default)
     {
+        _logger.LogInformation("Updating player {Id}. DTO Bio: {Bio}, Instagram: {Instagram}", id, dto.Bio, dto.InstagramUrl);
+        
         var player = await _dbContext.Players.FindAsync(new object[] { id }, cancellationToken);
-        if (player == null) return;
+        if (player == null)
+        {
+            _logger.LogWarning("Player {Id} not found for update", id);
+            throw new KeyNotFoundException($"Player with ID {id} not found");
+        }
 
         // Cleanup names
         dto.FirstName = dto.FirstName?.Replace(",", "").Trim();
         dto.LastName = dto.LastName?.Replace(",", "").Trim();
 
-        // Update basic info
-        if (!string.IsNullOrWhiteSpace(dto.FirstName)) player.FirstName = dto.FirstName;
-        player.Patronymic = dto.Patronymic ?? player.Patronymic;
-        if (!string.IsNullOrWhiteSpace(dto.LastName)) player.LastName = dto.LastName;
+        // Update basic info - only if provided (not null)
+        if (dto.FirstName != null && !string.IsNullOrWhiteSpace(dto.FirstName)) player.FirstName = dto.FirstName;
+        if (dto.Patronymic != null) player.Patronymic = dto.Patronymic;
+        if (dto.LastName != null && !string.IsNullOrWhiteSpace(dto.LastName)) player.LastName = dto.LastName;
         
-        player.Group = string.IsNullOrWhiteSpace(dto.Group) ? player.Group : dto.Group;
+        if (dto.Group != null) player.Group = dto.Group;
         
         // Handle StudentId: treat empty/whitespace as null to avoid unique index issues with multiple empty strings
         if (dto.StudentId != null)
@@ -153,12 +159,12 @@ public class PlayerService : IPlayerService
             player.StudentId = string.IsNullOrWhiteSpace(dto.StudentId) ? null : dto.StudentId.Trim();
         }
         
-        player.City = dto.City ?? player.City;
-        player.UserId = dto.UserId ?? player.UserId;
-        player.Faculty = dto.Faculty ?? player.Faculty;
-        player.Bio = dto.Bio; // Allow clearing bio
-        player.InstagramUrl = dto.InstagramUrl ?? player.InstagramUrl;
-        player.PhotoUrl = dto.PhotoUrl ?? player.PhotoUrl;
+        if (dto.City != null) player.City = dto.City;
+        if (dto.UserId != null) player.UserId = dto.UserId;
+        if (dto.Faculty != null) player.Faculty = dto.Faculty;
+        if (dto.Bio != null) player.Bio = dto.Bio; 
+        if (dto.InstagramUrl != null) player.InstagramUrl = dto.InstagramUrl;
+        if (dto.PhotoUrl != null) player.PhotoUrl = dto.PhotoUrl;
 
         // Sync name and photo to User entity if it exists
         if (player.UserId.HasValue)
@@ -172,6 +178,7 @@ public class PlayerService : IPlayerService
                 _dbContext.Users.Update(user);
             }
         }
+
 
 
         // Update sport stats (only if provided in DTO)
