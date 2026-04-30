@@ -37,8 +37,9 @@ public class CloudflareR2FileService : IFileService
         var config = new AmazonS3Config
         {
             ServiceURL = _settings.ServiceUrl,
-            AuthenticationRegion = "auto", 
-            ForcePathStyle = true
+            AuthenticationRegion = "us-east-1", // More reliable for R2 than "auto"
+            ForcePathStyle = true,
+            Timeout = TimeSpan.FromMinutes(5) // Increase timeout for large videos
         };
 
         _s3Client = new AmazonS3Client(_settings.AccessKey, _settings.SecretKey, config);
@@ -52,23 +53,43 @@ public class CloudflareR2FileService : IFileService
         var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
         var key = string.IsNullOrEmpty(folder) ? fileName : $"{folder}/{fileName}";
 
-        _logger.LogInformation("Uploading file to R2. Bucket: {Bucket}, Key: {Key}, Size: {Size}", _settings.BucketName, key, file.Length);
+        _logger.LogInformation("[R2] Starting upload for key: {Key}. Size: {Size} bytes", key, file.Length);
         
-        using var stream = file.OpenReadStream();
-        
-        var request = new PutObjectRequest
+        try 
         {
-            BucketName = _settings.BucketName,
-            Key = key,
-            InputStream = stream,
-            ContentType = file.ContentType,
-            DisablePayloadSigning = true
-        };
+            using var stream = file.OpenReadStream();
+            
+            var request = new PutObjectRequest
+            {
+                BucketName = _settings.BucketName,
+                Key = key,
+                InputStream = stream,
+                ContentType = file.ContentType,
+                DisablePayloadSigning = true,
+                AutoCloseStream = true
+            };
 
-        await _s3Client.PutObjectAsync(request, cancellationToken);
-        _logger.LogInformation("Successfully uploaded file to R2: {Key}", key);
+            _logger.LogInformation("[R2] Sending PutObjectRequest to S3 endpoint...");
+            var response = await _s3Client.PutObjectAsync(request, cancellationToken);
+            
+            _logger.LogInformation("[R2] Upload successful. RequestId: {RequestId}, Status: {Status}", 
+                response.ResponseMetadata.RequestId, response.HttpStatusCode);
 
-        return $"{_settings.PublicUrl}/{key}";
+            var finalUrl = $"{_settings.PublicUrl}/{key}";
+            _logger.LogInformation("[R2] Generated public URL: {Url}", finalUrl);
+            
+            return finalUrl;
+        }
+        catch (AmazonS3Exception e)
+        {
+            _logger.LogError(e, "[R2] AmazonS3Exception during upload for key {Key}: {Message}", key, e.Message);
+            throw new Exception($"S3 Error: {e.Message}", e);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "[R2] Unexpected error during upload for key {Key}: {Message}", key, e.Message);
+            throw;
+        }
     }
 
     public void DeleteFile(string relativePath)

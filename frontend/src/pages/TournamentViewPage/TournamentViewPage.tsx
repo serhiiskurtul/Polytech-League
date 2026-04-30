@@ -449,9 +449,10 @@ const TournamentViewPage = () => {
       await uploadEventMedia(id!, files);
       toast.success(files.length > 1 ? "Медіафайли завантажено" : "Медіафайл завантажено");
       fetchTournament(true);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      toast.error("Помилка при завантаженні медіа");
+      const errorMessage = err.response?.data?.error || err.response?.data?.message || "Помилка при завантаженні медіа";
+      toast.error(errorMessage);
     } finally {
       setIsUploading(false);
     }
