@@ -151,6 +151,7 @@ export const PlayerComparePage = () => {
             <div className={styles.playerColumn}>
               <SeasonSelector 
                 seasons={seasons} 
+                player={player1}
                 selectedId={selectedSeasonId1} 
                 onChange={setSelectedSeasonId1} 
               />
@@ -168,6 +169,7 @@ export const PlayerComparePage = () => {
                 <>
                   <SeasonSelector 
                     seasons={seasons} 
+                    player={player2}
                     selectedId={selectedSeasonId2} 
                     onChange={setSelectedSeasonId2} 
                   />
@@ -240,30 +242,46 @@ export const PlayerComparePage = () => {
   );
 };
 
-const SeasonSelector = ({ seasons, selectedId, onChange }: { 
+const SeasonSelector = ({ seasons, player, selectedId, onChange }: { 
   seasons: Season[], 
+  player: PlayerDto | null,
   selectedId: number | null, 
   onChange: (id: number | null) => void 
-}) => (
-  <div className={styles.seasonSelector}>
-    <label>Сезон</label>
-    <div className={styles.selectWrapper}>
-      <select 
-        value={selectedId || ''} 
-        onChange={(e) => onChange(Number(e.target.value) || null)}
-        className={styles.seasonSelect}
-      >
-        <option value="">За весь час</option>
-        {seasons.map(s => (
-          <option key={s.id} value={s.id}>
-            {s.name} {s.isCurrent ? '★' : ''}
-          </option>
-        ))}
-      </select>
-      <i className="fa-solid fa-chevron-down"></i>
+}) => {
+  // Filter seasons where the player had at least one achievement
+  const filteredSeasons = seasons.filter(s => {
+    if (!player || !player.achievements) return true; // Show all if no data
+    
+    const start = new Date(s.startDate);
+    const end = new Date(s.endDate);
+    
+    return player.achievements.some(a => {
+      const achDate = new Date(a.date);
+      return achDate >= start && achDate <= end;
+    });
+  });
+
+  return (
+    <div className={styles.seasonSelector}>
+      <label>Сезон</label>
+      <div className={styles.selectWrapper}>
+        <select 
+          value={selectedId || ''} 
+          onChange={(e) => onChange(Number(e.target.value) || null)}
+          className={styles.seasonSelect}
+        >
+          <option value="">За весь час</option>
+          {filteredSeasons.map(s => (
+            <option key={s.id} value={s.id}>
+              {s.name}
+            </option>
+          ))}
+        </select>
+        <i className="fa-solid fa-chevron-down"></i>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const PlayerCard = ({ player, color, selectedSeason }: { 
   player: PlayerDto, 
