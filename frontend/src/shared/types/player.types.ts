@@ -6,6 +6,9 @@ export interface PlayerDto {
     lastName: string;
     birthDate?: string | null;
     group: string;
+    enrollmentYear?: number;
+    specialtyCode?: number;
+    groupNumber?: number;
     studentId?: string | null;
     city: string;
     faculty?: string | null;
