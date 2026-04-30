@@ -436,6 +436,14 @@ const TournamentViewPage = () => {
 
     if (files.length === 0) return;
 
+    // Перевірка розміру файлів (напр. 500 МБ на файл)
+    const MAX_FILE_SIZE = 500 * 1024 * 1024;
+    const largeFiles = files.filter(f => f.size > MAX_FILE_SIZE);
+    if (largeFiles.length > 0) {
+      toast.error(`Файл(и) занадто великі: ${largeFiles.map(f => f.name).join(', ')}. Максимум 500 МБ.`);
+      return;
+    }
+
     try {
       setIsUploading(true);
       await uploadEventMedia(id!, files);

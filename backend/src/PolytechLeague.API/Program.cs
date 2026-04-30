@@ -166,6 +166,8 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseWebSockets();
+
 app.MapControllers();
 app.MapHub<ChatHub>("/hubs/chat");
 

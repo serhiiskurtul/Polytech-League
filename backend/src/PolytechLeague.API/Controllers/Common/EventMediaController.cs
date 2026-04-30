@@ -22,6 +22,8 @@ public class EventMediaController : ControllerBase
 
     [Authorize(Policy = "Admin")]
     [HttpPost("{eventId}/upload-multiple")]
+    [DisableRequestSizeLimit]
+    [RequestSizeLimit(2147483648)] // 2GB
     public async Task<IActionResult> UploadMultiple(long eventId, [FromForm] IEnumerable<IFormFile> files, CancellationToken cancellationToken)
     {
         var @event = await _dbContext.Events.FindAsync(new object[] { eventId }, cancellationToken);
@@ -29,28 +31,34 @@ public class EventMediaController : ControllerBase
 
         var uploadedUrls = new List<string>();
 
-        foreach (var file in files)
+        try
         {
-            if (file.Length > 0)
+            foreach (var file in files)
             {
-                // Determine folder based on file type
-                string folder = file.ContentType.StartsWith("video/") ? "events/videos" : "events/photos";
-                var url = await _fileService.SaveFileAsync(file, folder, cancellationToken);
-                
-                var eventPhoto = new EventPhotos
+                if (file.Length > 0)
                 {
-                    Url = url,
-                    EventId = eventId
-                };
+                    // Determine folder based on file type
+                    string folder = file.ContentType.StartsWith("video/") ? "events/videos" : "events/photos";
+                    var url = await _fileService.SaveFileAsync(file, folder, cancellationToken);
+                    
+                    var eventPhoto = new EventPhotos
+                    {
+                        Url = url,
+                        EventId = eventId
+                    };
 
-                _dbContext.EventPhotos.Add(eventPhoto);
-                uploadedUrls.Add(url);
+                    _dbContext.EventPhotos.Add(eventPhoto);
+                    uploadedUrls.Add(url);
+                }
             }
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            return Ok(new { urls = uploadedUrls });
         }
-
-        await _dbContext.SaveChangesAsync(cancellationToken);
-
-        return Ok(new { urls = uploadedUrls });
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = "Помилка при завантаженні файлів", error = ex.Message });
+        }
     }
 
     [Authorize(Policy = "Admin")]
@@ -74,6 +82,8 @@ public class EventMediaController : ControllerBase
 
     [Authorize(Policy = "Admin")]
     [HttpPost("{eventId}/set-main-photo")]
+    [DisableRequestSizeLimit]
+    [RequestSizeLimit(2147483648)] // 2GB
     public async Task<IActionResult> SetMainPhoto(long eventId, IFormFile file, CancellationToken cancellationToken)
     {
         var @event = await _dbContext.Events.FindAsync(new object[] { eventId }, cancellationToken);
