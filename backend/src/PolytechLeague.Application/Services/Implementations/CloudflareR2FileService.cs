@@ -38,8 +38,7 @@ public class CloudflareR2FileService : IFileService
         {
             ServiceURL = _settings.ServiceUrl,
             AuthenticationRegion = "auto", 
-            ForcePathStyle = true,
-            UseChunkedEncoding = false // THIS IS KEY FOR R2
+            ForcePathStyle = true
         };
 
         _s3Client = new AmazonS3Client(_settings.AccessKey, _settings.SecretKey, config);
@@ -53,15 +52,19 @@ public class CloudflareR2FileService : IFileService
         var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
         var key = string.IsNullOrEmpty(folder) ? fileName : $"{folder}/{fileName}";
 
-        using var stream = file.OpenReadStream();
+        using var ms = new MemoryStream();
+        await file.CopyToAsync(ms, cancellationToken);
+        ms.Position = 0;
+
         _logger.LogInformation("Uploading file to R2. Bucket: {Bucket}, Key: {Key}", _settings.BucketName, key);
         
         var request = new PutObjectRequest
         {
             BucketName = _settings.BucketName,
             Key = key,
-            InputStream = stream,
-            ContentType = file.ContentType
+            InputStream = ms,
+            ContentType = file.ContentType,
+            DisablePayloadSigning = true // Try disabling it here on the request level
         };
 
         await _s3Client.PutObjectAsync(request, cancellationToken);
