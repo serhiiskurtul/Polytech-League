@@ -35,6 +35,9 @@ public class EventConfiguration : IEntityTypeConfiguration<Event>
         builder.Property(x => x.Description)
             .HasColumnName("description");
 
+        builder.Property(x => x.MainPhotoUrl)
+            .HasColumnName("main_photo_url");
+
 
         builder.Property(x => x.Level)
             .HasColumnName("level")

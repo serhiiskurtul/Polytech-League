@@ -819,6 +819,10 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("location");
 
+                    b.Property<string>("MainPhotoUrl")
+                        .HasColumnType("text")
+                        .HasColumnName("main_photo_url");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
@@ -2133,7 +2137,8 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnName("beach_volleyball_team_id");
 
                     b.Property<string>("Bio")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("Bio");
 
                     b.Property<int?>("CheckersRating")
                         .HasColumnType("integer")
@@ -2189,7 +2194,8 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("InstagramUrl")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("InstagramUrl");
 
                     b.Property<bool>("IsExternal")
                         .HasColumnType("boolean");

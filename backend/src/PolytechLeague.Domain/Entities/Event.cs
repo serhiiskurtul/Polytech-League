@@ -11,6 +11,7 @@ public abstract class Event
     public required CompetitionLevel Level { get; set; }
     public EventCategory Category { get; set; } = EventCategory.Mixed;
     public string? Description { get; set; }
+    public string? MainPhotoUrl { get; set; }
 
     public DateTime? RegistrationStart { get; set; }
     public DateTime? RegistrationEnd { get; set; }

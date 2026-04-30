@@ -71,4 +71,41 @@ public class EventMediaController : ControllerBase
 
         return NoContent();
     }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{eventId}/set-main-photo")]
+    public async Task<IActionResult> SetMainPhoto(long eventId, IFormFile file, CancellationToken cancellationToken)
+    {
+        var @event = await _dbContext.Events.FindAsync(new object[] { eventId }, cancellationToken);
+        if (@event == null) return NotFound("Event not found");
+
+        var url = await _fileService.SaveFileAsync(file, "events/main", cancellationToken);
+        
+        @event.MainPhotoUrl = url;
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return Ok(new { url });
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{eventId}/mark-as-main/{photoId}")]
+    public async Task<IActionResult> MarkAsMain(long eventId, long photoId, CancellationToken cancellationToken)
+    {
+        var @event = await _dbContext.Events.FindAsync(new object[] { eventId }, cancellationToken);
+        if (@event == null) return NotFound("Event not found");
+
+        if (photoId <= 0)
+        {
+            @event.MainPhotoUrl = null;
+        }
+        else
+        {
+            var photo = await _dbContext.EventPhotos.FindAsync(new object[] { photoId }, cancellationToken);
+            if (photo == null || photo.EventId != eventId) return NotFound("Photo not found");
+            @event.MainPhotoUrl = photo.Url;
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return Ok(new { url = @event.MainPhotoUrl });
+    }
 }

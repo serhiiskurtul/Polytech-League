@@ -15,6 +15,8 @@ import {
   deleteTournamentPhoto,
   uploadEventMedia,
   deleteEventMedia,
+  setMainPhoto,
+  markAsMainPhoto,
   searchUsers,
   getAllPlayers,
   createPlayer,
@@ -1404,7 +1406,9 @@ const TournamentViewPage = () => {
               </div>
             </div>
             <div className={styles.tournamentImage}>
-              {details?.photos && details.photos.length > 0 ? (
+              {details?.mainPhotoUrl ? (
+                <img src={getImageUrl(details.mainPhotoUrl)} alt={tournament?.title} />
+              ) : details?.photos && details.photos.length > 0 ? (
                 <img src={getImageUrl(details.photos[0].url)} alt={tournament?.title} />
               ) : (
                 <i className={
@@ -2632,6 +2636,90 @@ const TournamentViewPage = () => {
                       <textarea rows={5} placeholder="Введіть детальний розклад (кожен пункт з нового рядка)..." value={editTournamentData.schedule} onChange={(e) => setEditTournamentData({ ...editTournamentData, schedule: e.target.value })} />
                     </div>
 
+                    <div className={styles.mainPhotoSection} style={{ gridColumn: '1 / -1' }}>
+                      <label><i className="fas fa-star"></i> Головне фото (афіша)</label>
+                      <div className={styles.mainPhotoContainer}>
+                        {details?.mainPhotoUrl ? (
+                          <div className={styles.mainPhotoPreview}>
+                            <img src={getImageUrl(details.mainPhotoUrl)} alt="Main" />
+                            <div className={styles.mainPhotoActions}>
+                                <button 
+                                className={styles.changeMainPhotoBtn}
+                                onClick={() => {
+                                    const input = document.createElement('input');
+                                    input.type = 'file';
+                                    input.accept = 'image/*';
+                                    input.onchange = async (e: any) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        try {
+                                        setIsUploading(true);
+                                        await setMainPhoto(id!, file);
+                                        toast.success("Головне фото оновлено");
+                                        fetchTournament(true);
+                                        } catch (err) {
+                                        toast.error("Помилка при оновленні");
+                                        } finally {
+                                        setIsUploading(false);
+                                        }
+                                    }
+                                    };
+                                    input.click();
+                                }}
+                                >
+                                <i className="fas fa-edit"></i> Змінити афішу
+                                </button>
+                                <button 
+                                className={styles.removeMainPhotoBtn}
+                                onClick={async () => {
+                                    if (!window.confirm("Видалити афішу? Змагання буде використовувати перше фото з галереї.")) return;
+                                    try {
+                                        // We can just call an update with null or a dedicated delete
+                                        // For now let's just use the markAsMain with null logic if supported or just add a simple setter
+                                        await api.post(`/event-media/${id}/mark-as-main/0`); // 0 or null logic
+                                        toast.success("Афішу видалено");
+                                        fetchTournament(true);
+                                    } catch (err) {
+                                        toast.error("Помилка");
+                                    }
+                                }}
+                                >
+                                <i className="fas fa-trash"></i>
+                                </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div 
+                            className={styles.mainPhotoPlaceholder}
+                            onClick={() => {
+                              const input = document.createElement('input');
+                              input.type = 'file';
+                              input.accept = 'image/*';
+                              input.onchange = async (e: any) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  try {
+                                    setIsUploading(true);
+                                    await setMainPhoto(id!, file);
+                                    toast.success("Головне фото встановлено");
+                                    fetchTournament(true);
+                                  } catch (err) {
+                                    toast.error("Помилка при завантаженні");
+                                  } finally {
+                                    setIsUploading(false);
+                                  }
+                                }
+                              };
+                              input.click();
+                            }}
+                          >
+                            <i className="fas fa-plus"></i>
+                            <span>Завантажити афішу</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
                     <div className={styles.photoManagementSection} style={{ gridColumn: '1 / -1' }}>
                       <label><i className="fas fa-images"></i> Фотографії змагань</label>
 
@@ -2658,9 +2746,25 @@ const TournamentViewPage = () => {
                               ) : (
                                 <img src={getImageUrl(photo.url)} alt="Tournament" />
                               )}
-                              <button onClick={() => handleDeletePhoto(photo.id)} className={styles.deletePhotoBtn}>
-                                <i className="fas fa-times"></i>
-                              </button>
+                              <div className={styles.adminPhotoActions}>
+                                <button 
+                                  onClick={() => {
+                                    markAsMainPhoto(id!, photo.id)
+                                      .then(() => {
+                                        toast.success("Встановлено як головне");
+                                        fetchTournament(true);
+                                      })
+                                      .catch(() => toast.error("Помилка"));
+                                  }} 
+                                  className={`${styles.setMainBtn} ${details?.mainPhotoUrl === photo.url ? styles.activeMain : ''}`}
+                                  title="Встановити як головне"
+                                >
+                                  <i className="fas fa-star"></i>
+                                </button>
+                                <button onClick={() => handleDeletePhoto(photo.id)} className={styles.deletePhotoBtn}>
+                                  <i className="fas fa-times"></i>
+                                </button>
+                              </div>
                             </div>
                           ))}
                         </div>

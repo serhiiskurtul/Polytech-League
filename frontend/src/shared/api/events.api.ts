@@ -26,3 +26,17 @@ export const uploadEventMedia = async (eventId: number | string, files: File[]):
 export const deleteEventMedia = async (mediaId: number | string): Promise<void> => {
     await api.delete(`/event-media/${mediaId}`);
 };
+
+export const setMainPhoto = async (eventId: number | string, file: File): Promise<{ url: string }> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await api.post<{ url: string }>(`/event-media/${eventId}/set-main-photo`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+};
+
+export const markAsMainPhoto = async (eventId: number | string, photoId: number | string): Promise<{ url: string }> => {
+    const response = await api.post<{ url: string }>(`/event-media/${eventId}/mark-as-main/${photoId}`);
+    return response.data;
+};
