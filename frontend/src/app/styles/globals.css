@@ -6,10 +6,17 @@
 }
 
 /* BASE */
+html {
+  font-size: 90%;
+}
+
 body {
   font-family: var(--nav-font-family);
   background-color: #F8FAFC;
   color: #1e242a;
+  zoom: 0.9;
+  -moz-transform: scale(0.9);
+  -moz-transform-origin: top center;
 }
 
 a {
@@ -154,7 +161,7 @@ h3{
   }
 }
 
-/* Адаптивна ширина для великих екранів та низького масштабу */
+/* РђРґР°РїС‚РёРІРЅР° С€РёСЂРёРЅР° РґР»СЏ РІРµР»РёРєРёС… РµРєСЂР°РЅС–РІ С‚Р° РЅРёР·СЊРєРѕРіРѕ РјР°СЃС€С‚Р°Р±Сѓ */
 @media (min-width: 1921px) {
   :root {
     --container-max-width: 1800px;
