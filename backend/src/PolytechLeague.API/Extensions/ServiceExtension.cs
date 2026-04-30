@@ -25,12 +25,13 @@ using PolytechLeague.Application.Services.Implementations.BeachVolleyball;
 using PolytechLeague.Infrastructure.Email;
 using PolytechLeague.Infrastructure.Redis;
 using StackExchange.Redis;
+using PolytechLeague.Application.Configuration;
 
 namespace PolytechLeague.API.Extensions;
 
 public static class ServiceExtension
 {
-    public static IServiceCollection AddServices(this IServiceCollection services)
+    public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IPasswordEncoder, BcryptPasswordEncoder>();
         services.AddScoped<IAuthService, AuthService>();
@@ -80,7 +81,10 @@ public static class ServiceExtension
         services.AddScoped<IBadmintonParticipantService, BadmintonParticipantService>();
         services.AddScoped<IBadmintonTeamService, BadmintonTeamService>();
         services.AddScoped<ITournamentService, TournamentService>();
-        services.AddScoped<IFileService, FileService>();
+        
+        services.Configure<CloudflareR2Settings>(configuration.GetSection("CloudflareR2"));
+        services.AddScoped<IFileService, CloudflareR2FileService>();
+
         services.AddScoped<ISeasonRatingService, SeasonRatingService>();
 
         return services;

@@ -83,7 +83,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services
     .AddPersistence(builder.Configuration)
-    .AddServices()
+    .AddServices(builder.Configuration)
     .AddAuth(builder.Configuration);
 
 
