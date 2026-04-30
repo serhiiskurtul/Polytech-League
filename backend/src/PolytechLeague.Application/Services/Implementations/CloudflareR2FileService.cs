@@ -19,7 +19,9 @@ public class CloudflareR2FileService : IFileService
         var config = new AmazonS3Config
         {
             ServiceURL = _settings.ServiceUrl,
-            ForcePathStyle = true // Required for Cloudflare R2
+            AuthenticationRegion = "auto", // Required for Cloudflare R2
+            ForcePathStyle = true,
+            DisablePayloadSigning = true // Recommended for R2 compatibility
         };
 
         _s3Client = new AmazonS3Client(_settings.AccessKey, _settings.SecretKey, config);
