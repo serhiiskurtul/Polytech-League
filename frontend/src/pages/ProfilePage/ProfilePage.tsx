@@ -39,7 +39,7 @@ interface Achievement {
 }
 
 const ProfilePage = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, refreshUser } = useAuth();
   const [playerProfile, setPlayerProfile] = useState<PlayerDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -101,9 +101,13 @@ const ProfilePage = () => {
     faculty: playerProfile?.faculty || '-',
     phone: '-', 
     city: playerProfile?.city || '-',
-    bio: playerProfile?.bio || '-',
+    bio: playerProfile?.bio || '',
     badges: isAdmin ? ['Адміністратор'] : ['Студент', 'Учасник'],
-    instagramUrl: playerProfile?.instagramUrl,
+    instagramUrl: playerProfile?.instagramUrl 
+      ? (playerProfile.instagramUrl.startsWith('http') 
+          ? playerProfile.instagramUrl 
+          : `https://instagram.com/${playerProfile.instagramUrl.replace('@', '')}`)
+      : null,
     photoUrl: playerProfile?.photoUrl,
     globalRank: playerProfile?.globalRank
   };
@@ -124,10 +128,10 @@ const ProfilePage = () => {
   const handleSaveProfile = async (data: Partial<PlayerDto>) => {
     if (!playerProfile?.id) return;
     try {
-      // Use the dedicated profile update endpoint which doesn't require direct ID access
       await updateProfile({ ...playerProfile, ...data });
       const updatedProfile = await getProfile();
       setPlayerProfile(updatedProfile);
+      await refreshUser();
       toast.success('Профіль успішно оновлено');
     } catch (error) {
       console.error('Failed to update profile:', error);

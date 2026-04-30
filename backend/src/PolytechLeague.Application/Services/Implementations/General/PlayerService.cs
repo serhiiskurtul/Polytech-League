@@ -160,7 +160,7 @@ public class PlayerService : IPlayerService
         player.InstagramUrl = dto.InstagramUrl ?? player.InstagramUrl;
         player.PhotoUrl = dto.PhotoUrl ?? player.PhotoUrl;
 
-        // Sync name to User entity if it exists
+        // Sync name and photo to User entity if it exists
         if (player.UserId.HasValue)
         {
             var user = await _dbContext.Users.FindAsync(new object[] { player.UserId.Value }, cancellationToken);
@@ -168,9 +168,11 @@ public class PlayerService : IPlayerService
             {
                 user.FirstName = player.FirstName;
                 user.LastName = player.LastName;
+                user.PhotoUrl = player.PhotoUrl; // Sync photo URL
                 _dbContext.Users.Update(user);
             }
         }
+
 
         // Update sport stats (only if provided in DTO)
         if (dto.ChessRating.HasValue) player.ChessRating = dto.ChessRating;

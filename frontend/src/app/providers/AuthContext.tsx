@@ -8,6 +8,7 @@ interface AuthContextType {
   user: User | null;
   login: (userData: User) => void;
   logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
   loading: boolean;
   isAuthenticated: boolean;
 }
@@ -18,19 +19,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const fetchUser = async () => {
+    try {
+      const response = await api.get("/users/me");
+      setUser(response.data);
+    } catch (error: any) {
+      if (error.response?.status !== 401) {
+        console.error(error);
+      }
+      setUser(null);
+    }
+  };
+
   useEffect(() => {
     const initAuth = async () => {
-      try {
-        const response = await api.get("/users/me");
-        setUser(response.data);
-      } catch (error: any) {
-        if (error.response?.status !== 401) {
-          console.error(error);
-        }
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
+      setLoading(true);
+      await fetchUser();
+      setLoading(false);
     };
 
     initAuth();
@@ -49,14 +54,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
+  const refreshUser = async () => {
+    await fetchUser();
+  };
+
   const isAuthenticated = !!user; // true — залогінений, false — гість
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, isAuthenticated }}>
+    <AuthContext.Provider value={{ user, login, logout, refreshUser, loading, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );
 }
+
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
