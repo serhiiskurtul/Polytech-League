@@ -103,4 +103,22 @@ public class UsersController(IUserService userService, IPlayerService playerServ
         await userService.DeleteAsync(id, cancellationToken);
         return NoContent();
     }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("block/{id}")]
+    public async Task<IActionResult> Block(
+        [FromRoute] long id, CancellationToken cancellationToken)
+    {
+        await userService.BlockAsync(id, cancellationToken);
+        return NoContent();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("unblock/{id}")]
+    public async Task<IActionResult> Unblock(
+        [FromRoute] long id, CancellationToken cancellationToken)
+    {
+        await userService.UnblockAsync(id, cancellationToken);
+        return NoContent();
+    }
 }

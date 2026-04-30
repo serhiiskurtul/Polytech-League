@@ -103,6 +103,45 @@ public class UserService : AbstractEntityService<User>, IUserService
         _logger.LogInformation("User {Id} marked as deleted", id);
     }
 
+    public async Task BlockAsync(long id, CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Blocking user with id {Id}", id);
+
+        var user = await _dbcontext.Set<User>()
+            .FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted, cancellationToken);
+
+        if (user is null)
+        {
+            _logger.LogWarning("User {Id} not found or already deleted", id);
+            throw new EntityNotFoundException(nameof(User), id);
+        }
+
+        user.IsBlocked = true;
+        await _dbcontext.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("User {Id} blocked", id);
+    }
+
+    public async Task UnblockAsync(long id, CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Unblocking user with id {Id}", id);
+
+        var user = await _dbcontext.Set<User>()
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted, cancellationToken);
+
+        if (user is null)
+        {
+            _logger.LogWarning("User {Id} not found or already deleted", id);
+            throw new EntityNotFoundException(nameof(User), id);
+        }
+
+        user.IsBlocked = false;
+        await _dbcontext.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("User {Id} unblocked", id);
+    }
+
     public async Task ConfirmEmailAsync(string email, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("Confirming email for {Email}", email);
@@ -137,5 +176,6 @@ public class UserService : AbstractEntityService<User>, IUserService
         oldEntity.Role = newEntity.Role;
         oldEntity.Email = newEntity.Email;
         oldEntity.PhotoUrl = newEntity.PhotoUrl;
+        oldEntity.IsBlocked = newEntity.IsBlocked;
     }
 }

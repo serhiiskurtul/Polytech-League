@@ -19,6 +19,7 @@ public class UserResponse
     public UserRole Role { get; set; }
     public string? Email { get; set; }
     public string? PhotoUrl { get; set; }
+    public bool IsBlocked { get; set; }
     
     [JsonPropertyName("createdAt")]
     public DateTime CreatedAt { get; set; }
@@ -32,6 +33,7 @@ public class UserWithDeletedResponse
     public UserRole Role { get; set; }
     public string? Email { get; set; }
     public bool IsDeleted { get; set; }
+    public bool IsBlocked { get; set; }
 }
 
 public static class UserDtoExtension
@@ -58,6 +60,7 @@ public static class UserDtoExtension
             Role = user.Role,
             Email = user.Email,
             PhotoUrl = user.PhotoUrl,
+            IsBlocked = user.IsBlocked,
             CreatedAt = user.CreatedAt
         };
     }
@@ -71,7 +74,8 @@ public static class UserDtoExtension
             LastName = user.LastName,
             Role = user.Role,
             Email = user.Email,
-            IsDeleted = user.IsDeleted
+            IsDeleted = user.IsDeleted,
+            IsBlocked = user.IsBlocked
         };
     }
 }

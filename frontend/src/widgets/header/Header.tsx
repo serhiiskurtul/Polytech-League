@@ -9,6 +9,7 @@ import { getPhotoUrl } from "@/shared/utils/photo.utils";
 
 export default function Header() {
   const { user, isAuthenticated } = useAuth();
+  const isAdmin = user?.role === 1 || user?.role === '1' || user?.role === 'Admin';
   const { unreadCount } = useNotifications();
   const { unreadTotal } = useChat();
 
@@ -73,6 +74,23 @@ export default function Header() {
                 <span>Рейтинги груп</span>
               </Link>
             </li>
+            {isAdmin && (
+              <>
+                <li className={styles.adminDivider}></li>
+                <li>
+                  <Link to="/admin/merges" className={`${styles.navLink} ${styles.adminLink}`} onClick={closeMenu}>
+                    <i className={`fas fa-code-merge ${styles.navIcon}`}></i>
+                    <span>Запити</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/admin/users" className={`${styles.navLink} ${styles.adminLink}`} onClick={closeMenu}>
+                    <i className={`fas fa-user-shield ${styles.navIcon}`}></i>
+                    <span>Користувачі</span>
+                  </Link>
+                </li>
+              </>
+            )}
           </ul>
         </nav>
 

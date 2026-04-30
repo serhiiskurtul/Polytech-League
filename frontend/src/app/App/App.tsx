@@ -20,6 +20,7 @@ import NotFoundPage from '@/pages/NotFoundPage/NotFoundPage';
 import InternalServerErrorPage from '@/pages/InternalServerErrorPage/InternalServerErrorPage';
 import { RatingsPage } from '@/pages/RatingsPage';
 import { AdminMergesPage } from '@/pages/AdminMergesPage/AdminMergesPage';
+import { AdminUsersPage } from '@/pages/AdminUsersPage';
 
 import ProtectedRoute from '../providers/ProtectedRoute';
 import ScrollToTop from '../providers/ScrollToTop';
@@ -195,6 +196,17 @@ export default function App() {
           element={
             <ProtectedRoute requireAuth={true} adminOnly={true}>
               <AdminMergesPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/users"
+          element={
+            <ProtectedRoute requireAuth={true} adminOnly={true}>
+              <div className="page-wrapper">
+                <AdminUsersPage />
+              </div>
             </ProtectedRoute>
           }
         />

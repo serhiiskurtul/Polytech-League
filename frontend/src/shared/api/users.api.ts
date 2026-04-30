@@ -5,7 +5,10 @@ export interface UserResponse {
   firstName: string;
   lastName: string;
   email: string;
-  role: number;
+  role: number | string;
+  isBlocked: boolean;
+  isDeleted: boolean;
+  createdAt: string;
 }
 
 export interface PagedResponse<T> {
@@ -13,13 +16,34 @@ export interface PagedResponse<T> {
   totalCount: number;
 }
 
+export const getUsers = async (page = 1, pageSize = 10, search = ''): Promise<PagedResponse<UserResponse>> => {
+  const response = await api.get<PagedResponse<UserResponse>>('/users', {
+    params: {
+      'page.PageNumber': page,
+      'page.PageSize': pageSize,
+      'filter.FirstName': search || undefined,
+    }
+  });
+  return response.data;
+};
+
 export const searchUsers = async (query: string): Promise<UserResponse[]> => {
   const response = await api.get<PagedResponse<UserResponse>>('/users', {
     params: {
       'filter.FirstName': query,
-      // 'filter.LastName': query, // API might not support multiple filters for one query easily
-      // 'filter.Email': query
     }
   });
   return response.data.data;
+};
+
+export const blockUser = async (id: number): Promise<void> => {
+  await api.post(`/users/block/${id}`);
+};
+
+export const unblockUser = async (id: number): Promise<void> => {
+  await api.post(`/users/unblock/${id}`);
+};
+
+export const deleteUser = async (id: number): Promise<void> => {
+  await api.delete(`/users/hard-delete/${id}`);
 };

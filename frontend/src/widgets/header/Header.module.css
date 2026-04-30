@@ -390,3 +390,25 @@
     justify-content: center;
   }
 }
+.adminDivider {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  margin: 0 10px;
+}
+
+.adminLink {
+  color: #f43f5e !important;
+}
+
+.adminLink:hover {
+  background: rgba(244, 63, 94, 0.1) !important;
+}
+
+@media (max-width: 992px) {
+  .adminDivider {
+    width: 100%;
+    height: 1px;
+    margin: 10px 0;
+  }
+}

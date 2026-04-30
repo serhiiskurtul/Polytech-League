@@ -102,7 +102,17 @@ const ProfilePage = () => {
     phone: '-', 
     city: playerProfile?.city || '-',
     bio: playerProfile?.bio ?? '',
-    badges: isAdmin ? ['Адміністратор'] : ['Студент', 'Учасник'],
+    badges: (() => {
+      if (isAdmin) return ['Адміністратор'];
+      const b = [];
+      if (playerProfile?.group && playerProfile.group !== '-' && playerProfile.group.trim() !== '') {
+        b.push('Студент');
+      }
+      if ((playerProfile?.matchesPlayed || 0) > 0) {
+        b.push('Спортсмен');
+      }
+      return b;
+    })(),
     instagramUrl: playerProfile?.instagramUrl && playerProfile.instagramUrl.trim() !== ''
       ? (playerProfile.instagramUrl.startsWith('http') 
           ? playerProfile.instagramUrl 

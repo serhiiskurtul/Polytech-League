@@ -50,5 +50,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(x => x.IsDeleted)
             .HasColumnName("is_deleted")
             .IsRequired();
+
+        builder.Property(x => x.IsBlocked)
+            .HasColumnName("is_blocked")
+            .IsRequired()
+            .HasDefaultValue(false);
     }
 }

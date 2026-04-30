@@ -25,6 +25,11 @@ public class AuthService(
             throw new AuthenticationException("Invalid email or password");
         }
 
+        if (user.IsBlocked)
+        {
+            throw new AuthenticationException("Your account is blocked. Please contact support.");
+        }
+
         var accessToken = jwtService.GenerateAccessToken(user);
         var refreshToken = jwtService.GenerateRefreshToken(user.Id);
 
@@ -59,6 +64,11 @@ public class AuthService(
             oldRefreshToken.Id, oldRefreshToken, cancellationToken);
 
         var user = await userService.GetByIdAsync(oldRefreshToken.UserId, cancellationToken);
+
+        if (user.IsBlocked)
+        {
+            throw new AuthenticationException("Your account is blocked. Please contact support.");
+        }
 
         var newAccessToken = jwtService.GenerateAccessToken(user);
         var newRefreshToken = jwtService.GenerateRefreshToken(user.Id);
