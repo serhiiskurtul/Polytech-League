@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import { getUsers, blockUser, unblockUser, deleteUser, UserResponse } from '@/shared/api/users.api';
 import styles from './AdminUsersPage.module.css';
 import toast from 'react-hot-toast';
-import { format } from 'date-fns';
-import { uk } from 'date-fns/locale';
 
 export const AdminUsersPage = () => {
   const [users, setUsers] = useState<UserResponse[]>([]);
@@ -125,7 +123,7 @@ export const AdminUsersPage = () => {
                       </span>
                     </td>
                     <td>
-                      {user.createdAt ? format(new Date(user.createdAt), 'dd MMMM yyyy', { locale: uk }) : '-'}
+                      {user.createdAt ? new Intl.DateTimeFormat('uk-UA', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(user.createdAt)) : '-'}
                     </td>
                     <td>
                       <div className={styles.actions}>
