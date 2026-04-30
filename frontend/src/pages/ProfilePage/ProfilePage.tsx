@@ -151,6 +151,7 @@ const ProfilePage = () => {
 
     try {
       const photoUrl = await uploadAvatar(file);
+      await refreshUser(); // Update global user state for Navbar/Header
       const updatedProfile = await getProfile();
       setPlayerProfile(updatedProfile);
       toast.success('Фото профілю оновлено');
