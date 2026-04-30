@@ -174,7 +174,7 @@ const Tournaments = () => {
   };
 
   return (
-    <div className="tournaments-page container">
+    <div className="tournaments-page">
       <header className="page-header">
         <div className="header-left">
           <h1 className="page-title">Змагання</h1>

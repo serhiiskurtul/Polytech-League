@@ -76,7 +76,9 @@ export default function App() {
           path="/calendar"
           element={
             <ProtectedRoute requireAuth={false}>
-              <CalendarPage />
+              <div className="page-wrapper">
+                <CalendarPage />
+              </div>
             </ProtectedRoute>
           }
         />
@@ -109,7 +111,9 @@ export default function App() {
           path="/ratings"
           element={
             <ProtectedRoute requireAuth={false}>
-              <PlayersRatingPage />
+              <div className="page-wrapper">
+                <PlayersRatingPage />
+              </div>
             </ProtectedRoute>
           }
         />

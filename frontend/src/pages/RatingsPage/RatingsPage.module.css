@@ -1,6 +1,6 @@
 .container {
-  padding: 40px 20px;
-  max-width: 1400px;
+  padding: 8px 0;
+  max-width: var(--container-max-width);
   margin: 0 auto;
   color: var(--text);
   min-height: 100vh;
