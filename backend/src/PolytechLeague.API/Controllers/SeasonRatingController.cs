@@ -29,6 +29,14 @@ public class SeasonRatingController : ControllerBase
         return Ok(rating);
     }
 
+    [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
+    [HttpPost("national/{seasonId}")]
+    public async Task<ActionResult> UpdateNationalRating(long seasonId, List<ManualRatingEntryDto> entries)
+    {
+        await _seasonRatingService.UpdateNationalRatingAsync(seasonId, entries);
+        return Ok();
+    }
+
     [HttpGet("seasons")]
     public async Task<ActionResult<IEnumerable<SeasonDto>>> GetAllSeasons()
     {

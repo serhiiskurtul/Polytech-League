@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './CollegesPage.module.css';
 import { getColleges, College } from '@/shared/api/colleges.api';
+import { getPhotoUrl } from '@/shared/utils/photo.utils';
 import toast from 'react-hot-toast';
 
 const CollegesPage: React.FC = () => {
@@ -37,7 +38,7 @@ const CollegesPage: React.FC = () => {
     <div className={styles.container}>
       <header className={styles.header}>
         <h1>Навчальні заклади</h1>
-        <p>Учасники всеукраїнських змагань Polytech League</p>
+        <p>Учасники всеукраїнських змагань</p>
       </header>
 
       {colleges.length === 0 ? (
@@ -52,7 +53,7 @@ const CollegesPage: React.FC = () => {
             <div key={college.id} className={styles.card}>
               <div className={styles.logoContainer}>
                 {college.logoUrl ? (
-                  <img src={college.logoUrl} alt={college.name} />
+                  <img src={getPhotoUrl(college.logoUrl)!} alt={college.name} />
                 ) : (
                   <i className="fas fa-university"></i>
                 )}

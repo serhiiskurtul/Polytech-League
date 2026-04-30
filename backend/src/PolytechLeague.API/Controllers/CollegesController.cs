@@ -9,10 +9,32 @@ namespace PolytechLeague.API.Controllers;
 public class CollegesController : ControllerBase
 {
     private readonly ICollegeService _collegeService;
+    private readonly IFileService _fileService;
 
-    public CollegesController(ICollegeService collegeService)
+    public CollegesController(ICollegeService collegeService, IFileService fileService)
     {
         _collegeService = collegeService;
+        _fileService = fileService;
+    }
+
+    [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
+    [HttpPost("{id}/upload-logo")]
+    public async Task<IActionResult> UploadLogo(long id, IFormFile file, CancellationToken cancellationToken)
+    {
+        var college = await _collegeService.GetCollegeByIdAsync(id);
+        if (college == null) return NotFound();
+
+        // Delete old logo if it exists and was uploaded to our storage
+        if (!string.IsNullOrEmpty(college.LogoUrl) && college.LogoUrl.Contains("/colleges/logos/"))
+        {
+            try { _fileService.DeleteFile(college.LogoUrl); } catch { }
+        }
+
+        var url = await _fileService.SaveFileAsync(file, "colleges/logos", cancellationToken);
+        college.LogoUrl = url;
+        
+        await _collegeService.UpdateCollegeAsync(id, college);
+        return Ok(new { url });
     }
 
     [HttpGet]

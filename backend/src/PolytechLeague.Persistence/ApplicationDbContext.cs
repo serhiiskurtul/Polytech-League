@@ -46,6 +46,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Season> Seasons { get; set; }
     public DbSet<ProfileMergeRequest> ProfileMergeRequests { get; set; }
     public DbSet<College> Colleges { get; set; }
+    public DbSet<NationalRatingManualEntry> NationalRatingManualEntries { get; set; }
 
 
     

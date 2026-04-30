@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './NationalRatingsPage.module.css';
-import { getSeasons, getNationalRating } from '@/shared/api/seasonRating.api';
+import { getSeasons, getNationalRating, updateNationalRating } from '@/shared/api/seasonRating.api';
+import { getColleges, College } from '@/shared/api/colleges.api';
 import { Season, SeasonRatingResponse } from '@/shared/types/seasonRating.types';
 import { useAuth } from '@/app/providers/AuthContext';
 import { Link } from 'react-router-dom';
@@ -12,28 +13,32 @@ const NationalRatingsPage: React.FC = () => {
   const isAdmin = user?.role === 1 || user?.role === '1' || user?.role === 'Admin';
   
   const [seasons, setSeasons] = useState<Season[]>([]);
+  const [colleges, setColleges] = useState<College[]>([]);
   const [selectedSeasonId, setSelectedSeasonId] = useState<number | null>(null);
   const [ratingData, setRatingData] = useState<SeasonRatingResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState<any[]>([]);
 
   useEffect(() => {
-    fetchSeasons();
+    fetchInitialData();
   }, []);
 
-  const fetchSeasons = async () => {
+  const fetchInitialData = async () => {
     try {
-      const data = await getSeasons();
-      setSeasons(data);
-      if (data.length > 0) {
-        const current = data.find(s => s.isCurrent) || data[0];
+      const [seasonsData, collegesData] = await Promise.all([getSeasons(), getColleges()]);
+      setSeasons(seasonsData);
+      setColleges(collegesData);
+      if (seasonsData.length > 0) {
+        const current = seasonsData.find(s => s.isCurrent) || seasonsData[0];
         setSelectedSeasonId(current.id);
         fetchRating(current.id);
       } else {
         setIsLoading(false);
       }
     } catch (error) {
-      console.error('Error fetching seasons:', error);
-      toast.error('Не вдалося завантажити сезони');
+      console.error('Error fetching initial data:', error);
+      toast.error('Не вдалося завантажити дані');
       setIsLoading(false);
     }
   };
@@ -55,22 +60,58 @@ const NationalRatingsPage: React.FC = () => {
     const id = parseInt(e.target.value);
     setSelectedSeasonId(id);
     fetchRating(id);
+    setIsEditing(false);
+  };
+
+  const startEditing = () => {
+    if (!ratingData) return;
+    
+    // Prepare edit data: for each college, find if it has an entry or default to 0/-
+    const initialEditData = colleges.map(college => {
+      const row = ratingData.rows.find(r => r.groupName === (college.shortName || college.name));
+      return {
+        collegeId: college.id,
+        collegeName: college.shortName || college.name,
+        points: row?.totalPoints || 0,
+        rank: row?.totalRank || '-'
+      };
+    });
+    
+    setEditData(initialEditData);
+    setIsEditing(true);
+  };
+
+  const handleEditChange = (collegeId: number, field: string, value: string) => {
+    setEditData(prev => prev.map(item => 
+      item.collegeId === collegeId ? { ...item, [field]: value } : item
+    ));
+  };
+
+  const saveChanges = async () => {
+    if (!selectedSeasonId) return;
+    try {
+      const entries = editData.map(d => ({
+        collegeId: d.collegeId,
+        points: parseInt(d.points) || 0,
+        rank: d.rank
+      }));
+      await updateNationalRating(selectedSeasonId, entries);
+      toast.success('Рейтинги оновлено');
+      setIsEditing(false);
+      fetchRating(selectedSeasonId);
+    } catch (error) {
+      toast.error('Не вдалося зберегти зміни');
+    }
   };
 
   const exportToExcel = () => {
     if (!ratingData) return;
 
-    const headers = ['Коледж', ...ratingData.sports.flatMap(s => [`${s} (Очко)`, `${s} (Місце)`]), 'Загальна сума очок', 'Підсумкове місце'];
-    const data = ratingData.rows.map(row => {
-      const obj: any = { 'Коледж': row.groupName };
-      ratingData.sports.forEach(s => {
-        obj[`${s} (Очко)`] = row.sportResults[s]?.points || 0;
-        obj[`${s} (Місце)`] = row.sportResults[s]?.rank || 0;
-      });
-      obj['Загальна сума очок'] = row.totalPoints;
-      obj['Підсумкове місце'] = row.totalRank;
-      return obj;
-    });
+    const data = ratingData.rows.map(row => ({
+      'Коледж': row.groupName,
+      'Загальна сума очок': row.totalPoints,
+      'Підсумкове місце': row.totalRank
+    }));
 
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
@@ -106,15 +147,28 @@ const NationalRatingsPage: React.FC = () => {
           </Link>
           
           {isAdmin && (
-            <Link to="/admin/colleges" className={styles.manageBtn}>
-              <i className="fas fa-edit"></i> Керування
-            </Link>
+            <>
+              {isEditing ? (
+                <button className={styles.saveBtn} onClick={saveChanges}>
+                  <i className="fas fa-save"></i> Зберегти
+                </button>
+              ) : (
+                <button className={styles.editBtn} onClick={startEditing}>
+                  <i className="fas fa-edit"></i> Редагувати залік
+                </button>
+              )}
+              <Link to="/admin/colleges" className={styles.manageBtn}>
+                <i className="fas fa-cog"></i> Керування
+              </Link>
+            </>
           )}
+
           {seasons.length > 0 && (
             <select
               className={styles.seasonSelect}
               value={selectedSeasonId || ''}
               onChange={handleSeasonChange}
+              disabled={isEditing}
             >
               {seasons.map(s => (
                 <option key={s.id} value={s.id}>
@@ -124,20 +178,10 @@ const NationalRatingsPage: React.FC = () => {
             </select>
           )}
 
-          {ratingData && ratingData.rows.length > 0 && (
-            <>
-              <div className={styles.legend}>
-                <div className={styles.legendItem}>
-                  <span className={`${styles.dot} ${styles.scoreDot}`}></span> О - Очки
-                </div>
-                <div className={styles.legendItem}>
-                  <span className={`${styles.dot} ${styles.rankDot}`}></span> М - Місце
-                </div>
-              </div>
-              <button className={`${styles.exportBtn} ${styles.excel}`} onClick={exportToExcel}>
-                <i className="fas fa-file-excel"></i> Excel
-              </button>
-            </>
+          {ratingData && ratingData.rows.length > 0 && !isEditing && (
+            <button className={`${styles.exportBtn} ${styles.excel}`} onClick={exportToExcel}>
+              <i className="fas fa-file-excel"></i> Excel
+            </button>
           )}
         </div>
       </header>
@@ -148,46 +192,52 @@ const NationalRatingsPage: React.FC = () => {
           <h3>Сезонів не знайдено</h3>
           <p>Дані про всеукраїнські змагання з'являться після створення першого сезону.</p>
         </div>
-      ) : ratingData && ratingData.rows.length > 0 ? (
+      ) : (ratingData && ratingData.rows.length > 0) || isEditing ? (
         <div className={styles.tableContainer}>
           <table className={styles.table}>
             <thead>
               <tr>
-                <th rowSpan={2} className={styles.mainHeader}>Коледж / Навчальний заклад</th>
-                {ratingData.sports.map(sport => (
-                  <th key={sport} colSpan={2} className={styles.mainHeader}>{sport}</th>
-                ))}
-                <th colSpan={2} className={styles.mainHeader}>Підсумковий результат</th>
-              </tr>
-              <tr>
-                {ratingData.sports.map(sport => (
-                  <React.Fragment key={`${sport}-sub`}>
-                    <th className={styles.subHeader}>О</th>
-                    <th className={styles.subHeader}>М</th>
-                  </React.Fragment>
-                ))}
-                <th className={styles.subHeader}>О</th>
-                <th className={styles.subHeader}>М</th>
+                <th className={styles.mainHeader}>Коледж / Навчальний заклади</th>
+                <th className={styles.mainHeader}>Загальна сума очок (О)</th>
+                <th className={styles.mainHeader}>Підсумкове місце (М)</th>
               </tr>
             </thead>
             <tbody>
-              {ratingData.rows.map((row) => (
-                <tr key={row.groupName} className={styles.row}>
-                  <td className={styles.collegeCell}>
-                    <div className={styles.collegeInfo}>
-                        <div className={styles.collegeName}>{row.groupName}</div>
-                    </div>
-                  </td>
-                  {ratingData.sports.map(sport => (
-                    <React.Fragment key={`${row.groupName}-${sport}`}>
-                      <td className={styles.scoreCell}>{row.sportResults[sport]?.points || '-'}</td>
-                      <td className={styles.rankCell}>{row.sportResults[sport]?.rank || '-'}</td>
-                    </React.Fragment>
-                  ))}
-                  <td className={styles.totalPointsCell}>{row.totalPoints}</td>
-                  <td className={styles.totalRankCell}>{row.totalRank}</td>
-                </tr>
-              ))}
+              {isEditing ? (
+                editData.map((item) => (
+                  <tr key={item.collegeId} className={styles.row}>
+                    <td className={styles.collegeCell}>{item.collegeName}</td>
+                    <td className={styles.editCell}>
+                      <input 
+                        type="number" 
+                        value={item.points} 
+                        onChange={(e) => handleEditChange(item.collegeId, 'points', e.target.value)}
+                        className={styles.editInput}
+                      />
+                    </td>
+                    <td className={styles.editCell}>
+                      <input 
+                        type="text" 
+                        value={item.rank} 
+                        onChange={(e) => handleEditChange(item.collegeId, 'rank', e.target.value)}
+                        className={styles.editInput}
+                      />
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                ratingData!.rows.map((row) => (
+                  <tr key={row.groupName} className={styles.row}>
+                    <td className={styles.collegeCell}>
+                      <div className={styles.collegeInfo}>
+                          <div className={styles.collegeName}>{row.groupName}</div>
+                      </div>
+                    </td>
+                    <td className={styles.totalPointsCell}>{row.totalPoints}</td>
+                    <td className={styles.totalRankCell}>{row.totalRank}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

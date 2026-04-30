@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './AdminCollegesPage.module.css';
-import { getColleges, createCollege, updateCollege, deleteCollege, College } from '@/shared/api/colleges.api';
+import { getColleges, createCollege, updateCollege, deleteCollege, uploadCollegeLogo, College } from '@/shared/api/colleges.api';
+import { getPhotoUrl } from '@/shared/utils/photo.utils';
 import toast from 'react-hot-toast';
 
 const AdminCollegesPage: React.FC = () => {
@@ -8,6 +9,8 @@ const AdminCollegesPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCollege, setEditingCollege] = useState<College | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<College>>({
     name: '',
     shortName: '',
@@ -34,16 +37,21 @@ const AdminCollegesPage: React.FC = () => {
     if (college) {
       setEditingCollege(college);
       setFormData(college);
+      setLogoPreview(college.logoUrl ? getPhotoUrl(college.logoUrl) : null);
     } else {
       setEditingCollege(null);
       setFormData({ name: '', shortName: '', city: '', logoUrl: '' });
+      setLogoPreview(null);
     }
+    setLogoFile(null);
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingCollege(null);
+    setLogoFile(null);
+    setLogoPreview(null);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,16 +59,33 @@ const AdminCollegesPage: React.FC = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setLogoFile(file);
+      setLogoPreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      let collegeId: number;
       if (editingCollege) {
         await updateCollege(editingCollege.id, formData);
+        collegeId = editingCollege.id;
         toast.success('Коледж оновлено');
       } else {
-        await createCollege(formData);
+        const created = await createCollege(formData);
+        collegeId = created.id;
         toast.success('Коледж додано');
       }
+
+      if (logoFile) {
+        await uploadCollegeLogo(collegeId, logoFile);
+        toast.success('Логотип завантажено');
+      }
+
       fetchColleges();
       handleCloseModal();
     } catch (error) {
@@ -99,7 +124,7 @@ const AdminCollegesPage: React.FC = () => {
             <div className={styles.cardInfo}>
               <div className={styles.logoContainer}>
                 {college.logoUrl ? (
-                  <img src={college.logoUrl} alt={college.name} />
+                  <img src={getPhotoUrl(college.logoUrl)!} alt={college.name} />
                 ) : (
                   <i className="fas fa-university"></i>
                 )}
@@ -156,8 +181,30 @@ const AdminCollegesPage: React.FC = () => {
                   placeholder="Наприклад: Львів"
                 />
               </div>
+              <div className={styles.logoSection}>
+                <div className={styles.modalLogoPreview}>
+                  {logoPreview ? (
+                    <img src={logoPreview} alt="Logo preview" />
+                  ) : (
+                    <i className="fas fa-university"></i>
+                  )}
+                </div>
+                <div className={styles.fileInputGroup}>
+                  <label htmlFor="logoUpload" className={styles.fileLabel}>
+                    <i className="fas fa-upload"></i> Завантажити логотип
+                  </label>
+                  <input 
+                    id="logoUpload"
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleFileChange} 
+                    className={styles.fileInput}
+                  />
+                </div>
+              </div>
+
               <div className={styles.formGroup}>
-                <label>URL Логотипу (опціонально)</label>
+                <label>Або вставте URL Логотипу</label>
                 <input 
                   name="logoUrl" 
                   value={formData.logoUrl} 
