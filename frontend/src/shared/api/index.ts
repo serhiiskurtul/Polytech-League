@@ -12,4 +12,5 @@ export * from './basketball3x3.api';
 export * from './badminton.api';
 export * from './armwrestling.api';
 export * from './tabletennis.api';
+export * from './events.api';
 export { axiosInstance };

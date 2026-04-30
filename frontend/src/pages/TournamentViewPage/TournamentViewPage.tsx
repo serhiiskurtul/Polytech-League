@@ -13,6 +13,8 @@ import {
   updateChessEvent,
   uploadTournamentPhoto,
   deleteTournamentPhoto,
+  uploadEventMedia,
+  deleteEventMedia,
   searchUsers,
   getAllPlayers,
   createPlayer,
@@ -421,45 +423,39 @@ const TournamentViewPage = () => {
   };
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement> | React.DragEvent) => {
-    let file: File | undefined;
+    let files: File[] = [];
 
     if ('files' in e.target && e.target.files) {
-      file = e.target.files[0];
+      files = Array.from(e.target.files);
     } else if ('dataTransfer' in e && e.dataTransfer.files) {
       e.preventDefault();
-      file = e.dataTransfer.files[0];
+      files = Array.from(e.dataTransfer.files);
     }
 
-    if (!file) return;
+    if (files.length === 0) return;
 
     try {
       setIsUploading(true);
-      if (tournament?.sport === 'checkers') {
-        await uploadCheckersPhoto(id!, file);
-      } else {
-        await uploadTournamentPhoto(id!, file);
-      }
+      await uploadEventMedia(id!, files);
+      toast.success(files.length > 1 ? "Медіафайли завантажено" : "Медіафайл завантажено");
       fetchTournament(true);
     } catch (err) {
       console.error(err);
-      alert("Помилка при завантаженні фото");
+      toast.error("Помилка при завантаженні медіа");
     } finally {
       setIsUploading(false);
     }
   };
 
   const handleDeletePhoto = async (photoId: number) => {
-    if (!window.confirm("Ви дійсно хочете видалити це фото?")) return;
+    if (!window.confirm("Ви дійсно хочете видалити цей медіафайл?")) return;
     try {
-      if (tournament?.sport === 'checkers') {
-        await deleteCheckersPhoto(id!, photoId);
-      } else {
-        await deleteTournamentPhoto(id!, photoId);
-      }
+      await deleteEventMedia(photoId);
+      toast.success("Видалено");
       fetchTournament(true);
     } catch (err) {
       console.error(err);
-      alert("Помилка при видаленні фото");
+      toast.error("Помилка при видаленні");
     }
   };
 
@@ -1150,6 +1146,11 @@ const TournamentViewPage = () => {
     if (!url) return '';
     if (url.startsWith('http')) return url;
     return `${BASE_URL}${url}`;
+  };
+
+  const isVideo = (url: string) => {
+    const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov'];
+    return videoExtensions.some(ext => url.toLowerCase().endsWith(ext));
   };
 
   const badgeObj = getLevelBadgeParams(details?.level);
@@ -2372,7 +2373,14 @@ const TournamentViewPage = () => {
                     className={styles.galleryItem}
                     onClick={() => setSelectedPhotoIndex(index)}
                   >
-                    <img src={getImageUrl(photo.url)} alt={`Фото ${index + 1}`} loading="lazy" />
+                    {isVideo(photo.url) ? (
+                      <div className={styles.videoThumbnail}>
+                        <video src={getImageUrl(photo.url)} muted />
+                        <div className={styles.videoPlayIcon}><i className="fas fa-play"></i></div>
+                      </div>
+                    ) : (
+                      <img src={getImageUrl(photo.url)} alt={`Фото ${index + 1}`} loading="lazy" />
+                    )}
                     <div className={styles.photoOverlay}>
                       <i className="fas fa-search-plus"></i>
                     </div>
@@ -2390,11 +2398,20 @@ const TournamentViewPage = () => {
                   <i className="fas fa-times"></i>
                 </button>
 
-                <img
-                  src={getImageUrl(details.photos[selectedPhotoIndex].url)}
-                  alt="Tournament Fullscreen"
-                  className={styles.lightboxImage}
-                />
+                {isVideo(details.photos[selectedPhotoIndex].url) ? (
+                  <video 
+                    src={getImageUrl(details.photos[selectedPhotoIndex].url)} 
+                    controls 
+                    autoPlay
+                    className={styles.lightboxVideo}
+                  />
+                ) : (
+                  <img
+                    src={getImageUrl(details.photos[selectedPhotoIndex].url)}
+                    alt="Tournament Fullscreen"
+                    className={styles.lightboxImage}
+                  />
+                )}
 
                 <div className={styles.lightboxNav}>
                   <button
@@ -2598,8 +2615,8 @@ const TournamentViewPage = () => {
                         ) : (
                           <div className={styles.uploadPlaceholder}>
                             <i className="fas fa-cloud-upload-alt"></i>
-                            <p>Перетягніть фото сюди або <span>виберіть файл</span></p>
-                            <input type="file" accept="image/*" onChange={handlePhotoUpload} className={styles.fileInput} />
+                            <p>Перетягніть файли сюди або <span>виберіть файли</span></p>
+                            <input type="file" accept="image/*,video/*" multiple onChange={handlePhotoUpload} className={styles.fileInput} />
                           </div>
                         )}
                       </div>
@@ -2608,7 +2625,11 @@ const TournamentViewPage = () => {
                         <div className={styles.currentPhotosGrid}>
                           {details.photos.map((photo: any) => (
                             <div key={photo.id} className={styles.photoPreviewCard}>
-                              <img src={getImageUrl(photo.url)} alt="Tournament" />
+                              {isVideo(photo.url) ? (
+                                <video src={getImageUrl(photo.url)} muted />
+                              ) : (
+                                <img src={getImageUrl(photo.url)} alt="Tournament" />
+                              )}
                               <button onClick={() => handleDeletePhoto(photo.id)} className={styles.deletePhotoBtn}>
                                 <i className="fas fa-times"></i>
                               </button>
