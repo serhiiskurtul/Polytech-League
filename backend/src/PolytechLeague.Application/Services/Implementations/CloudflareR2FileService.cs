@@ -15,11 +15,21 @@ public class CloudflareR2FileService : IFileService
     public CloudflareR2FileService(IOptions<CloudflareR2Settings> settings)
     {
         _settings = settings.Value;
+
+        if (string.IsNullOrEmpty(_settings.AccessKey) || string.IsNullOrEmpty(_settings.SecretKey))
+        {
+            throw new ArgumentException("Cloudflare R2 AccessKey or SecretKey is missing. Check environment variables.");
+        }
+
+        if (string.IsNullOrEmpty(_settings.ServiceUrl))
+        {
+            throw new ArgumentException("Cloudflare R2 ServiceUrl is missing. Check environment variables.");
+        }
         
         var config = new AmazonS3Config
         {
             ServiceURL = _settings.ServiceUrl,
-            AuthenticationRegion = "auto", // Required for Cloudflare R2
+            AuthenticationRegion = "auto", 
             ForcePathStyle = true
         };
 
