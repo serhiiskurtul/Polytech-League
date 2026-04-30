@@ -11,6 +11,7 @@ public class User
     public bool isEmailConfirmed { get; set; } = false;
     public required string Password { get; set; }
     public bool IsDeleted { get; set; } = false;
+    public string? PhotoUrl { get; set; }
 
     public ICollection<Notification>? Notifications { get; set; }
 }

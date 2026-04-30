@@ -57,6 +57,7 @@ public static class UserDtoExtension
             LastName = user.LastName,
             Role = user.Role,
             Email = user.Email,
+            PhotoUrl = user.PhotoUrl,
             CreatedAt = user.CreatedAt
         };
     }

@@ -136,5 +136,6 @@ public class UserService : AbstractEntityService<User>, IUserService
         oldEntity.LastName = newEntity.LastName;
         oldEntity.Role = newEntity.Role;
         oldEntity.Email = newEntity.Email;
+        oldEntity.PhotoUrl = newEntity.PhotoUrl;
     }
 }

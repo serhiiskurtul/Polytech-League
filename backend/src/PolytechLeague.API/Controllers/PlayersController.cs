@@ -50,22 +50,31 @@ public class PlayersController : ControllerBase
     public async Task<ActionResult<string>> UploadAvatar([FromForm] IFormFile file, CancellationToken cancellationToken)
     {
         var userId = User.GetUserId();
+        var user = await _userService.GetByIdAsync(userId, cancellationToken);
+        if (user == null) return NotFound("User not found");
+
         var player = await _playerService.GetByUserIdAsync(userId, cancellationToken);
 
-        if (player == null) return NotFound("Player not found");
-
-        // Save new file
+        // Save new file to storage
         var photoUrl = await _fileService.SaveFileAsync(file, "avatars", cancellationToken);
 
-        // Delete old file if it exists and is not a default one
-        if (!string.IsNullOrEmpty(player.PhotoUrl) && player.PhotoUrl.StartsWith("/uploads/avatars/"))
+        // Delete old file from storage if it exists
+        var oldPhotoUrl = user.PhotoUrl ?? player?.PhotoUrl;
+        if (!string.IsNullOrEmpty(oldPhotoUrl) && (oldPhotoUrl.StartsWith("/uploads/avatars/") || oldPhotoUrl.Contains("r2.cloudflarestorage.com") || oldPhotoUrl.Contains("r2.dev")))
         {
-            try { _fileService.DeleteFile(player.PhotoUrl); } catch { /* ignore */ }
+            try { _fileService.DeleteFile(oldPhotoUrl); } catch { /* ignore */ }
         }
 
-        // Update player
-        player.PhotoUrl = photoUrl;
-        await _playerService.UpdateAsync(player.Id ?? 0, player, cancellationToken);
+        // 1. Update User entity
+        user.PhotoUrl = photoUrl;
+        await _userService.UpdateAsync(userId, user, cancellationToken);
+
+        // 2. Update Player entity if it exists (to keep in sync)
+        if (player != null)
+        {
+            player.PhotoUrl = photoUrl;
+            await _playerService.UpdateAsync(player.Id ?? 0, player, cancellationToken);
+        }
 
         return Ok(new { photoUrl });
     }
