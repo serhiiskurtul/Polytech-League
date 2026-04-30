@@ -101,9 +101,13 @@ const NationalRatingsPage: React.FC = () => {
         </div>
 
         <div className={styles.controls}>
+          <Link to="/colleges" className={styles.collegesBtn}>
+            <i className="fas fa-university"></i> Коледжі
+          </Link>
+          
           {isAdmin && (
             <Link to="/admin/colleges" className={styles.manageBtn}>
-              <i className="fas fa-edit"></i> Керування коледжами
+              <i className="fas fa-edit"></i> Керування
             </Link>
           )}
           {seasons.length > 0 && (

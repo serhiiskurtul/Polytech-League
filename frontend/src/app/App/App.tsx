@@ -23,6 +23,7 @@ import { AdminMergesPage } from '@/pages/AdminMergesPage/AdminMergesPage';
 import { AdminUsersPage } from '@/pages/AdminUsersPage';
 import { NationalRatingsPage } from '@/pages/NationalRatingsPage';
 import { AdminCollegesPage } from '@/pages/AdminCollegesPage';
+import { CollegesPage } from '@/pages/CollegesPage';
 
 import ProtectedRoute from '../providers/ProtectedRoute';
 import ScrollToTop from '../providers/ScrollToTop';
@@ -138,6 +139,17 @@ export default function App() {
             <ProtectedRoute requireAuth={false}>
               <div className="page-wrapper">
                 <NationalRatingsPage />
+              </div>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/colleges"
+          element={
+            <ProtectedRoute requireAuth={false}>
+              <div className="page-wrapper">
+                <CollegesPage />
               </div>
             </ProtectedRoute>
           }
