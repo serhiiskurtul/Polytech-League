@@ -58,7 +58,8 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
         builder.Property(x => x.BeachVolleyballShirtNumber).HasColumnName("beach_volleyball_shirt_number");
         builder.Property(x => x.BeachVolleyballTeamId).HasColumnName("beach_volleyball_team_id");
 
-        // Relationships (Optional navigations could be added here if needed, 
-        // but they are usually handled by EF conventions or explicitly in Team configs)
+        // Social & Bio
+        builder.Property(x => x.Bio).HasColumnName("Bio");
+        builder.Property(x => x.InstagramUrl).HasColumnName("InstagramUrl");
     }
 }

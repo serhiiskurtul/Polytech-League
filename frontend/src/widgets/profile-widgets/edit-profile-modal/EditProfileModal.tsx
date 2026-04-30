@@ -152,15 +152,18 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
 
             <div className={styles.socialGroup}>
               <div className={styles.formGroup}>
-                <label htmlFor="instagramUrl"><i className="fab fa-instagram"></i> Instagram URL</label>
+                <label htmlFor="instagramUrl"><i className="fab fa-instagram"></i> Instagram</label>
                 <input
                   type="text"
                   id="instagramUrl"
                   name="instagramUrl"
                   value={formData.instagramUrl}
                   onChange={handleChange}
-                  placeholder="https://instagram.com/user"
+                  placeholder="@username або посилання"
                 />
+                <small style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '4px' }}>
+                  Введіть нікнейм або повне посилання на профіль
+                </small>
               </div>
             </div>
             
