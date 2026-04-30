@@ -89,12 +89,6 @@ export default function Header() {
                     <span>Користувачі</span>
                   </Link>
                 </li>
-                <li>
-                  <Link to="/admin/colleges" className={`${styles.navLink} ${styles.adminLink}`} onClick={closeMenu}>
-                    <i className={`fas fa-university ${styles.navIcon}`}></i>
-                    <span>Коледжі</span>
-                  </Link>
-                </li>
               </>
             )}
           </ul>
