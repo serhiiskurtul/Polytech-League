@@ -113,6 +113,7 @@ public class TournamentService : ITournamentService
             IsModerated = e.IsModerated,
             IsPublic = e.IsPublic,
             SeasonId = e.SeasonId,
+            MainPhotoUrl = e.MainPhotoUrl,
             Time = e.Date.ToString("HH:mm"),
             RawDate = e.Date
         }).ToList();
@@ -164,6 +165,7 @@ public class TournamentService : ITournamentService
             IsModerated = e.IsModerated,
             IsPublic = e.IsPublic,
             SeasonId = e.SeasonId,
+            MainPhotoUrl = e.MainPhotoUrl,
             Time = e.Date.ToString("HH:mm"),
             RawDate = e.Date
         };

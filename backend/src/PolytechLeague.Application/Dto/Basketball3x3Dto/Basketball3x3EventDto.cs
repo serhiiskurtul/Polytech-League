@@ -45,6 +45,7 @@ public class Basketball3x3EventResponse
     public required DateTime Date { get; set; }
     public required string Location { get; set; }
     public ICollection<EventPhotoDto>? Photos { get; set; }
+    public string? MainPhotoUrl { get; set; }
     public required ICollection<long> RefereeIds { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -109,6 +110,7 @@ public static class Basketball3x3EventDtoExtensions
             Date = entity.Date,
             Location = entity.Location,
             Photos = entity.Photos?.Select(p => p.ToDto()).ToList(),
+            MainPhotoUrl = entity.MainPhotoUrl,
             RefereeIds = entity.RefereeIds,
             Level = entity.Level,
             TournamentType = entity.TournamentType,

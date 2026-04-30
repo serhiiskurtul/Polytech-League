@@ -52,6 +52,7 @@ public class ChessEventResponse
     public required DateTime Date { get; set; }
     public required string Location { get; set; }
     public ICollection<EventPhotoDto>? Photos { get; set; }
+    public string? MainPhotoUrl { get; set; }
     public required ICollection<long> RefereeIds { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -134,6 +135,7 @@ public static class ChessEventDtoExtension
             Date = chessEvent.Date,
             Location = chessEvent.Location,
             Photos = chessEvent.Photos?.Select(p => p.ToDto()).ToList(),
+            MainPhotoUrl = chessEvent.MainPhotoUrl,
             RefereeIds = chessEvent.RefereeIds,
             Level = chessEvent.Level,
             Description = chessEvent.Description,

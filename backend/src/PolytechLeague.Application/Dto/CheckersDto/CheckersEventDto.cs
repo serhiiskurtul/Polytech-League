@@ -56,6 +56,7 @@ public class CheckersEventResponse
     public required DateTime Date { get; set; }
     public required string Location { get; set; }
     public ICollection<EventPhotoDto>? Photos { get; set; }
+    public string? MainPhotoUrl { get; set; }
     public required ICollection<long> RefereeIds { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -143,6 +144,7 @@ public static class CheckersEventDtoExtension
             Date = checkersEvent.Date,
             Location = checkersEvent.Location,
             Photos = checkersEvent.Photos?.Select(p => p.ToDto()).ToList(),
+            MainPhotoUrl = checkersEvent.MainPhotoUrl,
             RefereeIds = checkersEvent.RefereeIds,
             Level = checkersEvent.Level,
             Description = checkersEvent.Description,

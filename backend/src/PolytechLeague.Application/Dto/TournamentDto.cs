@@ -28,5 +28,6 @@ public class TournamentDto
     public bool IsModerated { get; set; }
     public bool IsPublic { get; set; }
     public long? SeasonId { get; set; }
+    public string? MainPhotoUrl { get; set; }
     public DateTime RawDate { get; set; }
 }
