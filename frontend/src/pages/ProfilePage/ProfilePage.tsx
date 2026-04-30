@@ -129,12 +129,13 @@ const ProfilePage = () => {
   const handleSaveProfile = async (data: Partial<PlayerDto>) => {
     if (!playerProfile?.id) return;
     try {
-      await updateProfile({ ...playerProfile, ...data });
-      const updatedProfile = await getProfile();
+      const updatedProfile = await updateProfile({ ...playerProfile, ...data });
+      console.log('Profile updated successfully:', updatedProfile);
       setPlayerProfile(updatedProfile);
       await refreshUser();
       toast.success('Профіль успішно оновлено');
     } catch (error) {
+
       console.error('Failed to update profile:', error);
       toast.error('Не вдалося оновити профіль');
     }

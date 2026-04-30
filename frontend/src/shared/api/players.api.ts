@@ -25,9 +25,11 @@ export const updatePlayer = async (id: number | string, data: PlayerDto): Promis
     await api.put(`/players/${id}`, data);
 };
 
-export const updateProfile = async (data: PlayerDto): Promise<void> => {
-    await api.put('/players/profile', data);
+export const updateProfile = async (data: PlayerDto): Promise<PlayerDto> => {
+    const response = await api.put<PlayerDto>('/players/profile', data);
+    return response.data;
 };
+
 
 
 export const deletePlayer = async (id: number | string): Promise<void> => {

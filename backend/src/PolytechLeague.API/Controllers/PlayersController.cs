@@ -88,15 +88,20 @@ public class PlayersController : ControllerBase
 
     [Authorize]
     [HttpPut("profile")]
-    public async Task<IActionResult> UpdateProfile([FromBody] PlayerDto dto, CancellationToken cancellationToken)
+    public async Task<ActionResult<PlayerDto>> UpdateProfile([FromBody] PlayerDto dto, CancellationToken cancellationToken)
     {
         var userId = User.GetUserId();
         var player = await _playerService.GetByUserIdAsync(userId, cancellationToken);
         if (player == null) return NotFound("Player profile not found");
         
+        // Ensure we are updating the correct player
         await _playerService.UpdateAsync(player.Id ?? 0, dto, cancellationToken);
-        return NoContent();
+        
+        // Fetch again to get the most up-to-date data
+        var updated = await _playerService.GetByUserIdAsync(userId, cancellationToken);
+        return Ok(updated);
     }
+
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PlayerDto>>> GetAll(CancellationToken cancellationToken)
