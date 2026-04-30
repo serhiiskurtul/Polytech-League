@@ -16,7 +16,6 @@ import {
   uploadEventMedia,
   deleteEventMedia,
   setMainPhoto,
-  markAsMainPhoto,
   searchUsers,
   getAllPlayers,
   createPlayer,
@@ -2756,20 +2755,6 @@ const TournamentViewPage = () => {
                                 <img src={getImageUrl(photo.url)} alt="Tournament" />
                               )}
                               <div className={styles.adminPhotoActions}>
-                                <button 
-                                  onClick={() => {
-                                    markAsMainPhoto(id!, photo.id)
-                                      .then(() => {
-                                        toast.success("Встановлено як головне");
-                                        fetchTournament(true);
-                                      })
-                                      .catch(() => toast.error("Помилка"));
-                                  }} 
-                                  className={`${styles.setMainBtn} ${details?.mainPhotoUrl === photo.url ? styles.activeMain : ''}`}
-                                  title="Встановити як головне"
-                                >
-                                  <i className="fas fa-star"></i>
-                                </button>
                                 <button onClick={() => handleDeletePhoto(photo.id)} className={styles.deletePhotoBtn}>
                                   <i className="fas fa-times"></i>
                                 </button>
