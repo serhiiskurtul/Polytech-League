@@ -24,8 +24,10 @@ public class EventMediaController : ControllerBase
     [HttpPost("{eventId}/upload-multiple")]
     [DisableRequestSizeLimit]
     [RequestSizeLimit(2147483648)] // 2GB
-    public async Task<IActionResult> UploadMultiple(long eventId, [FromForm] IEnumerable<IFormFile> files, CancellationToken cancellationToken)
+    public async Task<IActionResult> UploadMultiple(long eventId, List<IFormFile> files, CancellationToken cancellationToken)
     {
+        Console.WriteLine($"[DEBUG] UploadMultiple reached. EventId: {eventId}, Files count: {files?.Count ?? 0}");
+        
         var @event = await _dbContext.Events.FindAsync(new object[] { eventId }, cancellationToken);
         if (@event == null) return NotFound("Event not found");
 
@@ -86,6 +88,8 @@ public class EventMediaController : ControllerBase
     [RequestSizeLimit(2147483648)] // 2GB
     public async Task<IActionResult> SetMainPhoto(long eventId, IFormFile file, CancellationToken cancellationToken)
     {
+        Console.WriteLine($"[DEBUG] SetMainPhoto reached. EventId: {eventId}, FileName: {file?.FileName}");
+        
         var @event = await _dbContext.Events.FindAsync(new object[] { eventId }, cancellationToken);
         if (@event == null) return NotFound("Event not found");
 
