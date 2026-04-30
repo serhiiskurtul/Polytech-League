@@ -12,6 +12,8 @@ interface EditProfileModalProps {
 
 const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: EditProfileModalProps) => {
   const [formData, setFormData] = React.useState({
+    firstName: initialData.firstName || '',
+    lastName: initialData.lastName || '',
     group: initialData.group || '',
     studentId: initialData.studentId || '',
     faculty: initialData.faculty || '',
@@ -30,6 +32,8 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
   React.useEffect(() => {
     if (isOpen) {
       setFormData({
+        firstName: initialData.firstName || '',
+        lastName: initialData.lastName || '',
         group: initialData.group || '',
         studentId: initialData.studentId || '',
         faculty: initialData.faculty || '',
@@ -86,6 +90,31 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
         
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.formBody}>
+            <div className={styles.nameRow}>
+              <div className={styles.formGroup}>
+                <label htmlFor="firstName">Ім'я</label>
+                <input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label htmlFor="lastName">Прізвище</label>
+                <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
             {!isAdmin && (
               <>
                 <div className={styles.formGroup}>

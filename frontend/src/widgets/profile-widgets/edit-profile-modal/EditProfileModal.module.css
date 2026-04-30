@@ -85,6 +85,12 @@
   background: var(--muted);
 }
 
+.nameRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
 .formGroup {
   display: flex;
   flex-direction: column;
