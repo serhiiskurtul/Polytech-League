@@ -44,7 +44,11 @@ export default function Login() {
       navigate("/");
     } catch (error: any) {
       console.error("Login error:", error);
-      if (error.response?.status === 401) {
+      const detail = error.response?.data?.detail;
+      
+      if (detail && detail.toLowerCase().includes("blocked")) {
+        setError("root", { message: "Ваш акаунт заблокований адміністратором" });
+      } else if (error.response?.status === 401) {
         setError("root", { message: "Невірний email або пароль" });
       } else {
         setError("root", { message: "Щось пішло не так" });

@@ -391,18 +391,25 @@
   }
 }
 .adminDivider {
+  align-self: center;
   width: 1px;
-  height: 20px;
+  height: 24px;
   background: var(--border);
-  margin: 0 10px;
+  margin: 0 16px;
+  opacity: 0.8;
 }
 
 .adminLink {
   color: #f43f5e !important;
+  font-weight: 600 !important;
+}
+
+.adminLink i {
+  color: #f43f5e !important;
 }
 
 .adminLink:hover {
-  background: rgba(244, 63, 94, 0.1) !important;
+  background: rgba(244, 63, 94, 0.08) !important;
 }
 
 @media (max-width: 992px) {
