@@ -45,12 +45,6 @@ export default function Header() {
         <nav className={`${styles.navPrimary} ${isMenuOpen ? styles.navActive : ''}`}>
           <ul className={styles.navList}>
             <li>
-              <Link to="/" className={`${styles.navLink} ${styles.active}`} onClick={closeMenu}>
-                <i className={`fas fa-home ${styles.navIcon}`}></i>
-                <span>Головна</span>
-              </Link>
-            </li>
-            <li>
               <Link to="/calendar" className={styles.navLink} onClick={closeMenu}>
                 <i className={`fas fa-calendar-alt ${styles.navIcon}`}></i>
                 <span>Календар</span>
@@ -93,6 +87,12 @@ export default function Header() {
                   <Link to="/admin/users" className={`${styles.navLink} ${styles.adminLink}`} onClick={closeMenu}>
                     <i className={`fas fa-user-shield ${styles.navIcon}`}></i>
                     <span>Користувачі</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/admin/colleges" className={`${styles.navLink} ${styles.adminLink}`} onClick={closeMenu}>
+                    <i className={`fas fa-university ${styles.navIcon}`}></i>
+                    <span>Коледжі</span>
                   </Link>
                 </li>
               </>

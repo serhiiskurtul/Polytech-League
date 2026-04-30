@@ -2,10 +2,15 @@ import React, { useState, useEffect } from 'react';
 import styles from './NationalRatingsPage.module.css';
 import { getSeasons, getNationalRating } from '@/shared/api/seasonRating.api';
 import { Season, SeasonRatingResponse } from '@/shared/types/seasonRating.types';
+import { useAuth } from '@/app/providers/AuthContext';
+import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import * as XLSX from 'xlsx';
 
 const NationalRatingsPage: React.FC = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 1 || user?.role === '1' || user?.role === 'Admin';
+  
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [selectedSeasonId, setSelectedSeasonId] = useState<number | null>(null);
   const [ratingData, setRatingData] = useState<SeasonRatingResponse | null>(null);
@@ -96,6 +101,11 @@ const NationalRatingsPage: React.FC = () => {
         </div>
 
         <div className={styles.controls}>
+          {isAdmin && (
+            <Link to="/admin/colleges" className={styles.manageBtn}>
+              <i className="fas fa-edit"></i> Керування коледжами
+            </Link>
+          )}
           {seasons.length > 0 && (
             <select
               className={styles.seasonSelect}
