@@ -3207,3 +3207,54 @@ input:checked + .slider:before {
   object-fit: cover;
   border-radius: 8px;
 }
+
+.directDeleteBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  background: var(--danger);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.galleryItem:hover .directDeleteBtn {
+  opacity: 1;
+}
+
+.directDeleteBtn:hover {
+  background: #dc2626;
+  transform: scale(1.1);
+}
+
+.lightboxDeleteBtn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 8px 16px;
+  background: var(--danger);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 2002;
+}
+
+.lightboxDeleteBtn:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+}

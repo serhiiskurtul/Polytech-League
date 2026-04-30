@@ -2383,6 +2383,18 @@ const TournamentViewPage = () => {
                     )}
                     <div className={styles.photoOverlay}>
                       <i className="fas fa-search-plus"></i>
+                      {isAdmin && (
+                        <button 
+                          className={styles.directDeleteBtn} 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeletePhoto(photo.id);
+                          }}
+                          title="Видалити"
+                        >
+                          <i className="fas fa-trash-alt"></i>
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -2397,6 +2409,22 @@ const TournamentViewPage = () => {
                 <button className={styles.lightboxClose} onClick={() => setSelectedPhotoIndex(null)}>
                   <i className="fas fa-times"></i>
                 </button>
+
+                {isAdmin && (
+                  <button 
+                    className={styles.lightboxDeleteBtn} 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (details.photos[selectedPhotoIndex]) {
+                        handleDeletePhoto(details.photos[selectedPhotoIndex].id);
+                        setSelectedPhotoIndex(null);
+                      }
+                    }}
+                    title="Видалити медіафайл"
+                  >
+                    <i className="fas fa-trash-alt"></i> Видалити
+                  </button>
+                )}
 
                 {isVideo(details.photos[selectedPhotoIndex].url) ? (
                   <video 
