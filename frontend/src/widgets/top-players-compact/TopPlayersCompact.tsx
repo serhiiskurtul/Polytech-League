@@ -4,6 +4,7 @@ import { getPlayersRankings } from '@/shared/api/players.api';
 import { PlayerDto } from '@/shared/types/player.types';
 import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '@/shared/api/axiosInstance';
+import { getPhotoUrl } from '@/shared/utils/photo.utils';
 
 const TopPlayersCompact = () => {
   const navigate = useNavigate();
@@ -71,11 +72,6 @@ const TopPlayersCompact = () => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
-  const getPhotoUrl = (path: string | null | undefined) => {
-    if (!path) return null;
-    if (path.startsWith('http')) return path;
-    return `${BASE_URL}${path}`;
-  };
 
   const filteredPlayers = getFilteredPlayers();
 

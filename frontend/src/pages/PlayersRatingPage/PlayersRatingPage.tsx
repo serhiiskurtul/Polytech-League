@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import styles from './PlayersRatingPage.module.css';
+import { getPhotoUrl } from '../../shared/utils/photo.utils';
 import { getPlayersRankings } from '../../shared/api/players.api';
 import { getSeasons } from '../../shared/api/seasonRating.api';
 import { PlayerDto } from '../../shared/types/player.types';
@@ -279,9 +280,7 @@ const PlayersRatingPage = () => {
 
                 <div className={styles.tableBody}>
                   {filteredPlayers.map((player, index) => {
-                    const photoSrc = player.photoUrl
-                      ? (player.photoUrl.startsWith('http') ? player.photoUrl : `${baseUrl}${player.photoUrl}`)
-                      : null;
+                    const photoSrc = getPhotoUrl(player.photoUrl);
 
                     return (
                       <div key={player.id} className={styles.tableRow}>

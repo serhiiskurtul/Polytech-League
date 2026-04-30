@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import styles from './PlayerComparePage.module.css';
 import { getPlayerById, getPlayersRankings } from '../../shared/api/players.api';
 import { PlayerDto } from '../../shared/types/player.types';
+import { getPhotoUrl } from '../../shared/utils/photo.utils';
 
 export const PlayerComparePage = () => {
   const [searchParams] = useSearchParams();
@@ -99,10 +100,10 @@ export const PlayerComparePage = () => {
         <div className={styles.comparisonGrid}>
           {/* Player Cards */}
           <div className={styles.playersRow}>
-            <PlayerCard player={player1} baseUrl={baseUrl} color="#3b82f6" />
+            <PlayerCard player={player1} color="#3b82f6" />
             <div className={styles.vsCircle}>VS</div>
             {player2 ? (
-              <PlayerCard player={player2} baseUrl={baseUrl} color="#ef4444" />
+              <PlayerCard player={player2} color="#ef4444" />
             ) : (
               <div className={styles.emptyPlayerSlot}>
                 <p>Виберіть другого гравця в рейтингах</p>
@@ -159,10 +160,8 @@ export const PlayerComparePage = () => {
   );
 };
 
-const PlayerCard = ({ player, baseUrl, color }: { player: PlayerDto, baseUrl: string, color: string }) => {
-  const photoSrc = player.photoUrl
-    ? (player.photoUrl.startsWith('http') ? player.photoUrl : `${baseUrl}${player.photoUrl}`)
-    : null;
+const PlayerCard = ({ player, color }: { player: PlayerDto, color: string }) => {
+  const photoSrc = getPhotoUrl(player.photoUrl);
 
   return (
     <div className={styles.playerCard} style={{ '--accent-color': color } as React.CSSProperties}>

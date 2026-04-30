@@ -1,4 +1,5 @@
 import styles from './ProfileHeader.module.css';
+import { getPhotoUrl } from '@/shared/utils/photo.utils';
 
 interface UserData {
   name: string;
@@ -36,7 +37,7 @@ const ProfileHeader = ({ userData, isAdmin, onEdit, onAvatarUpload, onLogout, on
           <div className={styles.profileAvatar}>
             {userData.photoUrl ? (
               <img 
-                src={`${import.meta.env.VITE_API_BASE_URL || 'https://polytech-league-production.up.railway.app'}${userData.photoUrl}`} 
+                src={getPhotoUrl(userData.photoUrl)!} 
                 alt={userData.name} 
                 className={styles.avatarImage} 
               />

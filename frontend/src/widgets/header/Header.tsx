@@ -5,6 +5,7 @@ import { useAuth } from "@/app/providers/AuthContext";
 import { useState } from "react";
 import { useNotifications } from "@/app/providers/NotificationProvider";
 import { useChat } from "@/app/providers/ChatProvider";
+import { getPhotoUrl } from "@/shared/utils/photo.utils";
 
 export default function Header() {
   const { user, isAuthenticated } = useAuth();
@@ -89,7 +90,7 @@ export default function Header() {
                 <div className={styles.userAvatar}>
                   {user.photoUrl && user.photoUrl.trim() !== '' ? (
                     <img 
-                      src={`${import.meta.env.VITE_API_BASE_URL || 'https://polytech-league-production.up.railway.app'}${user.photoUrl}`} 
+                      src={getPhotoUrl(user.photoUrl)!} 
                       alt={`${user.firstName} ${user.lastName}`} 
                       className={styles.avatarImg}
                     />
