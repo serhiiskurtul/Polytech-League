@@ -79,6 +79,16 @@ public class EventMediaController : ControllerBase
         var @event = await _dbContext.Events.FindAsync(new object[] { eventId }, cancellationToken);
         if (@event == null) return NotFound("Event not found");
 
+        // Only delete the old photo if it was a dedicated main photo upload (not a link to a gallery photo)
+        if (!string.IsNullOrEmpty(@event.MainPhotoUrl) && @event.MainPhotoUrl.Contains("/events/main/"))
+        {
+            try
+            {
+                _fileService.DeleteFile(@event.MainPhotoUrl);
+            }
+            catch { /* ignore */ }
+        }
+
         var url = await _fileService.SaveFileAsync(file, "events/main", cancellationToken);
         
         @event.MainPhotoUrl = url;
@@ -93,6 +103,12 @@ public class EventMediaController : ControllerBase
     {
         var @event = await _dbContext.Events.FindAsync(new object[] { eventId }, cancellationToken);
         if (@event == null) return NotFound("Event not found");
+
+        // Clean up old main photo if it was a dedicated upload
+        if (!string.IsNullOrEmpty(@event.MainPhotoUrl) && @event.MainPhotoUrl.Contains("/events/main/"))
+        {
+            try { _fileService.DeleteFile(@event.MainPhotoUrl); } catch { }
+        }
 
         if (photoId <= 0)
         {

@@ -52,19 +52,17 @@ public class CloudflareR2FileService : IFileService
         var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
         var key = string.IsNullOrEmpty(folder) ? fileName : $"{folder}/{fileName}";
 
-        using var ms = new MemoryStream();
-        await file.CopyToAsync(ms, cancellationToken);
-        ms.Position = 0;
-
-        _logger.LogInformation("Uploading file to R2. Bucket: {Bucket}, Key: {Key}", _settings.BucketName, key);
+        _logger.LogInformation("Uploading file to R2. Bucket: {Bucket}, Key: {Key}, Size: {Size}", _settings.BucketName, key, file.Length);
+        
+        using var stream = file.OpenReadStream();
         
         var request = new PutObjectRequest
         {
             BucketName = _settings.BucketName,
             Key = key,
-            InputStream = ms,
+            InputStream = stream,
             ContentType = file.ContentType,
-            DisablePayloadSigning = true // Try disabling it here on the request level
+            DisablePayloadSigning = true
         };
 
         await _s3Client.PutObjectAsync(request, cancellationToken);
