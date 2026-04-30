@@ -5,6 +5,7 @@ namespace PolytechLeague.Application.Services.Interfaces;
 public interface ISeasonRatingService
 {
     Task<SeasonRatingDto> GetSeasonRatingAsync(long seasonId);
+    Task<SeasonRatingDto> GetNationalRatingAsync(long seasonId);
     Task<IEnumerable<SeasonDto>> GetAllSeasonsAsync();
     Task<SeasonDto?> GetCurrentSeasonAsync();
     

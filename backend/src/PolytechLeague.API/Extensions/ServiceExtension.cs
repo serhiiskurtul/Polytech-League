@@ -86,6 +86,7 @@ public static class ServiceExtension
         services.AddScoped<IFileService, CloudflareR2FileService>();
 
         services.AddScoped<ISeasonRatingService, SeasonRatingService>();
+        services.AddScoped<ICollegeService, CollegeService>();
 
         return services;
     }

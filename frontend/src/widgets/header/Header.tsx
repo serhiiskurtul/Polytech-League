@@ -74,6 +74,12 @@ export default function Header() {
                 <span>Рейтинги груп</span>
               </Link>
             </li>
+            <li>
+              <Link to="/national-ratings" className={styles.navLink} onClick={closeMenu}>
+                <i className={`fas fa-university ${styles.navIcon}`}></i>
+                <span>Всеукраїнський залік</span>
+              </Link>
+            </li>
             {isAdmin && (
               <>
                 <li className={styles.adminDivider}></li>

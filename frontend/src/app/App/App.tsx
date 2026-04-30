@@ -21,6 +21,7 @@ import InternalServerErrorPage from '@/pages/InternalServerErrorPage/InternalSer
 import { RatingsPage } from '@/pages/RatingsPage';
 import { AdminMergesPage } from '@/pages/AdminMergesPage/AdminMergesPage';
 import { AdminUsersPage } from '@/pages/AdminUsersPage';
+import { NationalRatingsPage } from '@/pages/NationalRatingsPage';
 
 import ProtectedRoute from '../providers/ProtectedRoute';
 import ScrollToTop from '../providers/ScrollToTop';
@@ -125,6 +126,17 @@ export default function App() {
             <ProtectedRoute requireAuth={false}>
               <div className="page-wrapper">
                 <RatingsPage />
+              </div>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/national-ratings"
+          element={
+            <ProtectedRoute requireAuth={false}>
+              <div className="page-wrapper">
+                <NationalRatingsPage />
               </div>
             </ProtectedRoute>
           }

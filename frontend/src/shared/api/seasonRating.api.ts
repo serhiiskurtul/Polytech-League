@@ -16,6 +16,11 @@ export const getSeasonRating = async (seasonId: number): Promise<SeasonRatingRes
   return response.data;
 };
 
+export const getNationalRating = async (seasonId: number): Promise<SeasonRatingResponse> => {
+  const response = await api.get<SeasonRatingResponse>(`/SeasonRating/national/${seasonId}`);
+  return response.data;
+};
+
 // Admin methods
 export const createSeason = async (season: Partial<Season>): Promise<Season> => {
   const response = await api.post<Season>('/SeasonRating/seasons', season);

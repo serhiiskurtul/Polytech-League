@@ -20,4 +20,7 @@ public class FutsalTeam
 
     [System.ComponentModel.DataAnnotations.Schema.NotMapped]
     public ICollection<long>? PlayerIds { get; set; }
+
+    public long? CollegeId { get; set; }
+    public College? College { get; set; }
 }

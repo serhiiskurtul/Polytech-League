@@ -22,6 +22,13 @@ public class SeasonRatingController : ControllerBase
         return Ok(rating);
     }
 
+    [HttpGet("national/{seasonId}")]
+    public async Task<ActionResult<SeasonRatingDto>> GetNationalRating(long seasonId)
+    {
+        var rating = await _seasonRatingService.GetNationalRatingAsync(seasonId);
+        return Ok(rating);
+    }
+
     [HttpGet("seasons")]
     public async Task<ActionResult<IEnumerable<SeasonDto>>> GetAllSeasons()
     {

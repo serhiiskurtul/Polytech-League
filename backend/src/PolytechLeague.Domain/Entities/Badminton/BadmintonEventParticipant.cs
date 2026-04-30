@@ -15,4 +15,6 @@ public class BadmintonEventParticipant
     public int Rank { get; set; }
     public string? GroupName { get; set; }
     public RegistrationStatus Status { get; set; } = RegistrationStatus.Approved;
+    public long? CollegeId { get; set; }
+    public College? College { get; set; }
 }

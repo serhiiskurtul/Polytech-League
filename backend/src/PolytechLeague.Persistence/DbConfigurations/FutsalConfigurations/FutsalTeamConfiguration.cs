@@ -25,5 +25,10 @@ public class FutsalTeamConfiguration : IEntityTypeConfiguration<FutsalTeam>
             .WithMany()
             .HasForeignKey(t => t.GoalkeeperId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(t => t.College)
+            .WithMany()
+            .HasForeignKey(t => t.CollegeId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

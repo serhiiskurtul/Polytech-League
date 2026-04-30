@@ -61,5 +61,10 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
         // Social & Bio
         builder.Property(x => x.Bio).HasColumnName("Bio");
         builder.Property(x => x.InstagramUrl).HasColumnName("InstagramUrl");
+
+        builder.HasOne(x => x.College)
+            .WithMany()
+            .HasForeignKey(x => x.CollegeId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }
