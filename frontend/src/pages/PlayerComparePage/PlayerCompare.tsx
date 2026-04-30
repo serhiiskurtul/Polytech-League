@@ -19,7 +19,8 @@ export const PlayerComparePage = () => {
   const [error, setError] = useState<string | null>(null);
   
   const [seasons, setSeasons] = useState<Season[]>([]);
-  const [selectedSeasonId, setSelectedSeasonId] = useState<number | null>(null);
+  const [selectedSeasonId1, setSelectedSeasonId1] = useState<number | null>(null);
+  const [selectedSeasonId2, setSelectedSeasonId2] = useState<number | null>(null);
   const [loadingSeasons, setLoadingSeasons] = useState(true);
 
   // Initial fetch of seasons
@@ -30,9 +31,11 @@ export const PlayerComparePage = () => {
         setSeasons(data);
         const current = data.find(s => s.isCurrent);
         if (current) {
-          setSelectedSeasonId(current.id);
+          setSelectedSeasonId1(current.id);
+          setSelectedSeasonId2(current.id);
         } else if (data.length > 0) {
-          setSelectedSeasonId(data[0].id);
+          setSelectedSeasonId1(data[0].id);
+          setSelectedSeasonId2(data[0].id);
         }
       } catch (err) {
         console.error('Failed to fetch seasons:', err);
@@ -53,14 +56,12 @@ export const PlayerComparePage = () => {
 
       setLoading(true);
       try {
-        // Fetch rankings for the selected season (or global if null)
-        const rankings = await getPlayersRankings(selectedSeasonId || undefined);
-        
-        const findAndEnrich = async (id: string) => {
+        const findAndEnrich = async (id: string, seasonId: number | null) => {
+          const rankings = await getPlayersRankings(seasonId || undefined);
           const detail = await getPlayerById(id);
           const rankingInfo = rankings.find(p => p.id === Number(id));
+          
           if (rankingInfo) {
-            // Enrich with season-specific stats from rankings
             return {
               ...detail,
               performanceScore: rankingInfo.performanceScore,
@@ -71,7 +72,6 @@ export const PlayerComparePage = () => {
               globalRank: rankingInfo.globalRank
             };
           }
-          // If not in rankings for this season, reset stats
           return {
             ...detail,
             performanceScore: 0,
@@ -83,11 +83,11 @@ export const PlayerComparePage = () => {
           };
         };
 
-        const data1 = await findAndEnrich(p1Id);
+        const data1 = await findAndEnrich(p1Id, selectedSeasonId1);
         setPlayer1(data1);
         
         if (p2Id) {
-          const data2 = await findAndEnrich(p2Id);
+          const data2 = await findAndEnrich(p2Id, selectedSeasonId2);
           setPlayer2(data2);
         }
       } catch (err) {
@@ -101,7 +101,7 @@ export const PlayerComparePage = () => {
     if (!loadingSeasons) {
       fetchPlayers();
     }
-  }, [p1Id, p2Id, selectedSeasonId, loadingSeasons]);
+  }, [p1Id, p2Id, selectedSeasonId1, selectedSeasonId2, loadingSeasons]);
 
 
   const calculateWinRate = (player: PlayerDto | null) => {
@@ -141,41 +141,51 @@ export const PlayerComparePage = () => {
           <button onClick={() => navigate(-1)} className={styles.backBtnSmall}>
             <i className="fa-solid fa-arrow-left"></i> Назад
           </button>
-          
           <h1 className={styles.title}>Порівняння гравців</h1>
-
-          <div className={styles.seasonSelector}>
-            <label>Сезон:</label>
-            <select 
-              value={selectedSeasonId || ''} 
-              onChange={(e) => setSelectedSeasonId(Number(e.target.value) || null)}
-              className={styles.seasonSelect}
-            >
-              <option value="">Всі сезони</option>
-              {seasons.map(s => (
-                <option key={s.id} value={s.id}>
-                  {s.name} {s.isCurrent ? '(Поточний)' : ''}
-                </option>
-              ))}
-            </select>
-          </div>
+          <div style={{ width: '100px' }}></div> {/* Spacer for symmetry */}
         </header>
 
         <div className={styles.comparisonGrid}>
           {/* Player Cards */}
           <div className={styles.playersRow}>
-            <PlayerCard player={player1} color="#3b82f6" />
+            <div className={styles.playerColumn}>
+              <SeasonSelector 
+                seasons={seasons} 
+                selectedId={selectedSeasonId1} 
+                onChange={setSelectedSeasonId1} 
+              />
+              <PlayerCard 
+                player={player1} 
+                color="#3b82f6" 
+                selectedSeason={seasons.find(s => s.id === selectedSeasonId1)} 
+              />
+            </div>
+
             <div className={styles.vsCircle}>VS</div>
-            {player2 ? (
-              <PlayerCard player={player2} color="#ef4444" />
-            ) : (
-              <div className={styles.emptyPlayerSlot}>
-                <p>Виберіть другого гравця в рейтингах</p>
-                <button onClick={() => navigate(`/ratings?p1=${p1Id}`)} className={styles.addPlayerBtn}>
-                  Додати гравця
-                </button>
-              </div>
-            )}
+
+            <div className={styles.playerColumn}>
+              {player2 ? (
+                <>
+                  <SeasonSelector 
+                    seasons={seasons} 
+                    selectedId={selectedSeasonId2} 
+                    onChange={setSelectedSeasonId2} 
+                  />
+                  <PlayerCard 
+                    player={player2} 
+                    color="#ef4444" 
+                    selectedSeason={seasons.find(s => s.id === selectedSeasonId2)} 
+                  />
+                </>
+              ) : (
+                <div className={styles.emptyPlayerSlot}>
+                  <p>Виберіть другого гравця в рейтингах</p>
+                  <button onClick={() => navigate(`/ratings?p1=${p1Id}`)} className={styles.addPlayerBtn}>
+                    Додати гравця
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
 
@@ -230,11 +240,61 @@ export const PlayerComparePage = () => {
   );
 };
 
-const PlayerCard = ({ player, color }: { player: PlayerDto, color: string }) => {
+const SeasonSelector = ({ seasons, selectedId, onChange }: { 
+  seasons: Season[], 
+  selectedId: number | null, 
+  onChange: (id: number | null) => void 
+}) => (
+  <div className={styles.seasonSelector}>
+    <label>Сезон</label>
+    <div className={styles.selectWrapper}>
+      <select 
+        value={selectedId || ''} 
+        onChange={(e) => onChange(Number(e.target.value) || null)}
+        className={styles.seasonSelect}
+      >
+        <option value="">За весь час</option>
+        {seasons.map(s => (
+          <option key={s.id} value={s.id}>
+            {s.name} {s.isCurrent ? '★' : ''}
+          </option>
+        ))}
+      </select>
+      <i className="fa-solid fa-chevron-down"></i>
+    </div>
+  </div>
+);
+
+const PlayerCard = ({ player, color, selectedSeason }: { 
+  player: PlayerDto, 
+  color: string,
+  selectedSeason?: Season 
+}) => {
   const photoSrc = getPhotoUrl(player.photoUrl);
+  
+  // Logic to determine status relative to selected season
+  const getStatus = () => {
+    if (!selectedSeason || !player.enrollmentYear) return null;
+    
+    // Extract year from season name (e.g., "2025-2026" -> 2025)
+    const seasonStartYear = parseInt(selectedSeason.name.split('-')[0]);
+    
+    if (seasonStartYear < player.enrollmentYear) {
+      return { text: 'Ще не вступив', type: 'future' };
+    }
+    
+    // Assume 4 years of Bachelor degree
+    if (seasonStartYear > player.enrollmentYear + 4) {
+      return { text: 'Випускник', type: 'past' };
+    }
+    
+    return null;
+  };
+
+  const status = getStatus();
 
   return (
-    <div className={styles.playerCard} style={{ '--accent-color': color } as React.CSSProperties}>
+    <div className={`${styles.playerCard} ${status ? styles.inactiveCard : ''}`} style={{ '--accent-color': color } as React.CSSProperties}>
       <div className={styles.avatarWrapper}>
         {photoSrc ? (
           <img src={photoSrc} alt="" className={styles.avatarImg} />
@@ -243,6 +303,7 @@ const PlayerCard = ({ player, color }: { player: PlayerDto, color: string }) => 
             {player.firstName[0]}{player.lastName[0]}
           </div>
         )}
+        {status && <div className={styles.statusBadge}>{status.text}</div>}
       </div>
       <div className={styles.cardInfo}>
         <h3 className={styles.cardName}>{player.firstName} {player.lastName}</h3>
