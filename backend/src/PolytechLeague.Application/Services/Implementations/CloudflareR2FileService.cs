@@ -2,6 +2,7 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using PolytechLeague.Application.Configuration;
 using PolytechLeague.Application.Services.Interfaces;
 
@@ -11,10 +12,12 @@ public class CloudflareR2FileService : IFileService
 {
     private readonly IAmazonS3 _s3Client;
     private readonly CloudflareR2Settings _settings;
+    private readonly ILogger<CloudflareR2FileService> _logger;
 
-    public CloudflareR2FileService(IOptions<CloudflareR2Settings> settings)
+    public CloudflareR2FileService(IOptions<CloudflareR2Settings> settings, ILogger<CloudflareR2FileService> logger)
     {
         _settings = settings.Value;
+        _logger = logger;
 
         if (string.IsNullOrEmpty(_settings.AccessKey) || string.IsNullOrEmpty(_settings.SecretKey))
         {
@@ -24,6 +27,11 @@ public class CloudflareR2FileService : IFileService
         if (string.IsNullOrEmpty(_settings.ServiceUrl))
         {
             throw new ArgumentException("Cloudflare R2 ServiceUrl is missing. Check environment variables.");
+        }
+
+        if (string.IsNullOrEmpty(_settings.BucketName))
+        {
+            throw new ArgumentException("Cloudflare R2 BucketName is missing. Check environment variables.");
         }
         
         var config = new AmazonS3Config
@@ -45,6 +53,8 @@ public class CloudflareR2FileService : IFileService
         var key = string.IsNullOrEmpty(folder) ? fileName : $"{folder}/{fileName}";
 
         using var stream = file.OpenReadStream();
+        _logger.LogInformation("Uploading file to R2. Bucket: {Bucket}, Key: {Key}", _settings.BucketName, key);
+        
         var request = new PutObjectRequest
         {
             BucketName = _settings.BucketName,
@@ -54,6 +64,7 @@ public class CloudflareR2FileService : IFileService
         };
 
         await _s3Client.PutObjectAsync(request, cancellationToken);
+        _logger.LogInformation("Successfully uploaded file to R2: {Key}", key);
 
         return $"{_settings.PublicUrl}/{key}";
     }
