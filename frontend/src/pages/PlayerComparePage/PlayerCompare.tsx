@@ -138,12 +138,11 @@ export const PlayerComparePage = () => {
     <div className={styles.page}>
       <div className={styles.container}>
         <header className={styles.header}>
-          <div className={styles.controlsRow}>
-            <button onClick={() => navigate(-1)} className={styles.backBtnSmall}>
-              <i className="fa-solid fa-arrow-left"></i> Назад
-            </button>
-            <h1 className={styles.title}>Порівняння гравців</h1>
-          </div>
+          <button onClick={() => navigate(-1)} className={styles.backBtnSmall}>
+            <i className="fa-solid fa-arrow-left"></i> Назад
+          </button>
+          
+          <h1 className={styles.title}>Порівняння гравців</h1>
 
           <div className={styles.seasonSelector}>
             <label>Сезон:</label>
