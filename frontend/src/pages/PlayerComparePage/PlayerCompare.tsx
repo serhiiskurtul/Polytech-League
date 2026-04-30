@@ -248,9 +248,23 @@ const SeasonSelector = ({ seasons, player, selectedId, onChange }: {
   selectedId: number | null, 
   onChange: (id: number | null) => void 
 }) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   // Filter seasons where the player had at least one achievement
   const filteredSeasons = seasons.filter(s => {
-    if (!player || !player.achievements) return true; // Show all if no data
+    if (!player || !player.achievements) return true;
     
     const start = new Date(s.startDate);
     const end = new Date(s.endDate);
@@ -261,23 +275,36 @@ const SeasonSelector = ({ seasons, player, selectedId, onChange }: {
     });
   });
 
+  const selectedSeason = seasons.find(s => s.id === selectedId);
+
   return (
-    <div className={styles.seasonSelector}>
+    <div className={styles.seasonSelector} ref={dropdownRef}>
       <label>Сезон</label>
-      <div className={styles.selectWrapper}>
-        <select 
-          value={selectedId || ''} 
-          onChange={(e) => onChange(Number(e.target.value) || null)}
-          className={styles.seasonSelect}
-        >
-          <option value="">За весь час</option>
-          {filteredSeasons.map(s => (
-            <option key={s.id} value={s.id}>
-              {s.name}
-            </option>
-          ))}
-        </select>
-        <i className="fa-solid fa-chevron-down"></i>
+      <div className={styles.customSelect} onClick={() => setIsOpen(!isOpen)}>
+        <span className={styles.currentValue}>
+          {selectedSeason ? selectedSeason.name : 'За весь час'}
+        </span>
+        <i className={`fa-solid fa-chevron-down ${isOpen ? styles.iconOpen : ''}`}></i>
+        
+        {isOpen && (
+          <div className={styles.dropdownList}>
+            <div 
+              className={`${styles.dropdownOption} ${!selectedId ? styles.selectedOption : ''}`}
+              onClick={() => { onChange(null); setIsOpen(false); }}
+            >
+              За весь час
+            </div>
+            {filteredSeasons.map(s => (
+              <div 
+                key={s.id} 
+                className={`${styles.dropdownOption} ${selectedId === s.id ? styles.selectedOption : ''}`}
+                onClick={() => { onChange(s.id); setIsOpen(false); }}
+              >
+                {s.name}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
