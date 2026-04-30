@@ -1163,6 +1163,35 @@ namespace PolytechLeague.Persistence.Migrations
                     b.ToTable("messages", (string)null);
                 });
 
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.NationalRatingManualEntry", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("CollegeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Points")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Rank")
+                        .HasColumnType("text");
+
+                    b.Property<long>("SeasonId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CollegeId");
+
+                    b.HasIndex("SeasonId");
+
+                    b.ToTable("NationalRatingManualEntries");
+                });
+
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Notification", b =>
                 {
                     b.Property<long>("Id")
@@ -2989,6 +3018,25 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Navigation("Conversation");
 
                     b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.NationalRatingManualEntry", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.College", "College")
+                        .WithMany()
+                        .HasForeignKey("CollegeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Season", "Season")
+                        .WithMany()
+                        .HasForeignKey("SeasonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("College");
+
+                    b.Navigation("Season");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Notification", b =>
