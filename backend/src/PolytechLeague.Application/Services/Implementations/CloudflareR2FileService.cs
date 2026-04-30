@@ -38,7 +38,8 @@ public class CloudflareR2FileService : IFileService
         {
             ServiceURL = _settings.ServiceUrl,
             AuthenticationRegion = "auto", 
-            ForcePathStyle = true
+            ForcePathStyle = true,
+            UseChunkedEncoding = false // THIS IS KEY FOR R2
         };
 
         _s3Client = new AmazonS3Client(_settings.AccessKey, _settings.SecretKey, config);
