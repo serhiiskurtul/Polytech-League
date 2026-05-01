@@ -1,1218 +1,1213 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using PolytechLeague.Application.Dto.GeneralDto;
-using PolytechLeague.Application.Services.Interfaces;
-using PolytechLeague.Domain.Entities;
-using PolytechLeague.Persistence.Database;
-using PolytechLeague.Domain.Entities.Chess;
-using PolytechLeague.Domain.Entities.Checkers;
-using PolytechLeague.Domain.Entities.TableTennis;
-using PolytechLeague.Domain.Entities.Badminton;
-using PolytechLeague.Domain.Entities.Armwrestling;
-using PolytechLeague.Domain.Entities.Armwrestling.Enums;
-using PolytechLeague.Domain.Entities.Futsal;
-using PolytechLeague.Domain.Entities.Volleyball;
-using PolytechLeague.Domain.Entities.Basketball3x3;
-using PolytechLeague.Domain.Entities.BeachVolleyball;
-using PolytechLeague.Domain.Entities.Shared;
-using PolytechLeague.Application.Utilities;
-
-namespace PolytechLeague.Application.Services.Implementations.General;
-
-public class PlayerService : IPlayerService
-{
-    private readonly ApplicationDbContext _dbContext;
-    private readonly ILogger<PlayerService> _logger;
-    private readonly INotificationService _notificationService;
-
-    public PlayerService(ApplicationDbContext dbContext, ILogger<PlayerService> logger, INotificationService notificationService)
-    {
-        _dbContext = dbContext;
-        _logger = logger;
-        _notificationService = notificationService;
-    }
-
-    public async Task<IEnumerable<PlayerDto>> GetAllAsync(CancellationToken cancellationToken = default)
-    {
-        var players = await _dbContext.Players
-            .Include(p => p.User)
-            .Where(p => p.User == null || p.User.Role != UserRole.Admin)
-            .ToListAsync(cancellationToken);
-        return players.Select(p => p.ToDto());
-    }
-
-    public async Task<PlayerDto?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
-    {
-        var allWithRankings = await GetAllWithRankingsAsync(null, cancellationToken);
-        var ranked = allWithRankings.FirstOrDefault(p => p.Id == id);
-        if (ranked != null) { await PopulateAutomaticBadgesAsync(ranked, cancellationToken); return ranked; }
-
-        // Fallback for players not in rankings (Admins, External)
-        var player = await _dbContext.Players
-            .Include(p => p.User)
-            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
-            
-        if (player == null) return null;
-        var dto = player.ToDto();
-        await PopulateAchievementsAsync(dto, cancellationToken); await PopulateAutomaticBadgesAsync(dto, cancellationToken);
-        return dto;
-    }
-
-    public async Task<string?> GetPhotoUrlByUserIdAsync(long userId, CancellationToken cancellationToken = default)
-    {
-        var player = await _dbContext.Players
-            .AsNoTracking()
-            .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
-            
-        return player?.PhotoUrl;
-    }
-
-    public async Task<PlayerDto?> GetByUserIdAsync(long userId, CancellationToken cancellationToken = default)
-    {
-        var allWithRankings = await GetAllWithRankingsAsync(null, cancellationToken);
-        var ranked = allWithRankings.FirstOrDefault(p => p.UserId == userId);
-        if (ranked != null) { await PopulateAutomaticBadgesAsync(ranked, cancellationToken); return ranked; }
-
-        // Fallback for players not in rankings (Admins, External)
-        var player = await _dbContext.Players
-            .Include(p => p.User)
-            .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
-            
-        if (player == null) return null;
-        var dto = player.ToDto();
-        await PopulateAchievementsAsync(dto, cancellationToken); await PopulateAutomaticBadgesAsync(dto, cancellationToken);
-        return dto;
-    }
-
-
-    public async Task<PlayerDto> CreateAsync(PlayerDto dto, CancellationToken cancellationToken = default)
-    {
-        // Cleanup names
-        dto.FirstName = dto.FirstName?.Replace(",", "").Trim();
-        dto.LastName = dto.LastName?.Replace(",", "").Trim();
-
-        // Try to prevent duplicates if specialty and enrollment year are provided or can be parsed
-        if (dto.EnrollmentYear == 0 && !string.IsNullOrEmpty(dto.Group))
-        {
-            var parsed = GroupUtility.ParseGroup(dto.Group, DateTime.Now);
-            dto.SpecialtyCode = parsed.specialty;
-            dto.EnrollmentYear = parsed.enrollmentYear;
-            dto.GroupNumber = parsed.groupNumber;
-        }
-
-        if (dto.EnrollmentYear > 0)
-        {
-            var existing = await _dbContext.Players
-                .FirstOrDefaultAsync(p => p.FirstName.ToLower() == dto.FirstName!.ToLower() && 
-                                          p.LastName.ToLower() == dto.LastName!.ToLower() &&
-                                          p.SpecialtyCode == dto.SpecialtyCode &&
-                                          p.EnrollmentYear == dto.EnrollmentYear, cancellationToken);
-            
-            if (existing != null)
-            {
-                _logger.LogInformation("Found existing player {PlayerId} for {Name} in group {Group}", existing.Id, dto.LastName, dto.Group);
-                return existing.ToDto();
-            }
-        }
-
-        var player = dto.FromDto();
-        
-        // Auto-populate group fields if not set but Group string is present
-        if (player.EnrollmentYear == 0 && !string.IsNullOrEmpty(player.Group))
-        {
-            var parsed = GroupUtility.ParseGroup(player.Group, DateTime.Now);
-            player.SpecialtyCode = parsed.specialty;
-            player.EnrollmentYear = parsed.enrollmentYear;
-            player.GroupNumber = parsed.groupNumber;
-        }
-
-        await _dbContext.Players.AddAsync(player, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        return player.ToDto();
-    }
-
-    public async Task UpdateAsync(long id, PlayerDto dto, CancellationToken cancellationToken = default)
-    {
-        _logger.LogInformation("Updating player {Id}. DTO Bio: {Bio}, Instagram: {Instagram}", id, dto.Bio, dto.InstagramUrl);
-        
-        var player = await _dbContext.Players.FindAsync(new object[] { id }, cancellationToken);
-        if (player == null)
-        {
-            _logger.LogWarning("Player {Id} not found for update", id);
-            throw new KeyNotFoundException($"Player with ID {id} not found");
-        }
-
-        // Cleanup names
-        dto.FirstName = dto.FirstName?.Replace(",", "").Trim();
-        dto.LastName = dto.LastName?.Replace(",", "").Trim();
-
-        // Update basic info - only if provided (not null)
-        if (dto.FirstName != null && !string.IsNullOrWhiteSpace(dto.FirstName)) player.FirstName = dto.FirstName;
-        if (dto.Patronymic != null) player.Patronymic = dto.Patronymic;
-        if (dto.LastName != null && !string.IsNullOrWhiteSpace(dto.LastName)) player.LastName = dto.LastName;
-        
-        if (dto.Group != null) player.Group = dto.Group;
-        
-        // Handle StudentId: treat empty/whitespace as null to avoid unique index issues with multiple empty strings
-        if (dto.StudentId != null)
-        {
-            player.StudentId = string.IsNullOrWhiteSpace(dto.StudentId) ? null : dto.StudentId.Trim();
-        }
-        
-        if (dto.City != null) player.City = dto.City;
-        if (dto.UserId != null) player.UserId = dto.UserId;
-        if (dto.StudyYears != null) player.StudyYears = dto.StudyYears;
-        
-        _logger.LogInformation("Updating Bio for player {Id}. Old: {Old}, New: {New}", id, player.Bio, dto.Bio);
-        if (dto.Bio != null) player.Bio = dto.Bio; 
-        
-        _logger.LogInformation("Updating InstagramUrl for player {Id}. Old: {Old}, New: {New}", id, player.InstagramUrl, dto.InstagramUrl);
-        if (dto.InstagramUrl != null) player.InstagramUrl = dto.InstagramUrl;
-        if (dto.PreviousNames != null) player.PreviousNames = dto.PreviousNames;
-        
-        if (dto.PhotoUrl != null) player.PhotoUrl = dto.PhotoUrl;
-
-        // Sync name and photo to User entity if it exists
-        if (player.UserId.HasValue)
-        {
-            var user = await _dbContext.Users.FindAsync(new object[] { player.UserId.Value }, cancellationToken);
-            if (user != null)
-            {
-                user.FirstName = player.FirstName;
-                user.LastName = player.LastName;
-                user.PhotoUrl = player.PhotoUrl; // Sync photo URL
-                _dbContext.Users.Update(user);
-            }
-        }
-
-        // Explicitly mark player as updated to ensure TPT fields are saved
-        _dbContext.Players.Update(player);
-
-
-
-        // Update sport stats (only if provided in DTO)
-        if (dto.ChessRating.HasValue) player.ChessRating = dto.ChessRating;
-        if (dto.ChessFideId != null) player.ChessFideId = dto.ChessFideId;
-        if (dto.ChessTitle != null) player.ChessTitle = dto.ChessTitle;
-        if (dto.CheckersRating.HasValue) player.CheckersRating = dto.CheckersRating;
-        if (dto.TableTennisRating.HasValue) player.TableTennisRating = dto.TableTennisRating;
-        if (dto.TableTennisHand.HasValue) player.TableTennisHand = dto.TableTennisHand;
-        if (dto.ArmwrestlingWeight.HasValue) player.ArmwrestlingWeight = dto.ArmwrestlingWeight;
-        if (dto.ArmwrestlingPreferredWeightClass.HasValue) player.ArmwrestlingPreferredWeightClass = dto.ArmwrestlingPreferredWeightClass;
-        
-        // Update team stats
-        if (dto.FutsalPosition.HasValue) player.FutsalPosition = dto.FutsalPosition;
-        if (dto.FutsalShirtNumber.HasValue) player.FutsalShirtNumber = dto.FutsalShirtNumber;
-        if (dto.FutsalTeamId.HasValue) player.FutsalTeamId = dto.FutsalTeamId;
-        
-        if (dto.VolleyballPosition.HasValue) player.VolleyballPosition = dto.VolleyballPosition;
-        if (dto.VolleyballShirtNumber.HasValue) player.VolleyballShirtNumber = dto.VolleyballShirtNumber;
-        if (dto.VolleyballTeamId.HasValue) player.VolleyballTeamId = dto.VolleyballTeamId;
-
-        if (dto.BasketballShirtNumber.HasValue) player.BasketballShirtNumber = dto.BasketballShirtNumber;
-        if (dto.BasketballTeamId.HasValue) player.BasketballTeamId = dto.BasketballTeamId;
-
-        if (dto.BeachVolleyballShirtNumber.HasValue) player.BeachVolleyballShirtNumber = dto.BeachVolleyballShirtNumber;
-        if (dto.BeachVolleyballTeamId.HasValue) player.BeachVolleyballTeamId = dto.BeachVolleyballTeamId;
-
-        player.IsExternal = dto.IsExternal;
-
-        try 
-        {
-            await _dbContext.SaveChangesAsync(cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating player {PlayerId}: {Message}", id, ex.Message);
-            throw; // Re-throw to let the controller handle it (it will return 500 but now we have logs)
-        }
-
-
-    }
-
-    public async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
-    {
-        var player = await _dbContext.Players.FindAsync(new object[] { id }, cancellationToken);
-        if (player != null)
-        {
-            _dbContext.Players.Remove(player);
-            await _dbContext.SaveChangesAsync(cancellationToken);
-        }
-    }
-
-    public async Task<IEnumerable<PlayerDto>> SearchAsync(string query, CancellationToken cancellationToken = default)
-    {
-        var lowerQuery = query.ToLower();
-        var players = await _dbContext.Players
-            .Include(p => p.User)
-            .Where(p => p.User == null || p.User.Role != UserRole.Admin)
-            .Where(p => p.FirstName.ToLower().Contains(lowerQuery) || 
-                        (p.Patronymic != null && p.Patronymic.ToLower().Contains(lowerQuery)) ||
-                        p.LastName.ToLower().Contains(lowerQuery) ||
-                        (p.PreviousNames != null && p.PreviousNames.ToLower().Contains(lowerQuery)) ||
-                        p.Group.ToLower().Contains(lowerQuery) ||
-                        (p.StudentId != null && p.StudentId.ToLower().Contains(lowerQuery)))
-            .ToListAsync(cancellationToken);
-        
-        // Also check if the query matches their calculated group name for other years
-        var allPlayers = await _dbContext.Players
-            .Include(p => p.User)
-            .Where(p => p.User == null || p.User.Role != UserRole.Admin)
-            .ToListAsync(cancellationToken);
-        var filtered = allPlayers.Where(p => 
-            p.FirstName.ToLower().Contains(lowerQuery) || 
-            (p.Patronymic != null && p.Patronymic.ToLower().Contains(lowerQuery)) ||
-            p.LastName.ToLower().Contains(lowerQuery) ||
-            (p.PreviousNames != null && p.PreviousNames.ToLower().Contains(lowerQuery)) ||
-            p.Group.ToLower().Contains(lowerQuery) ||
-            (p.EnrollmentYear > 0 && GroupUtility.GetCurrentGroupName(p.SpecialtyCode, p.EnrollmentYear, p.GroupNumber).ToLower().Contains(lowerQuery)) ||
-            (p.StudentId != null && p.StudentId.ToLower().Contains(lowerQuery))
-        );
-        
-        return filtered.Select(p => p.ToDto());
-    }
-
-    public async Task<IEnumerable<PlayerDto>> GetAllWithRankingsAsync(long? seasonId = null, CancellationToken cancellationToken = default)
-    {
-        try 
-        {
-            var players = await _dbContext.Players
-                .Include(p => p.User)
-                .Where(p => p.User == null || p.User.Role != UserRole.Admin)
-                .Where(p => !p.IsExternal)
-                .ToListAsync(cancellationToken);
-
-            
-            if (!players.Any()) return Enumerable.Empty<PlayerDto>();
-
-            var playerIds = players.Select(p => p.Id).ToList();
-
-            // 1. Level multipliers
-            var levelMultipliers = new Dictionary<CompetitionLevel, double> {
-                { CompetitionLevel.CollegeGroup, 1.0 },
-                { CompetitionLevel.Regional, 2.5 },
-                { CompetitionLevel.National, 5.0 }
-            };
-
-            var allEventsQuery = _dbContext.Set<Event>().AsQueryable();
-            if (seasonId.HasValue) 
-            {
-                var season = await _dbContext.Seasons.FindAsync(new object[] { seasonId.Value }, cancellationToken);
-                if (season != null)
-                {
-                    allEventsQuery = allEventsQuery.Where(e => e.SeasonId == seasonId.Value || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate));
-                }
-                else
-                {
-                    allEventsQuery = allEventsQuery.Where(e => e.SeasonId == seasonId.Value);
-                }
-            }
-
-            var allEvents = await allEventsQuery
-                .Select(e => new { e.Id, e.Level })
-                .ToDictionaryAsync(e => e.Id, e => e.Level, cancellationToken);
-            
-            var eventIds = allEvents.Keys.ToList();
-
-            // 2. Achievements
-            var chessAch = await _dbContext.ChessEventParticipants.Include(p => p.Tournament).Where(p => playerIds.Contains(p.PlayerId) && eventIds.Contains(p.TournamentId)).ToListAsync(cancellationToken);
-            var checkersAch = await _dbContext.CheckersEventParticipants.Include(p => p.Event).Where(p => playerIds.Contains(p.PlayerId) && eventIds.Contains(p.TournamentId)).ToListAsync(cancellationToken);
-            var ttAch = await _dbContext.TableTennisEventParticipants.Include(p => p.Tournament).Where(p => playerIds.Contains(p.PlayerId) && eventIds.Contains(p.TournamentId)).ToListAsync(cancellationToken);
-            var badmintonAch = await _dbContext.BadmintonEventParticipants.Include(p => p.Event).Where(p => playerIds.Contains(p.PlayerId) && eventIds.Contains(p.EventId)).ToListAsync(cancellationToken);
-            var armwAch = await _dbContext.ArmwrestlingEventParticipants.Include(p => p.Tournament).Where(p => playerIds.Contains(p.PlayerId) && eventIds.Contains(p.TournamentId)).ToListAsync(cancellationToken);
-            
-            var genericWinners = await _dbContext.Set<Event>()
-                .Where(e => eventIds.Contains(e.Id) && 
-                            ((e.FirstPlaceId.HasValue && playerIds.Contains(e.FirstPlaceId.Value)) || 
-                             (e.SecondPlaceId.HasValue && playerIds.Contains(e.SecondPlaceId.Value)) || 
-                             (e.ThirdPlaceId.HasValue && playerIds.Contains(e.ThirdPlaceId.Value))))
-                .ToListAsync(cancellationToken);
-
-            var futsalTeams = await _dbContext.FutsalTeams.Include(t => t.Event).Include(t => t.Players).Where(t => eventIds.Contains(t.EventId) && t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
-            var volleyballTeams = await _dbContext.VolleyballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => eventIds.Contains(t.EventId) && t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
-            var bballTeams = await _dbContext.Basketball3x3Teams.Include(t => t.Event).Include(t => t.Players).Where(t => eventIds.Contains(t.EventId) && t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
-            var beachVTeams = await _dbContext.BeachVolleyballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => eventIds.Contains(t.EventId) && t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
-            var ttTeams = await _dbContext.TableTennisTeams.Include(t => t.Event).Include(t => t.Players).Where(t => eventIds.Contains(t.EventId) && t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
-            var badTeams = await _dbContext.BadmintonTeams.Include(t => t.Event).Where(t => t.EventId != null && eventIds.Contains(t.EventId.Value) && ((t.Player1Id != null && playerIds.Contains(t.Player1Id.Value)) || (t.Player2Id != null && playerIds.Contains(t.Player2Id.Value)))).ToListAsync(cancellationToken);
-            // 3. Match Stats
-            var cwS = await _dbContext.ChessGames.Where(g => eventIds.Contains(g.TournamentId) && g.WhitePlayerId.HasValue && playerIds.Contains(g.WhitePlayerId.Value)).GroupBy(g => g.WhitePlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.WhiteWin) }).ToListAsync(cancellationToken);
-            var cbS = await _dbContext.ChessGames.Where(g => eventIds.Contains(g.TournamentId) && g.BlackPlayerId.HasValue && playerIds.Contains(g.BlackPlayerId.Value)).GroupBy(g => g.BlackPlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.BlackWin) }).ToListAsync(cancellationToken);
-            var chwS = await _dbContext.CheckersGames.Where(g => eventIds.Contains(g.TournamentId) && g.WhitePlayerId.HasValue && playerIds.Contains(g.WhitePlayerId.Value)).GroupBy(g => g.WhitePlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.WhiteWin) }).ToListAsync(cancellationToken);
-            var chbS = await _dbContext.CheckersGames.Where(g => eventIds.Contains(g.TournamentId) && g.BlackPlayerId.HasValue && playerIds.Contains(g.BlackPlayerId.Value)).GroupBy(g => g.BlackPlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.BlackWin) }).ToListAsync(cancellationToken);
-            var tt1S = await _dbContext.TableTennisMatches.Where(g => eventIds.Contains(g.TournamentId) && g.Player1Id.HasValue && playerIds.Contains(g.Player1Id.Value)).GroupBy(g => g.Player1Id!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
-            var tt2S = await _dbContext.TableTennisMatches.Where(g => eventIds.Contains(g.TournamentId) && g.Player2Id.HasValue && playerIds.Contains(g.Player2Id.Value)).GroupBy(g => g.Player2Id!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
-
-            var arm1S = await _dbContext.ArmwrestlingMatches.Where(g => eventIds.Contains(g.EventId) && playerIds.Contains(g.Player1Id)).GroupBy(g => g.Player1Id).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
-            var arm2S = await _dbContext.ArmwrestlingMatches.Where(g => eventIds.Contains(g.EventId) && playerIds.Contains(g.Player2Id)).GroupBy(g => g.Player2Id).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
-            var bad1S = await _dbContext.BadmintonMatches.Where(g => eventIds.Contains(g.EventId) && g.Player1Id != null && playerIds.Contains(g.Player1Id.Value)).GroupBy(g => g.Player1Id).Select(g => new { Id = g.Key!.Value, Count = g.Count(), Wins = g.Count(x => x.WinnerPlayerId == g.Key) }).ToListAsync(cancellationToken);
-            var bad2S = await _dbContext.BadmintonMatches.Where(g => eventIds.Contains(g.EventId) && g.Player2Id != null && playerIds.Contains(g.Player2Id.Value)).GroupBy(g => g.Player2Id).Select(g => new { Id = g.Key!.Value, Count = g.Count(), Wins = g.Count(x => x.WinnerPlayerId == g.Key) }).ToListAsync(cancellationToken);
-            
-            var goalsS = await _dbContext.FutsalGoals
-                .Include(g => g.Match)
-                    .ThenInclude(m => m.Event)
-                .Where(g => playerIds.Contains(g.PlayerId) && g.Match != null && eventIds.Contains(g.Match.EventId))
-                .GroupBy(g => g.PlayerId)
-                .Select(g => new { Id = g.Key, Goals = g.Sum(x => x.GoalsCount) })
-                .ToListAsync(cancellationToken);
-
-            var playerDtos = new List<PlayerDto>();
-
-            foreach (var player in players)
-            {
-                var dto = player.ToDto();
-                var armwrestlingWeightClasses = new HashSet<PolytechLeague.Domain.Entities.Armwrestling.Enums.ArmwrestlingWeightClass>();
-                
-                // Infer weight class from player's weight if not set
-                if (player.ArmwrestlingWeight.HasValue)
-                {
-                    var inferredClass = player.ArmwrestlingWeight.Value switch
-                    {
-                        <= 60 => ArmwrestlingWeightClass.Under60kg,
-                        <= 70 => ArmwrestlingWeightClass.Under70kg,
-                        <= 80 => ArmwrestlingWeightClass.Under80kg,
-                        <= 90 => ArmwrestlingWeightClass.Under90kg,
-                        _ => ArmwrestlingWeightClass.Plus90kg
-                    };
-                    
-                    armwrestlingWeightClasses.Add(inferredClass);
-                    if (!dto.ArmwrestlingPreferredWeightClass.HasValue)
-                    {
-                        dto.ArmwrestlingPreferredWeightClass = inferredClass;
-                    }
-                }
-
-                var playerId = player.Id;
-                var achievements = new List<AchievementDto>();
-                var sportTypes = new HashSet<string>();
-
-                foreach (var a in chessAch.Where(x => x.PlayerId == playerId && x.Tournament != null)) {
-                    achievements.Add(new AchievementDto { TournamentName = a.Tournament!.Name, SportType = "chess", Date = a.Tournament.Date, Rank = a.Rank, TournamentId = a.TournamentId, Result = GetResultLabel(a.Rank) });
-                    sportTypes.Add("chess");
-                }
-                foreach (var a in checkersAch.Where(x => x.PlayerId == playerId && x.Event != null)) {
-                    achievements.Add(new AchievementDto { TournamentName = a.Event!.Name, SportType = "checkers", Date = a.Event.Date, Rank = a.Rank, TournamentId = a.TournamentId, Result = GetResultLabel(a.Rank) });
-                    sportTypes.Add("checkers");
-                }
-                foreach (var a in ttAch.Where(x => x.PlayerId == playerId && x.Tournament != null)) {
-                    achievements.Add(new AchievementDto { TournamentName = a.Tournament!.Name, SportType = "table_tennis", Date = a.Tournament.Date, Rank = a.Rank, TournamentId = a.TournamentId, Result = GetResultLabel(a.Rank) });
-                    sportTypes.Add("table_tennis");
-                }
-                foreach (var a in badmintonAch.Where(x => x.PlayerId == playerId && x.Event != null)) {
-                    achievements.Add(new AchievementDto { TournamentName = a.Event!.Name, SportType = "badminton", Date = a.Event.Date, Rank = a.Rank, TournamentId = a.EventId, Result = GetResultLabel(a.Rank) });
-                    sportTypes.Add("badminton");
-                }
-                foreach (var a in armwAch.Where(x => x.PlayerId == playerId && x.Tournament != null)) {
-                    achievements.Add(new AchievementDto { TournamentName = a.Tournament!.Name, SportType = "armwrestling", Date = a.Tournament.Date, Rank = a.Rank, TournamentId = a.TournamentId, Result = GetResultLabel(a.Rank) });
-                    sportTypes.Add("armwrestling");
-                    
-                    var wc = a.Tournament!.WeightClass;
-                    armwrestlingWeightClasses.Add(wc);
-                    
-                    if (!dto.ArmwrestlingPreferredWeightClass.HasValue)
-                    {
-                        dto.ArmwrestlingPreferredWeightClass = wc;
-                    }
-                }
-                foreach (var e in genericWinners.Where(x => x.FirstPlaceId == playerId || x.SecondPlaceId == playerId || x.ThirdPlaceId == playerId)) {
-                    int r = (e.FirstPlaceId == playerId) ? 1 : ((e.SecondPlaceId == playerId) ? 2 : 3);
-                    
-                    string sportType = e switch {
-                        ChessEvent => "chess",
-                        CheckersEvent => "checkers",
-                        FutsalEvent => "futsal",
-                        VolleyballEvent => "volleyball",
-                        Basketball3x3Event => "basketball_3x3",
-                        BeachVolleyballEvent => "beach_volleyball",
-                        ArmwrestlingEvent => "armwrestling",
-                        TableTennisEvent => "table_tennis",
-                        BadmintonEvent => "badminton",
-                        _ => "other"
-                    };
-
-                    if (!achievements.Any(a => a.TournamentId == e.Id && a.SportType == sportType))
-                    {
-                        achievements.Add(new AchievementDto { TournamentName = e.Name, SportType = sportType, Date = e.Date, Rank = r, TournamentId = e.Id, Result = GetResultLabel(r) });
-                        sportTypes.Add(sportType);
-                    }
-                    
-                    if (e is ArmwrestlingEvent armwEvent)
-                    {
-                        armwrestlingWeightClasses.Add(armwEvent.WeightClass);
-                        if (!dto.ArmwrestlingPreferredWeightClass.HasValue)
-                        {
-                            dto.ArmwrestlingPreferredWeightClass = armwEvent.WeightClass;
-                        }
-                    }
-                }
-
-                // Team Sports
-                foreach (var t in futsalTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
-                    int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "futsal", Date = t.Event.Date, Rank = r, TournamentId = t.EventId, Result = GetResultLabel(r), IsCaptain = t.CaptainId == playerId });
-                    sportTypes.Add("futsal");
-                }
-                foreach (var t in volleyballTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
-                    int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "volleyball", Date = t.Event.Date, Rank = r, TournamentId = t.EventId, Result = GetResultLabel(r) });
-                    sportTypes.Add("volleyball");
-                }
-                foreach (var t in bballTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
-                    int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "basketball_3x3", Date = t.Event.Date, Rank = r, TournamentId = t.EventId, Result = GetResultLabel(r) });
-                    sportTypes.Add("basketball_3x3");
-                }
-                foreach (var t in beachVTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
-                    int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "beach_volleyball", Date = t.Event.Date, Rank = r, TournamentId = t.EventId, Result = GetResultLabel(r) });
-                    sportTypes.Add("beach_volleyball");
-                }
-                foreach (var t in ttTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
-                    int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "table_tennis", Date = t.Event.Date, Rank = r, TournamentId = t.EventId, Result = GetResultLabel(r) });
-                    sportTypes.Add("table_tennis");
-                }
-                foreach (var t in badTeams.Where(x => (x.Player1Id == playerId || x.Player2Id == playerId) && x.Event != null && x.EventId.HasValue)) {
-                    int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "badminton", Date = t.Event.Date, Rank = r, TournamentId = t.EventId!.Value, Result = GetResultLabel(r) });
-                    sportTypes.Add("badminton");
-                }
-
-                dto.Achievements = achievements;
-                dto.Sports = sportTypes.ToList();
-                dto.ArmwrestlingWeightClasses = armwrestlingWeightClasses.ToList();
-                dto.CompetitionsCount = achievements.Select(a => a.TournamentId).Distinct().Count();
-
-                // Stats
-                int played = 0, won = 0;
-                double totalScore = 0;
-                var sportStatsMap = new Dictionary<string, SportStatsDto>();
-                var pointsBreakdown = new List<PointEntryDto>();
-                foreach (var sport in sportTypes) sportStatsMap[sport] = new SportStatsDto { SportType = sport };
-
-                foreach (var ach in achievements) {
-                    double pts = 0;
-                    double mult = 1.0;
-                    string levelName = "РњС–Р¶РіСЂСѓРїРѕРІС–";
-                    
-                    if (allEvents.TryGetValue(ach.TournamentId, out var lvl)) {
-                        if (levelMultipliers.TryGetValue(lvl, out var m)) mult = m;
-                        levelName = lvl switch {
-                            CompetitionLevel.Regional => "РћР±Р»Р°СЃРЅС–",
-                            CompetitionLevel.National => "Р’СЃРµСѓРєСЂР°С—РЅСЃСЊРєС–",
-                            _ => "РњС–Р¶РіСЂСѓРїРѕРІС–"
-                        };
-                        
-                        // Participation points ONLY for CollegeGroup level
-                        if (lvl == CompetitionLevel.CollegeGroup) {
-                            pts = 10;
-                        }
-                    } else {
-                        // Fallback if event level is unknown
-                        pts = 10; 
-                    }
-
-                    if (ach.Rank == 1) pts += 100;
-                    else if (ach.Rank == 2) pts += 50;
-                    else if (ach.Rank == 3) pts += 30;
-                    
-                    if (pts <= 0) continue;
-                    var finalPts = (int)Math.Round(pts * mult);
-                    totalScore += finalPts;
-                    if (sportStatsMap.TryGetValue(ach.SportType, out var s)) s.PerformanceScore += finalPts;
-                    
-                    pointsBreakdown.Add(new PointEntryDto {
-                        Description = ach.Rank > 0 
-                            ? $"{ach.Rank} РјС–СЃС†Рµ: {ach.TournamentName} ({levelName})" 
-                            : $"РЈС‡Р°СЃС‚СЊ: {ach.TournamentName} ({levelName})",
-                        Points = finalPts,
-                        Category = "Achievements",
-                        SportType = ach.SportType
-                    });
-                }
-
-                void AddStats(string sport, int p, int w) {
-                    played += p; won += w;
-                    if (p > 0) {
-                        sportTypes.Add(sport);
-                        if (!sportStatsMap.ContainsKey(sport)) sportStatsMap[sport] = new SportStatsDto { SportType = sport };
-                        var s = sportStatsMap[sport];
-                        s.MatchesPlayed += p; s.WinsCount += w;
-                        
-                        int matchPts = 0; // Removed participation points
-                        int winPts = w * 2;
-                        int totalPts = matchPts + winPts;
-                        
-                        s.PerformanceScore += totalPts; 
-                        totalScore += totalPts;
-                        
-                        string sportName = sport switch {
-                            "chess" => "РЁР°С…Рё", "checkers" => "РЁР°С€РєРё", "table_tennis" => "РќР°СЃС‚С–Р»СЊРЅРёР№ С‚РµРЅС–СЃ",
-                            "armwrestling" => "РђСЂРјСЂРµСЃС‚Р»РёРЅРі", "badminton" => "Р‘Р°РґРјС–РЅС‚РѕРЅ", _ => sport
-                        };
-                        
-                        if (winPts > 0) pointsBreakdown.Add(new PointEntryDto { Description = $"РџРµСЂРµРјРѕРіРё ({sportName}): {w} С–РіРѕСЂ", Points = winPts, Category = "Activity", SportType = sport });
-                    }
-                }
-
-                var cw = cwS.FirstOrDefault(x => x.Id == playerId);
-                var cb = cbS.FirstOrDefault(x => x.Id == playerId);
-                var chw = chwS.FirstOrDefault(x => x.Id == playerId);
-                var chb = chbS.FirstOrDefault(x => x.Id == playerId);
-                var t1 = tt1S.FirstOrDefault(x => x.Id == playerId);
-                var t2 = tt2S.FirstOrDefault(x => x.Id == playerId);
-                var a1 = arm1S.FirstOrDefault(x => x.Id == playerId);
-                var a2 = arm2S.FirstOrDefault(x => x.Id == playerId);
-                var b1 = bad1S.FirstOrDefault(x => x.Id == playerId);
-                var b2 = bad2S.FirstOrDefault(x => x.Id == playerId);
-
-                AddStats("chess", (cw?.Count ?? 0) + (cb?.Count ?? 0), (cw?.Wins ?? 0) + (cb?.Wins ?? 0));
-                AddStats("checkers", (chw?.Count ?? 0) + (chb?.Count ?? 0), (chw?.Wins ?? 0) + (chb?.Wins ?? 0));
-                AddStats("table_tennis", (t1?.Count ?? 0) + (t2?.Count ?? 0), (t1?.Wins ?? 0) + (t2?.Wins ?? 0));
-                AddStats("armwrestling", (a1?.Count ?? 0) + (a2?.Count ?? 0), (a1?.Wins ?? 0) + (a2?.Wins ?? 0));
-                AddStats("badminton", (b1?.Count ?? 0) + (b2?.Count ?? 0), (b1?.Wins ?? 0) + (b2?.Wins ?? 0));
-                
-                // 4. Team Sport Stats & Goals
-                var pGoals = goalsS.FirstOrDefault(x => x.Id == playerId)?.Goals ?? 0;
-                if (pGoals > 0) {
-                    if (!sportStatsMap.ContainsKey("futsal")) sportStatsMap["futsal"] = new SportStatsDto { SportType = "futsal" };
-                    var s = sportStatsMap["futsal"];
-                    s.GoalsCount += pGoals;
-                    int goalPts = pGoals * 5;
-                    s.PerformanceScore += goalPts;
-                    totalScore += goalPts;
-                    
-                    pointsBreakdown.Add(new PointEntryDto { 
-                        Description = $"Р—Р°Р±РёС‚С– РіРѕР»Рё (Р¤СѓС‚Р·Р°Р»): {pGoals} РіРѕР»С–РІ", 
-                        Points = goalPts, 
-                        Category = "Goals",
-                        SportType = "futsal"
-                    });
-                }
-
-                dto.MatchesPlayed = played;
-                dto.WinsCount = won;
-                dto.GoalsScored = pGoals;
-                dto.PerformanceScore = (int)Math.Round(totalScore);
-                dto.SportStats = sportStatsMap.Values.ToList();
-                dto.PointsBreakdown = pointsBreakdown.OrderByDescending(x => x.Points).ToList();
-                
-                // Only add player to rankings if they have participated in at least one competition
-                if (achievements.Count > 0 || played > 0 || pGoals > 0)
-                {
-                    playerDtos.Add(dto);
-                }
-            }
-
-            var allRanked = playerDtos.OrderByDescending(p => p.PerformanceScore).ToList();
-            for (int i = 0; i < allRanked.Count; i++)
-            {
-                allRanked[i].GlobalRank = i + 1;
-            }
-
-            // Calculate sport-specific ranks
-            var allSportTypes = playerDtos.SelectMany(p => p.SportStats.Select(s => s.SportType)).Distinct().ToList();
-            foreach (var sport in allSportTypes)
-            {
-                var rankedForSport = playerDtos
-                    .Where(p => p.SportStats.Any(s => s.SportType == sport))
-                    .OrderByDescending(p => p.SportStats.First(s => s.SportType == sport).PerformanceScore)
-                    .ToList();
-
-                for (int i = 0; i < rankedForSport.Count; i++)
-                {
-                    var sportStat = rankedForSport[i].SportStats.First(s => s.SportType == sport);
-                    sportStat.Rank = i + 1;
-                }
-            }
-
-            _logger.LogInformation("Calculated rankings for {Count} players. First player: {Name} (Score: {Score}), Last player: {LastName} (Score: {LastScore})", 
-                allRanked.Count, 
-                allRanked.FirstOrDefault()?.LastName, 
-                allRanked.FirstOrDefault()?.PerformanceScore,
-                allRanked.LastOrDefault()?.LastName,
-                allRanked.LastOrDefault()?.PerformanceScore);
-
-            return allRanked;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error in GetAllWithRankingsAsync");
-            try { System.IO.File.WriteAllText("rankings_error.txt", ex.ToString()); } catch {}
-            return Enumerable.Empty<PlayerDto>();
-        }
-    }
-
-    private async Task PopulateAchievementsAsync(PlayerDto dto, CancellationToken cancellationToken)
-    {
-        if (dto.Id == null) return;
-        var playerId = dto.Id.Value;
-        var achievements = new List<AchievementDto>();
-
-        // 1. Chess
-        try {
-            var chessPerformances = await _dbContext.ChessEventParticipants
-                .Include(p => p.Tournament)
-                .Where(p => p.PlayerId == playerId)
-                .ToListAsync(cancellationToken);
-            
-            foreach (var p in chessPerformances) {
-                if (p.Tournament == null) continue;
-                int rank = p.Rank;
-                if (rank <= 0) {
-                    if (p.Tournament.FirstPlaceId == playerId) rank = 1;
-                    else if (p.Tournament.SecondPlaceId == playerId) rank = 2;
-                    else if (p.Tournament.ThirdPlaceId == playerId) rank = 3;
-                    else {
-                        rank = await _dbContext.ChessEventParticipants
-                            .Where(other => other.TournamentId == p.TournamentId && other.Points > p.Points)
-                            .CountAsync(cancellationToken) + 1;
-                    }
-                }
-                achievements.Add(new AchievementDto {
-                    TournamentName = p.Tournament.Name,
-                    SportType = "chess",
-                    Date = p.Tournament.Date,
-                    Rank = rank,
-                    TournamentId = p.TournamentId,
-                    Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ ({p.Points} РѕС‡РѕРє)" : $"{p.Points} РѕС‡РѕРє"
-                });
-            }
-        } catch (Exception ex) {
-            _logger.LogError(ex, "Error populating Chess achievements for player {PlayerId}", playerId);
-        }
-
-        // 2. Checkers
-        try {
-            var checkersPerformances = await _dbContext.CheckersEventParticipants
-                .Include(p => p.Event)
-                .Where(p => p.PlayerId == playerId)
-                .ToListAsync(cancellationToken);
-            
-            foreach (var p in checkersPerformances) {
-                if (p.Event == null) continue;
-                int rank = p.Rank;
-                if (rank <= 0) {
-                    if (p.Event.FirstPlaceId == playerId) rank = 1;
-                    else if (p.Event.SecondPlaceId == playerId) rank = 2;
-                    else if (p.Event.ThirdPlaceId == playerId) rank = 3;
-                    else {
-                        rank = await _dbContext.CheckersEventParticipants
-                            .Where(other => other.TournamentId == p.TournamentId && other.Points > p.Points)
-                            .CountAsync(cancellationToken) + 1;
-                    }
-                }
-                achievements.Add(new AchievementDto {
-                    TournamentName = p.Event.Name,
-                    SportType = "checkers",
-                    Date = p.Event.Date,
-                    Rank = rank,
-                    TournamentId = p.TournamentId,
-                    Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ ({p.Points} РѕС‡РѕРє)" : $"{p.Points} РѕС‡РѕРє"
-                });
-            }
-        } catch (Exception ex) {
-            _logger.LogError(ex, "Error populating Checkers achievements for player {PlayerId}", playerId);
-        }
-
-        // 3. Table Tennis
-        try {
-            var ttPerformances = await _dbContext.TableTennisEventParticipants
-                .Include(p => p.Tournament)
-                .Where(p => p.PlayerId == playerId)
-                .ToListAsync(cancellationToken);
-            
-            foreach (var p in ttPerformances) {
-                if (p.Tournament == null) continue;
-                int rank = p.Rank;
-                if (rank <= 0) {
-                    if (p.Tournament.FirstPlaceId == playerId) rank = 1;
-                    else if (p.Tournament.SecondPlaceId == playerId) rank = 2;
-                    else if (p.Tournament.ThirdPlaceId == playerId) rank = 3;
-                    else {
-                        rank = await _dbContext.TableTennisEventParticipants
-                            .Where(other => other.TournamentId == p.TournamentId && other.Points > p.Points)
-                            .CountAsync(cancellationToken) + 1;
-                    }
-                }
-                achievements.Add(new AchievementDto {
-                    TournamentName = p.Tournament.Name,
-                    SportType = "table_tennis",
-                    Date = p.Tournament.Date,
-                    Rank = rank,
-                    TournamentId = p.TournamentId,
-                    Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ" : "РЈС‡Р°СЃРЅРёРє"
-                });
-            }
-        } catch (Exception ex) {
-            _logger.LogError(ex, "Error populating Table Tennis achievements for player {PlayerId}", playerId);
-        }
-
-        // 4. Badminton
-        try {
-            var badmintonPerformances = await _dbContext.BadmintonEventParticipants
-                .Include(p => p.Event)
-                .Where(p => p.PlayerId == playerId)
-                .ToListAsync(cancellationToken);
-            
-            foreach (var p in badmintonPerformances) {
-                if (p.Event == null) continue;
-                int rank = p.Rank;
-                if (rank <= 0) {
-                    if (p.Event.FirstPlaceId == playerId) rank = 1;
-                    else if (p.Event.SecondPlaceId == playerId) rank = 2;
-                    else if (p.Event.ThirdPlaceId == playerId) rank = 3;
-                    else {
-                        rank = await _dbContext.BadmintonEventParticipants
-                            .Where(other => other.EventId == p.EventId && other.Points > p.Points)
-                            .CountAsync(cancellationToken) + 1;
-                    }
-                }
-                achievements.Add(new AchievementDto {
-                    TournamentName = p.Event.Name,
-                    SportType = "badminton",
-                    Date = p.Event.Date,
-                    Rank = rank,
-                    TournamentId = p.EventId,
-                    Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ" : "РЈС‡Р°СЃРЅРёРє"
-                });
-            }
-        } catch (Exception ex) {
-            _logger.LogError(ex, "Error populating Badminton achievements for player {PlayerId}", playerId);
-        }
-
-        // 5. Armwrestling & Generic Individual Winners
-        try {
-            var armwPerformances = await _dbContext.ArmwrestlingEventParticipants
-                .Include(p => p.Tournament)
-                .Where(p => p.PlayerId == playerId)
-                .ToListAsync(cancellationToken);
-
-            foreach (var p in armwPerformances) {
-                if (p.Tournament == null) continue;
-                int rank = p.Rank;
-                achievements.Add(new AchievementDto {
-                    TournamentName = p.Tournament.Name,
-                    SportType = "armwrestling",
-                    Date = p.Tournament.Date,
-                    Rank = rank,
-                    TournamentId = p.TournamentId,
-                    Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ" : "РЈС‡Р°СЃРЅРёРє"
-                });
-            }
-
-            var genericWinners = await _dbContext.Set<Event>()
-                .Where(e => e.FirstPlaceId == playerId || e.SecondPlaceId == playerId || e.ThirdPlaceId == playerId)
-                .ToListAsync(cancellationToken);
-
-            foreach (var e in genericWinners) {
-                if (achievements.Any(a => a.TournamentId == e.Id && a.SportType == "armwrestling")) continue;
-                int rank = e.FirstPlaceId == playerId ? 1 : (e.SecondPlaceId == playerId ? 2 : 3);
-                string sport = e is ArmwrestlingEvent ? "armwrestling" : "individual";
-                achievements.Add(new AchievementDto {
-                    TournamentName = e.Name,
-                    SportType = sport,
-                    Date = e.Date,
-                    Rank = rank,
-                    TournamentId = e.Id,
-                    Result = $"{rank} РјС–СЃС†Рµ"
-                });
-            }
-        } catch (Exception ex) {
-            _logger.LogError(ex, "Error populating Generic achievements for player {PlayerId}", playerId);
-        }
-
-        // 6. Team Sports (Futsal, Volleyball, etc.)
-        // Futsal
-        try {
-            var teams = await _dbContext.FutsalTeams
-                .Include(t => t.Event)
-                .Where(t => t.Players != null && t.Players.Any(pl => pl.Id == playerId))
-                .ToListAsync(cancellationToken);
-
-            foreach (var team in teams) {
-                if (team.Event == null) continue;
-                int rank = 0;
-                if (team.Id == team.Event.FirstPlaceTeamId) rank = 1;
-                else if (team.Id == team.Event.SecondPlaceTeamId) rank = 2;
-                else if (team.Id == team.Event.ThirdPlaceTeamId) rank = 3;
-                else {
-                    rank = await _dbContext.FutsalTeams
-                        .Where(others => others.EventId == team.EventId && others.Points > team.Points)
-                        .CountAsync(cancellationToken) + 1;
-                }
-                achievements.Add(new AchievementDto {
-                    TournamentName = team.Event.Name,
-                    SportType = "futsal",
-                    Date = team.Event.Date,
-                    Rank = rank,
-                    TournamentId = team.EventId,
-                    IsCaptain = team.CaptainId == playerId,
-                    Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ (РєРѕРјР°РЅРґР° {team.Name})" : $"РЈС‡Р°СЃРЅРёРє (РєРѕРјР°РЅРґР° {team.Name})"
-                });
-            }
-        } catch (Exception ex) {
-            _logger.LogError(ex, "Error populating Futsal achievements for player {PlayerId}", playerId);
-        }
-
-        // Other Team Sports (Volleyball, Basketball, Beach Volleyball)
-        try {
-            // Volleyball
-            var vTeams = await _dbContext.VolleyballTeams
-                .Include(t => t.Event)
-                .Where(t => t.Players != null && t.Players.Any(pl => pl.Id == playerId))
-                .ToListAsync(cancellationToken);
-            foreach (var t in vTeams) {
-                if (t.Event == null) continue;
-                int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "volleyball", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId, Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ ({t.Name})" : $"РЈС‡Р°СЃРЅРёРє ({t.Name})" });
-            }
-
-            // Basketball 3x3
-            var bTeams = await _dbContext.Basketball3x3Teams
-                .Include(t => t.Event)
-                .Where(t => t.Players != null && t.Players.Any(pl => pl.Id == playerId))
-                .ToListAsync(cancellationToken);
-            foreach (var t in bTeams) {
-                if (t.Event == null) continue;
-                int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "basketball_3x3", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId, Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ ({t.Name})" : $"РЈС‡Р°СЃРЅРёРє ({t.Name})" });
-            }
-
-            // Beach Volleyball
-            var bvTeams = await _dbContext.BeachVolleyballTeams
-                .Include(t => t.Event)
-                .Where(t => t.Players != null && t.Players.Any(pl => pl.Id == playerId))
-                .ToListAsync(cancellationToken);
-            foreach (var t in bvTeams) {
-                if (t.Event == null) continue;
-                int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "beach_volleyball", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId, Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ ({t.Name})" : $"РЈС‡Р°СЃРЅРёРє ({t.Name})" });
-            }
-
-            // Table Tennis Teams
-            var ttTeams = await _dbContext.TableTennisTeams
-                .Include(t => t.Event)
-                .Where(t => t.Players != null && t.Players.Any(pl => pl.Id == playerId))
-                .ToListAsync(cancellationToken);
-            foreach (var t in ttTeams) {
-                if (t.Event == null) continue;
-                int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "table_tennis", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId, Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ ({t.Name})" : $"РЈС‡Р°СЃРЅРёРє ({t.Name})" });
-            }
-
-            // Badminton Teams
-            var badTeams = await _dbContext.BadmintonTeams
-                .Include(t => t.Event)
-                .Where(t => t.Player1Id == playerId || t.Player2Id == playerId)
-                .ToListAsync(cancellationToken);
-            foreach (var t in badTeams) {
-                if (t.Event == null || !t.EventId.HasValue) continue;
-                int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "badminton", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId.Value, Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ ({t.Name})" : $"РЈС‡Р°СЃРЅРёРє ({t.Name})" });
-            }
-        } catch (Exception ex) {
-            _logger.LogError(ex, "Error populating other team achievements for player {PlayerId}", playerId);
-        }
-
-        dto.Achievements = achievements.OrderByDescending(a => a.Date).ToList();
-        dto.CompetitionsCount = achievements.Select(a => a.TournamentId).Distinct().Count();
-    }
-
-    private async Task PopulateStatsAsync(PlayerDto dto, CancellationToken cancellationToken)
-    {
-        if (dto.Id == null) return;
-        var playerId = dto.Id.Value;
-        var pointsBreakdown = new List<PointEntryDto>();
-        double totalScore = 0;
-
-        // 1. Achievements Points (from previously populated Achievements list)
-        var levelMultipliers = new Dictionary<CompetitionLevel, double> {
-            { CompetitionLevel.CollegeGroup, 1.0 },
-            { CompetitionLevel.Regional, 2.5 },
-            { CompetitionLevel.National, 5.0 }
-        };
-
-        var eventIds = dto.Achievements.Select(a => a.TournamentId).Distinct().ToList();
-        var eventLevels = await _dbContext.Set<Event>()
-            .Where(e => eventIds.Contains(e.Id))
-            .Select(e => new { e.Id, e.Level })
-            .ToDictionaryAsync(e => e.Id, e => e.Level, cancellationToken);
-
-        foreach (var ach in dto.Achievements) {
-            double basePts = (ach.Rank == 1) ? 100 : (ach.Rank == 2 ? 50 : (ach.Rank == 3 ? 30 : 0));
-            if (basePts <= 0) continue;
-
-            double mult = 1.0;
-            string levelName = "РњС–Р¶РіСЂСѓРїРѕРІС–";
-            if (eventLevels.TryGetValue(ach.TournamentId, out var lvl)) {
-                if (levelMultipliers.TryGetValue(lvl, out var m)) mult = m;
-                levelName = lvl switch {
-                    CompetitionLevel.Regional => "РћР±Р»Р°СЃРЅС–",
-                    CompetitionLevel.National => "Р’СЃРµСѓРєСЂР°С—РЅСЃСЊРєС–",
-                    _ => "РњС–Р¶РіСЂСѓРїРѕРІС–"
-                };
-            }
-
-            int finalPts = (int)Math.Round(basePts * mult);
-            totalScore += finalPts;
-            pointsBreakdown.Add(new PointEntryDto {
-                Description = $"{ach.Rank} РјС–СЃС†Рµ: {ach.TournamentName} ({levelName})",
-                Points = finalPts,
-                Category = "Achievements"
-            });
-        }
-
-        // 2. Individual Matches Played & Wins
-        int chessMatches = await _dbContext.ChessGames.CountAsync(g => g.WhitePlayerId == playerId || g.BlackPlayerId == playerId, cancellationToken);
-        int chessWins = await _dbContext.ChessGames.CountAsync(g => (g.WhitePlayerId == playerId && g.Result == GameResult.WhiteWin) || (g.BlackPlayerId == playerId && g.Result == GameResult.BlackWin), cancellationToken);
-        
-        int checkersMatches = await _dbContext.CheckersGames.CountAsync(g => g.WhitePlayerId == playerId || g.BlackPlayerId == playerId, cancellationToken);
-        int checkersWins = await _dbContext.CheckersGames.CountAsync(g => (g.WhitePlayerId == playerId && g.Result == GameResult.WhiteWin) || (g.BlackPlayerId == playerId && g.Result == GameResult.BlackWin), cancellationToken);
-        
-        int ttMatches = await _dbContext.TableTennisMatches.CountAsync(g => g.Player1Id == playerId || g.Player2Id == playerId, cancellationToken);
-        int ttWins = await _dbContext.TableTennisMatches.CountAsync(g => g.WinnerId == playerId, cancellationToken);
-        
-        int armMatches = await _dbContext.ArmwrestlingMatches.CountAsync(g => g.Player1Id == playerId || g.Player2Id == playerId, cancellationToken);
-        int armWins = await _dbContext.ArmwrestlingMatches.CountAsync(g => g.WinnerId == playerId, cancellationToken);
-        
-        int badMatches = await _dbContext.BadmintonMatches.CountAsync(g => g.Player1Id == playerId || g.Player2Id == playerId, cancellationToken);
-        int badWins = await _dbContext.BadmintonMatches.CountAsync(g => g.WinnerPlayerId == playerId, cancellationToken);
-
-        void AddActivityStats(string sportName, int p, int w) {
-            if (p <= 0) return;
-            int pts = (w * 2);
-            totalScore += pts;
-            if (w > 0) pointsBreakdown.Add(new PointEntryDto { Description = $"РџРµСЂРµРјРѕРіРё ({sportName}): {w} С–РіРѕСЂ", Points = w * 2, Category = "Activity" });
-        }
-
-        AddActivityStats("РЁР°С…Рё", chessMatches, chessWins);
-        AddActivityStats("РЁР°С€РєРё", checkersMatches, checkersWins);
-        AddActivityStats("РќР°СЃС‚С–Р»СЊРЅРёР№ С‚РµРЅС–СЃ", ttMatches, ttWins);
-        AddActivityStats("РђСЂРјСЂРµСЃС‚Р»РёРЅРі", armMatches, armWins);
-        AddActivityStats("Р‘Р°РґРјС–РЅС‚РѕРЅ", badMatches, badWins);
-
-        dto.MatchesPlayed = chessMatches + checkersMatches + ttMatches + armMatches + badMatches;
-        dto.WinsCount = chessWins + checkersWins + ttWins + armWins + badWins;
-
-        // 3. Futsal Goals
-        int futsalGoals = await _dbContext.FutsalGoals
-            .Where(g => g.PlayerId == playerId)
-            .SumAsync(g => (int?)g.GoalsCount ?? 0, cancellationToken);
-        
-        if (futsalGoals > 0) {
-            int goalPts = futsalGoals * 5;
-            totalScore += goalPts;
-            pointsBreakdown.Add(new PointEntryDto { 
-                Description = $"Р—Р°Р±РёС‚С– РіРѕР»Рё (Р¤СѓС‚Р·Р°Р»): {futsalGoals} РіРѕР»С–РІ", 
-                Points = goalPts, 
-                Category = "Goals" 
-            });
-        }
-        
-        dto.GoalsScored = futsalGoals;
-        dto.PerformanceScore = (int)Math.Round(totalScore);
-        dto.PointsBreakdown = pointsBreakdown.OrderByDescending(x => x.Points).ToList();
-    }
-
+﻿﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using PolytechLeague.Application.Dto.GeneralDto;
+using PolytechLeague.Application.Services.Interfaces;
+using PolytechLeague.Domain.Entities;
+using PolytechLeague.Persistence.Database;
+using PolytechLeague.Domain.Entities.Chess;
+using PolytechLeague.Domain.Entities.Checkers;
+using PolytechLeague.Domain.Entities.TableTennis;
+using PolytechLeague.Domain.Entities.Badminton;
+using PolytechLeague.Domain.Entities.Armwrestling;
+using PolytechLeague.Domain.Entities.Armwrestling.Enums;
+using PolytechLeague.Domain.Entities.Futsal;
+using PolytechLeague.Domain.Entities.Volleyball;
+using PolytechLeague.Domain.Entities.Basketball3x3;
+using PolytechLeague.Domain.Entities.BeachVolleyball;
+using PolytechLeague.Domain.Entities.Shared;
+using PolytechLeague.Application.Utilities;
+
+namespace PolytechLeague.Application.Services.Implementations.General;
+
+public class PlayerService : IPlayerService
+{
+    private readonly ApplicationDbContext _dbContext;
+    private readonly ILogger<PlayerService> _logger;
+    private readonly INotificationService _notificationService;
+
+    public PlayerService(ApplicationDbContext dbContext, ILogger<PlayerService> logger, INotificationService notificationService)
+    {
+        _dbContext = dbContext;
+        _logger = logger;
+        _notificationService = notificationService;
+    }
+
+    public async Task<IEnumerable<PlayerDto>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        var players = await _dbContext.Players
+            .Include(p => p.User)
+            .Where(p => p.User == null || p.User.Role != UserRole.Admin)
+            .ToListAsync(cancellationToken);
+        return players.Select(p => p.ToDto());
+    }
+
+    public async Task<PlayerDto?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
+    {
+        var allWithRankings = await GetAllWithRankingsAsync(null, cancellationToken);
+        var ranked = allWithRankings.FirstOrDefault(p => p.Id == id);
+        if (ranked != null) { await PopulateAutomaticBadgesAsync(ranked, cancellationToken); return ranked; }
+
+        // Fallback for players not in rankings (Admins, External)
+        var player = await _dbContext.Players
+            .Include(p => p.User)
+            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+            
+        if (player == null) return null;
+        var dto = player.ToDto();
+        await PopulateAchievementsAsync(dto, cancellationToken); await PopulateAutomaticBadgesAsync(dto, cancellationToken);
+        return dto;
+    }
+
+    public async Task<string?> GetPhotoUrlByUserIdAsync(long userId, CancellationToken cancellationToken = default)
+    {
+        var player = await _dbContext.Players
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
+            
+        return player?.PhotoUrl;
+    }
+
+    public async Task<PlayerDto?> GetByUserIdAsync(long userId, CancellationToken cancellationToken = default)
+    {
+        var allWithRankings = await GetAllWithRankingsAsync(null, cancellationToken);
+        var ranked = allWithRankings.FirstOrDefault(p => p.UserId == userId);
+        if (ranked != null) { await PopulateAutomaticBadgesAsync(ranked, cancellationToken); return ranked; }
+
+        // Fallback for players not in rankings (Admins, External)
+        var player = await _dbContext.Players
+            .Include(p => p.User)
+            .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
+            
+        if (player == null) return null;
+        var dto = player.ToDto();
+        await PopulateAchievementsAsync(dto, cancellationToken); await PopulateAutomaticBadgesAsync(dto, cancellationToken);
+        return dto;
+    }
+
+    public async Task<PlayerDto> CreateAsync(PlayerDto dto, CancellationToken cancellationToken = default)
+    {
+        // Cleanup names
+        dto.FirstName = dto.FirstName?.Replace(",", "").Trim();
+        dto.LastName = dto.LastName?.Replace(",", "").Trim();
+
+        // Try to prevent duplicates if specialty and enrollment year are provided or can be parsed
+        if (dto.EnrollmentYear == 0 && !string.IsNullOrEmpty(dto.Group))
+        {
+            var parsed = GroupUtility.ParseGroup(dto.Group, DateTime.Now);
+            dto.SpecialtyCode = parsed.specialty;
+            dto.EnrollmentYear = parsed.enrollmentYear;
+            dto.GroupNumber = parsed.groupNumber;
+        }
+
+        if (dto.EnrollmentYear > 0)
+        {
+            var existing = await _dbContext.Players
+                .FirstOrDefaultAsync(p => p.FirstName.ToLower() == dto.FirstName!.ToLower() && 
+                                          p.LastName.ToLower() == dto.LastName!.ToLower() &&
+                                          p.SpecialtyCode == dto.SpecialtyCode &&
+                                          p.EnrollmentYear == dto.EnrollmentYear, cancellationToken);
+            
+            if (existing != null)
+            {
+                _logger.LogInformation("Found existing player {PlayerId} for {Name} in group {Group}", existing.Id, dto.LastName, dto.Group);
+                return existing.ToDto();
+            }
+        }
+
+        var player = dto.FromDto();
+        
+        // Auto-populate group fields if not set but Group string is present
+        if (player.EnrollmentYear == 0 && !string.IsNullOrEmpty(player.Group))
+        {
+            var parsed = GroupUtility.ParseGroup(player.Group, DateTime.Now);
+            player.SpecialtyCode = parsed.specialty;
+            player.EnrollmentYear = parsed.enrollmentYear;
+            player.GroupNumber = parsed.groupNumber;
+        }
+
+        await _dbContext.Players.AddAsync(player, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return player.ToDto();
+    }
+
+    public async Task UpdateAsync(long id, PlayerDto dto, CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Updating player {Id}. DTO Bio: {Bio}, Instagram: {Instagram}", id, dto.Bio, dto.InstagramUrl);
+        
+        var player = await _dbContext.Players.FindAsync(new object[] { id }, cancellationToken);
+        if (player == null)
+        {
+            _logger.LogWarning("Player {Id} not found for update", id);
+            throw new KeyNotFoundException($"Player with ID {id} not found");
+        }
+
+        // Cleanup names
+        dto.FirstName = dto.FirstName?.Replace(",", "").Trim();
+        dto.LastName = dto.LastName?.Replace(",", "").Trim();
+
+        // Update basic info - only if provided (not null)
+        if (dto.FirstName != null && !string.IsNullOrWhiteSpace(dto.FirstName)) player.FirstName = dto.FirstName;
+        if (dto.Patronymic != null) player.Patronymic = dto.Patronymic;
+        if (dto.LastName != null && !string.IsNullOrWhiteSpace(dto.LastName)) player.LastName = dto.LastName;
+        
+        if (dto.Group != null) player.Group = dto.Group;
+        
+        // Handle StudentId: treat empty/whitespace as null to avoid unique index issues with multiple empty strings
+        if (dto.StudentId != null)
+        {
+            player.StudentId = string.IsNullOrWhiteSpace(dto.StudentId) ? null : dto.StudentId.Trim();
+        }
+        
+        if (dto.City != null) player.City = dto.City;
+        if (dto.UserId != null) player.UserId = dto.UserId;
+        if (dto.StudyYears != null) player.StudyYears = dto.StudyYears;
+        
+        _logger.LogInformation("Updating Bio for player {Id}. Old: {Old}, New: {New}", id, player.Bio, dto.Bio);
+        if (dto.Bio != null) player.Bio = dto.Bio; 
+        
+        _logger.LogInformation("Updating InstagramUrl for player {Id}. Old: {Old}, New: {New}", id, player.InstagramUrl, dto.InstagramUrl);
+        if (dto.InstagramUrl != null) player.InstagramUrl = dto.InstagramUrl;
+        if (dto.PreviousNames != null) player.PreviousNames = dto.PreviousNames;
+        
+        if (dto.PhotoUrl != null) player.PhotoUrl = dto.PhotoUrl;
+
+        // Sync name and photo to User entity if it exists
+        if (player.UserId.HasValue)
+        {
+            var user = await _dbContext.Users.FindAsync(new object[] { player.UserId.Value }, cancellationToken);
+            if (user != null)
+            {
+                user.FirstName = player.FirstName;
+                user.LastName = player.LastName;
+                user.PhotoUrl = player.PhotoUrl; // Sync photo URL
+                _dbContext.Users.Update(user);
+            }
+        }
+
+        // Explicitly mark player as updated to ensure TPT fields are saved
+        _dbContext.Players.Update(player);
+
+        // Update sport stats (only if provided in DTO)
+        if (dto.ChessRating.HasValue) player.ChessRating = dto.ChessRating;
+        if (dto.ChessFideId != null) player.ChessFideId = dto.ChessFideId;
+        if (dto.ChessTitle != null) player.ChessTitle = dto.ChessTitle;
+        if (dto.CheckersRating.HasValue) player.CheckersRating = dto.CheckersRating;
+        if (dto.TableTennisRating.HasValue) player.TableTennisRating = dto.TableTennisRating;
+        if (dto.TableTennisHand.HasValue) player.TableTennisHand = dto.TableTennisHand;
+        if (dto.ArmwrestlingWeight.HasValue) player.ArmwrestlingWeight = dto.ArmwrestlingWeight;
+        if (dto.ArmwrestlingPreferredWeightClass.HasValue) player.ArmwrestlingPreferredWeightClass = dto.ArmwrestlingPreferredWeightClass;
+        
+        // Update team stats
+        if (dto.FutsalPosition.HasValue) player.FutsalPosition = dto.FutsalPosition;
+        if (dto.FutsalShirtNumber.HasValue) player.FutsalShirtNumber = dto.FutsalShirtNumber;
+        if (dto.FutsalTeamId.HasValue) player.FutsalTeamId = dto.FutsalTeamId;
+        
+        if (dto.VolleyballPosition.HasValue) player.VolleyballPosition = dto.VolleyballPosition;
+        if (dto.VolleyballShirtNumber.HasValue) player.VolleyballShirtNumber = dto.VolleyballShirtNumber;
+        if (dto.VolleyballTeamId.HasValue) player.VolleyballTeamId = dto.VolleyballTeamId;
+
+        if (dto.BasketballShirtNumber.HasValue) player.BasketballShirtNumber = dto.BasketballShirtNumber;
+        if (dto.BasketballTeamId.HasValue) player.BasketballTeamId = dto.BasketballTeamId;
+
+        if (dto.BeachVolleyballShirtNumber.HasValue) player.BeachVolleyballShirtNumber = dto.BeachVolleyballShirtNumber;
+        if (dto.BeachVolleyballTeamId.HasValue) player.BeachVolleyballTeamId = dto.BeachVolleyballTeamId;
+
+        player.IsExternal = dto.IsExternal;
+
+        try 
+        {
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating player {PlayerId}: {Message}", id, ex.Message);
+            throw; // Re-throw to let the controller handle it (it will return 500 but now we have logs)
+        }
+
+    }
+
+    public async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
+    {
+        var player = await _dbContext.Players.FindAsync(new object[] { id }, cancellationToken);
+        if (player != null)
+        {
+            _dbContext.Players.Remove(player);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+    }
+
+    public async Task<IEnumerable<PlayerDto>> SearchAsync(string query, CancellationToken cancellationToken = default)
+    {
+        var lowerQuery = query.ToLower();
+        var players = await _dbContext.Players
+            .Include(p => p.User)
+            .Where(p => p.User == null || p.User.Role != UserRole.Admin)
+            .Where(p => p.FirstName.ToLower().Contains(lowerQuery) || 
+                        (p.Patronymic != null && p.Patronymic.ToLower().Contains(lowerQuery)) ||
+                        p.LastName.ToLower().Contains(lowerQuery) ||
+                        (p.PreviousNames != null && p.PreviousNames.ToLower().Contains(lowerQuery)) ||
+                        p.Group.ToLower().Contains(lowerQuery) ||
+                        (p.StudentId != null && p.StudentId.ToLower().Contains(lowerQuery)))
+            .ToListAsync(cancellationToken);
+        
+        // Also check if the query matches their calculated group name for other years
+        var allPlayers = await _dbContext.Players
+            .Include(p => p.User)
+            .Where(p => p.User == null || p.User.Role != UserRole.Admin)
+            .ToListAsync(cancellationToken);
+        var filtered = allPlayers.Where(p => 
+            p.FirstName.ToLower().Contains(lowerQuery) || 
+            (p.Patronymic != null && p.Patronymic.ToLower().Contains(lowerQuery)) ||
+            p.LastName.ToLower().Contains(lowerQuery) ||
+            (p.PreviousNames != null && p.PreviousNames.ToLower().Contains(lowerQuery)) ||
+            p.Group.ToLower().Contains(lowerQuery) ||
+            (p.EnrollmentYear > 0 && GroupUtility.GetCurrentGroupName(p.SpecialtyCode, p.EnrollmentYear, p.GroupNumber).ToLower().Contains(lowerQuery)) ||
+            (p.StudentId != null && p.StudentId.ToLower().Contains(lowerQuery))
+        );
+        
+        return filtered.Select(p => p.ToDto());
+    }
+
+    public async Task<IEnumerable<PlayerDto>> GetAllWithRankingsAsync(long? seasonId = null, CancellationToken cancellationToken = default)
+    {
+        try 
+        {
+            var players = await _dbContext.Players
+                .Include(p => p.User)
+                .Where(p => p.User == null || p.User.Role != UserRole.Admin)
+                .Where(p => !p.IsExternal)
+                .ToListAsync(cancellationToken);
+
+            if (!players.Any()) return Enumerable.Empty<PlayerDto>();
+
+            var playerIds = players.Select(p => p.Id).ToList();
+
+            // 1. Level multipliers
+            var levelMultipliers = new Dictionary<CompetitionLevel, double> {
+                { CompetitionLevel.CollegeGroup, 1.0 },
+                { CompetitionLevel.Regional, 2.5 },
+                { CompetitionLevel.National, 5.0 }
+            };
+
+            var allEventsQuery = _dbContext.Set<Event>().AsQueryable();
+            if (seasonId.HasValue) 
+            {
+                var season = await _dbContext.Seasons.FindAsync(new object[] { seasonId.Value }, cancellationToken);
+                if (season != null)
+                {
+                    allEventsQuery = allEventsQuery.Where(e => e.SeasonId == seasonId.Value || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate));
+                }
+                else
+                {
+                    allEventsQuery = allEventsQuery.Where(e => e.SeasonId == seasonId.Value);
+                }
+            }
+
+            var allEvents = await allEventsQuery
+                .Select(e => new { e.Id, e.Level })
+                .ToDictionaryAsync(e => e.Id, e => e.Level, cancellationToken);
+            
+            var eventIds = allEvents.Keys.ToList();
+
+            // 2. Achievements
+            var chessAch = await _dbContext.ChessEventParticipants.Include(p => p.Tournament).Where(p => playerIds.Contains(p.PlayerId) && eventIds.Contains(p.TournamentId)).ToListAsync(cancellationToken);
+            var checkersAch = await _dbContext.CheckersEventParticipants.Include(p => p.Event).Where(p => playerIds.Contains(p.PlayerId) && eventIds.Contains(p.TournamentId)).ToListAsync(cancellationToken);
+            var ttAch = await _dbContext.TableTennisEventParticipants.Include(p => p.Tournament).Where(p => playerIds.Contains(p.PlayerId) && eventIds.Contains(p.TournamentId)).ToListAsync(cancellationToken);
+            var badmintonAch = await _dbContext.BadmintonEventParticipants.Include(p => p.Event).Where(p => playerIds.Contains(p.PlayerId) && eventIds.Contains(p.EventId)).ToListAsync(cancellationToken);
+            var armwAch = await _dbContext.ArmwrestlingEventParticipants.Include(p => p.Tournament).Where(p => playerIds.Contains(p.PlayerId) && eventIds.Contains(p.TournamentId)).ToListAsync(cancellationToken);
+            
+            var genericWinners = await _dbContext.Set<Event>()
+                .Where(e => eventIds.Contains(e.Id) && 
+                            ((e.FirstPlaceId.HasValue && playerIds.Contains(e.FirstPlaceId.Value)) || 
+                             (e.SecondPlaceId.HasValue && playerIds.Contains(e.SecondPlaceId.Value)) || 
+                             (e.ThirdPlaceId.HasValue && playerIds.Contains(e.ThirdPlaceId.Value))))
+                .ToListAsync(cancellationToken);
+
+            var futsalTeams = await _dbContext.FutsalTeams.Include(t => t.Event).Include(t => t.Players).Where(t => eventIds.Contains(t.EventId) && t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
+            var volleyballTeams = await _dbContext.VolleyballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => eventIds.Contains(t.EventId) && t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
+            var bballTeams = await _dbContext.Basketball3x3Teams.Include(t => t.Event).Include(t => t.Players).Where(t => eventIds.Contains(t.EventId) && t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
+            var beachVTeams = await _dbContext.BeachVolleyballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => eventIds.Contains(t.EventId) && t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
+            var ttTeams = await _dbContext.TableTennisTeams.Include(t => t.Event).Include(t => t.Players).Where(t => eventIds.Contains(t.EventId) && t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
+            var badTeams = await _dbContext.BadmintonTeams.Include(t => t.Event).Where(t => t.EventId != null && eventIds.Contains(t.EventId.Value) && ((t.Player1Id != null && playerIds.Contains(t.Player1Id.Value)) || (t.Player2Id != null && playerIds.Contains(t.Player2Id.Value)))).ToListAsync(cancellationToken);
+            // 3. Match Stats
+            var cwS = await _dbContext.ChessGames.Where(g => eventIds.Contains(g.TournamentId) && g.WhitePlayerId.HasValue && playerIds.Contains(g.WhitePlayerId.Value)).GroupBy(g => g.WhitePlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.WhiteWin) }).ToListAsync(cancellationToken);
+            var cbS = await _dbContext.ChessGames.Where(g => eventIds.Contains(g.TournamentId) && g.BlackPlayerId.HasValue && playerIds.Contains(g.BlackPlayerId.Value)).GroupBy(g => g.BlackPlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.BlackWin) }).ToListAsync(cancellationToken);
+            var chwS = await _dbContext.CheckersGames.Where(g => eventIds.Contains(g.TournamentId) && g.WhitePlayerId.HasValue && playerIds.Contains(g.WhitePlayerId.Value)).GroupBy(g => g.WhitePlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.WhiteWin) }).ToListAsync(cancellationToken);
+            var chbS = await _dbContext.CheckersGames.Where(g => eventIds.Contains(g.TournamentId) && g.BlackPlayerId.HasValue && playerIds.Contains(g.BlackPlayerId.Value)).GroupBy(g => g.BlackPlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.BlackWin) }).ToListAsync(cancellationToken);
+            var tt1S = await _dbContext.TableTennisMatches.Where(g => eventIds.Contains(g.TournamentId) && g.Player1Id.HasValue && playerIds.Contains(g.Player1Id.Value)).GroupBy(g => g.Player1Id!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
+            var tt2S = await _dbContext.TableTennisMatches.Where(g => eventIds.Contains(g.TournamentId) && g.Player2Id.HasValue && playerIds.Contains(g.Player2Id.Value)).GroupBy(g => g.Player2Id!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
+
+            var arm1S = await _dbContext.ArmwrestlingMatches.Where(g => eventIds.Contains(g.EventId) && playerIds.Contains(g.Player1Id)).GroupBy(g => g.Player1Id).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
+            var arm2S = await _dbContext.ArmwrestlingMatches.Where(g => eventIds.Contains(g.EventId) && playerIds.Contains(g.Player2Id)).GroupBy(g => g.Player2Id).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
+            var bad1S = await _dbContext.BadmintonMatches.Where(g => eventIds.Contains(g.EventId) && g.Player1Id != null && playerIds.Contains(g.Player1Id.Value)).GroupBy(g => g.Player1Id).Select(g => new { Id = g.Key!.Value, Count = g.Count(), Wins = g.Count(x => x.WinnerPlayerId == g.Key) }).ToListAsync(cancellationToken);
+            var bad2S = await _dbContext.BadmintonMatches.Where(g => eventIds.Contains(g.EventId) && g.Player2Id != null && playerIds.Contains(g.Player2Id.Value)).GroupBy(g => g.Player2Id).Select(g => new { Id = g.Key!.Value, Count = g.Count(), Wins = g.Count(x => x.WinnerPlayerId == g.Key) }).ToListAsync(cancellationToken);
+            
+            var goalsS = await _dbContext.FutsalGoals
+                .Include(g => g.Match)
+                    .ThenInclude(m => m.Event)
+                .Where(g => playerIds.Contains(g.PlayerId) && g.Match != null && eventIds.Contains(g.Match.EventId))
+                .GroupBy(g => g.PlayerId)
+                .Select(g => new { Id = g.Key, Goals = g.Sum(x => x.GoalsCount) })
+                .ToListAsync(cancellationToken);
+
+            var playerDtos = new List<PlayerDto>();
+
+            foreach (var player in players)
+            {
+                var dto = player.ToDto();
+                var armwrestlingWeightClasses = new HashSet<PolytechLeague.Domain.Entities.Armwrestling.Enums.ArmwrestlingWeightClass>();
+                
+                // Infer weight class from player's weight if not set
+                if (player.ArmwrestlingWeight.HasValue)
+                {
+                    var inferredClass = player.ArmwrestlingWeight.Value switch
+                    {
+                        <= 60 => ArmwrestlingWeightClass.Under60kg,
+                        <= 70 => ArmwrestlingWeightClass.Under70kg,
+                        <= 80 => ArmwrestlingWeightClass.Under80kg,
+                        <= 90 => ArmwrestlingWeightClass.Under90kg,
+                        _ => ArmwrestlingWeightClass.Plus90kg
+                    };
+                    
+                    armwrestlingWeightClasses.Add(inferredClass);
+                    if (!dto.ArmwrestlingPreferredWeightClass.HasValue)
+                    {
+                        dto.ArmwrestlingPreferredWeightClass = inferredClass;
+                    }
+                }
+
+                var playerId = player.Id;
+                var achievements = new List<AchievementDto>();
+                var sportTypes = new HashSet<string>();
+
+                foreach (var a in chessAch.Where(x => x.PlayerId == playerId && x.Tournament != null)) {
+                    achievements.Add(new AchievementDto { TournamentName = a.Tournament!.Name, SportType = "chess", Date = a.Tournament.Date, Rank = a.Rank, TournamentId = a.TournamentId, Result = GetResultLabel(a.Rank) });
+                    sportTypes.Add("chess");
+                }
+                foreach (var a in checkersAch.Where(x => x.PlayerId == playerId && x.Event != null)) {
+                    achievements.Add(new AchievementDto { TournamentName = a.Event!.Name, SportType = "checkers", Date = a.Event.Date, Rank = a.Rank, TournamentId = a.TournamentId, Result = GetResultLabel(a.Rank) });
+                    sportTypes.Add("checkers");
+                }
+                foreach (var a in ttAch.Where(x => x.PlayerId == playerId && x.Tournament != null)) {
+                    achievements.Add(new AchievementDto { TournamentName = a.Tournament!.Name, SportType = "table_tennis", Date = a.Tournament.Date, Rank = a.Rank, TournamentId = a.TournamentId, Result = GetResultLabel(a.Rank) });
+                    sportTypes.Add("table_tennis");
+                }
+                foreach (var a in badmintonAch.Where(x => x.PlayerId == playerId && x.Event != null)) {
+                    achievements.Add(new AchievementDto { TournamentName = a.Event!.Name, SportType = "badminton", Date = a.Event.Date, Rank = a.Rank, TournamentId = a.EventId, Result = GetResultLabel(a.Rank) });
+                    sportTypes.Add("badminton");
+                }
+                foreach (var a in armwAch.Where(x => x.PlayerId == playerId && x.Tournament != null)) {
+                    achievements.Add(new AchievementDto { TournamentName = a.Tournament!.Name, SportType = "armwrestling", Date = a.Tournament.Date, Rank = a.Rank, TournamentId = a.TournamentId, Result = GetResultLabel(a.Rank) });
+                    sportTypes.Add("armwrestling");
+                    
+                    var wc = a.Tournament!.WeightClass;
+                    armwrestlingWeightClasses.Add(wc);
+                    
+                    if (!dto.ArmwrestlingPreferredWeightClass.HasValue)
+                    {
+                        dto.ArmwrestlingPreferredWeightClass = wc;
+                    }
+                }
+                foreach (var e in genericWinners.Where(x => x.FirstPlaceId == playerId || x.SecondPlaceId == playerId || x.ThirdPlaceId == playerId)) {
+                    int r = (e.FirstPlaceId == playerId) ? 1 : ((e.SecondPlaceId == playerId) ? 2 : 3);
+                    
+                    string sportType = e switch {
+                        ChessEvent => "chess",
+                        CheckersEvent => "checkers",
+                        FutsalEvent => "futsal",
+                        VolleyballEvent => "volleyball",
+                        Basketball3x3Event => "basketball_3x3",
+                        BeachVolleyballEvent => "beach_volleyball",
+                        ArmwrestlingEvent => "armwrestling",
+                        TableTennisEvent => "table_tennis",
+                        BadmintonEvent => "badminton",
+                        _ => "other"
+                    };
+
+                    if (!achievements.Any(a => a.TournamentId == e.Id && a.SportType == sportType))
+                    {
+                        achievements.Add(new AchievementDto { TournamentName = e.Name, SportType = sportType, Date = e.Date, Rank = r, TournamentId = e.Id, Result = GetResultLabel(r) });
+                        sportTypes.Add(sportType);
+                    }
+                    
+                    if (e is ArmwrestlingEvent armwEvent)
+                    {
+                        armwrestlingWeightClasses.Add(armwEvent.WeightClass);
+                        if (!dto.ArmwrestlingPreferredWeightClass.HasValue)
+                        {
+                            dto.ArmwrestlingPreferredWeightClass = armwEvent.WeightClass;
+                        }
+                    }
+                }
+
+                // Team Sports
+                foreach (var t in futsalTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
+                    int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
+                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "futsal", Date = t.Event.Date, Rank = r, TournamentId = t.EventId, Result = GetResultLabel(r), IsCaptain = t.CaptainId == playerId });
+                    sportTypes.Add("futsal");
+                }
+                foreach (var t in volleyballTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
+                    int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
+                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "volleyball", Date = t.Event.Date, Rank = r, TournamentId = t.EventId, Result = GetResultLabel(r) });
+                    sportTypes.Add("volleyball");
+                }
+                foreach (var t in bballTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
+                    int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
+                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "basketball_3x3", Date = t.Event.Date, Rank = r, TournamentId = t.EventId, Result = GetResultLabel(r) });
+                    sportTypes.Add("basketball_3x3");
+                }
+                foreach (var t in beachVTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
+                    int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
+                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "beach_volleyball", Date = t.Event.Date, Rank = r, TournamentId = t.EventId, Result = GetResultLabel(r) });
+                    sportTypes.Add("beach_volleyball");
+                }
+                foreach (var t in ttTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
+                    int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
+                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "table_tennis", Date = t.Event.Date, Rank = r, TournamentId = t.EventId, Result = GetResultLabel(r) });
+                    sportTypes.Add("table_tennis");
+                }
+                foreach (var t in badTeams.Where(x => (x.Player1Id == playerId || x.Player2Id == playerId) && x.Event != null && x.EventId.HasValue)) {
+                    int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
+                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "badminton", Date = t.Event.Date, Rank = r, TournamentId = t.EventId!.Value, Result = GetResultLabel(r) });
+                    sportTypes.Add("badminton");
+                }
+
+                dto.Achievements = achievements;
+                dto.Sports = sportTypes.ToList();
+                dto.ArmwrestlingWeightClasses = armwrestlingWeightClasses.ToList();
+                dto.CompetitionsCount = achievements.Select(a => a.TournamentId).Distinct().Count();
+
+                // Stats
+                int played = 0, won = 0;
+                double totalScore = 0;
+                var sportStatsMap = new Dictionary<string, SportStatsDto>();
+                var pointsBreakdown = new List<PointEntryDto>();
+                foreach (var sport in sportTypes) sportStatsMap[sport] = new SportStatsDto { SportType = sport };
+
+                foreach (var ach in achievements) {
+                    double pts = 0;
+                    double mult = 1.0;
+                    string levelName = "РњС–Р¶РіСЂСѓРїРѕРІС–";
+                    
+                    if (allEvents.TryGetValue(ach.TournamentId, out var lvl)) {
+                        if (levelMultipliers.TryGetValue(lvl, out var m)) mult = m;
+                        levelName = lvl switch {
+                            CompetitionLevel.Regional => "РћР±Р»Р°СЃРЅС–",
+                            CompetitionLevel.National => "Р’СЃРµСѓРєСЂР°С—РЅСЃСЊРєС–",
+                            _ => "РњС–Р¶РіСЂСѓРїРѕРІС–"
+                        };
+                        
+                        // Participation points ONLY for CollegeGroup level
+                        if (lvl == CompetitionLevel.CollegeGroup) {
+                            pts = 10;
+                        }
+                    } else {
+                        // Fallback if event level is unknown
+                        pts = 10; 
+                    }
+
+                    if (ach.Rank == 1) pts += 100;
+                    else if (ach.Rank == 2) pts += 50;
+                    else if (ach.Rank == 3) pts += 30;
+                    
+                    if (pts <= 0) continue;
+                    var finalPts = (int)Math.Round(pts * mult);
+                    totalScore += finalPts;
+                    if (sportStatsMap.TryGetValue(ach.SportType, out var s)) s.PerformanceScore += finalPts;
+                    
+                    pointsBreakdown.Add(new PointEntryDto {
+                        Description = ach.Rank > 0 
+                            ? $"{ach.Rank} РјС–СЃС†Рµ: {ach.TournamentName} ({levelName})" 
+                            : $"РЈС‡Р°СЃС‚СЊ: {ach.TournamentName} ({levelName})",
+                        Points = finalPts,
+                        Category = "Achievements",
+                        SportType = ach.SportType
+                    });
+                }
+
+                void AddStats(string sport, int p, int w) {
+                    played += p; won += w;
+                    if (p > 0) {
+                        sportTypes.Add(sport);
+                        if (!sportStatsMap.ContainsKey(sport)) sportStatsMap[sport] = new SportStatsDto { SportType = sport };
+                        var s = sportStatsMap[sport];
+                        s.MatchesPlayed += p; s.WinsCount += w;
+                        
+                        int matchPts = 0; // Removed participation points
+                        int winPts = w * 2;
+                        int totalPts = matchPts + winPts;
+                        
+                        s.PerformanceScore += totalPts; 
+                        totalScore += totalPts;
+                        
+                        string sportName = sport switch {
+                            "chess" => "РЁР°С…Рё", "checkers" => "РЁР°С€РєРё", "table_tennis" => "РќР°СЃС‚С–Р»СЊРЅРёР№ С‚РµРЅС–СЃ",
+                            "armwrestling" => "РђСЂРјСЂРµСЃС‚Р»РёРЅРі", "badminton" => "Р‘Р°РґРјС–РЅС‚РѕРЅ", _ => sport
+                        };
+                        
+                        if (winPts > 0) pointsBreakdown.Add(new PointEntryDto { Description = $"РџРµСЂРµРјРѕРіРё ({sportName}): {w} С–РіРѕСЂ", Points = winPts, Category = "Activity", SportType = sport });
+                    }
+                }
+
+                var cw = cwS.FirstOrDefault(x => x.Id == playerId);
+                var cb = cbS.FirstOrDefault(x => x.Id == playerId);
+                var chw = chwS.FirstOrDefault(x => x.Id == playerId);
+                var chb = chbS.FirstOrDefault(x => x.Id == playerId);
+                var t1 = tt1S.FirstOrDefault(x => x.Id == playerId);
+                var t2 = tt2S.FirstOrDefault(x => x.Id == playerId);
+                var a1 = arm1S.FirstOrDefault(x => x.Id == playerId);
+                var a2 = arm2S.FirstOrDefault(x => x.Id == playerId);
+                var b1 = bad1S.FirstOrDefault(x => x.Id == playerId);
+                var b2 = bad2S.FirstOrDefault(x => x.Id == playerId);
+
+                AddStats("chess", (cw?.Count ?? 0) + (cb?.Count ?? 0), (cw?.Wins ?? 0) + (cb?.Wins ?? 0));
+                AddStats("checkers", (chw?.Count ?? 0) + (chb?.Count ?? 0), (chw?.Wins ?? 0) + (chb?.Wins ?? 0));
+                AddStats("table_tennis", (t1?.Count ?? 0) + (t2?.Count ?? 0), (t1?.Wins ?? 0) + (t2?.Wins ?? 0));
+                AddStats("armwrestling", (a1?.Count ?? 0) + (a2?.Count ?? 0), (a1?.Wins ?? 0) + (a2?.Wins ?? 0));
+                AddStats("badminton", (b1?.Count ?? 0) + (b2?.Count ?? 0), (b1?.Wins ?? 0) + (b2?.Wins ?? 0));
+                
+                // 4. Team Sport Stats & Goals
+                var pGoals = goalsS.FirstOrDefault(x => x.Id == playerId)?.Goals ?? 0;
+                if (pGoals > 0) {
+                    if (!sportStatsMap.ContainsKey("futsal")) sportStatsMap["futsal"] = new SportStatsDto { SportType = "futsal" };
+                    var s = sportStatsMap["futsal"];
+                    s.GoalsCount += pGoals;
+                    int goalPts = pGoals * 5;
+                    s.PerformanceScore += goalPts;
+                    totalScore += goalPts;
+                    
+                    pointsBreakdown.Add(new PointEntryDto { 
+                        Description = $"Р—Р°Р±РёС‚С– РіРѕР»Рё (Р¤СѓС‚Р·Р°Р»): {pGoals} РіРѕР»С–РІ", 
+                        Points = goalPts, 
+                        Category = "Goals",
+                        SportType = "futsal"
+                    });
+                }
+
+                dto.MatchesPlayed = played;
+                dto.WinsCount = won;
+                dto.GoalsScored = pGoals;
+                dto.PerformanceScore = (int)Math.Round(totalScore);
+                dto.SportStats = sportStatsMap.Values.ToList();
+                dto.PointsBreakdown = pointsBreakdown.OrderByDescending(x => x.Points).ToList();
+                
+                // Only add player to rankings if they have participated in at least one competition
+                if (achievements.Count > 0 || played > 0 || pGoals > 0)
+                {
+                    playerDtos.Add(dto);
+                }
+            }
+
+            var allRanked = playerDtos.OrderByDescending(p => p.PerformanceScore).ToList();
+            for (int i = 0; i < allRanked.Count; i++)
+            {
+                allRanked[i].GlobalRank = i + 1;
+            }
+
+            // Calculate sport-specific ranks
+            var allSportTypes = playerDtos.SelectMany(p => p.SportStats.Select(s => s.SportType)).Distinct().ToList();
+            foreach (var sport in allSportTypes)
+            {
+                var rankedForSport = playerDtos
+                    .Where(p => p.SportStats.Any(s => s.SportType == sport))
+                    .OrderByDescending(p => p.SportStats.First(s => s.SportType == sport).PerformanceScore)
+                    .ToList();
+
+                for (int i = 0; i < rankedForSport.Count; i++)
+                {
+                    var sportStat = rankedForSport[i].SportStats.First(s => s.SportType == sport);
+                    sportStat.Rank = i + 1;
+                }
+            }
+
+            _logger.LogInformation("Calculated rankings for {Count} players. First player: {Name} (Score: {Score}), Last player: {LastName} (Score: {LastScore})", 
+                allRanked.Count, 
+                allRanked.FirstOrDefault()?.LastName, 
+                allRanked.FirstOrDefault()?.PerformanceScore,
+                allRanked.LastOrDefault()?.LastName,
+                allRanked.LastOrDefault()?.PerformanceScore);
+
+            return allRanked;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in GetAllWithRankingsAsync");
+            try { System.IO.File.WriteAllText("rankings_error.txt", ex.ToString()); } catch {}
+            return Enumerable.Empty<PlayerDto>();
+        }
+    }
+
+    private async Task PopulateAchievementsAsync(PlayerDto dto, CancellationToken cancellationToken)
+    {
+        if (dto.Id == null) return;
+        var playerId = dto.Id.Value;
+        var achievements = new List<AchievementDto>();
+
+        // 1. Chess
+        try {
+            var chessPerformances = await _dbContext.ChessEventParticipants
+                .Include(p => p.Tournament)
+                .Where(p => p.PlayerId == playerId)
+                .ToListAsync(cancellationToken);
+            
+            foreach (var p in chessPerformances) {
+                if (p.Tournament == null) continue;
+                int rank = p.Rank;
+                if (rank <= 0) {
+                    if (p.Tournament.FirstPlaceId == playerId) rank = 1;
+                    else if (p.Tournament.SecondPlaceId == playerId) rank = 2;
+                    else if (p.Tournament.ThirdPlaceId == playerId) rank = 3;
+                    else {
+                        rank = await _dbContext.ChessEventParticipants
+                            .Where(other => other.TournamentId == p.TournamentId && other.Points > p.Points)
+                            .CountAsync(cancellationToken) + 1;
+                    }
+                }
+                achievements.Add(new AchievementDto {
+                    TournamentName = p.Tournament.Name,
+                    SportType = "chess",
+                    Date = p.Tournament.Date,
+                    Rank = rank,
+                    TournamentId = p.TournamentId,
+                    Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ ({p.Points} РѕС‡РѕРє)" : $"{p.Points} РѕС‡РѕРє"
+                });
+            }
+        } catch (Exception ex) {
+            _logger.LogError(ex, "Error populating Chess achievements for player {PlayerId}", playerId);
+        }
+
+        // 2. Checkers
+        try {
+            var checkersPerformances = await _dbContext.CheckersEventParticipants
+                .Include(p => p.Event)
+                .Where(p => p.PlayerId == playerId)
+                .ToListAsync(cancellationToken);
+            
+            foreach (var p in checkersPerformances) {
+                if (p.Event == null) continue;
+                int rank = p.Rank;
+                if (rank <= 0) {
+                    if (p.Event.FirstPlaceId == playerId) rank = 1;
+                    else if (p.Event.SecondPlaceId == playerId) rank = 2;
+                    else if (p.Event.ThirdPlaceId == playerId) rank = 3;
+                    else {
+                        rank = await _dbContext.CheckersEventParticipants
+                            .Where(other => other.TournamentId == p.TournamentId && other.Points > p.Points)
+                            .CountAsync(cancellationToken) + 1;
+                    }
+                }
+                achievements.Add(new AchievementDto {
+                    TournamentName = p.Event.Name,
+                    SportType = "checkers",
+                    Date = p.Event.Date,
+                    Rank = rank,
+                    TournamentId = p.TournamentId,
+                    Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ ({p.Points} РѕС‡РѕРє)" : $"{p.Points} РѕС‡РѕРє"
+                });
+            }
+        } catch (Exception ex) {
+            _logger.LogError(ex, "Error populating Checkers achievements for player {PlayerId}", playerId);
+        }
+
+        // 3. Table Tennis
+        try {
+            var ttPerformances = await _dbContext.TableTennisEventParticipants
+                .Include(p => p.Tournament)
+                .Where(p => p.PlayerId == playerId)
+                .ToListAsync(cancellationToken);
+            
+            foreach (var p in ttPerformances) {
+                if (p.Tournament == null) continue;
+                int rank = p.Rank;
+                if (rank <= 0) {
+                    if (p.Tournament.FirstPlaceId == playerId) rank = 1;
+                    else if (p.Tournament.SecondPlaceId == playerId) rank = 2;
+                    else if (p.Tournament.ThirdPlaceId == playerId) rank = 3;
+                    else {
+                        rank = await _dbContext.TableTennisEventParticipants
+                            .Where(other => other.TournamentId == p.TournamentId && other.Points > p.Points)
+                            .CountAsync(cancellationToken) + 1;
+                    }
+                }
+                achievements.Add(new AchievementDto {
+                    TournamentName = p.Tournament.Name,
+                    SportType = "table_tennis",
+                    Date = p.Tournament.Date,
+                    Rank = rank,
+                    TournamentId = p.TournamentId,
+                    Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ" : "РЈС‡Р°СЃРЅРёРє"
+                });
+            }
+        } catch (Exception ex) {
+            _logger.LogError(ex, "Error populating Table Tennis achievements for player {PlayerId}", playerId);
+        }
+
+        // 4. Badminton
+        try {
+            var badmintonPerformances = await _dbContext.BadmintonEventParticipants
+                .Include(p => p.Event)
+                .Where(p => p.PlayerId == playerId)
+                .ToListAsync(cancellationToken);
+            
+            foreach (var p in badmintonPerformances) {
+                if (p.Event == null) continue;
+                int rank = p.Rank;
+                if (rank <= 0) {
+                    if (p.Event.FirstPlaceId == playerId) rank = 1;
+                    else if (p.Event.SecondPlaceId == playerId) rank = 2;
+                    else if (p.Event.ThirdPlaceId == playerId) rank = 3;
+                    else {
+                        rank = await _dbContext.BadmintonEventParticipants
+                            .Where(other => other.EventId == p.EventId && other.Points > p.Points)
+                            .CountAsync(cancellationToken) + 1;
+                    }
+                }
+                achievements.Add(new AchievementDto {
+                    TournamentName = p.Event.Name,
+                    SportType = "badminton",
+                    Date = p.Event.Date,
+                    Rank = rank,
+                    TournamentId = p.EventId,
+                    Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ" : "РЈС‡Р°СЃРЅРёРє"
+                });
+            }
+        } catch (Exception ex) {
+            _logger.LogError(ex, "Error populating Badminton achievements for player {PlayerId}", playerId);
+        }
+
+        // 5. Armwrestling & Generic Individual Winners
+        try {
+            var armwPerformances = await _dbContext.ArmwrestlingEventParticipants
+                .Include(p => p.Tournament)
+                .Where(p => p.PlayerId == playerId)
+                .ToListAsync(cancellationToken);
+
+            foreach (var p in armwPerformances) {
+                if (p.Tournament == null) continue;
+                int rank = p.Rank;
+                achievements.Add(new AchievementDto {
+                    TournamentName = p.Tournament.Name,
+                    SportType = "armwrestling",
+                    Date = p.Tournament.Date,
+                    Rank = rank,
+                    TournamentId = p.TournamentId,
+                    Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ" : "РЈС‡Р°СЃРЅРёРє"
+                });
+            }
+
+            var genericWinners = await _dbContext.Set<Event>()
+                .Where(e => e.FirstPlaceId == playerId || e.SecondPlaceId == playerId || e.ThirdPlaceId == playerId)
+                .ToListAsync(cancellationToken);
+
+            foreach (var e in genericWinners) {
+                if (achievements.Any(a => a.TournamentId == e.Id && a.SportType == "armwrestling")) continue;
+                int rank = e.FirstPlaceId == playerId ? 1 : (e.SecondPlaceId == playerId ? 2 : 3);
+                string sport = e is ArmwrestlingEvent ? "armwrestling" : "individual";
+                achievements.Add(new AchievementDto {
+                    TournamentName = e.Name,
+                    SportType = sport,
+                    Date = e.Date,
+                    Rank = rank,
+                    TournamentId = e.Id,
+                    Result = $"{rank} РјС–СЃС†Рµ"
+                });
+            }
+        } catch (Exception ex) {
+            _logger.LogError(ex, "Error populating Generic achievements for player {PlayerId}", playerId);
+        }
+
+        // 6. Team Sports (Futsal, Volleyball, etc.)
+        // Futsal
+        try {
+            var teams = await _dbContext.FutsalTeams
+                .Include(t => t.Event)
+                .Where(t => t.Players != null && t.Players.Any(pl => pl.Id == playerId))
+                .ToListAsync(cancellationToken);
+
+            foreach (var team in teams) {
+                if (team.Event == null) continue;
+                int rank = 0;
+                if (team.Id == team.Event.FirstPlaceTeamId) rank = 1;
+                else if (team.Id == team.Event.SecondPlaceTeamId) rank = 2;
+                else if (team.Id == team.Event.ThirdPlaceTeamId) rank = 3;
+                else {
+                    rank = await _dbContext.FutsalTeams
+                        .Where(others => others.EventId == team.EventId && others.Points > team.Points)
+                        .CountAsync(cancellationToken) + 1;
+                }
+                achievements.Add(new AchievementDto {
+                    TournamentName = team.Event.Name,
+                    SportType = "futsal",
+                    Date = team.Event.Date,
+                    Rank = rank,
+                    TournamentId = team.EventId,
+                    IsCaptain = team.CaptainId == playerId,
+                    Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ (РєРѕРјР°РЅРґР° {team.Name})" : $"РЈС‡Р°СЃРЅРёРє (РєРѕРјР°РЅРґР° {team.Name})"
+                });
+            }
+        } catch (Exception ex) {
+            _logger.LogError(ex, "Error populating Futsal achievements for player {PlayerId}", playerId);
+        }
+
+        // Other Team Sports (Volleyball, Basketball, Beach Volleyball)
+        try {
+            // Volleyball
+            var vTeams = await _dbContext.VolleyballTeams
+                .Include(t => t.Event)
+                .Where(t => t.Players != null && t.Players.Any(pl => pl.Id == playerId))
+                .ToListAsync(cancellationToken);
+            foreach (var t in vTeams) {
+                if (t.Event == null) continue;
+                int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
+                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "volleyball", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId, Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ ({t.Name})" : $"РЈС‡Р°СЃРЅРёРє ({t.Name})" });
+            }
+
+            // Basketball 3x3
+            var bTeams = await _dbContext.Basketball3x3Teams
+                .Include(t => t.Event)
+                .Where(t => t.Players != null && t.Players.Any(pl => pl.Id == playerId))
+                .ToListAsync(cancellationToken);
+            foreach (var t in bTeams) {
+                if (t.Event == null) continue;
+                int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
+                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "basketball_3x3", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId, Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ ({t.Name})" : $"РЈС‡Р°СЃРЅРёРє ({t.Name})" });
+            }
+
+            // Beach Volleyball
+            var bvTeams = await _dbContext.BeachVolleyballTeams
+                .Include(t => t.Event)
+                .Where(t => t.Players != null && t.Players.Any(pl => pl.Id == playerId))
+                .ToListAsync(cancellationToken);
+            foreach (var t in bvTeams) {
+                if (t.Event == null) continue;
+                int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
+                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "beach_volleyball", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId, Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ ({t.Name})" : $"РЈС‡Р°СЃРЅРёРє ({t.Name})" });
+            }
+
+            // Table Tennis Teams
+            var ttTeams = await _dbContext.TableTennisTeams
+                .Include(t => t.Event)
+                .Where(t => t.Players != null && t.Players.Any(pl => pl.Id == playerId))
+                .ToListAsync(cancellationToken);
+            foreach (var t in ttTeams) {
+                if (t.Event == null) continue;
+                int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
+                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "table_tennis", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId, Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ ({t.Name})" : $"РЈС‡Р°СЃРЅРёРє ({t.Name})" });
+            }
+
+            // Badminton Teams
+            var badTeams = await _dbContext.BadmintonTeams
+                .Include(t => t.Event)
+                .Where(t => t.Player1Id == playerId || t.Player2Id == playerId)
+                .ToListAsync(cancellationToken);
+            foreach (var t in badTeams) {
+                if (t.Event == null || !t.EventId.HasValue) continue;
+                int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
+                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "badminton", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId.Value, Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ ({t.Name})" : $"РЈС‡Р°СЃРЅРёРє ({t.Name})" });
+            }
+        } catch (Exception ex) {
+            _logger.LogError(ex, "Error populating other team achievements for player {PlayerId}", playerId);
+        }
+
+        dto.Achievements = achievements.OrderByDescending(a => a.Date).ToList();
+        dto.CompetitionsCount = achievements.Select(a => a.TournamentId).Distinct().Count();
+    }
+
+    private async Task PopulateStatsAsync(PlayerDto dto, CancellationToken cancellationToken)
+    {
+        if (dto.Id == null) return;
+        var playerId = dto.Id.Value;
+        var pointsBreakdown = new List<PointEntryDto>();
+        double totalScore = 0;
+
+        // 1. Achievements Points (from previously populated Achievements list)
+        var levelMultipliers = new Dictionary<CompetitionLevel, double> {
+            { CompetitionLevel.CollegeGroup, 1.0 },
+            { CompetitionLevel.Regional, 2.5 },
+            { CompetitionLevel.National, 5.0 }
+        };
+
+        var eventIds = dto.Achievements.Select(a => a.TournamentId).Distinct().ToList();
+        var eventLevels = await _dbContext.Set<Event>()
+            .Where(e => eventIds.Contains(e.Id))
+            .Select(e => new { e.Id, e.Level })
+            .ToDictionaryAsync(e => e.Id, e => e.Level, cancellationToken);
+
+        foreach (var ach in dto.Achievements) {
+            double basePts = (ach.Rank == 1) ? 100 : (ach.Rank == 2 ? 50 : (ach.Rank == 3 ? 30 : 0));
+            if (basePts <= 0) continue;
+
+            double mult = 1.0;
+            string levelName = "РњС–Р¶РіСЂСѓРїРѕРІС–";
+            if (eventLevels.TryGetValue(ach.TournamentId, out var lvl)) {
+                if (levelMultipliers.TryGetValue(lvl, out var m)) mult = m;
+                levelName = lvl switch {
+                    CompetitionLevel.Regional => "РћР±Р»Р°СЃРЅС–",
+                    CompetitionLevel.National => "Р’СЃРµСѓРєСЂР°С—РЅСЃСЊРєС–",
+                    _ => "РњС–Р¶РіСЂСѓРїРѕРІС–"
+                };
+            }
+
+            int finalPts = (int)Math.Round(basePts * mult);
+            totalScore += finalPts;
+            pointsBreakdown.Add(new PointEntryDto {
+                Description = $"{ach.Rank} РјС–СЃС†Рµ: {ach.TournamentName} ({levelName})",
+                Points = finalPts,
+                Category = "Achievements"
+            });
+        }
+
+        // 2. Individual Matches Played & Wins
+        int chessMatches = await _dbContext.ChessGames.CountAsync(g => g.WhitePlayerId == playerId || g.BlackPlayerId == playerId, cancellationToken);
+        int chessWins = await _dbContext.ChessGames.CountAsync(g => (g.WhitePlayerId == playerId && g.Result == GameResult.WhiteWin) || (g.BlackPlayerId == playerId && g.Result == GameResult.BlackWin), cancellationToken);
+        
+        int checkersMatches = await _dbContext.CheckersGames.CountAsync(g => g.WhitePlayerId == playerId || g.BlackPlayerId == playerId, cancellationToken);
+        int checkersWins = await _dbContext.CheckersGames.CountAsync(g => (g.WhitePlayerId == playerId && g.Result == GameResult.WhiteWin) || (g.BlackPlayerId == playerId && g.Result == GameResult.BlackWin), cancellationToken);
+        
+        int ttMatches = await _dbContext.TableTennisMatches.CountAsync(g => g.Player1Id == playerId || g.Player2Id == playerId, cancellationToken);
+        int ttWins = await _dbContext.TableTennisMatches.CountAsync(g => g.WinnerId == playerId, cancellationToken);
+        
+        int armMatches = await _dbContext.ArmwrestlingMatches.CountAsync(g => g.Player1Id == playerId || g.Player2Id == playerId, cancellationToken);
+        int armWins = await _dbContext.ArmwrestlingMatches.CountAsync(g => g.WinnerId == playerId, cancellationToken);
+        
+        int badMatches = await _dbContext.BadmintonMatches.CountAsync(g => g.Player1Id == playerId || g.Player2Id == playerId, cancellationToken);
+        int badWins = await _dbContext.BadmintonMatches.CountAsync(g => g.WinnerPlayerId == playerId, cancellationToken);
+
+        void AddActivityStats(string sportName, int p, int w) {
+            if (p <= 0) return;
+            int pts = (w * 2);
+            totalScore += pts;
+            if (w > 0) pointsBreakdown.Add(new PointEntryDto { Description = $"РџРµСЂРµРјРѕРіРё ({sportName}): {w} С–РіРѕСЂ", Points = w * 2, Category = "Activity" });
+        }
+
+        AddActivityStats("РЁР°С…Рё", chessMatches, chessWins);
+        AddActivityStats("РЁР°С€РєРё", checkersMatches, checkersWins);
+        AddActivityStats("РќР°СЃС‚С–Р»СЊРЅРёР№ С‚РµРЅС–СЃ", ttMatches, ttWins);
+        AddActivityStats("РђСЂРјСЂРµСЃС‚Р»РёРЅРі", armMatches, armWins);
+        AddActivityStats("Р‘Р°РґРјС–РЅС‚РѕРЅ", badMatches, badWins);
+
+        dto.MatchesPlayed = chessMatches + checkersMatches + ttMatches + armMatches + badMatches;
+        dto.WinsCount = chessWins + checkersWins + ttWins + armWins + badWins;
+
+        // 3. Futsal Goals
+        int futsalGoals = await _dbContext.FutsalGoals
+            .Where(g => g.PlayerId == playerId)
+            .SumAsync(g => (int?)g.GoalsCount ?? 0, cancellationToken);
+        
+        if (futsalGoals > 0) {
+            int goalPts = futsalGoals * 5;
+            totalScore += goalPts;
+            pointsBreakdown.Add(new PointEntryDto { 
+                Description = $"Р—Р°Р±РёС‚С– РіРѕР»Рё (Р¤СѓС‚Р·Р°Р»): {futsalGoals} РіРѕР»С–РІ", 
+                Points = goalPts, 
+                Category = "Goals" 
+            });
+        }
+        
+        dto.GoalsScored = futsalGoals;
+        dto.PerformanceScore = (int)Math.Round(totalScore);
+        dto.PointsBreakdown = pointsBreakdown.OrderByDescending(x => x.Points).ToList();
+    }
+
     private string GetResultLabel(int? rank)
     {
-        if (rank == 1) return "РџРµСЂРµРјРѕР¶РµС†СЊ";
-        if (rank == 2 || rank == 3) return "РџСЂРёР·РµСЂ";
-        return "РЈС‡Р°СЃРЅРёРє";
-    }
-
-    // Profile Merging Logic
-    public async Task<IEnumerable<PlayerDto>> FindPotentialArchivalMatchesAsync(string firstName, string lastName, string group, CancellationToken cancellationToken = default)
-    {
-        var matches = await _dbContext.Players
-            .Where(p => p.UserId == null && 
-                        p.FirstName.ToLower() == firstName.ToLower() && 
-                        p.LastName.ToLower() == lastName.ToLower())
-            .ToListAsync(cancellationToken);
-
-        return matches.Select(p => p.ToDto());
-    }
-
-    public async Task CreateMergeRequestAsync(long userId, long targetPlayerId, CancellationToken cancellationToken = default)
-    {
-        var existingRequest = await _dbContext.ProfileMergeRequests
-            .FirstOrDefaultAsync(r => r.UserId == userId && r.TargetPlayerId == targetPlayerId && r.Status == RegistrationStatus.Pending, cancellationToken);
-
-        if (existingRequest != null) return;
-
-        var request = new ProfileMergeRequest
-        {
-            UserId = userId,
-            TargetPlayerId = targetPlayerId,
-            Status = RegistrationStatus.Pending
-        };
-
-        _dbContext.ProfileMergeRequests.Add(request);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-
-        var user = await _dbContext.Users.FindAsync(new object[] { userId }, cancellationToken);
-        var player = await _dbContext.Players.FindAsync(new object[] { targetPlayerId }, cancellationToken);
-
-        await _notificationService.SendNotificationToAdminsAsync(
-            "Р—Р°РїРёС‚ РЅР° РѕР±'С”РґРЅР°РЅРЅСЏ РїСЂРѕС„С–Р»СЋ",
-            $"РљРѕСЂРёСЃС‚СѓРІР°С‡ {user?.FirstName} {user?.LastName} СЃС‚РІРµСЂРґР¶СѓС”, С‰Рѕ РІС–РЅ вЂ” С†Рµ РіСЂР°РІРµС†СЊ {player?.FirstName} {player?.LastName} ({player?.Group}).",
-            NotificationType.System,
-            $"/admin/merges"
-        );
-    }
-
-    public async Task<IEnumerable<ProfileMergeRequestDto>> GetPendingMergeRequestsAsync(CancellationToken cancellationToken = default)
-    {
-        var requests = await _dbContext.ProfileMergeRequests
-            .Include(r => r.User)
-            .Include(r => r.TargetPlayer)
-            .Where(r => r.Status == RegistrationStatus.Pending)
-            .ToListAsync(cancellationToken);
-
-        return requests.Select(r => new ProfileMergeRequestDto
-        {
-            Id = r.Id,
-            UserId = r.UserId,
-            UserFullName = $"{r.User?.FirstName} {r.User?.LastName}",
-            TargetPlayerId = r.TargetPlayerId,
-            TargetPlayerName = $"{r.TargetPlayer?.FirstName} {r.TargetPlayer?.LastName}",
-            TargetPlayerGroup = r.TargetPlayer?.Group,
-            Status = r.Status,
-            CreatedAt = r.CreatedAt,
-            AdminComment = r.AdminComment
-        });
-    }
-
-    public async Task ApproveMergeRequestAsync(long requestId, CancellationToken cancellationToken = default)
-    {
-        var request = await _dbContext.ProfileMergeRequests
-            .Include(r => r.User)
-            .Include(r => r.TargetPlayer)
-            .FirstOrDefaultAsync(r => r.Id == requestId, cancellationToken);
-
-        if (request == null || request.Status != RegistrationStatus.Pending) return;
-
-        var targetPlayer = request.TargetPlayer;
-        if (targetPlayer == null) return;
-
-        // 1. Check if user already has a Player profile (likely created automatically by GetProfile)
-        var currentPlayer = await _dbContext.Players
-            .FirstOrDefaultAsync(p => p.UserId == request.UserId, cancellationToken);
-
-        if (currentPlayer != null && currentPlayer.Id != targetPlayer.Id)
-        {
-            // MOVE ALL DATA FROM currentPlayer TO targetPlayer
-            await MergePlayersDataAsync(currentPlayer.Id, targetPlayer.Id, cancellationToken);
-            
-            // Delete the temporary current player
-            _dbContext.Players.Remove(currentPlayer);
-        }
-
-        // 2. Link User to the Archival Player
-        targetPlayer.UserId = request.UserId;
-        request.Status = RegistrationStatus.Approved;
-
-        await _dbContext.SaveChangesAsync(cancellationToken);
-
-        await _notificationService.SendNotificationToUserAsync(
-            request.UserId,
-            "Р—Р°РїРёС‚ СЃС…РІР°Р»РµРЅРѕ",
-            "Р’Р°С€ Р·Р°РїРёС‚ РЅР° РѕР±'С”РґРЅР°РЅРЅСЏ РїСЂРѕС„С–Р»СЋ Р±СѓР»Рѕ СЃС…РІР°Р»РµРЅРѕ. РўРµРїРµСЂ РІР°С€Р° С–СЃС‚РѕСЂС–СЏ РґРѕСЃСЏРіРЅРµРЅСЊ РґРѕСЃС‚СѓРїРЅР° Сѓ РІР°С€РѕРјСѓ Р°РєРєР°СѓРЅС‚С–.",
-            NotificationType.System
-        );
-    }
-
-    public async Task RejectMergeRequestAsync(long requestId, string comment, CancellationToken cancellationToken = default)
-    {
-        var request = await _dbContext.ProfileMergeRequests.FindAsync(new object[] { requestId }, cancellationToken);
-        if (request == null) return;
-
-        request.Status = RegistrationStatus.Rejected;
-        request.AdminComment = comment;
-
-        await _dbContext.SaveChangesAsync(cancellationToken);
-
-        await _notificationService.SendNotificationToUserAsync(
-            request.UserId,
-            "Р—Р°РїРёС‚ РІС–РґС…РёР»РµРЅРѕ",
-            $"Р’Р°С€ Р·Р°РїРёС‚ РЅР° РѕР±'С”РґРЅР°РЅРЅСЏ РїСЂРѕС„С–Р»СЋ Р±СѓР»Рѕ РІС–РґС…РёР»РµРЅРѕ. РџСЂРёС‡РёРЅР°: {comment}",
-            NotificationType.System
-        );
-    }
-
-    private async Task MergePlayersDataAsync(long sourceId, long targetId, CancellationToken cancellationToken)
-    {
-        // Update all related tables - Reassigning everything from the "new" profile back to the "archival" one
-        
-        // Chess
-        var chessPart = await _dbContext.ChessEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var p in chessPart) p.PlayerId = targetId;
-        
-        var chessGamesW = await _dbContext.ChessGames.Where(g => g.WhitePlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var g in chessGamesW) g.WhitePlayerId = targetId;
-        
-        var chessGamesB = await _dbContext.ChessGames.Where(g => g.BlackPlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var g in chessGamesB) g.BlackPlayerId = targetId;
-
-        // Checkers
-        var checkersPart = await _dbContext.CheckersEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var p in checkersPart) p.PlayerId = targetId;
-        
-        var checkersGamesW = await _dbContext.CheckersGames.Where(g => g.WhitePlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var g in checkersGamesW) g.WhitePlayerId = targetId;
-        
-        var checkersGamesB = await _dbContext.CheckersGames.Where(g => g.BlackPlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var g in checkersGamesB) g.BlackPlayerId = targetId;
-
-        // Table Tennis
-        var ttPart = await _dbContext.TableTennisEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var p in ttPart) p.PlayerId = targetId;
-        
-        var ttMatches1 = await _dbContext.TableTennisMatches.Where(m => m.Player1Id == sourceId).ToListAsync(cancellationToken);
-        foreach (var m in ttMatches1) m.Player1Id = targetId;
-        
-        var ttMatches2 = await _dbContext.TableTennisMatches.Where(m => m.Player2Id == sourceId).ToListAsync(cancellationToken);
-        foreach (var m in ttMatches2) m.Player2Id = targetId;
-        
-        var ttWinner = await _dbContext.TableTennisMatches.Where(m => m.WinnerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var m in ttWinner) m.WinnerId = targetId;
-
-        // Armwrestling
-        var armPart = await _dbContext.ArmwrestlingEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var p in armPart) p.PlayerId = targetId;
-        
-        var armMatches1 = await _dbContext.ArmwrestlingMatches.Where(m => m.Player1Id == sourceId).ToListAsync(cancellationToken);
-        foreach (var m in armMatches1) m.Player1Id = targetId;
-        
-        var armMatches2 = await _dbContext.ArmwrestlingMatches.Where(m => m.Player2Id == sourceId).ToListAsync(cancellationToken);
-        foreach (var m in armMatches2) m.Player2Id = targetId;
-        
-        var armWinner = await _dbContext.ArmwrestlingMatches.Where(m => m.WinnerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var m in armWinner) m.WinnerId = targetId;
-
-        // Badminton
-        var badPart = await _dbContext.BadmintonEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var p in badPart) p.PlayerId = targetId;
-        
-        var badMatches1 = await _dbContext.BadmintonMatches.Where(m => m.Player1Id == sourceId).ToListAsync(cancellationToken);
-        foreach (var m in badMatches1) m.Player1Id = targetId;
-        
-        var badMatches2 = await _dbContext.BadmintonMatches.Where(m => m.Player2Id == sourceId).ToListAsync(cancellationToken);
-        foreach (var m in badMatches2) m.Player2Id = targetId;
-
-        // Futsal Goals
-        var goals = await _dbContext.FutsalGoals.Where(g => g.PlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var g in goals) g.PlayerId = targetId;
-
-        // General Event Winners
-        var events1 = await _dbContext.Set<Event>().Where(e => e.FirstPlaceId == sourceId).ToListAsync(cancellationToken);
-        foreach (var e in events1) e.FirstPlaceId = targetId;
-        
-        var events2 = await _dbContext.Set<Event>().Where(e => e.SecondPlaceId == sourceId).ToListAsync(cancellationToken);
-        foreach (var e in events2) e.SecondPlaceId = targetId;
-        
-        var events3 = await _dbContext.Set<Event>().Where(e => e.ThirdPlaceId == sourceId).ToListAsync(cancellationToken);
-        foreach (var e in events3) e.ThirdPlaceId = targetId;
+        if (rank == 1) return "Переможець";
+        if (rank == 2 || rank == 3) return "Призер";
+        return "Учасник";
+    }
+
+    // Profile Merging Logic
+    public async Task<IEnumerable<PlayerDto>> FindPotentialArchivalMatchesAsync(string firstName, string lastName, string group, CancellationToken cancellationToken = default)
+    {
+        var matches = await _dbContext.Players
+            .Where(p => p.UserId == null && 
+                        p.FirstName.ToLower() == firstName.ToLower() && 
+                        p.LastName.ToLower() == lastName.ToLower())
+            .ToListAsync(cancellationToken);
+
+        return matches.Select(p => p.ToDto());
+    }
+
+    public async Task CreateMergeRequestAsync(long userId, long targetPlayerId, CancellationToken cancellationToken = default)
+    {
+        var existingRequest = await _dbContext.ProfileMergeRequests
+            .FirstOrDefaultAsync(r => r.UserId == userId && r.TargetPlayerId == targetPlayerId && r.Status == RegistrationStatus.Pending, cancellationToken);
+
+        if (existingRequest != null) return;
+
+        var request = new ProfileMergeRequest
+        {
+            UserId = userId,
+            TargetPlayerId = targetPlayerId,
+            Status = RegistrationStatus.Pending
+        };
+
+        _dbContext.ProfileMergeRequests.Add(request);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        var user = await _dbContext.Users.FindAsync(new object[] { userId }, cancellationToken);
+        var player = await _dbContext.Players.FindAsync(new object[] { targetPlayerId }, cancellationToken);
+
+        await _notificationService.SendNotificationToAdminsAsync(
+            "Р—Р°РїРёС‚ РЅР° РѕР±'С”РґРЅР°РЅРЅСЏ РїСЂРѕС„С–Р»СЋ",
+            $"РљРѕСЂРёСЃС‚СѓРІР°С‡ {user?.FirstName} {user?.LastName} СЃС‚РІРµСЂРґР¶СѓС”, С‰Рѕ РІС–РЅ вЂ” С†Рµ РіСЂР°РІРµС†СЊ {player?.FirstName} {player?.LastName} ({player?.Group}).",
+            NotificationType.System,
+            $"/admin/merges"
+        );
+    }
+
+    public async Task<IEnumerable<ProfileMergeRequestDto>> GetPendingMergeRequestsAsync(CancellationToken cancellationToken = default)
+    {
+        var requests = await _dbContext.ProfileMergeRequests
+            .Include(r => r.User)
+            .Include(r => r.TargetPlayer)
+            .Where(r => r.Status == RegistrationStatus.Pending)
+            .ToListAsync(cancellationToken);
+
+        return requests.Select(r => new ProfileMergeRequestDto
+        {
+            Id = r.Id,
+            UserId = r.UserId,
+            UserFullName = $"{r.User?.FirstName} {r.User?.LastName}",
+            TargetPlayerId = r.TargetPlayerId,
+            TargetPlayerName = $"{r.TargetPlayer?.FirstName} {r.TargetPlayer?.LastName}",
+            TargetPlayerGroup = r.TargetPlayer?.Group,
+            Status = r.Status,
+            CreatedAt = r.CreatedAt,
+            AdminComment = r.AdminComment
+        });
+    }
+
+    public async Task ApproveMergeRequestAsync(long requestId, CancellationToken cancellationToken = default)
+    {
+        var request = await _dbContext.ProfileMergeRequests
+            .Include(r => r.User)
+            .Include(r => r.TargetPlayer)
+            .FirstOrDefaultAsync(r => r.Id == requestId, cancellationToken);
+
+        if (request == null || request.Status != RegistrationStatus.Pending) return;
+
+        var targetPlayer = request.TargetPlayer;
+        if (targetPlayer == null) return;
+
+        // 1. Check if user already has a Player profile (likely created automatically by GetProfile)
+        var currentPlayer = await _dbContext.Players
+            .FirstOrDefaultAsync(p => p.UserId == request.UserId, cancellationToken);
+
+        if (currentPlayer != null && currentPlayer.Id != targetPlayer.Id)
+        {
+            // MOVE ALL DATA FROM currentPlayer TO targetPlayer
+            await MergePlayersDataAsync(currentPlayer.Id, targetPlayer.Id, cancellationToken);
+            
+            // Delete the temporary current player
+            _dbContext.Players.Remove(currentPlayer);
+        }
+
+        // 2. Link User to the Archival Player
+        targetPlayer.UserId = request.UserId;
+        request.Status = RegistrationStatus.Approved;
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        await _notificationService.SendNotificationToUserAsync(
+            request.UserId,
+            "Р—Р°РїРёС‚ СЃС…РІР°Р»РµРЅРѕ",
+            "Р’Р°С€ Р·Р°РїРёС‚ РЅР° РѕР±'С”РґРЅР°РЅРЅСЏ РїСЂРѕС„С–Р»СЋ Р±СѓР»Рѕ СЃС…РІР°Р»РµРЅРѕ. РўРµРїРµСЂ РІР°С€Р° С–СЃС‚РѕСЂС–СЏ РґРѕСЃСЏРіРЅРµРЅСЊ РґРѕСЃС‚СѓРїРЅР° Сѓ РІР°С€РѕРјСѓ Р°РєРєР°СѓРЅС‚С–.",
+            NotificationType.System
+        );
+    }
+
+    public async Task RejectMergeRequestAsync(long requestId, string comment, CancellationToken cancellationToken = default)
+    {
+        var request = await _dbContext.ProfileMergeRequests.FindAsync(new object[] { requestId }, cancellationToken);
+        if (request == null) return;
+
+        request.Status = RegistrationStatus.Rejected;
+        request.AdminComment = comment;
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        await _notificationService.SendNotificationToUserAsync(
+            request.UserId,
+            "Р—Р°РїРёС‚ РІС–РґС…РёР»РµРЅРѕ",
+            $"Р’Р°С€ Р·Р°РїРёС‚ РЅР° РѕР±'С”РґРЅР°РЅРЅСЏ РїСЂРѕС„С–Р»СЋ Р±СѓР»Рѕ РІС–РґС…РёР»РµРЅРѕ. РџСЂРёС‡РёРЅР°: {comment}",
+            NotificationType.System
+        );
+    }
+
+    private async Task MergePlayersDataAsync(long sourceId, long targetId, CancellationToken cancellationToken)
+    {
+        // Update all related tables - Reassigning everything from the "new" profile back to the "archival" one
+        
+        // Chess
+        var chessPart = await _dbContext.ChessEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var p in chessPart) p.PlayerId = targetId;
+        
+        var chessGamesW = await _dbContext.ChessGames.Where(g => g.WhitePlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var g in chessGamesW) g.WhitePlayerId = targetId;
+        
+        var chessGamesB = await _dbContext.ChessGames.Where(g => g.BlackPlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var g in chessGamesB) g.BlackPlayerId = targetId;
+
+        // Checkers
+        var checkersPart = await _dbContext.CheckersEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var p in checkersPart) p.PlayerId = targetId;
+        
+        var checkersGamesW = await _dbContext.CheckersGames.Where(g => g.WhitePlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var g in checkersGamesW) g.WhitePlayerId = targetId;
+        
+        var checkersGamesB = await _dbContext.CheckersGames.Where(g => g.BlackPlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var g in checkersGamesB) g.BlackPlayerId = targetId;
+
+        // Table Tennis
+        var ttPart = await _dbContext.TableTennisEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var p in ttPart) p.PlayerId = targetId;
+        
+        var ttMatches1 = await _dbContext.TableTennisMatches.Where(m => m.Player1Id == sourceId).ToListAsync(cancellationToken);
+        foreach (var m in ttMatches1) m.Player1Id = targetId;
+        
+        var ttMatches2 = await _dbContext.TableTennisMatches.Where(m => m.Player2Id == sourceId).ToListAsync(cancellationToken);
+        foreach (var m in ttMatches2) m.Player2Id = targetId;
+        
+        var ttWinner = await _dbContext.TableTennisMatches.Where(m => m.WinnerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var m in ttWinner) m.WinnerId = targetId;
+
+        // Armwrestling
+        var armPart = await _dbContext.ArmwrestlingEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var p in armPart) p.PlayerId = targetId;
+        
+        var armMatches1 = await _dbContext.ArmwrestlingMatches.Where(m => m.Player1Id == sourceId).ToListAsync(cancellationToken);
+        foreach (var m in armMatches1) m.Player1Id = targetId;
+        
+        var armMatches2 = await _dbContext.ArmwrestlingMatches.Where(m => m.Player2Id == sourceId).ToListAsync(cancellationToken);
+        foreach (var m in armMatches2) m.Player2Id = targetId;
+        
+        var armWinner = await _dbContext.ArmwrestlingMatches.Where(m => m.WinnerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var m in armWinner) m.WinnerId = targetId;
+
+        // Badminton
+        var badPart = await _dbContext.BadmintonEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var p in badPart) p.PlayerId = targetId;
+        
+        var badMatches1 = await _dbContext.BadmintonMatches.Where(m => m.Player1Id == sourceId).ToListAsync(cancellationToken);
+        foreach (var m in badMatches1) m.Player1Id = targetId;
+        
+        var badMatches2 = await _dbContext.BadmintonMatches.Where(m => m.Player2Id == sourceId).ToListAsync(cancellationToken);
+        foreach (var m in badMatches2) m.Player2Id = targetId;
+
+        // Futsal Goals
+        var goals = await _dbContext.FutsalGoals.Where(g => g.PlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var g in goals) g.PlayerId = targetId;
+
+        // General Event Winners
+        var events1 = await _dbContext.Set<Event>().Where(e => e.FirstPlaceId == sourceId).ToListAsync(cancellationToken);
+        foreach (var e in events1) e.FirstPlaceId = targetId;
+        
+        var events2 = await _dbContext.Set<Event>().Where(e => e.SecondPlaceId == sourceId).ToListAsync(cancellationToken);
+        foreach (var e in events2) e.SecondPlaceId = targetId;
+        
+        var events3 = await _dbContext.Set<Event>().Where(e => e.ThirdPlaceId == sourceId).ToListAsync(cancellationToken);
+        foreach (var e in events3) e.ThirdPlaceId = targetId;
     }
 
     private async Task PopulateAutomaticBadgesAsync(PlayerDto dto, CancellationToken cancellationToken)
@@ -1233,7 +1228,7 @@ public class PlayerService : IPlayerService
             {
                 badges.Add(new AutomaticBadgeDto { 
                     Type = "TopScorer", 
-                    Label = "Бомбардир сезону", 
+                    Label = "Найкращий бомбардир в історії", 
                     Icon = "fire" 
                 });
             }
@@ -1262,26 +1257,14 @@ public class PlayerService : IPlayerService
             {
                 badges.Add(new AutomaticBadgeDto { 
                     Type = "SeasonTopScorer", 
-                    Label = "Бомбардир сезону", 
-                    SeasonName = top.SeasonName,
+                    Label = $"Найкращий бомбардир ({top.SeasonName})", 
                     Icon = "soccer-ball" 
-                });
-            }
-
-            // 3. Rank Leader
-            if (dto.GlobalRank == 1)
-            {
-                badges.Add(new AutomaticBadgeDto { 
-                    Type = "RankLeader", 
-                    Label = "Лідер рейтингу", 
-                    Icon = "trophy" 
                 });
             }
         } catch (Exception ex) {
             _logger.LogError(ex, "Error populating automatic badges for player {PlayerId}", playerId);
         }
 
-        dto.AutomaticBadges = badges;
         dto.AutomaticBadges = badges;
     }
 }
