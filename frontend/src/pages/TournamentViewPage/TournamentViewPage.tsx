@@ -162,11 +162,33 @@ const TournamentViewPage = () => {
   };
 
   // Centralized sport checks
-  const sportKey = tournament?.sport?.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') || '';
+  const getNormalizedSportKey = () => {
+    const rawSport = (tournament?.sport || '').toLowerCase().replace(/-/g, '_').replace(/\s/g, '');
+    const sportMap: Record<string, string> = {
+      'футзал': 'futsal',
+      'волейбол': 'volleyball',
+      'пляжний_волейбол': 'beach_volleyball',
+      'пляжнийволейбол': 'beach_volleyball',
+      'баскетбол_3х3': 'basketball_3x3',
+      'баскетбол3х3': 'basketball_3x3',
+      'бадмінтон': 'badminton',
+      'настільний_теніс': 'table_tennis',
+      'настільнийтеніс': 'table_tennis',
+      'шахи': 'chess',
+      'шашки': 'checkers',
+      'армрестлінг': 'armwrestling'
+    };
+    return sportMap[rawSport] || rawSport;
+  };
+
+  const sportKey = getNormalizedSportKey();
   const isChess = sportKey === 'chess';
   const isCheckers = sportKey === 'checkers';
   const isBadminton = sportKey === 'badminton';
   const isTableTennis = sportKey === 'tabletennis' || sportKey === 'table_tennis';
+  const isFutsal = sportKey === 'futsal';
+  const isVolleyball = sportKey === 'volleyball' || sportKey === 'beach_volleyball';
+  const isBasketball3x3 = sportKey === 'basketball_3x3' || sportKey === 'basketball3x3';
 
   // Admin Form States
   const [newPlayer, setNewPlayer] = useState({
@@ -1729,22 +1751,13 @@ const TournamentViewPage = () => {
           </div>
 
           {(() => {
-            const rawSport = (tournament?.sport || '').toLowerCase().replace(/-/g, '_').replace(/\s/g, '');
-            const sportMap: Record<string, string> = {
-              'футзал': 'futsal',
-              'волейбол': 'volleyball',
-              'пляжний_волейбол': 'beach_volleyball',
-              'баскетбол_3х3': 'basketball_3x3',
-              'бадмінтон': 'badminton'
-            };
-            const s = sportMap[rawSport] || rawSport;
-            const isTeamFromDetails = !!(details as any)?.isTeam;
-            const mandatoryTeamSports = ['volleyball', 'beach_volleyball', 'futsal', 'basketball_3x3', 'basketball3x3'];
+            const mandatoryTeamSports = ['volleyball', 'beach_volleyball', 'futsal', 'basketball_3_3', 'basketball_3x3', 'basketball3x3'];
+            const isTeam = !!(details as any)?.isTeam || mandatoryTeamSports.includes(sportKey);
 
-            if (details && (isTeamFromDetails === true || (isTeamFromDetails === false && mandatoryTeamSports.includes(s) && (details as any).isTeam === undefined))) {
+            if (details && isTeam) {
               return (
                 <TeamSportsTournamentView
-                  sport={s as any}
+                  sport={sportKey as any}
                   details={details}
                   isAdmin={isAdmin}
                   onRefresh={() => fetchTournament(true)}
@@ -1752,7 +1765,7 @@ const TournamentViewPage = () => {
               );
             }
 
-            if (s === 'armwrestling' && details) {
+            if (sportKey === 'armwrestling' && details) {
               return (
                 <ArmwrestlingTournamentView
                   details={details as any}
@@ -1762,7 +1775,7 @@ const TournamentViewPage = () => {
               );
             }
 
-            if (s === 'chess' || s === 'checkers' || s === 'badminton' || s === 'tabletennis' || s === 'table_tennis') {
+            if (sportKey === 'chess' || sportKey === 'checkers' || sportKey === 'badminton' || sportKey === 'tabletennis' || sportKey === 'table_tennis') {
               return (
                 <>
 
