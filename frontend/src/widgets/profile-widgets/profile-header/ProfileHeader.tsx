@@ -58,7 +58,7 @@ const ProfileHeader = ({ userData, isAdmin, onEdit, onAvatarUpload, onLogout, on
             <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap' }}>
               <h1 className={styles.profileName}>{userData.name}</h1>
-              {userData.previousNames && (
+              {userData.previousNames && !isAdmin && (
                 <span style={{ 
                   fontSize: '16px', 
                   color: '#64748b', 

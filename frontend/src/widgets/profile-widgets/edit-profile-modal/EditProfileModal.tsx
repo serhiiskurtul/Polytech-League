@@ -132,21 +132,21 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
               </div>
             </div>
 
-            <div className={styles.formGroup}>
-              <label htmlFor="previousNames"><i className="fas fa-history"></i> Попереднє прізвище (якщо змінювали)</label>
-              <input
-                type="text"
-                id="previousNames"
-                name="previousNames"
-                value={formData.previousNames}
-                onChange={handleChange}
-                placeholder="Наприклад: Паламарюк"
-              />
-              <small className={styles.helpText}>Допоможе знайти ваш профіль за старим прізвищем</small>
-            </div>
-
             {!isAdmin && (
               <>
+                <div className={styles.formGroup}>
+                  <label htmlFor="previousNames"><i className="fas fa-history"></i> Попереднє прізвище (якщо змінювали)</label>
+                  <input
+                    type="text"
+                    id="previousNames"
+                    name="previousNames"
+                    value={formData.previousNames}
+                    onChange={handleChange}
+                    placeholder="Наприклад: Паламарюк"
+                  />
+                  <small className={styles.helpText}>Допоможе знайти ваш профіль за старим прізвищем</small>
+                </div>
+
                 <div className={styles.formGroup}>
                   <label htmlFor="group">Група</label>
                   <select
