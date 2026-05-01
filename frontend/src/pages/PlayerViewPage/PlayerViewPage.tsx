@@ -97,6 +97,7 @@ const PlayerViewPage = () => {
     wins: playerProfile.winsCount || 0,
     eloRating: playerProfile.chessRating || 0,
     goalsScored: playerProfile.goalsScored || 0,
+    competitionsCount: playerProfile.competitionsCount || 0,
     globalRank: playerProfile.globalRank,
     sportStats: playerProfile.sportStats
   };
