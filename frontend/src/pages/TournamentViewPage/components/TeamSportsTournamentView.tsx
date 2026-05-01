@@ -1270,8 +1270,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                     <th>№</th>
                     <th>Учасник</th>
                     <th>Група</th>
-                    <th>Статус</th>
-                    {isAdmin && <th>Дії</th>}
+                    <th style={{ textAlign: 'center' }}>Статус</th>
+                    {isAdmin && <th style={{ textAlign: 'center' }}>Дії</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -1301,7 +1301,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         </span>
                       </td>
                       {isAdmin && (
-                        <td>
+                        <td style={{ textAlign: 'center' }}>
                           <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
                             {p.status === RegistrationStatus.Pending && (
                               <>

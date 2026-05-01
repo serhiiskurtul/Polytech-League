@@ -2462,7 +2462,7 @@ const TournamentViewPage = () => {
                                   ) : (
                                     <td>{p.points}</td>
                                   )}
-                                  <td>
+                                  <td style={{ textAlign: 'center' }}>
                                     <span style={{
                                       fontSize: '11px',
                                       fontWeight: 'bold',
@@ -2477,8 +2477,8 @@ const TournamentViewPage = () => {
                                     </span>
                                   </td>
                                   {isAdmin && (
-                                    <td>
-                                      <div style={{ display: 'flex', gap: '8px' }}>
+                                    <td style={{ textAlign: 'center' }}>
+                                      <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
                                         {p.status === RegistrationStatus.Pending && (
                                           <>
                                             <button onClick={() => handleApproveParticipant(p.playerId, p.playerName)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Підтвердити">
