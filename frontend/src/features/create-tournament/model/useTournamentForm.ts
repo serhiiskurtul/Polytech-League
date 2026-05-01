@@ -218,10 +218,10 @@ export const useTournamentForm = () => {
         isTeam: formData.isTeam,
         isPublic: formData.level === 'CollegeGroup' ? formData.isPublic : false,
         isModerated: formData.level === 'CollegeGroup' ? formData.requireApproval : false,
-        // Optional: registration period (if backend is ready)
         registrationStart: formData.level === 'CollegeGroup' ? combineDateTime(formData.registrationStartDate, formData.registrationStartTime) : null,
         registrationEnd: formData.level === 'CollegeGroup' ? combineDateTime(formData.registrationDeadline, formData.registrationDeadlineTime) : null,
         endDate: formData.endDate ? combineDateTime(formData.endDate, formData.endTime) : null,
+        category: formData.category,
       };
 
       let payload: any = { ...basePayload };
@@ -248,7 +248,6 @@ export const useTournamentForm = () => {
 
         case 'table_tennis':
           payload.tournamentType = formData.tournamentType || null;
-          payload.category = formData.category;
           break;
 
         case 'armwrestling':
