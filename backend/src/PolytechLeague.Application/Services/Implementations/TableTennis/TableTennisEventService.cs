@@ -136,7 +136,16 @@ public class TableTennisEventService(
         {
             var player = await _dbcontext.Set<Player>().FindAsync(dto.PlayerId);
             participant.GroupName = player?.Group;
+            participant.PlayerFirstName = player?.FirstName;
+            participant.PlayerLastName = player?.LastName;
         }
+        else
+        {
+             var player = await _dbcontext.Set<Player>().FindAsync(dto.PlayerId);
+             participant.PlayerFirstName = dto.FirstName ?? player?.FirstName;
+             participant.PlayerLastName = dto.LastName ?? player?.LastName;
+        }
+
         _dbcontext.Set<TableTennisEventParticipant>().Add(participant);
         await _dbcontext.SaveChangesAsync(cancellationToken);
 
@@ -156,6 +165,11 @@ public class TableTennisEventService(
             participant.Points = dto.Points;
             participant.Rank = dto.Rank;
             participant.Status = dto.Status;
+            participant.GroupName = dto.GroupName;
+            
+            if (!string.IsNullOrEmpty(dto.FirstName)) participant.PlayerFirstName = dto.FirstName;
+            if (!string.IsNullOrEmpty(dto.LastName)) participant.PlayerLastName = dto.LastName;
+
             _dbcontext.Set<TableTennisEventParticipant>().Update(participant);
             await _dbcontext.SaveChangesAsync(cancellationToken);
 

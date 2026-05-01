@@ -135,7 +135,7 @@ public static class ChessEventDtoExtension
 
     public static ChessEventResponse ToResponse(this ChessEvent chessEvent)
     {
-        return new ChessEventResponse
+        var response = new ChessEventResponse
         {
             Id = chessEvent.Id,
             Name = chessEvent.Name,
@@ -163,14 +163,53 @@ public static class ChessEventDtoExtension
             IsTeam = chessEvent.IsTeam,
             IsModerated = chessEvent.IsModerated,
             IsPublic = chessEvent.IsPublic,
-            FirstPlace = chessEvent.FirstPlace?.ToDto(),
-            SecondPlace = chessEvent.SecondPlace?.ToDto(),
-            ThirdPlace = chessEvent.ThirdPlace?.ToDto(),
+            SeasonId = chessEvent.SeasonId,
+            Category = chessEvent.Category,
             FirstPlaceTeam = chessEvent.FirstPlaceTeam?.ToResponse(),
             SecondPlaceTeam = chessEvent.SecondPlaceTeam?.ToResponse(),
-            ThirdPlaceTeam = chessEvent.ThirdPlaceTeam?.ToResponse(),
-            SeasonId = chessEvent.SeasonId,
-            Category = chessEvent.Category
+            ThirdPlaceTeam = chessEvent.ThirdPlaceTeam?.ToResponse()
+        };
+
+        if (chessEvent.Players != null)
+        {
+            if (chessEvent.FirstPlaceId != null)
+            {
+                var p = chessEvent.Players.FirstOrDefault(x => x.PlayerId == chessEvent.FirstPlaceId);
+                if (p != null) response.FirstPlace = p.ToWinnerDto();
+                else if (chessEvent.FirstPlace != null) response.FirstPlace = chessEvent.FirstPlace.ToDto();
+            }
+            if (chessEvent.SecondPlaceId != null)
+            {
+                var p = chessEvent.Players.FirstOrDefault(x => x.PlayerId == chessEvent.SecondPlaceId);
+                if (p != null) response.SecondPlace = p.ToWinnerDto();
+                else if (chessEvent.SecondPlace != null) response.SecondPlace = chessEvent.SecondPlace.ToDto();
+            }
+            if (chessEvent.ThirdPlaceId != null)
+            {
+                var p = chessEvent.Players.FirstOrDefault(x => x.PlayerId == chessEvent.ThirdPlaceId);
+                if (p != null) response.ThirdPlace = p.ToWinnerDto();
+                else if (chessEvent.ThirdPlace != null) response.ThirdPlace = chessEvent.ThirdPlace.ToDto();
+            }
+        }
+        else
+        {
+            response.FirstPlace = chessEvent.FirstPlace?.ToDto();
+            response.SecondPlace = chessEvent.SecondPlace?.ToDto();
+            response.ThirdPlace = chessEvent.ThirdPlace?.ToDto();
+        }
+
+        return response;
+    }
+
+    private static PlayerDto ToWinnerDto(this ChessEventParticipant participant)
+    {
+        return new PlayerDto
+        {
+            Id = participant.PlayerId,
+            FirstName = participant.PlayerFirstName ?? participant.Player?.FirstName ?? "Unknown",
+            LastName = participant.PlayerLastName ?? participant.Player?.LastName ?? "",
+            GroupName = participant.GroupName ?? participant.Player?.Group ?? "Unknown",
+            PhotoUrl = participant.Player?.PhotoUrl
         };
     }
 }

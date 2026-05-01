@@ -76,6 +76,11 @@
   align-items: center;
   gap: 8px;
   position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
 }
 
 .navLink:hover {
@@ -85,6 +90,77 @@
 
 .navIcon {
   font-size: 14px;
+}
+
+/* Dropdown Menu */
+.dropdown {
+  position: relative;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  padding: 8px;
+  list-style: none;
+  min-width: 220px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border);
+  z-index: 1001;
+}
+
+.dark .dropdownMenu {
+  background: #1e293b;
+}
+
+.dropdown:hover .dropdownMenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.dropdownMenu li {
+  width: 100%;
+}
+
+.dropdownMenu a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: var(--muted);
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.dropdownMenu a:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.dropdownMenu a i {
+  width: 20px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.dropdownIcon {
+  font-size: 10px;
+  margin-left: 4px;
+  transition: transform 0.3s ease;
+}
+
+.dropdown:hover .dropdownIcon {
+  transform: rotate(180deg);
 }
 
 /* Дії користувача */
@@ -116,7 +192,7 @@
   color: var(--primary);
 }
 
-/* Індикатор сповіщень - червона точка біля іконки сповіщення */
+/* Індикатор сповіщень */
 .notificationBadge {
   position: absolute;
   top: 4px;
@@ -135,7 +211,6 @@
   justify-content: center;
   line-height: 1;
 }
-
 
 /* Профіль користувача */
 .userProfile {
@@ -167,7 +242,7 @@
   justify-content: center;
   font-weight: 600;
   font-size: 16px;
-  overflow: hidden; /* Ensure image doesn't overflow container */
+  overflow: hidden;
 }
 
 .avatarImg {
@@ -201,10 +276,6 @@
   background: var(--primary-dark);
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(0, 102, 204, 0.25);
-}
-
-.loginBtn:active {
-  transform: translateY(0);
 }
 
 .userProfileLink {
@@ -340,6 +411,23 @@
   .container {
     justify-content: space-between;
   }
+
+  .dropdownMenu {
+    position: static;
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+    width: 100%;
+    box-shadow: none;
+    border: none;
+    background: transparent;
+    padding-left: 20px;
+    display: none;
+  }
+
+  .dropdown:hover .dropdownMenu {
+    display: block;
+  }
 }
 
 @media (max-width: 768px) {
@@ -391,6 +479,7 @@
     justify-content: center;
   }
 }
+
 .adminDivider {
   display: block;
   width: 1px;

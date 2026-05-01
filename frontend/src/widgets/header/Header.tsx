@@ -62,23 +62,32 @@ export default function Header() {
                 <span>Зала слави</span>
               </Link>
             </li>
-            <li>
-              <Link to="/ratings" className={styles.navLink} onClick={closeMenu}>
-                <i className={`fas fa-user-friends ${styles.navIcon}`}></i>
-                <span>Рейтинги гравців</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/group-ratings" className={styles.navLink} onClick={closeMenu}>
-                <i className={`fas fa-users ${styles.navIcon}`}></i>
-                <span>Рейтинги груп</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/national-ratings" className={styles.navLink} onClick={closeMenu}>
-                <i className={`fas fa-university ${styles.navIcon}`}></i>
-                <span>Всеукраїнський залік</span>
-              </Link>
+            <li className={styles.dropdown}>
+              <button className={styles.navLink} onClick={(e) => e.preventDefault()}>
+                <i className={`fas fa-chart-line ${styles.navIcon}`}></i>
+                <span>Рейтинги</span>
+                <i className={`fas fa-chevron-down ${styles.dropdownIcon}`}></i>
+              </button>
+              <ul className={styles.dropdownMenu}>
+                <li>
+                  <Link to="/ratings" onClick={closeMenu}>
+                    <i className="fas fa-user-friends"></i>
+                    Рейтинги гравців
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/group-ratings" onClick={closeMenu}>
+                    <i className="fas fa-users"></i>
+                    Рейтинги груп
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/national-ratings" onClick={closeMenu}>
+                    <i className="fas fa-university"></i>
+                    Всеукраїнський залік
+                  </Link>
+                </li>
+              </ul>
             </li>
             {isAdmin && (
               <>

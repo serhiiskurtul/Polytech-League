@@ -14,6 +14,8 @@ public class ChessEventParticipant
     public double Points { get; set; } = 0;
     public int Rank { get; set; } //місце
     public string? GroupName { get; set; }
+    public string? PlayerFirstName { get; set; }
+    public string? PlayerLastName { get; set; }
     public RegistrationStatus Status { get; set; } = RegistrationStatus.Approved;
     public long? CollegeId { get; set; }
     public College? College { get; set; }

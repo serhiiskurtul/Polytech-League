@@ -138,7 +138,7 @@ public static class TableTennisEventDtoExtensions
 
     public static TableTennisEventResponse ToResponse(this TableTennisEvent entity)
     {
-        return new TableTennisEventResponse
+        var response = new TableTennisEventResponse
         {
             Id = entity.Id,
             Name = entity.Name,
@@ -151,9 +151,6 @@ public static class TableTennisEventDtoExtensions
             Description = entity.Description,
             TournamentType = entity.TournamentType,
             Category = entity.Category,
-            FirstPlace = entity.FirstPlace?.ToDto(),
-            SecondPlace = entity.SecondPlace?.ToDto(),
-            ThirdPlace = entity.ThirdPlace?.ToDto(),
             FirstPlaceTeam = entity.FirstPlaceTeam?.ToResponse(),
             SecondPlaceTeam = entity.SecondPlaceTeam?.ToResponse(),
             ThirdPlaceTeam = entity.ThirdPlaceTeam?.ToResponse(),
@@ -169,6 +166,48 @@ public static class TableTennisEventDtoExtensions
             IsTeam = entity.IsTeam,
             IsModerated = entity.IsModerated,
             SeasonId = entity.SeasonId
+        };
+
+        if (entity.Participants != null)
+        {
+            if (entity.FirstPlaceId != null)
+            {
+                var p = entity.Participants.FirstOrDefault(x => x.PlayerId == entity.FirstPlaceId);
+                if (p != null) response.FirstPlace = p.ToWinnerDto();
+                else if (entity.FirstPlace != null) response.FirstPlace = entity.FirstPlace.ToDto();
+            }
+            if (entity.SecondPlaceId != null)
+            {
+                var p = entity.Participants.FirstOrDefault(x => x.PlayerId == entity.SecondPlaceId);
+                if (p != null) response.SecondPlace = p.ToWinnerDto();
+                else if (entity.SecondPlace != null) response.SecondPlace = entity.SecondPlace.ToDto();
+            }
+            if (entity.ThirdPlaceId != null)
+            {
+                var p = entity.Participants.FirstOrDefault(x => x.PlayerId == entity.ThirdPlaceId);
+                if (p != null) response.ThirdPlace = p.ToWinnerDto();
+                else if (entity.ThirdPlace != null) response.ThirdPlace = entity.ThirdPlace.ToDto();
+            }
+        }
+        else
+        {
+            response.FirstPlace = entity.FirstPlace?.ToDto();
+            response.SecondPlace = entity.SecondPlace?.ToDto();
+            response.ThirdPlace = entity.ThirdPlace?.ToDto();
+        }
+
+        return response;
+    }
+
+    private static PlayerDto ToWinnerDto(this TableTennisEventParticipant participant)
+    {
+        return new PlayerDto
+        {
+            Id = participant.PlayerId,
+            FirstName = participant.PlayerFirstName ?? participant.Player?.FirstName ?? "Unknown",
+            LastName = participant.PlayerLastName ?? participant.Player?.LastName ?? "",
+            GroupName = participant.GroupName ?? participant.Player?.Group ?? "Unknown",
+            PhotoUrl = participant.Player?.PhotoUrl
         };
     }
 

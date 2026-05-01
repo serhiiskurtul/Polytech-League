@@ -116,6 +116,9 @@ public class ChessEventService :
             participant.GroupName = player?.Group;
         }
 
+        participant.PlayerFirstName = player?.FirstName;
+        participant.PlayerLastName = player?.LastName;
+
         _dbcontext.Set<ChessEventParticipant>().Add(participant);
         await _dbcontext.SaveChangesAsync(cancellationToken);
 
@@ -141,11 +144,9 @@ public class ChessEventService :
 
             if (participant.Player != null)
             {
-                if (!string.IsNullOrEmpty(dto.FirstName)) participant.Player.FirstName = dto.FirstName;
-                if (!string.IsNullOrEmpty(dto.LastName)) participant.Player.LastName = dto.LastName;
-                if (!string.IsNullOrEmpty(dto.GroupName)) participant.Player.Group = dto.GroupName;
-                
-                _dbcontext.Set<Player>().Update(participant.Player);
+                if (!string.IsNullOrEmpty(dto.FirstName)) participant.PlayerFirstName = dto.FirstName;
+                if (!string.IsNullOrEmpty(dto.LastName)) participant.PlayerLastName = dto.LastName;
+                participant.GroupName = dto.GroupName;
             }
             
             _dbcontext.Set<ChessEventParticipant>().Update(participant);

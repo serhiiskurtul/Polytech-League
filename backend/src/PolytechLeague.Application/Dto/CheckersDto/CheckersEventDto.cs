@@ -144,7 +144,7 @@ public static class CheckersEventDtoExtension
 
     public static CheckersEventResponse ToResponse(this CheckersEvent checkersEvent)
     {
-        return new CheckersEventResponse
+        var response = new CheckersEventResponse
         {
             Id = checkersEvent.Id,
             Name = checkersEvent.Name,
@@ -173,14 +173,53 @@ public static class CheckersEventDtoExtension
             IsTeam = checkersEvent.IsTeam,
             IsModerated = checkersEvent.IsModerated,
             IsPublic = checkersEvent.IsPublic,
-            FirstPlace = checkersEvent.FirstPlace?.ToDto(),
-            SecondPlace = checkersEvent.SecondPlace?.ToDto(),
-            ThirdPlace = checkersEvent.ThirdPlace?.ToDto(),
+            SeasonId = checkersEvent.SeasonId,
+            Category = checkersEvent.Category,
             FirstPlaceTeam = checkersEvent.FirstPlaceTeam?.ToResponse(),
             SecondPlaceTeam = checkersEvent.SecondPlaceTeam?.ToResponse(),
-            ThirdPlaceTeam = checkersEvent.ThirdPlaceTeam?.ToResponse(),
-            SeasonId = checkersEvent.SeasonId,
-            Category = checkersEvent.Category
+            ThirdPlaceTeam = checkersEvent.ThirdPlaceTeam?.ToResponse()
+        };
+
+        if (checkersEvent.Players != null)
+        {
+            if (checkersEvent.FirstPlaceId != null)
+            {
+                var p = checkersEvent.Players.FirstOrDefault(x => x.PlayerId == checkersEvent.FirstPlaceId);
+                if (p != null) response.FirstPlace = p.ToWinnerDto();
+                else if (checkersEvent.FirstPlace != null) response.FirstPlace = checkersEvent.FirstPlace.ToDto();
+            }
+            if (checkersEvent.SecondPlaceId != null)
+            {
+                var p = checkersEvent.Players.FirstOrDefault(x => x.PlayerId == checkersEvent.SecondPlaceId);
+                if (p != null) response.SecondPlace = p.ToWinnerDto();
+                else if (checkersEvent.SecondPlace != null) response.SecondPlace = checkersEvent.SecondPlace.ToDto();
+            }
+            if (checkersEvent.ThirdPlaceId != null)
+            {
+                var p = checkersEvent.Players.FirstOrDefault(x => x.PlayerId == checkersEvent.ThirdPlaceId);
+                if (p != null) response.ThirdPlace = p.ToWinnerDto();
+                else if (checkersEvent.ThirdPlace != null) response.ThirdPlace = checkersEvent.ThirdPlace.ToDto();
+            }
+        }
+        else
+        {
+            response.FirstPlace = checkersEvent.FirstPlace?.ToDto();
+            response.SecondPlace = checkersEvent.SecondPlace?.ToDto();
+            response.ThirdPlace = checkersEvent.ThirdPlace?.ToDto();
+        }
+
+        return response;
+    }
+
+    private static PlayerDto ToWinnerDto(this CheckersEventParticipant participant)
+    {
+        return new PlayerDto
+        {
+            Id = participant.PlayerId,
+            FirstName = participant.PlayerFirstName ?? participant.Player?.FirstName ?? "Unknown",
+            LastName = participant.PlayerLastName ?? participant.Player?.LastName ?? "",
+            GroupName = participant.GroupName ?? participant.Player?.Group ?? "Unknown",
+            PhotoUrl = participant.Player?.PhotoUrl
         };
     }
 }

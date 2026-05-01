@@ -26,15 +26,21 @@ public static class CheckersEventParticipantDtoExtensions
 {
     public static CheckersEventParticipantDto ToDto(this CheckersEventParticipant participant)
     {
+        string? firstName = participant.PlayerFirstName ?? participant.Player?.FirstName;
+        string? lastName = participant.PlayerLastName ?? participant.Player?.LastName;
+        string? fullName = (firstName != null || lastName != null) 
+            ? $"{firstName} {lastName}".Trim() 
+            : null;
+
         return new CheckersEventParticipantDto
         {
             Id = participant.Id,
             UserId = participant.Player?.UserId,
             TournamentId = participant.TournamentId,
             PlayerId = participant.PlayerId,
-            PlayerName = participant.Player != null ? $"{participant.Player.FirstName} {participant.Player.Patronymic ?? ""} {participant.Player.LastName}".Replace("  ", " ").Trim() : null,
-            FirstName = participant.Player?.FirstName,
-            LastName = participant.Player?.LastName,
+            PlayerName = fullName,
+            FirstName = firstName,
+            LastName = lastName,
             Points = participant.Points,
             Rating = participant.StartingRating,
             Rank = participant.Rank,
@@ -53,6 +59,8 @@ public static class CheckersEventParticipantDtoExtensions
             Points = dto.Points,
             Rank = dto.Rank,
             GroupName = dto.GroupName,
+            PlayerFirstName = dto.FirstName,
+            PlayerLastName = dto.LastName,
             Status = dto.Status
         };
     }
