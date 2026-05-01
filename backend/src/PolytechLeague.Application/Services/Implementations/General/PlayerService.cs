@@ -592,7 +592,12 @@ public class PlayerService : IPlayerService
                 dto.PerformanceScore = (int)Math.Round(totalScore);
                 dto.SportStats = sportStatsMap.Values.ToList();
                 dto.PointsBreakdown = pointsBreakdown.OrderByDescending(x => x.Points).ToList();
-                playerDtos.Add(dto);
+                
+                // Only add player to rankings if they have participated in at least one competition
+                if (achievements.Count > 0 || played > 0 || pGoals > 0)
+                {
+                    playerDtos.Add(dto);
+                }
             }
 
             var allRanked = playerDtos.OrderByDescending(p => p.PerformanceScore).ToList();
