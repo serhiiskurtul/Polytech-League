@@ -53,19 +53,23 @@ public class BeachVolleyballTeamService(
 
     public override async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
     {
-        // 1. Bulk delete associated participants using a subquery
-        await _dbcontext.BeachVolleyballEventParticipants
-            .Where(p => p.EventId == _dbcontext.BeachVolleyballTeams
-                .Where(t => t.Id == id)
-                .Select(t => t.EventId)
-                .FirstOrDefault() &&
-                _dbcontext.Players.Any(pl => pl.Id == p.PlayerId && pl.BeachVolleyballTeamId == id))
-            .ExecuteDeleteAsync(cancellationToken);
+        var teamInfo = await _dbcontext.BeachVolleyballTeams
+            .AsNoTracking()
+            .Select(t => new { t.Id, t.EventId, PlayerIds = t.Players!.Select(p => p.Id).ToList() })
+            .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
 
-        // 2. Clear BeachVolleyballTeamId for all players in this team
-        await _dbcontext.Players
-            .Where(p => p.BeachVolleyballTeamId == id)
-            .ExecuteUpdateAsync(s => s.SetProperty(p => p.BeachVolleyballTeamId, (long?)null), cancellationToken);
+        if (teamInfo != null && teamInfo.PlayerIds.Any())
+        {
+            // 1. Bulk delete associated participants
+            await _dbcontext.BeachVolleyballEventParticipants
+                .Where(p => p.EventId == teamInfo.EventId && teamInfo.PlayerIds.Contains(p.PlayerId))
+                .ExecuteDeleteAsync(cancellationToken);
+
+            // 2. Clear BeachVolleyballTeamId for all players in this team
+            await _dbcontext.Players
+                .Where(p => p.BeachVolleyballTeamId == id)
+                .ExecuteUpdateAsync(s => s.SetProperty(p => p.BeachVolleyballTeamId, (long?)null), cancellationToken);
+        }
 
         await base.DeleteAsync(id, cancellationToken);
     }

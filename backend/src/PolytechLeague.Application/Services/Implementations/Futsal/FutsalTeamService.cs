@@ -39,21 +39,24 @@ public class FutsalTeamService(
 
     public override async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
     {
-        // 1. Bulk delete associated participants using a subquery
-        await _dbcontext.FutsalEventParticipants
-            .Where(p => p.EventId == _dbcontext.FutsalTeams
-                .Where(t => t.Id == id)
-                .Select(t => t.EventId)
-                .FirstOrDefault() &&
-                _dbcontext.Players.Any(pl => pl.Id == p.PlayerId && pl.FutsalTeamId == id))
-            .ExecuteDeleteAsync(cancellationToken);
+        var teamInfo = await _dbcontext.FutsalTeams
+            .AsNoTracking()
+            .Select(t => new { t.Id, t.EventId, PlayerIds = t.Players!.Select(p => p.Id).ToList() })
+            .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
 
-        // 2. Clear FutsalTeamId for all players in this team
-        await _dbcontext.Players
-            .Where(p => p.FutsalTeamId == id)
-            .ExecuteUpdateAsync(s => s.SetProperty(p => p.FutsalTeamId, (long?)null), cancellationToken);
+        if (teamInfo != null && teamInfo.PlayerIds.Any())
+        {
+            // 1. Bulk delete associated participants
+            await _dbcontext.FutsalEventParticipants
+                .Where(p => p.EventId == teamInfo.EventId && teamInfo.PlayerIds.Contains(p.PlayerId))
+                .ExecuteDeleteAsync(cancellationToken);
 
-        // 3. Delete the team itself using base logic
+            // 2. Clear FutsalTeamId for all players in this team
+            await _dbcontext.Players
+                .Where(p => p.FutsalTeamId == id)
+                .ExecuteUpdateAsync(s => s.SetProperty(p => p.FutsalTeamId, (long?)null), cancellationToken);
+        }
+
         await base.DeleteAsync(id, cancellationToken);
     }
 
