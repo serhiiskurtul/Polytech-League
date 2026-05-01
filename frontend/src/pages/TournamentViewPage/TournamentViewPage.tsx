@@ -876,7 +876,13 @@ const TournamentViewPage = () => {
         default: await registerForChessEvent(id, playerId);
       }
 
-      toast.success("Ви успішно зареєструвалися!");
+      const isModerated = tournament?.isModerated || (details && details.isPublic === false) || details?.isModerated;
+
+      if (isModerated) {
+        toast.success("Ваша заявка надіслана на модерацію. Очікуйте на підтвердження адміністратором.");
+      } else {
+        toast.success("Ви успішно зареєструвалися!");
+      }
       fetchTournament(true);
     } catch (err: any) {
       console.error(err);
