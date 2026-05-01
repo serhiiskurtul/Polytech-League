@@ -59,17 +59,17 @@ const ProfileStats = ({ stats }: ProfileStatsProps) => {
       <div className={styles.cardHeader}>
         <h2 className={styles.cardTitle}><i className="fas fa-chart-bar"></i> Статистика</h2>
       </div>
-      
+
       <div className={styles.statsGrid}>
-        <div className={styles.statCard}>
+        <div className={styles.statCard} title="Загальна кількість зіграних офіційних матчів">
           <div className={styles.statValue}>{stats.matchesPlayed}</div>
           <div className={styles.statLabel}>Зіграних матчів</div>
         </div>
-        <div className={styles.statCard}>
+        <div className={styles.statCard} title="Загальна кількість перемог">
           <div className={styles.statValue}>{stats.wins}</div>
           <div className={styles.statLabel}>Перемог</div>
         </div>
-        <div className={styles.statCard}>
+        <div className={styles.statCard} title="Кількість турнірів, у яких брав участь гравець">
           <div className={styles.statValue}>{stats.competitionsCount}</div>
           <div className={styles.statLabel}>Змагань</div>
         </div>
@@ -87,7 +87,7 @@ const ProfileStats = ({ stats }: ProfileStatsProps) => {
         )}
         {stats.chessTotalPoints !== null && stats.chessTotalPoints !== undefined && (
           <div className={styles.statCard} title="Загальна кількість набраних очок у міжгрупових змаганнях з шахів">
-            <div className={styles.statValue}>
+            <div className={styles.statValue} title="Набрані очки / Можливі очки">
               {stats.chessTotalPoints}
               {stats.chessTotalPossiblePoints !== null && stats.chessTotalPossiblePoints !== undefined && `/${stats.chessTotalPossiblePoints}`}
             </div>
