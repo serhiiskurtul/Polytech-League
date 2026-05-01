@@ -129,12 +129,23 @@
   background-position: right 16px center;
   background-size: 18px;
   cursor: pointer;
+  padding-right: 45px;
+  background-color: var(--bg);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  font-weight: 500;
+}
+
+.selectInput:hover {
+  border-color: var(--muted);
+  background-color: var(--card);
+  transform: translateY(-1px);
 }
 
 .selectInput:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-light);
+  box-shadow: 0 0 0 4px var(--primary-light);
+  background-color: var(--card);
 }
 
 .formGroup input:focus,

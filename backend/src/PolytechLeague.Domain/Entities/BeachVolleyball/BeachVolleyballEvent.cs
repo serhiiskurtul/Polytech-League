@@ -7,6 +7,7 @@ public class BeachVolleyballEvent : Event
     public BeachVolleyballTournamentType? TournamentType { get; set; }
 
     public ICollection<BeachVolleyballMatch>? Matches { get; set; }
+    public ICollection<BeachVolleyballEventParticipant>? Participants { get; set; }
     public ICollection<BeachVolleyballTeam>? Teams { get; set; }
 
     public long? FirstPlaceTeamId { get; set; }

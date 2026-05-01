@@ -133,9 +133,10 @@ const TournamentViewPage = () => {
     email?: string;
     group?: string;
     studentId?: string;
+    studyYears?: string;
+    city?: string;
     rating?: number;
     birthDate?: string;
-    faculty?: string;
   };
 
   // Centralized sport checks
@@ -152,6 +153,7 @@ const TournamentViewPage = () => {
     lastName: '',
     group: '',
     studentId: '',
+    studyYears: '',
     birthDate: '',
     city: 'Чернівці',
     ratingELO: 1500,
@@ -178,7 +180,7 @@ const TournamentViewPage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isEditingTournament, setIsEditingTournament] = useState(false);
-  const isMandatoryTeamSport = ['futsal', 'volleyball', 'beach_volleyball', 'basketball_3x3', 'basketball3x3'].includes(sportKey);
+  const isMandatoryTeamSport = ['futsal', 'volleyball', 'beach-volleyball', 'beach_volleyball', 'basketball-3x3', 'basketball_3x3', 'basketball3x3'].includes(sportKey);
   const [showWinnersAdmin, setShowWinnersAdmin] = useState(false);
   const [winners, setWinners] = useState({
     firstPlaceId: 0,
@@ -416,7 +418,11 @@ const TournamentViewPage = () => {
         isModerated: !!details.isModerated,
         isPublic: details.isPublic !== undefined ? !!details.isPublic : true,
         seasonId: details.seasonId || null,
-        category: (details as any).category || (tournament?.category as any) || 'Mixed'
+        category: (details as any).category || 
+                  (tournament?.category === 'Чоловіки' ? 'Men' : 
+                   tournament?.category === 'Жінки' ? 'Women' : 
+                   tournament?.category === 'Змішаний' ? 'Mixed' : 
+                   (tournament?.category as any)) || 'Mixed'
       });
       setIsEditingTournament(true);
     }
@@ -700,6 +706,19 @@ const TournamentViewPage = () => {
           case 'table_tennis':
             await removeParticipantFromTableTennisEvent(id!, playerId);
             break;
+          case 'volleyball':
+            await removeVolleyballParticipant(id!, playerId);
+            break;
+          case 'beach_volleyball':
+            await removeBeachVolleyballParticipant(id!, playerId);
+            break;
+          case 'futsal':
+            await removeFutsalParticipant(id!, playerId);
+            break;
+          case 'basketball_3x3':
+          case 'basketball3x3':
+            await removeBasketball3x3Participant(id!, playerId);
+            break;
           default:
             await removeParticipantFromEvent(id!, playerId);
         }
@@ -783,6 +802,11 @@ const TournamentViewPage = () => {
         case 'badminton': await approveBadmintonParticipant(id!, playerId); break;
         case 'tabletennis':
         case 'table_tennis': await approveTableTennisParticipant(id!, playerId); break;
+        case 'volleyball': await approveVolleyballParticipant(id!, playerId); break;
+        case 'beach_volleyball': await approveBeachVolleyballParticipant(id!, playerId); break;
+        case 'futsal': await approveFutsalParticipant(id!, playerId); break;
+        case 'basketball_3x3':
+        case 'basketball3x3': await approveBasketball3x3Participant(id!, playerId); break;
         default: await approveChessParticipant(id!, playerId);
       }
       toast.success("Учасника схвалено!");
@@ -803,6 +827,11 @@ const TournamentViewPage = () => {
         case 'badminton': await rejectBadmintonParticipant(id!, playerId); break;
         case 'tabletennis':
         case 'table_tennis': await rejectTableTennisParticipant(id!, playerId); break;
+        case 'volleyball': await rejectVolleyballParticipant(id!, playerId); break;
+        case 'beach_volleyball': await rejectBeachVolleyballParticipant(id!, playerId); break;
+        case 'futsal': await rejectFutsalParticipant(id!, playerId); break;
+        case 'basketball_3x3':
+        case 'basketball3x3': await rejectBasketball3x3Participant(id!, playerId); break;
         default: await rejectChessParticipant(id!, playerId);
       }
       toast.success("Учасника відхилено");
@@ -932,6 +961,7 @@ const TournamentViewPage = () => {
               lastName: p.lastName,
               group: p.group,
               studentId: p.studentId || '',
+              studyYears: p.studyYears || '',
               birthDate: p.birthDate || '',
               rating: tournament?.sport === 'checkers' ? (p.checkersRating || 0) : (p.chessRating || 0)
             }));
@@ -974,6 +1004,7 @@ const TournamentViewPage = () => {
         lastName: result.lastName,
         group: result.group || '',
         studentId: result.studentId || '',
+        studyYears: result.studyYears || '',
         birthDate: result.birthDate || '',
         ratingELO: result.rating || 1500,
         userId: result.userId || null,
@@ -1014,6 +1045,7 @@ const TournamentViewPage = () => {
           birthDate: newPlayer.birthDate || null,
           group: newPlayer.group,
           studentId: newPlayer.studentId || null,
+          studyYears: newPlayer.studyYears || null,
           city: newPlayer.city,
           chessRating: tournament?.sport === 'chess' ? newPlayer.ratingELO : undefined,
           checkersRating: tournament?.sport === 'checkers' ? newPlayer.ratingELO : undefined,
@@ -1054,7 +1086,7 @@ const TournamentViewPage = () => {
           await addParticipantToEvent(id!, { playerId: playerId, points: 0, rank: 0, status: RegistrationStatus.Approved });
       }
       toast.success("Учасник успішно доданий до змагань!");
-      setNewPlayer({ firstName: '', patronymic: '', lastName: '', group: '', studentId: '', birthDate: '', city: 'Чернівці', ratingELO: 1500, fideId: '', title: '', userId: null, existingPlayerId: null, weight: 0 });
+      setNewPlayer({ firstName: '', patronymic: '', lastName: '', group: '', studentId: '', studyYears: '', birthDate: '', city: 'Чернівці', ratingELO: 1500, fideId: '', title: '', userId: null, existingPlayerId: null, weight: 0 });
       fetchTournament(true); // Refresh
     } catch (err) {
       console.error(err);
@@ -1656,11 +1688,12 @@ const TournamentViewPage = () => {
                     }></i>
                   </div>
                   <div className={styles.statValue}>
-                    {((details as any)?.category === 'Men' ? 'Чоловіки' : 
-                      (details as any)?.category === 'Women' ? 'Жінки' : 
-                      (details as any)?.category === 'Mixed' ? 'Змішане' : 
-                      (tournament?.category === 'Чоловіки' ? 'Чоловіки' : 
-                       tournament?.category === 'Жінки' ? 'Жінки' : 'Змішане'))}
+                      {(() => {
+                        const cat = (details as any)?.category || tournament?.category;
+                        if (cat === 'Men' || cat === 'Чоловіки') return 'Чоловіки';
+                        if (cat === 'Women' || cat === 'Жінки') return 'Жінки';
+                        return 'Змішане';
+                      })()}
                   </div>
                   <div className={styles.statLabel}>Категорія</div>
                 </div>

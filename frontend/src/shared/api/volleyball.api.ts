@@ -35,6 +35,18 @@ export const registerForVolleyballEvent = async (id: string | number, playerId: 
   await api.post(`/volleyball-events/${id}/register?playerId=${playerId}`);
 };
 
+export const approveVolleyballParticipant = async (id: string | number, playerId: number): Promise<void> => {
+  await api.post(`/volleyball-events/${id}/participants/${playerId}/approve`);
+};
+
+export const rejectVolleyballParticipant = async (id: string | number, playerId: number): Promise<void> => {
+  await api.post(`/volleyball-events/${id}/participants/${playerId}/reject`);
+};
+
+export const removeVolleyballParticipant = async (id: string | number, playerId: number): Promise<void> => {
+  await api.delete(`/volleyball-events/${id}/participants/${playerId}`);
+};
+
 export const deleteVolleyballMatch = async (id: number): Promise<void> => {
   await api.delete(`/volleyball-matches/${id}`);
 };

@@ -80,4 +80,31 @@ public class FutsalEventsController(
         await redisService.RemoveGroupAsync("futsal_events_group");
         return Ok();
     }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{id}/participants/{playerId}/approve")]
+    public async Task<IActionResult> ApproveParticipant(long id, long playerId, CancellationToken cancellationToken)
+    {
+        await futsalEventService.ApproveParticipantAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("futsal_events_group");
+        return Ok();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{id}/participants/{playerId}/reject")]
+    public async Task<IActionResult> RejectParticipant(long id, long playerId, CancellationToken cancellationToken)
+    {
+        await futsalEventService.RejectParticipantAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("futsal_events_group");
+        return Ok();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpDelete("{id}/participants/{playerId}")]
+    public async Task<IActionResult> RemoveParticipant(long id, long playerId, CancellationToken cancellationToken)
+    {
+        await futsalEventService.RemoveParticipantAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("futsal_events_group");
+        return NoContent();
+    }
 }

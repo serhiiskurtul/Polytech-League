@@ -7,6 +7,7 @@ public class Basketball3x3Event : Event
     public Basketball3x3TournamentType? TournamentType { get; set; }
 
     public ICollection<Basketball3x3Match>? Matches { get; set; }
+    public ICollection<Basketball3x3EventParticipant>? Participants { get; set; }
     public ICollection<Basketball3x3Team>? Teams { get; set; }
     
     public long? FirstPlaceTeamId { get; set; }

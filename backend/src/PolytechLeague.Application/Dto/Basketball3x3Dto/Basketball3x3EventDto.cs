@@ -73,7 +73,21 @@ public class Basketball3x3EventResponse
     public Basketball3x3TeamResponse? ThirdPlaceTeam { get; set; }
     public ICollection<Basketball3x3TeamResponse>? Teams { get; set; }
     public ICollection<Basketball3x3MatchResponse>? Matches { get; set; }
+    public ICollection<Basketball3x3EventParticipantDto>? Participants { get; set; }
     public long? SeasonId { get; set; }
+    public bool IsModerated { get; set; }
+    public bool IsPublic { get; set; }
+    public bool IsTeam { get; set; }
+}
+
+public class Basketball3x3EventParticipantDto
+{
+    public long PlayerId { get; set; }
+    public string? PlayerName { get; set; }
+    public string? GroupName { get; set; }
+    
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public RegistrationStatus Status { get; set; }
 }
 
 public static class Basketball3x3EventDtoExtensions
@@ -132,8 +146,18 @@ public static class Basketball3x3EventDtoExtensions
             ThirdPlaceTeam = entity.ThirdPlaceTeam?.ToResponse(),
             Teams = entity.Teams?.Select(t => t.ToResponse()).ToList(),
             Matches = entity.Matches?.Select(m => m.ToResponse()).ToList(),
+            Participants = entity.Participants?.Select(p => new Basketball3x3EventParticipantDto
+            {
+                PlayerId = p.PlayerId,
+                PlayerName = p.Player != null ? $"{p.Player.FirstName} {p.Player.LastName}" : null,
+                GroupName = p.GroupName,
+                Status = p.Status
+            }).ToList(),
             SeasonId = entity.SeasonId,
-            Category = entity.Category
+            Category = entity.Category,
+            IsModerated = entity.IsModerated,
+            IsPublic = entity.IsPublic,
+            IsTeam = entity.IsTeam
         };
     }
 }

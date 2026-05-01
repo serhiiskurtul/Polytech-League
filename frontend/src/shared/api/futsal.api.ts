@@ -39,6 +39,18 @@ export const registerForFutsalEvent = async (id: string | number, playerId: numb
   await api.post(`/futsal-events/${id}/register?playerId=${playerId}`);
 };
 
+export const approveFutsalParticipant = async (id: string | number, playerId: number): Promise<void> => {
+  await api.post(`/futsal-events/${id}/participants/${playerId}/approve`);
+};
+
+export const rejectFutsalParticipant = async (id: string | number, playerId: number): Promise<void> => {
+  await api.post(`/futsal-events/${id}/participants/${playerId}/reject`);
+};
+
+export const removeFutsalParticipant = async (id: string | number, playerId: number): Promise<void> => {
+  await api.delete(`/futsal-events/${id}/participants/${playerId}`);
+};
+
 export const deleteFutsalTeam = async (id: number): Promise<void> => {
   await api.delete(`/futsal-teams/${id}`);
 };

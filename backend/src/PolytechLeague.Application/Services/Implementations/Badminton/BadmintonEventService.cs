@@ -192,7 +192,7 @@ public class BadmintonEventService(
 
         if (exists) return;
 
-        var status = (tournament.IsModerated && !tournament.IsPublic) ? RegistrationStatus.Pending : RegistrationStatus.Approved;
+        var status = tournament.IsModerated ? RegistrationStatus.Pending : RegistrationStatus.Approved;
 
         var participant = new BadmintonEventParticipant
         {

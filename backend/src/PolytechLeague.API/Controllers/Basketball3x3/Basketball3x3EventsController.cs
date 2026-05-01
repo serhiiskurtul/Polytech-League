@@ -80,4 +80,31 @@ public class Basketball3x3EventsController(
         await redisService.RemoveGroupAsync("basketball3x3_events_group");
         return Ok();
     }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{id}/participants/{playerId}/approve")]
+    public async Task<IActionResult> ApproveParticipant(long id, long playerId, CancellationToken cancellationToken)
+    {
+        await basketball3x3EventService.ApproveParticipantAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("basketball3x3_events_group");
+        return Ok();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{id}/participants/{playerId}/reject")]
+    public async Task<IActionResult> RejectParticipant(long id, long playerId, CancellationToken cancellationToken)
+    {
+        await basketball3x3EventService.RejectParticipantAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("basketball3x3_events_group");
+        return Ok();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpDelete("{id}/participants/{playerId}")]
+    public async Task<IActionResult> RemoveParticipant(long id, long playerId, CancellationToken cancellationToken)
+    {
+        await basketball3x3EventService.RemoveParticipantAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("basketball3x3_events_group");
+        return NoContent();
+    }
 }

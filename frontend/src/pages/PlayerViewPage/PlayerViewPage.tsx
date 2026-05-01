@@ -74,7 +74,7 @@ const PlayerViewPage = () => {
     name: `${playerProfile.firstName} ${playerProfile.lastName}`,
     group: playerProfile.group || '—',
     studentId: playerProfile.studentId || '—',
-    faculty: playerProfile.faculty || '—',
+    studyYears: playerProfile.studyYears || '—',
     email: '—', // Hide email for public profiles
     phone: '—',
     city: playerProfile.city || '—',

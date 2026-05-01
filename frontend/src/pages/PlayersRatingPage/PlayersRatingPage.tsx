@@ -125,8 +125,7 @@ const PlayersRatingPage = () => {
       const q = searchQuery.toLowerCase();
       result = result.filter(p =>
         p.firstName.toLowerCase().includes(q) ||
-        p.lastName.toLowerCase().includes(q) ||
-        p.faculty?.toLowerCase().includes(q)
+        p.lastName.toLowerCase().includes(q)
       );
     }
 

@@ -107,7 +107,7 @@ const PlayerSearchInput: React.FC<PlayerSearchInputProps> = ({
                   {player.firstName} {player.patronymic} {player.lastName}
                 </span>
                 <span className={styles.playerGroup}>
-                  {player.group} {player.faculty ? `• ${player.faculty}` : ''}
+                  {player.group} {player.studyYears ? `• ${player.studyYears}` : ''}
                 </span>
                 {player.studentId && (
                   <span className={styles.studentId}>ID: {player.studentId}</span>

@@ -45,6 +45,8 @@ public class VolleyballEventService(
     public override async Task<VolleyballEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)
     {
         var entity = await _dbcontext.VolleyballEvents
+            .Include(e => e.Participants!)
+                .ThenInclude(p => p.Player)
             .Include(e => e.Teams!)
                 .ThenInclude(t => t.Players)
             .Include(e => e.Matches!)
@@ -156,34 +158,173 @@ public class VolleyballEventService(
         }
 
         tournament.Teams ??= new List<VolleyballTeam>();
+        tournament.Participants ??= new List<VolleyballEventParticipant>();
 
-        // Check if player is already in any team for this event
-        var alreadyRegistered = tournament.Teams.Any(t => t.Players?.Any(p => p.Id == playerId) == true);
-        if (alreadyRegistered) return;
+        // Check if player is already registered as a participant
+        var existingParticipant = tournament.Participants.FirstOrDefault(p => p.PlayerId == playerId);
+        if (existingParticipant != null) return;
 
-        var team = tournament.Teams.FirstOrDefault(t => t.Name == groupName);
-        if (team == null)
+        var status = tournament.IsModerated ? RegistrationStatus.Pending : RegistrationStatus.Approved;
+
+        var participant = new VolleyballEventParticipant
         {
-            team = new VolleyballTeam
-            {
-                Name = groupName,
-                EventId = eventId,
-                Players = new List<Player>()
-            };
-            tournament.Teams.Add(team);
-        }
+            EventId = eventId,
+            PlayerId = playerId,
+            Status = status,
+            GroupName = player.Group
+        };
 
-        team.Players ??= new List<Player>();
-        team.Players.Add(player);
+        tournament.Participants.Add(participant);
+
+        if (status == RegistrationStatus.Approved)
+        {
+            if (!string.IsNullOrEmpty(groupName))
+            {
+                var team = tournament.Teams.FirstOrDefault(t => t.Name == groupName);
+                if (team == null)
+                {
+                    team = new VolleyballTeam
+                    {
+                        Name = groupName,
+                        EventId = eventId,
+                        Players = new List<Player>()
+                    };
+                    tournament.Teams.Add(team);
+                }
+
+                team.Players ??= new List<Player>();
+                if (!team.Players.Any(p => p.Id == playerId))
+                {
+                    team.Players.Add(player);
+                }
+            }
+        }
 
         await _dbcontext.SaveChangesAsync(cancellationToken);
         
-        await _notificationService.SendNotificationToAdminsAsync(
-            "Нова реєстрація на волейбол",
-            $"Гравець {player.FirstName} {player.LastName} (група {groupName}) зареєструвався на {tournament.Name}",
-            NotificationType.Tournament,
-            $"/tournaments/{eventId}"
-        );
+        if (status == RegistrationStatus.Pending)
+        {
+            await _notificationService.SendNotificationToAdminsAsync(
+                "Новий запит на реєстрацію (волейбол)",
+                $"Гравець {player.FirstName} {player.LastName} (група {player.Group}) хоче зареєструватися на {tournament.Name}",
+                NotificationType.Tournament,
+                $"/tournaments/{eventId}"
+            );
+        }
+        else
+        {
+            await _notificationService.SendNotificationToAdminsAsync(
+                "Нова реєстрація на волейбол",
+                $"Гравець {player.FirstName} {player.LastName} (група {player.Group}) зареєструвався на {tournament.Name}",
+                NotificationType.Tournament,
+                $"/tournaments/{eventId}"
+            );
+        }
+    }
+
+    public async Task ApproveParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken = default)
+    {
+        var tournament = await _dbcontext.VolleyballEvents
+            .Include(e => e.Participants!)
+            .Include(e => e.Teams!)
+            .ThenInclude(t => t.Players)
+            .FirstOrDefaultAsync(e => e.Id == eventId, cancellationToken);
+
+        if (tournament == null) return;
+
+        var participant = tournament.Participants?.FirstOrDefault(p => p.PlayerId == playerId);
+        if (participant == null || participant.Status == RegistrationStatus.Approved) return;
+
+        participant.Status = RegistrationStatus.Approved;
+
+        var player = await _dbcontext.Players.FindAsync(new object[] { playerId }, cancellationToken);
+        if (player != null)
+        {
+            var groupName = participant.GroupName ?? player.Group;
+            if (!string.IsNullOrEmpty(groupName))
+            {
+                var team = tournament.Teams?.FirstOrDefault(t => t.Name == groupName);
+                if (team == null)
+                {
+                    team = new VolleyballTeam
+                    {
+                        Name = groupName,
+                        EventId = eventId,
+                        Players = new List<Player>()
+                    };
+                    tournament.Teams!.Add(team);
+                }
+
+                team.Players ??= new List<Player>();
+                if (!team.Players.Any(p => p.Id == playerId))
+                {
+                    team.Players.Add(player);
+                }
+            }
+
+            if (player.UserId.HasValue)
+            {
+                await _notificationService.SendNotificationToUserAsync(
+                    player.UserId.Value,
+                    "Реєстрація схвалена",
+                    $"Вашу заявку на участь у змаганні з волейболу \"{tournament.Name}\" схвалено!",
+                    NotificationType.Tournament,
+                    $"/tournaments/{eventId}"
+                );
+            }
+        }
+
+        await _dbcontext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task RejectParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken = default)
+    {
+        var participant = await _dbcontext.VolleyballEventParticipants
+            .FirstOrDefaultAsync(p => p.EventId == eventId && p.PlayerId == playerId, cancellationToken);
+
+        var tournament = await _dbcontext.VolleyballEvents.FindAsync(eventId);
+
+        if (participant != null)
+        {
+            participant.Status = RegistrationStatus.Rejected;
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+
+            var player = await _dbcontext.Players.FindAsync(new object[] { playerId }, cancellationToken);
+            if (player?.UserId.HasValue == true)
+            {
+                await _notificationService.SendNotificationToUserAsync(
+                    player.UserId.Value,
+                    "Реєстрація відхилена",
+                    $"Вашу заявку на участь у змаганні з волейболу \"{tournament?.Name}\" було відхилено.",
+                    NotificationType.Tournament,
+                    $"/tournaments/{eventId}"
+                );
+            }
+        }
+    }
+
+    public async Task RemoveParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken = default)
+    {
+        var participant = await _dbcontext.VolleyballEventParticipants
+            .FirstOrDefaultAsync(p => p.EventId == eventId && p.PlayerId == playerId, cancellationToken);
+
+        if (participant != null)
+        {
+            _dbcontext.VolleyballEventParticipants.Remove(participant);
+
+            // Also remove from team if exists
+            var teamWithPlayer = await _dbcontext.VolleyballTeams
+                .Include(t => t.Players)
+                .FirstOrDefaultAsync(t => t.EventId == eventId && t.Players!.Any(p => p.Id == playerId), cancellationToken);
+
+            if (teamWithPlayer != null)
+            {
+                var p = teamWithPlayer.Players!.First(p => p.Id == playerId);
+                teamWithPlayer.Players!.Remove(p);
+            }
+
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+        }
     }
 
     public override async Task DeleteAsync(long id, CancellationToken cancellationToken = default)

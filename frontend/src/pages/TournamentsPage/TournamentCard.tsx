@@ -67,6 +67,18 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
     'beach-volleyball': 'Пляжний волейбол'
   };
 
+  const levelLabels: Record<string, string> = {
+    'CollegeGroup': 'Міжгруповий',
+    'Regional': 'Регіональний',
+    'National': 'Всеукраїнський'
+  };
+
+  const categoryLabels: Record<string, string> = {
+    'Men': 'Чоловіки',
+    'Women': 'Жінки',
+    'Mixed': 'Змішаний'
+  };
+
   // Форматування дати
   const formatDate = (dateString: string) => {
     if (dateString.includes(' - ')) {
@@ -108,11 +120,11 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
         <div className="tournament-badges">
           <div className="badge-item badge-level">
             <i className="fas fa-layer-group"></i>
-            <span>{tournament.level}</span>
+            <span>{levelLabels[tournament.level] || tournament.level}</span>
           </div>
           <div className="badge-item badge-category">
             <i className="fas fa-users"></i>
-            <span>{tournament.category}</span>
+            <span>{categoryLabels[tournament.category] || tournament.category}</span>
           </div>
         </div>
 
@@ -165,10 +177,10 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
                 <i className="fas fa-map-marker-alt"></i> {tournament.location}
               </span>
               <span className="tournament-level-badge">
-                 <i className="fas fa-layer-group"></i> {tournament.level}
+                 <i className="fas fa-layer-group"></i> {levelLabels[tournament.level] || tournament.level}
               </span>
               <span className="tournament-category-badge">
-                 <i className="fas fa-users"></i> {tournament.category}
+                 <i className="fas fa-users"></i> {categoryLabels[tournament.category] || tournament.category}
               </span>
             </div>
           </div>

@@ -77,7 +77,21 @@ public class FutsalEventResponse
     public FutsalTeamResponse? ThirdPlaceTeam { get; set; }
     public ICollection<FutsalTeamResponse>? Teams { get; set; }
     public ICollection<FutsalMatchResponse>? Matches { get; set; }
+    public ICollection<FutsalEventParticipantDto>? Participants { get; set; }
     public long? SeasonId { get; set; }
+    public bool IsModerated { get; set; }
+    public bool IsPublic { get; set; }
+    public bool IsTeam { get; set; }
+}
+
+public class FutsalEventParticipantDto
+{
+    public long PlayerId { get; set; }
+    public string? PlayerName { get; set; }
+    public string? GroupName { get; set; }
+    
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public RegistrationStatus Status { get; set; }
 }
 
 public static class FutsalEventDtoExtensions
@@ -139,8 +153,18 @@ public static class FutsalEventDtoExtensions
             ThirdPlaceTeam = entity.ThirdPlaceTeam?.ToResponse(),
             Teams = entity.Teams?.Select(t => t.ToResponse()).ToList(),
             Matches = entity.Matches?.Select(m => m.ToResponse()).ToList(),
+            Participants = entity.Participants?.Select(p => new FutsalEventParticipantDto
+            {
+                PlayerId = p.PlayerId,
+                PlayerName = p.Player != null ? $"{p.Player.FirstName} {p.Player.LastName}" : null,
+                GroupName = p.GroupName,
+                Status = p.Status
+            }).ToList(),
             SeasonId = entity.SeasonId,
-            Category = entity.Category
+            Category = entity.Category,
+            IsModerated = entity.IsModerated,
+            IsPublic = entity.IsPublic,
+            IsTeam = entity.IsTeam
         };
     }
 }

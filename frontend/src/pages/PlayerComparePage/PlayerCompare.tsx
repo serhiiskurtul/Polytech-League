@@ -353,9 +353,9 @@ const PlayerCard = ({ player, color, selectedSeason }: {
       <div className={styles.cardInfo}>
         <h3 className={styles.cardName}>{player.firstName} {player.lastName}</h3>
         <p className={styles.cardGroup}>{player.group}</p>
-        {player.faculty && (
+        {player.studyYears && (
           <div className={styles.cardRank}>
-            <i className="fa-solid fa-award"></i> {player.faculty}
+            <i className="fa-solid fa-calendar-alt"></i> {player.studyYears}
           </div>
         )}
       </div>

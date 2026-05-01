@@ -570,10 +570,10 @@ public class TournamentService : ITournamentService
     {
         return level switch
         {
-            CompetitionLevel.CollegeGroup => "Міжгруповий",
-            CompetitionLevel.Regional => "Регіональний",
-            CompetitionLevel.National => "Всеукраїнський",
-            _ => "Невідомо"
+            CompetitionLevel.CollegeGroup => "CollegeGroup",
+            CompetitionLevel.Regional => "Regional",
+            CompetitionLevel.National => "National",
+            _ => "CollegeGroup"
         };
     }
 
@@ -581,10 +581,10 @@ public class TournamentService : ITournamentService
     {
         return category switch
         {
-            EventCategory.Men => "Чоловіки",
-            EventCategory.Women => "Жінки",
-            EventCategory.Mixed => "Змішаний",
-            _ => "Змішаний"
+            EventCategory.Men => "Men",
+            EventCategory.Women => "Women",
+            EventCategory.Mixed => "Mixed",
+            _ => "Mixed"
         };
     }
 }

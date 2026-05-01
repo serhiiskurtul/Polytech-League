@@ -15,13 +15,13 @@ public class BeachVolleyballEventsController(
     [HttpGet]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
-        var cached = await redisService.GetDataAsync<IEnumerable<BeachVolleyballEventResponse>>("beach_volleyball_events_all");
+        var cached = await redisService.GetDataAsync<IEnumerable<BeachVolleyballEventResponse>>("beachvolleyball_events_all");
         if (cached != null) return Ok(cached);
 
         var entities = await beachVolleyballEventService.GetAllAsync(cancellationToken: cancellationToken);
         var response = entities.Select(e => e.ToResponse()).ToList();
 
-        await redisService.SetDataAsync("beach_volleyball_events_all", response, TimeSpan.FromMinutes(60), "beach_volleyball_events_group");
+        await redisService.SetDataAsync("beachvolleyball_events_all", response, TimeSpan.FromMinutes(60), "beachvolleyball_events_group");
         return Ok(response);
     }
 
@@ -41,7 +41,7 @@ public class BeachVolleyballEventsController(
         var entity = request.FromRequest();
         await beachVolleyballEventService.CreateAsync(entity, cancellationToken);
 
-        await redisService.RemoveGroupAsync("beach_volleyball_events_group");
+        await redisService.RemoveGroupAsync("beachvolleyball_events_group");
 
         return Created();
     }
@@ -56,7 +56,7 @@ public class BeachVolleyballEventsController(
         var entity = request.FromRequest();
         await beachVolleyballEventService.UpdateAsync(id, entity, cancellationToken);
 
-        await redisService.RemoveGroupAsync("beach_volleyball_events_group");
+        await redisService.RemoveGroupAsync("beachvolleyball_events_group");
 
         return NoContent();
     }
@@ -67,7 +67,7 @@ public class BeachVolleyballEventsController(
     {
         await beachVolleyballEventService.DeleteAsync(id, cancellationToken);
 
-        await redisService.RemoveGroupAsync("beach_volleyball_events_group");
+        await redisService.RemoveGroupAsync("beachvolleyball_events_group");
 
         return NoContent();
     }
@@ -77,7 +77,34 @@ public class BeachVolleyballEventsController(
     public async Task<IActionResult> Register(long id, [FromQuery] long playerId, CancellationToken cancellationToken)
     {
         await beachVolleyballEventService.RegisterPlayerAsync(id, playerId, cancellationToken);
-        await redisService.RemoveGroupAsync("beach_volleyball_events_group");
+        await redisService.RemoveGroupAsync("beachvolleyball_events_group");
         return Ok();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{id}/participants/{playerId}/approve")]
+    public async Task<IActionResult> ApproveParticipant(long id, long playerId, CancellationToken cancellationToken)
+    {
+        await beachVolleyballEventService.ApproveParticipantAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("beachvolleyball_events_group");
+        return Ok();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("{id}/participants/{playerId}/reject")]
+    public async Task<IActionResult> RejectParticipant(long id, long playerId, CancellationToken cancellationToken)
+    {
+        await beachVolleyballEventService.RejectParticipantAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("beachvolleyball_events_group");
+        return Ok();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpDelete("{id}/participants/{playerId}")]
+    public async Task<IActionResult> RemoveParticipant(long id, long playerId, CancellationToken cancellationToken)
+    {
+        await beachVolleyballEventService.RemoveParticipantAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("beachvolleyball_events_group");
+        return NoContent();
     }
 }

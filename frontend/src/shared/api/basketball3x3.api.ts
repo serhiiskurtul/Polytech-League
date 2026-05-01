@@ -39,6 +39,18 @@ export const registerForBasketball3x3Event = async (id: string | number, playerI
   await api.post(`/basketball3x3-events/${id}/register?playerId=${playerId}`);
 };
 
+export const approveBasketball3x3Participant = async (id: string | number, playerId: number): Promise<void> => {
+  await api.post(`/basketball3x3-events/${id}/participants/${playerId}/approve`);
+};
+
+export const rejectBasketball3x3Participant = async (id: string | number, playerId: number): Promise<void> => {
+  await api.post(`/basketball3x3-events/${id}/participants/${playerId}/reject`);
+};
+
+export const removeBasketball3x3Participant = async (id: string | number, playerId: number): Promise<void> => {
+  await api.delete(`/basketball3x3-events/${id}/participants/${playerId}`);
+};
+
 export const deleteBasketball3x3Team = async (id: number): Promise<void> => {
   await api.delete(`/basketball3x3-teams/${id}`);
 };

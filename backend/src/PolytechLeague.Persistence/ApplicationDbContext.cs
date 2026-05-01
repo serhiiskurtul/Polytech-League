@@ -78,23 +78,27 @@ public class ApplicationDbContext : DbContext
     // Futsal
     public DbSet<FutsalTeam> FutsalTeams { get; set; }
     public DbSet<FutsalEvent> FutsalEvents { get; set; }
+    public DbSet<FutsalEventParticipant> FutsalEventParticipants { get; set; }
     public DbSet<FutsalMatch> FutsalMatches { get; set; }
     public DbSet<FutsalGoal> FutsalGoals { get; set; }
 
     // Basketball 3x3
     public DbSet<Basketball3x3Team> Basketball3x3Teams { get; set; }
     public DbSet<Basketball3x3Event> Basketball3x3Events { get; set; }
+    public DbSet<Basketball3x3EventParticipant> Basketball3x3EventParticipants { get; set; }
     public DbSet<Basketball3x3Match> Basketball3x3Matches { get; set; }
 
     // Volleyball
     public DbSet<VolleyballTeam> VolleyballTeams { get; set; }
     public DbSet<VolleyballEvent> VolleyballEvents { get; set; }
+    public DbSet<VolleyballEventParticipant> VolleyballEventParticipants { get; set; }
     public DbSet<VolleyballMatch> VolleyballMatches { get; set; }
     public DbSet<VolleyballSet> VolleyballSets { get; set; }
 
     // Beach volleyball
     public DbSet<BeachVolleyballTeam> BeachVolleyballTeams { get; set; }
     public DbSet<BeachVolleyballEvent> BeachVolleyballEvents { get; set; }
+    public DbSet<BeachVolleyballEventParticipant> BeachVolleyballEventParticipants { get; set; }
     public DbSet<BeachVolleyballMatch> BeachVolleyballMatches { get; set; }
     public DbSet<BeachVolleyballSet> BeachVolleyballSets { get; set; }
 
@@ -173,23 +177,27 @@ public class ApplicationDbContext : DbContext
         // Futsal configurations
         modelBuilder.ApplyConfiguration(new FutsalTeamConfiguration());
         modelBuilder.ApplyConfiguration(new FutsalEventConfiguration());
+        modelBuilder.ApplyConfiguration(new FutsalEventParticipantConfiguration());
         modelBuilder.ApplyConfiguration(new FutsalMatchConfiguration());
         modelBuilder.ApplyConfiguration(new FutsalGoalConfiguration());
 
         // Basketball 3x3 configurations
         modelBuilder.ApplyConfiguration(new Basketball3x3TeamConfiguration());
         modelBuilder.ApplyConfiguration(new Basketball3x3EventConfiguration());
+        modelBuilder.ApplyConfiguration(new Basketball3x3EventParticipantConfiguration());
         modelBuilder.ApplyConfiguration(new Basketball3x3MatchConfiguration());
 
         // Volleyball
         modelBuilder.ApplyConfiguration(new VolleyballTeamConfiguration());
         modelBuilder.ApplyConfiguration(new VolleyballEventConfiguration());
+        modelBuilder.ApplyConfiguration(new VolleyballEventParticipantConfiguration());
         modelBuilder.ApplyConfiguration(new VolleyballMatchConfiguration());
         modelBuilder.ApplyConfiguration(new VolleyballSetConfiguration());
 
         // Beach volleyball
         modelBuilder.ApplyConfiguration(new BeachVolleyballTeamConfiguration());
         modelBuilder.ApplyConfiguration(new BeachVolleyballEventConfiguration());
+        modelBuilder.ApplyConfiguration(new BeachVolleyballEventParticipantConfiguration());
         modelBuilder.ApplyConfiguration(new BeachVolleyballMatchConfiguration());
         modelBuilder.ApplyConfiguration(new BeachVolleyballSetConfiguration());
 

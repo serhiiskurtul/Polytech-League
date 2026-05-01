@@ -5,4 +5,7 @@ namespace PolytechLeague.Application.Services.Interfaces.Basketball3x3;
 public interface IBasketball3x3EventService : IAbstractEntityService<Basketball3x3Event>
 {
     Task RegisterPlayerAsync(long eventId, long playerId, CancellationToken cancellationToken = default);
+    Task ApproveParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken = default);
+    Task RejectParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken = default);
+    Task RemoveParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken = default);
 }
