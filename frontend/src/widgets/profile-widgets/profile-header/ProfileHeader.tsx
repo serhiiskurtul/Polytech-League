@@ -86,7 +86,7 @@ const ProfileHeader = ({ userData, isAdmin, onEdit, onAvatarUpload, onLogout, on
               ))}
               {userData.isFounder && (
                 <span className={styles.badgeFounder}>
-                  <i className="fas fa-crown"></i> Founder
+                  Засновник Polytech League
                 </span>
               )}
             </div>
