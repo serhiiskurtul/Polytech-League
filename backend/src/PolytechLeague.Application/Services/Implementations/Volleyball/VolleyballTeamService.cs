@@ -37,6 +37,24 @@ public class VolleyballTeamService(
         await _dbcontext.SaveChangesAsync(cancellationToken);
     }
 
+    public override async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
+    {
+        var team = await _dbcontext.Set<VolleyballTeam>()
+            .Include(t => t.Players)
+            .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
+
+        if (team?.Players != null)
+        {
+            foreach (var player in team.Players)
+            {
+                player.VolleyballTeamId = null;
+            }
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+        }
+
+        await base.DeleteAsync(id, cancellationToken);
+    }
+
     protected override void UpdateValues(VolleyballTeam oldEntity, VolleyballTeam newEntity)
     {
         oldEntity.Name = newEntity.Name;

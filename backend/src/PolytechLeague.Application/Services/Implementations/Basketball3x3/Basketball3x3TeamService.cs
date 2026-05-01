@@ -37,6 +37,24 @@ public class Basketball3x3TeamService(
         await _dbcontext.SaveChangesAsync(cancellationToken);
     }
 
+    public override async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
+    {
+        var team = await _dbcontext.Set<Basketball3x3Team>()
+            .Include(t => t.Players)
+            .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
+
+        if (team?.Players != null)
+        {
+            foreach (var player in team.Players)
+            {
+                player.BasketballTeamId = null;
+            }
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+        }
+
+        await base.DeleteAsync(id, cancellationToken);
+    }
+
     protected override void UpdateValues(Basketball3x3Team oldEntity, Basketball3x3Team newEntity)
     {
         oldEntity.Name = newEntity.Name;

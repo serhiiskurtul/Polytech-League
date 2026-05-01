@@ -37,6 +37,24 @@ public class FutsalTeamService(
         await _dbcontext.SaveChangesAsync(cancellationToken);
     }
 
+    public override async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
+    {
+        var team = await _dbcontext.Set<FutsalTeam>()
+            .Include(t => t.Players)
+            .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
+
+        if (team?.Players != null)
+        {
+            foreach (var player in team.Players)
+            {
+                player.FutsalTeamId = null;
+            }
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+        }
+
+        await base.DeleteAsync(id, cancellationToken);
+    }
+
     protected override void UpdateValues(FutsalTeam oldEntity, FutsalTeam newEntity)
     {
         oldEntity.Name = newEntity.Name;
