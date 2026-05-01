@@ -1833,8 +1833,8 @@ const TournamentViewPage = () => {
                                 ) : (
                                   <th>Очки</th>
                                 )}
-                                <th>Статус</th>
-                                {isAdmin && <th>Дії</th>}
+                                <th style={{ textAlign: 'center' }}>Статус</th>
+                                {isAdmin && <th style={{ textAlign: 'center' }}>Дії</th>}
                               </tr>
                             </thead>
                             <tbody>
@@ -1901,8 +1901,8 @@ const TournamentViewPage = () => {
                                           </td>
                                         </>
                                       )}
-                                      <td>-</td>
-                                      <td>
+                                      <td style={{ textAlign: 'center' }}>-</td>
+                                      <td style={{ textAlign: 'center' }}>
                                         <button type="button" onClick={() => handleSaveParticipantEdit(p.playerId)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }}><i className="fas fa-check"></i></button>
                                         <button type="button" onClick={handleCancelParticipantEdit} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><i className="fas fa-times"></i></button>
                                       </td>
@@ -1928,7 +1928,7 @@ const TournamentViewPage = () => {
                                       ) : (
                                         <td><strong>{p.points ?? 0}</strong></td>
                                       )}
-                                      <td>
+                                      <td style={{ textAlign: 'center' }}>
                                         {p.status && (
                                           <span style={{
                                             fontSize: '11px',
@@ -1948,8 +1948,8 @@ const TournamentViewPage = () => {
                                         )}
                                       </td>
                                       {isAdmin && (
-                                        <td>
-                                          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                                        <td style={{ textAlign: 'center' }}>
+                                          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'center' }}>
                                             {p.status === RegistrationStatus.Pending && (
                                               <>
                                                 <button 
@@ -2425,7 +2425,8 @@ const TournamentViewPage = () => {
                                 ) : (
                                   <th>Очки</th>
                                 )}
-                                {isAdmin && <th>Дії</th>}
+                                <th style={{ textAlign: 'center' }}>Статус</th>
+                                {isAdmin && <th style={{ textAlign: 'center' }}>Дії</th>}
                               </tr>
                             </thead>
                             <tbody>
