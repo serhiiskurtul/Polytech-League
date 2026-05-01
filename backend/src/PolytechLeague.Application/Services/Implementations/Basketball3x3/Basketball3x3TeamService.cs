@@ -39,33 +39,19 @@ public class Basketball3x3TeamService(
 
     public override async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
     {
-        var team = await _dbcontext.Set<Basketball3x3Team>()
-            .Include(t => t.Players)
-            .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
+        // 1. Bulk delete associated participants using a subquery
+        await _dbcontext.Basketball3x3EventParticipants
+            .Where(p => p.EventId == _dbcontext.Basketball3x3Teams
+                .Where(t => t.Id == id)
+                .Select(t => t.EventId)
+                .FirstOrDefault() &&
+                _dbcontext.Players.Any(pl => pl.Id == p.PlayerId && pl.BasketballTeamId == id))
+            .ExecuteDeleteAsync(cancellationToken);
 
-        if (team != null)
-        {
-            if (team.Players != null)
-            {
-                var playerIds = team.Players.Select(p => p.Id).ToList();
-                
-                // Also remove these players from the event participants
-                var participants = await _dbcontext.Set<Basketball3x3EventParticipant>()
-                    .Where(p => p.EventId == team.EventId && playerIds.Contains(p.PlayerId))
-                    .ToListAsync(cancellationToken);
-                
-                if (participants.Any())
-                {
-                    _dbcontext.Set<Basketball3x3EventParticipant>().RemoveRange(participants);
-                }
-
-                foreach (var player in team.Players)
-                {
-                    player.BasketballTeamId = null;
-                }
-            }
-            await _dbcontext.SaveChangesAsync(cancellationToken);
-        }
+        // 2. Clear BasketballTeamId for all players in this team
+        await _dbcontext.Players
+            .Where(p => p.BasketballTeamId == id)
+            .ExecuteUpdateAsync(s => s.SetProperty(p => p.BasketballTeamId, (long?)null), cancellationToken);
 
         await base.DeleteAsync(id, cancellationToken);
     }
