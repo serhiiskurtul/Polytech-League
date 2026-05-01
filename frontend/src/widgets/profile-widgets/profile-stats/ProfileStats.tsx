@@ -91,7 +91,9 @@ const ProfileStats = ({ stats }: ProfileStatsProps) => {
               {stats.chessTotalPoints}
               {stats.chessTotalPossiblePoints !== null && stats.chessTotalPossiblePoints !== undefined && `/${stats.chessTotalPossiblePoints}`}
             </div>
-            <div className={styles.statLabel}>Очки в міжгрупових шахах</div>
+            <div className={styles.statLabel}>
+              Очки в міжгрупових шахах <i className="fas fa-info-circle" style={{ fontSize: '12px', opacity: 0.7 }}></i>
+            </div>
           </div>
         )}
         {stats.isChessUndefeatedFourSeasons && (

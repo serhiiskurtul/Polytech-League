@@ -5,6 +5,7 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
   border: 1px solid var(--border);
   transition: all 0.3s ease;
+  cursor: help;
 }
 
 .card:hover {
@@ -47,6 +48,7 @@
   flex-direction: column;
   gap: 12px;
   transition: all 0.3s ease;
+  cursor: help;
 }
 
 .statCard:hover {

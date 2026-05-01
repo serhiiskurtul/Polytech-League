@@ -480,110 +480,110 @@ public class PlayerService : IPlayerService
                 // Stats
                 int played = 0, won = 0;
                 double totalScore = 0;
-                var sportStatsMap = new Dictionary<string, SportStatsDto>();
-                var pointsBreakdown = new List<PointEntryDto>();
-                foreach (var sport in sportTypes) sportStatsMap[sport] = new SportStatsDto { SportType = sport };
-
-                foreach (var ach in achievements) {
-                    double pts = 0;
-                    double mult = 1.0;
-                    string levelName = "РњС–Р¶РіСЂСѓРїРѕРІС–";
-                    
-                    if (allEvents.TryGetValue(ach.TournamentId, out var lvl)) {
-                        if (levelMultipliers.TryGetValue(lvl, out var m)) mult = m;
-                        levelName = lvl switch {
-                            CompetitionLevel.Regional => "РћР±Р»Р°СЃРЅС–",
-                            CompetitionLevel.National => "Р’СЃРµСѓРєСЂР°С—РЅСЃСЊРєС–",
-                            _ => "РњС–Р¶РіСЂСѓРїРѕРІС–"
-                        };
-                        
-                        // Participation points ONLY for CollegeGroup level
-                        if (lvl == CompetitionLevel.CollegeGroup) {
-                            pts = 10;
-                        }
-                    } else {
-                        // Fallback if event level is unknown
-                        pts = 10; 
-                    }
-
-                    if (ach.Rank == 1) pts += 100;
-                    else if (ach.Rank == 2) pts += 50;
-                    else if (ach.Rank == 3) pts += 30;
-                    
-                    if (pts <= 0) continue;
-                    var finalPts = (int)Math.Round(pts * mult);
-                    totalScore += finalPts;
-                    if (sportStatsMap.TryGetValue(ach.SportType, out var s)) s.PerformanceScore += finalPts;
-                    
-                    pointsBreakdown.Add(new PointEntryDto {
-                        Description = ach.Rank > 0 
-                            ? $"{ach.Rank} РјС–СЃС†Рµ: {ach.TournamentName} ({levelName})" 
-                            : $"РЈС‡Р°СЃС‚СЊ: {ach.TournamentName} ({levelName})",
-                        Points = finalPts,
-                        Category = "Achievements",
-                        SportType = ach.SportType
-                    });
-                }
-
-                void AddStats(string sport, int p, int w) {
-                    played += p; won += w;
-                    if (p > 0) {
-                        sportTypes.Add(sport);
-                        if (!sportStatsMap.ContainsKey(sport)) sportStatsMap[sport] = new SportStatsDto { SportType = sport };
-                        var s = sportStatsMap[sport];
-                        s.MatchesPlayed += p; s.WinsCount += w;
-                        
-                        int matchPts = 0; // Removed participation points
-                        int winPts = w * 2;
-                        int totalPts = matchPts + winPts;
-                        
-                        s.PerformanceScore += totalPts; 
-                        totalScore += totalPts;
-                        
-                        string sportName = sport switch {
-                            "chess" => "РЁР°С…Рё", "checkers" => "РЁР°С€РєРё", "table_tennis" => "РќР°СЃС‚С–Р»СЊРЅРёР№ С‚РµРЅС–СЃ",
-                            "armwrestling" => "РђСЂРјСЂРµСЃС‚Р»РёРЅРі", "badminton" => "Р‘Р°РґРјС–РЅС‚РѕРЅ", _ => sport
-                        };
-                        
-                        if (winPts > 0) pointsBreakdown.Add(new PointEntryDto { Description = $"РџРµСЂРµРјРѕРіРё ({sportName}): {w} С–РіРѕСЂ", Points = winPts, Category = "Activity", SportType = sport });
-                    }
-                }
-
-                var cw = cwS.FirstOrDefault(x => x.Id == playerId);
-                var cb = cbS.FirstOrDefault(x => x.Id == playerId);
-                var chw = chwS.FirstOrDefault(x => x.Id == playerId);
-                var chb = chbS.FirstOrDefault(x => x.Id == playerId);
-                var t1 = tt1S.FirstOrDefault(x => x.Id == playerId);
-                var t2 = tt2S.FirstOrDefault(x => x.Id == playerId);
-                var a1 = arm1S.FirstOrDefault(x => x.Id == playerId);
-                var a2 = arm2S.FirstOrDefault(x => x.Id == playerId);
-                var b1 = bad1S.FirstOrDefault(x => x.Id == playerId);
-                var b2 = bad2S.FirstOrDefault(x => x.Id == playerId);
-
-                AddStats("chess", (cw?.Count ?? 0) + (cb?.Count ?? 0), (cw?.Wins ?? 0) + (cb?.Wins ?? 0));
-                AddStats("checkers", (chw?.Count ?? 0) + (chb?.Count ?? 0), (chw?.Wins ?? 0) + (chb?.Wins ?? 0));
-                AddStats("table_tennis", (t1?.Count ?? 0) + (t2?.Count ?? 0), (t1?.Wins ?? 0) + (t2?.Wins ?? 0));
-                AddStats("armwrestling", (a1?.Count ?? 0) + (a2?.Count ?? 0), (a1?.Wins ?? 0) + (a2?.Wins ?? 0));
-                AddStats("badminton", (b1?.Count ?? 0) + (b2?.Count ?? 0), (b1?.Wins ?? 0) + (b2?.Wins ?? 0));
-                
-                // 4. Team Sport Stats & Goals
-                var pGoals = goalsS.FirstOrDefault(x => x.Id == playerId)?.Goals ?? 0;
-                if (pGoals > 0) {
-                    if (!sportStatsMap.ContainsKey("futsal")) sportStatsMap["futsal"] = new SportStatsDto { SportType = "futsal" };
-                    var s = sportStatsMap["futsal"];
-                    s.GoalsCount += pGoals;
-                    int goalPts = pGoals * 5;
-                    s.PerformanceScore += goalPts;
-                    totalScore += goalPts;
-                    
-                    pointsBreakdown.Add(new PointEntryDto { 
-                        Description = $"Р—Р°Р±РёС‚С– РіРѕР»Рё (Р¤СѓС‚Р·Р°Р»): {pGoals} РіРѕР»С–РІ", 
-                        Points = goalPts, 
-                        Category = "Goals",
-                        SportType = "futsal"
-                    });
-                }
-
+                                var sportStatsMap = new Dictionary<string, SportStatsDto>();
+                var pointsBreakdown = new List<PointEntryDto>();
+                foreach (var sport in sportTypes) sportStatsMap[sport] = new SportStatsDto { SportType = sport };
+
+                foreach (var ach in achievements) {
+                    double pts = 0;
+                    double mult = 1.0;
+                    string levelName = "Міжгрупові";
+                    
+                    if (allEvents.TryGetValue(ach.TournamentId, out var lvl)) {
+                        if (levelMultipliers.TryGetValue(lvl, out var m)) mult = m;
+                        levelName = lvl switch {
+                            CompetitionLevel.Regional => "Обласні",
+                            CompetitionLevel.National => "Всеукраїнські",
+                            _ => "Міжгрупові"
+                        };
+                        
+                        // Participation points ONLY for CollegeGroup level
+                        if (lvl == CompetitionLevel.CollegeGroup) {
+                            pts = 10;
+                        }
+                    } else {
+                        // Fallback if event level is unknown
+                        pts = 10; 
+                    }
+
+                    if (ach.Rank == 1) pts += 100;
+                    else if (ach.Rank == 2) pts += 50;
+                    else if (ach.Rank == 3) pts += 30;
+                    
+                    if (pts <= 0) continue;
+                    var finalPts = (int)Math.Round(pts * mult);
+                    totalScore += finalPts;
+                    if (sportStatsMap.TryGetValue(ach.SportType, out var s)) s.PerformanceScore += finalPts;
+                    
+                    pointsBreakdown.Add(new PointEntryDto {
+                        Description = ach.Rank > 0 
+                            ? $"{ach.Rank} місце: {ach.TournamentName} ({levelName})" 
+                            : $"Участь: {ach.TournamentName} ({levelName})",
+                        Points = finalPts,
+                        Category = "Achievements",
+                        SportType = ach.SportType
+                    });
+                }
+
+                void AddStats(string sport, int p, int w) {
+                    played += p; won += w;
+                    if (p > 0) {
+                        sportTypes.Add(sport);
+                        if (!sportStatsMap.ContainsKey(sport)) sportStatsMap[sport] = new SportStatsDto { SportType = sport };
+                        var s = sportStatsMap[sport];
+                        s.MatchesPlayed += p; s.WinsCount += w;
+                        
+                        int matchPts = 0; // Removed participation points
+                        int winPts = w * 2;
+                        int totalPts = matchPts + winPts;
+                        
+                        s.PerformanceScore += totalPts; 
+                        totalScore += totalPts;
+                        
+                        string sportName = sport switch {
+                            "chess" => "Шахи", "checkers" => "Шашки", "table_tennis" => "Настільний теніс",
+                            "armwrestling" => "Армрестлинг", "badminton" => "Бадмінтон", _ => sport
+                        };
+                        
+                        if (winPts > 0) pointsBreakdown.Add(new PointEntryDto { Description = $"Перемоги ({sportName}): {w} ігор", Points = winPts, Category = "Activity", SportType = sport });
+                    }
+                }
+
+                var cw = cwS.FirstOrDefault(x => x.Id == playerId);
+                var cb = cbS.FirstOrDefault(x => x.Id == playerId);
+                var chw = chwS.FirstOrDefault(x => x.Id == playerId);
+                var chb = chbS.FirstOrDefault(x => x.Id == playerId);
+                var t1 = tt1S.FirstOrDefault(x => x.Id == playerId);
+                var t2 = tt2S.FirstOrDefault(x => x.Id == playerId);
+                var a1 = arm1S.FirstOrDefault(x => x.Id == playerId);
+                var a2 = arm2S.FirstOrDefault(x => x.Id == playerId);
+                var b1 = bad1S.FirstOrDefault(x => x.Id == playerId);
+                var b2 = bad2S.FirstOrDefault(x => x.Id == playerId);
+
+                AddStats("chess", (cw?.Count ?? 0) + (cb?.Count ?? 0), (cw?.Wins ?? 0) + (cb?.Wins ?? 0));
+                AddStats("checkers", (chw?.Count ?? 0) + (chb?.Count ?? 0), (chw?.Wins ?? 0) + (chb?.Wins ?? 0));
+                AddStats("table_tennis", (t1?.Count ?? 0) + (t2?.Count ?? 0), (t1?.Wins ?? 0) + (t2?.Wins ?? 0));
+                AddStats("armwrestling", (a1?.Count ?? 0) + (a2?.Count ?? 0), (a1?.Wins ?? 0) + (a2?.Wins ?? 0));
+                AddStats("badminton", (b1?.Count ?? 0) + (b2?.Count ?? 0), (b1?.Wins ?? 0) + (b2?.Wins ?? 0));
+                
+                // 4. Team Sport Stats & Goals
+                var pGoals = goalsS.FirstOrDefault(x => x.Id == playerId)?.Goals ?? 0;
+                if (pGoals > 0) {
+                    if (!sportStatsMap.ContainsKey("futsal")) sportStatsMap["futsal"] = new SportStatsDto { SportType = "futsal" };
+                    var s = sportStatsMap["futsal"];
+                    s.GoalsCount += pGoals;
+                    int goalPts = pGoals * 5;
+                    s.PerformanceScore += goalPts;
+                    totalScore += goalPts;
+                    
+                    pointsBreakdown.Add(new PointEntryDto { 
+                        Description = $"Забиті голи (Футзал): {pGoals} голів", 
+                        Points = goalPts, 
+                        Category = "Goals",
+                        SportType = "futsal"
+                    });
+                }
+
                 dto.MatchesPlayed = played;
                 dto.WinsCount = won;
                 dto.GoalsScored = pGoals;
