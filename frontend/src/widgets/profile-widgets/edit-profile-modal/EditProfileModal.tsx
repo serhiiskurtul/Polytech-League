@@ -142,7 +142,7 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
                     name="previousNames"
                     value={formData.previousNames}
                     onChange={handleChange}
-                    placeholder="Наприклад: Паламарюк"
+                    placeholder="Введіть старе прізвище"
                   />
                   <small className={styles.helpText}>Допоможе знайти ваш профіль за старим прізвищем</small>
                 </div>

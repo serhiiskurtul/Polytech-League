@@ -2411,6 +2411,9 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<bool>("IsExternal")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsFounder")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("PreviousNames")
                         .HasColumnType("text");
 

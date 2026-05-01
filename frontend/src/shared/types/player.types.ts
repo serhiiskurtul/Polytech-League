@@ -16,6 +16,7 @@ export interface PlayerDto {
     instagramUrl?: string | null;
     photoUrl?: string | null;
     previousNames?: string | null;
+    isFounder?: boolean;
 
     // Chess
     chessRating?: number | null;

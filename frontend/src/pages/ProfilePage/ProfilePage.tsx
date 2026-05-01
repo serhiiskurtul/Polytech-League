@@ -120,7 +120,8 @@ const ProfilePage = () => {
       : null,
     photoUrl: playerProfile?.photoUrl,
 
-    globalRank: playerProfile?.globalRank
+    globalRank: playerProfile?.globalRank,
+    isFounder: playerProfile?.isFounder
   };
 
   const stats = {

@@ -302,6 +302,9 @@ const PlayersRatingPage = () => {
                             <div className={styles.playerDetails}>
                               <div className={styles.playerName}>
                                 {player.firstName} {player.lastName}
+                                {player.isFounder && (
+                                  <i className="fa-solid fa-crown" style={{ color: '#f59e0b', marginLeft: '6px', fontSize: '14px' }} title="Засновник Polytech League"></i>
+                                )}
                                 {player.previousNames && (
                                   <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 'normal', marginLeft: '4px' }}>
                                     ({player.previousNames})

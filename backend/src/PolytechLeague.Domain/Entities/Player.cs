@@ -50,6 +50,7 @@ public class Player : Person
 
     public bool IsExternal { get; set; } = false;
     public string? PreviousNames { get; set; }
+    public bool IsFounder { get; set; } = false;
     public long? CollegeId { get; set; }
     public College? College { get; set; }
 }

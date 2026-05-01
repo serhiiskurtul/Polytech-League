@@ -17,6 +17,7 @@ interface UserData {
   volleyballShirtNumber?: number | null;
   basketballShirtNumber?: number | null;
   previousNames?: string | null;
+  isFounder?: boolean;
 }
 
 
@@ -83,6 +84,11 @@ const ProfileHeader = ({ userData, isAdmin, onEdit, onAvatarUpload, onLogout, on
                   {badge}
                 </span>
               ))}
+              {userData.isFounder && (
+                <span className={styles.badgeFounder}>
+                  <i className="fas fa-crown"></i> Founder
+                </span>
+              )}
             </div>
             </div>
             <div className={styles.socialLinks}>
