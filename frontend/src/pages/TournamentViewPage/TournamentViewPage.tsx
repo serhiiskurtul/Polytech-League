@@ -1886,15 +1886,9 @@ const TournamentViewPage = () => {
                                         </>
                                       ) : (
                                         <>
-                                          {sportKey === 'armwrestling' ? (
-                                            <td>
-                                              <input type="number" step="0.1" value={editingParticipantData.weight} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, weight: parseFloat(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
-                                            </td>
-                                          ) : (
-                                            <td>
-                                              <input type="number" step="0.5" value={editingParticipantData.points} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, points: parseFloat(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
-                                            </td>
-                                          )}
+                                          <td>
+                                            <input type="number" step="0.5" value={editingParticipantData.points} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, points: parseFloat(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
+                                          </td>
                                         </>
                                       )}
                                       <td>
