@@ -1282,6 +1282,8 @@ public class PlayerService : IPlayerService
                 .OrderByDescending(p => p.Tournament!.Date)
                 .ToListAsync(cancellationToken);
 
+            _logger.LogInformation("Found {Count} chess performances for player {PlayerId}", chessPerformances.Count, playerId);
+
             if (!chessPerformances.Any()) return;
 
             // 2. Check for 4-streak 1st place

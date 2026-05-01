@@ -85,7 +85,7 @@ const ProfileStats = ({ stats }: ProfileStatsProps) => {
             <div className={styles.statLabel}>Забитих голів</div>
           </div>
         )}
-        {stats.chessTotalPoints !== null && stats.chessTotalPoints !== undefined && stats.chessTotalPossiblePoints && (
+        {stats.chessTotalPoints !== null && stats.chessTotalPoints !== undefined && stats.chessTotalPossiblePoints !== null && stats.chessTotalPossiblePoints !== undefined && (
           <div className={styles.statCard} title="Очки в міжгрупових змаганнях з шахів">
             <div className={styles.statValue}>{stats.chessTotalPoints}/{stats.chessTotalPossiblePoints}</div>
             <div className={styles.statLabel}>Очки (шахи)</div>

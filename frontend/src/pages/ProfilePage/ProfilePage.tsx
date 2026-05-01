@@ -29,6 +29,9 @@ interface Stats {
   wins: number;
   eloRating: number;
   goalsScored: number;
+  chessTotalPoints?: number | null;
+  chessTotalPossiblePoints?: number | null;
+  isChessUndefeatedFourSeasons?: boolean;
 }
 
 interface Achievement {
@@ -52,6 +55,7 @@ const ProfilePage = () => {
     const fetchProfile = async () => {
       try {
         const data = await getProfile();
+        console.log('PLAYER PROFILE DATA:', data);
         setPlayerProfile(data);
       } catch (error) {
         console.error("Failed to fetch player profile:", error);
@@ -132,7 +136,10 @@ const ProfilePage = () => {
     eloRating: playerProfile?.chessRating || 0,
     goalsScored: playerProfile?.goalsScored || 0,
     globalRank: playerProfile?.globalRank,
-    sportStats: playerProfile?.sportStats
+    sportStats: playerProfile?.sportStats,
+    chessTotalPoints: playerProfile?.chessTotalPoints,
+    chessTotalPossiblePoints: playerProfile?.chessTotalPossiblePoints,
+    isChessUndefeatedFourSeasons: playerProfile?.isChessUndefeatedFourSeasons
   };
 
   const handleEditProfile = () => {
