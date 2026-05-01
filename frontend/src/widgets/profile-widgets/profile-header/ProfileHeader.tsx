@@ -18,6 +18,12 @@ interface UserData {
   basketballShirtNumber?: number | null;
   previousNames?: string | null;
   isFounder?: boolean;
+  automaticBadges?: Array<{
+    type: string;
+    label: string;
+    seasonName?: string;
+    icon?: string;
+  }>;
 }
 
 
@@ -89,6 +95,20 @@ const ProfileHeader = ({ userData, isAdmin, onEdit, onAvatarUpload, onLogout, on
                   Засновник Polytech League
                 </span>
               )}
+              {userData.automaticBadges?.map((badge, index) => (
+                <span 
+                  key={`auto-${index}`} 
+                  className={
+                    badge.type === 'TopScorer' ? styles.badgeTopScorer :
+                    badge.type === 'RankLeader' ? styles.badgeRankLeader :
+                    styles.badgeSeasonTopScorer
+                  }
+                  title={badge.seasonName ? `Сезон: ${badge.seasonName}` : undefined}
+                >
+                  <i className={`fas fa-${badge.icon || 'star'}`}></i>
+                  {badge.label} {badge.seasonName && `(${badge.seasonName})`}
+                </span>
+              ))}
             </div>
             </div>
             <div className={styles.socialLinks}>

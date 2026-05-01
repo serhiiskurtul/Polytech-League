@@ -27,6 +27,7 @@ public class PlayerDto
     public string? InstagramUrl { get; set; }
     public string? PreviousNames { get; set; }
     public bool IsFounder { get; set; }
+    public List<AutomaticBadgeDto> AutomaticBadges { get; set; } = new();
 
     // Chess
     public int? ChessRating { get; set; }
@@ -94,6 +95,14 @@ public class SportStatsDto
     public int WinsCount { get; set; }
     public int GoalsCount { get; set; }
     public int Rank { get; set; }
+}
+
+public class AutomaticBadgeDto
+{
+    public required string Type { get; set; } // e.g. "TopScorer", "SeasonTopScorer", "RankLeader"
+    public required string Label { get; set; }
+    public string? SeasonName { get; set; }
+    public string? Icon { get; set; }
 }
 
 public static class PlayerDtoExtensions

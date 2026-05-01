@@ -17,6 +17,12 @@ export interface PlayerDto {
     photoUrl?: string | null;
     previousNames?: string | null;
     isFounder?: boolean;
+    automaticBadges?: Array<{
+        type: string;
+        label: string;
+        seasonName?: string;
+        icon?: string;
+    }>;
 
     // Chess
     chessRating?: number | null;

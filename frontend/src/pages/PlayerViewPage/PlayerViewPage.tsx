@@ -86,6 +86,7 @@ const PlayerViewPage = () => {
     globalRank: playerProfile.globalRank,
     previousNames: playerProfile.previousNames,
     isFounder: playerProfile.isFounder,
+    automaticBadges: playerProfile.automaticBadges,
     futsalShirtNumber: playerProfile.futsalShirtNumber,
     volleyballShirtNumber: playerProfile.volleyballShirtNumber,
     basketballShirtNumber: playerProfile.basketballShirtNumber

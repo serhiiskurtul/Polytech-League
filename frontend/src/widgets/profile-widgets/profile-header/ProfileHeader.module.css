@@ -365,3 +365,57 @@
   border: 1px solid #334155;
 }
 
+
+.badgeTopScorer {
+  background: #fff7ed;
+  color: #ea580c;
+  border: 1px solid #fdba74;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badgeTopScorer i {
+  color: #f97316;
+  animation: flicker 1.5s infinite;
+}
+
+.badgeRankLeader {
+  background: #f5f3ff;
+  color: #7c3aed;
+  border: 1px solid #c4b5fd;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badgeRankLeader i {
+  color: #8b5cf6;
+}
+
+.badgeSeasonTopScorer {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@keyframes flicker {
+  0% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 0.8; transform: scale(1); }
+}

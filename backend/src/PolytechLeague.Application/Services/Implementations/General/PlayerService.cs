@@ -45,7 +45,7 @@ public class PlayerService : IPlayerService
     {
         var allWithRankings = await GetAllWithRankingsAsync(null, cancellationToken);
         var ranked = allWithRankings.FirstOrDefault(p => p.Id == id);
-        if (ranked != null) return ranked;
+        if (ranked != null) { await PopulateAutomaticBadgesAsync(ranked, cancellationToken); return ranked; }
 
         // Fallback for players not in rankings (Admins, External)
         var player = await _dbContext.Players
@@ -54,7 +54,7 @@ public class PlayerService : IPlayerService
             
         if (player == null) return null;
         var dto = player.ToDto();
-        await PopulateAchievementsAsync(dto, cancellationToken);
+        await PopulateAchievementsAsync(dto, cancellationToken); await PopulateAutomaticBadgesAsync(dto, cancellationToken);
         return dto;
     }
 
@@ -71,7 +71,7 @@ public class PlayerService : IPlayerService
     {
         var allWithRankings = await GetAllWithRankingsAsync(null, cancellationToken);
         var ranked = allWithRankings.FirstOrDefault(p => p.UserId == userId);
-        if (ranked != null) return ranked;
+        if (ranked != null) { await PopulateAutomaticBadgesAsync(ranked, cancellationToken); return ranked; }
 
         // Fallback for players not in rankings (Admins, External)
         var player = await _dbContext.Players
@@ -80,7 +80,7 @@ public class PlayerService : IPlayerService
             
         if (player == null) return null;
         var dto = player.ToDto();
-        await PopulateAchievementsAsync(dto, cancellationToken);
+        await PopulateAchievementsAsync(dto, cancellationToken); await PopulateAutomaticBadgesAsync(dto, cancellationToken);
         return dto;
     }
 
@@ -1216,3 +1216,72 @@ public class PlayerService : IPlayerService
     }
 }
 
+
+    private async Task PopulateAutomaticBadgesAsync(PlayerDto dto, CancellationToken cancellationToken)
+    {
+        if (dto.Id == null) return;
+        var playerId = dto.Id.Value;
+        var badges = new List<AutomaticBadgeDto>();
+
+        try {
+            // 1. All-time Top Scorer
+            var allTimeTopScorer = await _dbContext.FutsalGoals
+                .GroupBy(g => g.PlayerId)
+                .Select(group => new { PlayerId = group.Key, TotalGoals = group.Sum(g => g.GoalsCount) })
+                .OrderByDescending(x => x.TotalGoals)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (allTimeTopScorer != null && allTimeTopScorer.PlayerId == playerId && allTimeTopScorer.TotalGoals > 0)
+            {
+                badges.Add(new AutomaticBadgeDto { 
+                    Type = "TopScorer", 
+                    Label = "Найкращий бомбардир", 
+                    Icon = "fire" 
+                });
+            }
+
+            // 2. Season Top Scorers
+            var seasonTopScorersData = await _dbContext.FutsalGoals
+                .Include(g => g.Match)
+                    .ThenInclude(m => m.Event)
+                        .ThenInclude(e => e.Season)
+                .Where(g => g.Match != null && g.Match.Event != null && g.Match.Event.SeasonId != null)
+                .GroupBy(g => new { g.PlayerId, g.Match.Event.SeasonId, SeasonName = g.Match.Event.Season.Name })
+                .Select(group => new { 
+                    PlayerId = group.Key.PlayerId, 
+                    SeasonId = group.Key.SeasonId, 
+                    SeasonName = group.Key.SeasonName, 
+                    TotalGoals = group.Sum(g => g.GoalsCount) 
+                })
+                .ToListAsync(cancellationToken);
+
+            var topPerSeason = seasonTopScorersData
+                .GroupBy(s => s.SeasonId)
+                .Select(g => g.OrderByDescending(x => x.TotalGoals).First())
+                .Where(x => x.PlayerId == playerId && x.TotalGoals > 0);
+
+            foreach (var top in topPerSeason)
+            {
+                badges.Add(new AutomaticBadgeDto { 
+                    Type = "SeasonTopScorer", 
+                    Label = "Бомбардир сезону", 
+                    SeasonName = top.SeasonName,
+                    Icon = "soccer-ball" 
+                });
+            }
+
+            // 3. Rank Leader
+            if (dto.GlobalRank == 1)
+            {
+                badges.Add(new AutomaticBadgeDto { 
+                    Type = "RankLeader", 
+                    Label = "Лідер рейтингу", 
+                    Icon = "trophy" 
+                });
+            }
+        } catch (Exception ex) {
+            _logger.LogError(ex, "Error populating automatic badges for player {PlayerId}", playerId);
+        }
+
+        dto.AutomaticBadges = badges;
+    }

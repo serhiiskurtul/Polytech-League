@@ -121,7 +121,8 @@ const ProfilePage = () => {
     photoUrl: playerProfile?.photoUrl,
 
     globalRank: playerProfile?.globalRank,
-    isFounder: playerProfile?.isFounder
+    isFounder: playerProfile?.isFounder,
+    automaticBadges: playerProfile?.automaticBadges
   };
 
   const stats = {
