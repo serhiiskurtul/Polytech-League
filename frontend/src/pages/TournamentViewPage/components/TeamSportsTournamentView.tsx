@@ -1283,7 +1283,19 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       </td>
                       <td>{p.groupName || '—'}</td>
                       <td style={{ textAlign: 'center' }}>
-                        <span className={`${styles.statusBadge} ${styles[p.status?.toLowerCase()]}`}>
+                        <span style={{
+                          fontSize: '11px',
+                          fontWeight: 'bold',
+                          padding: '4px 10px',
+                          borderRadius: '6px',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px',
+                          background: p.status === RegistrationStatus.Approved ? '#ecfdf5' : p.status === RegistrationStatus.Pending ? '#fffbeb' : '#fef2f2',
+                          color: p.status === RegistrationStatus.Approved ? '#10b981' : p.status === RegistrationStatus.Pending ? '#f59e0b' : '#ef4444',
+                          border: `1px solid ${p.status === RegistrationStatus.Approved ? '#bdf4e4' : p.status === RegistrationStatus.Pending ? '#fef3c7' : '#fee2e2'}`,
+                          display: 'inline-block',
+                          boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                        }}>
                           {p.status === RegistrationStatus.Approved ? 'Підтверджено' : 
                            p.status === RegistrationStatus.Pending ? 'Очікує' : 'Відхилено'}
                         </span>
@@ -1295,15 +1307,19 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                               <>
                                 <button 
                                   onClick={() => handleApproveParticipant(p.playerId)} 
-                                  className={styles.approveBtn}
+                                  style={{ padding: '6px 10px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(16,185,129,0.2)' }} 
                                   title="Підтвердити"
+                                  onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+                                  onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                                 >
                                   <i className="fas fa-check"></i>
                                 </button>
                                 <button 
                                   onClick={() => handleRejectParticipant(p.playerId)} 
-                                  className={styles.rejectBtn}
+                                  style={{ padding: '6px 10px', background: '#f59e0b', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(245,158,11,0.2)' }} 
                                   title="Відхилити"
+                                  onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+                                  onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                                 >
                                   <i className="fas fa-times"></i>
                                 </button>
@@ -1311,8 +1327,10 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                             )}
                             <button 
                               onClick={() => handleRemoveParticipant(p.playerId)} 
-                              className={styles.deleteBtn}
+                              style={{ padding: '6px 10px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(239,68,68,0.2)' }} 
                               title="Видалити зовсім"
+                              onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+                              onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                             >
                               <i className="fas fa-trash"></i>
                             </button>

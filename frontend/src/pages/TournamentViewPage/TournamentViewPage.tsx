@@ -1827,6 +1827,7 @@ const TournamentViewPage = () => {
                                 ) : (
                                   <th>Очки</th>
                                 )}
+                                <th>Статус</th>
                                 {isAdmin && <th>Дії</th>}
                               </tr>
                             </thead>
@@ -1894,6 +1895,7 @@ const TournamentViewPage = () => {
                                           </td>
                                         </>
                                       )}
+                                      <td>-</td>
                                       <td>
                                         <button type="button" onClick={() => handleSaveParticipantEdit(p.playerId)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }}><i className="fas fa-check"></i></button>
                                         <button type="button" onClick={handleCancelParticipantEdit} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}><i className="fas fa-times"></i></button>
@@ -1910,9 +1912,19 @@ const TournamentViewPage = () => {
                                         ) : (
                                           <strong>{p.playerName}</strong>
                                         )}
+                                      </td>
+                                      <td>{p.groupName || '—'}</td>
+                                      {isChess ? (
+                                        <>
+                                          <td>{p.rating ?? 0}</td>
+                                          <td><strong>{p.points ?? 0}</strong></td>
+                                        </>
+                                      ) : (
+                                        <td><strong>{p.points ?? 0}</strong></td>
+                                      )}
+                                      <td>
                                         {p.status && (
                                           <span style={{
-                                            marginLeft: '8px',
                                             fontSize: '11px',
                                             fontWeight: 'bold',
                                             padding: '4px 10px',
@@ -1929,15 +1941,6 @@ const TournamentViewPage = () => {
                                           </span>
                                         )}
                                       </td>
-                                      <td>{p.groupName || '—'}</td>
-                                      {isChess ? (
-                                        <>
-                                          <td>{p.rating ?? 0}</td>
-                                          <td><strong>{p.points ?? 0}</strong></td>
-                                        </>
-                                      ) : (
-                                        <td><strong>{p.points ?? 0}</strong></td>
-                                      )}
                                       {isAdmin && (
                                         <td>
                                           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
@@ -1992,7 +1995,7 @@ const TournamentViewPage = () => {
                                   )}
                                 </tr>
                               )) : (
-                                <tr><td colSpan={6}>Ще немає даних</td></tr>
+                                <tr><td colSpan={7}>Ще немає даних</td></tr>
                               )}
                             </tbody>
                           </table>
