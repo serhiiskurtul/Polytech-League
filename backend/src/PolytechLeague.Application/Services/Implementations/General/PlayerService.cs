@@ -1331,23 +1331,34 @@ public class PlayerService : IPlayerService
 
             // 3. Calculate total points and possible points
             double totalPoints = chessPerformances.Sum(p => p.Points);
-            double totalPossible = 0;
+            _logger.LogInformation("Player {PlayerId} has {Points} total points from {Count} performances", playerId, totalPoints, chessPerformances.Count);
 
             var tournamentIds = chessPerformances.Select(p => p.TournamentId).ToList();
+            double totalPossible = 0;
+
+            foreach (var tId in tournamentIds)
+            {
+                var maxRound = await _dbContext.ChessGames
+                    .Where(g => g.TournamentId == tId)
+                    .Select(g => (int?)g.Round)
+                    .MaxAsync(cancellationToken) ?? 0;
+                totalPossible += maxRound;
+            }
+
+            _logger.LogInformation("Player {PlayerId} total possible points calculated as {Possible}", playerId, totalPossible);
+            
+            if (totalPossible > 0 || totalPoints > 0)
+            {
+                dto.ChessTotalPoints = totalPoints;
+                dto.ChessTotalPossiblePoints = totalPossible > 0 ? totalPossible : null;
+            }
+
+            // 4. Undefeated in 4 seasons
+            // Re-fetch games for this player to check for losses
             var games = await _dbContext.ChessGames
                 .Where(g => tournamentIds.Contains(g.TournamentId) && (g.WhitePlayerId == playerId || g.BlackPlayerId == playerId))
                 .ToListAsync(cancellationToken);
 
-            totalPossible = games.Count;
-            
-            if (totalPossible > 0)
-            {
-                dto.ChessTotalPoints = totalPoints;
-                dto.ChessTotalPossiblePoints = totalPossible;
-            }
-
-            // 4. Undefeated in 4 seasons
-            // Group games by season
             var seasonsWithChess = await _dbContext.Seasons
                 .Where(s => _dbContext.ChessEvents.Any(e => e.SeasonId == s.Id && e.Level == CompetitionLevel.CollegeGroup && 
                     _dbContext.ChessEventParticipants.Any(p => p.TournamentId == e.Id && p.PlayerId == playerId)))
