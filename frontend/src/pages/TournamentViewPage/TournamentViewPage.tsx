@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'; // test
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/app/providers/AuthContext';
@@ -23,11 +23,8 @@ import {
   approveChessParticipant,
   rejectChessParticipant,
   importDataFromFile,
-  getProfile
-} from '@/shared/api';
-import { PlayerDto } from '@/shared/types/player.types';
-import { RegistrationStatus } from '@/shared/types/tournament.types';
-import {
+  getProfile,
+  // Checkers
   getCheckersEventById,
   updateCheckersEvent,
   addParticipantToCheckersEvent,
@@ -39,9 +36,8 @@ import {
   importCheckersDataFromFile,
   registerForCheckersEvent,
   approveCheckersParticipant,
-  rejectCheckersParticipant
-} from '@/shared/api/checkers.api';
-import {
+  rejectCheckersParticipant,
+  // Armwrestling
   getArmwrestlingEventById,
   updateArmwrestlingEvent,
   addParticipantToArmwrestlingEvent,
@@ -49,13 +45,36 @@ import {
   updateArmwrestlingParticipant,
   registerForArmwrestlingEvent,
   approveArmwrestlingParticipant,
-  rejectArmwrestlingParticipant
-} from '@/shared/api/armwrestling.api';
-import { getVolleyballEventById, updateVolleyballEvent, registerForVolleyballEvent } from '@/shared/api/volleyball.api';
-import { getBeachVolleyballEventById, updateBeachVolleyballEvent, registerForBeachVolleyballEvent } from '@/shared/api/beachVolleyball.api';
-import { getFutsalEventById, updateFutsalEvent, registerForFutsalEvent } from '@/shared/api/futsal.api';
-import { getBasketball3x3EventById, updateBasketball3x3Event, registerForBasketball3x3Event } from '@/shared/api/basketball3x3.api';
-import {
+  rejectArmwrestlingParticipant,
+  // Volleyball
+  getVolleyballEventById, 
+  updateVolleyballEvent, 
+  registerForVolleyballEvent,
+  approveVolleyballParticipant,
+  rejectVolleyballParticipant,
+  removeVolleyballParticipant,
+  // Beach Volleyball
+  getBeachVolleyballEventById, 
+  updateBeachVolleyballEvent, 
+  registerForBeachVolleyballEvent,
+  approveBeachVolleyballParticipant,
+  rejectBeachVolleyballParticipant,
+  removeBeachVolleyballParticipant,
+  // Futsal
+  getFutsalEventById, 
+  updateFutsalEvent, 
+  registerForFutsalEvent,
+  approveFutsalParticipant,
+  rejectFutsalParticipant,
+  removeFutsalParticipant,
+  // Basketball 3x3
+  getBasketball3x3EventById, 
+  updateBasketball3x3Event, 
+  registerForBasketball3x3Event,
+  approveBasketball3x3Participant,
+  rejectBasketball3x3Participant,
+  removeBasketball3x3Participant,
+  // Badminton
   getBadmintonEventById,
   updateBadmintonEvent,
   addParticipantToBadmintonEvent,
@@ -63,8 +82,11 @@ import {
   updateBadmintonParticipant,
   registerForBadmintonEvent,
   approveBadmintonParticipant,
-  rejectBadmintonParticipant
-} from '@/shared/api/badminton.api';
+  rejectBadmintonParticipant,
+  removeBadmintonParticipant
+} from '@/shared/api';
+import { PlayerDto } from '@/shared/types/player.types';
+import { RegistrationStatus } from '@/shared/types/tournament.types';
 import {
   getTableTennisEventById,
   updateTableTennisEvent,

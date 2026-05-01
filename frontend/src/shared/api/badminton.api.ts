@@ -43,6 +43,8 @@ export const removeParticipantFromBadmintonEvent = async (eventId: string | numb
   await api.delete(`/badminton-events/${eventId}/participants/${playerId}`);
 };
 
+export const removeBadmintonParticipant = removeParticipantFromBadmintonEvent;
+
 export const updateBadmintonParticipant = async (eventId: string | number, playerId: number, data: any): Promise<void> => {
   await api.put(`/badminton-events/${eventId}/participants/${playerId}`, data);
 };
