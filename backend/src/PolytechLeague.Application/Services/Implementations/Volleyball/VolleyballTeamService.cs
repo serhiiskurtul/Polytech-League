@@ -43,11 +43,26 @@ public class VolleyballTeamService(
             .Include(t => t.Players)
             .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
 
-        if (team?.Players != null)
+        if (team != null)
         {
-            foreach (var player in team.Players)
+            if (team.Players != null)
             {
-                player.VolleyballTeamId = null;
+                var playerIds = team.Players.Select(p => p.Id).ToList();
+                
+                // Also remove these players from the event participants
+                var participants = await _dbcontext.Set<VolleyballEventParticipant>()
+                    .Where(p => p.EventId == team.EventId && playerIds.Contains(p.PlayerId))
+                    .ToListAsync(cancellationToken);
+                
+                if (participants.Any())
+                {
+                    _dbcontext.Set<VolleyballEventParticipant>().RemoveRange(participants);
+                }
+
+                foreach (var player in team.Players)
+                {
+                    player.VolleyballTeamId = null;
+                }
             }
             await _dbcontext.SaveChangesAsync(cancellationToken);
         }

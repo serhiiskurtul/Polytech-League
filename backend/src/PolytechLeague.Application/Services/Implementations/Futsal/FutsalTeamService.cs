@@ -43,11 +43,26 @@ public class FutsalTeamService(
             .Include(t => t.Players)
             .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
 
-        if (team?.Players != null)
+        if (team != null)
         {
-            foreach (var player in team.Players)
+            if (team.Players != null)
             {
-                player.FutsalTeamId = null;
+                var playerIds = team.Players.Select(p => p.Id).ToList();
+                
+                // Also remove these players from the event participants
+                var participants = await _dbcontext.Set<FutsalEventParticipant>()
+                    .Where(p => p.EventId == team.EventId && playerIds.Contains(p.PlayerId))
+                    .ToListAsync(cancellationToken);
+                
+                if (participants.Any())
+                {
+                    _dbcontext.Set<FutsalEventParticipant>().RemoveRange(participants);
+                }
+
+                foreach (var player in team.Players)
+                {
+                    player.FutsalTeamId = null;
+                }
             }
             await _dbcontext.SaveChangesAsync(cancellationToken);
         }
