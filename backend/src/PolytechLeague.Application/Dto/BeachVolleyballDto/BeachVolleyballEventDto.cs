@@ -18,6 +18,9 @@ public class BeachVolleyballEventRequest
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public BeachVolleyballTournamentType? TournamentType { get; set; }
+    
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public EventCategory Category { get; set; } = EventCategory.Mixed;
 
     public string? Description { get; set; }
 
@@ -54,6 +57,9 @@ public class BeachVolleyballEventResponse
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public BeachVolleyballTournamentType? TournamentType { get; set; }
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public EventCategory Category { get; set; }
 
     public string? Description { get; set; }
 
@@ -99,7 +105,8 @@ public static class BeachVolleyballEventDtoExtensions
             FirstPlaceTeamId = request.FirstPlaceTeamId,
             SecondPlaceTeamId = request.SecondPlaceTeamId,
             ThirdPlaceTeamId = request.ThirdPlaceTeamId,
-            SeasonId = request.SeasonId
+            SeasonId = request.SeasonId,
+            Category = request.Category
         };
     }
 
@@ -127,7 +134,8 @@ public static class BeachVolleyballEventDtoExtensions
             ThirdPlaceTeam = entity.ThirdPlaceTeam?.ToResponse(),
             Teams = entity.Teams?.Select(t => t.ToResponse()).ToList(),
             Matches = entity.Matches?.Select(m => m.ToResponse()).ToList(),
-            SeasonId = entity.SeasonId
+            SeasonId = entity.SeasonId,
+            Category = entity.Category
         };
     }
 }

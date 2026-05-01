@@ -25,6 +25,9 @@ public class ChessEventRequest
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public ChessSystem? System { get; set; }
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public EventCategory Category { get; set; } = EventCategory.Mixed;
+
     
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
@@ -66,6 +69,9 @@ public class ChessEventResponse
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public ChessSystem? System { get; set; }
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public EventCategory Category { get; set; }
 
     public required ICollection<ChessGameDto> Games { get; set; }
     public required ICollection<ChessEventParticipantDto> Participants { get; set; }
@@ -122,7 +128,8 @@ public static class ChessEventDtoExtension
             FirstPlaceTeamId = chessEventRequest.FirstPlaceTeamId,
             SecondPlaceTeamId = chessEventRequest.SecondPlaceTeamId,
             ThirdPlaceTeamId = chessEventRequest.ThirdPlaceTeamId,
-            SeasonId = chessEventRequest.SeasonId
+            SeasonId = chessEventRequest.SeasonId,
+            Category = chessEventRequest.Category
         };
     }
 
@@ -162,7 +169,8 @@ public static class ChessEventDtoExtension
             FirstPlaceTeam = chessEvent.FirstPlaceTeam?.ToResponse(),
             SecondPlaceTeam = chessEvent.SecondPlaceTeam?.ToResponse(),
             ThirdPlaceTeam = chessEvent.ThirdPlaceTeam?.ToResponse(),
-            SeasonId = chessEvent.SeasonId
+            SeasonId = chessEvent.SeasonId,
+            Category = chessEvent.Category
         };
     }
 }

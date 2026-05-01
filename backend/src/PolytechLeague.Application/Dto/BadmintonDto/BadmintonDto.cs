@@ -18,6 +18,9 @@ public class BadmintonEventRequest
     
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public BadmintonTournamentType? TournamentType { get; set; }
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public EventCategory Category { get; set; } = EventCategory.Mixed;
     
     public string? Description { get; set; }
 
@@ -83,6 +86,9 @@ public class BadmintonEventResponse
     
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public BadmintonTournamentType? TournamentType { get; set; }
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public EventCategory Category { get; set; }
 
     public string? Description { get; set; }
 
@@ -189,7 +195,9 @@ public static class BadmintonDtoExtensions
             IsTeam = request.IsTeam,
             IsModerated = request.IsModerated,
             IsPublic = request.IsPublic,
-            SeasonId = request.SeasonId
+            IsPublic = request.IsPublic,
+            SeasonId = request.SeasonId,
+            Category = request.Category
         };
     }
 
@@ -226,7 +234,10 @@ public static class BadmintonDtoExtensions
             Teams = entity.Teams?.Select(t => t.ToDto()).ToList(),
             Matches = entity.Matches?.Select(m => m.ToResponse()).ToList(),
             Participants = entity.Participants?.Select(p => p.ToDto()).ToList(),
-            SeasonId = entity.SeasonId
+            Matches = entity.Matches?.Select(m => m.ToResponse()).ToList(),
+            Participants = entity.Participants?.Select(p => p.ToDto()).ToList(),
+            SeasonId = entity.SeasonId,
+            Category = entity.Category
         };
     }
 

@@ -29,6 +29,9 @@ public class CheckersEventRequest
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public CheckersVariant Variant { get; set; }
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public EventCategory Category { get; set; } = EventCategory.Mixed;
+
 
     public string? Rules { get; set; }
     public string? Prizes { get; set; }
@@ -73,6 +76,9 @@ public class CheckersEventResponse
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public CheckersVariant? Variant { get; set; }
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public EventCategory Category { get; set; }
 
 
     public required ICollection<CheckersGameDto> Games { get; set; }
@@ -131,7 +137,8 @@ public static class CheckersEventDtoExtension
             FirstPlaceTeamId = checkersEventRequest.FirstPlaceTeamId,
             SecondPlaceTeamId = checkersEventRequest.SecondPlaceTeamId,
             ThirdPlaceTeamId = checkersEventRequest.ThirdPlaceTeamId,
-            SeasonId = checkersEventRequest.SeasonId
+            SeasonId = checkersEventRequest.SeasonId,
+            Category = checkersEventRequest.Category
         };
     }
 
@@ -172,7 +179,8 @@ public static class CheckersEventDtoExtension
             FirstPlaceTeam = checkersEvent.FirstPlaceTeam?.ToResponse(),
             SecondPlaceTeam = checkersEvent.SecondPlaceTeam?.ToResponse(),
             ThirdPlaceTeam = checkersEvent.ThirdPlaceTeam?.ToResponse(),
-            SeasonId = checkersEvent.SeasonId
+            SeasonId = checkersEvent.SeasonId,
+            Category = checkersEvent.Category
         };
     }
 }
