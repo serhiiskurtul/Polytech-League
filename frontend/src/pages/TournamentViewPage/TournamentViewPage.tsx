@@ -1020,7 +1020,8 @@ const TournamentViewPage = () => {
           checkersRating: tournament?.sport === 'checkers' ? newPlayer.ratingELO : undefined,
           userId: newPlayer.userId,
           chessFideId: newPlayer.fideId.trim() || null,
-          chessTitle: newPlayer.title.trim() || null
+          chessTitle: newPlayer.title.trim() || null,
+          competitionsCount: 0
         };
         const created = await createPlayer(playerPayload);
         playerId = created.id!;

@@ -64,7 +64,7 @@ export interface PlayerDto {
         rank: number;
     }[];
     pointsBreakdown?: PointEntryDto[];
-    competitionsCount: number;
+    competitionsCount?: number;
     isExternal?: boolean;
 }
 
