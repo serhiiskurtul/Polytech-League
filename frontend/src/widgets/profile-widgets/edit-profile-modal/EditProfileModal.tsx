@@ -10,6 +10,12 @@ interface EditProfileModalProps {
   isAdmin?: boolean;
 }
 
+const AVAILABLE_GROUPS = [
+  'Гість', '211', '221', '222', '231', '241', '311', '312', '321', 
+  '322', '331', '332', '341', '411', '421', '422', '431', '433', 
+  '441', '511', '512', '513', '521', '522', '523', '531', '532', '541'
+];
+
 const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: EditProfileModalProps) => {
   const [formData, setFormData] = React.useState({
     firstName: initialData.firstName || '',
@@ -61,8 +67,17 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
     e.preventDefault();
     setLoading(true);
 
+    if (formData.studentId && !/^[A-Za-z]{2}\d{8}$/.test(formData.studentId)) {
+      import('react-hot-toast').then(({ toast }) => {
+        toast.error('Студентський квиток має бути у форматі: 2 літери та 8 цифр (наприклад, PH12345678)');
+      });
+      setLoading(false);
+      return;
+    }
+
     const sanitizedData = {
       ...formData,
+      studentId: formData.studentId.toUpperCase(),
       futsalShirtNumber: (formData.futsalShirtNumber === '' || formData.futsalShirtNumber === null) ? null : parseInt(formData.futsalShirtNumber.toString()),
       volleyballShirtNumber: (formData.volleyballShirtNumber === '' || formData.volleyballShirtNumber === null) ? null : parseInt(formData.volleyballShirtNumber.toString()),
       basketballShirtNumber: (formData.basketballShirtNumber === '' || formData.basketballShirtNumber === null) ? null : parseInt(formData.basketballShirtNumber.toString()),
@@ -119,14 +134,18 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
               <>
                 <div className={styles.formGroup}>
                   <label htmlFor="group">Група</label>
-                  <input
-                    type="text"
+                  <select
                     id="group"
                     name="group"
                     value={formData.group}
-                    onChange={handleChange}
-                    placeholder="Наприклад: ІТ-41"
-                  />
+                    onChange={(e) => setFormData(prev => ({ ...prev, group: e.target.value }))}
+                    className={styles.selectInput}
+                  >
+                    <option value="">Оберіть групу</option>
+                    {AVAILABLE_GROUPS.map(g => (
+                      <option key={g} value={g}>{g === 'Гість' ? g : `${g} група`}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className={styles.formGroup}>
@@ -137,8 +156,10 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
                     name="studentId"
                     value={formData.studentId}
                     onChange={handleChange}
-                    placeholder="Наприклад: KB 12345678"
+                    placeholder="Приклад: PH12345678"
+                    maxLength={10}
                   />
+                  <small className={styles.helpText}>2 літери та 8 цифр</small>
                 </div>
                 
                 <div className={styles.formGroup}>
