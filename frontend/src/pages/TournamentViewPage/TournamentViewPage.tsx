@@ -1910,9 +1910,22 @@ const TournamentViewPage = () => {
                                         ) : (
                                           <strong>{p.playerName}</strong>
                                         )}
-                                        {p.status && p.status !== RegistrationStatus.Approved && (
-                                          <span className={`${styles.statusBadge} ${styles[p.status.toLowerCase()]}`} style={{ marginLeft: '8px', fontSize: '10px', padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase', fontWeight: 'bold' }}>
-                                            {p.status === RegistrationStatus.Pending ? 'Очікує' : 'Відхилено'}
+                                        {p.status && (
+                                          <span style={{
+                                            marginLeft: '8px',
+                                            fontSize: '11px',
+                                            fontWeight: 'bold',
+                                            padding: '4px 10px',
+                                            borderRadius: '6px',
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.5px',
+                                            background: p.status === RegistrationStatus.Approved ? '#ecfdf5' : p.status === RegistrationStatus.Pending ? '#fffbeb' : '#fef2f2',
+                                            color: p.status === RegistrationStatus.Approved ? '#10b981' : p.status === RegistrationStatus.Pending ? '#f59e0b' : '#ef4444',
+                                            border: `1px solid ${p.status === RegistrationStatus.Approved ? '#bdf4e4' : p.status === RegistrationStatus.Pending ? '#fef3c7' : '#fee2e2'}`,
+                                            display: 'inline-block',
+                                            boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                                          }}>
+                                            {p.status === RegistrationStatus.Approved ? 'Схвалено' : p.status === RegistrationStatus.Pending ? 'Очікує' : 'Відхилено'}
                                           </span>
                                         )}
                                       </td>
@@ -1925,16 +1938,56 @@ const TournamentViewPage = () => {
                                       ) : (
                                         <td><strong>{p.points ?? 0}</strong></td>
                                       )}
-                                      {isAdmin && <td>
-                                        {p.status === RegistrationStatus.Pending && (
-                                          <>
-                                            <button type="button" onClick={() => handleApproveParticipant(p.playerId, p.playerName)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }} title="Схвалити"><i className="fas fa-check"></i></button>
-                                            <button type="button" onClick={() => handleRejectParticipant(p.playerId, p.playerName)} style={{ padding: '4px 8px', background: '#f59e0b', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }} title="Відхилити"><i className="fas fa-user-slash"></i></button>
-                                          </>
-                                        )}
-                                        <button type="button" onClick={() => handleEditParticipantClick(p)} style={{ padding: '4px 8px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '4px' }} title="Редагувати"><i className="fas fa-edit"></i></button>
-                                        <button type="button" onClick={() => handleRemoveParticipant(p.playerId, p.playerName)} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Видалити"><i className="fas fa-trash"></i></button>
-                                      </td>}
+                                      {isAdmin && (
+                                        <td>
+                                          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                                            {p.status === RegistrationStatus.Pending && (
+                                              <>
+                                                <button 
+                                                  type="button" 
+                                                  onClick={() => handleApproveParticipant(p.playerId, p.playerName)} 
+                                                  style={{ padding: '6px 10px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(16,185,129,0.2)' }} 
+                                                  title="Схвалити"
+                                                  onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+                                                  onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                                                >
+                                                  <i className="fas fa-check" style={{ fontSize: '14px' }}></i>
+                                                </button>
+                                                <button 
+                                                  type="button" 
+                                                  onClick={() => handleRejectParticipant(p.playerId, p.playerName)} 
+                                                  style={{ padding: '6px 10px', background: '#f59e0b', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(245,158,11,0.2)' }} 
+                                                  title="Відхилити"
+                                                  onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+                                                  onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                                                >
+                                                  <i className="fas fa-times" style={{ fontSize: '14px' }}></i>
+                                                </button>
+                                              </>
+                                            )}
+                                            <button 
+                                              type="button" 
+                                              onClick={() => handleEditParticipantClick(p)} 
+                                              style={{ padding: '6px 10px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(59,130,246,0.2)' }} 
+                                              title="Редагувати"
+                                              onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+                                              onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                                            >
+                                              <i className="fas fa-edit" style={{ fontSize: '14px' }}></i>
+                                            </button>
+                                            <button 
+                                              type="button" 
+                                              onClick={() => handleRemoveParticipant(p.playerId, p.playerName)} 
+                                              style={{ padding: '6px 10px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(239,68,68,0.2)' }} 
+                                              title="Видалити"
+                                              onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+                                              onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                                            >
+                                              <i className="fas fa-trash" style={{ fontSize: '14px' }}></i>
+                                            </button>
+                                          </div>
+                                        </td>
+                                      )}
                                     </>
                                   )}
                                 </tr>
