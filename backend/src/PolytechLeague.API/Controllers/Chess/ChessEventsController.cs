@@ -220,4 +220,19 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
         await redisService.RemoveDataAsync($"chess_event_{id}");
         return Ok();
     }
+
+    [AllowAnonymous]
+    [HttpGet("champions")]
+    public async Task<IActionResult> GetChampions(CancellationToken cancellationToken)
+    {
+        var cacheKey = "chess_champions_hall_of_fame";
+        var cached = await redisService.GetDataAsync<List<ChessChampionDto>>(cacheKey);
+        if (cached is not null) return Ok(cached);
+
+        var result = await chessEventService.GetChampionsAsync(cancellationToken);
+        
+        await redisService.SetDataAsync(cacheKey, result, TimeSpan.FromHours(24), "chess_events_all");
+        
+        return Ok(result);
+    }
 }

@@ -1,5 +1,5 @@
 import api from './axiosInstance';
-import { ChessEventResponse, ChessEventParticipantDto, ChessGameDto, ChessEventRequest } from '@/shared/types/chess.types';
+import { ChessEventResponse, ChessEventParticipantDto, ChessGameDto, ChessEventRequest, ChessChampionDto } from '@/shared/types/chess.types';
 
 export const getChessEventById = async (id: number | string): Promise<ChessEventResponse> => {
     try {
@@ -90,4 +90,9 @@ export const rejectChessParticipant = async (eventId: number | string, playerId:
 
 export const deleteChessTeam = async (id: number): Promise<void> => {
     await api.delete(`/chess-teams/${id}`);
+};
+
+export const getChessChampions = async (): Promise<ChessChampionDto[]> => {
+    const response = await api.get<ChessChampionDto[]>('/chess-events/champions');
+    return response.data;
 };

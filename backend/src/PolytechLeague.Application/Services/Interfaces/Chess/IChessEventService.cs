@@ -14,4 +14,5 @@ public interface IChessEventService : IAbstractEntityService<ChessEvent>
     Task RegisterPlayerAsync(long eventId, long playerId, CancellationToken cancellationToken = default);
     Task ApproveParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken = default);
     Task RejectParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken = default);
+    Task<List<PolytechLeague.Application.Dto.ChessDto.ChessChampionDto>> GetChampionsAsync(CancellationToken cancellationToken = default);
 }

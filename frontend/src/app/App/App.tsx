@@ -24,6 +24,7 @@ import { AdminUsersPage } from '@/pages/AdminUsersPage';
 import { NationalRatingsPage } from '@/pages/NationalRatingsPage';
 import { AdminCollegesPage } from '@/pages/AdminCollegesPage';
 import { CollegesPage } from '@/pages/CollegesPage';
+import ChessChampionsPage from '@/pages/ChessChampionsPage/ChessChampionsPage';
 
 import ProtectedRoute from '../providers/ProtectedRoute';
 import ScrollToTop from '../providers/ScrollToTop';
@@ -179,6 +180,15 @@ export default function App() {
           element={
             <ProtectedRoute requireAuth={false}>
               <div>Список команд</div>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/hall-of-fame/chess"
+          element={
+            <ProtectedRoute requireAuth={false}>
+              <ChessChampionsPage />
             </ProtectedRoute>
           }
         />

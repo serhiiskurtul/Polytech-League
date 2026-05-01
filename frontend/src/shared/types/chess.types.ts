@@ -143,3 +143,13 @@ export interface ChessGameDto {
     blackTeamScore?: number | null;
     pgn?: string;
 }
+
+export interface ChessChampionDto {
+  playerId: number;
+  playerName: string;
+  playerPhotoUrl?: string;
+  seasonName: string;
+  tournamentName: string;
+  date: string;
+  points: number;
+}

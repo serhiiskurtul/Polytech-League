@@ -464,4 +464,25 @@ public class ChessEventService :
             $"/tournaments/{eventId}"
         );
     }
+
+    public async Task<List<PolytechLeague.Application.Dto.ChessDto.ChessChampionDto>> GetChampionsAsync(CancellationToken cancellationToken = default)
+    {
+        return await _dbcontext.Set<ChessEvent>()
+            .Where(e => e.Level == CompetitionLevel.CollegeGroup && e.FirstPlaceId != null)
+            .Include(e => e.Season)
+            .Include(e => e.FirstPlace)
+            .Include(e => e.Players)
+            .OrderByDescending(e => e.Date)
+            .Select(e => new PolytechLeague.Application.Dto.ChessDto.ChessChampionDto
+            {
+                PlayerId = e.FirstPlaceId!.Value,
+                PlayerName = $"{e.FirstPlace!.FirstName} {e.FirstPlace.LastName}",
+                PlayerPhotoUrl = e.FirstPlace.PhotoUrl,
+                SeasonName = e.Season != null ? e.Season.Name : e.Date.Year.ToString(),
+                TournamentName = e.Name,
+                Date = e.Date,
+                Points = e.Players != null ? e.Players.Where(p => p.PlayerId == e.FirstPlaceId).Select(p => p.Points).FirstOrDefault() : 0
+            })
+            .ToListAsync(cancellationToken);
+    }
 }
