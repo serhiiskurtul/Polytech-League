@@ -42,13 +42,15 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
   const statusColors: Record<string, string> = {
     'ongoing': '#10b981',
     'upcoming': '#f59e0b',
+    'registration': '#3b82f6',
     'completed': '#64748b'
   };
 
   // Назви статусів
   const statusLabels: Record<string, string> = {
     'ongoing': 'Триває',
-    'upcoming': 'Скоро',
+    'upcoming': 'Заплановано',
+    'registration': 'Реєстрація',
     'completed': 'Завершено'
   };
 

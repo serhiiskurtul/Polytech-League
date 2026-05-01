@@ -93,7 +93,7 @@ public class TournamentService : ITournamentService
             Id = e.Id,
             Title = e.Name,
             Sport = GetSportName(e),
-            Status = GetStatus(e.Date),
+            Status = GetStatus(e),
             Date = e.Date.ToString("dd.MM.yyyy"),
             Location = e.Location,
             Description = e.Description ?? string.Empty,
@@ -106,7 +106,7 @@ public class TournamentService : ITournamentService
             RegistrationStart = e.RegistrationStart?.ToString("yyyy-MM-ddTHH:mm:ssZ"),
             RegistrationEnd = e.RegistrationEnd?.ToString("yyyy-MM-ddTHH:mm:ssZ") ?? e.Date.AddDays(-5).ToString("yyyy-MM-ddTHH:mm:ssZ"),
             EndDate = e.EndDate?.ToString("yyyy-MM-ddTHH:mm:ssZ"),
-            CurrentRound = GetStatus(e.Date) == "ongoing" ? "В процесі" : "Реєстрація",
+            CurrentRound = GetStatus(e) == "ongoing" ? "В процесі" : "Реєстрація",
             Registered = false,
             Featured = false,
             IsTeam = e.IsTeam,
@@ -145,7 +145,7 @@ public class TournamentService : ITournamentService
             Id = e.Id,
             Title = e.Name,
             Sport = GetSportName(e),
-            Status = GetStatus(e.Date),
+            Status = GetStatus(e),
             Date = e.Date.ToString("dd MMMM, yyyy", new System.Globalization.CultureInfo("uk-UA")),
             Location = e.Location,
             Description = e.Description ?? string.Empty,
@@ -158,7 +158,7 @@ public class TournamentService : ITournamentService
             RegistrationStart = e.RegistrationStart?.ToString("yyyy-MM-ddTHH:mm:ssZ"),
             RegistrationEnd = e.RegistrationEnd?.ToString("yyyy-MM-ddTHH:mm:ssZ") ?? e.Date.AddDays(-5).ToString("yyyy-MM-ddTHH:mm:ssZ"),
             EndDate = e.EndDate?.ToString("yyyy-MM-ddTHH:mm:ssZ"),
-            CurrentRound = GetStatus(e.Date) == "ongoing" ? "В процесі" : "Реєстрація",
+            CurrentRound = GetStatus(e) == "ongoing" ? "В процесі" : "Реєстрація",
             Registered = false,
             Featured = false,
             IsTeam = e.IsTeam,
@@ -257,12 +257,27 @@ public class TournamentService : ITournamentService
         };
     }
 
-    private string GetStatus(DateTime date)
+    private string GetStatus(PolytechLeague.Domain.Entities.Event e)
     {
         var now = DateTime.UtcNow;
-        if (date > now.AddDays(1)) return "upcoming";
-        if (date < now.AddDays(-1)) return "completed";
-        return "ongoing";
+
+        // 1. Completed: if EndDate passed, or if no EndDate and more than 1 day after start
+        if (e.EndDate.HasValue && e.EndDate.Value < now) return "completed";
+        if (!e.EndDate.HasValue && e.Date < now.AddDays(-1)) return "completed";
+
+        // 2. Ongoing: if currently between start and end dates
+        if (e.Date <= now && (e.EndDate.HasValue ? e.EndDate.Value >= now : e.Date.AddDays(1) >= now))
+            return "ongoing";
+
+        // 3. Registration: if within registration period
+        if (e.RegistrationStart.HasValue && e.RegistrationStart.Value <= now && 
+            e.RegistrationEnd.HasValue && e.RegistrationEnd.Value >= now)
+            return "registration";
+
+        // 4. Upcoming: if in the future
+        if (e.Date > now) return "upcoming";
+
+        return "completed";
     }
 
     public async Task<GeneralStatsDto> GetGeneralStatsAsync()
