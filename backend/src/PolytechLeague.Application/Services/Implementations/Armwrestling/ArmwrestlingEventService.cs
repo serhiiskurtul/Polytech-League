@@ -157,6 +157,13 @@ public class ArmwrestlingEventService :
         if (string.IsNullOrEmpty(participant.GroupName))
         {
             participant.GroupName = player?.Group;
+            participant.PlayerFirstName = player?.FirstName;
+            participant.PlayerLastName = player?.LastName;
+        }
+        else
+        {
+             participant.PlayerFirstName = dto.FirstName ?? player?.FirstName;
+             participant.PlayerLastName = dto.LastName ?? player?.LastName;
         }
 
         _dbcontext.ArmwrestlingEventParticipants.Add(participant);
@@ -178,6 +185,11 @@ public class ArmwrestlingEventService :
             participant.Weight = dto.Weight;
             participant.Rank = dto.Rank;
             participant.Status = dto.Status;
+            participant.GroupName = dto.GroupName;
+
+            if (!string.IsNullOrEmpty(dto.FirstName)) participant.PlayerFirstName = dto.FirstName;
+            if (!string.IsNullOrEmpty(dto.LastName)) participant.PlayerLastName = dto.LastName;
+
             _dbcontext.Set<ArmwrestlingEventParticipant>().Update(participant);
             await _dbcontext.SaveChangesAsync(cancellationToken);
 

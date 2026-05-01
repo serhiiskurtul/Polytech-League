@@ -208,7 +208,7 @@ public static class ChessEventDtoExtension
             Id = participant.PlayerId,
             FirstName = participant.PlayerFirstName ?? participant.Player?.FirstName ?? "Unknown",
             LastName = participant.PlayerLastName ?? participant.Player?.LastName ?? "",
-            GroupName = participant.GroupName ?? participant.Player?.Group ?? "Unknown",
+            Group = participant.GroupName ?? participant.Player?.Group ?? "Unknown",
             PhotoUrl = participant.Player?.PhotoUrl
         };
     }

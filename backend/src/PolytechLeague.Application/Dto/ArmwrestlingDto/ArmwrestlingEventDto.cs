@@ -165,36 +165,70 @@ public static class ArmwrestlingEventDtoExtensions
             Schedule = entity.Schedule,
             TimeControl = entity.TimeControl,
             ParticipantsCount = entity.ParticipantsCount,
-            FirstPlace = entity.FirstPlace?.ToDto(),
-            SecondPlace = entity.SecondPlace?.ToDto(),
-            ThirdPlace = entity.ThirdPlace?.ToDto(),
             TournamentType = entity.TournamentType,
             IsModerated = entity.IsModerated,
             IsPublic = entity.IsPublic,
             SeasonId = entity.SeasonId
         };
 
-        // Populate Participants from the actual participants collection
         if (entity.Players != null && entity.Players.Any())
         {
             response.Participants = entity.Players
                 .Select(p => p.ToDto())
                 .ToList();
-        }
-        else if (entity.Matches != null)
-        {
-            // Fallback for older data or if participants weren't properly migrated
-            var playersMap = new Dictionary<long, ArmwrestlingEventParticipantDto>();
-            foreach (var match in entity.Matches)
+
+            if (entity.FirstPlaceId != null)
             {
-                if (match.Player1 != null && !playersMap.ContainsKey(match.Player1Id))
-                    playersMap[match.Player1Id] = new ArmwrestlingEventParticipantDto { PlayerId = match.Player1Id, PlayerName = $"{match.Player1.FirstName} {match.Player1.LastName}" };
-                if (match.Player2 != null && !playersMap.ContainsKey(match.Player2Id))
-                    playersMap[match.Player2Id] = new ArmwrestlingEventParticipantDto { PlayerId = match.Player2Id, PlayerName = $"{match.Player2.FirstName} {match.Player2.LastName}" };
+                var p = entity.Players.FirstOrDefault(x => x.PlayerId == entity.FirstPlaceId);
+                if (p != null) response.FirstPlace = p.ToWinnerDto();
+                else if (entity.FirstPlace != null) response.FirstPlace = entity.FirstPlace.ToDto();
             }
-            response.Participants = playersMap.Values.ToList();
+            if (entity.SecondPlaceId != null)
+            {
+                var p = entity.Players.FirstOrDefault(x => x.PlayerId == entity.SecondPlaceId);
+                if (p != null) response.SecondPlace = p.ToWinnerDto();
+                else if (entity.SecondPlace != null) response.SecondPlace = entity.SecondPlace.ToDto();
+            }
+            if (entity.ThirdPlaceId != null)
+            {
+                var p = entity.Players.FirstOrDefault(x => x.PlayerId == entity.ThirdPlaceId);
+                if (p != null) response.ThirdPlace = p.ToWinnerDto();
+                else if (entity.ThirdPlace != null) response.ThirdPlace = entity.ThirdPlace.ToDto();
+            }
+        }
+        else
+        {
+            response.FirstPlace = entity.FirstPlace?.ToDto();
+            response.SecondPlace = entity.SecondPlace?.ToDto();
+            response.ThirdPlace = entity.ThirdPlace?.ToDto();
+
+            if (entity.Matches != null)
+            {
+                // Fallback for older data or if participants weren't properly migrated
+                var playersMap = new Dictionary<long, ArmwrestlingEventParticipantDto>();
+                foreach (var match in entity.Matches)
+                {
+                    if (match.Player1 != null && !playersMap.ContainsKey(match.Player1Id))
+                        playersMap[match.Player1Id] = new ArmwrestlingEventParticipantDto { PlayerId = match.Player1Id, PlayerName = $"{match.Player1.FirstName} {match.Player1.LastName}" };
+                    if (match.Player2 != null && !playersMap.ContainsKey(match.Player2Id))
+                        playersMap[match.Player2Id] = new ArmwrestlingEventParticipantDto { PlayerId = match.Player2Id, PlayerName = $"{match.Player2.FirstName} {match.Player2.LastName}" };
+                }
+                response.Participants = playersMap.Values.ToList();
+            }
         }
 
         return response;
+    }
+
+    private static PlayerDto ToWinnerDto(this ArmwrestlingEventParticipant participant)
+    {
+        return new PlayerDto
+        {
+            Id = participant.PlayerId,
+            FirstName = participant.PlayerFirstName ?? participant.Player?.FirstName ?? "Unknown",
+            LastName = participant.PlayerLastName ?? participant.Player?.LastName ?? "",
+            Group = participant.GroupName ?? participant.Player?.Group ?? "Unknown",
+            PhotoUrl = participant.Player?.PhotoUrl
+        };
     }
 }
