@@ -11,7 +11,7 @@ export interface PlayerDto {
     groupNumber?: number;
     studentId?: string | null;
     city: string;
-    faculty?: string | null;
+    studyYears?: string | null;
     bio?: string | null;
     instagramUrl?: string | null;
     photoUrl?: string | null;

@@ -22,7 +22,7 @@ public class PlayerDto
     public string? StudentId { get; set; }
     public string? City { get; set; }
     public string? PhotoUrl { get; set; }
-    public string? Faculty { get; set; }
+    public string? StudyYears { get; set; }
     public string? Bio { get; set; }
     public string? InstagramUrl { get; set; }
 
@@ -113,7 +113,7 @@ public static class PlayerDtoExtensions
             StudentId = player.StudentId,
             City = player.City,
             PhotoUrl = player.PhotoUrl,
-            Faculty = player.Faculty,
+            StudyYears = player.StudyYears,
             Bio = player.Bio,
             InstagramUrl = player.InstagramUrl,
             ChessRating = player.ChessRating,
@@ -163,7 +163,7 @@ public static class PlayerDtoExtensions
             StudentId = dto.StudentId,
             City = dto.City ?? "Чернівці",
             PhotoUrl = dto.PhotoUrl ?? "",
-            Faculty = dto.Faculty,
+            StudyYears = dto.StudyYears,
             Bio = dto.Bio,
             InstagramUrl = dto.InstagramUrl,
             ChessRating = dto.ChessRating,

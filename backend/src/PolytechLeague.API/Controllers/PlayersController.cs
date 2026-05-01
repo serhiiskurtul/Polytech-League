@@ -37,7 +37,7 @@ public class PlayersController : ControllerBase
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Group = "Гість", // Default value
-                City = "Київ",
+                City = "Чернівці",
                 PhotoUrl = user.PhotoUrl
             };
             player = await _playerService.CreateAsync(player, cancellationToken);

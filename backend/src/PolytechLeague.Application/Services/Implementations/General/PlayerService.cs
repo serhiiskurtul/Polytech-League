@@ -161,7 +161,7 @@ public class PlayerService : IPlayerService
         
         if (dto.City != null) player.City = dto.City;
         if (dto.UserId != null) player.UserId = dto.UserId;
-        if (dto.Faculty != null) player.Faculty = dto.Faculty;
+        if (dto.StudyYears != null) player.StudyYears = dto.StudyYears;
         
         _logger.LogInformation("Updating Bio for player {Id}. Old: {Old}, New: {New}", id, player.Bio, dto.Bio);
         if (dto.Bio != null) player.Bio = dto.Bio; 

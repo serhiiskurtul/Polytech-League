@@ -11,7 +11,7 @@ interface EditProfileModalProps {
 }
 
 const AVAILABLE_GROUPS = [
-  'Гість', '211', '221', '222', '231', '241', '311', '312', '321', 
+  '211', '221', '222', '231', '241', '311', '312', '321', 
   '322', '331', '332', '341', '411', '421', '422', '431', '433', 
   '441', '511', '512', '513', '521', '522', '523', '531', '532', '541'
 ];
@@ -22,7 +22,7 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
     lastName: initialData.lastName || '',
     group: initialData.group || '',
     studentId: initialData.studentId || '',
-    faculty: initialData.faculty || '',
+    studyYears: initialData.studyYears || '',
     city: initialData.city || '',
     bio: initialData.bio || '',
     instagramUrl: initialData.instagramUrl || '',
@@ -42,7 +42,7 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
         lastName: initialData.lastName || '',
         group: initialData.group || '',
         studentId: initialData.studentId || '',
-        faculty: initialData.faculty || '',
+        studyYears: initialData.studyYears || '',
         city: initialData.city || '',
         bio: initialData.bio || '',
         instagramUrl: initialData.instagramUrl || '',
@@ -143,7 +143,7 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
                   >
                     <option value="">Оберіть групу</option>
                     {AVAILABLE_GROUPS.map(g => (
-                      <option key={g} value={g}>{g === 'Гість' ? g : `${g} група`}</option>
+                      <option key={g} value={g}>{g} група</option>
                     ))}
                   </select>
                 </div>
@@ -163,14 +163,14 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
                 </div>
                 
                 <div className={styles.formGroup}>
-                  <label htmlFor="faculty">Факультет</label>
+                  <label htmlFor="studyYears">Роки навчання</label>
                   <input
                     type="text"
-                    id="faculty"
-                    name="faculty"
-                    value={formData.faculty}
+                    id="studyYears"
+                    name="studyYears"
+                    value={formData.studyYears}
                     onChange={handleChange}
-                    placeholder="Наприклад: ФІОТ"
+                    placeholder="Наприклад: 2021-2025"
                   />
                 </div>
                 

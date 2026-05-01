@@ -68,12 +68,15 @@ public class BeachVolleyballEventService(
 
     protected override async Task OnCreatedAsync(BeachVolleyballEvent entity, CancellationToken cancellationToken)
     {
-        await _notificationService.SendNotificationToAllAsync(
-            "Нове змагання!",
-            $"Створено нове змагання з пляжного волейболу: {entity.Name}",
-            NotificationType.Tournament,
-            $"/tournaments/{entity.Id}"
-        );
+        if (_notificationService != null)
+        {
+            await _notificationService.SendNotificationToAllAsync(
+                "Нове змагання!",
+                $"Створено нове змагання з пляжного волейболу: {entity.Name}",
+                NotificationType.Tournament,
+                $"/tournaments/{entity.Id}"
+            );
+        }
     }
 
     protected override async Task OnUpdatedAsync(BeachVolleyballEvent oldEntity, BeachVolleyballEvent newEntity, CancellationToken cancellationToken)

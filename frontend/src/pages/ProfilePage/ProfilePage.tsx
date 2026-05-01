@@ -15,7 +15,7 @@ import { toast } from 'react-hot-toast';
 interface UserData {
   name: string;
   studentId: string;
-  faculty: string;
+  studyYears: string;
   email: string;
   phone: string;
   city: string;
@@ -98,7 +98,7 @@ const ProfilePage = () => {
     name: user ? `${user.firstName} ${user.lastName}` : 'Користувач',
     group: playerProfile?.group || '-',
     studentId: playerProfile?.studentId || '-',
-    faculty: playerProfile?.faculty || '-',
+    studyYears: playerProfile?.studyYears || '-',
     phone: '-', 
     city: playerProfile?.city || '-',
     bio: playerProfile?.bio ?? '',

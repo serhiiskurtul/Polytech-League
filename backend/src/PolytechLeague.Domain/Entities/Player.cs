@@ -13,7 +13,7 @@ public class Player : Person
     public int SpecialtyCode { get; set; }
     public int GroupNumber { get; set; }
     public string? StudentId { get; set; }
-    public string? Faculty { get; set; }
+    public string? StudyYears { get; set; }
     public string? Bio { get; set; }
     public string? InstagramUrl { get; set; }
 

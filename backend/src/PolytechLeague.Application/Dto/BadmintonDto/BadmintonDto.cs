@@ -195,7 +195,6 @@ public static class BadmintonDtoExtensions
             IsTeam = request.IsTeam,
             IsModerated = request.IsModerated,
             IsPublic = request.IsPublic,
-            IsPublic = request.IsPublic,
             SeasonId = request.SeasonId,
             Category = request.Category
         };
@@ -232,8 +231,6 @@ public static class BadmintonDtoExtensions
             SecondPlaceTeam = entity.SecondPlaceTeam?.ToDto(),
             ThirdPlaceTeam = entity.ThirdPlaceTeam?.ToDto(),
             Teams = entity.Teams?.Select(t => t.ToDto()).ToList(),
-            Matches = entity.Matches?.Select(m => m.ToResponse()).ToList(),
-            Participants = entity.Participants?.Select(p => p.ToDto()).ToList(),
             Matches = entity.Matches?.Select(m => m.ToResponse()).ToList(),
             Participants = entity.Participants?.Select(p => p.ToDto()).ToList(),
             SeasonId = entity.SeasonId,

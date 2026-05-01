@@ -7,7 +7,7 @@ interface UserData {
   bio: string;
   group: string;
   studentId: string;
-  faculty: string;
+  studyYears: string;
   phone: string;
   city: string;
   instagramUrl?: string | null;
@@ -117,8 +117,8 @@ const ProfileHeader = ({ userData, isAdmin, onEdit, onAvatarUpload, onLogout, on
                 <span className={styles.detailValue}>{userData.studentId}</span>
               </div>
               <div className={styles.detailItem}>
-                <span className={styles.detailLabel}><i className="fas fa-graduation-cap"></i> Факультет</span>
-                <span className={styles.detailValue}>{userData.faculty}</span>
+                <span className={styles.detailLabel}><i className="fas fa-calendar-alt"></i> Роки навчання</span>
+                <span className={styles.detailValue}>{userData.studyYears}</span>
               </div>
               <div className={styles.detailItem}>
                 <span className={styles.detailLabel}><i className="fas fa-map-marker-alt"></i> Місто</span>

@@ -19,7 +19,7 @@ public class AuthService(
     public async Task<AuthResponse> AuthenticateAsync(AuthRequest authRequest)
     {
         var user = await dbcontext.Set<User>().AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Email.ToLower() == authRequest.Email.ToLower());
+            .FirstOrDefaultAsync(x => x.Email != null && x.Email.ToLower() == authRequest.Email.ToLower());
         if (user == null || !passwordService.Verify(authRequest.Password, user.Password))
         {
             throw new AuthenticationException("Invalid email or password");

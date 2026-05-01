@@ -69,12 +69,15 @@ public class Basketball3x3EventService(
 
     protected override async Task OnCreatedAsync(Basketball3x3Event entity, CancellationToken cancellationToken)
     {
-        await _notificationService?.SendNotificationToAllAsync(
-            "Нове змагання!",
-            $"Створено нове змагання з баскетболу 3х3: {entity.Name}",
-            NotificationType.Tournament,
-            $"/tournaments/{entity.Id}"
-        );
+        if (_notificationService != null)
+        {
+            await _notificationService.SendNotificationToAllAsync(
+                "Нове змагання!",
+                $"Створено нове змагання з баскетболу 3х3: {entity.Name}",
+                NotificationType.Tournament,
+                $"/tournaments/{entity.Id}"
+            );
+        }
     }
 
     protected override async Task OnUpdatedAsync(Basketball3x3Event oldEntity, Basketball3x3Event newEntity, CancellationToken cancellationToken)
@@ -99,11 +102,11 @@ public class Basketball3x3EventService(
 
         bool winnersSet = newEntity.FirstPlaceTeamId != null && newEntity.SecondPlaceTeamId != null && newEntity.ThirdPlaceTeamId != null;
         
-        if (winnersSet)
+        if (winnersSet && _notificationService != null)
         {
-            await _notificationService?.SendNotificationToAllAsync(
-                "Змагання завершено!",
-                $"Визначено переможців у змаганні з баскетболу 3х3: {newEntity.Name}",
+            await _notificationService.SendNotificationToAllAsync(
+                "Турнір завершено!",
+                $"Змагання з баскетболу 3х3 \"{newEntity.Name}\" завершено. Перегляньте результати!",
                 NotificationType.Tournament,
                 $"/tournaments/{newEntity.Id}"
             );

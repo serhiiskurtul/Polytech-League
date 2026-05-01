@@ -16,7 +16,7 @@ public class BadmintonTeamService(
 {
     public override async Task<BadmintonTeam> CreateAsync(BadmintonTeam entity, CancellationToken cancellationToken = default)
     {
-        logger.LogDebug("Creating badminton team with player mapping.");
+        _logger.LogDebug("Creating badminton team with player mapping.");
         
         if (entity.PlayerIds != null && entity.PlayerIds.Count >= 2)
         {
@@ -25,15 +25,15 @@ public class BadmintonTeamService(
             entity.Player2Id = ids[1];
         }
 
-        context.Set<BadmintonTeam>().Add(entity);
-        await context.SaveChangesAsync(cancellationToken);
+        _dbcontext.Set<BadmintonTeam>().Add(entity);
+        await _dbcontext.SaveChangesAsync(cancellationToken);
         
         return entity;
     }
 
     public override async Task UpdateAsync(long id, BadmintonTeam newEntity, CancellationToken cancellationToken = default)
     {
-        var oldEntity = await context.Set<BadmintonTeam>()
+        var oldEntity = await _dbcontext.Set<BadmintonTeam>()
             .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
         
         if (oldEntity == null) return;
@@ -47,7 +47,7 @@ public class BadmintonTeamService(
             oldEntity.Player2Id = ids[1];
         }
 
-        await context.SaveChangesAsync(cancellationToken);
+        await _dbcontext.SaveChangesAsync(cancellationToken);
     }
 
     protected override void UpdateValues(BadmintonTeam oldEntity, BadmintonTeam newEntity)
