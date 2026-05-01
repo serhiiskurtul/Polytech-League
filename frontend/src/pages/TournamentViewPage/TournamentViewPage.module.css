@@ -372,12 +372,6 @@
   text-align: center;
   box-shadow: var(--shadow);
   border: 1px solid var(--border);
-  transition: transform 0.3s ease;
-}
-
-.statCard:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
 }
 
 .statIcon {
@@ -1404,11 +1398,6 @@
   flex: 1;
   max-width: 200px;
   text-align: center;
-  transition: transform 0.3s ease;
-}
-
-.podiumPlace:hover {
-  transform: translateY(-8px);
 }
 
 .podiumRank {
