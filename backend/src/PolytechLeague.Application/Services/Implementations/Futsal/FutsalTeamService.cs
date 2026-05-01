@@ -39,19 +39,31 @@ public class FutsalTeamService(
 
     public override async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
     {
-        var teamInfo = await _dbcontext.FutsalTeams
-            .AsNoTracking()
-            .Select(t => new { t.Id, t.EventId, PlayerIds = t.Players!.Select(p => p.Id).ToList() })
-            .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
+        // 1. Get EventId and PlayerIds directly from the database tables for maximum reliability
+        var eventId = await _dbcontext.FutsalTeams
+            .Where(t => t.Id == id)
+            .Select(t => t.EventId)
+            .FirstOrDefaultAsync(cancellationToken);
 
-        if (teamInfo != null && teamInfo.PlayerIds.Any())
+        if (eventId == 0) 
         {
-            // 1. Bulk delete associated participants
+            await base.DeleteAsync(id, cancellationToken);
+            return;
+        }
+
+        var playerIds = await _dbcontext.Players
+            .Where(p => p.FutsalTeamId == id)
+            .Select(p => p.Id)
+            .ToListAsync(cancellationToken);
+
+        if (playerIds.Any())
+        {
+            // 2. Bulk delete associated participants
             await _dbcontext.FutsalEventParticipants
-                .Where(p => p.EventId == teamInfo.EventId && teamInfo.PlayerIds.Contains(p.PlayerId))
+                .Where(p => p.EventId == eventId && playerIds.Contains(p.PlayerId))
                 .ExecuteDeleteAsync(cancellationToken);
 
-            // 2. Clear FutsalTeamId for all players in this team
+            // 3. Clear FutsalTeamId for all players in this team
             await _dbcontext.Players
                 .Where(p => p.FutsalTeamId == id)
                 .ExecuteUpdateAsync(s => s.SetProperty(p => p.FutsalTeamId, (long?)null), cancellationToken);
