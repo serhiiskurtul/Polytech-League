@@ -895,7 +895,20 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           <button className={activeTab === 'teams' ? styles.activeTab : ''} onClick={() => setActiveTab('teams')}>Команди</button>
           {isAdmin && (
             <button className={activeTab === 'participants' ? styles.activeTab : ''} onClick={() => setActiveTab('participants')}>
-              Учасники {details.participants?.length > 0 && `(${details.participants.length})`}
+              Учасники {details.participants?.filter((p: any) => p.status === RegistrationStatus.Pending)?.length > 0 && (
+                <span style={{ 
+                  marginLeft: '6px', 
+                  background: '#ef4444', 
+                  color: '#fff', 
+                  padding: '1px 6px', 
+                  borderRadius: '10px', 
+                  fontSize: '11px',
+                  fontWeight: 'bold',
+                  boxShadow: '0 2px 4px rgba(239,68,68,0.3)'
+                }}>
+                  {details.participants.filter((p: any) => p.status === RegistrationStatus.Pending).length}
+                </span>
+              )}
             </button>
           )}
           {isAdmin && activeTab === 'matches' && (

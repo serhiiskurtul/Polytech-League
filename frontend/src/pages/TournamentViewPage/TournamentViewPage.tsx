@@ -1271,6 +1271,9 @@ const TournamentViewPage = () => {
     : ((details as any)?.players?.length || (details as any)?.participants?.length || 0);
 
   const participantLabel = isTeamSport ? 'команд' : 'учасників';
+  
+  const pendingParticipantsCount = (details?.participants?.filter((p: any) => p.status === RegistrationStatus.Pending)?.length || 0) +
+                                   (details?.teams?.filter((t: any) => t.status === RegistrationStatus.Pending)?.length || 0);
 
   const filteredGames = (tournament?.sport === 'chess' || tournament?.sport === 'checkers') && (details as any)?.games
     ? [...(details as any).games].filter((g: any) => {
@@ -1806,7 +1809,20 @@ const TournamentViewPage = () => {
                         className={`${styles.tabButton} ${activeTab === 'participants' ? styles.active : ''}`}
                         onClick={() => setActiveTab('participants')}
                       >
-                        <i className="fas fa-users"></i> Учасники {actualParticipants > 0 && `(${actualParticipants})`}
+                        <i className="fas fa-users"></i> Учасники {pendingParticipantsCount > 0 && (
+                          <span style={{ 
+                            marginLeft: '6px', 
+                            background: '#ef4444', 
+                            color: '#fff', 
+                            padding: '2px 8px', 
+                            borderRadius: '12px', 
+                            fontSize: '11px',
+                            fontWeight: 'bold',
+                            boxShadow: '0 2px 4px rgba(239,68,68,0.3)'
+                          }}>
+                            {pendingParticipantsCount}
+                          </span>
+                        )}
                       </button>
                       <button
                         className={`${styles.tabButton} ${activeTab === 'schedule' ? styles.active : ''}`}
