@@ -91,7 +91,7 @@ import {
   getTableTennisEventById,
   updateTableTennisEvent,
   addParticipantToTableTennisEvent,
-  removeParticipantFromTableTennisEvent,
+  removeTableTennisParticipant,
   updateTableTennisParticipant,
   registerForTableTennisEvent,
   approveTableTennisParticipant,
@@ -748,7 +748,7 @@ const TournamentViewPage = () => {
             break;
           case 'tabletennis':
           case 'table_tennis':
-            await removeParticipantFromTableTennisEvent(id!, playerId);
+            await removeTableTennisParticipant(id!, playerId);
             break;
           case 'volleyball':
             await removeVolleyballParticipant(id!, playerId);
@@ -773,6 +773,55 @@ const TournamentViewPage = () => {
         console.error(err);
         alert("Помилка при видаленні учасника");
       }
+    }
+  };
+
+  const handleApproveParticipant = async (playerId: number, playerName?: string) => {
+    try {
+      const sportKey = tournament?.sport?.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') || '';
+      switch (sportKey) {
+        case 'checkers': await approveCheckersParticipant(id!, playerId); break;
+        case 'armwrestling': await approveArmwrestlingParticipant(id!, playerId); break;
+        case 'badminton': await approveBadmintonParticipant(id!, playerId); break;
+        case 'tabletennis':
+        case 'table_tennis': await approveTableTennisParticipant(id!, playerId); break;
+        case 'volleyball': await approveVolleyballParticipant(id!, playerId); break;
+        case 'beach_volleyball': await approveBeachVolleyballParticipant(id!, playerId); break;
+        case 'futsal': await approveFutsalParticipant(id!, playerId); break;
+        case 'basketball_3x3':
+        case 'basketball3x3': await approveBasketball3x3Participant(id!, playerId); break;
+        default: await approveChessParticipant(id!, playerId);
+      }
+      toast.success(`Учасника ${playerName ? `"${playerName}" ` : ''}схвалено!`);
+      fetchTournament(true);
+    } catch (err) {
+      console.error(err);
+      toast.error("Помилка при схваленні");
+    }
+  };
+
+  const handleRejectParticipant = async (playerId: number, playerName?: string) => {
+    if (!window.confirm(`Відхилити участь учасника${playerName ? ` "${playerName}"` : ''}?`)) return;
+    try {
+      const sportKey = tournament?.sport?.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') || '';
+      switch (sportKey) {
+        case 'checkers': await rejectCheckersParticipant(id!, playerId); break;
+        case 'armwrestling': await rejectArmwrestlingParticipant(id!, playerId); break;
+        case 'badminton': await rejectBadmintonParticipant(id!, playerId); break;
+        case 'tabletennis':
+        case 'table_tennis': await rejectTableTennisParticipant(id!, playerId); break;
+        case 'volleyball': await rejectVolleyballParticipant(id!, playerId); break;
+        case 'beach_volleyball': await rejectBeachVolleyballParticipant(id!, playerId); break;
+        case 'futsal': await rejectFutsalParticipant(id!, playerId); break;
+        case 'basketball_3x3':
+        case 'basketball3x3': await rejectBasketball3x3Participant(id!, playerId); break;
+        default: await rejectChessParticipant(id!, playerId);
+      }
+      toast.success(`Учасника ${playerName ? `"${playerName}" ` : ''}відхилено`);
+      fetchTournament(true);
+    } catch (err) {
+      console.error(err);
+      toast.error("Помилка при відхиленні");
     }
   };
 
@@ -2369,10 +2418,10 @@ const TournamentViewPage = () => {
                                       <div style={{ display: 'flex', gap: '8px' }}>
                                         {p.status === RegistrationStatus.Pending && (
                                           <>
-                                            <button onClick={() => handleApproveParticipant(p.playerId)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Підтвердити">
+                                            <button onClick={() => handleApproveParticipant(p.playerId, p.playerName)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Підтвердити">
                                               <i className="fas fa-check"></i>
                                             </button>
-                                            <button onClick={() => handleRejectParticipant(p.playerId)} style={{ padding: '4px 8px', background: '#f59e0b', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Відхилити">
+                                            <button onClick={() => handleRejectParticipant(p.playerId, p.playerName)} style={{ padding: '4px 8px', background: '#f59e0b', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Відхилити">
                                               <i className="fas fa-times"></i>
                                             </button>
                                           </>

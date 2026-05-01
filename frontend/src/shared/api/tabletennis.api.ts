@@ -16,7 +16,7 @@ export const addParticipantToTableTennisEvent = async (eventId: string | number,
   return response.data;
 };
 
-export const removeParticipantFromTableTennisEvent = async (eventId: string | number, playerId: number) => {
+export const removeTableTennisParticipant = async (eventId: string | number, playerId: number) => {
   const response = await api.delete(`/table-tennis-events/${eventId}/participants/${playerId}`);
   return response.data;
 };

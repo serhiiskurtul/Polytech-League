@@ -69,9 +69,9 @@ import {
   removeBadmintonParticipant,
   approveTableTennisParticipant,
   rejectTableTennisParticipant,
-  removeTableTennisParticipant,
-  RegistrationStatus
+  removeTableTennisParticipant
 } from '@/shared/api';
+import { RegistrationStatus } from '@/shared/types/tournament.types';
 import TournamentPodium from './TournamentPodium';
 import FutsalBracket from './FutsalBracket';
 import styles from '../TournamentViewPage.module.css';
