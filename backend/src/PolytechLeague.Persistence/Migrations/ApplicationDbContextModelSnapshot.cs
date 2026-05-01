@@ -2300,9 +2300,6 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<int>("EnrollmentYear")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Faculty")
-                        .HasColumnType("text");
-
                     b.Property<int?>("FutsalPosition")
                         .HasColumnType("integer")
                         .HasColumnName("futsal_position");
@@ -2336,6 +2333,9 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<string>("StudentId")
                         .HasColumnType("text")
                         .HasColumnName("student_id");
+
+                    b.Property<string>("StudyYears")
+                        .HasColumnType("text");
 
                     b.Property<int?>("TableTennisHand")
                         .HasColumnType("integer")
