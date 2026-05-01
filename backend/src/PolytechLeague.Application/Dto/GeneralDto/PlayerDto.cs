@@ -25,6 +25,7 @@ public class PlayerDto
     public string? StudyYears { get; set; }
     public string? Bio { get; set; }
     public string? InstagramUrl { get; set; }
+    public string? PreviousNames { get; set; }
 
     // Chess
     public int? ChessRating { get; set; }
@@ -116,6 +117,7 @@ public static class PlayerDtoExtensions
             StudyYears = player.StudyYears,
             Bio = player.Bio,
             InstagramUrl = player.InstagramUrl,
+            PreviousNames = player.PreviousNames,
             ChessRating = player.ChessRating,
             ChessFideId = player.ChessFideId,
             ChessTitle = player.ChessTitle,
@@ -166,6 +168,7 @@ public static class PlayerDtoExtensions
             StudyYears = dto.StudyYears,
             Bio = dto.Bio,
             InstagramUrl = dto.InstagramUrl,
+            PreviousNames = dto.PreviousNames,
             ChessRating = dto.ChessRating,
             ChessFideId = dto.ChessFideId,
             ChessTitle = dto.ChessTitle,

@@ -16,6 +16,7 @@ interface UserData {
   futsalShirtNumber?: number | null;
   volleyballShirtNumber?: number | null;
   basketballShirtNumber?: number | null;
+  previousNames?: string | null;
 }
 
 
@@ -57,6 +58,19 @@ const ProfileHeader = ({ userData, isAdmin, onEdit, onAvatarUpload, onLogout, on
             <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap' }}>
               <h1 className={styles.profileName}>{userData.name}</h1>
+              {userData.previousNames && (
+                <span style={{ 
+                  fontSize: '16px', 
+                  color: '#64748b', 
+                  fontWeight: '500',
+                  background: '#f1f5f9',
+                  padding: '2px 8px',
+                  borderRadius: '6px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  екс {userData.previousNames}
+                </span>
+              )}
             </div>
             <div className={styles.profileBadges}>
               {userData.badges.map((badge, index) => (

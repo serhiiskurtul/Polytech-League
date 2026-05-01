@@ -15,6 +15,7 @@ export interface PlayerDto {
     bio?: string | null;
     instagramUrl?: string | null;
     photoUrl?: string | null;
+    previousNames?: string | null;
 
     // Chess
     chessRating?: number | null;

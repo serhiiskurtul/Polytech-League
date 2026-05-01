@@ -168,6 +168,7 @@ public class PlayerService : IPlayerService
         
         _logger.LogInformation("Updating InstagramUrl for player {Id}. Old: {Old}, New: {New}", id, player.InstagramUrl, dto.InstagramUrl);
         if (dto.InstagramUrl != null) player.InstagramUrl = dto.InstagramUrl;
+        if (dto.PreviousNames != null) player.PreviousNames = dto.PreviousNames;
         
         if (dto.PhotoUrl != null) player.PhotoUrl = dto.PhotoUrl;
 
@@ -248,6 +249,7 @@ public class PlayerService : IPlayerService
             .Where(p => p.FirstName.ToLower().Contains(lowerQuery) || 
                         (p.Patronymic != null && p.Patronymic.ToLower().Contains(lowerQuery)) ||
                         p.LastName.ToLower().Contains(lowerQuery) ||
+                        (p.PreviousNames != null && p.PreviousNames.ToLower().Contains(lowerQuery)) ||
                         p.Group.ToLower().Contains(lowerQuery) ||
                         (p.StudentId != null && p.StudentId.ToLower().Contains(lowerQuery)))
             .ToListAsync(cancellationToken);
@@ -261,6 +263,7 @@ public class PlayerService : IPlayerService
             p.FirstName.ToLower().Contains(lowerQuery) || 
             (p.Patronymic != null && p.Patronymic.ToLower().Contains(lowerQuery)) ||
             p.LastName.ToLower().Contains(lowerQuery) ||
+            (p.PreviousNames != null && p.PreviousNames.ToLower().Contains(lowerQuery)) ||
             p.Group.ToLower().Contains(lowerQuery) ||
             (p.EnrollmentYear > 0 && GroupUtility.GetCurrentGroupName(p.SpecialtyCode, p.EnrollmentYear, p.GroupNumber).ToLower().Contains(lowerQuery)) ||
             (p.StudentId != null && p.StudentId.ToLower().Contains(lowerQuery))

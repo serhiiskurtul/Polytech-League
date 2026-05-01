@@ -125,7 +125,8 @@ const PlayersRatingPage = () => {
       const q = searchQuery.toLowerCase();
       result = result.filter(p =>
         p.firstName.toLowerCase().includes(q) ||
-        p.lastName.toLowerCase().includes(q)
+        p.lastName.toLowerCase().includes(q) ||
+        (p.previousNames && p.previousNames.toLowerCase().includes(q))
       );
     }
 
@@ -299,7 +300,14 @@ const PlayersRatingPage = () => {
                               </div>
                             )}
                             <div className={styles.playerDetails}>
-                              <div className={styles.playerName}>{player.firstName} {player.lastName}</div>
+                              <div className={styles.playerName}>
+                                {player.firstName} {player.lastName}
+                                {player.previousNames && (
+                                  <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 'normal', marginLeft: '4px' }}>
+                                    ({player.previousNames})
+                                  </span>
+                                )}
+                              </div>
                               <div className={styles.playerSubInfo}>
                                 <span className={styles.groupText}>{player.group || '—'}</span>
                               </div>

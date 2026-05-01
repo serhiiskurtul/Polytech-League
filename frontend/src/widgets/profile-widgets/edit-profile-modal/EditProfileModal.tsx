@@ -29,7 +29,8 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
     isExternal: initialData.isExternal || false,
     futsalShirtNumber: initialData.futsalShirtNumber !== null && initialData.futsalShirtNumber !== undefined ? initialData.futsalShirtNumber : '',
     volleyballShirtNumber: initialData.volleyballShirtNumber !== null && initialData.volleyballShirtNumber !== undefined ? initialData.volleyballShirtNumber : '',
-    basketballShirtNumber: initialData.basketballShirtNumber !== null && initialData.basketballShirtNumber !== undefined ? initialData.basketballShirtNumber : ''
+    basketballShirtNumber: initialData.basketballShirtNumber !== null && initialData.basketballShirtNumber !== undefined ? initialData.basketballShirtNumber : '',
+    previousNames: initialData.previousNames || ''
   });
 
   const [loading, setLoading] = React.useState(false);
@@ -49,7 +50,8 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
         isExternal: initialData.isExternal || false,
         futsalShirtNumber: initialData.futsalShirtNumber !== null && initialData.futsalShirtNumber !== undefined ? initialData.futsalShirtNumber : '',
         volleyballShirtNumber: initialData.volleyballShirtNumber !== null && initialData.volleyballShirtNumber !== undefined ? initialData.volleyballShirtNumber : '',
-        basketballShirtNumber: initialData.basketballShirtNumber !== null && initialData.basketballShirtNumber !== undefined ? initialData.basketballShirtNumber : ''
+        basketballShirtNumber: initialData.basketballShirtNumber !== null && initialData.basketballShirtNumber !== undefined ? initialData.basketballShirtNumber : '',
+        previousNames: initialData.previousNames || ''
       });
     }
   }, [isOpen, initialData]);
@@ -128,6 +130,19 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
                   required
                 />
               </div>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label htmlFor="previousNames"><i className="fas fa-history"></i> Попереднє прізвище (якщо змінювали)</label>
+              <input
+                type="text"
+                id="previousNames"
+                name="previousNames"
+                value={formData.previousNames}
+                onChange={handleChange}
+                placeholder="Наприклад: Паламарюк"
+              />
+              <small className={styles.helpText}>Допоможе знайти ваш профіль за старим прізвищем</small>
             </div>
 
             {!isAdmin && (

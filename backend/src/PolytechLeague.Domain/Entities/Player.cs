@@ -49,6 +49,7 @@ public class Player : Person
     public long? BeachVolleyballTeamId { get; set; }
 
     public bool IsExternal { get; set; } = false;
+    public string? PreviousNames { get; set; }
     public long? CollegeId { get; set; }
     public College? College { get; set; }
 }
