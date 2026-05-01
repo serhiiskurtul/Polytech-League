@@ -167,6 +167,26 @@ public class BadmintonEventService(
             throw new InvalidOperationException("Self-registration is only allowed for college group tournaments.");
         }
 
+        var player = await _dbcontext.Set<Player>()
+            .Include(p => p.User)
+            .FirstOrDefaultAsync(p => p.Id == playerId, cancellationToken)
+            ?? throw new PolytechLeague.Domain.Exceptions.EntityNotFoundException(nameof(Player), playerId);
+
+        if (player.User?.Role == UserRole.Admin)
+        {
+            throw new InvalidOperationException("Administrators cannot register for tournaments.");
+        }
+
+        if (player.Group == "Гість")
+        {
+            throw new InvalidOperationException("Користувачі з групою 'Гість' не можуть реєструватися на змагання. Будь ласка, оновіть свою групу в профілі.");
+        }
+
+        if (string.IsNullOrWhiteSpace(player.StudentId))
+        {
+            throw new InvalidOperationException("Для реєстрації на змагання необхідно вказати серію та номер студентського квитка в профілі (наприклад: PH13856483).");
+        }
+
         var exists = await _dbcontext.BadmintonEventParticipants
             .AnyAsync(p => p.EventId == eventId && p.PlayerId == playerId, cancellationToken);
 
@@ -178,11 +198,9 @@ public class BadmintonEventService(
         {
             EventId = eventId,
             PlayerId = playerId,
-            Status = status
+            Status = status,
+            GroupName = player.Group
         };
-
-        var player = await _dbcontext.Set<Player>().FindAsync([playerId], cancellationToken);
-        participant.GroupName = player?.Group;
 
         _dbcontext.BadmintonEventParticipants.Add(participant);
         await _dbcontext.SaveChangesAsync(cancellationToken);

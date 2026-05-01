@@ -124,8 +124,25 @@ public class Basketball3x3EventService(
             throw new InvalidOperationException("Self-registration is only allowed for college group tournaments.");
         }
 
-        var player = await _dbcontext.Players.FindAsync([playerId], cancellationToken);
-        if (player == null) throw new PolytechLeague.Domain.Exceptions.EntityNotFoundException(nameof(Player), playerId);
+        var player = await _dbcontext.Set<Player>()
+            .Include(p => p.User)
+            .FirstOrDefaultAsync(p => p.Id == playerId, cancellationToken)
+            ?? throw new PolytechLeague.Domain.Exceptions.EntityNotFoundException(nameof(Player), playerId);
+
+        if (player.User?.Role == UserRole.Admin)
+        {
+            throw new InvalidOperationException("Administrators cannot register for tournaments.");
+        }
+
+        if (player.Group == "Гість")
+        {
+            throw new InvalidOperationException("Користувачі з групою 'Гість' не можуть реєструватися на змагання. Будь ласка, оновіть свою групу в профілі.");
+        }
+
+        if (string.IsNullOrWhiteSpace(player.StudentId))
+        {
+            throw new InvalidOperationException("Для реєстрації на змагання необхідно вказати серію та номер студентського квитка в профілі (наприклад: PH13856483).");
+        }
 
         var groupName = player.Group;
         if (string.IsNullOrWhiteSpace(groupName))

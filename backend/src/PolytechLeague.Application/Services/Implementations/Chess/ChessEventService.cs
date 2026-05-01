@@ -365,6 +365,16 @@ public class ChessEventService :
             throw new InvalidOperationException("Administrators cannot register for tournaments.");
         }
 
+        if (player.Group == "Гість")
+        {
+            throw new InvalidOperationException("Користувачі з групою 'Гість' не можуть реєструватися на змагання. Будь ласка, оновіть свою групу в профілі.");
+        }
+
+        if (string.IsNullOrWhiteSpace(player.StudentId))
+        {
+            throw new InvalidOperationException("Для реєстрації на змагання необхідно вказати серію та номер студентського квитка в профілі (наприклад: PH13856483).");
+        }
+
         var exists = await _dbcontext.Set<ChessEventParticipant>()
             .AnyAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
 
