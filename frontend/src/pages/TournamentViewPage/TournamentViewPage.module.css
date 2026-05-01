@@ -2819,11 +2819,13 @@ input:checked + .slider:before {
   min-width: 300px;
   display: flex;
   flex-direction: column;
+  align-items: center; /* Center the match list horizontally */
 }
 
 .stageHeader {
   margin-bottom: 40px;
   position: relative;
+  text-align: center; /* Center the badge */
 }
 
 .stageNameBadge {
@@ -2843,6 +2845,7 @@ input:checked + .slider:before {
   display: flex;
   flex-direction: column;
   justify-content: center; /* Center matches vertically */
+  align-items: center; /* Center matches horizontally */
   gap: 48px;
   padding: 20px;
   flex: 1; /* Take full height to allow centering */

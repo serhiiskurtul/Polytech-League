@@ -1292,7 +1292,10 @@ const TournamentViewPage = () => {
   const isRegistrationOpen = (!regStart || now >= regStart) && (!regEnd || now <= regEnd);
   const isFinished = tournament?.status === 'completed' || !!details?.firstPlace || !!details?.firstPlaceTeam || (tournament?.endDate && new Date(tournament.endDate) < now) || (regEnd && now > regEnd);
   
-  const userRegistration = details?.participants?.find((p: any) => p.userId === user?.id);
+  const userRegistration = details?.participants?.find((p: any) => 
+    (p.userId && p.userId === user?.id) || 
+    (p.playerId && currentUserPlayer && p.playerId === currentUserPlayer.id)
+  );
   const isUserRegistered = !!userRegistration;
 
   return (
