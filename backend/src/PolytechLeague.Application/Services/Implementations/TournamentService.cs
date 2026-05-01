@@ -587,4 +587,44 @@ public class TournamentService : ITournamentService
             _ => "Mixed"
         };
     }
+    public async Task<IEnumerable<PolytechLeague.Application.Dto.General.ChampionDto>> GetChampionsAsync(string? sportType = null)
+    {
+        var query = _context.Set<PolytechLeague.Domain.Entities.Event>()
+            .Where(e => e.Level == CompetitionLevel.CollegeGroup && e.FirstPlaceId != null)
+            .Include(e => e.Season)
+            .Include(e => e.FirstPlace)
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(sportType) && sportType != "all")
+        {
+            query = query.Where(e =>
+                (sportType == "chess" && e is ChessEvent) ||
+                (sportType == "checkers" && e is CheckersEvent) ||
+                (sportType == "table-tennis" && e is TableTennisEvent) ||
+                (sportType == "armwrestling" && e is ArmwrestlingEvent) ||
+                (sportType == "badminton" && e is BadmintonEvent) ||
+                (sportType == "futsal" && e is FutsalEvent) ||
+                (sportType == "basketball-3x3" && e is Basketball3x3Event) ||
+                (sportType == "volleyball" && e is VolleyballEvent) ||
+                (sportType == "beach-volleyball" && e is BeachVolleyballEvent)
+            );
+        }
+
+        var results = await query
+            .OrderByDescending(e => e.Date)
+            .ToListAsync();
+
+        return results.Select(e => new PolytechLeague.Application.Dto.General.ChampionDto
+        {
+            PlayerId = e.FirstPlaceId!.Value,
+            PlayerName = $"{e.FirstPlace!.FirstName} {e.FirstPlace.LastName}",
+            PlayerPhotoUrl = e.FirstPlace.PhotoUrl,
+            SeasonName = e.Season?.Name ?? e.Date.Year.ToString(),
+            TournamentId = e.Id,
+            TournamentName = e.Name,
+            SportType = GetSportName(e),
+            Date = e.Date,
+            Points = 0 
+        });
+    }
 }

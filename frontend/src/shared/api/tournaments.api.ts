@@ -1,5 +1,5 @@
 import api from './axiosInstance';
-import { Tournament, PagedResponse, RecentMatch } from '../types/tournament.types';
+import { Tournament, PagedResponse, RecentMatch, Champion } from '../types/tournament.types';
 
 export const getTournaments = async (
     page: number = 1, 
@@ -62,6 +62,18 @@ export const getTournamentsStats = async (): Promise<TournamentStats> => {
         return response.data;
     } catch (error) {
         console.error('Помилка при отриманні статистики турнірів:', error);
+        throw error;
+    }
+};
+
+export const getChampions = async (sport?: string): Promise<Champion[]> => {
+    try {
+        const response = await api.get<Champion[]>('/tournaments/champions', {
+            params: { sport }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Помилка при отриманні чемпіонів:', error);
         throw error;
     }
 };

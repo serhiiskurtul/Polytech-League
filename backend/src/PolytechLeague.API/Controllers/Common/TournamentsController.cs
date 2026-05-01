@@ -49,4 +49,11 @@ public class TournamentsController : ControllerBase
         var results = await _tournamentService.GetRecentMatchesAsync(count, sport);
         return Ok(results);
     }
+
+    [HttpGet("champions")]
+    public async Task<ActionResult<IEnumerable<PolytechLeague.Application.Dto.General.ChampionDto>>> GetChampions([FromQuery] string? sport = null)
+    {
+        var champions = await _tournamentService.GetChampionsAsync(sport);
+        return Ok(champions);
+    }
 }

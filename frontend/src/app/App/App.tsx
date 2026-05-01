@@ -24,7 +24,7 @@ import { AdminUsersPage } from '@/pages/AdminUsersPage';
 import { NationalRatingsPage } from '@/pages/NationalRatingsPage';
 import { AdminCollegesPage } from '@/pages/AdminCollegesPage';
 import { CollegesPage } from '@/pages/CollegesPage';
-import ChessChampionsPage from '@/pages/ChessChampionsPage/ChessChampionsPage';
+import ChampionsPage from '@/pages/ChampionsPage/ChampionsPage';
 
 import ProtectedRoute from '../providers/ProtectedRoute';
 import ScrollToTop from '../providers/ScrollToTop';
@@ -185,10 +185,10 @@ export default function App() {
         />
 
         <Route
-          path="/hall-of-fame/chess"
+          path="/hall-of-fame/:sport"
           element={
             <ProtectedRoute requireAuth={false}>
-              <ChessChampionsPage />
+              <ChampionsPage />
             </ProtectedRoute>
           }
         />

@@ -50,3 +50,15 @@ export enum RegistrationStatus {
 }
 
 export type TournamentCategory = 'Men' | 'Women' | 'Mixed';
+
+export interface Champion {
+  playerId: number;
+  playerName: string;
+  playerPhotoUrl?: string;
+  seasonName: string;
+  tournamentId: number;
+  tournamentName: string;
+  sportType: string;
+  date: string;
+  points: number;
+}
