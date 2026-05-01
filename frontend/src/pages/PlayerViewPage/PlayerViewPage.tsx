@@ -101,7 +101,10 @@ const PlayerViewPage = () => {
     goalsScored: playerProfile.goalsScored || 0,
     competitionsCount: playerProfile.competitionsCount || 0,
     globalRank: playerProfile.globalRank,
-    sportStats: playerProfile.sportStats
+    sportStats: playerProfile.sportStats,
+    chessTotalPoints: playerProfile.chessTotalPoints,
+    chessTotalPossiblePoints: playerProfile.chessTotalPossiblePoints,
+    isChessUndefeatedFourSeasons: playerProfile.isChessUndefeatedFourSeasons
   };
 
   const handleCompare = () => {

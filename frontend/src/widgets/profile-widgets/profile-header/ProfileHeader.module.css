@@ -419,3 +419,17 @@
   50% { opacity: 1; transform: scale(1.1); }
   100% { opacity: 0.8; transform: scale(1); }
 }
+
+.badgeChessStreak {
+  background: #fdf2f8;
+  color: #db2777;
+  border: 1px solid #fbcfe8;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(219, 39, 119, 0.1);
+}

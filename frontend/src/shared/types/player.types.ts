@@ -28,6 +28,10 @@ export interface PlayerDto {
     chessRating?: number | null;
     chessFideId?: string | null;
     chessTitle?: string | null;
+    hasChessFourStreak?: boolean;
+    chessTotalPoints?: number | null;
+    chessTotalPossiblePoints?: number | null;
+    isChessUndefeatedFourSeasons?: boolean;
 
     // Checkers
     checkersRating?: number | null;

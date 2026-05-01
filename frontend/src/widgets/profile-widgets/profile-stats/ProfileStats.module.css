@@ -165,3 +165,16 @@
   color: #b45309;
   font-size: 1.2rem;
 }
+
+.undefeatedCard {
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%) !important;
+  border: 1px solid #10b981 !important;
+}
+
+.undefeatedCard .statValue {
+  color: #059669;
+}
+
+.undefeatedCard:hover {
+  background: #059669 !important;
+}

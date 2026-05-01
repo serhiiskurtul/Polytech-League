@@ -14,6 +14,9 @@ interface Stats {
   goalsScored: number;
   globalRank?: number;
   sportStats?: SportStat[];
+  chessTotalPoints?: number | null;
+  chessTotalPossiblePoints?: number | null;
+  isChessUndefeatedFourSeasons?: boolean;
 }
 
 interface ProfileStatsProps {
@@ -80,6 +83,18 @@ const ProfileStats = ({ stats }: ProfileStatsProps) => {
           <div className={styles.statCard}>
             <div className={styles.statValue}>{stats.goalsScored}</div>
             <div className={styles.statLabel}>Забитих голів</div>
+          </div>
+        )}
+        {stats.chessTotalPoints !== null && stats.chessTotalPoints !== undefined && stats.chessTotalPossiblePoints && (
+          <div className={styles.statCard} title="Очки в міжгрупових змаганнях з шахів">
+            <div className={styles.statValue}>{stats.chessTotalPoints}/{stats.chessTotalPossiblePoints}</div>
+            <div className={styles.statLabel}>Очки (шахи)</div>
+          </div>
+        )}
+        {stats.isChessUndefeatedFourSeasons && (
+          <div className={`${styles.statCard} ${styles.undefeatedCard}`} title="Не програв жодної партії протягом 4 сезонів">
+            <div className={styles.statValue}><i className="fas fa-shield-alt"></i></div>
+            <div className={styles.statLabel}>Непереможний (4 сезони)</div>
           </div>
         )}
       </div>

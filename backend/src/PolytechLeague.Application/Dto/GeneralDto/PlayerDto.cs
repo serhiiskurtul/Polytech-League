@@ -33,6 +33,10 @@ public class PlayerDto
     public int? ChessRating { get; set; }
     public string? ChessFideId { get; set; }
     public string? ChessTitle { get; set; }
+    public bool HasChessFourStreak { get; set; }
+    public double? ChessTotalPoints { get; set; }
+    public double? ChessTotalPossiblePoints { get; set; }
+    public bool IsChessUndefeatedFourSeasons { get; set; }
 
     // Checkers
     public int? CheckersRating { get; set; }
@@ -132,6 +136,10 @@ public static class PlayerDtoExtensions
             ChessRating = player.ChessRating,
             ChessFideId = player.ChessFideId,
             ChessTitle = player.ChessTitle,
+            HasChessFourStreak = false, // Will be populated in service
+            ChessTotalPoints = null,
+            ChessTotalPossiblePoints = null,
+            IsChessUndefeatedFourSeasons = false,
             CheckersRating = player.CheckersRating,
             TableTennisRating = player.TableTennisRating,
             TableTennisHand = player.TableTennisHand,

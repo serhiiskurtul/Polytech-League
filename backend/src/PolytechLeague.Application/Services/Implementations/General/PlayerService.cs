@@ -1,4 +1,4 @@
-﻿﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PolytechLeague.Application.Dto.GeneralDto;
 using PolytechLeague.Application.Services.Interfaces;
@@ -45,7 +45,7 @@ public class PlayerService : IPlayerService
     {
         var allWithRankings = await GetAllWithRankingsAsync(null, cancellationToken);
         var ranked = allWithRankings.FirstOrDefault(p => p.Id == id);
-        if (ranked != null) { await PopulateAutomaticBadgesAsync(ranked, cancellationToken); return ranked; }
+        if (ranked != null) { await PopulateAutomaticBadgesAsync(ranked, cancellationToken); await PopulateChessSpecialStatsAsync(ranked, cancellationToken); return ranked; }
 
         // Fallback for players not in rankings (Admins, External)
         var player = await _dbContext.Players
@@ -54,7 +54,7 @@ public class PlayerService : IPlayerService
             
         if (player == null) return null;
         var dto = player.ToDto();
-        await PopulateAchievementsAsync(dto, cancellationToken); await PopulateAutomaticBadgesAsync(dto, cancellationToken);
+        await PopulateAchievementsAsync(dto, cancellationToken); await PopulateAutomaticBadgesAsync(dto, cancellationToken); await PopulateChessSpecialStatsAsync(dto, cancellationToken);
         return dto;
     }
 
@@ -71,7 +71,7 @@ public class PlayerService : IPlayerService
     {
         var allWithRankings = await GetAllWithRankingsAsync(null, cancellationToken);
         var ranked = allWithRankings.FirstOrDefault(p => p.UserId == userId);
-        if (ranked != null) { await PopulateAutomaticBadgesAsync(ranked, cancellationToken); return ranked; }
+        if (ranked != null) { await PopulateAutomaticBadgesAsync(ranked, cancellationToken); await PopulateChessSpecialStatsAsync(ranked, cancellationToken); return ranked; }
 
         // Fallback for players not in rankings (Admins, External)
         var player = await _dbContext.Players
@@ -80,7 +80,7 @@ public class PlayerService : IPlayerService
             
         if (player == null) return null;
         var dto = player.ToDto();
-        await PopulateAchievementsAsync(dto, cancellationToken); await PopulateAutomaticBadgesAsync(dto, cancellationToken);
+        await PopulateAchievementsAsync(dto, cancellationToken); await PopulateAutomaticBadgesAsync(dto, cancellationToken); await PopulateChessSpecialStatsAsync(dto, cancellationToken);
         return dto;
     }
 
@@ -1266,5 +1266,119 @@ public class PlayerService : IPlayerService
         }
 
         dto.AutomaticBadges = badges;
+    }
+
+    private async Task PopulateChessSpecialStatsAsync(PlayerDto dto, CancellationToken cancellationToken)
+    {
+        if (dto.Id == null) return;
+        var playerId = dto.Id.Value;
+
+        try
+        {
+            // 1. Get all inter-group chess performances
+            var chessPerformances = await _dbContext.ChessEventParticipants
+                .Include(p => p.Tournament)
+                .Where(p => p.PlayerId == playerId && p.Tournament != null && p.Tournament.Level == CompetitionLevel.CollegeGroup)
+                .OrderByDescending(p => p.Tournament!.Date)
+                .ToListAsync(cancellationToken);
+
+            if (!chessPerformances.Any()) return;
+
+            // 2. Check for 4-streak 1st place
+            int currentStreak = 0;
+            int maxStreak = 0;
+            foreach (var p in chessPerformances.OrderBy(x => x.Tournament!.Date))
+            {
+                if (p.Rank == 1)
+                {
+                    currentStreak++;
+                    if (currentStreak > maxStreak) maxStreak = currentStreak;
+                }
+                else
+                {
+                    currentStreak = 0;
+                }
+            }
+
+            if (maxStreak >= 4)
+            {
+                dto.HasChessFourStreak = true;
+                if (!dto.AutomaticBadges.Any(b => b.Type == "ChessStreak4"))
+                {
+                    dto.AutomaticBadges.Add(new AutomaticBadgeDto
+                    {
+                        Type = "ChessStreak4",
+                        Label = "4-разовий чемпіон шахів поспіль",
+                        Icon = "crown"
+                    });
+                }
+                
+                // Also add to achievements if not already there as a special one
+                if (!dto.Achievements.Any(a => a.TournamentName == "4-разовий чемпіон шахів поспіль"))
+                {
+                    dto.Achievements.Add(new AchievementDto
+                    {
+                        TournamentName = "4-разовий чемпіон шахів поспіль",
+                        SportType = "chess",
+                        Date = chessPerformances.First().Tournament!.Date,
+                        Rank = 1,
+                        Result = "Спеціальне досягнення"
+                    });
+                }
+            }
+
+            // 3. Calculate total points and possible points
+            double totalPoints = chessPerformances.Sum(p => p.Points);
+            double totalPossible = 0;
+
+            var tournamentIds = chessPerformances.Select(p => p.TournamentId).ToList();
+            var games = await _dbContext.ChessGames
+                .Where(g => tournamentIds.Contains(g.TournamentId) && (g.WhitePlayerId == playerId || g.BlackPlayerId == playerId))
+                .ToListAsync(cancellationToken);
+
+            totalPossible = games.Count;
+            
+            if (totalPossible > 0)
+            {
+                dto.ChessTotalPoints = totalPoints;
+                dto.ChessTotalPossiblePoints = totalPossible;
+            }
+
+            // 4. Undefeated in 4 seasons
+            // Group games by season
+            var seasonsWithChess = await _dbContext.Seasons
+                .Where(s => _dbContext.ChessEvents.Any(e => e.SeasonId == s.Id && e.Level == CompetitionLevel.CollegeGroup && 
+                    _dbContext.ChessEventParticipants.Any(p => p.TournamentId == e.Id && p.PlayerId == playerId)))
+                .ToListAsync(cancellationToken);
+
+            int undefeatedSeasons = 0;
+            foreach (var season in seasonsWithChess)
+            {
+                var seasonEventIds = await _dbContext.ChessEvents
+                    .Where(e => e.SeasonId == season.Id && e.Level == CompetitionLevel.CollegeGroup)
+                    .Select(e => e.Id)
+                    .ToListAsync(cancellationToken);
+
+                var seasonGames = games.Where(g => seasonEventIds.Contains(g.TournamentId)).ToList();
+                if (!seasonGames.Any()) continue;
+
+                bool lost = seasonGames.Any(g => 
+                    (g.WhitePlayerId == playerId && g.Result == GameResult.BlackWin) ||
+                    (g.BlackPlayerId == playerId && g.Result == GameResult.WhiteWin)
+                );
+
+                if (!lost) undefeatedSeasons++;
+            }
+
+            if (undefeatedSeasons >= 4)
+            {
+                dto.IsChessUndefeatedFourSeasons = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error populating special chess stats for player {PlayerId}", playerId);
+        }
+
     }
 }
