@@ -3,6 +3,7 @@ using PolytechLeague.Application.Dto;
 using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Entities.BeachVolleyball;
 using PolytechLeague.Domain.Entities.BeachVolleyball.Enums;
+using PolytechLeague.Domain.Entities.Shared;
 
 namespace PolytechLeague.Application.Dto.BeachVolleyballDto;
 

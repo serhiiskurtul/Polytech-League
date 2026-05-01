@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using PolytechLeague.Application.Services.Interfaces;
 using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Exceptions;
+using PolytechLeague.Domain.Entities.Shared;
 
 namespace PolytechLeague.Application.Services.Implementations.Volleyball;
 

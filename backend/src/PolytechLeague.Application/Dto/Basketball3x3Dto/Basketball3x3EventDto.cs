@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Entities.Basketball3x3;
 using PolytechLeague.Domain.Entities.Basketball3x3.Enums;
+using PolytechLeague.Domain.Entities.Shared;
 
 namespace PolytechLeague.Application.Dto.Basketball3x3Dto;
 

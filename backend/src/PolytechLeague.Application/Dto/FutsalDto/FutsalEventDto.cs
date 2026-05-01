@@ -3,6 +3,7 @@ using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Entities.Futsal;
 using PolytechLeague.Domain.Entities.Futsal.Enums;
 using PolytechLeague.Application.Dto.ChessDto;
+using PolytechLeague.Domain.Entities.Shared;
 
 namespace PolytechLeague.Application.Dto.FutsalDto;
 

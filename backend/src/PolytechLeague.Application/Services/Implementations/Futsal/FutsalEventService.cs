@@ -4,6 +4,7 @@ using PolytechLeague.Application.Services.Interfaces.Futsal;
 using PolytechLeague.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
 using PolytechLeague.Application.Services.Interfaces;
+using PolytechLeague.Domain.Entities.Shared;
 using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Exceptions;
 
@@ -13,19 +14,12 @@ public class FutsalEventService :
     AbstractEntityService<FutsalEvent>,
     IFutsalEventService
 {
-    private readonly ApplicationDbContext _dbcontext;
-    private readonly ILogger<AbstractEntityService<FutsalEvent>> _logger;
-    private readonly INotificationService _notificationService;
-
     public FutsalEventService(
         ApplicationDbContext dbcontext,
         ILogger<AbstractEntityService<FutsalEvent>> logger,
         INotificationService notificationService
     ) : base(dbcontext, logger, notificationService)
     {
-        _dbcontext = dbcontext;
-        _logger = logger;
-        _notificationService = notificationService;
     }
     protected override void UpdateValues(FutsalEvent oldEntity, FutsalEvent newEntity)
     {
@@ -287,7 +281,7 @@ public class FutsalEventService :
                 await _notificationService.SendNotificationToUserAsync(
                     player.UserId.Value,
                     "Реєстрація схвалена",
-                    $"Вашу заявку на участь у змаганні з футзалу \"{tournament.Name}\" схвалено!",
+                    $"Вашу заявку на участь у змаганні з футзалу \"{tournament?.Name}\" схвалено!",
                     NotificationType.Tournament,
                     $"/tournaments/{eventId}"
                 );
@@ -302,6 +296,8 @@ public class FutsalEventService :
         var participant = await _dbcontext.FutsalEventParticipants
             .FirstOrDefaultAsync(p => p.EventId == eventId && p.PlayerId == playerId, cancellationToken);
 
+        var tournament = await _dbcontext.FutsalEvents.FindAsync(new object[] { eventId }, cancellationToken);
+
         if (participant != null)
         {
             participant.Status = RegistrationStatus.Rejected;
@@ -313,7 +309,7 @@ public class FutsalEventService :
                 await _notificationService.SendNotificationToUserAsync(
                     player.UserId.Value,
                     "Реєстрація відхилена",
-                    $"Вашу заявку на участь у змаганні з футзалу \"{tournament.Name}\" було відхилено.",
+                    $"Вашу заявку на участь у змаганні з футзалу \"{tournament?.Name}\" було відхилено.",
                     NotificationType.Tournament,
                     $"/tournaments/{eventId}"
                 );

@@ -17,23 +17,17 @@ public class CheckersEventService :
     AbstractEntityService<CheckersEvent>,
     ICheckersEventService
 {
-    private readonly ApplicationDbContext _dbcontext;
-    private readonly ILogger<AbstractEntityService<CheckersEvent>> _logger;
-    private readonly INotificationService _notificationService;
     private readonly IExcelImportService _excelImportService;
-
-    public CheckersEventService(
-        ApplicationDbContext dbcontext,
-        ILogger<AbstractEntityService<CheckersEvent>> logger,
-        INotificationService notificationService,
-        IExcelImportService excelImportService
-    ) : base(dbcontext, logger, notificationService)
-    {
-        _dbcontext = dbcontext;
-        _logger = logger;
-        _notificationService = notificationService;
-        _excelImportService = excelImportService;
-    }
+ 
+     public CheckersEventService(
+         ApplicationDbContext dbcontext,
+         ILogger<AbstractEntityService<CheckersEvent>> logger,
+         INotificationService notificationService,
+         IExcelImportService excelImportService
+     ) : base(dbcontext, logger, notificationService)
+     {
+         _excelImportService = excelImportService;
+     }
     protected override void UpdateValues(CheckersEvent oldEntity, CheckersEvent newEntity)
     {
         oldEntity.Name = newEntity.Name;

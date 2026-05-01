@@ -5,6 +5,7 @@ using PolytechLeague.Application.Services.Interfaces.Badminton;
 using PolytechLeague.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
 using PolytechLeague.Application.Services.Interfaces;
+using PolytechLeague.Domain.Entities.Shared;
 using PolytechLeague.Domain.Entities;
 
 using PolytechLeague.Application.Dto.BadmintonDto;

@@ -16,23 +16,17 @@ public class ChessEventService :
     AbstractEntityService<ChessEvent>,
     IChessEventService
 {
-    private readonly ApplicationDbContext _dbcontext;
-    private readonly ILogger<AbstractEntityService<ChessEvent>> _logger;
-    private readonly INotificationService _notificationService;
     private readonly IExcelImportService _excelImportService;
-
-    public ChessEventService(
-        ApplicationDbContext dbcontext,
-        ILogger<AbstractEntityService<ChessEvent>> logger,
-        INotificationService notificationService,
-        IExcelImportService excelImportService
-    ) : base(dbcontext, logger, notificationService)
-    {
-        _dbcontext = dbcontext;
-        _logger = logger;
-        _notificationService = notificationService;
-        _excelImportService = excelImportService;
-    }
+ 
+     public ChessEventService(
+         ApplicationDbContext dbcontext,
+         ILogger<AbstractEntityService<ChessEvent>> logger,
+         INotificationService notificationService,
+         IExcelImportService excelImportService
+     ) : base(dbcontext, logger, notificationService)
+     {
+         _excelImportService = excelImportService;
+     }
     protected override void UpdateValues(ChessEvent oldEntity, ChessEvent newEntity)
     {
         oldEntity.Name = newEntity.Name;
