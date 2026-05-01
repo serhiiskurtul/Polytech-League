@@ -79,10 +79,6 @@ const ChessChampionsPage: React.FC = () => {
           </div>
         )}
       </main>
-
-      <footer className={styles.footer}>
-        <p>&copy; {new Date().getFullYear()} Polytech League. Всі права захищено.</p>
-      </footer>
     </div>
   );
 };
