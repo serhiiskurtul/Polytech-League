@@ -86,18 +86,24 @@ const ProfileStats = ({ stats }: ProfileStatsProps) => {
           </div>
         )}
         {stats.chessTotalPoints !== null && stats.chessTotalPoints !== undefined && (
-          <div className={styles.statCard} title="Загальна кількість набраних очок у міжгрупових змаганнях з шахів">
-            <div className={styles.statValue} title="Набрані очки / Можливі очки">
+          <div 
+            className={`${styles.statCard} ${styles.hasTooltip}`} 
+            data-tooltip="Загальна кількість набраних очок у міжгрупових змаганнях з шахів"
+          >
+            <div className={styles.statValue}>
               {stats.chessTotalPoints}
               {stats.chessTotalPossiblePoints !== null && stats.chessTotalPossiblePoints !== undefined && `/${stats.chessTotalPossiblePoints}`}
             </div>
             <div className={styles.statLabel}>
-              Очки в міжгрупових шахах <i className="fas fa-info-circle" style={{ fontSize: '12px', opacity: 0.7 }}></i>
+              Очки в міжгрупових шахах <i className="fas fa-info-circle"></i>
             </div>
           </div>
         )}
         {stats.isChessUndefeatedFourSeasons && (
-          <div className={`${styles.statCard} ${styles.undefeatedCard}`} title="Не програв жодної партії протягом 4 сезонів">
+          <div 
+            className={`${styles.statCard} ${styles.undefeatedCard} ${styles.hasTooltip}`} 
+            data-tooltip="Не програв жодної партії протягом 4 сезонів"
+          >
             <div className={styles.statValue}><i className="fas fa-shield-alt"></i></div>
             <div className={styles.statLabel}>Непереможний (4 сезони)</div>
           </div>
