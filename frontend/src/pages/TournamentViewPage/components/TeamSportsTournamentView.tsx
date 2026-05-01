@@ -51,7 +51,26 @@ import {
   deleteBadmintonTeam,
   deleteChessTeam,
   deleteCheckersTeam,
-  deleteTableTennisTeam
+  deleteTableTennisTeam,
+  approveFutsalParticipant,
+  rejectFutsalParticipant,
+  removeFutsalParticipant,
+  approveVolleyballParticipant,
+  rejectVolleyballParticipant,
+  removeVolleyballParticipant,
+  approveBasketball3x3Participant,
+  rejectBasketball3x3Participant,
+  removeBasketball3x3Participant,
+  approveBeachVolleyballParticipant,
+  rejectBeachVolleyballParticipant,
+  removeBeachVolleyballParticipant,
+  approveBadmintonParticipant,
+  rejectBadmintonParticipant,
+  removeBadmintonParticipant,
+  approveTableTennisParticipant,
+  rejectTableTennisParticipant,
+  removeTableTennisParticipant,
+  RegistrationStatus
 } from '@/shared/api';
 import TournamentPodium from './TournamentPodium';
 import FutsalBracket from './FutsalBracket';
@@ -73,7 +92,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   isAdmin,
   onRefresh
 }) => {
-  const [activeTab, setActiveTab] = useState<'standings' | 'matches' | 'teams' | 'info' | 'bracket'>((sport === 'futsal' || sport === 'футзал') ? 'bracket' : 'matches');
+  const [activeTab, setActiveTab] = useState<'standings' | 'matches' | 'teams' | 'info' | 'bracket' | 'participants'>((sport === 'futsal' || sport === 'футзал') ? 'bracket' : 'matches');
   const [allPlayers, setAllPlayers] = useState<PlayerDto[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -598,51 +617,88 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
   const handleTogglePlayerInTeam = async (teamId: number, playerId: number) => {
     try {
+      const updateApi = getTeamUpdateApi();
       const team = details.teams.find((t: any) => t.id === teamId);
-      const currentParticipantIds = team.players?.map((p: any) => p.id) || [];
-      
-      let newPlayerIds: number[];
-      if (currentParticipantIds.includes(playerId)) {
-        newPlayerIds = currentParticipantIds.filter((id: number) => id !== playerId);
-      } else {
-        newPlayerIds = [...currentParticipantIds, playerId];
-      }
+      if (!team) return;
 
-      let updateApi;
-      switch (sport) {
-        case 'volleyball': updateApi = updateVolleyballTeam; break;
-        case 'beach_volleyball': updateApi = updateBeachVolleyballTeam; break;
-        case 'futsal': updateApi = updateFutsalTeam; break;
-        case 'basketball_3x3': updateApi = updateBasketball3x3Team; break;
-        case 'badminton': updateApi = updateBadmintonTeam; break;
-        case 'chess': updateApi = updateChessTeam; break;
-        case 'checkers': updateApi = updateCheckersTeam; break;
-        case 'tabletennis':
-        case 'table_tennis':
-        case 'table-tennis': updateApi = updateTableTennisTeam; break;
-        default: updateApi = updateVolleyballTeam;
-      }
+      const playerIds = team.players?.map((p: any) => p.id) || [];
+      const isAlreadyIn = playerIds.includes(playerId);
 
+      const newPlayerIds = isAlreadyIn 
+        ? playerIds.filter((id: number) => id !== playerId)
+        : [...playerIds, playerId];
 
-      const payload = {
-        id: team.id,
-        name: team.name,
-        eventId: team.eventId,
-        points: team.points,
-        rank: team.rank,
-        playerIds: newPlayerIds,
-        captainId: newPlayerIds.includes(team.captainId) ? team.captainId : null,
-        goalkeeperId: newPlayerIds.includes(team.goalkeeperId) ? team.goalkeeperId : null
-      };
-
-      await updateApi(teamId, payload);
+      await updateApi(teamId, { ...team, playerIds: newPlayerIds });
       onRefresh();
     } catch (err) {
       console.error(err);
-      alert('Помилка при оновленні складу команди');
+      alert('Помилка при зміні складу команди');
     }
   };
 
+  const handleApproveParticipant = async (playerId: number) => {
+    try {
+      let approveApi;
+      switch (sport) {
+        case 'futsal': approveApi = approveFutsalParticipant; break;
+        case 'volleyball': approveApi = approveVolleyballParticipant; break;
+        case 'beach_volleyball': approveApi = approveBeachVolleyballParticipant; break;
+        case 'basketball_3x3': approveApi = approveBasketball3x3Participant; break;
+        case 'badminton': approveApi = approveBadmintonParticipant; break;
+        case 'table_tennis':
+        case 'tabletennis': approveApi = approveTableTennisParticipant; break;
+        default: approveApi = approveFutsalParticipant;
+      }
+      await approveApi(details.id, playerId);
+      onRefresh();
+    } catch (err) {
+      console.error(err);
+      alert('Помилка при підтвердженні заявки');
+    }
+  };
+
+  const handleRejectParticipant = async (playerId: number) => {
+    try {
+      let rejectApi;
+      switch (sport) {
+        case 'futsal': rejectApi = rejectFutsalParticipant; break;
+        case 'volleyball': rejectApi = rejectVolleyballParticipant; break;
+        case 'beach_volleyball': rejectApi = rejectBeachVolleyballParticipant; break;
+        case 'basketball_3x3': rejectApi = rejectBasketball3x3Participant; break;
+        case 'badminton': rejectApi = rejectBadmintonParticipant; break;
+        case 'table_tennis':
+        case 'tabletennis': rejectApi = rejectTableTennisParticipant; break;
+        default: rejectApi = rejectFutsalParticipant;
+      }
+      await rejectApi(details.id, playerId);
+      onRefresh();
+    } catch (err) {
+      console.error(err);
+      alert('Помилка при відхиленні заявки');
+    }
+  };
+
+  const handleRemoveParticipant = async (playerId: number) => {
+    if (!window.confirm('Ви впевнені, що хочете повністю видалити цей запис про реєстрацію?')) return;
+    try {
+      let removeApi;
+      switch (sport) {
+        case 'futsal': removeApi = removeFutsalParticipant; break;
+        case 'volleyball': removeApi = removeVolleyballParticipant; break;
+        case 'beach_volleyball': removeApi = removeBeachVolleyballParticipant; break;
+        case 'basketball_3x3': removeApi = removeBasketball3x3Participant; break;
+        case 'badminton': removeApi = removeBadmintonParticipant; break;
+        case 'table_tennis':
+        case 'tabletennis': removeApi = removeTableTennisParticipant; break;
+        default: removeApi = removeFutsalParticipant;
+      }
+      await removeApi(details.id, playerId);
+      onRefresh();
+    } catch (err) {
+      console.error(err);
+      alert('Помилка при видаленні учасника');
+    }
+  };
   const handleSetCaptain = async (teamId: number, playerId: number | null) => {
     try {
       const team = details.teams.find((t: any) => t.id === teamId);
@@ -837,6 +893,11 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
             <button className={activeTab === 'bracket' ? styles.activeTab : ''} onClick={() => setActiveTab('bracket')}>Сітка</button>
           )}
           <button className={activeTab === 'teams' ? styles.activeTab : ''} onClick={() => setActiveTab('teams')}>Команди</button>
+          {isAdmin && (
+            <button className={activeTab === 'participants' ? styles.activeTab : ''} onClick={() => setActiveTab('participants')}>
+              Учасники {details.participants?.length > 0 && `(${details.participants.length})`}
+            </button>
+          )}
           {isAdmin && activeTab === 'matches' && (
             <button className={styles.addMatchGlobalBtn} onClick={() => setIsCreateMatchModalOpen(true)}>
               <i className="fas fa-plus-circle"></i> Додати матч
@@ -1197,6 +1258,74 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
               </div>
             ))}
             {(!details.teams || details.teams.length === 0) && <p className={styles.noData}>У цих змаганнях ще немає команд</p>}
+          </div>
+        )}
+
+        {activeTab === 'participants' && (
+          <div className={styles.participantsList}>
+            <div className={styles.tableWrapper}>
+              <table className={styles.dataTable}>
+                <thead>
+                  <tr>
+                    <th>№</th>
+                    <th>Учасник</th>
+                    <th>Група</th>
+                    <th>Статус</th>
+                    {isAdmin && <th>Дії</th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {(details.participants || []).length > 0 ? (details.participants || []).map((p: any, idx: number) => (
+                    <tr key={p.id || p.playerId}>
+                      <td>{idx + 1}</td>
+                      <td>
+                        <strong>{p.playerName}</strong>
+                      </td>
+                      <td>{p.groupName || '—'}</td>
+                      <td style={{ textAlign: 'center' }}>
+                        <span className={`${styles.statusBadge} ${styles[p.status?.toLowerCase()]}`}>
+                          {p.status === RegistrationStatus.Approved ? 'Підтверджено' : 
+                           p.status === RegistrationStatus.Pending ? 'Очікує' : 'Відхилено'}
+                        </span>
+                      </td>
+                      {isAdmin && (
+                        <td>
+                          <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                            {p.status === RegistrationStatus.Pending && (
+                              <>
+                                <button 
+                                  onClick={() => handleApproveParticipant(p.playerId)} 
+                                  className={styles.approveBtn}
+                                  title="Підтвердити"
+                                >
+                                  <i className="fas fa-check"></i>
+                                </button>
+                                <button 
+                                  onClick={() => handleRejectParticipant(p.playerId)} 
+                                  className={styles.rejectBtn}
+                                  title="Відхилити"
+                                >
+                                  <i className="fas fa-times"></i>
+                                </button>
+                              </>
+                            )}
+                            <button 
+                              onClick={() => handleRemoveParticipant(p.playerId)} 
+                              className={styles.deleteBtn}
+                              title="Видалити зовсім"
+                            >
+                              <i className="fas fa-trash"></i>
+                            </button>
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  )) : (
+                    <tr><td colSpan={isAdmin ? 5 : 4} className={styles.noData}>Учасників ще немає</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 

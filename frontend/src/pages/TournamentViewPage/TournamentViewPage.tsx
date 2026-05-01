@@ -837,55 +837,6 @@ const TournamentViewPage = () => {
     }
   };
 
-  const handleApproveParticipant = async (playerId: number, playerName: string) => {
-    try {
-      const sportKey = tournament?.sport?.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') || '';
-      switch (sportKey) {
-        case 'checkers': await approveCheckersParticipant(id!, playerId); break;
-        case 'armwrestling': await approveArmwrestlingParticipant(id!, playerId); break;
-        case 'badminton': await approveBadmintonParticipant(id!, playerId); break;
-        case 'tabletennis':
-        case 'table_tennis': await approveTableTennisParticipant(id!, playerId); break;
-        case 'volleyball': await approveVolleyballParticipant(id!, playerId); break;
-        case 'beach_volleyball': await approveBeachVolleyballParticipant(id!, playerId); break;
-        case 'futsal': await approveFutsalParticipant(id!, playerId); break;
-        case 'basketball_3x3':
-        case 'basketball3x3': await approveBasketball3x3Participant(id!, playerId); break;
-        default: await approveChessParticipant(id!, playerId);
-      }
-      toast.success("Учасника схвалено!");
-      fetchTournament(true);
-    } catch (err) {
-      console.error(err);
-      toast.error("Помилка при схваленні");
-    }
-  };
-
-  const handleRejectParticipant = async (playerId: number, playerName: string) => {
-    if (!window.confirm(`Відхилити участь ${playerName}?`)) return;
-    try {
-      const sportKey = tournament?.sport?.toLowerCase().replace(/-/g, '_').replace(/\s/g, '') || '';
-      switch (sportKey) {
-        case 'checkers': await rejectCheckersParticipant(id!, playerId); break;
-        case 'armwrestling': await rejectArmwrestlingParticipant(id!, playerId); break;
-        case 'badminton': await rejectBadmintonParticipant(id!, playerId); break;
-        case 'tabletennis':
-        case 'table_tennis': await rejectTableTennisParticipant(id!, playerId); break;
-        case 'volleyball': await rejectVolleyballParticipant(id!, playerId); break;
-        case 'beach_volleyball': await rejectBeachVolleyballParticipant(id!, playerId); break;
-        case 'futsal': await rejectFutsalParticipant(id!, playerId); break;
-        case 'basketball_3x3':
-        case 'basketball3x3': await rejectBasketball3x3Participant(id!, playerId); break;
-        default: await rejectChessParticipant(id!, playerId);
-      }
-      toast.success("Учасника відхилено");
-      fetchTournament(true);
-    } catch (err) {
-      console.error(err);
-      toast.error("Помилка при відхиленні");
-    }
-  };
-
   const fetchTournament = async (quiet = false) => {
     if (!id) return;
     if (!quiet) setIsLoading(true);
@@ -2399,11 +2350,37 @@ const TournamentViewPage = () => {
                                   ) : (
                                     <td>{p.points}</td>
                                   )}
+                                  <td>
+                                    <span style={{
+                                      fontSize: '11px',
+                                      fontWeight: 'bold',
+                                      padding: '4px 8px',
+                                      borderRadius: '4px',
+                                      background: p.status === RegistrationStatus.Approved ? '#ecfdf5' : p.status === RegistrationStatus.Pending ? '#fffbeb' : '#fef2f2',
+                                      color: p.status === RegistrationStatus.Approved ? '#10b981' : p.status === RegistrationStatus.Pending ? '#f59e0b' : '#ef4444',
+                                      border: `1px solid ${p.status === RegistrationStatus.Approved ? '#bdf4e4' : p.status === RegistrationStatus.Pending ? '#fef3c7' : '#fee2e2'}`,
+                                      display: 'inline-block'
+                                    }}>
+                                      {p.status === RegistrationStatus.Approved ? 'Підтверджено' : p.status === RegistrationStatus.Pending ? 'Очікує' : 'Відхилено'}
+                                    </span>
+                                  </td>
                                   {isAdmin && (
                                     <td>
-                                      <button onClick={() => handleRemoveParticipant(p.playerId, p.playerName)} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Видалити">
-                                        <i className="fas fa-trash"></i>
-                                      </button>
+                                      <div style={{ display: 'flex', gap: '8px' }}>
+                                        {p.status === RegistrationStatus.Pending && (
+                                          <>
+                                            <button onClick={() => handleApproveParticipant(p.playerId)} style={{ padding: '4px 8px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Підтвердити">
+                                              <i className="fas fa-check"></i>
+                                            </button>
+                                            <button onClick={() => handleRejectParticipant(p.playerId)} style={{ padding: '4px 8px', background: '#f59e0b', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Відхилити">
+                                              <i className="fas fa-times"></i>
+                                            </button>
+                                          </>
+                                        )}
+                                        <button onClick={() => handleRemoveParticipant(p.playerId, p.playerName)} style={{ padding: '4px 8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Видалити зовсім">
+                                          <i className="fas fa-trash"></i>
+                                        </button>
+                                      </div>
                                     </td>
                                   )}
                                 </tr>
