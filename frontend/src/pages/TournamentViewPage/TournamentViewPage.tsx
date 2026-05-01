@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react'; // test
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/app/providers/AuthContext';
@@ -178,6 +178,7 @@ const TournamentViewPage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isEditingTournament, setIsEditingTournament] = useState(false);
+  const isMandatoryTeamSport = ['futsal', 'volleyball', 'beach_volleyball', 'basketball_3x3', 'basketball3x3'].includes(sportKey);
   const [showWinnersAdmin, setShowWinnersAdmin] = useState(false);
   const [winners, setWinners] = useState({
     firstPlaceId: 0,
@@ -188,8 +189,6 @@ const TournamentViewPage = () => {
   const handleSaveWinners = async () => {
     if (!details || !id) return;
     try {
-      const sportRaw = tournament?.sport || '';
-      const sportKey = sportRaw.toLowerCase().replace(/-/g, '_').replace(/\s/g, '');
       const isTeamSport = !!(details as any).isTeam || ['futsal', 'volleyball', 'beach_volleyball', 'basketball_3x3', 'badminton'].includes(sportKey);
 
       // Build clean base payload with common fields to avoid "Extra fields" 400 error
@@ -410,7 +409,7 @@ const TournamentViewPage = () => {
         headRefereeName: details.headRefereeName || '',
         referees: (details as any).referees || '',
         schedule: details.schedule || '',
-        isTeam: !!(details as any).isTeam,
+        isTeam: (['volleyball', 'beach_volleyball', 'futsal', 'basketball_3x3', 'basketball3x3'].includes((tournament?.sport || '').toLowerCase().replace(/-/g, '_'))) ? true : !!(details as any).isTeam,
         registrationStart: formatDateForInput(tournament?.registrationStart || details.registrationStart),
         registrationEnd: formatDateForInput(tournament?.registrationEnd || details.registrationEnd),
         endDate: formatDateForInput(tournament?.endDate || details.endDate),
@@ -2570,6 +2569,7 @@ const TournamentViewPage = () => {
                     )}
                     {editTournamentData.level === 'CollegeGroup' && (
                       <div className={styles.formGroup} style={{ gridColumn: '1 / -1', display: 'flex', gap: '20px' }}>
+                        {!isMandatoryTeamSport && (
                         <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                           <input
                             type="checkbox"
@@ -2582,6 +2582,7 @@ const TournamentViewPage = () => {
                             <small style={{ color: '#64748b' }}>Матчі проводяться між командами (групами)</small>
                           </div>
                         </label>
+                        )}
 
                         <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f0f9ff', padding: '12px', borderRadius: '8px', border: '1px solid #bae6fd' }}>
                           <input
@@ -2620,6 +2621,7 @@ const TournamentViewPage = () => {
                     )}
                     {editTournamentData.level !== 'CollegeGroup' && (
                        <div className={styles.formGroup} style={{ gridColumn: '1 / -1', display: 'flex', gap: '20px' }}>
+                        {!isMandatoryTeamSport && (
                         <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                           <input
                             type="checkbox"
@@ -2632,6 +2634,7 @@ const TournamentViewPage = () => {
                             <small style={{ color: '#64748b' }}>Матчі проводяться між командами (групами)</small>
                           </div>
                         </label>
+                        )}
                        </div>
                     )}
                     <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
