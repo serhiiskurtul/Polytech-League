@@ -76,7 +76,7 @@ const ProfileStats = ({ stats }: ProfileStatsProps) => {
         {stats.eloRating > 0 && (
           <div className={styles.statCard}>
             <div className={styles.statValue}>{stats.eloRating}</div>
-            <div className={styles.statLabel}>Рейтинг Elo (шахи)</div>
+            <div className={styles.statLabel}>Шаховий рейтинг Elo</div>
           </div>
         )}
         {stats.goalsScored > 0 && (
@@ -86,12 +86,12 @@ const ProfileStats = ({ stats }: ProfileStatsProps) => {
           </div>
         )}
         {stats.chessTotalPoints !== null && stats.chessTotalPoints !== undefined && (
-          <div className={styles.statCard} title="Очки в міжгрупових змаганнях з шахів">
+          <div className={styles.statCard} title="Загальна кількість набраних очок у міжгрупових змаганнях з шахів">
             <div className={styles.statValue}>
               {stats.chessTotalPoints}
               {stats.chessTotalPossiblePoints !== null && stats.chessTotalPossiblePoints !== undefined && `/${stats.chessTotalPossiblePoints}`}
             </div>
-            <div className={styles.statLabel}>Очки (шахи)</div>
+            <div className={styles.statLabel}>Очки в міжгрупових шахах</div>
           </div>
         )}
         {stats.isChessUndefeatedFourSeasons && (
