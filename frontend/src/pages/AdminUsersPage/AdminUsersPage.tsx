@@ -114,6 +114,10 @@ export const AdminUsersPage = () => {
           <div className={styles.titleSection}>
             <h1>Керування користувачами</h1>
             <p>Перегляд, блокування та видалення облікових записів</p>
+            <div className={styles.statsBadge}>
+              {activeTab === 'users' ? 'Всього акаунтів: ' : 'Всього гравців: '}
+              <span>{totalCount}</span>
+            </div>
           </div>
         </header>
 

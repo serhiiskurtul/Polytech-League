@@ -61,6 +61,23 @@
   color: white;
 }
 
+.statsBadge {
+  display: inline-block;
+  background: rgba(var(--primary-rgb), 0.1);
+  padding: 6px 16px;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  border: 1px solid rgba(var(--primary-rgb), 0.2);
+  margin-top: 8px;
+}
+
+.statsBadge span {
+  color: var(--text);
+  font-weight: 800;
+}
+
 .controls {
   display: flex;
   gap: 16px;
