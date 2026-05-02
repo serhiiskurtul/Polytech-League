@@ -53,9 +53,9 @@ const CollegesPage: React.FC = () => {
               <div className={styles.info}>
                 <span className={styles.shortName}>{college.shortName}</span>
                 <h3 className={styles.fullName}>{college.name}</h3>
-                <div className={styles.city}>
-                  <i className="fas fa-map-marker-alt"></i>
-                  <span>{college.city || 'Місто не вказано'}</span>
+                <div className={styles.region}>
+                  <i className="fas fa-globe"></i>
+                  <span>{college.region || 'Регіон не вказано'}</span>
                 </div>
               </div>
             </div>

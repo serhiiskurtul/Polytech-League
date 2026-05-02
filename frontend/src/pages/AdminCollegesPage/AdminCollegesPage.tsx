@@ -12,7 +12,6 @@ const AdminCollegesPage: React.FC = () => {
   const [formData, setFormData] = useState<Partial<College>>({
     name: '',
     shortName: '',
-    city: '',
     region: ''
   });
 
@@ -37,7 +36,7 @@ const AdminCollegesPage: React.FC = () => {
       setFormData(college);
     } else {
       setEditingCollege(null);
-      setFormData({ name: '', shortName: '', city: '', region: '' });
+      setFormData({ name: '', shortName: '', region: '' });
     }
     setIsModalOpen(true);
   };
@@ -107,7 +106,6 @@ const AdminCollegesPage: React.FC = () => {
               <div className={styles.details}>
                 <h3>{college.name}</h3>
                 <span className={styles.shortName}>{college.shortName}</span>
-                <span className={styles.city}><i className="fas fa-map-marker-alt"></i> {college.city || 'Місто не вказано'}</span>
                 <span className={styles.region}><i className="fas fa-globe"></i> {college.region || 'Регіон не вказано'}</span>
               </div>
             </div>
@@ -146,15 +144,6 @@ const AdminCollegesPage: React.FC = () => {
                   onChange={handleInputChange} 
                   required 
                   placeholder="Наприклад: ВСП ППК"
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label>Місто</label>
-                <input 
-                  name="city" 
-                  value={formData.city} 
-                  onChange={handleInputChange} 
-                  placeholder="Наприклад: Львів"
                 />
               </div>
               <div className={styles.formGroup}>

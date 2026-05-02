@@ -4,7 +4,6 @@ export interface College {
   id: number;
   name: string;
   shortName: string;
-  city?: string;
   region?: string;
 }
 
