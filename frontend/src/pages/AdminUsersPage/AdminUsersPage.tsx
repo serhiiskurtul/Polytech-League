@@ -11,6 +11,7 @@ export const AdminUsersPage = () => {
   const [users, setUsers] = useState<UserResponse[]>([]);
   const [players, setPlayers] = useState<PlayerDto[]>([]);
   const [activeTab, setActiveTab] = useState<'users' | 'players'>('users');
+  const [showDuplicatesOnly, setShowDuplicatesOnly] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
@@ -38,10 +39,9 @@ export const AdminUsersPage = () => {
       if (searchTerm) {
         data = await searchPlayers(searchTerm);
       } else {
-        data = await getAllPlayers();
+        // Use getPlayersRankings to get calculated scores
+        data = await getPlayersRankings();
       }
-      // Simple client-side pagination for players if needed, 
-      // but usually the list isn't massive for a start.
       setPlayers(data);
       setTotalCount(data.length);
     } catch (error) {
@@ -121,19 +121,31 @@ export const AdminUsersPage = () => {
           </div>
         </header>
 
-        <div className={styles.tabs}>
-          <button 
-            className={`${styles.tab} ${activeTab === 'users' ? styles.activeTab : ''}`}
-            onClick={() => setActiveTab('users')}
-          >
-            Користувачі
-          </button>
-          <button 
-            className={`${styles.tab} ${activeTab === 'players' ? styles.activeTab : ''}`}
-            onClick={() => setActiveTab('players')}
-          >
-            Гравці (Рейтинг)
-          </button>
+        <div className={styles.tabsRow}>
+          <div className={styles.tabs}>
+            <button 
+              className={`${styles.tab} ${activeTab === 'users' ? styles.activeTab : ''}`}
+              onClick={() => setActiveTab('users')}
+            >
+              Користувачі
+            </button>
+            <button 
+              className={`${styles.tab} ${activeTab === 'players' ? styles.activeTab : ''}`}
+              onClick={() => setActiveTab('players')}
+            >
+              Гравці (Рейтинг)
+            </button>
+          </div>
+
+          {activeTab === 'players' && (
+            <button 
+              className={`${styles.duplicateBtn} ${showDuplicatesOnly ? styles.duplicateBtnActive : ''}`}
+              onClick={() => setShowDuplicatesOnly(!showDuplicatesOnly)}
+              title="Показати гравців з однаковими іменами"
+            >
+              <i className="fas fa-copy"></i> {showDuplicatesOnly ? 'Всі гравці' : 'Знайти дублікати'}
+            </button>
+          )}
         </div>
 
         <div className={styles.controls}>
@@ -219,48 +231,47 @@ export const AdminUsersPage = () => {
                   <th>Гравець</th>
                   <th>Група</th>
                   <th>Рейтинг</th>
-                  <th>Статус</th>
                   <th>Дії</th>
                 </tr>
               </thead>
               <tbody>
-                {players.slice((page - 1) * pageSize, page * pageSize).map((player) => {
-                  const photoSrc = getPhotoUrl(player.photoUrl);
-                  return (
-                    <tr key={player.id}>
-                      <td>
-                        <div className={styles.userCell}>
-                          {photoSrc ? (
-                            <img src={photoSrc} alt="" className={styles.avatar} />
-                          ) : (
-                            <div className={styles.avatar}>
-                              {player.firstName[0]}{player.lastName[0]}
+                {(() => {
+                  let displayPlayers = [...players];
+                  if (showDuplicatesOnly) {
+                    const nameCounts = new Map<string, number>();
+                    displayPlayers.forEach(p => {
+                      const key = `${p.firstName.toLowerCase()}_${p.lastName.toLowerCase()}`;
+                      nameCounts.set(key, (nameCounts.get(key) || 0) + 1);
+                    });
+                    displayPlayers = displayPlayers.filter(p => {
+                      const key = `${p.firstName.toLowerCase()}_${p.lastName.toLowerCase()}`;
+                      return (nameCounts.get(key) || 0) > 1;
+                    }).sort((a, b) => {
+                      const keyA = `${a.firstName.toLowerCase()}_${a.lastName.toLowerCase()}`;
+                      const keyB = `${b.firstName.toLowerCase()}_${b.lastName.toLowerCase()}`;
+                      return keyA.localeCompare(keyB);
+                    });
+                  }
+
+                  return displayPlayers.slice((page - 1) * pageSize, page * pageSize).map((player) => {
+                    const photoSrc = getPhotoUrl(player.photoUrl);
+                    return (
+                      <tr key={player.id} className={showDuplicatesOnly ? styles.duplicateRow : ''}>
+                        <td>
+                          <div className={styles.userCell}>
+                            {photoSrc ? (
+                              <img src={photoSrc} alt="" className={styles.avatar} />
+                            ) : (
+                              <div className={styles.avatar}>
+                                {player.firstName[0]}{player.lastName[0]}
+                              </div>
+                            )}
+                            <div>
+                              <Link to={`/players/${player.id}`} className={styles.playerLink}>
+                                <span className={styles.userName}>{player.firstName} {player.lastName}</span>
+                              </Link>
+                              <span className={styles.userEmail}>ID: {player.id}</span>
                             </div>
-                          )}
-                          <div>
-                            <span className={styles.userName}>{player.firstName} {player.lastName}</span>
-                            <span className={styles.userEmail}>ID: {player.id}</span>
-                          </div>
-                        </div>
-                      </td>
-                      <td>{player.group || '-'}</td>
-                      <td>{player.performanceScore}</td>
-                      <td>
-                        <span className={`${styles.roleBadge} ${player.isExternal ? styles.blockedStatus : styles.userRole}`}>
-                          {player.isExternal ? 'Зовнішній' : 'Студент'}
-                        </span>
-                      </td>
-                      <td>
-                        <div className={styles.actions}>
-                          <Link 
-                            to={`/players/${player.id}`} 
-                            className={styles.actionBtn}
-                            title="Перейти в профіль"
-                          >
-                            <i className="fas fa-external-link-alt"></i>
-                          </Link>
-                          <button 
-                            className={`${styles.actionBtn} ${styles.deleteBtn}`}
                             onClick={() => player.id && handleDeletePlayer(player.id)}
                             title="Видалити гравця"
                           >
