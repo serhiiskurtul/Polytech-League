@@ -289,9 +289,22 @@ public class TournamentService : ITournamentService
         var activeTournamentsCount = await _context.Set<PolytechLeague.Domain.Entities.Event>()
             .CountAsync(e => e.Date >= startOfSeason);
 
-        var registeredPlayersCount = await _context.Players
-            .Include(p => p.User)
-            .CountAsync(p => p.User == null || p.User.Role != UserRole.Admin);
+        // Count only players who are in the ranking (have at least one achievement or participation)
+        var rankedPlayersCount = await _context.Players
+            .Where(p => p.User == null || p.User.Role != UserRole.Admin)
+            .Where(p => !p.IsExternal && !p.IsGuest)
+            .CountAsync(p => _context.Achievements.Any(a => a.PlayerId == p.Id) ||
+                            _context.FutsalParticipants.Any(fp => fp.PlayerId == p.Id) ||
+                            _context.VolleyballParticipants.Any(vp => vp.PlayerId == p.Id) ||
+                            _context.Basketball3x3Participants.Any(bp => bp.PlayerId == p.Id) ||
+                            _context.ChessParticipants.Any(cp => cp.PlayerId == p.Id) ||
+                            _context.CheckersParticipants.Any(cp => cp.PlayerId == p.Id) ||
+                            _context.BeachVolleyballParticipants.Any(bvp => bvp.PlayerId == p.Id) ||
+                            _context.TableTennisParticipants.Any(ttp => ttp.PlayerId == p.Id) ||
+                            _context.BadmintonParticipants.Any(bmp => bmp.PlayerId == p.Id) ||
+                            _context.ArmwrestlingParticipants.Any(ap => ap.PlayerId == p.Id));
+
+        var registeredPlayersCount = rankedPlayersCount;
 
         // Count total matches across all sport tables
         int totalMatches = 0;
