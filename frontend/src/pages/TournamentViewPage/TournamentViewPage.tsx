@@ -1011,12 +1011,12 @@ const TournamentViewPage = () => {
               firstName: p.firstName,
               patronymic: p.patronymic || '',
               lastName: p.lastName,
-              group: p.group,
+              group: p.group || null,
               studentId: p.studentId || '',
               studyYears: p.studyYears || '',
               birthDate: p.birthDate || '',
               rating: tournament?.sport === 'checkers' ? (p.checkersRating || 0) : (p.chessRating || 0)
-            }));
+            } as SearchResult));
 
           // 2. Search in Users (remote search)
           const users = await searchUsers(searchQuery);
