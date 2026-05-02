@@ -144,6 +144,11 @@ const NationalRatingsPage: React.FC = () => {
             <span className={styles.nationalBadge}>National</span>
           </h1>
           <p>Загальний облік результатів змагань між коледжами</p>
+          {ratingData && (
+            <div className={styles.participationStats}>
+              Взяло участь: <span>{ratingData.rows.length}</span> навчальних закладів
+            </div>
+          )}
         </div>
 
         <div className={styles.controls}>
