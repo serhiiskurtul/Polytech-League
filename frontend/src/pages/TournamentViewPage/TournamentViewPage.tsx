@@ -85,7 +85,7 @@ import {
   rejectBadmintonParticipant,
   removeBadmintonParticipant
 } from '@/shared/api';
-import { PlayerDto } from '@/shared/types/player.types';
+import { PlayerDto, Gender } from '@/shared/types/player.types';
 import { RegistrationStatus } from '@/shared/types/tournament.types';
 import {
   getTableTennisEventById,
@@ -205,7 +205,8 @@ const TournamentViewPage = () => {
     title: '',
     userId: null as number | null,
     existingPlayerId: null as number | null,
-    weight: 0
+    weight: 0,
+    gender: 'None' as Gender
   });
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -882,6 +883,11 @@ const TournamentViewPage = () => {
       return;
     }
 
+    if (!activePlayer?.gender || activePlayer.gender === 'None') {
+      toast.error("Для реєстрації на змагання необхідно вказати стать у профілі.");
+      return;
+    }
+
     if (!window.confirm("Ви впевнені, що хочете зареєструватися на ці змагання?")) return;
 
     try {
@@ -914,7 +920,7 @@ const TournamentViewPage = () => {
       fetchTournament(true);
     } catch (err: any) {
       console.error(err);
-      toast.error(err.response?.data?.message || "Помилка при реєстрації");
+      toast.error(err.response?.data?.detail || err.response?.data?.message || "Помилка при реєстрації");
     } finally {
       setIsRegistering(false);
     }
@@ -1141,7 +1147,8 @@ const TournamentViewPage = () => {
           chessFideId: newPlayer.fideId.trim() || null,
           chessTitle: newPlayer.title.trim() || null,
           isGuest: !newPlayer.group,
-          competitionsCount: 0
+          competitionsCount: 0,
+          gender: newPlayer.gender
         };
         const created = await createPlayer(playerPayload);
         playerId = created.id!;
@@ -1216,7 +1223,7 @@ const TournamentViewPage = () => {
           });
       }
       toast.success("Учасник успішно доданий до змагань!");
-      setNewPlayer({ firstName: '', patronymic: '', lastName: '', group: '', studentId: '', studyYears: '', birthDate: '', city: 'Чернівці', ratingELO: 1500, fideId: '', title: '', userId: null, existingPlayerId: null, weight: 0 });
+      setNewPlayer({ firstName: '', patronymic: '', lastName: '', group: '', studentId: '', studyYears: '', birthDate: '', city: 'Чернівці', ratingELO: 1500, fideId: '', title: '', userId: null, existingPlayerId: null, weight: 0, gender: 'None' });
       fetchTournament(true); // Refresh
     } catch (err) {
       console.error(err);
@@ -2493,6 +2500,18 @@ const TournamentViewPage = () => {
                                     <input type="number" step="0.1" placeholder="Вага" value={newPlayer.weight} onChange={(e) => setNewPlayer({ ...newPlayer, weight: parseFloat(e.target.value) || 0 })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
                                   </div>
                                 )}
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                  <label style={{ marginBottom: '4px', fontSize: '12px' }}>Стать</label>
+                                  <select
+                                    value={newPlayer.gender}
+                                    onChange={(e) => setNewPlayer({ ...newPlayer, gender: e.target.value as Gender })}
+                                    style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}
+                                  >
+                                    <option value="None">Не вказано</option>
+                                    <option value="Male">Чоловік</option>
+                                    <option value="Female">Жінка</option>
+                                  </select>
+                                </div>
                               </div>
                               <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                                 <button type="button" onClick={handleAddPlayer} style={{ padding: '10px 24px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
@@ -2500,7 +2519,7 @@ const TournamentViewPage = () => {
                                 </button>
                                 {(newPlayer.userId || newPlayer.existingPlayerId) && (
                                   <button
-                                    onClick={() => setNewPlayer({ ...newPlayer, userId: null, existingPlayerId: null, firstName: '', lastName: '', group: '' })}
+                                    onClick={() => setNewPlayer({ ...newPlayer, userId: null, existingPlayerId: null, firstName: '', lastName: '', group: '', gender: 'None' })}
                                     style={{ padding: '10px 24px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
                                   >
                                     Скинути вибір

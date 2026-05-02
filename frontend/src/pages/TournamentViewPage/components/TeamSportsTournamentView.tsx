@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PlayerDto } from '@/shared/types/player.types';
+import { PlayerDto, Gender } from '@/shared/types/player.types';
 import { ChessEventResponse, ChessEventParticipantDto, ChessGameDto, ChessEventRequest, GameResult } from '@/shared/types/chess.types';
 import { getAllPlayers } from '@/shared/api';
 import { 
@@ -124,7 +124,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
   // Quick Add Player State
   const [isQuickAddMode, setIsQuickAddMode] = useState(false);
-  const [quickAddForm, setQuickAddForm] = useState({ firstName: '', lastName: '', group: '' });
+  const [quickAddForm, setQuickAddForm] = useState({ firstName: '', lastName: '', group: '', gender: 'None' as Gender });
 
   // Olympic Filtering State
   const [roundNumber, setRoundNumber] = useState(1);
@@ -758,7 +758,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         firstName: quickAddForm.firstName,
         lastName: quickAddForm.lastName,
         group: quickAddForm.group,
-        city: 'Чернівці'
+        city: 'Чернівці',
+        gender: quickAddForm.gender
       } as PlayerDto);
 
       // Add to team
@@ -768,7 +769,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       await loadAllPlayers();
       
       // Reset form
-      setQuickAddForm({ firstName: '', lastName: '', group: '' });
+      setQuickAddForm({ firstName: '', lastName: '', group: '', gender: 'None' });
       setIsQuickAddMode(false);
       setSearchQuery('');
     } catch (err) {
@@ -1629,6 +1630,19 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       onChange={e => setQuickAddForm({...quickAddForm, group: e.target.value})}
                       placeholder="напр. 321 або Випускник"
                     />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label>Стать</label>
+                    <select
+                      value={quickAddForm.gender}
+                      onChange={e => setQuickAddForm({...quickAddForm, gender: e.target.value as Gender})}
+                      className={styles.modalSelect}
+                      style={{width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0'}}
+                    >
+                      <option value="None">Оберіть стать...</option>
+                      <option value="Male">Чоловік</option>
+                      <option value="Female">Жінка</option>
+                    </select>
                   </div>
                   <div className={styles.modalFooter} style={{padding: '20px 0 0 0', display: 'flex', gap: '12px', background: 'transparent', borderTop: 'none'}}>
                     <button className={styles.cancelBtn} onClick={() => setIsQuickAddMode(false)}>Назад до пошуку</button>

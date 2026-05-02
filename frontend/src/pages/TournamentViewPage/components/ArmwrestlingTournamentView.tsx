@@ -6,7 +6,7 @@ import {
   ArmwrestlingMatchResponse
 } from '@/shared/types/armwrestling.types';
 import { RegistrationStatus } from '@/shared/types/tournament.types';
-import { PlayerDto } from '@/shared/types/player.types';
+import { PlayerDto, Gender } from '@/shared/types/player.types';
 import { getAllPlayers, createPlayer, searchUsers } from '@/shared/api';
 import {
   createArmwrestlingMatch,
@@ -37,7 +37,7 @@ type SearchResult = {
   firstName: string;
   lastName: string;
   email?: string;
-  group?: string;
+  group?: string | null;
   rating?: number;
 };
 
@@ -68,7 +68,8 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
     lastName: '',
     group: '',
     userId: null as number | null,
-    existingPlayerId: null as number | null
+    existingPlayerId: null as number | null,
+    gender: 'None' as Gender
   });
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -183,11 +184,16 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
       if (existing) {
         playerId = existing.id!;
       } else {
+        let gender: Gender = 'None';
+        if (details.category === 'Men') gender = 'Male';
+        else if (details.category === 'Women') gender = 'Female';
+
         const created = await createPlayer({
           firstName,
           lastName,
           group: 'Гість',
-          city: 'Київ'
+          city: 'Київ',
+          gender
         });
         playerId = created.id!;
       }
@@ -383,7 +389,8 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
           lastName: newParticipant.lastName,
           group: newParticipant.group,
           userId: newParticipant.userId,
-          city: 'Київ'
+          city: 'Київ',
+          gender: newParticipant.gender
         });
         playerId = created.id!;
         alert('Гравця створено та додано у базу!');
@@ -401,7 +408,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
       toast.success('Учасника успішно додано до змагання!');
 
       setShowAddPlayer(false);
-      setNewParticipant({ firstName: '', lastName: '', group: '', userId: null, existingPlayerId: null });
+      setNewParticipant({ firstName: '', lastName: '', group: '', userId: null, existingPlayerId: null, gender: 'None' });
       loadPlayers();
       onRefresh();
     } catch (err) {
@@ -764,6 +771,17 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
                   onChange={(e) => setNewParticipant({ ...newParticipant, group: e.target.value })}
                   style={{ width: '100%', padding: '8px', marginBottom: '12px', borderRadius: '6px', border: '1px solid #ccc' }}
                 />
+                <div style={{ marginBottom: '12px' }}>
+                  <select
+                    value={newParticipant.gender}
+                    onChange={(e) => setNewParticipant({ ...newParticipant, gender: e.target.value as Gender })}
+                    style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}
+                  >
+                    <option value="None">Оберіть стать...</option>
+                    <option value="Male">Чоловік</option>
+                    <option value="Female">Жінка</option>
+                  </select>
+                </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <button type="button" className={styles.saveBtn} style={{ flex: 1 }} onClick={handleAddParticipant}>
                     {newParticipant.existingPlayerId ? 'Додати існуючого' : 'Створити та додати'}
@@ -771,7 +789,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
                   {(newParticipant.userId || newParticipant.existingPlayerId) && (
                     <button
                       type="button"
-                      onClick={() => setNewParticipant({ firstName: '', lastName: '', group: '', userId: null, existingPlayerId: null })}
+                      onClick={() => setNewParticipant({ firstName: '', lastName: '', group: '', userId: null, existingPlayerId: null, gender: 'None' })}
                       style={{ padding: '8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
                     >
                       <i className="fas fa-times"></i>
