@@ -151,14 +151,14 @@ const TournamentViewPage = () => {
     userId?: number | null;
     firstName: string;
     lastName: string;
-    patronymic?: string;
+    patronymic?: string | null;
     email?: string;
-    group?: string;
-    studentId?: string;
-    studyYears?: string;
+    group?: string | null;
+    studentId?: string | null;
+    studyYears?: string | null;
     city?: string;
     rating?: number;
-    birthDate?: string;
+    birthDate?: string | null;
   };
 
   // Centralized sport checks
