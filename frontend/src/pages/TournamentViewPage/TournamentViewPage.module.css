@@ -420,8 +420,8 @@
 }
 
 .resultBlackWin {
-  background: var(--danger-light);
-  color: var(--danger);
+  background: var(--success-light);
+  color: var(--success);
 }
 
 .resultDraw {
