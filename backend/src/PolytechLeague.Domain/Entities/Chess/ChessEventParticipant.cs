@@ -16,6 +16,7 @@ public class ChessEventParticipant
     public string? GroupName { get; set; }
     public string? PlayerFirstName { get; set; }
     public string? PlayerLastName { get; set; }
+    public int Rating { get; set; }
     public RegistrationStatus Status { get; set; } = RegistrationStatus.Approved;
     public long? CollegeId { get; set; }
     public College? College { get; set; }

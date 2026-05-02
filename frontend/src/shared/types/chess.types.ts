@@ -127,6 +127,7 @@ export interface ChessEventParticipantDto {
     points: number;
     rank: number;
     groupName?: string;
+    rating?: number;
     status: RegistrationStatus;
 }
 

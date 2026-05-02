@@ -45,7 +45,7 @@ public static class ChessEventParticipantDtoExtensions
             PlayerName = fullName,
             FirstName = firstName,
             LastName = lastName,
-            Rating = participant.Player?.ChessRating ?? 0,
+            Rating = participant.Rating != 0 ? participant.Rating : (participant.Player?.ChessRating ?? 0),
             Points = participant.Points,
             Rank = participant.Rank,
             Buchholz = 0,
@@ -68,6 +68,7 @@ public static class ChessEventParticipantDtoExtensions
             GroupName = dto.GroupName,
             PlayerFirstName = dto.FirstName,
             PlayerLastName = dto.LastName,
+            Rating = dto.Rating,
             Status = dto.Status
         };
     }

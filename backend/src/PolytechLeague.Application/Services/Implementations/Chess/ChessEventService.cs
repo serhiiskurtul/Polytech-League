@@ -118,6 +118,7 @@ public class ChessEventService :
 
         participant.PlayerFirstName = dto.FirstName ?? player?.FirstName;
         participant.PlayerLastName = dto.LastName ?? player?.LastName;
+        participant.Rating = dto.Rating != 0 ? dto.Rating : (player?.ChessRating ?? 0);
 
         _dbcontext.Set<ChessEventParticipant>().Add(participant);
         await _dbcontext.SaveChangesAsync(cancellationToken);
@@ -148,6 +149,7 @@ public class ChessEventService :
                 if (!string.IsNullOrEmpty(dto.LastName)) participant.PlayerLastName = dto.LastName;
                 participant.GroupName = dto.GroupName;
             }
+            participant.Rating = dto.Rating;
             
             _dbcontext.Set<ChessEventParticipant>().Update(participant);
             await _dbcontext.SaveChangesAsync(cancellationToken);

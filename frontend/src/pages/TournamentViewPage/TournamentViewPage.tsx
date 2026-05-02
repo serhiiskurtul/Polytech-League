@@ -618,7 +618,8 @@ const TournamentViewPage = () => {
       status: p.status || RegistrationStatus.Approved,
       firstName: p.firstName || '',
       lastName: p.lastName || '',
-      groupName: p.groupName || ''
+      groupName: p.groupName || '',
+      rating: p.rating || 0
     });
   };
 
@@ -717,7 +718,8 @@ const TournamentViewPage = () => {
           status: editingParticipantData.status,
           firstName: editingParticipantData.firstName,
           lastName: editingParticipantData.lastName,
-          groupName: editingParticipantData.groupName
+          groupName: editingParticipantData.groupName,
+          rating: editingParticipantData.rating
         };
         await updateParticipantInEvent(id!, playerId, payload);
       }
@@ -1167,7 +1169,8 @@ const TournamentViewPage = () => {
             rank: 0, 
             status: RegistrationStatus.Approved,
             firstName: newPlayer.firstName,
-            lastName: newPlayer.lastName
+            lastName: newPlayer.lastName,
+            rating: newPlayer.ratingELO
           });
       }
       toast.success("Учасник успішно доданий до змагань!");
