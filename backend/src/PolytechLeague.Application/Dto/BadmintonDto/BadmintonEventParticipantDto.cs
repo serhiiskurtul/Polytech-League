@@ -15,6 +15,9 @@ public class BadmintonEventParticipantDto
     public int Rank { get; set; }
     public string? GroupName { get; set; }
     
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
+    
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public RegistrationStatus Status { get; set; }
 }
@@ -23,13 +26,21 @@ public static class BadmintonEventParticipantDtoExtensions
 {
     public static BadmintonEventParticipantDto ToDto(this BadmintonEventParticipant participant)
     {
+        string? firstName = participant.PlayerFirstName ?? participant.Player?.FirstName;
+        string? lastName = participant.PlayerLastName ?? participant.Player?.LastName;
+        string? fullName = (firstName != null || lastName != null) 
+            ? $"{firstName} {lastName}".Trim() 
+            : null;
+
         return new BadmintonEventParticipantDto
         {
             Id = participant.PlayerId,
             UserId = participant.Player?.UserId,
             EventId = participant.EventId,
             PlayerId = participant.PlayerId,
-            PlayerName = participant.Player != null ? $"{participant.Player.FirstName} {participant.Player.Patronymic ?? ""} {participant.Player.LastName}".Replace("  ", " ").Trim() : null,
+            PlayerName = fullName,
+            FirstName = firstName,
+            LastName = lastName,
             Points = participant.Points,
             Rank = participant.Rank,
             GroupName = participant.GroupName ?? participant.Player?.Group,
@@ -46,6 +57,8 @@ public static class BadmintonEventParticipantDtoExtensions
             Points = dto.Points,
             Rank = dto.Rank,
             GroupName = dto.GroupName,
+            PlayerFirstName = dto.FirstName,
+            PlayerLastName = dto.LastName,
             Status = dto.Status
         };
     }

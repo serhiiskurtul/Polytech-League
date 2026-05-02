@@ -112,12 +112,15 @@ public class BadmintonEventService(
 
         if (exists) return;
 
+        var player = await _dbcontext.Set<Player>().FindAsync(dto.PlayerId);
         var participant = dto.FromDto(eventId);
         if (string.IsNullOrEmpty(participant.GroupName))
         {
-            var player = await _dbcontext.Set<Player>().FindAsync(dto.PlayerId);
             participant.GroupName = player?.Group;
         }
+        participant.PlayerFirstName = player?.FirstName;
+        participant.PlayerLastName = player?.LastName;
+
         _dbcontext.BadmintonEventParticipants.Add(participant);
         await _dbcontext.SaveChangesAsync(cancellationToken);
 
@@ -137,6 +140,14 @@ public class BadmintonEventService(
             participant.Points = dto.Points;
             participant.Rank = dto.Rank;
             participant.Status = dto.Status;
+            participant.GroupName = dto.GroupName;
+
+            if (participant.Player != null)
+            {
+                participant.PlayerFirstName = participant.Player.FirstName;
+                participant.PlayerLastName = participant.Player.LastName;
+            }
+
             _dbcontext.BadmintonEventParticipants.Update(participant);
             await _dbcontext.SaveChangesAsync(cancellationToken);
 
@@ -200,7 +211,9 @@ public class BadmintonEventService(
             EventId = eventId,
             PlayerId = playerId,
             Status = status,
-            GroupName = player.Group
+            GroupName = player.Group,
+            PlayerFirstName = player.FirstName,
+            PlayerLastName = player.LastName
         };
 
         _dbcontext.BadmintonEventParticipants.Add(participant);

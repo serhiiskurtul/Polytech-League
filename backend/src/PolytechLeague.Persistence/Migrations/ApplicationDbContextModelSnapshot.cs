@@ -55,6 +55,12 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<string>("GroupName")
                         .HasColumnType("text");
 
+                    b.Property<string>("PlayerFirstName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PlayerLastName")
+                        .HasColumnType("text");
+
                     b.Property<int>("Rank")
                         .HasColumnType("integer");
 
@@ -134,6 +140,12 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("GroupName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PlayerFirstName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PlayerLastName")
                         .HasColumnType("text");
 
                     b.Property<double>("Points")
@@ -523,8 +535,14 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<string>("GroupName")
                         .HasColumnType("text");
 
+                    b.Property<string>("PlayerFirstName")
+                        .HasColumnType("text");
+
                     b.Property<long>("PlayerId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("PlayerLastName")
+                        .HasColumnType("text");
 
                     b.Property<double>("Points")
                         .HasColumnType("double precision")
@@ -684,6 +702,12 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("GroupName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PlayerFirstName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PlayerLastName")
                         .HasColumnType("text");
 
                     b.Property<double>("Points")
@@ -1465,6 +1489,12 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("GroupName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PlayerFirstName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PlayerLastName")
                         .HasColumnType("text");
 
                     b.Property<double>("Points")
