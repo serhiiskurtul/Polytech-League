@@ -473,12 +473,12 @@ const TournamentViewPage = () => {
                    tournament?.category === 'Жінки' ? 'Women' : 
                    tournament?.category === 'Змішаний' ? 'Mixed' : 
                    (tournament?.category as any)) || 'Mixed',
-        firstPlaceId: details.firstPlaceId || null,
-        secondPlaceId: details.secondPlaceId || null,
-        thirdPlaceId: details.thirdPlaceId || null,
-        firstPlaceTeamId: details.firstPlaceTeamId || null,
-        secondPlaceTeamId: details.secondPlaceTeamId || null,
-        thirdPlaceTeamId: details.thirdPlaceTeamId || null
+        firstPlaceId: details.firstPlace?.id || null,
+        secondPlaceId: details.secondPlace?.id || null,
+        thirdPlaceId: details.thirdPlace?.id || null,
+        firstPlaceTeamId: details.firstPlaceTeam?.id || null,
+        secondPlaceTeamId: details.secondPlaceTeam?.id || null,
+        thirdPlaceTeamId: details.thirdPlaceTeam?.id || null
       } as any);
       setIsEditingTournament(true);
     }
@@ -991,8 +991,14 @@ const TournamentViewPage = () => {
                 endDate: formatDateForInput(data.endDate || d.endDate),
                 isModerated: !!d.isModerated,
                 isPublic: d.isPublic !== undefined ? !!d.isPublic : true,
-                seasonId: d.seasonId || null
-              });
+                seasonId: d.seasonId || null,
+                firstPlaceId: d.firstPlace?.id || null,
+                secondPlaceId: d.secondPlace?.id || null,
+                thirdPlaceId: d.thirdPlace?.id || null,
+                firstPlaceTeamId: d.firstPlaceTeam?.id || null,
+                secondPlaceTeamId: d.secondPlaceTeam?.id || null,
+                thirdPlaceTeamId: d.thirdPlaceTeam?.id || null
+              } as any);
             }
         } catch (eventErr) {
           console.error('Failed to fetch detailed event info:', eventErr);
