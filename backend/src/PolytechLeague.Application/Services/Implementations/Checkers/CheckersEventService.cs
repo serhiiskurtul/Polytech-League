@@ -110,8 +110,8 @@ public class CheckersEventService :
             entity.GroupName = player?.Group;
         }
         
-        entity.PlayerFirstName = player?.FirstName;
-        entity.PlayerLastName = player?.LastName;
+        entity.PlayerFirstName = request.FirstName ?? player?.FirstName;
+        entity.PlayerLastName = request.LastName ?? player?.LastName;
 
         await _dbcontext.Set<CheckersEventParticipant>().AddAsync(entity, cancellationToken);
         await _dbcontext.SaveChangesAsync(cancellationToken);
@@ -338,7 +338,9 @@ public class CheckersEventService :
             TournamentId = eventId,
             PlayerId = playerId,
             Status = status,
-            GroupName = player.Group
+            GroupName = player.Group,
+            PlayerFirstName = player.FirstName,
+            PlayerLastName = player.LastName
         };
 
         _dbcontext.Set<CheckersEventParticipant>().Add(participant);

@@ -157,14 +157,8 @@ public class ArmwrestlingEventService :
         if (string.IsNullOrEmpty(participant.GroupName))
         {
             participant.GroupName = player?.Group;
-            participant.PlayerFirstName = player?.FirstName;
-            participant.PlayerLastName = player?.LastName;
-        }
-        else
-        {
-             participant.PlayerFirstName = dto.FirstName ?? player?.FirstName;
-             participant.PlayerLastName = dto.LastName ?? player?.LastName;
-        }
+        participant.PlayerFirstName = dto.FirstName ?? player?.FirstName;
+        participant.PlayerLastName = dto.LastName ?? player?.LastName;
 
         _dbcontext.ArmwrestlingEventParticipants.Add(participant);
         await _dbcontext.SaveChangesAsync(cancellationToken);
@@ -254,7 +248,9 @@ public class ArmwrestlingEventService :
             TournamentId = eventId,
             PlayerId = playerId,
             Status = status,
-            GroupName = player.Group
+            GroupName = player.Group,
+            PlayerFirstName = player.FirstName,
+            PlayerLastName = player.LastName
         };
 
         _dbcontext.ArmwrestlingEventParticipants.Add(participant);

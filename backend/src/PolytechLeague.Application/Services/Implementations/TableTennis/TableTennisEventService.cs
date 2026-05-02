@@ -132,19 +132,14 @@ public class TableTennisEventService(
             Status = dto.Status
         };
 
+        var player = await _dbcontext.Set<Player>().FindAsync(dto.PlayerId);
         if (string.IsNullOrEmpty(participant.GroupName))
         {
-            var player = await _dbcontext.Set<Player>().FindAsync(dto.PlayerId);
             participant.GroupName = player?.Group;
-            participant.PlayerFirstName = player?.FirstName;
-            participant.PlayerLastName = player?.LastName;
         }
-        else
-        {
-             var player = await _dbcontext.Set<Player>().FindAsync(dto.PlayerId);
-             participant.PlayerFirstName = dto.FirstName ?? player?.FirstName;
-             participant.PlayerLastName = dto.LastName ?? player?.LastName;
-        }
+        
+        participant.PlayerFirstName = dto.FirstName ?? player?.FirstName;
+        participant.PlayerLastName = dto.LastName ?? player?.LastName;
 
         _dbcontext.Set<TableTennisEventParticipant>().Add(participant);
         await _dbcontext.SaveChangesAsync(cancellationToken);
@@ -233,7 +228,9 @@ public class TableTennisEventService(
             TournamentId = eventId,
             PlayerId = playerId,
             Status = status,
-            GroupName = player.Group
+            GroupName = player.Group,
+            PlayerFirstName = player.FirstName,
+            PlayerLastName = player.LastName
         };
 
         _dbcontext.Set<TableTennisEventParticipant>().Add(participant);

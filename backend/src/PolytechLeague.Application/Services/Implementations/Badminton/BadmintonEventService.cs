@@ -118,8 +118,8 @@ public class BadmintonEventService(
         {
             participant.GroupName = player?.Group;
         }
-        participant.PlayerFirstName = player?.FirstName;
-        participant.PlayerLastName = player?.LastName;
+        participant.PlayerFirstName = dto.FirstName ?? player?.FirstName;
+        participant.PlayerLastName = dto.LastName ?? player?.LastName;
 
         _dbcontext.BadmintonEventParticipants.Add(participant);
         await _dbcontext.SaveChangesAsync(cancellationToken);

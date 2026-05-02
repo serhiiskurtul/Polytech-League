@@ -1120,20 +1120,55 @@ const TournamentViewPage = () => {
 
       switch (sportKey) {
         case 'checkers':
-          await addParticipantToCheckersEvent(id!, { playerId: playerId, points: 0, rank: 0, status: RegistrationStatus.Approved });
+          await addParticipantToCheckersEvent(id!, { 
+            playerId: playerId, 
+            points: 0, 
+            rank: 0, 
+            status: RegistrationStatus.Approved,
+            firstName: newPlayer.firstName,
+            lastName: newPlayer.lastName
+          });
           break;
         case 'armwrestling':
-          await addParticipantToArmwrestlingEvent(id!, { playerId: playerId, weight: newPlayer.weight || 0, rank: 0, status: RegistrationStatus.Approved });
+          await addParticipantToArmwrestlingEvent(id!, { 
+            playerId: playerId, 
+            weight: newPlayer.weight || 0, 
+            rank: 0, 
+            status: RegistrationStatus.Approved,
+            firstName: newPlayer.firstName,
+            lastName: newPlayer.lastName
+          });
           break;
         case 'badminton':
-          await addParticipantToBadmintonEvent(id!, { playerId: playerId, points: 0, rank: 0, status: RegistrationStatus.Approved });
+          await addParticipantToBadmintonEvent(id!, { 
+            playerId: playerId, 
+            points: 0, 
+            rank: 0, 
+            status: RegistrationStatus.Approved,
+            firstName: newPlayer.firstName,
+            lastName: newPlayer.lastName
+          });
           break;
         case 'tabletennis':
         case 'table_tennis':
-          await addParticipantToTableTennisEvent(id!, { playerId: playerId, points: 0, rank: 0, status: RegistrationStatus.Approved });
+          await addParticipantToTableTennisEvent(id!, { 
+            playerId: playerId, 
+            points: 0, 
+            rank: 0, 
+            status: RegistrationStatus.Approved,
+            firstName: newPlayer.firstName,
+            lastName: newPlayer.lastName
+          });
           break;
         default:
-          await addParticipantToEvent(id!, { playerId: playerId, points: 0, rank: 0, status: RegistrationStatus.Approved });
+          await addParticipantToEvent(id!, { 
+            playerId: playerId, 
+            points: 0, 
+            rank: 0, 
+            status: RegistrationStatus.Approved,
+            firstName: newPlayer.firstName,
+            lastName: newPlayer.lastName
+          });
       }
       toast.success("Учасник успішно доданий до змагань!");
       setNewPlayer({ firstName: '', patronymic: '', lastName: '', group: '', studentId: '', studyYears: '', birthDate: '', city: 'Чернівці', ratingELO: 1500, fideId: '', title: '', userId: null, existingPlayerId: null, weight: 0 });
