@@ -84,7 +84,7 @@ const NationalRatingsPage: React.FC = () => {
     setIsEditing(true);
   };
 
-  const handleEditChange = (collegeId: number, field: string, value: string) => {
+  const handleEditChange = (collegeId: number, field: string, value: any) => {
     setEditData(prev => prev.map(item => 
       item.collegeId === collegeId ? { ...item, [field]: value } : item
     ));
