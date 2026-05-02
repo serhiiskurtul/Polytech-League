@@ -718,6 +718,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("rank");
 
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
+
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -2442,6 +2445,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<bool>("IsFounder")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsGuest")
                         .HasColumnType("boolean");
 
                     b.Property<string>("PreviousNames")

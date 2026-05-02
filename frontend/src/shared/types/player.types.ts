@@ -5,7 +5,8 @@ export interface PlayerDto {
     patronymic?: string | null;
     lastName: string;
     birthDate?: string | null;
-    group: string;
+    group?: string | null;
+    isGuest?: boolean;
     enrollmentYear?: number;
     specialtyCode?: number;
     groupNumber?: number;

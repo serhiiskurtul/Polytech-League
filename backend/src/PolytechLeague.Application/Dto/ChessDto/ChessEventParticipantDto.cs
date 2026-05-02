@@ -24,6 +24,7 @@ public class ChessEventParticipantDto
     
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public RegistrationStatus Status { get; set; }
+    public bool IsGuest { get; set; }
 }
 
 public static class ChessEventParticipantDtoExtensions
@@ -53,7 +54,8 @@ public static class ChessEventParticipantDtoExtensions
             FideId = participant.Player?.ChessFideId,
             Title = participant.Player?.ChessTitle,
             GroupName = participant.GroupName ?? participant.Player?.Group,
-            Status = participant.Status
+            Status = participant.Status,
+            IsGuest = participant.Player?.IsGuest ?? false
         };
     }
 

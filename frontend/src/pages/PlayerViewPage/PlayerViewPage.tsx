@@ -58,11 +58,11 @@ const PlayerViewPage = () => {
     );
   }
 
-  if (error || !playerProfile) {
+  if (error || !playerProfile || playerProfile.isGuest) {
     return (
       <div className={styles.errorContainer}>
         <i className="fas fa-user-slash"></i>
-        <h2>{error || "Профіль не знайдений"}</h2>
+        <h2>{playerProfile?.isGuest ? "Цей учасник є гостем і не має профілю" : (error || "Профіль не знайдений")}</h2>
         <button className={styles.backBtn} onClick={() => navigate('/ratings')}>
           До рейтингу
         </button>

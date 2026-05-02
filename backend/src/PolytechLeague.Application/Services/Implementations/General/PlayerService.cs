@@ -275,7 +275,7 @@ public class PlayerService : IPlayerService
             var players = await _dbContext.Players
                 .Include(p => p.User)
                 .Where(p => p.User == null || p.User.Role != UserRole.Admin)
-                .Where(p => !p.IsExternal)
+                .Where(p => !p.IsExternal && !p.IsGuest)
                 .ToListAsync(cancellationToken);
 
             if (!players.Any()) return Enumerable.Empty<PlayerDto>();

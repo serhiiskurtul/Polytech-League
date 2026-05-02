@@ -34,6 +34,7 @@ export interface ChessEventParticipantResponse {
   title?: string | null;
   groupName?: string | null;
   status: RegistrationStatus;
+  isGuest?: boolean;
 }
 
 export interface ChessGameResponse {
@@ -129,6 +130,7 @@ export interface ChessEventParticipantDto {
     groupName?: string;
     rating?: number;
     status: RegistrationStatus;
+    isGuest?: boolean;
 }
 
 export interface ChessGameDto {

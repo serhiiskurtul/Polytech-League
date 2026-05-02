@@ -1076,8 +1076,12 @@ const TournamentViewPage = () => {
   };
 
   const handleAddPlayer = async () => {
-    if (!newPlayer.firstName || !newPlayer.lastName || !newPlayer.group) {
-      alert("Заповніть ім'я, прізвище та групу користувача!");
+    if (!newPlayer.firstName || !newPlayer.lastName) {
+      alert("Заповніть ім'я та прізвище користувача!");
+      return;
+    }
+    if (tournament?.sport !== 'chess' && !newPlayer.group) {
+      alert("Група є обов'язковою для цього виду спорту!");
       return;
     }
     try {
@@ -1104,6 +1108,7 @@ const TournamentViewPage = () => {
           userId: newPlayer.userId,
           chessFideId: newPlayer.fideId.trim() || null,
           chessTitle: newPlayer.title.trim() || null,
+          isGuest: !newPlayer.group,
           competitionsCount: 0
         };
         const created = await createPlayer(playerPayload);
@@ -1966,9 +1971,13 @@ const TournamentViewPage = () => {
                                       <td>{p.rank || idx + 1}</td>
                                       <td>
                                         {p.playerId ? (
-                                          <Link to={`/players/${p.playerId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
-                                            {p.playerName}
-                                          </Link>
+                                          !p.isGuest ? (
+                                            <Link to={`/players/${p.playerId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
+                                              {p.playerName}
+                                            </Link>
+                                          ) : (
+                                            <span style={{ fontWeight: 'bold' }}>{p.playerName}</span>
+                                          )
                                         ) : (
                                           <strong>{p.playerName}</strong>
                                         )}
@@ -2490,7 +2499,7 @@ const TournamentViewPage = () => {
                                 <tr key={p.id}>
                                   <td>{idx + 1}</td>
                                   <td>
-                                    {p.playerId ? (
+                                    {p.playerId && !p.isGuest ? (
                                       <Link to={`/players/${p.playerId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
                                         {p.playerName}
                                       </Link>

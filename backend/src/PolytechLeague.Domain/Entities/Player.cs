@@ -8,7 +8,8 @@ namespace PolytechLeague.Domain.Entities;
 public class Player : Person
 {
     public required string City { get; set; }
-    public required string Group { get; set; }
+    public string? Group { get; set; }
+    public bool IsGuest { get; set; } = false;
     public int EnrollmentYear { get; set; }
     public int SpecialtyCode { get; set; }
     public int GroupNumber { get; set; }
