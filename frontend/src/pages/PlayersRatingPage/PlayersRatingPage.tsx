@@ -21,6 +21,7 @@ const PlayersRatingPage = () => {
   
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [selectedSeasonId, setSelectedSeasonId] = useState<string>('all');
+  const [selectedGender, setSelectedGender] = useState<'all' | 'male' | 'female'>('all');
 
   useEffect(() => {
     if (players.length > 0 && p1Id && selectedPlayers.length === 0) {
@@ -102,10 +103,25 @@ const PlayersRatingPage = () => {
   useEffect(() => {
     setSelectedWeightClass('all');
     setSortBy('performance');
+    setSelectedGender('all');
   }, [activeTab]);
 
   const filteredPlayers = useMemo(() => {
     let result = [...players];
+
+    // Filter by gender for Chess/Checkers
+    if ((activeTab.toLowerCase() === 'chess' || activeTab.toLowerCase() === 'checkers') && selectedGender !== 'all') {
+      result = result.filter(p => {
+        if (!p.patronymic) return false; // Or default to one? Better to hide if unknown or show in "All"
+        const patr = p.patronymic.trim().toLowerCase();
+        const isFemale = patr.endsWith('івна') || patr.endsWith('ївна');
+        const isMale = patr.endsWith('вич');
+        
+        if (selectedGender === 'female') return isFemale;
+        if (selectedGender === 'male') return isMale;
+        return true;
+      });
+    }
 
     // Filter by tab
     if (activeTab !== 'Загальний') {
@@ -247,6 +263,29 @@ const PlayersRatingPage = () => {
               </select>
             </div>
 
+            {(activeTab.toLowerCase() === 'chess' || activeTab.toLowerCase() === 'checkers') && (
+              <div className={styles.genderTabs}>
+                <button 
+                  className={`${styles.genderTab} ${selectedGender === 'all' ? styles.activeGenderTab : ''}`}
+                  onClick={() => setSelectedGender('all')}
+                >
+                  Всі
+                </button>
+                <button 
+                  className={`${styles.genderTab} ${selectedGender === 'male' ? styles.activeGenderTab : ''}`}
+                  onClick={() => setSelectedGender('male')}
+                >
+                  Чоловіки
+                </button>
+                <button 
+                  className={`${styles.genderTab} ${selectedGender === 'female' ? styles.activeGenderTab : ''}`}
+                  onClick={() => setSelectedGender('female')}
+                >
+                  Жінки
+                </button>
+              </div>
+            )}
+
             <div className={styles.resultsCount}>
               Знайдено: <strong>{filteredPlayers.length}</strong> гравців
             </div>
@@ -295,9 +334,12 @@ const PlayersRatingPage = () => {
                             {photoSrc ? (
                               <img src={photoSrc} alt="" className={styles.playerAvatarImg} />
                             ) : (
-                              <div className={styles.playerAvatar}>
-                                {player.firstName[0]}{player.lastName[0]}
-                              </div>
+                              <img 
+                                src="https://cdn-icons-png.flaticon.com/512/149/149071.png" 
+                                alt="Placeholder" 
+                                className={styles.playerAvatarImg} 
+                                style={{ opacity: 0.6, background: '#f1f5f9' }}
+                              />
                             )}
                             <div className={styles.playerDetails}>
                               <div className={styles.playerName}>

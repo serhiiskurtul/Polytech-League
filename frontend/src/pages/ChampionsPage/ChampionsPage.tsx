@@ -65,7 +65,7 @@ const ChampionsPage: React.FC = () => {
         <div className={styles.headerContent}>
           <i className={`fas ${getSportIcon(sport || 'all')}`} style={{ fontSize: '3.5rem', color: '#fbbf24', marginBottom: '1.5rem', filter: 'drop-shadow(0 0 10px rgba(251, 191, 36, 0.5))' }}></i>
           <h1 className={styles.title}>Зала слави {getSportTitle(sport || 'all')}</h1>
-          <p className={styles.subtitle}>Чемпіони Polytech League міжгрупових змагань</p>
+          <p className={styles.subtitle}>Чемпіони міжгрупових змагань</p>
         </div>
       </header>
 
@@ -85,16 +85,16 @@ const ChampionsPage: React.FC = () => {
         ) : (
           <div className={styles.championsGrid}>
             {champions.map((champion) => (
-              <Link 
-                key={`${champion.playerId}-${champion.tournamentId}`} 
-                to={`/tournaments/${champion.tournamentId}`} 
+              <Link
+                key={`${champion.playerId}-${champion.tournamentId}`}
+                to={`/tournaments/${champion.tournamentId}`}
                 className={styles.championCard}
               >
                 <div className={styles.yearBadge}>{champion.seasonName}</div>
                 <div className={styles.photoWrapper}>
-                  <img 
-                    src={champion.playerPhotoUrl || '/images/placeholders/user.png'} 
-                    alt={champion.playerName} 
+                  <img
+                    src={champion.playerPhotoUrl || '/images/placeholders/user.png'}
+                    alt={champion.playerName}
                     className={styles.playerPhoto}
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = '/images/placeholders/user.png';
@@ -105,8 +105,8 @@ const ChampionsPage: React.FC = () => {
                   </div>
                 </div>
                 <div className={styles.info}>
-                  <Link 
-                    to={`/players/${champion.playerId}`} 
+                  <Link
+                    to={`/players/${champion.playerId}`}
                     className={styles.playerName}
                     onClick={(e) => e.stopPropagation()}
                   >
