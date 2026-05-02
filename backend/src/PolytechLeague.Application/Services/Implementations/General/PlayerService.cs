@@ -1127,48 +1127,7 @@ public class PlayerService : IPlayerService
                 .ToListAsync(cancellationToken);
             _logger.LogInformation("Found {Count} chess performances for player {PlayerId}", chessPerformances.Count, playerId);
             if (!chessPerformances.Any()) return;
-            // 2. Check for 4-streak 1st place
-            int currentStreak = 0;
-            int maxStreak = 0;
-            foreach (var p in chessPerformances.OrderBy(x => x.Tournament!.Date))
-            {
-                bool isWin = p.Rank == 1 || (p.Tournament != null && p.Tournament.FirstPlaceId == playerId);
-                if (isWin)
-                {
-                    currentStreak++;
-                    if (currentStreak > maxStreak) maxStreak = currentStreak;
-                }
-                else
-                {
-                    currentStreak = 0;
-                }
-            }
-            if (maxStreak >= 4)
-            {
-                dto.HasChessFourStreak = true;
-                if (!dto.AutomaticBadges.Any(b => b.Type == "ChessStreak4"))
-                {
-                    dto.AutomaticBadges.Add(new AutomaticBadgeDto
-                    {
-                        Type = "ChessStreak4",
-                        Label = "4-разовий чемпіон шахів поспіль",
-                        Icon = "crown"
-                    });
-                }
-                // Also add to achievements if not already there as a special one
-                if (!dto.Achievements.Any(a => a.TournamentName == "4-разовий чемпіон шахів поспіль"))
-                {
-                    dto.Achievements.Add(new AchievementDto
-                    {
-                        TournamentName = "4-разовий чемпіон шахів поспіль",
-                        SportType = "chess",
-                        Date = chessPerformances.First().Tournament!.Date,
-                        Rank = 1,
-                        Result = "Спеціальне досягнення"
-                    });
-                }
-            }
-            // 3. Check for 4 total 1st places
+            // 2. Check for 4 total 1st places
             var wins = chessPerformances.Where(p => p.Rank == 1 || (p.Tournament != null && p.Tournament.FirstPlaceId == playerId)).ToList();
             int totalWins = wins.Count;
             if (totalWins >= 4)
@@ -1194,7 +1153,7 @@ public class PlayerService : IPlayerService
                     });
                 }
             }
-            // 4. Calculate total points and possible points
+            // 3. Calculate total points and possible points
             double totalPoints = chessPerformances.Sum(p => p.Points);
             _logger.LogInformation("Player {PlayerId} has {Points} total points from {Count} performances", playerId, totalPoints, chessPerformances.Count);
             var tournamentIds = chessPerformances.Select(p => p.TournamentId).ToList();
@@ -1205,7 +1164,7 @@ public class PlayerService : IPlayerService
                 dto.ChessTotalPoints = totalPoints;
                 dto.ChessTotalPossiblePoints = totalPossible > 0 ? totalPossible : null;
             }
-            // 5. Undefeated in 4 seasons
+            // 4. Undefeated in 4 seasons
             // Re-fetch games for this player to check for losses
             var games = await _dbContext.ChessGames
                 .Where(g => tournamentIds.Contains(g.TournamentId) && (g.WhitePlayerId == playerId || g.BlackPlayerId == playerId))
