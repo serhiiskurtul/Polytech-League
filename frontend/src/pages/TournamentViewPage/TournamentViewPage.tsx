@@ -339,7 +339,13 @@ const TournamentViewPage = () => {
     isModerated: false,
     isPublic: true,
     seasonId: null,
-    category: 'Mixed'
+    category: 'Mixed',
+    firstPlaceId: null,
+    secondPlaceId: null,
+    thirdPlaceId: null,
+    firstPlaceTeamId: null,
+    secondPlaceTeamId: null,
+    thirdPlaceTeamId: null
   });
 
 
@@ -466,8 +472,14 @@ const TournamentViewPage = () => {
                   (tournament?.category === 'Чоловіки' ? 'Men' : 
                    tournament?.category === 'Жінки' ? 'Women' : 
                    tournament?.category === 'Змішаний' ? 'Mixed' : 
-                   (tournament?.category as any)) || 'Mixed'
-      });
+                   (tournament?.category as any)) || 'Mixed',
+        firstPlaceId: details.firstPlaceId || null,
+        secondPlaceId: details.secondPlaceId || null,
+        thirdPlaceId: details.thirdPlaceId || null,
+        firstPlaceTeamId: details.firstPlaceTeamId || null,
+        secondPlaceTeamId: details.secondPlaceTeamId || null,
+        thirdPlaceTeamId: details.thirdPlaceTeamId || null
+      } as any);
       setIsEditingTournament(true);
     }
   };
@@ -552,7 +564,13 @@ const TournamentViewPage = () => {
         isModerated: editTournamentData.level === 'CollegeGroup' ? editTournamentData.isModerated : false,
         isPublic: editTournamentData.level === 'CollegeGroup' ? editTournamentData.isPublic : false,
         seasonId: editTournamentData.seasonId || null,
-        category: editTournamentData.category || 'Mixed'
+        category: editTournamentData.category || 'Mixed',
+        firstPlaceId: (editTournamentData as any).firstPlaceId || null,
+        secondPlaceId: (editTournamentData as any).secondPlaceId || null,
+        thirdPlaceId: (editTournamentData as any).thirdPlaceId || null,
+        firstPlaceTeamId: (editTournamentData as any).firstPlaceTeamId || null,
+        secondPlaceTeamId: (editTournamentData as any).secondPlaceTeamId || null,
+        thirdPlaceTeamId: (editTournamentData as any).thirdPlaceTeamId || null
       };
 
       if (sportKey === 'checkers') {
