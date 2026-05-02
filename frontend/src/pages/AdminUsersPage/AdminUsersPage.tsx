@@ -35,14 +35,31 @@ export const AdminUsersPage = () => {
   const fetchPlayers = async () => {
     setLoading(true);
     try {
-      let data: PlayerDto[];
+      // 1. Fetch base player data (either searched or all)
+      let basePlayers: PlayerDto[];
       if (searchTerm) {
-        data = await searchPlayers(searchTerm);
+        basePlayers = await searchPlayers(searchTerm);
       } else {
-        data = await getPlayersRankings();
+        basePlayers = await getAllPlayers();
       }
-      setPlayers(data);
-      setTotalCount(data.length);
+      
+      // 2. Fetch players with rankings to get calculated scores
+      const rankedPlayers = await getPlayersRankings();
+      
+      // 3. Create a map of scores for quick lookup
+      const scoresMap = new Map<number, number>();
+      rankedPlayers.forEach(p => {
+        if (p.id) scoresMap.set(p.id, p.performanceScore || 0);
+      });
+      
+      // 4. Merge scores into the base list
+      const mergedData = basePlayers.map(p => ({
+        ...p,
+        performanceScore: p.id ? (scoresMap.get(p.id) || 0) : 0
+      }));
+      
+      setPlayers(mergedData);
+      setTotalCount(mergedData.length);
     } catch (error) {
       console.error('Failed to fetch players:', error);
       toast.error('Не вдалося завантажити список гравців');
