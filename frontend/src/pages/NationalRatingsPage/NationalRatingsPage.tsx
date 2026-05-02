@@ -74,6 +74,7 @@ const NationalRatingsPage: React.FC = () => {
         collegeId: college.id,
         collegeName: college.shortName || college.name,
         region: college.region || '—',
+        participated: !!row,
         points: row?.totalPoints || 0,
         rank: row?.totalRank || '-'
       };
@@ -92,11 +93,13 @@ const NationalRatingsPage: React.FC = () => {
   const saveChanges = async () => {
     if (!selectedSeasonId) return;
     try {
-      const entries = editData.map(d => ({
-        collegeId: d.collegeId,
-        points: parseInt(d.points) || 0,
-        rank: d.rank
-      }));
+      const entries = editData
+        .filter(d => d.participated)
+        .map(d => ({
+          collegeId: d.collegeId,
+          points: parseInt(d.points) || 0,
+          rank: d.rank
+        }));
       await updateNationalRating(selectedSeasonId, entries);
       toast.success('Рейтинги оновлено');
       setIsEditing(false);
@@ -221,6 +224,7 @@ const NationalRatingsPage: React.FC = () => {
             <thead>
               <tr>
                 <th className={styles.mainHeader}>Коледж / Навчальний заклади</th>
+                <th className={styles.mainHeader}>Участь</th>
                 <th className={styles.mainHeader}>Регіон</th>
                 <th className={styles.mainHeader}>Загальна сума очок (О)</th>
                 <th className={styles.mainHeader}>Підсумкове місце (М)</th>
@@ -229,8 +233,16 @@ const NationalRatingsPage: React.FC = () => {
             <tbody>
               {isEditing ? (
                 editData.map((item) => (
-                  <tr key={item.collegeId} className={styles.row}>
+                  <tr key={item.collegeId} className={`${styles.row} ${!item.participated ? styles.inactiveRow : ''}`}>
                     <td className={styles.collegeCell}>{item.collegeName}</td>
+                    <td className={styles.editCell}>
+                      <input 
+                        type="checkbox" 
+                        checked={item.participated} 
+                        onChange={(e) => handleEditChange(item.collegeId, 'participated', e.target.checked)}
+                        className={styles.participationCheckbox}
+                      />
+                    </td>
                     <td className={styles.regionCell}>{item.region}</td>
                     <td className={styles.editCell}>
                       <input 
@@ -238,6 +250,7 @@ const NationalRatingsPage: React.FC = () => {
                         value={item.points} 
                         onChange={(e) => handleEditChange(item.collegeId, 'points', e.target.value)}
                         className={styles.editInput}
+                        disabled={!item.participated}
                       />
                     </td>
                     <td className={styles.editCell}>
@@ -246,6 +259,7 @@ const NationalRatingsPage: React.FC = () => {
                         value={item.rank} 
                         onChange={(e) => handleEditChange(item.collegeId, 'rank', e.target.value)}
                         className={styles.editInput}
+                        disabled={!item.participated}
                       />
                     </td>
                   </tr>

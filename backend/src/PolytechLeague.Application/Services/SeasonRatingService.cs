@@ -401,21 +401,23 @@ public class SeasonRatingService : ISeasonRatingService
             .Where(e => e.SeasonId == seasonId)
             .ToListAsync();
 
-        var rows = colleges.Select(c => {
-            var entry = manualEntries.FirstOrDefault(e => e.CollegeId == c.Id);
-            return new GroupRatingRowDto
-            {
-                GroupName = c.ShortName ?? c.Name,
-                SportResults = new Dictionary<string, SportResultDto>(), // No sport-specific results anymore
-                TotalPoints = entry?.Points ?? 0,
-                TotalRank = entry?.Rank ?? "-"
-            };
-        }).OrderBy(r => {
-            if (r.TotalRank == "-") return int.MaxValue;
-            var parts = r.TotalRank!.Split('-');
-            if (int.TryParse(parts[0], out int rank)) return rank;
-            return int.MaxValue;
-        }).ToList();
+        var rows = colleges
+            .Where(c => manualEntries.Any(e => e.CollegeId == c.Id))
+            .Select(c => {
+                var entry = manualEntries.First(e => e.CollegeId == c.Id);
+                return new GroupRatingRowDto
+                {
+                    GroupName = c.ShortName ?? c.Name,
+                    SportResults = new Dictionary<string, SportResultDto>(),
+                    TotalPoints = entry.Points,
+                    TotalRank = entry.Rank ?? "-"
+                };
+            }).OrderBy(r => {
+                if (r.TotalRank == "-") return int.MaxValue;
+                var parts = r.TotalRank!.Split('-');
+                if (int.TryParse(parts[0], out int rank)) return rank;
+                return int.MaxValue;
+            }).ToList();
 
         return new SeasonRatingDto
         {
