@@ -224,7 +224,7 @@ const NationalRatingsPage: React.FC = () => {
             <thead>
               <tr>
                 <th className={styles.mainHeader}>Коледж / Навчальний заклади</th>
-                <th className={styles.mainHeader}>Участь</th>
+                {isEditing && <th className={styles.mainHeader}>Участь</th>}
                 <th className={styles.mainHeader}>Регіон</th>
                 <th className={styles.mainHeader}>Загальна сума очок (О)</th>
                 <th className={styles.mainHeader}>Підсумкове місце (М)</th>
