@@ -433,3 +433,17 @@
   gap: 6px;
   box-shadow: 0 2px 8px rgba(219, 39, 119, 0.1);
 }
+
+.badgeChessWins {
+  background: #f0f9ff;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(3, 105, 161, 0.1);
+}

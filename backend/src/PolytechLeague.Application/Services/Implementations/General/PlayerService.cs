@@ -1132,7 +1132,8 @@ public class PlayerService : IPlayerService
             int maxStreak = 0;
             foreach (var p in chessPerformances.OrderBy(x => x.Tournament!.Date))
             {
-                if (p.Rank == 1)
+                bool isWin = p.Rank == 1 || (p.Tournament != null && p.Tournament.FirstPlaceId == playerId);
+                if (isWin)
                 {
                     currentStreak++;
                     if (currentStreak > maxStreak) maxStreak = currentStreak;
@@ -1168,7 +1169,8 @@ public class PlayerService : IPlayerService
                 }
             }
             // 3. Check for 4 total 1st places
-            int totalWins = chessPerformances.Count(p => p.Rank == 1);
+            var wins = chessPerformances.Where(p => p.Rank == 1 || (p.Tournament != null && p.Tournament.FirstPlaceId == playerId)).ToList();
+            int totalWins = wins.Count;
             if (totalWins >= 4)
             {
                 if (!dto.AutomaticBadges.Any(b => b.Type == "ChessTotalWins4"))
@@ -1186,7 +1188,7 @@ public class PlayerService : IPlayerService
                     {
                         TournamentName = "4-разовий переможець міжгрупових шахів",
                         SportType = "chess",
-                        Date = chessPerformances.Where(p => p.Rank == 1).OrderByDescending(p => p.Tournament!.Date).First().Tournament!.Date,
+                        Date = wins.OrderByDescending(p => p.Tournament!.Date).First().Tournament!.Date,
                         Rank = 1,
                         Result = "Спеціальне досягнення"
                     });

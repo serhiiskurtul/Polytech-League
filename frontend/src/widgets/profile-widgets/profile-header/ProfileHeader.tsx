@@ -103,6 +103,7 @@ const ProfileHeader = ({ userData, isAdmin, onEdit, onAvatarUpload, onLogout, on
                     badge.type === 'TopScorer' ? styles.badgeTopScorer :
                     badge.type === 'RankLeader' ? styles.badgeRankLeader :
                     badge.type === 'ChessStreak4' ? styles.badgeChessStreak :
+                    badge.type === 'ChessTotalWins4' ? styles.badgeChessWins :
                     styles.badgeSeasonTopScorer
                   }
                   title={badge.seasonName ? `Сезон: ${badge.seasonName}` : undefined}
