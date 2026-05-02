@@ -80,7 +80,28 @@ const NationalRatingsPage: React.FC = () => {
       };
     });
     
-    setEditData(initialEditData);
+    const sortedEditData = initialEditData.sort((a, b) => {
+      // Participating colleges come first
+      if (a.participated && !b.participated) return -1;
+      if (!a.participated && b.participated) return 1;
+
+      // If both are participating, sort by rank
+      if (a.participated && b.participated) {
+        if (a.rank === '-' && b.rank === '-') return a.collegeName.localeCompare(b.collegeName);
+        if (a.rank === '-') return 1;
+        if (b.rank === '-') return -1;
+
+        const rankA = parseInt(a.rank.toString().split('-')[0]);
+        const rankB = parseInt(b.rank.toString().split('-')[0]);
+
+        if (!isNaN(rankA) && !isNaN(rankB)) return rankA - rankB;
+      }
+
+      // Default to alphabetical by name
+      return a.collegeName.localeCompare(b.collegeName);
+    });
+
+    setEditData(sortedEditData);
     setIsEditing(true);
   };
 
