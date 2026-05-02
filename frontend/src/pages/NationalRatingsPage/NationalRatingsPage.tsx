@@ -98,7 +98,7 @@ const NationalRatingsPage: React.FC = () => {
         .map(d => ({
           collegeId: d.collegeId,
           points: parseInt(d.points) || 0,
-          rank: d.rank
+          rank: d.rank?.toString().trim() || '-'
         }));
       await updateNationalRating(selectedSeasonId, entries);
       toast.success('Рейтинги оновлено');
@@ -284,7 +284,7 @@ const NationalRatingsPage: React.FC = () => {
                       })()}
                     </td>
                     <td className={styles.totalPointsCell}>{row.totalPoints}</td>
-                    <td className={styles.totalRankCell}>{row.totalRank}</td>
+                    <td className={styles.totalRankCell}>{row.totalRank || (row as any).TotalRank || '-'}</td>
                   </tr>
                 ))
               )}

@@ -17,7 +17,7 @@ export interface GroupRatingRow {
   groupName: string;
   sportResults: Record<string, SportResult>;
   totalPoints: number;
-  totalRank: number;
+  totalRank: string;
 }
 
 export interface SeasonRatingResponse {
