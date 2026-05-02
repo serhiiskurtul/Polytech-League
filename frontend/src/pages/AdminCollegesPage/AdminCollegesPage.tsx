@@ -9,14 +9,11 @@ const AdminCollegesPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCollege, setEditingCollege] = useState<College | null>(null);
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<College>>({
     name: '',
     shortName: '',
     city: '',
-    region: '',
-    logoUrl: ''
+    region: ''
   });
 
   useEffect(() => {
@@ -38,21 +35,16 @@ const AdminCollegesPage: React.FC = () => {
     if (college) {
       setEditingCollege(college);
       setFormData(college);
-      setLogoPreview(college.logoUrl ? getPhotoUrl(college.logoUrl) : null);
     } else {
       setEditingCollege(null);
-      setFormData({ name: '', shortName: '', city: '', region: '', logoUrl: '' });
-      setLogoPreview(null);
+      setFormData({ name: '', shortName: '', city: '', region: '' });
     }
-    setLogoFile(null);
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingCollege(null);
-    setLogoFile(null);
-    setLogoPreview(null);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,13 +52,7 @@ const AdminCollegesPage: React.FC = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setLogoFile(file);
-      setLogoPreview(URL.createObjectURL(file));
-    }
-  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,11 +66,6 @@ const AdminCollegesPage: React.FC = () => {
         const created = await createCollege(formData);
         collegeId = created.id;
         toast.success('Коледж додано');
-      }
-
-      if (logoFile) {
-        await uploadCollegeLogo(collegeId, logoFile);
-        toast.success('Логотип завантажено');
       }
 
       fetchColleges();
@@ -190,37 +171,6 @@ const AdminCollegesPage: React.FC = () => {
                   value={formData.region} 
                   onChange={handleInputChange} 
                   placeholder="Наприклад: Львівська обл."
-                />
-              </div>
-              <div className={styles.logoSection}>
-                <div className={styles.modalLogoPreview}>
-                  {logoPreview ? (
-                    <img src={logoPreview} alt="Logo preview" />
-                  ) : (
-                    <i className="fas fa-university"></i>
-                  )}
-                </div>
-                <div className={styles.fileInputGroup}>
-                  <label htmlFor="logoUpload" className={styles.fileLabel}>
-                    <i className="fas fa-upload"></i> Завантажити логотип
-                  </label>
-                  <input 
-                    id="logoUpload"
-                    type="file" 
-                    accept="image/*" 
-                    onChange={handleFileChange} 
-                    className={styles.fileInput}
-                  />
-                </div>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>Або вставте URL Логотипу</label>
-                <input 
-                  name="logoUrl" 
-                  value={formData.logoUrl} 
-                  onChange={handleInputChange} 
-                  placeholder="https://example.com/logo.png"
                 />
               </div>
               <div className={styles.modalActions}>
