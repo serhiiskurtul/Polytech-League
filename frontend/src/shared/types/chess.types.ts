@@ -112,6 +112,9 @@ export interface ChessEventRequest {
   firstPlaceId?: number | null;
   secondPlaceId?: number | null;
   thirdPlaceId?: number | null;
+  firstPlaceTeamId?: number | null;
+  secondPlaceTeamId?: number | null;
+  thirdPlaceTeamId?: number | null;
   registrationStart?: string;
   registrationEnd?: string;
   endDate?: string;
