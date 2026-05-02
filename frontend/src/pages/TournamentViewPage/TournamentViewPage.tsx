@@ -299,11 +299,10 @@ const TournamentViewPage = () => {
         case 'basketball_3x3':
         case 'basketball3x3': await updateBasketball3x3Event(id, payload as any); break;
         case 'badminton': await updateBadmintonEvent(id, payload as any); break;
-        case 'tabletennis':
         case 'table_tennis': await updateTableTennisEvent(id, {
           ...payload,
           tournamentType: (details as any).tournamentType || 'RoundRobin',
-          category: (details as any).category || 'Men'
+          category: editTournamentData.category || 'Mixed'
         } as any); break;
         default: await updateChessEvent(id, payload as any);
       }
@@ -580,7 +579,7 @@ const TournamentViewPage = () => {
           ...payload,
           hand: (details as any).hand,
           weightClass: (details as any).weightClass,
-          category: (details as any).category,
+          category: editTournamentData.category,
           timeControl: editTournamentData.timeControl,
           participantsCount: editTournamentData.participantsCount
         });
