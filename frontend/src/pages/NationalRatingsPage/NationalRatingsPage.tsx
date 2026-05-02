@@ -19,6 +19,7 @@ const NationalRatingsPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState<any[]>([]);
+  const [showFullName, setShowFullName] = useState(false);
 
   useEffect(() => {
     fetchInitialData();
@@ -143,11 +144,23 @@ const NationalRatingsPage: React.FC = () => {
             Всеукраїнський залік 
             <span className={styles.nationalBadge}>National</span>
           </h1>
-          <p>Загальний облік результатів змагань між коледжами</p>
           {ratingData && (
-            <div className={styles.participationStats}>
-              Взяло участь: <span>{ratingData.rows.length}</span> навчальних закладів
-            </div>
+            <>
+              <div className={styles.participationStats}>
+                Взяло участь: <span>{ratingData.rows.length}</span> навчальних закладів
+              </div>
+              <div className={styles.nameToggleWrapper}>
+                <span className={`${styles.toggleText} ${!showFullName ? styles.activeText : ''}`}>Скорочена</span>
+                <button 
+                  className={`${styles.toggleBtn} ${showFullName ? styles.toggleActive : ''}`}
+                  onClick={() => setShowFullName(!showFullName)}
+                  title={showFullName ? "Показати скорочені назви" : "Показати повні назви"}
+                >
+                  <div className={styles.toggleCircle}></div>
+                </button>
+                <span className={`${styles.toggleText} ${showFullName ? styles.activeText : ''}`}>Повна назва</span>
+              </div>
+            </>
           )}
         </div>
 
@@ -242,7 +255,12 @@ const NationalRatingsPage: React.FC = () => {
                   <tr key={row.groupName} className={styles.row}>
                     <td className={styles.collegeCell}>
                       <div className={styles.collegeInfo}>
-                          <div className={styles.collegeName}>{row.groupName}</div>
+                          <div className={styles.collegeName}>
+                            {(() => {
+                              const college = colleges.find(c => (c.shortName || c.name) === row.groupName);
+                              return showFullName ? (college?.name || row.groupName) : (college?.shortName || row.groupName);
+                            })()}
+                          </div>
                       </div>
                     </td>
                     <td className={styles.regionCell}>

@@ -86,6 +86,58 @@
   box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
 }
 
+.nameToggleWrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 15px;
+  padding-left: 5px;
+}
+
+.toggleText {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.activeText {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.toggleBtn {
+  width: 44px;
+  height: 24px;
+  background: var(--border);
+  border: none;
+  border-radius: 20px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.toggleActive {
+  background: var(--primary);
+}
+
+.toggleCircle {
+  width: 18px;
+  height: 18px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggleActive .toggleCircle {
+  left: 23px;
+}
+
 .seasonSelect {
   background: var(--card);
   border: 1px solid var(--border);
