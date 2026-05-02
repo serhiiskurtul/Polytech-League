@@ -93,6 +93,9 @@ const AdminCollegesPage: React.FC = () => {
         <div>
           <h1>Керування коледжами</h1>
           <p>Додавання та редагування навчальних закладів для всеукраїнського заліку</p>
+          <div className={styles.collegeStats}>
+            Всього в базі: <span>{colleges.length}</span> навчальних закладів
+          </div>
         </div>
         <button className={styles.addBtn} onClick={() => handleOpenModal()}>
           <i className="fas fa-plus"></i> Додати коледж
