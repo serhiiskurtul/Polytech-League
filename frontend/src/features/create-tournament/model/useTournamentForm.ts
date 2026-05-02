@@ -163,7 +163,12 @@ export const useTournamentForm = () => {
     if (!formData.name.trim()) errors.push('Назва турніру обов\'язкова');
     if (!formData.startDate) errors.push('Дата початку обов\'язкова');
     if (formData.level === 'CollegeGroup') {
-      if (!formData.registrationDeadline) errors.push('Термін реєстрації обов\'язковий');
+      const isFutureTournament = formData.startDate && new Date(formData.startDate) > new Date();
+      
+      if (isFutureTournament && !formData.registrationDeadline) {
+        errors.push('Термін реєстрації обов\'язковий для майбутніх змагань');
+      }
+      
       if (formData.registrationDeadline && formData.startDate && new Date(formData.registrationDeadline) > new Date(formData.startDate)) {
         errors.push('Термін реєстрації не може бути пізніше дати початку');
       }
@@ -192,7 +197,7 @@ export const useTournamentForm = () => {
     try {
       // Helper to combine date and time strings into ISO string
       const combineDateTime = (dateStr: string, timeStr: string) => {
-        if (!dateStr) return new Date().toISOString();
+        if (!dateStr) return null;
         const [year, month, day] = dateStr.split('-');
         const [hours, minutes] = timeStr.split(':');
         const date = new Date(Number(year), Number(month) - 1, Number(day), Number(hours), Number(minutes));
@@ -218,8 +223,8 @@ export const useTournamentForm = () => {
         isTeam: formData.isTeam,
         isPublic: formData.level === 'CollegeGroup' ? formData.isPublic : false,
         isModerated: formData.level === 'CollegeGroup' ? formData.requireApproval : false,
-        registrationStart: formData.level === 'CollegeGroup' ? combineDateTime(formData.registrationStartDate, formData.registrationStartTime) : null,
-        registrationEnd: formData.level === 'CollegeGroup' ? combineDateTime(formData.registrationDeadline, formData.registrationDeadlineTime) : null,
+        registrationStart: formData.level === 'CollegeGroup' && formData.registrationStartDate ? combineDateTime(formData.registrationStartDate, formData.registrationStartTime) : null,
+        registrationEnd: formData.level === 'CollegeGroup' && formData.registrationDeadline ? combineDateTime(formData.registrationDeadline, formData.registrationDeadlineTime) : null,
         endDate: formData.endDate ? combineDateTime(formData.endDate, formData.endTime) : null,
         category: formData.category,
       };
