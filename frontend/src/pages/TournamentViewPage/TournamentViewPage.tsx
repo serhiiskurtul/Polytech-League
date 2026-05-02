@@ -1083,7 +1083,7 @@ const TournamentViewPage = () => {
 
       if (!playerId) {
         // Check if player is already in the tournament (by userId)
-        if (newPlayer.userId && details?.players.some((p: any) => p.userId === newPlayer.userId)) {
+        if (newPlayer.userId && (details?.players || details?.participants || []).some((p: any) => p.userId === newPlayer.userId)) {
           alert("Цей користувач вже бере участь у змаганнях!");
           return;
         }
