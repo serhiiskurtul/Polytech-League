@@ -173,7 +173,7 @@ const PlayersRatingPage = () => {
               Рейтинги гравців
             </h1>
             <p className={styles.heroDescription}>
-              Система рейтингів на основі результатів змагань (призові місця, рівень змагань та ігрова активність).
+              Система рейтингів на основі результатів змагань (призові місця та рівень змагань).
             </p>
           </div>
 
@@ -448,16 +448,7 @@ const PlayersRatingPage = () => {
                 </ul>
               </div>
 
-              <div className={styles.formulaCard}>
-                <div className={styles.formulaIcon} style={{ background: '#e0f2fe', color: '#0284c7' }}>
-                  <i className="fa-solid fa-bolt"></i>
-                </div>
-                <h3>Ігрова активність</h3>
-                <p>Додаткові бали за результати ігор незалежно від рівня змагань:</p>
-                <ul>
-                  <li><span>Перемога в грі:</span> +2 бали</li>
-                </ul>
-              </div>
+
 
               <div className={styles.formulaCard}>
                 <div className={styles.formulaIcon} style={{ background: '#ffedd5', color: '#ea580c' }}>

@@ -473,8 +473,8 @@ public class PlayerService : IPlayerService
                         if (!sportStatsMap.ContainsKey(sport)) sportStatsMap[sport] = new SportStatsDto { SportType = sport };
                         var s = sportStatsMap[sport];
                         s.MatchesPlayed += p; s.WinsCount += w;
-                        int matchPts = 0; // Removed participation points
-                        int winPts = w * 2;
+                        int matchPts = 0;
+                        int winPts = 0;
                         int totalPts = matchPts + winPts;
                         s.PerformanceScore += totalPts;
                         totalScore += totalPts;
@@ -482,7 +482,6 @@ public class PlayerService : IPlayerService
                             "chess" => "Шахи", "checkers" => "Шашки", "table_tennis" => "Настільний теніс",
                             "armwrestling" => "Армрестлинг", "badminton" => "Бадмінтон", _ => sport
                         };
-                        if (winPts > 0) pointsBreakdown.Add(new PointEntryDto { Description = $"Перемоги ({sportName}): {w} ігор", Points = winPts, Category = "Activity", SportType = sport });
                     }
                 }
                 var cw = cwS.FirstOrDefault(x => x.Id == playerId);
