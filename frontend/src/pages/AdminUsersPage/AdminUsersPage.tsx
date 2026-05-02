@@ -15,7 +15,7 @@ export const AdminUsersPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const pageSize = 10;
+  const pageSize = 100;
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -224,7 +224,7 @@ export const AdminUsersPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {players.map((player) => {
+                {players.slice((page - 1) * pageSize, page * pageSize).map((player) => {
                   const photoSrc = getPhotoUrl(player.photoUrl);
                   return (
                     <tr key={player.id}>
