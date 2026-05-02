@@ -4,7 +4,6 @@ export interface College {
   id: number;
   name: string;
   shortName: string;
-  logoUrl?: string;
   city?: string;
   region?: string;
 }
@@ -33,11 +32,4 @@ export const deleteCollege = async (id: number): Promise<void> => {
   await api.delete(`/Colleges/${id}`);
 };
 
-export const uploadCollegeLogo = async (id: number, file: File): Promise<string> => {
-  const formData = new FormData();
-  formData.append('file', file);
-  const response = await api.post<{ url: string }>(`/Colleges/${id}/upload-logo`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  });
-  return response.data.url;
-};
+

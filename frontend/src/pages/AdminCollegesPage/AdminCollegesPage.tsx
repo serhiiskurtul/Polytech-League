@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './AdminCollegesPage.module.css';
-import { getColleges, createCollege, updateCollege, deleteCollege, uploadCollegeLogo, College } from '@/shared/api/colleges.api';
+import { getColleges, createCollege, updateCollege, deleteCollege, College } from '@/shared/api/colleges.api';
 import { getPhotoUrl } from '@/shared/utils/photo.utils';
 import toast from 'react-hot-toast';
 
@@ -104,13 +104,6 @@ const AdminCollegesPage: React.FC = () => {
         {colleges.map(college => (
           <div key={college.id} className={styles.card}>
             <div className={styles.cardInfo}>
-              <div className={styles.logoContainer}>
-                {college.logoUrl ? (
-                  <img src={getPhotoUrl(college.logoUrl)!} alt={college.name} />
-                ) : (
-                  <i className="fas fa-university"></i>
-                )}
-              </div>
               <div className={styles.details}>
                 <h3>{college.name}</h3>
                 <span className={styles.shortName}>{college.shortName}</span>

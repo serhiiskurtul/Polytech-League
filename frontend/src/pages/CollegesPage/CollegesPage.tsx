@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './CollegesPage.module.css';
 import { getColleges, College } from '@/shared/api/colleges.api';
-import { getPhotoUrl } from '@/shared/utils/photo.utils';
 import toast from 'react-hot-toast';
 
 const CollegesPage: React.FC = () => {
@@ -51,13 +50,6 @@ const CollegesPage: React.FC = () => {
         <div className={styles.grid}>
           {colleges.map(college => (
             <div key={college.id} className={styles.card}>
-              <div className={styles.logoContainer}>
-                {college.logoUrl ? (
-                  <img src={getPhotoUrl(college.logoUrl)!} alt={college.name} />
-                ) : (
-                  <i className="fas fa-university"></i>
-                )}
-              </div>
               <div className={styles.info}>
                 <span className={styles.shortName}>{college.shortName}</span>
                 <h3 className={styles.fullName}>{college.name}</h3>

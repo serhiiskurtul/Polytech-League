@@ -38,8 +38,6 @@ public class CollegeService : ICollegeService
 
         existing.Name = college.Name;
         existing.ShortName = college.ShortName;
-        existing.LogoUrl = college.LogoUrl;
-        existing.City = college.City;
         existing.Region = college.Region;
 
         await _context.SaveChangesAsync();
