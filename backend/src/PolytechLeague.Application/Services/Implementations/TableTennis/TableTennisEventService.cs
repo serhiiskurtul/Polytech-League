@@ -7,6 +7,7 @@ using PolytechLeague.Persistence.Database;
 using PolytechLeague.Application.Services.Interfaces;
 using PolytechLeague.Domain.Entities;
 using PolytechLeague.Application.Dto.TableTennisDto;
+using PolytechLeague.Domain.Entities.Enums;
 
 namespace PolytechLeague.Application.Services.Implementations.TableTennis;
 
@@ -214,6 +215,11 @@ public class TableTennisEventService(
         if (string.IsNullOrWhiteSpace(player.StudentId))
         {
             throw new InvalidOperationException("Для реєстрації на змагання необхідно вказати серію та номер студентського квитка в профілі (наприклад: PH13856483).");
+        }
+
+        if (player.Gender == Gender.None)
+        {
+            throw new InvalidOperationException("Для реєстрації на змагання необхідно вказати стать у профілі.");
         }
 
         var exists = await _dbcontext.Set<TableTennisEventParticipant>()

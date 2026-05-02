@@ -7,6 +7,7 @@ using PolytechLeague.Application.Services.Interfaces;
 using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Exceptions;
 using PolytechLeague.Domain.Entities.Shared;
+using PolytechLeague.Domain.Entities.Enums;
 
 namespace PolytechLeague.Application.Services.Implementations.Basketball3x3;
 
@@ -148,6 +149,11 @@ public class Basketball3x3EventService(
         if (string.IsNullOrWhiteSpace(player.StudentId))
         {
             throw new InvalidOperationException("Для реєстрації на змагання необхідно вказати серію та номер студентського квитка в профілі (наприклад: PH13856483).");
+        }
+
+        if (player.Gender == Gender.None)
+        {
+            throw new InvalidOperationException("Для реєстрації на змагання необхідно вказати стать у профілі.");
         }
 
         var groupName = player.Group;

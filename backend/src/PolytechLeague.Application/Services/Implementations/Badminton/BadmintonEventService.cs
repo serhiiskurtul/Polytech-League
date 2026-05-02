@@ -9,6 +9,7 @@ using PolytechLeague.Domain.Entities.Shared;
 using PolytechLeague.Domain.Entities;
 
 using PolytechLeague.Application.Dto.BadmintonDto;
+using PolytechLeague.Domain.Entities.Enums;
 
 namespace PolytechLeague.Application.Services.Implementations.Badminton;
 
@@ -197,6 +198,11 @@ public class BadmintonEventService(
         if (string.IsNullOrWhiteSpace(player.StudentId))
         {
             throw new InvalidOperationException("Для реєстрації на змагання необхідно вказати серію та номер студентського квитка в профілі (наприклад: PH13856483).");
+        }
+
+        if (player.Gender == Gender.None)
+        {
+            throw new InvalidOperationException("Для реєстрації на змагання необхідно вказати стать у профілі.");
         }
 
         var exists = await _dbcontext.BadmintonEventParticipants

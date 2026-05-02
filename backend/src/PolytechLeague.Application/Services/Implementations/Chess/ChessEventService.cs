@@ -9,6 +9,7 @@ using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Exceptions;
 using PolytechLeague.Application.Dto;
 using PolytechLeague.Application.Utilities;
+using PolytechLeague.Domain.Entities.Enums;
 
 namespace PolytechLeague.Application.Services.Implementations.Chess;
 
@@ -370,6 +371,11 @@ public class ChessEventService :
         if (string.IsNullOrWhiteSpace(player.StudentId))
         {
             throw new InvalidOperationException("Для реєстрації на змагання необхідно вказати серію та номер студентського квитка в профілі (наприклад: PH13856483).");
+        }
+
+        if (player.Gender == Gender.None)
+        {
+            throw new InvalidOperationException("Для реєстрації на змагання необхідно вказати стать у профілі.");
         }
 
         var exists = await _dbcontext.Set<ChessEventParticipant>()
