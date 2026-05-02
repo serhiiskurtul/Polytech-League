@@ -293,16 +293,16 @@ public class TournamentService : ITournamentService
         var rankedPlayersCount = await _context.Players
             .Where(p => p.User == null || p.User.Role != UserRole.Admin)
             .Where(p => !p.IsExternal && !p.IsGuest)
-            .CountAsync(p => _context.Achievements.Any(a => a.PlayerId == p.Id) ||
-                            _context.FutsalParticipants.Any(fp => fp.PlayerId == p.Id) ||
-                            _context.VolleyballParticipants.Any(vp => vp.PlayerId == p.Id) ||
-                            _context.Basketball3x3Participants.Any(bp => bp.PlayerId == p.Id) ||
-                            _context.ChessParticipants.Any(cp => cp.PlayerId == p.Id) ||
-                            _context.CheckersParticipants.Any(cp => cp.PlayerId == p.Id) ||
-                            _context.BeachVolleyballParticipants.Any(bvp => bvp.PlayerId == p.Id) ||
-                            _context.TableTennisParticipants.Any(ttp => ttp.PlayerId == p.Id) ||
-                            _context.BadmintonParticipants.Any(bmp => bmp.PlayerId == p.Id) ||
-                            _context.ArmwrestlingParticipants.Any(ap => ap.PlayerId == p.Id));
+            .CountAsync(p => _context.Set<Event>().Any(e => e.FirstPlaceId == p.Id || e.SecondPlaceId == p.Id || e.ThirdPlaceId == p.Id) ||
+                            _context.FutsalEventParticipants.Any(fp => fp.PlayerId == p.Id) ||
+                            _context.VolleyballEventParticipants.Any(vp => vp.PlayerId == p.Id) ||
+                            _context.Basketball3x3EventParticipants.Any(bp => bp.PlayerId == p.Id) ||
+                            _context.ChessEventParticipants.Any(cp => cp.PlayerId == p.Id) ||
+                            _context.CheckersEventParticipants.Any(cp => cp.PlayerId == p.Id) ||
+                            _context.BeachVolleyballEventParticipants.Any(bvp => bvp.PlayerId == p.Id) ||
+                            _context.TableTennisEventParticipants.Any(ttp => ttp.PlayerId == p.Id) ||
+                            _context.BadmintonEventParticipants.Any(bmp => bmp.PlayerId == p.Id) ||
+                            _context.ArmwrestlingEventParticipants.Any(ap => ap.PlayerId == p.Id));
 
         var registeredPlayersCount = rankedPlayersCount;
 
