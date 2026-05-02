@@ -61,9 +61,46 @@
 .sportFilters {
   display: flex;
   justify-content: center;
-  gap: 15px;
-  margin-bottom: 40px;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
   flex-wrap: wrap;
+}
+
+.genderFilters {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.genderBtn {
+  padding: 0.6rem 1.8rem;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  color: #94a3b8;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.genderBtn:hover {
+  background: rgba(251, 191, 36, 0.1);
+  color: #fbbf24;
+}
+
+.activeGender {
+  background: #fbbf24;
+  color: #1e293b;
+  border-color: #fbbf24;
+  box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
 }
 
 .filterBtn {
