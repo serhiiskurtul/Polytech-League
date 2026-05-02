@@ -94,6 +94,8 @@ export interface ArmwrestlingEventRequest {
 
 export interface ArmwrestlingEventParticipantDto {
   playerId: number;
+  firstName?: string;
+  lastName?: string;
   weight: number;
   rank: number;
   groupName?: string;

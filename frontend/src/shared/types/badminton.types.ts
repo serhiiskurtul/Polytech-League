@@ -90,6 +90,8 @@ export interface BadmintonEventResponse {
 export interface BadmintonEventParticipantDto {
   playerId: number;
   playerName?: string;
+  firstName?: string;
+  lastName?: string;
   points: number;
   rank: number;
   userId?: number;

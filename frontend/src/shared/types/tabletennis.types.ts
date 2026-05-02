@@ -77,6 +77,8 @@ export interface TableTennisEventRequest {
 
 export interface TableTennisEventParticipantDto {
   playerId: number;
+  firstName?: string;
+  lastName?: string;
   points: number;
   rank: number;
   groupName?: string;
