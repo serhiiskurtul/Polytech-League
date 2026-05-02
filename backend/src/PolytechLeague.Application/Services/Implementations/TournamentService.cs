@@ -12,6 +12,7 @@ using PolytechLeague.Domain.Entities.TableTennis;
 using PolytechLeague.Domain.Entities.Armwrestling;
 using PolytechLeague.Domain.Entities.Badminton;
 using PolytechLeague.Domain.Entities.BeachVolleyball;
+using PolytechLeague.Domain.Entities.Enums;
 
 namespace PolytechLeague.Application.Services.Implementations;
 

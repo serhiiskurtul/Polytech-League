@@ -15,6 +15,7 @@ using PolytechLeague.Domain.Entities.Volleyball;
 using PolytechLeague.Domain.Entities.Basketball3x3;
 using PolytechLeague.Domain.Entities.BeachVolleyball;
 using PolytechLeague.Domain.Entities.Shared;
+using PolytechLeague.Domain.Entities.Enums;
 using PolytechLeague.Application.Utilities;
 namespace PolytechLeague.Application.Services.Implementations.General;
 

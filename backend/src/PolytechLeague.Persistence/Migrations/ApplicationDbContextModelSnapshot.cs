@@ -2426,6 +2426,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("futsal_team_id");
 
+                    b.Property<int>("Gender")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Group")
                         .IsRequired()
                         .HasColumnType("text")
