@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getUsers, blockUser, unblockUser, deleteUser, UserResponse } from '@/shared/api/users.api';
-import { getAllPlayers, deletePlayer, searchPlayers } from '@/shared/api/players.api';
+import { getAllPlayers, deletePlayer, searchPlayers, getPlayersRankings } from '@/shared/api/players.api';
 import { PlayerDto } from '@/shared/types/player.types';
 import { getPhotoUrl } from '@/shared/utils/photo.utils';
 import { Link } from 'react-router-dom';
@@ -39,7 +39,6 @@ export const AdminUsersPage = () => {
       if (searchTerm) {
         data = await searchPlayers(searchTerm);
       } else {
-        // Use getPlayersRankings to get calculated scores
         data = await getPlayersRankings();
       }
       setPlayers(data);
@@ -272,16 +271,32 @@ export const AdminUsersPage = () => {
                               </Link>
                               <span className={styles.userEmail}>ID: {player.id}</span>
                             </div>
-                            onClick={() => player.id && handleDeletePlayer(player.id)}
-                            title="Видалити гравця"
-                          >
-                            <i className="fas fa-trash-alt"></i>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
+                          </div>
+                        </td>
+                        <td>{player.group || '-'}</td>
+                        <td>{player.performanceScore}</td>
+                        <td>
+                          <div className={styles.actions}>
+                            <Link 
+                              to={`/players/${player.id}`} 
+                              className={styles.actionBtn}
+                              title="Перейти в профіль"
+                            >
+                              <i className="fas fa-external-link-alt"></i>
+                            </Link>
+                            <button 
+                              className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                              onClick={() => player.id && handleDeletePlayer(player.id)}
+                              title="Видалити гравця"
+                            >
+                              <i className="fas fa-trash-alt"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  });
+                })()}
               </tbody>
             </table>
           )}
