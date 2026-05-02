@@ -195,7 +195,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
       // 2. Add to event if not already there
       const isAlreadyInEvent = details.participants?.some((p: any) => (p.playerId || p.id) === playerId);
       if (!isAlreadyInEvent) {
-        await addParticipantToArmwrestlingEvent(details.id, { playerId, weight: 0, rank: 0, status: RegistrationStatus.Approved });
+        await addParticipantToArmwrestlingEvent(details.id, { playerId, weight: 0, rank: 0, status: RegistrationStatus.Approved, groupName: 'Гість' });
       }
 
       await loadPlayers(playerNum === 1 ? { p1: playerId } : { p2: playerId });
@@ -397,7 +397,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
       }
 
       // Add link to event
-      await addParticipantToArmwrestlingEvent(details.id, { playerId: playerId!, weight: 0, rank: 0, status: RegistrationStatus.Approved });
+      await addParticipantToArmwrestlingEvent(details.id, { playerId: playerId!, weight: 0, rank: 0, status: RegistrationStatus.Approved, groupName: newParticipant.group });
       toast.success('Учасника успішно додано до змагання!');
 
       setShowAddPlayer(false);

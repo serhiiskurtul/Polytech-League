@@ -694,21 +694,30 @@ const TournamentViewPage = () => {
           playerId,
           weight: (editingParticipantData as any).weight || 0,
           rank: editingParticipantData.rank,
-          status: editingParticipantData.status
+          status: editingParticipantData.status,
+          firstName: editingParticipantData.firstName,
+          lastName: editingParticipantData.lastName,
+          groupName: editingParticipantData.groupName
         });
       } else if (sportKey === 'badminton') {
         await updateBadmintonParticipant(id!, playerId, {
           playerId,
           points: editingParticipantData.points,
           rank: editingParticipantData.rank,
-          status: editingParticipantData.status
+          status: editingParticipantData.status,
+          firstName: editingParticipantData.firstName,
+          lastName: editingParticipantData.lastName,
+          groupName: editingParticipantData.groupName
         });
       } else if (sportKey === 'tabletennis' || sportKey === 'table_tennis') {
         await updateTableTennisParticipant(id!, playerId, {
           playerId,
           points: editingParticipantData.points,
           rank: editingParticipantData.rank,
-          status: editingParticipantData.status
+          status: editingParticipantData.status,
+          firstName: editingParticipantData.firstName,
+          lastName: editingParticipantData.lastName,
+          groupName: editingParticipantData.groupName
         });
       } else {
         const payload: ChessEventParticipantDto = {
@@ -1133,7 +1142,8 @@ const TournamentViewPage = () => {
             rank: 0, 
             status: RegistrationStatus.Approved,
             firstName: newPlayer.firstName,
-            lastName: newPlayer.lastName
+            lastName: newPlayer.lastName,
+            groupName: newPlayer.group
           });
           break;
         case 'armwrestling':
@@ -1143,7 +1153,8 @@ const TournamentViewPage = () => {
             rank: 0, 
             status: RegistrationStatus.Approved,
             firstName: newPlayer.firstName,
-            lastName: newPlayer.lastName
+            lastName: newPlayer.lastName,
+            groupName: newPlayer.group
           });
           break;
         case 'badminton':
@@ -1153,7 +1164,8 @@ const TournamentViewPage = () => {
             rank: 0, 
             status: RegistrationStatus.Approved,
             firstName: newPlayer.firstName,
-            lastName: newPlayer.lastName
+            lastName: newPlayer.lastName,
+            groupName: newPlayer.group
           });
           break;
         case 'tabletennis':
@@ -1164,7 +1176,8 @@ const TournamentViewPage = () => {
             rank: 0, 
             status: RegistrationStatus.Approved,
             firstName: newPlayer.firstName,
-            lastName: newPlayer.lastName
+            lastName: newPlayer.lastName,
+            groupName: newPlayer.group
           });
           break;
         default:
@@ -1175,7 +1188,8 @@ const TournamentViewPage = () => {
             status: RegistrationStatus.Approved,
             firstName: newPlayer.firstName,
             lastName: newPlayer.lastName,
-            rating: newPlayer.ratingELO
+            rating: newPlayer.ratingELO,
+            groupName: newPlayer.group
           });
       }
       toast.success("Учасник успішно доданий до змагань!");
