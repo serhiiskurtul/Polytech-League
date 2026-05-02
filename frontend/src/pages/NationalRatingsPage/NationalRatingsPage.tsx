@@ -234,7 +234,12 @@ const NationalRatingsPage: React.FC = () => {
               {isEditing ? (
                 editData.map((item) => (
                   <tr key={item.collegeId} className={`${styles.row} ${!item.participated ? styles.inactiveRow : ''}`}>
-                    <td className={styles.collegeCell}>{item.collegeName}</td>
+                    <td className={styles.collegeCell}>
+                      {(() => {
+                        const college = colleges.find(c => c.id === item.collegeId);
+                        return showFullName ? (college?.name || item.collegeName) : (college?.shortName || item.collegeName);
+                      })()}
+                    </td>
                     <td className={styles.editCell}>
                       <input 
                         type="checkbox" 
