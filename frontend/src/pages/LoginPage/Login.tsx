@@ -75,6 +75,7 @@ export default function Login() {
             labelInput="Email"
             type="email"
             placeholder="student@gmail.com"
+            autoComplete="username email"
             register={register('email')}
             error={errors.email?.message}
           />
@@ -83,6 +84,7 @@ export default function Login() {
             labelInput="Пароль"
             type="password"
             placeholder="••••••••"
+            autoComplete="current-password"
             register={register('password')}
             error={errors.password?.message}
           />

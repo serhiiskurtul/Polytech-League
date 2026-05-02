@@ -138,12 +138,14 @@ export default function Signup() {
             <InputSign
               labelInput="Ім'я"
               placeholder="Артем"
+              autoComplete="given-name"
               register={register('firstName')}
               error={errors.firstName?.message}
             />
             <InputSign
               labelInput="Прізвище"
               placeholder="Іванов"
+              autoComplete="family-name"
               register={register('lastName')}
               error={errors.lastName?.message}
             />
@@ -153,6 +155,7 @@ export default function Signup() {
             labelInput="Email"
             type="email"
             placeholder="student@gmail.com"
+            autoComplete="email"
             register={register('email')}
             error={errors.email?.message}
           />
@@ -161,6 +164,7 @@ export default function Signup() {
             labelInput="Пароль"
             type="password"
             placeholder="••••••••"
+            autoComplete="new-password"
             register={register('password')}
             error={errors.password?.message}
           />
@@ -169,6 +173,7 @@ export default function Signup() {
             labelInput="Підтвердьте пароль"
             type="password"
             placeholder="••••••••"
+            autoComplete="new-password"
             register={register('confirmPassword')}
             error={errors.confirmPassword?.message}
           />
