@@ -407,10 +407,11 @@ public class SeasonRatingService : ISeasonRatingService
                 var entry = manualEntries.First(e => e.CollegeId == c.Id);
                 return new GroupRatingRowDto
                 {
+                    CollegeId = c.Id,
                     GroupName = c.ShortName ?? c.Name,
                     SportResults = new Dictionary<string, SportResultDto>(),
                     TotalPoints = entry.Points,
-                    TotalRank = entry.Rank ?? "-"
+                    TotalRank = !string.IsNullOrWhiteSpace(entry.Rank) ? entry.Rank : "-"
                 };
             }).OrderBy(r => {
                 if (r.TotalRank == "-") return int.MaxValue;

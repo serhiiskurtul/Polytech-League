@@ -14,6 +14,7 @@ export interface SportResult {
 }
 
 export interface GroupRatingRow {
+  collegeId: number;
   groupName: string;
   sportResults: Record<string, SportResult>;
   totalPoints: number;

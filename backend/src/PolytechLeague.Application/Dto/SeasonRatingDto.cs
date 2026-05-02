@@ -12,6 +12,7 @@ public class SeasonRatingDto
 
 public class GroupRatingRowDto
 {
+    public long CollegeId { get; set; }
     public required string GroupName { get; set; }
     public required Dictionary<string, SportResultDto> SportResults { get; set; }
     public int TotalPoints { get; set; }

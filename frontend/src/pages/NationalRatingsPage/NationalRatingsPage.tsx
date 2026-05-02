@@ -69,7 +69,7 @@ const NationalRatingsPage: React.FC = () => {
     
     // Prepare edit data: for each college, find if it has an entry or default to 0/-
     const initialEditData = colleges.map(college => {
-      const row = ratingData.rows.find(r => r.groupName === (college.shortName || college.name));
+      const row = ratingData.rows.find(r => r.collegeId === college.id);
       return {
         collegeId: college.id,
         collegeName: college.shortName || college.name,
@@ -271,7 +271,7 @@ const NationalRatingsPage: React.FC = () => {
                       <div className={styles.collegeInfo}>
                           <div className={styles.collegeName}>
                             {(() => {
-                              const college = colleges.find(c => (c.shortName || c.name) === row.groupName);
+                              const college = colleges.find(c => c.id === row.collegeId);
                               return showFullName ? (college?.name || row.groupName) : (college?.shortName || row.groupName);
                             })()}
                           </div>
@@ -279,7 +279,7 @@ const NationalRatingsPage: React.FC = () => {
                     </td>
                     <td className={styles.regionCell}>
                       {(() => {
-                        const college = colleges.find(c => (c.shortName || c.name) === row.groupName);
+                        const college = colleges.find(c => c.id === row.collegeId);
                         return college?.region || '—';
                       })()}
                     </td>
