@@ -15,6 +15,7 @@ const AdminCollegesPage: React.FC = () => {
     name: '',
     shortName: '',
     city: '',
+    region: '',
     logoUrl: ''
   });
 
@@ -40,7 +41,7 @@ const AdminCollegesPage: React.FC = () => {
       setLogoPreview(college.logoUrl ? getPhotoUrl(college.logoUrl) : null);
     } else {
       setEditingCollege(null);
-      setFormData({ name: '', shortName: '', city: '', logoUrl: '' });
+      setFormData({ name: '', shortName: '', city: '', region: '', logoUrl: '' });
       setLogoPreview(null);
     }
     setLogoFile(null);
@@ -133,6 +134,7 @@ const AdminCollegesPage: React.FC = () => {
                 <h3>{college.name}</h3>
                 <span className={styles.shortName}>{college.shortName}</span>
                 <span className={styles.city}><i className="fas fa-map-marker-alt"></i> {college.city || 'Місто не вказано'}</span>
+                <span className={styles.region}><i className="fas fa-globe"></i> {college.region || 'Регіон не вказано'}</span>
               </div>
             </div>
             <div className={styles.actions}>
@@ -179,6 +181,15 @@ const AdminCollegesPage: React.FC = () => {
                   value={formData.city} 
                   onChange={handleInputChange} 
                   placeholder="Наприклад: Львів"
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Регіон</label>
+                <input 
+                  name="region" 
+                  value={formData.region} 
+                  onChange={handleInputChange} 
+                  placeholder="Наприклад: Львівська обл."
                 />
               </div>
               <div className={styles.logoSection}>

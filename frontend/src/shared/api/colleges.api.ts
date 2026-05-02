@@ -6,6 +6,7 @@ export interface College {
   shortName: string;
   logoUrl?: string;
   city?: string;
+  region?: string;
 }
 
 export const getColleges = async (): Promise<College[]> => {

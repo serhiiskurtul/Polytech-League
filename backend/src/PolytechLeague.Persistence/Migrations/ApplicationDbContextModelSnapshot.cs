@@ -867,6 +867,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Region")
+                        .HasColumnType("text");
+
                     b.Property<string>("ShortName")
                         .IsRequired()
                         .HasColumnType("text");

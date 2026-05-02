@@ -108,12 +108,16 @@
   margin-bottom: 8px;
 }
 
-.city {
+.city, .region {
   display: flex;
   align-items: center;
   gap: 6px;
   font-size: 0.85rem;
   color: var(--muted);
+}
+
+.region {
+  margin-top: 4px;
 }
 
 .actions {

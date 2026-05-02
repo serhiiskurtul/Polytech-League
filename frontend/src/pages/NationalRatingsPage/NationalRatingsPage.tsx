@@ -72,7 +72,7 @@ const NationalRatingsPage: React.FC = () => {
       return {
         collegeId: college.id,
         collegeName: college.shortName || college.name,
-        region: college.city || '—',
+        region: college.region || '—',
         points: row?.totalPoints || 0,
         rank: row?.totalRank || '-'
       };
@@ -112,7 +112,7 @@ const NationalRatingsPage: React.FC = () => {
       const college = colleges.find(c => (c.shortName || c.name) === row.groupName);
       return {
         'Коледж': row.groupName,
-        'Регіон': college?.city || '—',
+        'Регіон': college?.region || '—',
         'Загальна сума очок': row.totalPoints,
         'Підсумкове місце': row.totalRank
       };
@@ -248,7 +248,7 @@ const NationalRatingsPage: React.FC = () => {
                     <td className={styles.regionCell}>
                       {(() => {
                         const college = colleges.find(c => (c.shortName || c.name) === row.groupName);
-                        return college?.city || '—';
+                        return college?.region || '—';
                       })()}
                     </td>
                     <td className={styles.totalPointsCell}>{row.totalPoints}</td>
