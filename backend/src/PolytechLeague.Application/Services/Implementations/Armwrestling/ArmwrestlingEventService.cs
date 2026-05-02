@@ -157,6 +157,8 @@ public class ArmwrestlingEventService :
         if (string.IsNullOrEmpty(participant.GroupName))
         {
             participant.GroupName = player?.Group;
+        }
+        
         participant.PlayerFirstName = dto.FirstName ?? player?.FirstName;
         participant.PlayerLastName = dto.LastName ?? player?.LastName;
 
