@@ -29,7 +29,7 @@ const Tournaments = () => {
   const [tournaments, setTournaments] = useState<TournamentUI[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
-    pageSize: 6,
+    pageSize: 12,
     totalCount: 0,
     totalPages: 0
   });
