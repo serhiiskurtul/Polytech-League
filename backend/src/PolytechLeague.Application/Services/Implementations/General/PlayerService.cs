@@ -1171,15 +1171,7 @@ public class PlayerService : IPlayerService
             double totalPoints = chessPerformances.Sum(p => p.Points);
             _logger.LogInformation("Player {PlayerId} has {Points} total points from {Count} performances", playerId, totalPoints, chessPerformances.Count);
             var tournamentIds = chessPerformances.Select(p => p.TournamentId).ToList();
-            double totalPossible = 0;
-            foreach (var tId in tournamentIds)
-            {
-                var maxRound = await _dbContext.ChessGames
-                    .Where(g => g.TournamentId == tId)
-                    .Select(g => (int?)g.Round)
-                    .MaxAsync(cancellationToken) ?? 0;
-                totalPossible += maxRound;
-            }
+            double totalPossible = chessPerformances.Count * 5;
             _logger.LogInformation("Player {PlayerId} total possible points calculated as {Possible}", playerId, totalPossible);
             if (totalPossible > 0 || totalPoints > 0)
             {
