@@ -4,6 +4,7 @@ using PolytechLeague.Domain.Entities.TableTennis.Enums;
 using PolytechLeague.Domain.Entities.Armwrestling.Enums;
 using PolytechLeague.Domain.Entities.Futsal.Enums;
 using PolytechLeague.Domain.Entities.Volleyball.Enums;
+using PolytechLeague.Domain.Entities.Enums;
 
 namespace PolytechLeague.Application.Dto.GeneralDto;
 
@@ -14,6 +15,8 @@ public class PlayerDto
     public string? FirstName { get; set; }
     public string? Patronymic { get; set; }
     public string? LastName { get; set; }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public Gender Gender { get; set; }
     public DateOnly? BirthDate { get; set; }
     public string? Group { get; set; }
     public int EnrollmentYear { get; set; }
@@ -158,6 +161,7 @@ public static class PlayerDtoExtensions
             BeachVolleyballTeamId = player.BeachVolleyballTeamId,
             IsExternal = player.IsExternal,
             IsGuest = player.IsGuest,
+            Gender = player.Gender,
             Achievements = new List<AchievementDto>(),
             MatchesPlayed = 0,
             WinsCount = 0,
@@ -210,7 +214,8 @@ public static class PlayerDtoExtensions
             BeachVolleyballShirtNumber = dto.BeachVolleyballShirtNumber,
             BeachVolleyballTeamId = dto.BeachVolleyballTeamId,
             IsExternal = dto.IsExternal,
-            IsGuest = dto.IsGuest
+            IsGuest = dto.IsGuest,
+            Gender = dto.Gender
         };
     }
 }

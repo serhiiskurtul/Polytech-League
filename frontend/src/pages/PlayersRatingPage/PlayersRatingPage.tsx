@@ -112,7 +112,14 @@ const PlayersRatingPage = () => {
     // Filter by gender for Chess/Checkers
     if ((activeTab.toLowerCase() === 'chess' || activeTab.toLowerCase() === 'checkers') && selectedGender !== 'all') {
       result = result.filter(p => {
-        if (!p.patronymic) return false; // Or default to one? Better to hide if unknown or show in "All"
+        // 1. Use explicit gender if set
+        if (p.gender && p.gender !== 'None') {
+          if (selectedGender === 'female') return p.gender === 'Female';
+          if (selectedGender === 'male') return p.gender === 'Male';
+        }
+
+        // 2. Fallback to heuristic based on patronymic
+        if (!p.patronymic) return false;
         const patr = p.patronymic.trim().toLowerCase();
         const isFemale = patr.endsWith('івна') || patr.endsWith('ївна');
         const isMale = patr.endsWith('вич');

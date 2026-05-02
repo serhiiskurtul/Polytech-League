@@ -30,7 +30,8 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
     futsalShirtNumber: initialData.futsalShirtNumber !== null && initialData.futsalShirtNumber !== undefined ? initialData.futsalShirtNumber : '',
     volleyballShirtNumber: initialData.volleyballShirtNumber !== null && initialData.volleyballShirtNumber !== undefined ? initialData.volleyballShirtNumber : '',
     basketballShirtNumber: initialData.basketballShirtNumber !== null && initialData.basketballShirtNumber !== undefined ? initialData.basketballShirtNumber : '',
-    previousNames: initialData.previousNames || ''
+    previousNames: initialData.previousNames || '',
+    gender: initialData.gender || 'None'
   });
 
   const [loading, setLoading] = React.useState(false);
@@ -51,7 +52,8 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
         futsalShirtNumber: initialData.futsalShirtNumber !== null && initialData.futsalShirtNumber !== undefined ? initialData.futsalShirtNumber : '',
         volleyballShirtNumber: initialData.volleyballShirtNumber !== null && initialData.volleyballShirtNumber !== undefined ? initialData.volleyballShirtNumber : '',
         basketballShirtNumber: initialData.basketballShirtNumber !== null && initialData.basketballShirtNumber !== undefined ? initialData.basketballShirtNumber : '',
-        previousNames: initialData.previousNames || ''
+        previousNames: initialData.previousNames || '',
+        gender: initialData.gender || 'None'
       });
     }
   }, [isOpen, initialData]);
@@ -72,6 +74,14 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
     if (formData.studentId && !/^[A-Za-z]{2}\d{8}$/.test(formData.studentId)) {
       import('react-hot-toast').then(({ toast }) => {
         toast.error('Студентський квиток має бути у форматі: 2 літери та 8 цифр (наприклад, PH12345678)');
+      });
+      setLoading(false);
+      return;
+    }
+    
+    if (formData.gender === 'None') {
+      import('react-hot-toast').then(({ toast }) => {
+        toast.error('Будь ласка, оберіть вашу стать. Це обов\'язково для участі в змаганнях.');
       });
       setLoading(false);
       return;
@@ -129,6 +139,26 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
                   onChange={handleChange}
                   required
                 />
+              </div>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label htmlFor="gender">Стать (Обов'язково)</label>
+              <div className={styles.genderToggle}>
+                <button 
+                  type="button" 
+                  className={`${styles.genderOption} ${formData.gender === 'Male' ? styles.activeGender : ''}`}
+                  onClick={() => setFormData(prev => ({ ...prev, gender: 'Male' }))}
+                >
+                  <i className="fas fa-mars"></i> Чоловік
+                </button>
+                <button 
+                  type="button" 
+                  className={`${styles.genderOption} ${formData.gender === 'Female' ? styles.activeGender : ''}`}
+                  onClick={() => setFormData(prev => ({ ...prev, gender: 'Female' }))}
+                >
+                  <i className="fas fa-venus"></i> Жінка
+                </button>
               </div>
             </div>
 

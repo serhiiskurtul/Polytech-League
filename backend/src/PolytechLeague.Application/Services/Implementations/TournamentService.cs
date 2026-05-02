@@ -637,7 +637,8 @@ public class TournamentService : ITournamentService
             TournamentName = e.Name,
             SportType = GetSportName(e),
             Date = e.Date,
-            Points = 0 
+            Points = 0,
+            Gender = e.FirstPlace.Gender
         });
     }
 }

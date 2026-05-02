@@ -149,6 +149,7 @@ public class PlayerService : IPlayerService
         if (dto.InstagramUrl != null) player.InstagramUrl = dto.InstagramUrl;
         if (dto.PreviousNames != null) player.PreviousNames = dto.PreviousNames;
         if (dto.PhotoUrl != null) player.PhotoUrl = dto.PhotoUrl;
+        if (dto.Gender != Gender.None) player.Gender = dto.Gender;
         // Sync name and photo to User entity if it exists
         if (player.UserId.HasValue)
         {

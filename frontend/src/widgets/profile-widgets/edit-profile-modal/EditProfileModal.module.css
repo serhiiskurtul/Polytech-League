@@ -237,3 +237,41 @@
     grid-template-columns: 1fr;
   }
 }
+
+.genderToggle {
+  display: flex;
+  gap: 12px;
+}
+
+.genderOption {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--muted);
+  transition: all 0.2s ease;
+}
+
+.genderOption:hover {
+  background: var(--card);
+  border-color: var(--muted);
+}
+
+.genderOption i {
+  font-size: 16px;
+}
+
+.activeGender {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+

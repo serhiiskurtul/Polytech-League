@@ -11,4 +11,5 @@ public class ChampionDto
     public string SportType { get; set; } = string.Empty;
     public DateTime Date { get; set; }
     public double Points { get; set; }
+    public PolytechLeague.Domain.Entities.Enums.Gender Gender { get; set; }
 }

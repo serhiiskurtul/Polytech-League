@@ -1,9 +1,12 @@
+export type Gender = 'Male' | 'Female' | 'None';
+
 export interface PlayerDto {
     id?: number;
     userId?: number | null;
     firstName: string;
     patronymic?: string | null;
     lastName: string;
+    gender: Gender;
     birthDate?: string | null;
     group?: string | null;
     isGuest?: boolean;

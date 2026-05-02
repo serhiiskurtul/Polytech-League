@@ -54,8 +54,14 @@ const ChampionsPage: React.FC = () => {
 
   const filteredChampions = champions.filter(champion => {
     if ((sport === 'chess' || sport === 'checkers') && selectedGender !== 'all') {
+      // 1. Use explicit gender if available
+      if (champion.gender && champion.gender !== 'None') {
+        if (selectedGender === 'female') return champion.gender === 'Female';
+        if (selectedGender === 'male') return champion.gender === 'Male';
+      }
+
+      // 2. Fallback to heuristic
       const name = champion.playerName.toLowerCase();
-      // Heuristic: check for patronymic suffixes in the full name string
       const isFemale = name.includes('івна') || name.includes('ївна');
       const isMale = name.includes('вич');
       

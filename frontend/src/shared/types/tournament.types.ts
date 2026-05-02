@@ -61,4 +61,5 @@ export interface Champion {
   sportType: string;
   date: string;
   points: number;
+  gender: 'Male' | 'Female' | 'None';
 }

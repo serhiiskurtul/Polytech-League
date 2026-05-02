@@ -2,6 +2,7 @@ using PolytechLeague.Domain.Entities.TableTennis.Enums;
 using PolytechLeague.Domain.Entities.Armwrestling.Enums;
 using PolytechLeague.Domain.Entities.Futsal.Enums;
 using PolytechLeague.Domain.Entities.Volleyball.Enums;
+using PolytechLeague.Domain.Entities.Enums;
 
 namespace PolytechLeague.Domain.Entities;
 
@@ -54,4 +55,5 @@ public class Player : Person
     public bool IsFounder { get; set; } = false;
     public long? CollegeId { get; set; }
     public College? College { get; set; }
+    public Gender Gender { get; set; } = Gender.None;
 }
