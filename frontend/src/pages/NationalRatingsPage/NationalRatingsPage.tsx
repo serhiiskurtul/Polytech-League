@@ -72,6 +72,7 @@ const NationalRatingsPage: React.FC = () => {
       return {
         collegeId: college.id,
         collegeName: college.shortName || college.name,
+        region: college.city || '—',
         points: row?.totalPoints || 0,
         rank: row?.totalRank || '-'
       };
@@ -107,11 +108,15 @@ const NationalRatingsPage: React.FC = () => {
   const exportToExcel = () => {
     if (!ratingData) return;
 
-    const data = ratingData.rows.map(row => ({
-      'Коледж': row.groupName,
-      'Загальна сума очок': row.totalPoints,
-      'Підсумкове місце': row.totalRank
-    }));
+    const data = ratingData.rows.map(row => {
+      const college = colleges.find(c => (c.shortName || c.name) === row.groupName);
+      return {
+        'Коледж': row.groupName,
+        'Регіон': college?.city || '—',
+        'Загальна сума очок': row.totalPoints,
+        'Підсумкове місце': row.totalRank
+      };
+    });
 
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
@@ -198,6 +203,7 @@ const NationalRatingsPage: React.FC = () => {
             <thead>
               <tr>
                 <th className={styles.mainHeader}>Коледж / Навчальний заклади</th>
+                <th className={styles.mainHeader}>Регіон</th>
                 <th className={styles.mainHeader}>Загальна сума очок (О)</th>
                 <th className={styles.mainHeader}>Підсумкове місце (М)</th>
               </tr>
@@ -207,6 +213,7 @@ const NationalRatingsPage: React.FC = () => {
                 editData.map((item) => (
                   <tr key={item.collegeId} className={styles.row}>
                     <td className={styles.collegeCell}>{item.collegeName}</td>
+                    <td className={styles.regionCell}>{item.region}</td>
                     <td className={styles.editCell}>
                       <input 
                         type="number" 
@@ -232,6 +239,12 @@ const NationalRatingsPage: React.FC = () => {
                       <div className={styles.collegeInfo}>
                           <div className={styles.collegeName}>{row.groupName}</div>
                       </div>
+                    </td>
+                    <td className={styles.regionCell}>
+                      {(() => {
+                        const college = colleges.find(c => (c.shortName || c.name) === row.groupName);
+                        return college?.city || '—';
+                      })()}
                     </td>
                     <td className={styles.totalPointsCell}>{row.totalPoints}</td>
                     <td className={styles.totalRankCell}>{row.totalRank}</td>
