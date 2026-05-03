@@ -8,6 +8,7 @@ import { AuthProvider } from './app/providers/AuthContext';
 import { NotificationProvider } from './app/providers/NotificationProvider';
 import { ChatProvider } from './app/providers/ChatProvider';
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Failed to find the root element');
@@ -20,6 +21,7 @@ createRoot(rootElement).render(
           <ChatProvider>
             <App />
             <Analytics />
+            <SpeedInsights />
           </ChatProvider>
         </NotificationProvider>
       </AuthProvider>
