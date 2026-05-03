@@ -31,6 +31,7 @@ public class PlayerDto
     public string? PreviousNames { get; set; }
     public bool IsFounder { get; set; }
     public List<AutomaticBadgeDto> AutomaticBadges { get; set; } = new();
+    public bool HasPendingMergeRequest { get; set; }
 
     // Chess
     public int? ChessRating { get; set; }

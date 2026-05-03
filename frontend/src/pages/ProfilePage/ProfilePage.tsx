@@ -57,6 +57,9 @@ const ProfilePage = () => {
         const data = await getProfile();
         console.log('PLAYER PROFILE DATA:', data);
         setPlayerProfile(data);
+        if (data.hasPendingMergeRequest) {
+          setIsMergeRequestSent(true);
+        }
       } catch (error) {
         console.error("Failed to fetch player profile:", error);
         toast.error("Не вдалося завантажити спортивний профіль");
@@ -69,7 +72,7 @@ const ProfilePage = () => {
   }, []);
 
   useEffect(() => {
-    if (playerProfile && user && archivalMatches.length === 0 && !isMergeRequestSent) {
+    if (playerProfile && user && archivalMatches.length === 0 && !isMergeRequestSent && !playerProfile.hasPendingMergeRequest) {
       // If profile is fresh (Group is Guest) or just has no achievements, check for historical data
       const checkHistory = async () => {
         try {

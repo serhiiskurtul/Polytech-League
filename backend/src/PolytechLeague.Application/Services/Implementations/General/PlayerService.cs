@@ -52,6 +52,8 @@ public class PlayerService : IPlayerService
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
         if (player == null) return null;
         var dto = player.ToDto();
+        dto.HasPendingMergeRequest = await _dbContext.ProfileMergeRequests
+            .AnyAsync(r => r.UserId == (player.UserId ?? 0) && r.Status == RegistrationStatus.Pending, cancellationToken);
         await PopulateAchievementsAsync(dto, cancellationToken); await PopulateAutomaticBadgesAsync(dto, cancellationToken); await PopulateChessSpecialStatsAsync(dto, cancellationToken);
         return dto;
     }
@@ -75,6 +77,8 @@ public class PlayerService : IPlayerService
             .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
         if (player == null) return null;
         var dto = player.ToDto();
+        dto.HasPendingMergeRequest = await _dbContext.ProfileMergeRequests
+            .AnyAsync(r => r.UserId == userId && r.Status == RegistrationStatus.Pending, cancellationToken);
         await PopulateAchievementsAsync(dto, cancellationToken); await PopulateAutomaticBadgesAsync(dto, cancellationToken); await PopulateChessSpecialStatsAsync(dto, cancellationToken);
         return dto;
     }
@@ -957,12 +961,18 @@ public class PlayerService : IPlayerService
     }
     // Profile Merging Logic
 
-    public async Task<IEnumerable<PlayerDto>> FindPotentialArchivalMatchesAsync(string firstName, string lastName, string group, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<PlayerDto>> FindPotentialArchivalMatchesAsync(long userId, string firstName, string lastName, string group, CancellationToken cancellationToken = default)
     {
+        var pendingTargetIds = await _dbContext.ProfileMergeRequests
+            .Where(r => r.UserId == userId && r.Status == RegistrationStatus.Pending)
+            .Select(r => r.TargetPlayerId)
+            .ToListAsync(cancellationToken);
+
         var matches = await _dbContext.Players
             .Where(p => p.UserId == null &&
                         p.FirstName.ToLower() == firstName.ToLower() &&
-                        p.LastName.ToLower() == lastName.ToLower())
+                        p.LastName.ToLower() == lastName.ToLower() &&
+                        !pendingTargetIds.Contains(p.Id))
             .ToListAsync(cancellationToken);
         return matches.Select(p => p.ToDto());
     }

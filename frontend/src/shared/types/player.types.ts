@@ -82,6 +82,7 @@ export interface PlayerDto {
     pointsBreakdown?: PointEntryDto[];
     competitionsCount?: number;
     isExternal?: boolean;
+    hasPendingMergeRequest?: boolean;
 }
 
 

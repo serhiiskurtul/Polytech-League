@@ -165,7 +165,8 @@ public class PlayersController : ControllerBase
     [HttpGet("check-archival")]
     public async Task<ActionResult<IEnumerable<PlayerDto>>> CheckArchival([FromQuery] string firstName, [FromQuery] string lastName, [FromQuery] string group, CancellationToken cancellationToken)
     {
-        var matches = await _playerService.FindPotentialArchivalMatchesAsync(firstName, lastName, group, cancellationToken);
+        var userId = User.GetUserId();
+        var matches = await _playerService.FindPotentialArchivalMatchesAsync(userId, firstName, lastName, group, cancellationToken);
         return Ok(matches);
     }
 
