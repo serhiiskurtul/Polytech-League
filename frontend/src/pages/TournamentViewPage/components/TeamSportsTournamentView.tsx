@@ -717,6 +717,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const handleSetCaptain = async (teamId: number, playerId: number | null) => {
     try {
       const team = details.teams.find((t: any) => t.id === teamId);
+      if (!team) return;
+
       const updateApi = getTeamUpdateApi();
       
       const payload = {
@@ -741,6 +743,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const handleSetGoalkeeper = async (teamId: number, playerId: number | null) => {
     try {
       const team = details.teams.find((t: any) => t.id === teamId);
+      if (!team) return;
+
       const updateApi = getTeamUpdateApi();
       
       const payload = {
@@ -765,6 +769,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const handleToggleGeneralTable = async (teamId: number) => {
     try {
       const team = details.teams.find((t: any) => t.id === teamId);
+      if (!team) return;
+
       const updateApi = getTeamUpdateApi();
       await updateApi(teamId, { ...team, isGeneralTableIncluded: !team.isGeneralTableIncluded });
       onRefresh();
@@ -1678,22 +1684,22 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                                         {(isSelected && (sport === 'futsal' || sport === 'футзал')) && (
                                           <div className={styles.roleToggles}>
                                             <button 
-                                              className={`${styles.roleToggleBtn} ${team.captainId === player.id ? styles.isCaptain : ''}`}
+                                              className={`${styles.roleToggleBtn} ${team?.captainId === player.id ? styles.isCaptain : ''}`}
                                               onClick={(e) => {
                                                 e.stopPropagation();
-                                                handleSetCaptain(editingTeamId, team.captainId === player.id ? null : player.id!);
+                                                handleSetCaptain(editingTeamId, team?.captainId === player.id ? null : player.id!);
                                               }}
-                                              title={team.captainId === player.id ? "Прибрати капітана" : "Призначити капітаном"}
+                                              title={team?.captainId === player.id ? "Прибрати капітана" : "Призначити капітаном"}
                                             >
                                               <i className="fas fa-copyright"></i>
                                             </button>
                                             <button 
-                                              className={`${styles.roleToggleBtn} ${team.goalkeeperId === player.id ? styles.isGoalkeeper : ''}`}
+                                              className={`${styles.roleToggleBtn} ${team?.goalkeeperId === player.id ? styles.isGoalkeeper : ''}`}
                                               onClick={(e) => {
                                                 e.stopPropagation();
-                                                handleSetGoalkeeper(editingTeamId, team.goalkeeperId === player.id ? null : player.id!);
+                                                handleSetGoalkeeper(editingTeamId, team?.goalkeeperId === player.id ? null : player.id!);
                                               }}
-                                              title={team.goalkeeperId === player.id ? "Прибрати воротаря" : "Призначити воротарем"}
+                                              title={team?.goalkeeperId === player.id ? "Прибрати воротаря" : "Призначити воротарем"}
                                             >
                                               <i className="fas fa-hands"></i>
                                             </button>
@@ -1707,7 +1713,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                             );
                         }) : (
                           // Read-only view for regular users
-                          details.teams.find((t: any) => t.id === editingTeamId)?.players?.map((player: any) => (
+                          details?.teams?.find((t: any) => t.id === editingTeamId)?.players?.map((player: any) => (
                             <div key={player.id} className={`${styles.playerPickItem} ${styles.selected}`}>
                                 <div className={styles.pickInfo}>
                                     <span className={styles.pName}>{player.lastName} {player.firstName}</span>
@@ -1716,10 +1722,10 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                                 <div className={styles.pickStatus}>
                                    {((sport === 'futsal' || sport === 'футзал')) && (
                                       <div className={styles.roleToggles}>
-                                        {details.teams.find((t: any) => t.id === editingTeamId).captainId === player.id && (
+                                        {details?.teams?.find((t: any) => t.id === editingTeamId)?.captainId === player.id && (
                                           <span className={styles.isCaptain} title="Капітан"><i className="fas fa-copyright"></i></span>
                                         )}
-                                        {details.teams.find((t: any) => t.id === editingTeamId).goalkeeperId === player.id && (
+                                        {details?.teams?.find((t: any) => t.id === editingTeamId)?.goalkeeperId === player.id && (
                                           <span className={styles.isGoalkeeper} title="Воротар"><i className="fas fa-hands"></i></span>
                                         )}
                                       </div>
@@ -1864,7 +1870,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         <option value="">-- Оберіть воротаря --</option>
                         {(selectedMatchForScorers.homeRoster?.length > 0 
                             ? selectedMatchForScorers.homeRoster 
-                            : details.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players || []
+                            : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players || []
                         ).map((p: any) => (
                           <option key={p.id} value={p.id}>
                             {p.futsalShirtNumber ? `№${p.futsalShirtNumber} ` : ''}{p.lastName} {p.firstName}
@@ -1881,7 +1887,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         <option value="">-- Оберіть капітана --</option>
                         {(selectedMatchForScorers.homeRoster?.length > 0 
                             ? selectedMatchForScorers.homeRoster 
-                            : details.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players || []
+                            : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players || []
                         ).map((p: any) => (
                           <option key={p.id} value={p.id}>
                             {p.futsalShirtNumber ? `№${p.futsalShirtNumber} ` : ''}{p.lastName} {p.firstName}
@@ -1893,7 +1899,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   <div className={styles.scorersList}>
                     {(selectedMatchForScorers.homeRoster?.length > 0 
                         ? selectedMatchForScorers.homeRoster 
-                        : details.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players || []
+                        : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players || []
                     ).map((player: any) => (
                       <div key={player.id} className={styles.scorerInputItem}>
                         <span className={styles.playerNameMini}>
@@ -1911,7 +1917,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         />
                       </div>
                     ))}
-                    {!(selectedMatchForScorers.homeRoster?.length > 0 || details.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players?.length > 0) && (
+                    {!(selectedMatchForScorers.homeRoster?.length > 0 || details?.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players?.length > 0) && (
                         <p className={styles.noPlayersHint}>У цій команді ще немає гравців</p>
                     )}
                   </div>
@@ -1932,7 +1938,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         <option value="">-- Оберіть воротаря --</option>
                         {(selectedMatchForScorers.awayRoster?.length > 0 
                             ? selectedMatchForScorers.awayRoster 
-                            : details.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players || []
+                            : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players || []
                         ).map((p: any) => (
                           <option key={p.id} value={p.id}>
                             {p.futsalShirtNumber ? `№${p.futsalShirtNumber} ` : ''}{p.lastName} {p.firstName}
@@ -1949,7 +1955,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         <option value="">-- Оберіть капітана --</option>
                         {(selectedMatchForScorers.awayRoster?.length > 0 
                             ? selectedMatchForScorers.awayRoster 
-                            : details.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players || []
+                            : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players || []
                         ).map((p: any) => (
                           <option key={p.id} value={p.id}>
                             {p.futsalShirtNumber ? `№${p.futsalShirtNumber} ` : ''}{p.lastName} {p.firstName}
@@ -1961,7 +1967,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   <div className={styles.scorersList}>
                     {(selectedMatchForScorers.awayRoster?.length > 0 
                         ? selectedMatchForScorers.awayRoster 
-                        : details.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players || []
+                        : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players || []
                     ).map((player: any) => (
                       <div key={player.id} className={styles.scorerInputItem}>
                         <span className={styles.playerNameMini}>
@@ -1979,7 +1985,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         />
                       </div>
                     ))}
-                    {!(selectedMatchForScorers.awayRoster?.length > 0 || details.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players?.length > 0) && (
+                    {!(selectedMatchForScorers.awayRoster?.length > 0 || details?.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players?.length > 0) && (
                         <p className={styles.noPlayersHint}>У цій команді ще немає гравців</p>
                     )}
                   </div>
@@ -2026,9 +2032,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                 <div className={styles.teamScorersSection}>
                   <div style={{ marginBottom: '16px' }}>
                     <h5 style={{ color: '#3b82f6' }}>Автори голів</h5>
-                    {selectedMatchForInfo.goals?.filter((g: any) => selectedMatchForInfo.homeRoster?.some((p: any) => p.id === g.playerId) || details.teams.find((t: any) => t.id === selectedMatchForInfo.homeTeamId)?.players?.some((p: any) => p.id === g.playerId)).map((g: any) => (
+                    {selectedMatchForInfo.goals?.filter((g: any) => selectedMatchForInfo.homeRoster?.some((p: any) => p.id === g.playerId) || details?.teams?.find((t: any) => t.id === selectedMatchForInfo.homeTeamId)?.players?.some((p: any) => p.id === g.playerId)).map((g: any) => (
                       <div key={g.id} style={{ fontSize: '14px', margin: '4px 0', fontWeight: 600 }}>
-                        ⚽ {g.player?.lastName || details.teams.find((t: any) => t.id === selectedMatchForInfo.homeTeamId)?.players?.find((p: any) => p.id === g.playerId)?.lastName} - {g.goalsCount}
+                        ⚽ {g.player?.lastName || details?.teams?.find((t: any) => t.id === selectedMatchForInfo.homeTeamId)?.players?.find((p: any) => p.id === g.playerId)?.lastName} - {g.goalsCount}
                       </div>
                     ))}
                   </div>
@@ -2036,7 +2042,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                     {(selectedMatchForInfo.homeRoster?.length > 0 
                         ? selectedMatchForInfo.homeRoster 
-                        : details.teams?.find((t: any) => t.id === selectedMatchForInfo.homeTeamId)?.players || []
+                        : details?.teams?.find((t: any) => t.id === selectedMatchForInfo.homeTeamId)?.players || []
                     ).map((p: any) => (
                       <span key={p.id} style={{ background: '#f1f5f9', padding: '4px 10px', borderRadius: '8px', fontSize: '12px', fontWeight: 600 }}>
                         {p.lastName} {p.id === selectedMatchForInfo.homeCaptainId && <b style={{color: '#f59e0b'}}>(C)</b>} {p.id === selectedMatchForInfo.homeGoalkeeperId && <b style={{color: '#3b82f6'}}>(GK)</b>}
@@ -2051,9 +2057,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                 <div className={styles.teamScorersSection}>
                   <div style={{ marginBottom: '16px' }}>
                     <h5 style={{ color: '#3b82f6' }}>Автори голів</h5>
-                    {selectedMatchForInfo.goals?.filter((g: any) => selectedMatchForInfo.awayRoster?.some((p: any) => p.id === g.playerId) || details.teams.find((t: any) => t.id === selectedMatchForInfo.awayTeamId)?.players?.some((p: any) => p.id === g.playerId)).map((g: any) => (
+                    {selectedMatchForInfo.goals?.filter((g: any) => selectedMatchForInfo.awayRoster?.some((p: any) => p.id === g.playerId) || details?.teams?.find((t: any) => t.id === selectedMatchForInfo.awayTeamId)?.players?.some((p: any) => p.id === g.playerId)).map((g: any) => (
                       <div key={g.id} style={{ fontSize: '14px', margin: '4px 0', fontWeight: 600 }}>
-                        ⚽ {g.player?.lastName || details.teams.find((t: any) => t.id === selectedMatchForInfo.awayTeamId)?.players?.find((p: any) => p.id === g.playerId)?.lastName} - {g.goalsCount}
+                        ⚽ {g.player?.lastName || details?.teams?.find((t: any) => t.id === selectedMatchForInfo.awayTeamId)?.players?.find((p: any) => p.id === g.playerId)?.lastName} - {g.goalsCount}
                       </div>
                     ))}
                   </div>
