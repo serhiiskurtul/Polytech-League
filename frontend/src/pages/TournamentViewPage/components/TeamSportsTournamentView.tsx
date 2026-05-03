@@ -1666,8 +1666,6 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                 />
               </div>
 
-              )}
-
               {isGroupsPlayoff && (
                 <div className={styles.formGroup} style={{ marginTop: '16px' }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
