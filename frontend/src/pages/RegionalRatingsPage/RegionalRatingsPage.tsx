@@ -8,6 +8,12 @@ import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import * as XLSX from 'xlsx';
 
+const ALL_SPORTS = [
+  "Шахи", "Шашки", "Футзал", "Армреслінг", 
+  "Настільний теніс", "Бадмінтон", "Волейбол", 
+  "Баскетбол 3x3", "Пляжний волейбол" 
+];
+
 const RegionalRatingsPage: React.FC = () => {
   const { user } = useAuth();
   const isAdmin = user?.role === 1 || user?.role === '1' || user?.role === 'Admin';
@@ -19,6 +25,7 @@ const RegionalRatingsPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState<any[]>([]);
+  const [activeSports, setActiveSports] = useState<string[]>([]);
   const [showFullName, setShowFullName] = useState(false);
 
   useEffect(() => {
@@ -107,6 +114,7 @@ const RegionalRatingsPage: React.FC = () => {
     });
 
     setEditData(sortedEditData);
+    setActiveSports(ratingData.sports || []);
     setIsEditing(true);
   };
 
@@ -127,7 +135,7 @@ const RegionalRatingsPage: React.FC = () => {
           rank: d.rank?.toString().trim() || '-',
           sportResults: d.sportResults || {}
         }));
-      await updateRegionalRating(selectedSeasonId, entries);
+      await updateRegionalRating(selectedSeasonId, { entries, activeSports });
       toast.success('Рейтинги оновлено');
       setIsEditing(false);
       fetchRating(selectedSeasonId);
@@ -238,6 +246,30 @@ const RegionalRatingsPage: React.FC = () => {
           )}
         </div>
       </header>
+
+      {isEditing && (
+        <div className={styles.sportSelection}>
+          <h3>Виберіть види спорту для відображення:</h3>
+          <div className={styles.sportCheckboxes}>
+            {ALL_SPORTS.map(sport => (
+              <label key={sport} className={styles.sportCheckboxLabel}>
+                <input 
+                  type="checkbox" 
+                  checked={activeSports.includes(sport)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setActiveSports(prev => [...prev, sport]);
+                    } else {
+                      setActiveSports(prev => prev.filter(s => s !== sport));
+                    }
+                  }}
+                />
+                {sport}
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
 
       {seasons.length === 0 ? (
         <div className={styles.emptyState}>

@@ -31,9 +31,9 @@ public class SeasonRatingController : ControllerBase
 
     [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
     [HttpPost("national/{seasonId}")]
-    public async Task<ActionResult> UpdateNationalRating(long seasonId, [FromBody] List<ManualRatingEntryDto> entries)
+    public async Task<ActionResult> UpdateNationalRating(long seasonId, [FromBody] UpdateManualRatingRequestDto request)
     {
-        await _seasonRatingService.UpdateNationalRatingAsync(seasonId, entries);
+        await _seasonRatingService.UpdateNationalRatingAsync(seasonId, request);
         return Ok();
     }
 
@@ -46,9 +46,9 @@ public class SeasonRatingController : ControllerBase
 
     [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
     [HttpPost("regional/{seasonId}")]
-    public async Task<ActionResult> UpdateRegionalRating(long seasonId, [FromBody] List<ManualRatingEntryDto> entries)
+    public async Task<ActionResult> UpdateRegionalRating(long seasonId, [FromBody] UpdateManualRatingRequestDto request)
     {
-        await _seasonRatingService.UpdateRegionalRatingAsync(seasonId, entries);
+        await _seasonRatingService.UpdateRegionalRatingAsync(seasonId, request);
         return Ok();
     }
 

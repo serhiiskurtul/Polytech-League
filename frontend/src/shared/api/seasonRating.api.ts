@@ -21,8 +21,8 @@ export const getNationalRating = async (seasonId: number): Promise<SeasonRatingR
   return response.data;
 };
 
-export const updateNationalRating = async (seasonId: number, entries: any[]): Promise<void> => {
-  await api.post(`/SeasonRating/national/${seasonId}`, entries);
+export const updateNationalRating = async (seasonId: number, data: { entries: any[], activeSports: string[] }): Promise<void> => {
+  await api.post(`/SeasonRating/national/${seasonId}`, data);
 };
 
 export const getRegionalRating = async (seasonId: number): Promise<SeasonRatingResponse> => {
@@ -30,8 +30,8 @@ export const getRegionalRating = async (seasonId: number): Promise<SeasonRatingR
   return response.data;
 };
 
-export const updateRegionalRating = async (seasonId: number, entries: any[]): Promise<void> => {
-  await api.post(`/SeasonRating/regional/${seasonId}`, entries);
+export const updateRegionalRating = async (seasonId: number, data: { entries: any[], activeSports: string[] }): Promise<void> => {
+  await api.post(`/SeasonRating/regional/${seasonId}`, data);
 };
 
 // Admin methods

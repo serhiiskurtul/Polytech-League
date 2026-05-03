@@ -6,9 +6,9 @@ public interface ISeasonRatingService
 {
     Task<SeasonRatingDto> GetSeasonRatingAsync(long seasonId);
     Task<SeasonRatingDto> GetNationalRatingAsync(long seasonId);
-    Task UpdateNationalRatingAsync(long seasonId, List<ManualRatingEntryDto> entries);
+    Task UpdateNationalRatingAsync(long seasonId, UpdateManualRatingRequestDto request);
     Task<SeasonRatingDto> GetRegionalRatingAsync(long seasonId);
-    Task UpdateRegionalRatingAsync(long seasonId, List<ManualRatingEntryDto> entries);
+    Task UpdateRegionalRatingAsync(long seasonId, UpdateManualRatingRequestDto request);
     Task<IEnumerable<SeasonDto>> GetAllSeasonsAsync();
     Task<SeasonDto?> GetCurrentSeasonAsync();
     

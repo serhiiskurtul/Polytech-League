@@ -396,12 +396,20 @@ public class SeasonRatingService : ISeasonRatingService
         var season = await _context.Seasons.FindAsync(seasonId);
         if (season == null) throw new Exception("Season not found");
 
-        var sports = new List<string> 
+        var allSports = new List<string> 
         { 
             "Шахи", "Шашки", "Футзал", "Армреслінг", 
             "Настільний теніс", "Бадмінтон", "Волейбол", 
             "Баскетбол 3x3", "Пляжний волейбол" 
         };
+
+        var sports = allSports;
+        if (!string.IsNullOrEmpty(season.NationalRatingSports))
+        {
+            try {
+                sports = System.Text.Json.JsonSerializer.Deserialize<List<string>>(season.NationalRatingSports) ?? allSports;
+            } catch { /* Use all sports if JSON is invalid */ }
+        }
 
         var colleges = await _context.Colleges.ToListAsync();
         var manualEntries = await _context.NationalRatingManualEntries
@@ -463,10 +471,15 @@ public class SeasonRatingService : ISeasonRatingService
         };
     }
 
-    public async Task UpdateNationalRatingAsync(long seasonId, List<ManualRatingEntryDto> entries)
+    public async Task UpdateNationalRatingAsync(long seasonId, UpdateManualRatingRequestDto request)
     {
         var season = await _context.Seasons.FindAsync(seasonId);
         if (season == null) throw new Exception("Season not found");
+
+        if (request.ActiveSports != null)
+        {
+            season.NationalRatingSports = System.Text.Json.JsonSerializer.Serialize(request.ActiveSports);
+        }
 
         var existingEntries = await _context.NationalRatingManualEntries
             .Where(e => e.SeasonId == seasonId)
@@ -474,7 +487,7 @@ public class SeasonRatingService : ISeasonRatingService
 
         _context.NationalRatingManualEntries.RemoveRange(existingEntries);
 
-        foreach (var entry in entries)
+        foreach (var entry in request.Entries)
         {
             string? sportResultsJson = null;
             if (entry.SportResults != null && entry.SportResults.Count > 0)
@@ -500,12 +513,20 @@ public class SeasonRatingService : ISeasonRatingService
         var season = await _context.Seasons.FindAsync(seasonId);
         if (season == null) throw new Exception("Season not found");
 
-        var sports = new List<string> 
+        var allSports = new List<string> 
         { 
             "Шахи", "Шашки", "Футзал", "Армреслінг", 
             "Настільний теніс", "Бадмінтон", "Волейбол", 
             "Баскетбол 3x3", "Пляжний волейбол" 
         };
+
+        var sports = allSports;
+        if (!string.IsNullOrEmpty(season.RegionalRatingSports))
+        {
+            try {
+                sports = System.Text.Json.JsonSerializer.Deserialize<List<string>>(season.RegionalRatingSports) ?? allSports;
+            } catch { /* Use all sports if JSON is invalid */ }
+        }
 
         var colleges = await _context.Colleges.ToListAsync();
         var manualEntries = await _context.RegionalRatingManualEntries
@@ -567,10 +588,15 @@ public class SeasonRatingService : ISeasonRatingService
         };
     }
 
-    public async Task UpdateRegionalRatingAsync(long seasonId, List<ManualRatingEntryDto> entries)
+    public async Task UpdateRegionalRatingAsync(long seasonId, UpdateManualRatingRequestDto request)
     {
         var season = await _context.Seasons.FindAsync(seasonId);
         if (season == null) throw new Exception("Season not found");
+
+        if (request.ActiveSports != null)
+        {
+            season.RegionalRatingSports = System.Text.Json.JsonSerializer.Serialize(request.ActiveSports);
+        }
 
         var existingEntries = await _context.RegionalRatingManualEntries
             .Where(e => e.SeasonId == seasonId)
@@ -578,7 +604,7 @@ public class SeasonRatingService : ISeasonRatingService
 
         _context.RegionalRatingManualEntries.RemoveRange(existingEntries);
 
-        foreach (var entry in entries)
+        foreach (var entry in request.Entries)
         {
             string? sportResultsJson = null;
             if (entry.SportResults != null && entry.SportResults.Count > 0)

@@ -9,6 +9,9 @@ public class Season
     public DateTime EndDate { get; set; }
     public int? SpartakiadNumber { get; set; }
     
+    public string? NationalRatingSports { get; set; } // JSON list of active sports for national rating
+    public string? RegionalRatingSports { get; set; } // JSON list of active sports for regional rating
+
     public ICollection<Event>? Events { get; set; }
 }
 

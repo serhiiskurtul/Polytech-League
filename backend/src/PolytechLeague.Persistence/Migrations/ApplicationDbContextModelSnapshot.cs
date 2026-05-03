@@ -1498,6 +1498,12 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
+                    b.Property<string>("NationalRatingSports")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RegionalRatingSports")
+                        .HasColumnType("text");
+
                     b.Property<int?>("SpartakiadNumber")
                         .HasColumnType("integer");
 
