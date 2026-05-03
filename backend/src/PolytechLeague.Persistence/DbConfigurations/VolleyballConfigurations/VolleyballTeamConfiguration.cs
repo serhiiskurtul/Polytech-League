@@ -14,5 +14,6 @@ public class VolleyballTeamConfiguration : IEntityTypeConfiguration<VolleyballTe
 
         builder.Property(t => t.Name).IsRequired().HasMaxLength(200);
         builder.Property(t => t.Rank).HasColumnName("rank");
+        builder.Property(t => t.IsGeneralTableIncluded).HasDefaultValue(false);
     }
 }

@@ -20,4 +20,5 @@ public class VolleyballTeam
     public College? College { get; set; }
 
     public string? TournamentGroupName { get; set; }
+    public bool IsGeneralTableIncluded { get; set; } = false;
 }

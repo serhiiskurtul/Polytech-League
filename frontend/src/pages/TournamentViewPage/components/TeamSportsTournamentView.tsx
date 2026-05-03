@@ -108,7 +108,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const [isCreateTeamModalOpen, setIsCreateTeamModalOpen] = useState(false);
   const [newTeamForm, setNewTeamForm] = useState({
     name: '',
-    tournamentGroupName: ''
+    tournamentGroupName: '',
+    isGeneralTableIncluded: false
   });
 
   // Team Roster Management State
@@ -379,7 +380,10 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     let teams = details.teams || [];
     const matches = details.matches || details.games || [];
     
-    if (groupFilter) {
+    if (groupFilter === 'GENERAL_TABLE') {
+      // General Table: teams with flag OR teams with no group at all
+      teams = teams.filter((t: any) => t.isGeneralTableIncluded || !t.tournamentGroupName);
+    } else if (groupFilter) {
       teams = teams.filter((t: any) => t.tournamentGroupName === groupFilter);
     }
     
@@ -400,8 +404,12 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       };
 
       matches.forEach((match: any) => {
-        // Only include group stage matches if we are filtering by group
-        if (groupFilter && match.stage !== 'Груповий етап') return;
+        // For specific group tables, only include group stage matches
+        if (groupFilter && groupFilter !== 'GENERAL_TABLE' && match.stage !== 'Груповий етап') return;
+        
+        // For general table, we can include all matches if needed, or specific ones. 
+        // Usually general table is for final ranking, so we include matches that affect it.
+        // For simplicity, we filter matches by teams involved.
 
         const isChessLike = sport === 'chess' || sport === 'checkers';
         
@@ -485,6 +493,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const isGroupsPlayoff = details.tournamentType === 'GroupsPlayoff';
   const groupNames = Array.from(new Set((details.teams || []).map((t: any) => t.tournamentGroupName).filter(Boolean))) as string[];
   const sortedGroups = groupNames.sort();
+  
+  const generalTableTeams = (details.teams || []).filter((t: any) => t.isGeneralTableIncluded || !t.tournamentGroupName);
+  const hasGeneralTable = generalTableTeams.length > 0;
   
   // For GroupsPlayoff, we show multiple tables. For others, just one.
   const standingsData = !isGroupsPlayoff ? calculateStandings() : [];
@@ -585,10 +596,10 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         return;
       }
 
-      const payload = {
         name: newTeamForm.name,
         eventId: details.id,
-        tournamentGroupName: newTeamForm.tournamentGroupName || null
+        tournamentGroupName: newTeamForm.tournamentGroupName || null,
+        isGeneralTableIncluded: newTeamForm.isGeneralTableIncluded
       };
 
       let createApi;
@@ -610,7 +621,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       await createApi(payload);
 
       setIsCreateTeamModalOpen(false);
-      setNewTeamForm({ name: '', tournamentGroupName: '' });
+      setNewTeamForm({ name: '', tournamentGroupName: '', isGeneralTableIncluded: false });
       onRefresh();
     } catch (err) {
       console.error('Create Team Error:', err);
@@ -747,6 +758,18 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     } catch (err) {
       console.error(err);
       alert('Помилка при призначенні воротаря');
+    }
+  };
+  
+  const handleToggleGeneralTable = async (teamId: number) => {
+    try {
+      const team = details.teams.find((t: any) => t.id === teamId);
+      const updateApi = getTeamUpdateApi();
+      await updateApi(teamId, { ...team, isGeneralTableIncluded: !team.isGeneralTableIncluded });
+      onRefresh();
+    } catch (err) {
+      console.error(err);
+      alert('Помилка при зміні статусу загальної таблиці');
     }
   };
 
@@ -1187,8 +1210,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         {activeTab === 'standings' && (
           <div className={styles.standingsSection}>
             {isGroupsPlayoff ? (
-              sortedGroups.length > 0 ? (
-                sortedGroups.map(groupName => (
+              <>
+                {sortedGroups.map(groupName => (
                   <div key={groupName} className={styles.groupStandings}>
                     <h3 className={styles.groupTitle}>Група {groupName}</h3>
                     <div className={styles.standingsTable}>
@@ -1232,53 +1255,117 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       </table>
                     </div>
                   </div>
-                ))
-              ) : (
-                <p className={styles.noData}>Команди ще не розподілені по групах</p>
-              )
+                ))}
+                
+                {hasGeneralTable && (
+                   <div className={styles.groupStandings} style={{ marginTop: '40px', borderTop: '2px solid #3b82f6', paddingTop: '20px' }}>
+                      <h3 className={styles.groupTitle} style={{ color: '#3b82f6' }}>
+                        <i className="fas fa-star" style={{ marginRight: '8px' }}></i>
+                        Загальна таблиця (Фінальний етап)
+                      </h3>
+                      <div className={styles.standingsTable}>
+                        <table className={styles.leagueTable}>
+                          <thead>
+                            <tr>
+                              <th title="Місце">#</th>
+                              <th title="Назва команди">Команда</th>
+                              <th title="Ігри">І</th>
+                              <th title="Виграші">В</th>
+                              <th title="Поразки">П</th>
+                              <th title="Забиті - Пропущені">Сети (З-П)</th>
+                              <th title="Очки">Очки</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {calculateStandings('GENERAL_TABLE').map((team: any) => (
+                              <tr key={team.id} style={team.isGeneralTableIncluded ? { backgroundColor: 'rgba(59, 130, 246, 0.05)' } : {}}>
+                                <td>{team.displayRank}</td>
+                                <td className={styles.tableName}>
+                                  {team.name}
+                                  {team.isGeneralTableIncluded && <i className="fas fa-check-circle" style={{ marginLeft: '6px', color: '#3b82f6', fontSize: '12px' }} title="Додано вручну"></i>}
+                                </td>
+                                <td>{team.gp}</td>
+                                <td>{team.w}</td>
+                                <td>{team.l}</td>
+                                <td>{team.gf} - {team.ga}</td>
+                                <td className={team.points > 0 ? styles.tablePointsHighlight : styles.tablePoints}>
+                                  {isAdmin ? (
+                                    <input 
+                                      type="number" 
+                                      min="0"
+                                      className={styles.pointsInlineInput}
+                                      defaultValue={team.points}
+                                      onBlur={(e) => handleUpdateTeamPoints(team.id, parseInt(e.target.value) || 0)}
+                                    />
+                                  ) : (
+                                    team.points
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                   </div>
+                )}
+              </>
             ) : (
               <div className={styles.standingsTable}>
-                <table className={styles.leagueTable}>
-                  <thead>
-                    <tr>
-                      <th title="Місце">#</th>
-                      <th title="Назва команди">Команда</th>
-                      <th title="Ігри">І</th>
-                      <th title="Виграші">В</th>
-                      <th title="Нічиї">Н</th>
-                      <th title="Поразки">П</th>
-                      <th title="Забиті - Пропущені">М'ячі (З-П)</th>
-                      <th title="Очки">Очки</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {standingsData.map((team: any) => (
-                      <tr key={team.id}>
-                        <td>{team.displayRank}</td>
-                        <td className={styles.tableName}>{team.name}</td>
-                        <td>{team.gp}</td>
-                        <td>{team.w}</td>
-                        <td>{team.d}</td>
-                        <td>{team.l}</td>
-                        <td>{team.gf} - {team.ga}</td>
-                        <td className={styles.tablePoints}>
-                          {isAdmin ? (
-                            <input 
-                              type="number" 
-                              min="0"
-                              className={styles.pointsInlineInput}
-                              defaultValue={team.points}
-                              onBlur={(e) => handleUpdateTeamPoints(team.id, parseInt(e.target.value) || 0)}
-                            />
-                          ) : (
-                            team.points
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                {/* Regular Standing Table logic here if not GroupsPlayoff */}
               </div>
+            )}
+
+            {/* General Table Section (Optional for Volleyball GroupsPlayoff or manual) */}
+            {isGroupsPlayoff && hasGeneralTable && (
+               <div className={styles.groupStandings} style={{ marginTop: '40px', borderTop: '2px solid #3b82f6', paddingTop: '20px' }}>
+                  <h3 className={styles.groupTitle} style={{ color: '#3b82f6' }}>
+                    <i className="fas fa-star" style={{ marginRight: '8px' }}></i>
+                    Загальна таблиця (Фінальний етап)
+                  </h3>
+                  <div className={styles.standingsTable}>
+                    <table className={styles.leagueTable}>
+                      <thead>
+                        <tr>
+                          <th title="Місце">#</th>
+                          <th title="Назва команди">Команда</th>
+                          <th title="Ігри">І</th>
+                          <th title="Виграші">В</th>
+                          <th title="Поразки">П</th>
+                          <th title="Забиті - Пропущені">Сети (З-П)</th>
+                          <th title="Очки">Очки</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {calculateStandings('GENERAL_TABLE').map((team: any) => (
+                          <tr key={team.id} style={team.isGeneralTableIncluded ? { backgroundColor: 'rgba(59, 130, 246, 0.05)' } : {}}>
+                            <td>{team.displayRank}</td>
+                            <td className={styles.tableName}>
+                              {team.name}
+                              {team.isGeneralTableIncluded && <i className="fas fa-check-circle" style={{ marginLeft: '6px', color: '#3b82f6', fontSize: '12px' }} title="Додано вручну"></i>}
+                            </td>
+                            <td>{team.gp}</td>
+                            <td>{team.w}</td>
+                            <td>{team.l}</td>
+                            <td>{team.gf} - {team.ga}</td>
+                            <td className={styles.tablePoints}>
+                              {isAdmin ? (
+                                <input 
+                                  type="number" 
+                                  min="0"
+                                  className={styles.pointsInlineInput}
+                                  defaultValue={team.points}
+                                  onBlur={(e) => handleUpdateTeamPoints(team.id, parseInt(e.target.value) || 0)}
+                                />
+                              ) : (
+                                team.points
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+               </div>
             )}
           </div>
         )}
@@ -1312,6 +1399,23 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       </button>
                       <button className={styles.deleteTeamBtn} onClick={() => handleDeleteTeam(team.id, team.name)} title="Видалити команду">
                         <i className="fas fa-trash"></i>
+                      </button>
+                      <button 
+                        className={`${styles.generalTableBtn} ${team.isGeneralTableIncluded ? styles.active : ''}`} 
+                        onClick={() => handleToggleGeneralTable(team.id)}
+                        title={team.isGeneralTableIncluded ? "Прибрати із загальної таблиці" : "Додати в загальну таблицю"}
+                        style={{
+                          background: team.isGeneralTableIncluded ? '#3b82f6' : '#f1f5f9',
+                          color: team.isGeneralTableIncluded ? '#fff' : '#64748b',
+                          border: 'none',
+                          padding: '6px 10px',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          fontSize: '14px'
+                        }}
+                      >
+                        <i className="fas fa-star"></i>
                       </button>
                     </div>
                   )}
@@ -1547,15 +1651,22 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                 />
               </div>
 
+              )}
+
               {isGroupsPlayoff && (
-                <div className={styles.formGroup}>
-                  <label>Турнірна група (для етапів)</label>
-                  <input 
-                    type="text" 
-                    value={newTeamForm.tournamentGroupName} 
-                    onChange={e => setNewTeamForm({...newTeamForm, tournamentGroupName: e.target.value})}
-                    placeholder="напр. А або Б"
-                  />
+                <div className={styles.formGroup} style={{ marginTop: '16px' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <input 
+                      type="checkbox" 
+                      checked={newTeamForm.isGeneralTableIncluded} 
+                      onChange={e => setNewTeamForm({...newTeamForm, isGeneralTableIncluded: e.target.checked})}
+                      style={{ width: '18px', height: '18px' }}
+                    />
+                    Включити в загальну таблицю
+                  </label>
+                  <p style={{ fontSize: '12px', color: '#94a3b8', marginLeft: '26px', marginTop: '4px' }}>
+                    Команда з'явиться у фінальному рейтингу турніру
+                  </p>
                 </div>
               )}
 
