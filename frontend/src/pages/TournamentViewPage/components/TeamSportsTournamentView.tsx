@@ -95,6 +95,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const [activeTab, setActiveTab] = useState<'standings' | 'matches' | 'teams' | 'info' | 'bracket' | 'participants'>((sport === 'futsal' || sport === 'футзал') ? 'bracket' : 'matches');
   const [allPlayers, setAllPlayers] = useState<PlayerDto[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const isRegionalOrNational = details?.level === 'Regional' || details?.level === 'National';
   
   // Create Match State
   const [isCreateMatchModalOpen, setIsCreateMatchModalOpen] = useState(false);
@@ -921,7 +922,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
             <button className={activeTab === 'bracket' ? styles.activeTab : ''} onClick={() => setActiveTab('bracket')}>Сітка</button>
           )}
           <button className={activeTab === 'teams' ? styles.activeTab : ''} onClick={() => setActiveTab('teams')}>Команди</button>
-          {isAdmin && (
+          {isAdmin && !isRegionalOrNational && (
             <button className={activeTab === 'participants' ? styles.activeTab : ''} onClick={() => setActiveTab('participants')}>
               Учасники {details.participants?.filter((p: any) => p.status === RegistrationStatus.Pending)?.length > 0 && (
                 <span style={{ 
@@ -1363,23 +1364,6 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       <button className={styles.deleteTeamBtn} onClick={() => handleDeleteTeam(team.id, team.name)} title="Видалити команду">
                         <i className="fas fa-trash"></i>
                       </button>
-                      <button 
-                        className={`${styles.generalTableBtn} ${team.isGeneralTableIncluded ? styles.active : ''}`} 
-                        onClick={() => handleToggleGeneralTable(team.id)}
-                        title={team.isGeneralTableIncluded ? "Прибрати із загальної таблиці" : "Додати в загальну таблицю"}
-                        style={{
-                          background: team.isGeneralTableIncluded ? '#3b82f6' : '#f1f5f9',
-                          color: team.isGeneralTableIncluded ? '#fff' : '#64748b',
-                          border: 'none',
-                          padding: '6px 10px',
-                          borderRadius: '8px',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s',
-                          fontSize: '14px'
-                        }}
-                      >
-                        <i className="fas fa-star"></i>
-                      </button>
                     </div>
                   )}
                 </div>
@@ -1400,7 +1384,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           </div>
         )}
 
-        {activeTab === 'participants' && (
+        {activeTab === 'participants' && !isRegionalOrNational && (
           <div className={styles.participantsList}>
             <div className={styles.tableWrapper}>
               <table className={styles.dataTable}>
