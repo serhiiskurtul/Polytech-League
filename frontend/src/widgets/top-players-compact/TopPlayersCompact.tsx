@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import styles from './TopPlayersCompact.module.css';
 import { getPlayersRankings } from '@/shared/api/players.api';
+import { getCurrentSeason } from '@/shared/api/seasonRating.api';
 import { PlayerDto } from '@/shared/types/player.types';
 import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '@/shared/api/axiosInstance';
@@ -29,7 +30,16 @@ const TopPlayersCompact = () => {
     const fetchRankings = async () => {
       try {
         setLoading(true);
-        const data = await getPlayersRankings();
+        // First try to get current season to show seasonal rankings
+        let seasonId = undefined;
+        try {
+          const currentSeason = await getCurrentSeason();
+          if (currentSeason) seasonId = currentSeason.id;
+        } catch (e) {
+          console.error('Could not fetch current season, falling back to all-time', e);
+        }
+        
+        const data = await getPlayersRankings(seasonId);
         setPlayers(data);
       } catch (error) {
         console.error('Помилка при завантаженні рейтингів:', error);
