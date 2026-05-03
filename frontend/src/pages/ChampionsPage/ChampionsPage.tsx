@@ -7,7 +7,6 @@ import styles from './ChampionsPage.module.css';
 const ChampionsPage: React.FC = () => {
   const { sport } = useParams<{ sport: string }>();
   const [champions, setChampions] = useState<Champion[]>([]);
-  const [selectedGender, setSelectedGender] = useState<'all' | 'male' | 'female'>('all');
   const [loading, setLoading] = useState(true);
 
   const getSportTitle = (sportType: string) => {
@@ -49,27 +48,7 @@ const ChampionsPage: React.FC = () => {
     };
 
     fetchChampions();
-    setSelectedGender('all');
   }, [sport]);
-
-  const filteredChampions = champions.filter(champion => {
-    if ((sport === 'chess' || sport === 'checkers') && selectedGender !== 'all') {
-      // 1. Use explicit gender if available
-      if (champion.gender && champion.gender !== 'None') {
-        if (selectedGender === 'female') return champion.gender === 'Female';
-        if (selectedGender === 'male') return champion.gender === 'Male';
-      }
-
-      // 2. Fallback to heuristic
-      const name = champion.playerName.toLowerCase();
-      const isFemale = name.includes('івна') || name.includes('ївна');
-      const isMale = name.includes('вич');
-      
-      if (selectedGender === 'female') return isFemale;
-      if (selectedGender === 'male') return isMale;
-    }
-    return true;
-  });
 
   if (loading) {
     return (
@@ -98,30 +77,7 @@ const ChampionsPage: React.FC = () => {
           <Link to="/hall-of-fame/armwrestling" className={`${styles.filterBtn} ${sport === 'armwrestling' ? styles.active : ''}`}>Армреслінг</Link>
         </div>
 
-        {(sport === 'chess' || sport === 'checkers') && (
-          <div className={styles.genderFilters}>
-            <button 
-              className={`${styles.genderBtn} ${selectedGender === 'all' ? styles.activeGender : ''}`}
-              onClick={() => setSelectedGender('all')}
-            >
-              Всі
-            </button>
-            <button 
-              className={`${styles.genderBtn} ${selectedGender === 'male' ? styles.activeGender : ''}`}
-              onClick={() => setSelectedGender('male')}
-            >
-              Чоловіки
-            </button>
-            <button 
-              className={`${styles.genderBtn} ${selectedGender === 'female' ? styles.activeGender : ''}`}
-              onClick={() => setSelectedGender('female')}
-            >
-              Жінки
-            </button>
-          </div>
-        )}
-
-        {filteredChampions.length === 0 ? (
+        {champions.length === 0 ? (
           <div className={styles.emptyState}>
             <i className="fas fa-award" style={{ fontSize: '4rem', opacity: 0.1, marginBottom: '1.5rem' }}></i>
             <p>Чемпіонів у цій категорії поки не визначено</p>
