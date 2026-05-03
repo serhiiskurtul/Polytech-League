@@ -39,7 +39,7 @@ public class FutsalTeamService(
 
     public override async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
     {
-        // 1. Get EventId and PlayerIds directly from the database tables for maximum reliability
+        // 1. Get EventId directly
         var eventId = await _dbcontext.FutsalTeams
             .Where(t => t.Id == id)
             .Select(t => t.EventId)
@@ -51,6 +51,33 @@ public class FutsalTeamService(
             return;
         }
 
+        // 2. Clean up Matches and Goals
+        var matchIds = await _dbcontext.FutsalMatches
+            .Where(m => m.HomeTeamId == id || m.AwayTeamId == id)
+            .Select(m => m.Id)
+            .ToListAsync(cancellationToken);
+
+        if (matchIds.Any())
+        {
+            await _dbcontext.FutsalGoals
+                .Where(g => matchIds.Contains(g.MatchId))
+                .ExecuteDeleteAsync(cancellationToken);
+
+            await _dbcontext.FutsalMatches
+                .Where(m => matchIds.Contains(m.Id))
+                .ExecuteDeleteAsync(cancellationToken);
+        }
+
+        // 3. Clear winner placeholders in the event
+        await _dbcontext.FutsalEvents
+            .Where(e => e.Id == eventId && (e.FirstPlaceTeamId == id || e.SecondPlaceTeamId == id || e.ThirdPlaceTeamId == id))
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(e => e.FirstPlaceTeamId, e => e.FirstPlaceTeamId == id ? null : e.FirstPlaceTeamId)
+                .SetProperty(e => e.SecondPlaceTeamId, e => e.SecondPlaceTeamId == id ? null : e.SecondPlaceTeamId)
+                .SetProperty(e => e.ThirdPlaceTeamId, e => e.ThirdPlaceTeamId == id ? null : e.ThirdPlaceTeamId), 
+                cancellationToken);
+
+        // 4. Clean up Players and Participants
         var playerIds = await _dbcontext.Players
             .Where(p => p.FutsalTeamId == id)
             .Select(p => p.Id)
@@ -58,12 +85,10 @@ public class FutsalTeamService(
 
         if (playerIds.Any())
         {
-            // 2. Bulk delete associated participants
             await _dbcontext.FutsalEventParticipants
                 .Where(p => p.EventId == eventId && playerIds.Contains(p.PlayerId))
                 .ExecuteDeleteAsync(cancellationToken);
 
-            // 3. Clear FutsalTeamId for all players in this team
             await _dbcontext.Players
                 .Where(p => p.FutsalTeamId == id)
                 .ExecuteUpdateAsync(s => s.SetProperty(p => p.FutsalTeamId, (long?)null), cancellationToken);
