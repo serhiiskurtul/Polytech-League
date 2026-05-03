@@ -12,6 +12,12 @@
   color: var(--text-secondary);
 }
 
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 .customInput {
   width: 100%;
   padding: 16px 18px;
@@ -22,6 +28,10 @@
   color: var(--text);
   transition: border 0.3s, box-shadow 0.3s;
   font-family: var(--nav-font-family);
+}
+
+.passwordInput {
+  padding-right: 50px;
 }
 
 .customInput:focus {
@@ -36,6 +46,26 @@
 
 .inputError:focus {
   box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.15);
+}
+
+.passwordToggle {
+  position: absolute;
+  right: 18px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: color 0.2s;
+  z-index: 1;
+}
+
+.passwordToggle:hover {
+  color: var(--primary);
 }
 
 .errorMessage {
