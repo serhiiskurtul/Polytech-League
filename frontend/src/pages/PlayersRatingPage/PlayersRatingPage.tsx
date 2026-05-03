@@ -166,7 +166,7 @@ const PlayersRatingPage = () => {
       }
       return (b.performanceScore || 0) - (a.performanceScore || 0);
     });
-  }, [players, activeTab, searchQuery, selectedWeightClass, sortBy]);
+  }, [players, activeTab, searchQuery, selectedWeightClass, sortBy, selectedGender]);
 
   const getSportInfo = (sportKey: string) => {
     switch (sportKey.toLowerCase()) {

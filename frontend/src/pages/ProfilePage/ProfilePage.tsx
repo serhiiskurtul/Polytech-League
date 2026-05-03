@@ -126,7 +126,8 @@ const ProfilePage = () => {
 
     globalRank: playerProfile?.globalRank,
     isFounder: playerProfile?.isFounder,
-    automaticBadges: playerProfile?.automaticBadges
+    automaticBadges: playerProfile?.automaticBadges,
+    gender: playerProfile?.gender
   };
 
   const stats = {

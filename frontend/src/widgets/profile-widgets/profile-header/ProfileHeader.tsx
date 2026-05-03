@@ -24,6 +24,7 @@ interface UserData {
     seasonName?: string;
     icon?: string;
   }>;
+  gender?: string;
 }
 
 
@@ -166,6 +167,16 @@ const ProfileHeader = ({ userData, isAdmin, onEdit, onAvatarUpload, onLogout, on
                 <span className={styles.detailLabel}><i className="fas fa-map-marker-alt"></i> Місто</span>
                 <span className={styles.detailValue}>{userData.city}</span>
               </div>
+              {userData.gender && userData.gender !== 'None' && (
+                <div className={styles.detailItem}>
+                  <span className={styles.detailLabel}>
+                    <i className={userData.gender === 'Female' ? "fas fa-venus" : "fas fa-mars"}></i> Стать
+                  </span>
+                  <span className={styles.detailValue}>
+                    {userData.gender === 'Female' ? 'Жінка' : 'Чоловік'}
+                  </span>
+                </div>
+              )}
               {userData.futsalShirtNumber !== null && userData.futsalShirtNumber !== undefined && (
                 <div className={styles.detailItem}>
                   <span className={styles.detailLabel}><i className="fas fa-tshirt" style={{ color: '#e11d48' }}></i> № Футзал</span>
