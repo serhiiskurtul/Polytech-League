@@ -66,6 +66,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
   const [newParticipant, setNewParticipant] = useState({
     firstName: '',
     lastName: '',
+    patronymic: '',
     group: '',
     userId: null as number | null,
     existingPlayerId: null as number | null,
@@ -170,8 +171,18 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
 
   const handleQuickAddPlayer = async (fullName: string, playerNum: 1 | 2) => {
     const parts = fullName.trim().split(/\s+/);
-    const firstName = parts[0] || 'Гравець';
-    const lastName = parts.slice(1).join(' ') || 'Новий';
+    let firstName = 'Гравець';
+    let lastName = 'Новий';
+    let patronymic = '';
+
+    if (parts.length >= 3) {
+      firstName = parts[0];
+      patronymic = parts[1];
+      lastName = parts.slice(2).join(' ');
+    } else {
+      firstName = parts[0] || 'Гравець';
+      lastName = parts.slice(1).join(' ') || 'Новий';
+    }
 
     // 1. Check if ANY player with this name already exists in DB
     const existing = allPlayers.find(p =>
@@ -191,6 +202,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
         const created = await createPlayer({
           firstName,
           lastName,
+          patronymic,
           group: 'Гість',
           city: 'Київ',
           gender
@@ -387,6 +399,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
         const created = await createPlayer({
           firstName: newParticipant.firstName,
           lastName: newParticipant.lastName,
+          patronymic: newParticipant.patronymic || null,
           group: newParticipant.group,
           userId: newParticipant.userId,
           city: 'Київ',
@@ -408,7 +421,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
       toast.success('Учасника успішно додано до змагання!');
 
       setShowAddPlayer(false);
-      setNewParticipant({ firstName: '', lastName: '', group: '', userId: null, existingPlayerId: null, gender: 'None' });
+      setNewParticipant({ firstName: '', lastName: '', patronymic: '', group: '', userId: null, existingPlayerId: null, gender: 'None' });
       loadPlayers();
       onRefresh();
     } catch (err) {
@@ -751,20 +764,26 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
                   )}
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
-                  <input
-                    placeholder="Ім'я"
-                    value={newParticipant.firstName}
-                    onChange={(e) => setNewParticipant({ ...newParticipant, firstName: e.target.value })}
-                    style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}
-                  />
-                  <input
-                    placeholder="Прізвище"
-                    value={newParticipant.lastName}
-                    onChange={(e) => setNewParticipant({ ...newParticipant, lastName: e.target.value })}
-                    style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}
-                  />
-                </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '8px' }}>
+                    <input
+                      placeholder="Прізвище"
+                      value={newParticipant.lastName}
+                      onChange={(e) => setNewParticipant({ ...newParticipant, lastName: e.target.value })}
+                      style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}
+                    />
+                    <input
+                      placeholder="Ім'я"
+                      value={newParticipant.firstName}
+                      onChange={(e) => setNewParticipant({ ...newParticipant, firstName: e.target.value })}
+                      style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}
+                    />
+                    <input
+                      placeholder="По батькові"
+                      value={newParticipant.patronymic}
+                      onChange={(e) => setNewParticipant({ ...newParticipant, patronymic: e.target.value })}
+                      style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}
+                    />
+                  </div>
                 <input
                   placeholder="Група (напр. 211)"
                   value={newParticipant.group}

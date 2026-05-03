@@ -125,7 +125,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
   // Quick Add Player State
   const [isQuickAddMode, setIsQuickAddMode] = useState(false);
-  const [quickAddForm, setQuickAddForm] = useState({ firstName: '', lastName: '', group: '', gender: 'None' as Gender });
+  const [quickAddForm, setQuickAddForm] = useState({ firstName: '', lastName: '', patronymic: '', group: '', gender: 'None' as Gender });
 
   // Olympic Filtering State
   const [roundNumber, setRoundNumber] = useState(1);
@@ -760,6 +760,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       const newPlayer = await createPlayer({
         firstName: quickAddForm.firstName,
         lastName: quickAddForm.lastName,
+        patronymic: quickAddForm.patronymic || null,
         group: quickAddForm.group,
         city: 'Чернівці',
         gender: quickAddForm.gender
@@ -772,7 +773,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       await loadAllPlayers();
       
       // Reset form
-      setQuickAddForm({ firstName: '', lastName: '', group: '', gender: 'None' });
+      setQuickAddForm({ firstName: '', lastName: '', patronymic: '', group: '', gender: 'None' });
       setIsQuickAddMode(false);
       setSearchQuery('');
     } catch (err) {
@@ -1690,6 +1691,15 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         placeholder="напр. Іван"
                       />
                     </div>
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label>По батькові (необов'язково)</label>
+                    <input 
+                      type="text" 
+                      value={quickAddForm.patronymic} 
+                      onChange={e => setQuickAddForm({...quickAddForm, patronymic: e.target.value})}
+                      placeholder="напр. Миколайович"
+                    />
                   </div>
                   <div className={styles.formGroup}>
                     <label>Група / Статус</label>
