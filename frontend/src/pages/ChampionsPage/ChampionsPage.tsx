@@ -93,11 +93,11 @@ const ChampionsPage: React.FC = () => {
                 <div className={styles.yearBadge}>{champion.seasonName}</div>
                 <div className={styles.photoWrapper}>
                   <img
-                    src={champion.playerPhotoUrl || '/images/placeholders/user.png'}
+                    src={champion.playerPhotoUrl || '/champion-placeholder.png'}
                     alt={champion.playerName}
                     className={styles.playerPhoto}
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/images/placeholders/user.png';
+                      (e.target as HTMLImageElement).src = '/champion-placeholder.png';
                     }}
                   />
                   <div className={styles.medal}>
