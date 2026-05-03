@@ -595,7 +595,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         alert('Будь ласка, введіть назву команди');
         return;
       }
-
+      const payload = {
         name: newTeamForm.name,
         eventId: details.id,
         tournamentGroupName: newTeamForm.tournamentGroupName || null,
