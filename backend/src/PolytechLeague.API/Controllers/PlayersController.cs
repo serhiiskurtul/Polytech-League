@@ -202,5 +202,22 @@ public class PlayersController : ControllerBase
         await _playerService.RejectMergeRequestAsync(id, comment, cancellationToken);
         return Ok();
     }
+
+    [Authorize(Policy = "Admin")]
+    [HttpGet("merge-requests/all")]
+    public async Task<ActionResult<IEnumerable<ProfileMergeRequestDto>>> GetAllMergeRequests(CancellationToken cancellationToken)
+    {
+        var requests = await _playerService.GetAllMergeRequestsAsync(cancellationToken);
+        return Ok(requests);
+    }
+
+    [Authorize]
+    [HttpPost("merge-requests/ignore")]
+    public async Task<IActionResult> IgnoreMergeRequest([FromQuery] long targetPlayerId, CancellationToken cancellationToken)
+    {
+        var userId = User.GetUserId();
+        await _playerService.IgnoreMergeRequestAsync(userId, targetPlayerId, cancellationToken);
+        return Ok();
+    }
 }
 

@@ -18,7 +18,9 @@ public interface IPlayerService
     Task<IEnumerable<PlayerDto>> FindPotentialArchivalMatchesAsync(long userId, string firstName, string lastName, string group, CancellationToken cancellationToken = default);
     Task CreateMergeRequestAsync(long userId, long targetPlayerId, CancellationToken cancellationToken = default);
     Task<IEnumerable<ProfileMergeRequestDto>> GetPendingMergeRequestsAsync(CancellationToken cancellationToken = default);
+    Task<IEnumerable<ProfileMergeRequestDto>> GetAllMergeRequestsAsync(CancellationToken cancellationToken = default);
     Task ApproveMergeRequestAsync(long requestId, CancellationToken cancellationToken = default);
     Task RejectMergeRequestAsync(long requestId, string comment, CancellationToken cancellationToken = default);
+    Task IgnoreMergeRequestAsync(long userId, long targetPlayerId, CancellationToken cancellationToken = default);
 }
 

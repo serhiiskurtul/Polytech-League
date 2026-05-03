@@ -81,3 +81,12 @@ export const rejectMergeRequest = async (id: number, comment: string): Promise<v
     await api.post(`/players/merge-requests/${id}/reject?comment=${comment}`);
 };
 
+export const ignoreMergeRequest = async (targetPlayerId: number): Promise<void> => {
+    await api.post(`/players/merge-requests/ignore?targetPlayerId=${targetPlayerId}`);
+};
+
+export const getAllMergeRequests = async (): Promise<any[]> => {
+    const response = await api.get<any[]>('/players/merge-requests/all');
+    return response.data;
+};
+

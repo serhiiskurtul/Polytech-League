@@ -10,14 +10,76 @@
     padding: 24px;
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 20px;
     transition: transform 0.2s;
 }
 
-.requestCard:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f3f4f6;
+    padding-bottom: 12px;
+}
+
+.headerRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.viewToggle {
+    display: flex;
+    background: #f3f4f6;
+    padding: 4px;
+    border-radius: 8px;
+    gap: 4px;
+}
+
+.viewToggle button {
+    border: none;
+    background: transparent;
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.viewToggle button.activeTab {
+    background: white;
+    color: #3b82f6;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+}
+
+.date {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.statusPending, .statusApproved, .statusRejected, .statusIgnored {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.statusPending { background: #eff6ff; color: #3b82f6; }
+.statusApproved { background: #ecfdf5; color: #10b981; }
+.statusRejected { background: #fef2f2; color: #ef4444; }
+.statusIgnored { background: #f3f4f6; color: #6b7280; }
+
+.comment {
+    background: #f9fafb;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #4b5563;
+    border-left: 4px solid #d1d5db;
 }
 
 .requestInfo {
@@ -60,6 +122,7 @@
 .actions {
     display: flex;
     gap: 12px;
+    margin-left: auto;
 }
 
 .approveBtn {
@@ -99,24 +162,31 @@
 }
 
 @media (max-width: 768px) {
-    .requestCard {
+    .headerRow {
         flex-direction: column;
         align-items: flex-start;
-        gap: 20px;
+        gap: 15px;
+    }
+
+    .requestCard {
+        align-items: flex-start;
     }
     
     .requestInfo {
         flex-direction: column;
         align-items: flex-start;
         gap: 15px;
+        width: 100%;
     }
     
     .arrow {
         transform: rotate(90deg);
+        align-self: center;
     }
     
     .actions {
         width: 100%;
+        margin-left: 0;
     }
     
     .approveBtn, .rejectBtn {

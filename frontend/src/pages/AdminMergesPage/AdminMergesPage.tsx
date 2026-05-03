@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
-import { getPendingMergeRequests, approveMergeRequest, rejectMergeRequest } from '@/shared/api/players.api';
+import { getPendingMergeRequests, approveMergeRequest, rejectMergeRequest, getAllMergeRequests } from '@/shared/api/players.api';
 import { toast } from 'react-hot-toast';
 import styles from './AdminMergesPage.module.css';
 
 export const AdminMergesPage = () => {
     const [requests, setRequests] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [showHistory, setShowHistory] = useState(false);
 
     const fetchRequests = async () => {
         try {
-            const data = await getPendingMergeRequests();
+            setLoading(true);
+            const data = showHistory ? await getAllMergeRequests() : await getPendingMergeRequests();
             setRequests(data);
         } catch (error) {
             toast.error('Не вдалося завантажити запити');
@@ -20,7 +22,7 @@ export const AdminMergesPage = () => {
 
     useEffect(() => {
         fetchRequests();
-    }, []);
+    }, [showHistory]);
 
     const handleApprove = async (id: number) => {
         try {
@@ -44,27 +46,56 @@ export const AdminMergesPage = () => {
         }
     };
 
-    if (loading) return <div className="page-wrapper">Завантаження...</div>;
+    const getStatusBadge = (status: string) => {
+        switch (status) {
+            case 'Approved': return <span className={styles.statusApproved}>Схвалено</span>;
+            case 'Rejected': return <span className={styles.statusRejected}>Відхилено</span>;
+            case 'Ignored': return <span className={styles.statusIgnored}>Проігноровано</span>;
+            default: return <span className={styles.statusPending}>В очікуванні</span>;
+        }
+    };
 
     return (
         <div className="page-wrapper">
             <div className="container">
-                <div className="header-row">
-                    <h1 style={{ color: '#1f2937', marginBottom: '30px' }}>
+                <div className={styles.headerRow}>
+                    <h1 style={{ color: '#1f2937', margin: 0 }}>
                         <i className="fas fa-users-cog" style={{ marginRight: '15px', color: '#3b82f6' }}></i>
                         Запити на об'єднання профілів
                     </h1>
+                    <div className={styles.viewToggle}>
+                        <button 
+                            className={!showHistory ? styles.activeTab : ''} 
+                            onClick={() => setShowHistory(false)}
+                        >
+                            Активні
+                        </button>
+                        <button 
+                            className={showHistory ? styles.activeTab : ''} 
+                            onClick={() => setShowHistory(true)}
+                        >
+                            Історія
+                        </button>
+                    </div>
                 </div>
 
-                {requests.length === 0 ? (
+                {loading ? (
+                   <div style={{ textAlign: 'center', padding: '50px' }}>Завантаження...</div>
+                ) : requests.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '100px 20px', background: 'white', borderRadius: '15px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}>
                         <i className="fas fa-check-circle" style={{ fontSize: '64px', color: '#10b981', marginBottom: '20px' }}></i>
-                        <p style={{ fontSize: '18px', color: '#6b7280' }}>Немає активних запитів на об'єднання</p>
+                        <p style={{ fontSize: '18px', color: '#6b7280' }}>
+                            {showHistory ? 'Історія порожня' : 'Немає активних запитів на об\'єднання'}
+                        </p>
                     </div>
                 ) : (
                     <div className={styles.requestList}>
                         {requests.map(req => (
                             <div key={req.id} className={styles.requestCard}>
+                                <div className={styles.cardHeader}>
+                                    <span className={styles.date}>{new Date(req.createdAt).toLocaleDateString()}</span>
+                                    {getStatusBadge(req.status)}
+                                </div>
                                 <div className={styles.requestInfo}>
                                     <div className={styles.party}>
                                         <span className={styles.label}>Користувач (Аккаунт):</span>
@@ -79,14 +110,20 @@ export const AdminMergesPage = () => {
                                         <span className={styles.subValue}>Група: {req.targetPlayerGroup}</span>
                                     </div>
                                 </div>
-                                <div className={styles.actions}>
-                                    <button onClick={() => handleApprove(req.id)} className={styles.approveBtn}>
-                                        <i className="fas fa-check"></i> Схвалити
-                                    </button>
-                                    <button onClick={() => handleReject(req.id)} className={styles.rejectBtn}>
-                                        <i className="fas fa-times"></i> Відхилити
-                                    </button>
-                                </div>
+                                {req.status === 'Pending' ? (
+                                    <div className={styles.actions}>
+                                        <button onClick={() => handleApprove(req.id)} className={styles.approveBtn}>
+                                            <i className="fas fa-check"></i> Схвалити
+                                        </button>
+                                        <button onClick={() => handleReject(req.id)} className={styles.rejectBtn}>
+                                            <i className="fas fa-times"></i> Відхилити
+                                        </button>
+                                    </div>
+                                ) : req.adminComment && (
+                                    <div className={styles.comment}>
+                                        <strong>Коментар адміна:</strong> {req.adminComment}
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>

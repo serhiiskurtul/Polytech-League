@@ -8,7 +8,7 @@ import EditProfileModal from '@/widgets/profile-widgets/edit-profile-modal/EditP
 import styles from './ProfilePage.module.css';
 import { useAuth } from '@/app/providers/AuthContext';
 import { PlayerDto } from '@/shared/types/player.types';
-import { updatePlayer, updateProfile, getProfile, uploadAvatar, checkArchivalMatches, createMergeRequest } from '@/shared/api/players.api';
+import { getProfile, updateProfile, uploadAvatar, checkArchivalMatches, createMergeRequest, ignoreMergeRequest } from '@/shared/api/players.api';
 
 import { toast } from 'react-hot-toast';
 
@@ -252,7 +252,15 @@ const ProfilePage = () => {
                 Так, це я
               </button>
               <button 
-                onClick={() => setArchivalMatches([])}
+                onClick={async () => {
+                  try {
+                    await ignoreMergeRequest(archivalMatches[0].id!);
+                    setArchivalMatches([]);
+                  } catch (error) {
+                    console.error("Failed to ignore match:", error);
+                    setArchivalMatches([]);
+                  }
+                }}
                 style={{ background: 'transparent', border: 'none', color: '#6b7280', cursor: 'pointer' }}
               >
                 Ні
