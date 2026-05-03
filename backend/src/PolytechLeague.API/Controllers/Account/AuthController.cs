@@ -19,14 +19,15 @@ public class AuthController(IAuthService authService) : Controller
 
         SetAuthCookies(tokens);
 
-        return Ok();
+        return Ok(tokens);
     }
 
     [AllowAnonymous]
     [HttpPost("refresh")]
-    public async Task<IActionResult> Refresh(CancellationToken cancellationToken)
+    public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest? bodyRequest, CancellationToken cancellationToken)
     {
-        var refreshToken = Request.Cookies["refresh_token"];
+        // Спробуємо взяти з тіла, якщо куки заблоковані
+        var refreshToken = bodyRequest?.RefreshToken ?? Request.Cookies["refresh_token"];
 
         if (string.IsNullOrEmpty(refreshToken))
         {
@@ -41,7 +42,7 @@ public class AuthController(IAuthService authService) : Controller
 
             SetAuthCookies(tokens);
 
-            return Ok();
+            return Ok(tokens);
         }
         catch
         {
