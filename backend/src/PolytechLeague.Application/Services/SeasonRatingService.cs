@@ -454,6 +454,69 @@ public class SeasonRatingService : ISeasonRatingService
         await _context.SaveChangesAsync();
     }
 
+    public async Task<SeasonRatingDto> GetRegionalRatingAsync(long seasonId)
+    {
+        var season = await _context.Seasons.FindAsync(seasonId);
+        if (season == null) throw new Exception("Season not found");
+
+        var colleges = await _context.Colleges.ToListAsync();
+        var manualEntries = await _context.RegionalRatingManualEntries
+            .Where(e => e.SeasonId == seasonId)
+            .ToListAsync();
+
+        var rows = colleges
+            .Where(c => manualEntries.Any(e => e.CollegeId == c.Id))
+            .Select(c => {
+                var entry = manualEntries.First(e => e.CollegeId == c.Id);
+                return new GroupRatingRowDto
+                {
+                    CollegeId = c.Id,
+                    GroupName = c.ShortName ?? c.Name,
+                    SportResults = new Dictionary<string, SportResultDto>(),
+                    TotalPoints = entry.Points,
+                    TotalRank = !string.IsNullOrWhiteSpace(entry.Rank) ? entry.Rank : "-"
+                };
+            }).OrderBy(r => {
+                if (r.TotalRank == "-") return int.MaxValue;
+                var parts = r.TotalRank!.Split('-');
+                if (int.TryParse(parts[0], out int rank)) return rank;
+                return int.MaxValue;
+            }).ToList();
+
+        return new SeasonRatingDto
+        {
+            SeasonId = season.Id,
+            SeasonName = season.Name,
+            Sports = new List<string>(), // No sport columns
+            Rows = rows
+        };
+    }
+
+    public async Task UpdateRegionalRatingAsync(long seasonId, List<ManualRatingEntryDto> entries)
+    {
+        var season = await _context.Seasons.FindAsync(seasonId);
+        if (season == null) throw new Exception("Season not found");
+
+        var existingEntries = await _context.RegionalRatingManualEntries
+            .Where(e => e.SeasonId == seasonId)
+            .ToListAsync();
+
+        _context.RegionalRatingManualEntries.RemoveRange(existingEntries);
+
+        foreach (var entry in entries)
+        {
+            _context.RegionalRatingManualEntries.Add(new RegionalRatingManualEntry
+            {
+                SeasonId = seasonId,
+                CollegeId = entry.CollegeId,
+                Points = entry.Points,
+                Rank = entry.Rank
+            });
+        }
+
+        await _context.SaveChangesAsync();
+    }
+
     public async Task<IEnumerable<SeasonDto>> GetAllSeasonsAsync()
     {
         return await _context.Seasons

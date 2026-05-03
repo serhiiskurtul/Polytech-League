@@ -37,6 +37,21 @@ public class SeasonRatingController : ControllerBase
         return Ok();
     }
 
+    [HttpGet("regional/{seasonId}")]
+    public async Task<ActionResult<SeasonRatingDto>> GetRegionalRating(long seasonId)
+    {
+        var rating = await _seasonRatingService.GetRegionalRatingAsync(seasonId);
+        return Ok(rating);
+    }
+
+    [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
+    [HttpPost("regional/{seasonId}")]
+    public async Task<ActionResult> UpdateRegionalRating(long seasonId, [FromBody] List<ManualRatingEntryDto> entries)
+    {
+        await _seasonRatingService.UpdateRegionalRatingAsync(seasonId, entries);
+        return Ok();
+    }
+
     [HttpGet("seasons")]
     public async Task<ActionResult<IEnumerable<SeasonDto>>> GetAllSeasons()
     {

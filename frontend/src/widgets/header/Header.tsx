@@ -87,6 +87,12 @@ export default function Header() {
                     Всеукраїнський залік
                   </Link>
                 </li>
+                <li>
+                  <Link to="/regional-ratings" onClick={closeMenu}>
+                    <i className="fas fa-map-marked-alt"></i>
+                    Обласний залік
+                  </Link>
+                </li>
               </ul>
             </li>
             {isAdmin && (

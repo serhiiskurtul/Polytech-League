@@ -1439,6 +1439,35 @@ namespace PolytechLeague.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.RegionalRatingManualEntry", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("CollegeId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Points")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Rank")
+                        .HasColumnType("text");
+
+                    b.Property<long>("SeasonId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CollegeId");
+
+                    b.HasIndex("SeasonId");
+
+                    b.ToTable("RegionalRatingManualEntries");
+                });
+
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Season", b =>
                 {
                     b.Property<long>("Id")
@@ -3268,6 +3297,25 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Navigation("TargetPlayer");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.RegionalRatingManualEntry", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.College", "College")
+                        .WithMany()
+                        .HasForeignKey("CollegeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Season", "Season")
+                        .WithMany()
+                        .HasForeignKey("SeasonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("College");
+
+                    b.Navigation("Season");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.TableTennis.TableTennisEventParticipant", b =>

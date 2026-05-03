@@ -23,6 +23,7 @@ import { AdminMergesPage } from '@/pages/AdminMergesPage/AdminMergesPage';
 import { AdminUsersPage } from '@/pages/AdminUsersPage';
 import { NationalRatingsPage } from '@/pages/NationalRatingsPage';
 import { AdminCollegesPage } from '@/pages/AdminCollegesPage';
+import { RegionalRatingsPage } from '@/pages/RegionalRatingsPage';
 import { CollegesPage } from '@/pages/CollegesPage';
 import ChampionsPage from '@/pages/ChampionsPage/ChampionsPage';
 
@@ -140,6 +141,17 @@ export default function App() {
             <ProtectedRoute requireAuth={false}>
               <div className="page-wrapper">
                 <NationalRatingsPage />
+              </div>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/regional-ratings"
+          element={
+            <ProtectedRoute requireAuth={false}>
+              <div className="page-wrapper">
+                <RegionalRatingsPage />
               </div>
             </ProtectedRoute>
           }
