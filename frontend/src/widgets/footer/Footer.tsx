@@ -13,7 +13,8 @@ const Footer = () => {
     { id: 'checkers', label: 'Шашки' },
     { id: 'table-tennis', label: 'Настільний теніс' },
     { id: 'badminton', label: 'Бадмінтон' },
-    { id: 'armwrestling', label: 'Армреслінг' }
+    { id: 'armwrestling', label: 'Армреслінг' },
+    { id: 'athletics', label: 'Легка атлетика' }
   ];
 
   const quickLinks = [
@@ -36,7 +37,8 @@ const Footer = () => {
       'table-tennis': 'fas fa-table-tennis',
       'badminton': 'fas fa-feather-alt',
       'armwrestling': 'fas fa-fist-raised',
-      'beach-volleyball': 'fas fa-umbrella-beach'
+      'beach-volleyball': 'fas fa-umbrella-beach',
+      'athletics': 'fas fa-running'
     };
     const iconClass = icons[sportId] || 'fas fa-trophy';
     return <i className={iconClass} style={{ marginRight: '8px' }}></i>;
