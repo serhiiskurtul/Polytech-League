@@ -10,18 +10,18 @@ export const AVAILABLE_SPORTS = [
   { id: 'volleyball', name: 'Волейбол', icon: 'fas fa-volleyball-ball' },
   { id: 'chess', name: 'Шахи', icon: 'fas fa-chess' },
   { id: 'checkers', name: 'Шашки', icon: 'fas fa-chess-board' },
-  { id: 'beach-volleyball', name: 'Пляжний волейбол', icon: 'fas fa-umbrella-beach' },
+  { id: 'beach_volleyball', name: 'Пляжний волейбол', icon: 'fas fa-umbrella-beach' },
   { id: 'badminton', name: 'Бадмінтон', icon: 'fas fa-feather-alt' },
   { id: 'armwrestling', name: 'Армреслінг', icon: 'fas fa-fist-raised' },
   { id: 'table_tennis', name: 'Настільний теніс', icon: 'fas fa-table-tennis' }
 ];
 
 export const TOURNAMENT_TYPES = [
-  { id: 'single_elimination', name: 'Олімпійська система', description: 'Програєш - вилітаєш' },
-  { id: 'double_elimination', name: 'Двоєступінчаста система', description: 'Друга спроба при поразці' },
-  { id: 'round_robin', name: 'Кругова система', description: 'Всі грають з усіма' },
-  { id: 'swiss', name: 'Швейцарська система', description: 'Для шахів та шашок' },
-  { id: 'groups_playoff', name: 'Груповий етап + плей-офф', description: 'Найпопулярніший формат' }
+  { id: 'SingleElimination', name: 'Олімпійська система', description: 'Програєш - вилітаєш' },
+  { id: 'DoubleElimination', name: 'Двоєступінчаста система', description: 'Друга спроба при поразці' },
+  { id: 'RoundRobin', name: 'Кругова система', description: 'Всі грають з усіма' },
+  { id: 'Swiss', name: 'Швейцарська система', description: 'Для шахів та шашок' },
+  { id: 'GroupsPlayoff', name: 'Груповий етап + плей-офф', description: 'Найпопулярніший формат' }
 ];
 
 export const CHESS_SYSTEMS = [
@@ -75,15 +75,15 @@ export const ARMWRESTLING_CATEGORIES = [
 ];
 
 export const BASKETBALL3X3_TOURNAMENT_TYPES = [
-  { id: 'single_elimination', name: 'Олімпійська система', description: 'Програєш - вилітаєш' },
-  { id: 'double_elimination', name: 'Подвійна олімпійська система (є другий шанс)', description: 'Друга спроба при поразці' },
-  { id: 'round_robin', name: 'Кругова система', description: 'Всі грають з усіма' },
-  { id: 'groups_playoff', name: 'Груповий етап + плей-офф', description: 'Найпопулярніший формат' }
+  { id: 'SingleElimination', name: 'Олімпійська система', description: 'Програєш - вилітаєш' },
+  { id: 'DoubleElimination', name: 'Подвійна олімпійська система (є другий шанс)', description: 'Друга спроба при поразці' },
+  { id: 'RoundRobin', name: 'Кругова система', description: 'Всі грають з усіма' },
+  { id: 'GroupsPlayoff', name: 'Груповий етап + плей-офф', description: 'Найпопулярніший формат' }
 ];
 
 export const BADMINTON_TOURNAMENT_TYPES = [
-  { id: 'single_elimination', name: 'Олімпійська система', description: 'Програєш - вилітаєш' },
-  { id: 'double_elimination', name: 'Подвійна олімпійська система (є другий шанс)', description: 'Друга спроба при поразці' },
-  { id: 'round_robin', name: 'Кругова система', description: 'Всі грають з усіма' },
-  { id: 'groups_playoff', name: 'Груповий етап + плей-офф', description: 'Найпопулярніший формат' }
+  { id: 'SingleElimination', name: 'Олімпійська система', description: 'Програєш - вилітаєш' },
+  { id: 'DoubleElimination', name: 'Подвійна олімпійська система (є другий шанс)', description: 'Друга спроба при поразці' },
+  { id: 'RoundRobin', name: 'Кругова система', description: 'Всі грають з усіма' },
+  { id: 'GroupsPlayoff', name: 'Груповий етап + плей-офф', description: 'Найпопулярніший формат' }
 ];

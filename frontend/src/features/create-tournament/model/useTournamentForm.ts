@@ -63,7 +63,7 @@ export const useTournamentForm = () => {
   const [formData, setFormData] = useState<TournamentFormData>({
     name: '',
     sport: '',
-    type: 'groups_playoff',
+    type: 'GroupsPlayoff',
     description: '',
     maxTeams: 32,
     minTeams: 2,
@@ -205,7 +205,9 @@ export const useTournamentForm = () => {
       };
 
       // Fix inconsistency for basketball_3x3 vs basketball-3x3
-      const sportKey = formData.sport === 'basketball-3x3' ? 'basketball_3x3' : formData.sport;
+      let sportKey = formData.sport;
+      if (sportKey === 'basketball-3x3') sportKey = 'basketball_3x3';
+      if (sportKey === 'beach-volleyball') sportKey = 'beach_volleyball'; // fallback if still using hyphen
       const endpoint = TOURNAMENT_CREATE_ENDPOINTS[sportKey];
       if (!endpoint) throw new Error('Невідомий вид спорту');
 
