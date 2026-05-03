@@ -7,7 +7,7 @@ import './app/styles/globals.css';
 import { AuthProvider } from './app/providers/AuthContext';
 import { NotificationProvider } from './app/providers/NotificationProvider';
 import { ChatProvider } from './app/providers/ChatProvider';
-
+import { Analytics } from "@vercel/analytics/react";
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Failed to find the root element');
@@ -19,6 +19,7 @@ createRoot(rootElement).render(
         <NotificationProvider>
           <ChatProvider>
             <App />
+            <Analytics />
           </ChatProvider>
         </NotificationProvider>
       </AuthProvider>
