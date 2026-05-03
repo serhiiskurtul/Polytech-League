@@ -107,7 +107,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   // Create Team State
   const [isCreateTeamModalOpen, setIsCreateTeamModalOpen] = useState(false);
   const [newTeamForm, setNewTeamForm] = useState({
-    name: ''
+    name: '',
+    tournamentGroupName: ''
   });
 
   // Team Roster Management State
@@ -374,15 +375,21 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     }
   };
 
-  const calculateStandings = () => {
-    const teams = details.teams || [];
+  const calculateStandings = (groupFilter?: string) => {
+    let teams = details.teams || [];
     const matches = details.matches || details.games || [];
+    
+    if (groupFilter) {
+      teams = teams.filter((t: any) => t.tournamentGroupName === groupFilter);
+    }
+    
     if (teams.length === 0) return [];
 
     const standings = teams.map((team: any) => {
       const stats = {
         id: team.id,
         name: team.name,
+        tournamentGroupName: team.tournamentGroupName,
         gp: 0, // Games Played
         w: 0,  // Wins
         d: 0,  // Draws
@@ -393,6 +400,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       };
 
       matches.forEach((match: any) => {
+        // Only include group stage matches if we are filtering by group
+        if (groupFilter && match.stage !== 'Груповий етап') return;
+
         const isChessLike = sport === 'chess' || sport === 'checkers';
         
         let isHome = false;
@@ -436,8 +446,6 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       // Traditional points calculation
       const autoPoints = stats.w * 3 + stats.d * 1;
       
-      // Only use manual points if they are greater than 0, otherwise prefer auto-calculated points 
-      // if any games have been played.
       const finalPoints = (stats.manualPoints > 0 && stats.gp === 0) 
         ? stats.manualPoints 
         : autoPoints;
@@ -446,21 +454,15 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     });
 
     const sortedStandings = standings.sort((a: any, b: any) => {
-      // Priority 1: Points
       const aP = a.points;
       const bP = b.points;
       if (bP !== aP) return bP - aP;
-
-      // Priority 2: Goal Difference
       const aDiff = a.gf - a.ga;
       const bDiff = b.gf - b.ga;
       if (bDiff !== aDiff) return bDiff - aDiff;
-
-      // Priority 3: Goals Scored
       return b.gf - a.gf;
     });
 
-    // Assign shared ranks (e.g. "1-2")
     const standingsWithRanks = [];
     let i = 0;
     while (i < sortedStandings.length) {
@@ -471,21 +473,21 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
              sortedStandings[i + tieCount].gf === sortedStandings[i].gf) {
         tieCount++;
       }
-
-      const rankStr = tieCount > 1 
-        ? `${i + 1}-${i + tieCount}` 
-        : (i + 1).toString();
-
+      const rankStr = tieCount > 1 ? `${i + 1}-${i + tieCount}` : (i + 1).toString();
       for (let j = 0; j < tieCount; j++) {
         standingsWithRanks.push({ ...sortedStandings[i + j], displayRank: rankStr });
       }
       i += tieCount;
     }
-
     return standingsWithRanks;
   };
 
-  const standingsData = calculateStandings();
+  const isGroupsPlayoff = details.tournamentType === 'GroupsPlayoff';
+  const groupNames = Array.from(new Set((details.teams || []).map((t: any) => t.tournamentGroupName).filter(Boolean))) as string[];
+  const sortedGroups = groupNames.sort();
+  
+  // For GroupsPlayoff, we show multiple tables. For others, just one.
+  const standingsData = !isGroupsPlayoff ? calculateStandings() : [];
 
   const handleCreateMatch = async () => {
     try {
@@ -585,7 +587,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
       const payload = {
         name: newTeamForm.name,
-        eventId: details.id
+        eventId: details.id,
+        tournamentGroupName: newTeamForm.tournamentGroupName || null
       };
 
       let createApi;
@@ -607,7 +610,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       await createApi(payload);
 
       setIsCreateTeamModalOpen(false);
-      setNewTeamForm({ name: '' });
+      setNewTeamForm({ name: '', tournamentGroupName: '' });
       onRefresh();
     } catch (err) {
       console.error('Create Team Error:', err);
@@ -1181,47 +1184,101 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         )}
 
         {activeTab === 'standings' && (
-          <div className={styles.standingsTable}>
-            <table className={styles.leagueTable}>
-              <thead>
-                <tr>
-                  <th title="Місце">#</th>
-                  <th title="Назва команди">Команда (Група)</th>
-                  <th title="Ігри">І</th>
-                  <th title="Виграші">В</th>
-                  <th title="Нічиї">Н</th>
-                  <th title="Поразки">П</th>
-                  <th title="Забиті - Пропущені">М'ячі (З-П)</th>
-                  <th title="Очки (3 за перемогу, 1 за нічию)">Очки</th>
-                </tr>
-              </thead>
-              <tbody>
-                {standingsData.map((team: any, index: number) => (
-                  <tr key={team.id}>
-                    <td>{team.displayRank}</td>
-                    <td className={styles.tableName}>{team.name}</td>
-                    <td>{team.gp}</td>
-                    <td>{team.w}</td>
-                    <td>{team.d}</td>
-                    <td>{team.l}</td>
-                    <td>{team.gf} - {team.ga}</td>
-                    <td className={styles.tablePoints}>
-                      {isAdmin ? (
-                        <input 
-                          type="number" 
-                          min="0"
-                          className={styles.pointsInlineInput}
-                          defaultValue={team.points}
-                          onBlur={(e) => handleUpdateTeamPoints(team.id, parseInt(e.target.value) || 0)}
-                        />
-                      ) : (
-                        team.points
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className={styles.standingsSection}>
+            {isGroupsPlayoff ? (
+              sortedGroups.length > 0 ? (
+                sortedGroups.map(groupName => (
+                  <div key={groupName} className={styles.groupStandings}>
+                    <h3 className={styles.groupTitle}>Група {groupName}</h3>
+                    <div className={styles.standingsTable}>
+                      <table className={styles.leagueTable}>
+                        <thead>
+                          <tr>
+                            <th title="Місце">#</th>
+                            <th title="Назва команди">Команда</th>
+                            <th title="Ігри">І</th>
+                            <th title="Виграші">В</th>
+                            <th title="Поразки">П</th>
+                            <th title="Забиті - Пропущені">Сети (З-П)</th>
+                            <th title="Очки">Очки</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {calculateStandings(groupName).map((team: any) => (
+                            <tr key={team.id}>
+                              <td>{team.displayRank}</td>
+                              <td className={styles.tableName}>{team.name}</td>
+                              <td>{team.gp}</td>
+                              <td>{team.w}</td>
+                              <td>{team.l}</td>
+                              <td>{team.gf} - {team.ga}</td>
+                              <td className={styles.tablePoints}>
+                                {isAdmin ? (
+                                  <input 
+                                    type="number" 
+                                    min="0"
+                                    className={styles.pointsInlineInput}
+                                    defaultValue={team.points}
+                                    onBlur={(e) => handleUpdateTeamPoints(team.id, parseInt(e.target.value) || 0)}
+                                  />
+                                ) : (
+                                  team.points
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className={styles.noData}>Команди ще не розподілені по групах</p>
+              )
+            ) : (
+              <div className={styles.standingsTable}>
+                <table className={styles.leagueTable}>
+                  <thead>
+                    <tr>
+                      <th title="Місце">#</th>
+                      <th title="Назва команди">Команда</th>
+                      <th title="Ігри">І</th>
+                      <th title="Виграші">В</th>
+                      <th title="Нічиї">Н</th>
+                      <th title="Поразки">П</th>
+                      <th title="Забиті - Пропущені">М'ячі (З-П)</th>
+                      <th title="Очки">Очки</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {standingsData.map((team: any) => (
+                      <tr key={team.id}>
+                        <td>{team.displayRank}</td>
+                        <td className={styles.tableName}>{team.name}</td>
+                        <td>{team.gp}</td>
+                        <td>{team.w}</td>
+                        <td>{team.d}</td>
+                        <td>{team.l}</td>
+                        <td>{team.gf} - {team.ga}</td>
+                        <td className={styles.tablePoints}>
+                          {isAdmin ? (
+                            <input 
+                              type="number" 
+                              min="0"
+                              className={styles.pointsInlineInput}
+                              defaultValue={team.points}
+                              onBlur={(e) => handleUpdateTeamPoints(team.id, parseInt(e.target.value) || 0)}
+                            />
+                          ) : (
+                            team.points
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
 
@@ -1488,6 +1545,18 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   placeholder="напр. 221"
                 />
               </div>
+
+              {isGroupsPlayoff && (
+                <div className={styles.formGroup}>
+                  <label>Турнірна група (для етапів)</label>
+                  <input 
+                    type="text" 
+                    value={newTeamForm.tournamentGroupName} 
+                    onChange={e => setNewTeamForm({...newTeamForm, tournamentGroupName: e.target.value})}
+                    placeholder="напр. А або Б"
+                  />
+                </div>
+              )}
 
               <div className={styles.modalFooter} style={{padding: '24px 0 0 0', background: 'transparent', borderTop: 'none'}}>
                 <button className={styles.saveBtn} onClick={handleCreateTeam}>Створити команду</button>

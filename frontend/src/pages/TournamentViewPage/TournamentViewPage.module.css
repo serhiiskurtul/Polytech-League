@@ -3407,3 +3407,39 @@ input:checked + .slider:before {
   background: var(--warning);
   color: white;
 }
+
+/* Group Standings Styles */
+.standingsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.groupStandings {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.groupTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #3b82f6;
+  display: inline-block;
+}
+
+.groupBadge {
+  background: #3b82f6;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-left: 8px;
+  vertical-align: middle;
+}

@@ -1868,6 +1868,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("rank");
 
+                    b.Property<string>("TournamentGroupName")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CollegeId");

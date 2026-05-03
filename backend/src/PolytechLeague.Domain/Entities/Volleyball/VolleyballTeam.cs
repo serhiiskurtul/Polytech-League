@@ -18,4 +18,6 @@ public class VolleyballTeam
 
     public long? CollegeId { get; set; }
     public College? College { get; set; }
+
+    public string? TournamentGroupName { get; set; }
 }
