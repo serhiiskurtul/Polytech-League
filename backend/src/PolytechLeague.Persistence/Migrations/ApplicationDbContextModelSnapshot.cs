@@ -1270,6 +1270,9 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<long>("SeasonId")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("SportResults")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CollegeId");
@@ -1458,6 +1461,9 @@ namespace PolytechLeague.Persistence.Migrations
 
                     b.Property<long>("SeasonId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("SportResults")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 

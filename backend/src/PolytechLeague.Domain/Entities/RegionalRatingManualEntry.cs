@@ -9,4 +9,5 @@ public class RegionalRatingManualEntry
     public College? College { get; set; }
     public int Points { get; set; }
     public string? Rank { get; set; }
+    public string? SportResults { get; set; } // Stores JSON: Dictionary<string, string>
 }

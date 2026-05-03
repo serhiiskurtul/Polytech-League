@@ -70,13 +70,22 @@ const NationalRatingsPage: React.FC = () => {
     // Prepare edit data: for each college, find if it has an entry or default to 0/-
     const initialEditData = colleges.map(college => {
       const row = ratingData.rows.find(r => r.collegeId === college.id);
+      
+      const sportResults: Record<string, string> = {};
+      if (row?.sportResults) {
+        Object.keys(row.sportResults).forEach(sport => {
+          sportResults[sport] = row.sportResults[sport].rank?.toString() || '-';
+        });
+      }
+
       return {
         collegeId: college.id,
         collegeName: college.shortName || college.name,
         region: college.region || '—',
         participated: !!row,
         points: row?.totalPoints || 0,
-        rank: row?.totalRank || '-'
+        rank: row?.totalRank || '-',
+        sportResults: sportResults
       };
     });
     
@@ -119,7 +128,8 @@ const NationalRatingsPage: React.FC = () => {
         .map(d => ({
           collegeId: d.collegeId,
           points: parseInt(d.points) || 0,
-          rank: d.rank?.toString().trim() || '-'
+          rank: d.rank?.toString().trim() || '-',
+          sportResults: d.sportResults || {}
         }));
       await updateNationalRating(selectedSeasonId, entries);
       toast.success('Рейтинги оновлено');
@@ -244,75 +254,111 @@ const NationalRatingsPage: React.FC = () => {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th className={styles.mainHeader}>Коледж / Навчальний заклади</th>
-                {isEditing && <th className={styles.mainHeader}>Участь</th>}
-                <th className={styles.mainHeader}>Регіон</th>
-                <th className={styles.mainHeader}>Загальна сума очок (О)</th>
-                <th className={styles.mainHeader}>Підсумкове місце (М)</th>
+                <th className={styles.mainHeader} rowSpan={2}>Коледж / Навчальний заклади</th>
+                {isEditing && <th className={styles.mainHeader} rowSpan={2}>Участь</th>}
+                <th className={styles.mainHeader} rowSpan={2}>Регіон</th>
+                {ratingData?.sports && ratingData.sports.length > 0 && (
+                  <th className={styles.mainHeader} colSpan={ratingData.sports.length}>Види спорту (місця)</th>
+                )}
+                <th className={styles.mainHeader} rowSpan={2}>Загальна сума очок (О)</th>
+                <th className={styles.mainHeader} rowSpan={2}>Підсумкове місце (М)</th>
               </tr>
+              {ratingData?.sports && ratingData.sports.length > 0 && (
+                <tr>
+                  {ratingData.sports.map(sport => (
+                    <th key={sport} className={styles.subHeader}>{sport}</th>
+                  ))}
+                </tr>
+              )}
             </thead>
             <tbody>
               {isEditing ? (
-                editData.map((item) => (
-                  <tr key={item.collegeId} className={`${styles.row} ${!item.participated ? styles.inactiveRow : ''}`}>
-                    <td className={styles.collegeCell}>
-                      {(() => {
-                        const college = colleges.find(c => c.id === item.collegeId);
-                        return showFullName ? (college?.name || item.collegeName) : (college?.shortName || item.collegeName);
-                      })()}
-                    </td>
-                    <td className={styles.editCell}>
-                      <input 
-                        type="checkbox" 
-                        checked={item.participated} 
-                        onChange={(e) => handleEditChange(item.collegeId, 'participated', e.target.checked)}
-                        className={styles.participationCheckbox}
-                      />
-                    </td>
-                    <td className={styles.regionCell}>{item.region}</td>
-                    <td className={styles.editCell}>
-                      <input 
-                        type="number" 
-                        value={item.points} 
-                        onChange={(e) => handleEditChange(item.collegeId, 'points', e.target.value)}
-                        className={styles.editInput}
-                        disabled={!item.participated}
-                      />
-                    </td>
-                    <td className={styles.editCell}>
-                      <input 
-                        type="text" 
-                        value={item.rank} 
-                        onChange={(e) => handleEditChange(item.collegeId, 'rank', e.target.value)}
-                        className={styles.editInput}
-                        disabled={!item.participated}
-                      />
-                    </td>
-                  </tr>
-                ))
+                editData.map((item) => {
+                  const isCHPFK = item.collegeName === 'ЧПФК' || item.collegeName.includes('Чернівецький політехнічний');
+                  return (
+                    <tr key={item.collegeId} className={`${styles.row} ${!item.participated ? styles.inactiveRow : ''}`}>
+                      <td className={styles.collegeCell}>
+                        {(() => {
+                          const college = colleges.find(c => c.id === item.collegeId);
+                          return showFullName ? (college?.name || item.collegeName) : (college?.shortName || item.collegeName);
+                        })()}
+                      </td>
+                      <td className={styles.editCell}>
+                        <input 
+                          type="checkbox" 
+                          checked={item.participated} 
+                          onChange={(e) => handleEditChange(item.collegeId, 'participated', e.target.checked)}
+                          className={styles.participationCheckbox}
+                        />
+                      </td>
+                      <td className={styles.regionCell}>{item.region}</td>
+                      {ratingData?.sports.map(sport => (
+                        <td key={sport} className={styles.editCell}>
+                          {isCHPFK ? (
+                            <input 
+                              type="text" 
+                              value={item.sportResults?.[sport] || '-'} 
+                              onChange={(e) => {
+                                const newSportResults = { ...(item.sportResults || {}) };
+                                newSportResults[sport] = e.target.value;
+                                handleEditChange(item.collegeId, 'sportResults', newSportResults);
+                              }}
+                              className={styles.editInputSmall}
+                              disabled={!item.participated}
+                            />
+                          ) : (
+                            <span className={styles.dash}>—</span>
+                          )}
+                        </td>
+                      ))}
+                      <td className={styles.editCell}>
+                        <input 
+                          type="number" 
+                          value={item.points} 
+                          onChange={(e) => handleEditChange(item.collegeId, 'points', e.target.value)}
+                          className={styles.editInput}
+                          disabled={!item.participated}
+                        />
+                      </td>
+                      <td className={styles.editCell}>
+                        <input 
+                          type="text" 
+                          value={item.rank} 
+                          onChange={(e) => handleEditChange(item.collegeId, 'rank', e.target.value)}
+                          className={styles.editInput}
+                          disabled={!item.participated}
+                        />
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
-                ratingData!.rows.map((row) => (
-                  <tr key={row.groupName} className={styles.row}>
-                    <td className={styles.collegeCell}>
-                      <div className={styles.collegeInfo}>
-                          <div className={styles.collegeName}>
-                            {(() => {
-                              const college = colleges.find(c => c.id === row.collegeId);
-                              return showFullName ? (college?.name || row.groupName) : (college?.shortName || row.groupName);
-                            })()}
-                          </div>
-                      </div>
-                    </td>
-                    <td className={styles.regionCell}>
-                      {(() => {
-                        const college = colleges.find(c => c.id === row.collegeId);
-                        return college?.region || '—';
-                      })()}
-                    </td>
-                    <td className={styles.totalPointsCell}>{row.totalPoints}</td>
-                    <td className={styles.totalRankCell}>{row.totalRank || (row as any).TotalRank || '-'}</td>
-                  </tr>
-                ))
+                ratingData!.rows.map((row) => {
+                  const college = colleges.find(c => c.id === row.collegeId);
+                  const isCHPFK = college?.shortName === 'ЧПФК' || college?.name?.includes('Чернівецький політехнічний');
+                  
+                  return (
+                    <tr key={row.collegeId || row.groupName} className={styles.row}>
+                      <td className={styles.collegeCell}>
+                        <div className={styles.collegeInfo}>
+                            <div className={styles.collegeName}>
+                              {showFullName ? (college?.name || row.groupName) : (college?.shortName || row.groupName)}
+                            </div>
+                        </div>
+                      </td>
+                      <td className={styles.regionCell}>
+                        {college?.region || '—'}
+                      </td>
+                      {ratingData?.sports.map(sport => (
+                        <td key={sport} className={styles.sportRankCell}>
+                          {isCHPFK ? (row.sportResults?.[sport]?.rank || '-') : '—'}
+                        </td>
+                      ))}
+                      <td className={styles.totalPointsCell}>{row.totalPoints}</td>
+                      <td className={styles.totalRankCell}>{row.totalRank || '-'}</td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>

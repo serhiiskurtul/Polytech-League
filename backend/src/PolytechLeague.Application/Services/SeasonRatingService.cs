@@ -396,6 +396,13 @@ public class SeasonRatingService : ISeasonRatingService
         var season = await _context.Seasons.FindAsync(seasonId);
         if (season == null) throw new Exception("Season not found");
 
+        var sports = new List<string> 
+        { 
+            "Шахи", "Шашки", "Футзал", "Армреслінг", 
+            "Настільний теніс", "Бадмінтон", "Волейбол", 
+            "Баскетбол 3x3", "Пляжний волейбол" 
+        };
+
         var colleges = await _context.Colleges.ToListAsync();
         var manualEntries = await _context.NationalRatingManualEntries
             .Where(e => e.SeasonId == seasonId)
@@ -405,11 +412,38 @@ public class SeasonRatingService : ISeasonRatingService
             .Where(c => manualEntries.Any(e => e.CollegeId == c.Id))
             .Select(c => {
                 var entry = manualEntries.First(e => e.CollegeId == c.Id);
+                var sportResults = new Dictionary<string, SportResultDto>();
+                
+                if (!string.IsNullOrEmpty(entry.SportResults))
+                {
+                    try 
+                    {
+                        var manualSportResults = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(entry.SportResults);
+                        if (manualSportResults != null)
+                        {
+                            foreach (var kvp in manualSportResults)
+                            {
+                                sportResults[kvp.Key] = new SportResultDto { Rank = kvp.Value, Points = 0 };
+                            }
+                        }
+                    }
+                    catch { /* Ignore invalid JSON */ }
+                }
+
+                // Fill missing sports with "-"
+                foreach (var s in sports)
+                {
+                    if (!sportResults.ContainsKey(s))
+                    {
+                        sportResults[s] = new SportResultDto { Rank = "-", Points = 0 };
+                    }
+                }
+
                 return new GroupRatingRowDto
                 {
                     CollegeId = c.Id,
                     GroupName = c.ShortName ?? c.Name,
-                    SportResults = new Dictionary<string, SportResultDto>(),
+                    SportResults = sportResults,
                     TotalPoints = entry.Points,
                     TotalRank = !string.IsNullOrWhiteSpace(entry.Rank) ? entry.Rank : "-"
                 };
@@ -424,7 +458,7 @@ public class SeasonRatingService : ISeasonRatingService
         {
             SeasonId = season.Id,
             SeasonName = season.Name,
-            Sports = new List<string>(), // No sport columns
+            Sports = sports,
             Rows = rows
         };
     }
@@ -442,12 +476,19 @@ public class SeasonRatingService : ISeasonRatingService
 
         foreach (var entry in entries)
         {
+            string? sportResultsJson = null;
+            if (entry.SportResults != null && entry.SportResults.Count > 0)
+            {
+                sportResultsJson = System.Text.Json.JsonSerializer.Serialize(entry.SportResults);
+            }
+
             _context.NationalRatingManualEntries.Add(new NationalRatingManualEntry
             {
                 SeasonId = seasonId,
                 CollegeId = entry.CollegeId,
                 Points = entry.Points,
-                Rank = entry.Rank
+                Rank = entry.Rank,
+                SportResults = sportResultsJson
             });
         }
 
@@ -459,6 +500,13 @@ public class SeasonRatingService : ISeasonRatingService
         var season = await _context.Seasons.FindAsync(seasonId);
         if (season == null) throw new Exception("Season not found");
 
+        var sports = new List<string> 
+        { 
+            "Шахи", "Шашки", "Футзал", "Армреслінг", 
+            "Настільний теніс", "Бадмінтон", "Волейбол", 
+            "Баскетбол 3x3", "Пляжний волейбол" 
+        };
+
         var colleges = await _context.Colleges.ToListAsync();
         var manualEntries = await _context.RegionalRatingManualEntries
             .Where(e => e.SeasonId == seasonId)
@@ -468,11 +516,38 @@ public class SeasonRatingService : ISeasonRatingService
             .Where(c => manualEntries.Any(e => e.CollegeId == c.Id))
             .Select(c => {
                 var entry = manualEntries.First(e => e.CollegeId == c.Id);
+                var sportResults = new Dictionary<string, SportResultDto>();
+                
+                if (!string.IsNullOrEmpty(entry.SportResults))
+                {
+                    try 
+                    {
+                        var manualSportResults = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(entry.SportResults);
+                        if (manualSportResults != null)
+                        {
+                            foreach (var kvp in manualSportResults)
+                            {
+                                sportResults[kvp.Key] = new SportResultDto { Rank = kvp.Value, Points = 0 };
+                            }
+                        }
+                    }
+                    catch { /* Ignore invalid JSON */ }
+                }
+
+                // Fill missing sports with "-"
+                foreach (var s in sports)
+                {
+                    if (!sportResults.ContainsKey(s))
+                    {
+                        sportResults[s] = new SportResultDto { Rank = "-", Points = 0 };
+                    }
+                }
+
                 return new GroupRatingRowDto
                 {
                     CollegeId = c.Id,
                     GroupName = c.ShortName ?? c.Name,
-                    SportResults = new Dictionary<string, SportResultDto>(),
+                    SportResults = sportResults,
                     TotalPoints = entry.Points,
                     TotalRank = !string.IsNullOrWhiteSpace(entry.Rank) ? entry.Rank : "-"
                 };
@@ -487,7 +562,7 @@ public class SeasonRatingService : ISeasonRatingService
         {
             SeasonId = season.Id,
             SeasonName = season.Name,
-            Sports = new List<string>(), // No sport columns
+            Sports = sports,
             Rows = rows
         };
     }
@@ -505,12 +580,19 @@ public class SeasonRatingService : ISeasonRatingService
 
         foreach (var entry in entries)
         {
+            string? sportResultsJson = null;
+            if (entry.SportResults != null && entry.SportResults.Count > 0)
+            {
+                sportResultsJson = System.Text.Json.JsonSerializer.Serialize(entry.SportResults);
+            }
+
             _context.RegionalRatingManualEntries.Add(new RegionalRatingManualEntry
             {
                 SeasonId = seasonId,
                 CollegeId = entry.CollegeId,
                 Points = entry.Points,
-                Rank = entry.Rank
+                Rank = entry.Rank,
+                SportResults = sportResultsJson
             });
         }
 

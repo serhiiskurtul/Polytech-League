@@ -10,7 +10,7 @@ export interface Season {
 
 export interface SportResult {
   points: number;
-  rank: number;
+  rank: string | number;
 }
 
 export interface GroupRatingRow {
