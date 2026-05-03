@@ -256,7 +256,8 @@ const TournamentViewPage = () => {
         endDate: formatToISO(editTournamentData.endDate),
         isModerated: editTournamentData.level === 'CollegeGroup' ? editTournamentData.isModerated : false,
         isTeam: !!(details as any).isTeam,
-        seasonId: editTournamentData.seasonId || null
+        seasonId: editTournamentData.seasonId || null,
+        category: editTournamentData.category || (isVolleyball ? 'Men' : 'Mixed')
       };
 
       if (isTeamSport) {
@@ -303,7 +304,7 @@ const TournamentViewPage = () => {
         case 'table_tennis': await updateTableTennisEvent(id, {
           ...payload,
           tournamentType: (details as any).tournamentType || 'RoundRobin',
-          category: editTournamentData.category || 'Mixed'
+          category: editTournamentData.category || (isVolleyball ? 'Men' : 'Mixed')
         } as any); break;
         default: await updateChessEvent(id, payload as any);
       }
@@ -472,7 +473,7 @@ const TournamentViewPage = () => {
           (tournament?.category === 'Чоловіки' ? 'Men' :
             tournament?.category === 'Жінки' ? 'Women' :
               tournament?.category === 'Змішаний' ? 'Mixed' :
-                (tournament?.category as any)) || 'Mixed',
+                (tournament?.category as any)) || (isVolleyball ? 'Men' : 'Mixed'),
         firstPlaceId: details.firstPlace?.id || null,
         secondPlaceId: details.secondPlace?.id || null,
         thirdPlaceId: details.thirdPlace?.id || null,
@@ -564,7 +565,7 @@ const TournamentViewPage = () => {
         isModerated: editTournamentData.level === 'CollegeGroup' ? editTournamentData.isModerated : false,
         isPublic: editTournamentData.level === 'CollegeGroup' ? editTournamentData.isPublic : false,
         seasonId: editTournamentData.seasonId || null,
-        category: editTournamentData.category || 'Mixed',
+        category: editTournamentData.category || (isVolleyball ? 'Men' : 'Mixed'),
         firstPlaceId: (editTournamentData as any).firstPlaceId || null,
         secondPlaceId: (editTournamentData as any).secondPlaceId || null,
         thirdPlaceId: (editTournamentData as any).thirdPlaceId || null,
@@ -2823,7 +2824,7 @@ const TournamentViewPage = () => {
                       <select value={editTournamentData.category} onChange={(e) => setEditTournamentData({ ...editTournamentData, category: e.target.value as any })}>
                         <option value="Men">Чоловіки</option>
                         <option value="Women">Жінки</option>
-                        <option value="Mixed">Змішане (Mixed)</option>
+                        {!isVolleyball && <option value="Mixed">Змішане (Mixed)</option>}
                       </select>
                     </div>
                     {(tournament?.sport === 'chess' || tournament?.sport === 'checkers') && (
