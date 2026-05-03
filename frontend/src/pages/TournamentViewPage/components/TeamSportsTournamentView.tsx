@@ -1330,58 +1330,6 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
               </div>
             )}
 
-            {/* General Table Section (Optional for Volleyball GroupsPlayoff or manual) */}
-            {isGroupsPlayoff && hasGeneralTable && (
-               <div className={styles.groupStandings} style={{ marginTop: '40px', borderTop: '2px solid #3b82f6', paddingTop: '20px' }}>
-                  <h3 className={styles.groupTitle} style={{ color: '#3b82f6' }}>
-                    <i className="fas fa-star" style={{ marginRight: '8px' }}></i>
-                    Загальна таблиця (Фінальний етап)
-                  </h3>
-                  <div className={styles.standingsTable}>
-                    <table className={styles.leagueTable}>
-                      <thead>
-                        <tr>
-                          <th title="Місце">#</th>
-                          <th title="Назва команди">Команда</th>
-                          <th title="Ігри">І</th>
-                          <th title="Виграші">В</th>
-                          <th title="Поразки">П</th>
-                          <th title="Забиті - Пропущені">Сети (З-П)</th>
-                          <th title="Очки">Очки</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {calculateStandings('GENERAL_TABLE').map((team: any) => (
-                          <tr key={team.id} style={team.isGeneralTableIncluded ? { backgroundColor: 'rgba(59, 130, 246, 0.05)' } : {}}>
-                            <td>{team.displayRank}</td>
-                            <td className={styles.tableName} onClick={() => { setEditingTeamId(team.id); setIsTeamRosterModalOpen(true); }} style={{ cursor: 'pointer' }}>
-                              {team.name}
-                              {team.isGeneralTableIncluded && <i className="fas fa-check-circle" style={{ marginLeft: '6px', color: '#3b82f6', fontSize: '12px' }} title="Додано вручну"></i>}
-                            </td>
-                            <td>{team.gp}</td>
-                            <td>{team.w}</td>
-                            <td>{team.l}</td>
-                            <td>{team.gf} - {team.ga}</td>
-                            <td className={styles.tablePoints}>
-                              {isAdmin ? (
-                                <input 
-                                  type="number" 
-                                  min="0"
-                                  className={styles.pointsInlineInput}
-                                  defaultValue={team.points}
-                                  onBlur={(e) => handleUpdateTeamPoints(team.id, parseInt(e.target.value) || 0)}
-                                />
-                              ) : (
-                                team.points
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-               </div>
-            )}
           </div>
         )}
 
