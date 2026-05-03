@@ -21,6 +21,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchUser = async () => {
     try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      }
+      
       const response = await api.get("/users/me");
       setUser(response.data);
     } catch (error: any) {
@@ -52,6 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
+    delete api.defaults.headers.common['Authorization'];
     setUser(null);
   };
 

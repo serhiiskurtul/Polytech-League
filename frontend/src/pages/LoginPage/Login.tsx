@@ -43,6 +43,9 @@ export default function Login() {
       localStorage.setItem('token', response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
 
+      // Set header explicitly for the current instance to be sure
+      api.defaults.headers.common['Authorization'] = `Bearer ${response.accessToken}`;
+
       const meResponse = await api.get("/users/me");
       login(meResponse.data);
       navigate("/");
