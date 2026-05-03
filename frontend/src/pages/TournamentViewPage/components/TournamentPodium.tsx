@@ -7,13 +7,15 @@ interface TournamentPodiumProps {
   secondPlace?: any | null;
   thirdPlace?: any | null;
   isTeam?: boolean;
+  onViewRoster?: (teamId: number) => void;
 }
 
 const TournamentPodium: React.FC<TournamentPodiumProps> = ({ 
   firstPlace, 
   secondPlace, 
   thirdPlace,
-  isTeam = false
+  isTeam = false,
+  onViewRoster
 }) => {
   if (!firstPlace && !secondPlace && !thirdPlace) return null;
 
@@ -42,7 +44,11 @@ const TournamentPodium: React.FC<TournamentPodiumProps> = ({
           {rank === 1 && <i className="fas fa-crown"></i>}
           {rank !== 1 && rank}
         </div>
-        <div className={styles.podiumAvatar}>
+        <div 
+          className={styles.podiumAvatar}
+          onClick={() => isTeam && participant.id && onViewRoster && onViewRoster(participant.id)}
+          style={{ cursor: (isTeam && onViewRoster) ? 'pointer' : 'default' }}
+        >
           {hasPhoto ? (
             <img 
               src={getImageUrl(participant.photoUrl)} 
@@ -53,7 +59,11 @@ const TournamentPodium: React.FC<TournamentPodiumProps> = ({
             initials
           )}
         </div>
-        <div className={styles.podiumName}>
+        <div 
+          className={styles.podiumName}
+          onClick={() => isTeam && participant.id && onViewRoster && onViewRoster(participant.id)}
+          style={{ cursor: (isTeam && onViewRoster) ? 'pointer' : 'default' }}
+        >
           {displayName}
         </div>
         <div className={styles.podiumGroup}>

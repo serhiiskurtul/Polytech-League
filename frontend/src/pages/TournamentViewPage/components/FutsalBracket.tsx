@@ -90,7 +90,13 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
           <div className={`${styles.futsalTeamRow} ${isHomeWinner ? styles.futsalWinner : isDraw ? styles.futsalDraw : ''}`}>
             <div className={styles.futsalTeamInfo}>
                <div className={styles.futsalTeamHeader}>
-                 <span className={styles.futsalTeamName}>{match.homeTeam?.name || 'TBD'}</span>
+                 <span 
+                   className={styles.futsalTeamName}
+                   onClick={(e) => { e.stopPropagation(); onViewRoster && onViewRoster(match.homeTeamId); }}
+                   style={{ cursor: onViewRoster ? 'pointer' : 'default' }}
+                 >
+                   {match.homeTeam?.name || 'TBD'}
+                 </span>
                  {onViewRoster && (
                    <button className={styles.rosterMiniBtn} onClick={(e) => { e.stopPropagation(); onViewRoster(match.homeTeamId); }}>
                      <i className="fas fa-users"></i>
@@ -113,7 +119,13 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
           <div className={`${styles.futsalTeamRow} ${isAwayWinner ? styles.futsalWinner : isDraw ? styles.futsalDraw : ''}`}>
             <div className={styles.futsalTeamInfo}>
                <div className={styles.futsalTeamHeader}>
-                 <span className={styles.futsalTeamName}>{match.awayTeam?.name || 'TBD'}</span>
+                 <span 
+                   className={styles.futsalTeamName}
+                   onClick={(e) => { e.stopPropagation(); onViewRoster && onViewRoster(match.awayTeamId); }}
+                   style={{ cursor: onViewRoster ? 'pointer' : 'default' }}
+                 >
+                   {match.awayTeam?.name || 'TBD'}
+                 </span>
                  {onViewRoster && (
                    <button className={styles.rosterMiniBtn} onClick={(e) => { e.stopPropagation(); onViewRoster(match.awayTeamId); }}>
                      <i className="fas fa-users"></i>

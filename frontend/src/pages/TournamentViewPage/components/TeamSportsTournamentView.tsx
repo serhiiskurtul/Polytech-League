@@ -960,6 +960,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
              secondPlace={details.secondPlaceTeam}
              thirdPlace={details.thirdPlaceTeam}
              isTeam={true}
+             onViewRoster={(teamId) => { setEditingTeamId(teamId); setIsTeamRosterModalOpen(true); }}
            />
         </div>
       )}
@@ -1095,7 +1096,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       <div className={`${styles.teamLogo} ${isHomeWinner ? styles.winnerLogo : ''}`}>
                         {(match.whiteTeam?.name || match.homeTeam?.name || match.whitePlayer?.lastName)?.[0] || 'T'}
                       </div>
-                      <div className={`${styles.teamName} ${isHomeWinner ? styles.winnerName : ''} ${isDraw ? styles.drawName : ''}`}>
+                      <div 
+                        className={`${styles.teamName} ${isHomeWinner ? styles.winnerName : ''} ${isDraw ? styles.drawName : ''}`}
+                        onClick={() => {
+                          const tId = match.whiteTeamId || match.homeTeamId;
+                          if (tId) { setEditingTeamId(tId); setIsTeamRosterModalOpen(true); }
+                        }}
+                        style={{ cursor: 'pointer' }}
+                      >
                         {match.whiteTeam?.name || match.homeTeam?.name || match.whitePlayer?.name || match.whitePlayer?.lastName || 'Home'}
                         {isHomeWinner && <i className={`fas fa-crown ${styles.crownIcon}`}></i>}
                         {isDraw && <i className={`fas fa-handshake ${styles.drawIcon}`}></i>}
@@ -1120,7 +1128,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       <div className={`${styles.teamLogo} ${isAwayWinner ? styles.winnerLogo : ''}`}>
                         {(match.blackTeam?.name || match.awayTeam?.name || match.awayTeamName || match.blackPlayer?.lastName)?.[0] || 'T'}
                       </div>
-                      <div className={`${styles.teamName} ${isAwayWinner ? styles.winnerName : ''} ${isDraw ? styles.drawName : ''}`}>
+                      <div 
+                        className={`${styles.teamName} ${isAwayWinner ? styles.winnerName : ''} ${isDraw ? styles.drawName : ''}`}
+                        onClick={() => {
+                          const tId = match.blackTeamId || match.awayTeamId;
+                          if (tId) { setEditingTeamId(tId); setIsTeamRosterModalOpen(true); }
+                        }}
+                        style={{ cursor: 'pointer' }}
+                      >
                         {match.blackTeam?.name || match.awayTeam?.name || match.awayTeamName || match.blackPlayer?.name || match.blackPlayer?.lastName || 'Away'}
                         {isAwayWinner && <i className={`fas fa-crown ${styles.crownIcon}`}></i>}
                         {isDraw && <i className={`fas fa-handshake ${styles.drawIcon}`}></i>}
@@ -1231,7 +1246,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                           {calculateStandings(groupName).map((team: any) => (
                             <tr key={team.id}>
                               <td>{team.displayRank}</td>
-                              <td className={styles.tableName}>{team.name}</td>
+                              <td className={styles.tableName} onClick={() => { setEditingTeamId(team.id); setIsTeamRosterModalOpen(true); }} style={{ cursor: 'pointer' }}>{team.name}</td>
                               <td>{team.gp}</td>
                               <td>{team.w}</td>
                               <td>{team.l}</td>
@@ -1280,7 +1295,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                             {calculateStandings('GENERAL_TABLE').map((team: any) => (
                               <tr key={team.id} style={team.isGeneralTableIncluded ? { backgroundColor: 'rgba(59, 130, 246, 0.05)' } : {}}>
                                 <td>{team.displayRank}</td>
-                                <td className={styles.tableName}>
+                                <td className={styles.tableName} onClick={() => { setEditingTeamId(team.id); setIsTeamRosterModalOpen(true); }} style={{ cursor: 'pointer' }}>
                                   {team.name}
                                   {team.isGeneralTableIncluded && <i className="fas fa-check-circle" style={{ marginLeft: '6px', color: '#3b82f6', fontSize: '12px' }} title="Додано вручну"></i>}
                                 </td>
@@ -1339,7 +1354,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         {calculateStandings('GENERAL_TABLE').map((team: any) => (
                           <tr key={team.id} style={team.isGeneralTableIncluded ? { backgroundColor: 'rgba(59, 130, 246, 0.05)' } : {}}>
                             <td>{team.displayRank}</td>
-                            <td className={styles.tableName}>
+                            <td className={styles.tableName} onClick={() => { setEditingTeamId(team.id); setIsTeamRosterModalOpen(true); }} style={{ cursor: 'pointer' }}>
                               {team.name}
                               {team.isGeneralTableIncluded && <i className="fas fa-check-circle" style={{ marginLeft: '6px', color: '#3b82f6', fontSize: '12px' }} title="Додано вручну"></i>}
                             </td>
@@ -1385,7 +1400,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
          {activeTab === 'teams' && (
           <div className={styles.teamsGrid}>
             {details.teams?.map((team: any) => (
-              <div key={team.id} className={styles.teamCard}>
+              <div key={team.id} className={styles.teamCard} onClick={() => { setEditingTeamId(team.id); setIsTeamRosterModalOpen(true); }} style={{ cursor: 'pointer' }}>
                 <div className={styles.teamCardHeader}>
                   <div className={styles.teamAvatar}>{team.name?.[0] || 'T'}</div>
                   <div className={styles.teamInfo}>
@@ -1687,8 +1702,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
               <button className={styles.closeButton} onClick={() => { setIsTeamRosterModalOpen(false); setEditingTeamId(null); setIsQuickAddMode(false); }}>&times;</button>
             </div>
             
-            {!isQuickAddMode ? (
-              <>
+             {isAdmin && !isQuickAddMode && (
                 <div className={styles.searchBox} style={{padding: '20px 40px 0 40px', display: 'flex', gap: '10px'}}>
                     <input 
                         type="text" 
@@ -1714,9 +1728,13 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       <i className="fas fa-user-plus"></i>
                     </button>
                 </div>
+             )}
+             
+             {!isQuickAddMode ? (
+               <>
                 <div className={styles.modalBody} style={{maxHeight: '400px'}}>
                     <div className={styles.playersList}>
-                        {filteredPlayers.map(player => {
+                        {isAdmin ? filteredPlayers.map(player => {
                             const team = details.teams.find((t: any) => t.id === editingTeamId);
                             const isSelected = team.players?.some((p: any) => p.id === player.id);
                             
@@ -1757,8 +1775,30 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                                     </div>
                                 </div>
                             );
-                        })}
-                        {filteredPlayers.length === 0 && (
+                        }) : (
+                          // Read-only view for regular users
+                          details.teams.find((t: any) => t.id === editingTeamId)?.players?.map((player: any) => (
+                            <div key={player.id} className={`${styles.playerPickItem} ${styles.selected}`}>
+                                <div className={styles.pickInfo}>
+                                    <span className={styles.pName}>{player.lastName} {player.firstName}</span>
+                                    <span className={styles.pGroup}>{player.group}</span>
+                                </div>
+                                <div className={styles.pickStatus}>
+                                   {((sport === 'futsal' || sport === 'футзал')) && (
+                                      <div className={styles.roleToggles}>
+                                        {details.teams.find((t: any) => t.id === editingTeamId).captainId === player.id && (
+                                          <span className={styles.isCaptain} title="Капітан"><i className="fas fa-copyright"></i></span>
+                                        )}
+                                        {details.teams.find((t: any) => t.id === editingTeamId).goalkeeperId === player.id && (
+                                          <span className={styles.isGoalkeeper} title="Воротар"><i className="fas fa-hands"></i></span>
+                                        )}
+                                      </div>
+                                   )}
+                                </div>
+                            </div>
+                          ))
+                        )}
+                        {isAdmin && filteredPlayers.length === 0 && (
                           <div className={styles.noPlayersHint} style={{textAlign: 'center', padding: '20px'}}>
                             Гравців не знайдено. 
                             <button 
