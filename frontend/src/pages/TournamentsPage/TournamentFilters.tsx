@@ -46,7 +46,7 @@ const TournamentFilters = ({ activeStatus, activeSport, activeLevel, onStatusCha
   const levels = [
     { id: 'all', label: 'Всі категорії', icon: 'fas fa-globe' },
     { id: 'CollegeGroup', label: 'Міжгрупові', icon: 'fas fa-users' },
-    { id: 'Regional', label: 'Регіональні', icon: 'fas fa-map-marked-alt' },
+    { id: 'Regional', label: 'Обласні', icon: 'fas fa-map-marked-alt' },
     { id: 'National', label: 'Всеукраїнські', icon: 'fas fa-flag' }
   ];
 

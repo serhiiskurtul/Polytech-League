@@ -69,7 +69,7 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
 
   const levelLabels: Record<string, string> = {
     'CollegeGroup': 'Міжгруповий',
-    'Regional': 'Регіональний',
+    'Regional': 'Обласний',
     'National': 'Всеукраїнський'
   };
 
