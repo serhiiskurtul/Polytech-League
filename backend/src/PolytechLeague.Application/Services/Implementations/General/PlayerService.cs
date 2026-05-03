@@ -436,18 +436,16 @@ public class PlayerService : IPlayerService
                 foreach (var ach in achievements) {
                     double pts = 0;
                     double mult = 1.0;
-                    string levelName = "Міжгрупові";
                     if (allEvents.TryGetValue(ach.TournamentId, out var lvl)) {
                         if (levelMultipliers.TryGetValue(lvl, out var m)) mult = m;
                         levelName = lvl switch {
                             CompetitionLevel.Regional => "Обласні",
                             CompetitionLevel.National => "Всеукраїнські",
+                            CompetitionLevel.University => "Університетські",
+                            CompetitionLevel.InterUniversity => "Міжуніверситетські",
                             _ => "Міжгрупові"
                         };
-                        // Participation points ONLY for CollegeGroup level
-                        if (lvl == CompetitionLevel.CollegeGroup) {
-                            pts = 10;
-                        }
+                        pts = 10; // Participation points for all levels
                     } else {
                         // Fallback if event level is unknown
                         pts = 10;
