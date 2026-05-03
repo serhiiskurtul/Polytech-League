@@ -47,29 +47,29 @@ import {
   approveArmwrestlingParticipant,
   rejectArmwrestlingParticipant,
   // Volleyball
-  getVolleyballEventById, 
-  updateVolleyballEvent, 
+  getVolleyballEventById,
+  updateVolleyballEvent,
   registerForVolleyballEvent,
   approveVolleyballParticipant,
   rejectVolleyballParticipant,
   removeVolleyballParticipant,
   // Beach Volleyball
-  getBeachVolleyballEventById, 
-  updateBeachVolleyballEvent, 
+  getBeachVolleyballEventById,
+  updateBeachVolleyballEvent,
   registerForBeachVolleyballEvent,
   approveBeachVolleyballParticipant,
   rejectBeachVolleyballParticipant,
   removeBeachVolleyballParticipant,
   // Futsal
-  getFutsalEventById, 
-  updateFutsalEvent, 
+  getFutsalEventById,
+  updateFutsalEvent,
   registerForFutsalEvent,
   approveFutsalParticipant,
   rejectFutsalParticipant,
   removeFutsalParticipant,
   // Basketball 3x3
-  getBasketball3x3EventById, 
-  updateBasketball3x3Event, 
+  getBasketball3x3EventById,
+  updateBasketball3x3Event,
   registerForBasketball3x3Event,
   approveBasketball3x3Participant,
   rejectBasketball3x3Participant,
@@ -414,20 +414,20 @@ const TournamentViewPage = () => {
       }
     }
   };
-  
+
   const formatDateForInput = (dateStr: string | undefined | null) => {
     if (!dateStr) return '';
     try {
       const d = new Date(dateStr);
       if (isNaN(d.getTime())) return '';
-      
+
       const pad = (num: number) => String(num).padStart(2, '0');
       const year = d.getFullYear();
       const month = pad(d.getMonth() + 1);
       const day = pad(d.getDate());
       const hours = pad(d.getHours());
       const minutes = pad(d.getMinutes());
-      
+
       return `${year}-${month}-${day}T${hours}:${minutes}`;
     } catch (e) {
       return '';
@@ -468,11 +468,11 @@ const TournamentViewPage = () => {
         isModerated: !!details.isModerated,
         isPublic: details.isPublic !== undefined ? !!details.isPublic : true,
         seasonId: details.seasonId || null,
-        category: (details as any).category || 
-                  (tournament?.category === 'Чоловіки' ? 'Men' : 
-                   tournament?.category === 'Жінки' ? 'Women' : 
-                   tournament?.category === 'Змішаний' ? 'Mixed' : 
-                   (tournament?.category as any)) || 'Mixed',
+        category: (details as any).category ||
+          (tournament?.category === 'Чоловіки' ? 'Men' :
+            tournament?.category === 'Жінки' ? 'Women' :
+              tournament?.category === 'Змішаний' ? 'Mixed' :
+                (tournament?.category as any)) || 'Mixed',
         firstPlaceId: details.firstPlace?.id || null,
         secondPlaceId: details.secondPlace?.id || null,
         thirdPlaceId: details.thirdPlace?.id || null,
@@ -593,8 +593,8 @@ const TournamentViewPage = () => {
       } else if (sportKey === 'basketball_3x3' || sportKey === 'basketball3x3') {
         await updateBasketball3x3Event(id!, { ...payload, tournamentType: (details as any).tournamentType || 'RoundRobin' });
       } else if (sportKey === 'tabletennis' || sportKey === 'table_tennis') {
-        await updateTableTennisEvent(id!, { 
-          ...payload, 
+        await updateTableTennisEvent(id!, {
+          ...payload,
           tournamentType: (details as any).tournamentType || 'RoundRobin'
         });
       } else {
@@ -931,7 +931,7 @@ const TournamentViewPage = () => {
     if (!quiet) setIsLoading(true);
     try {
       if (user && !currentUserPlayer) {
-        getProfile().then(setCurrentUserPlayer).catch(() => {});
+        getProfile().then(setCurrentUserPlayer).catch(() => { });
       }
       const data = await getTournamentById(id);
       setTournament(data);
@@ -966,45 +966,45 @@ const TournamentViewPage = () => {
           setAllPlayers(playersData);
 
           // Initialize winners state
-            if (detailsData) {
-              const d = detailsData as any;
-              setWinners({
-                firstPlaceId: d.firstPlace?.id || d.firstPlaceTeam?.id || 0,
-                secondPlaceId: d.secondPlace?.id || d.secondPlaceTeam?.id || 0,
-                thirdPlaceId: d.thirdPlace?.id || d.thirdPlaceTeam?.id || 0
-              });
+          if (detailsData) {
+            const d = detailsData as any;
+            setWinners({
+              firstPlaceId: d.firstPlace?.id || d.firstPlaceTeam?.id || 0,
+              secondPlaceId: d.secondPlace?.id || d.secondPlaceTeam?.id || 0,
+              thirdPlaceId: d.thirdPlace?.id || d.thirdPlaceTeam?.id || 0
+            });
 
-              // Initialize editTournamentData to prevent 400 errors when saving winners
-              setEditTournamentData({
-                name: data.title || d.name || '',
-                date: formatDateForInput(d.date),
-                location: data.location || d.location || '',
-                refereeIds: d.refereeIds || [],
-                level: d.level || 'CollegeGroup',
-                description: data.description || d.description || '',
-                timeControl: d.timeControl || '',
-                participantsCount: d.participantsCount || 0,
-                system: d.system || 'Swiss',
-                rules: d.rules || '',
-                prizes: d.prizes || '',
-                headRefereeName: d.headRefereeName || '',
-                referees: d.referees || '',
-                schedule: d.schedule || '',
-                isTeam: !!d.isTeam,
-                registrationStart: formatDateForInput(data.registrationStart || d.registrationStart),
-                registrationEnd: formatDateForInput(data.registrationEnd || d.registrationEnd),
-                endDate: formatDateForInput(data.endDate || d.endDate),
-                isModerated: !!d.isModerated,
-                isPublic: d.isPublic !== undefined ? !!d.isPublic : true,
-                seasonId: d.seasonId || null,
-                firstPlaceId: d.firstPlace?.id || null,
-                secondPlaceId: d.secondPlace?.id || null,
-                thirdPlaceId: d.thirdPlace?.id || null,
-                firstPlaceTeamId: d.firstPlaceTeam?.id || null,
-                secondPlaceTeamId: d.secondPlaceTeam?.id || null,
-                thirdPlaceTeamId: d.thirdPlaceTeam?.id || null
-              } as any);
-            }
+            // Initialize editTournamentData to prevent 400 errors when saving winners
+            setEditTournamentData({
+              name: data.title || d.name || '',
+              date: formatDateForInput(d.date),
+              location: data.location || d.location || '',
+              refereeIds: d.refereeIds || [],
+              level: d.level || 'CollegeGroup',
+              description: data.description || d.description || '',
+              timeControl: d.timeControl || '',
+              participantsCount: d.participantsCount || 0,
+              system: d.system || 'Swiss',
+              rules: d.rules || '',
+              prizes: d.prizes || '',
+              headRefereeName: d.headRefereeName || '',
+              referees: d.referees || '',
+              schedule: d.schedule || '',
+              isTeam: !!d.isTeam,
+              registrationStart: formatDateForInput(data.registrationStart || d.registrationStart),
+              registrationEnd: formatDateForInput(data.registrationEnd || d.registrationEnd),
+              endDate: formatDateForInput(data.endDate || d.endDate),
+              isModerated: !!d.isModerated,
+              isPublic: d.isPublic !== undefined ? !!d.isPublic : true,
+              seasonId: d.seasonId || null,
+              firstPlaceId: d.firstPlace?.id || null,
+              secondPlaceId: d.secondPlace?.id || null,
+              thirdPlaceId: d.thirdPlace?.id || null,
+              firstPlaceTeamId: d.firstPlaceTeam?.id || null,
+              secondPlaceTeamId: d.secondPlaceTeam?.id || null,
+              thirdPlaceTeamId: d.thirdPlaceTeam?.id || null
+            } as any);
+          }
         } catch (eventErr) {
           console.error('Failed to fetch detailed event info:', eventErr);
         }
@@ -1166,10 +1166,10 @@ const TournamentViewPage = () => {
 
       switch (sportKey) {
         case 'checkers':
-          await addParticipantToCheckersEvent(id!, { 
-            playerId: playerId, 
-            points: 0, 
-            rank: 0, 
+          await addParticipantToCheckersEvent(id!, {
+            playerId: playerId,
+            points: 0,
+            rank: 0,
             status: RegistrationStatus.Approved,
             firstName: newPlayer.firstName,
             lastName: newPlayer.lastName,
@@ -1177,10 +1177,10 @@ const TournamentViewPage = () => {
           });
           break;
         case 'armwrestling':
-          await addParticipantToArmwrestlingEvent(id!, { 
-            playerId: playerId, 
-            weight: newPlayer.weight || 0, 
-            rank: 0, 
+          await addParticipantToArmwrestlingEvent(id!, {
+            playerId: playerId,
+            weight: newPlayer.weight || 0,
+            rank: 0,
             status: RegistrationStatus.Approved,
             firstName: newPlayer.firstName,
             lastName: newPlayer.lastName,
@@ -1188,10 +1188,10 @@ const TournamentViewPage = () => {
           });
           break;
         case 'badminton':
-          await addParticipantToBadmintonEvent(id!, { 
-            playerId: playerId, 
-            points: 0, 
-            rank: 0, 
+          await addParticipantToBadmintonEvent(id!, {
+            playerId: playerId,
+            points: 0,
+            rank: 0,
             status: RegistrationStatus.Approved,
             firstName: newPlayer.firstName,
             lastName: newPlayer.lastName,
@@ -1200,10 +1200,10 @@ const TournamentViewPage = () => {
           break;
         case 'tabletennis':
         case 'table_tennis':
-          await addParticipantToTableTennisEvent(id!, { 
-            playerId: playerId, 
-            points: 0, 
-            rank: 0, 
+          await addParticipantToTableTennisEvent(id!, {
+            playerId: playerId,
+            points: 0,
+            rank: 0,
             status: RegistrationStatus.Approved,
             firstName: newPlayer.firstName,
             lastName: newPlayer.lastName,
@@ -1211,10 +1211,10 @@ const TournamentViewPage = () => {
           });
           break;
         default:
-          await addParticipantToEvent(id!, { 
-            playerId: playerId, 
-            points: 0, 
-            rank: 0, 
+          await addParticipantToEvent(id!, {
+            playerId: playerId,
+            points: 0,
+            rank: 0,
             status: RegistrationStatus.Approved,
             firstName: newPlayer.firstName,
             lastName: newPlayer.lastName,
@@ -1294,8 +1294,8 @@ const TournamentViewPage = () => {
 
   const sortedPlayers = (() => {
     const rawParticipants = details?.participants || details?.players || [];
-    const filtered = isAdmin 
-      ? rawParticipants 
+    const filtered = isAdmin
+      ? rawParticipants
       : rawParticipants.filter((p: any) => p.status === RegistrationStatus.Approved || !p.status);
 
     if (tournament?.sport === 'chess' || tournament?.sport === 'checkers') {
@@ -1358,9 +1358,9 @@ const TournamentViewPage = () => {
     : ((details as any)?.players?.length || (details as any)?.participants?.length || 0);
 
   const participantLabel = isTeamSport ? 'команд' : 'учасників';
-  
+
   const pendingParticipantsCount = (details?.participants?.filter((p: any) => p.status === RegistrationStatus.Pending)?.length || 0) +
-                                   (details?.teams?.filter((t: any) => t.status === RegistrationStatus.Pending)?.length || 0);
+    (details?.teams?.filter((t: any) => t.status === RegistrationStatus.Pending)?.length || 0);
 
   const filteredGames = (tournament?.sport === 'chess' || tournament?.sport === 'checkers') && (details as any)?.games
     ? [...(details as any).games].filter((g: any) => {
@@ -1387,9 +1387,9 @@ const TournamentViewPage = () => {
   const regEnd = tournament?.registrationEnd ? new Date(tournament.registrationEnd) : null;
   const isRegistrationOpen = (!regStart || now >= regStart) && (!regEnd || now <= regEnd);
   const isFinished = tournament?.status === 'completed' || !!details?.firstPlace || !!details?.firstPlaceTeam || (tournament?.endDate && new Date(tournament.endDate) < now) || (regEnd && now > regEnd);
-  
-  const userRegistration = details?.participants?.find((p: any) => 
-    (p.userId && p.userId === user?.id) || 
+
+  const userRegistration = details?.participants?.find((p: any) =>
+    (p.userId && p.userId === user?.id) ||
     (p.playerId && currentUserPlayer && p.playerId === currentUserPlayer.id)
   );
   const isUserRegistered = !!userRegistration;
@@ -1451,7 +1451,7 @@ const TournamentViewPage = () => {
                     <option key="default-first" value="0">-- Оберіть переможця --</option>
                     {!isTeamSport && sortedPlayers?.map((p: any) => (
                       <option key={`first-p-${p.playerId}`} value={p.playerId}>
-                        {p.playerName} { (['chess', 'checkers', 'tabletennis', 'badminton'].includes(tournament?.sport)) && (p.points !== undefined) ? `(${p.points} очок)` : ''}
+                        {p.playerName} {(['chess', 'checkers', 'tabletennis', 'badminton'].includes(tournament?.sport)) && (p.points !== undefined) ? `(${p.points} очок)` : ''}
                       </option>
                     ))}
                     {isTeamSport && details?.teams?.map((t: any) => (
@@ -1472,7 +1472,7 @@ const TournamentViewPage = () => {
                     <option key="default-second" value="0">-- Оберіть переможця --</option>
                     {!isTeamSport && sortedPlayers?.map((p: any) => (
                       <option key={`second-p-${p.playerId}`} value={p.playerId}>
-                        {p.playerName} { (['chess', 'checkers', 'tabletennis', 'badminton'].includes(tournament?.sport)) && (p.points !== undefined) ? `(${p.points} очок)` : ''}
+                        {p.playerName} {(['chess', 'checkers', 'tabletennis', 'badminton'].includes(tournament?.sport)) && (p.points !== undefined) ? `(${p.points} очок)` : ''}
                       </option>
                     ))}
                     {isTeamSport && details?.teams?.map((t: any) => (
@@ -1493,7 +1493,7 @@ const TournamentViewPage = () => {
                     <option key="default-third" value="0">-- Оберіть переможця --</option>
                     {!isTeamSport && sortedPlayers?.map((p: any) => (
                       <option key={`third-p-${p.playerId}`} value={p.playerId}>
-                        {p.playerName} { (['chess', 'checkers', 'tabletennis', 'badminton'].includes(tournament?.sport)) && (p.points !== undefined) ? `(${p.points} очок)` : ''}
+                        {p.playerName} {(['chess', 'checkers', 'tabletennis', 'badminton'].includes(tournament?.sport)) && (p.points !== undefined) ? `(${p.points} очок)` : ''}
                       </option>
                     ))}
                     {isTeamSport && details?.teams?.map((t: any) => (
@@ -1565,19 +1565,19 @@ const TournamentViewPage = () => {
                     <div className={`${styles.registrationStatus} ${styles[userRegistration.status?.toLowerCase()]}`}>
                       <i className={
                         userRegistration.status === RegistrationStatus.Approved ? "fas fa-check-circle" :
-                        userRegistration.status === RegistrationStatus.Pending ? "fas fa-clock" :
-                        "fas fa-times-circle"
+                          userRegistration.status === RegistrationStatus.Pending ? "fas fa-clock" :
+                            "fas fa-times-circle"
                       }></i>
                       <span>
                         {userRegistration.status === RegistrationStatus.Approved ? "Ви зареєстровані" :
-                         userRegistration.status === RegistrationStatus.Pending ? "Очікує підтвердження" :
-                         "Заявку відхилено"}
+                          userRegistration.status === RegistrationStatus.Pending ? "Очікує підтвердження" :
+                            "Заявку відхилено"}
                       </span>
                     </div>
                   ) : (
                     isRegistrationOpen && !isAdmin && details?.level === 'CollegeGroup' ? (
-                      <button 
-                        className={styles.registerButton} 
+                      <button
+                        className={styles.registerButton}
                         onClick={handleRegister}
                         disabled={isRegistering}
                       >
@@ -1679,9 +1679,9 @@ const TournamentViewPage = () => {
                       </div>
                       <div>
                         <strong>Тип реєстрації:</strong><br />
-                        <span style={{ 
-                          fontSize: '13px', 
-                          fontWeight: 'bold', 
+                        <span style={{
+                          fontSize: '13px',
+                          fontWeight: 'bold',
                           color: details?.isPublic ? '#10b981' : '#f59e0b',
                           background: details?.isPublic ? '#ecfdf5' : '#fffbeb',
                           padding: '2px 8px',
@@ -1805,11 +1805,11 @@ const TournamentViewPage = () => {
                 <div className={styles.statCard}>
                   <div className={styles.statIcon}>
                     <i className={
-                      tournament?.sport === 'badminton' || 
-                      tournament?.sport === 'table_tennis' || 
-                      tournament?.sport === 'tabletennis' || 
-                      tournament?.sport === 'armwrestling'
-                        ? "fas fa-project-diagram" 
+                      tournament?.sport === 'badminton' ||
+                        tournament?.sport === 'table_tennis' ||
+                        tournament?.sport === 'tabletennis' ||
+                        tournament?.sport === 'armwrestling'
+                        ? "fas fa-project-diagram"
                         : "fas fa-chess-board"
                     }></i>
                   </div>
@@ -1824,19 +1824,19 @@ const TournamentViewPage = () => {
                 <div className={styles.statCard}>
                   <div className={styles.statIcon}>
                     <i className={
-                      tournament?.sport === 'badminton' ? "fas fa-shuttlecock" : 
-                      tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? "fas fa-table-tennis" : 
-                      tournament?.sport === 'armwrestling' ? "fas fa-hand-rock" : 
-                      "fas fa-venus-mars"
+                      tournament?.sport === 'badminton' ? "fas fa-shuttlecock" :
+                        tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? "fas fa-table-tennis" :
+                          tournament?.sport === 'armwrestling' ? "fas fa-hand-rock" :
+                            "fas fa-venus-mars"
                     }></i>
                   </div>
                   <div className={styles.statValue}>
-                      {(() => {
-                        const cat = (details as any)?.category || tournament?.category;
-                        if (cat === 'Men' || cat === 'Чоловіки') return 'Чоловіки';
-                        if (cat === 'Women' || cat === 'Жінки') return 'Жінки';
-                        return 'Змішане';
-                      })()}
+                    {(() => {
+                      const cat = (details as any)?.category || tournament?.category;
+                      if (cat === 'Men' || cat === 'Чоловіки') return 'Чоловіки';
+                      if (cat === 'Women' || cat === 'Жінки') return 'Жінки';
+                      return 'Змішане';
+                    })()}
                   </div>
                   <div className={styles.statLabel}>Категорія</div>
                 </div>
@@ -1897,12 +1897,12 @@ const TournamentViewPage = () => {
                         onClick={() => setActiveTab('participants')}
                       >
                         <i className="fas fa-users"></i> Учасники {pendingParticipantsCount > 0 && (
-                          <span style={{ 
-                            marginLeft: '6px', 
-                            background: '#ef4444', 
-                            color: '#fff', 
-                            padding: '2px 8px', 
-                            borderRadius: '12px', 
+                          <span style={{
+                            marginLeft: '6px',
+                            background: '#ef4444',
+                            color: '#fff',
+                            padding: '2px 8px',
+                            borderRadius: '12px',
                             fontSize: '11px',
                             fontWeight: 'bold',
                             boxShadow: '0 2px 4px rgba(239,68,68,0.3)'
@@ -1951,19 +1951,19 @@ const TournamentViewPage = () => {
                                       <td>
                                         {(tournament?.sport?.toLowerCase() === 'chess' || tournament?.sport?.toLowerCase() === 'checkers') ? (
                                           <div style={{ display: 'flex', gap: '4px' }}>
-                                            <input 
-                                              type="text" 
+                                            <input
+                                              type="text"
                                               placeholder="Прізвище"
-                                              value={editingParticipantData.lastName} 
-                                              onChange={(e) => setEditingParticipantData({ ...editingParticipantData, lastName: e.target.value })} 
-                                              style={{ width: '100px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} 
+                                              value={editingParticipantData.lastName}
+                                              onChange={(e) => setEditingParticipantData({ ...editingParticipantData, lastName: e.target.value })}
+                                              style={{ width: '100px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}
                                             />
-                                            <input 
-                                              type="text" 
+                                            <input
+                                              type="text"
                                               placeholder="Ім'я"
-                                              value={editingParticipantData.firstName} 
-                                              onChange={(e) => setEditingParticipantData({ ...editingParticipantData, firstName: e.target.value })} 
-                                              style={{ width: '80px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} 
+                                              value={editingParticipantData.firstName}
+                                              onChange={(e) => setEditingParticipantData({ ...editingParticipantData, firstName: e.target.value })}
+                                              style={{ width: '80px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}
                                             />
                                           </div>
                                         ) : (
@@ -1978,11 +1978,11 @@ const TournamentViewPage = () => {
                                       </td>
                                       <td>
                                         {(tournament?.sport?.toLowerCase() === 'chess' || tournament?.sport?.toLowerCase() === 'checkers') ? (
-                                          <input 
-                                            type="text" 
-                                            value={editingParticipantData.groupName} 
-                                            onChange={(e) => setEditingParticipantData({ ...editingParticipantData, groupName: e.target.value })} 
-                                            style={{ width: '80px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} 
+                                          <input
+                                            type="text"
+                                            value={editingParticipantData.groupName}
+                                            onChange={(e) => setEditingParticipantData({ ...editingParticipantData, groupName: e.target.value })}
+                                            style={{ width: '80px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}
                                           />
                                         ) : (
                                           p.groupName || '—'
@@ -2059,20 +2059,20 @@ const TournamentViewPage = () => {
                                           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'center' }}>
                                             {p.status === RegistrationStatus.Pending && (
                                               <>
-                                                <button 
-                                                  type="button" 
-                                                  onClick={() => handleApproveParticipant(p.playerId, p.playerName)} 
-                                                  style={{ padding: '6px 10px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(16,185,129,0.2)' }} 
+                                                <button
+                                                  type="button"
+                                                  onClick={() => handleApproveParticipant(p.playerId, p.playerName)}
+                                                  style={{ padding: '6px 10px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(16,185,129,0.2)' }}
                                                   title="Схвалити"
                                                   onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
                                                   onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                                                 >
                                                   <i className="fas fa-check" style={{ fontSize: '14px' }}></i>
                                                 </button>
-                                                <button 
-                                                  type="button" 
-                                                  onClick={() => handleRejectParticipant(p.playerId, p.playerName)} 
-                                                  style={{ padding: '6px 10px', background: '#f59e0b', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(245,158,11,0.2)' }} 
+                                                <button
+                                                  type="button"
+                                                  onClick={() => handleRejectParticipant(p.playerId, p.playerName)}
+                                                  style={{ padding: '6px 10px', background: '#f59e0b', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(245,158,11,0.2)' }}
                                                   title="Відхилити"
                                                   onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
                                                   onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
@@ -2081,20 +2081,20 @@ const TournamentViewPage = () => {
                                                 </button>
                                               </>
                                             )}
-                                            <button 
-                                              type="button" 
-                                              onClick={() => handleEditParticipantClick(p)} 
-                                              style={{ padding: '6px 10px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(59,130,246,0.2)' }} 
+                                            <button
+                                              type="button"
+                                              onClick={() => handleEditParticipantClick(p)}
+                                              style={{ padding: '6px 10px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(59,130,246,0.2)' }}
                                               title="Редагувати"
                                               onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
                                               onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                                             >
                                               <i className="fas fa-edit" style={{ fontSize: '14px' }}></i>
                                             </button>
-                                            <button 
-                                              type="button" 
-                                              onClick={() => handleRemoveParticipant(p.playerId, p.playerName)} 
-                                              style={{ padding: '6px 10px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(239,68,68,0.2)' }} 
+                                            <button
+                                              type="button"
+                                              onClick={() => handleRemoveParticipant(p.playerId, p.playerName)}
+                                              style={{ padding: '6px 10px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(239,68,68,0.2)' }}
                                               title="Видалити"
                                               onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
                                               onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
@@ -2167,12 +2167,12 @@ const TournamentViewPage = () => {
                             <label style={{ fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>Тур</label>
                             <input type="number" placeholder="Усі" value={gameFilters.round} onChange={(e) => setGameFilters({ ...gameFilters, round: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', width: '80px' }} />
                           </div>
-                           <div style={{ display: 'flex', flexDirection: 'column' }}>
-                             <label style={{ fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>
-                               {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? 'Стіл' : tournament?.sport === 'badminton' ? 'Корт' : 'Дошка'}
-                             </label>
-                             <input type="number" placeholder="Усі" value={gameFilters.board} onChange={(e) => setGameFilters({ ...gameFilters, board: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', width: '80px' }} />
-                           </div>
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <label style={{ fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>
+                              {tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? 'Стіл' : tournament?.sport === 'badminton' ? 'Корт' : 'Дошка'}
+                            </label>
+                            <input type="number" placeholder="Усі" value={gameFilters.board} onChange={(e) => setGameFilters({ ...gameFilters, board: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', width: '80px' }} />
+                          </div>
                           <div style={{ display: 'flex', flexDirection: 'column' }}>
                             <label style={{ fontSize: '12px', marginBottom: '4px', fontWeight: 'bold', color: '#666' }}>Учасник (ім'я)</label>
                             <input type="text" placeholder="Пошук..." value={gameFilters.participant} onChange={(e) => setGameFilters({ ...gameFilters, participant: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', minWidth: '200px' }} />
@@ -2415,13 +2415,13 @@ const TournamentViewPage = () => {
                                     left: 0,
                                     right: 0,
                                     background: '#fff',
-                                            border: '1px solid #ccc',
-                                            borderRadius: '6px',
-                                            zIndex: 10,
-                                            maxHeight: '200px',
-                                            overflowY: 'auto',
-                                            boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-                                          }}>
+                                    border: '1px solid #ccc',
+                                    borderRadius: '6px',
+                                    zIndex: 10,
+                                    maxHeight: '200px',
+                                    overflowY: 'auto',
+                                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                                  }}>
                                     {searchResults.map((result, idx) => (
                                       <div
                                         key={`${result.type}-${result.id}-${idx}`}
@@ -2661,7 +2661,7 @@ const TournamentViewPage = () => {
             <div className={styles.gallerySection}>
               <div className={styles.galleryHeader}>
                 <i className="fas fa-images"></i>
-                <h2>Галерея змагань</h2>
+                <h2>Галерея змагання</h2>
               </div>
               <div className={styles.photoGrid}>
                 {details.photos.map((photo: any, index: number) => (
@@ -2681,8 +2681,8 @@ const TournamentViewPage = () => {
                     <div className={styles.photoOverlay}>
                       <i className="fas fa-search-plus"></i>
                       {isAdmin && (
-                        <button 
-                          className={styles.directDeleteBtn} 
+                        <button
+                          className={styles.directDeleteBtn}
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDeletePhoto(photo.id);
@@ -2708,8 +2708,8 @@ const TournamentViewPage = () => {
                 </button>
 
                 {isAdmin && (
-                  <button 
-                    className={styles.lightboxDeleteBtn} 
+                  <button
+                    className={styles.lightboxDeleteBtn}
                     onClick={(e) => {
                       e.stopPropagation();
                       if (details.photos[selectedPhotoIndex]) {
@@ -2724,9 +2724,9 @@ const TournamentViewPage = () => {
                 )}
 
                 {isVideo(details.photos[selectedPhotoIndex].url) ? (
-                  <video 
-                    src={getImageUrl(details.photos[selectedPhotoIndex].url)} 
-                    controls 
+                  <video
+                    src={getImageUrl(details.photos[selectedPhotoIndex].url)}
+                    controls
                     autoPlay
                     className={styles.lightboxVideo}
                   />
@@ -2845,26 +2845,26 @@ const TournamentViewPage = () => {
                     {editTournamentData.level === 'CollegeGroup' && (
                       <div className={styles.formGroup} style={{ gridColumn: '1 / -1', display: 'flex', gap: '20px' }}>
                         {!isMandatoryTeamSport && (
-                        <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                          <input
-                            type="checkbox"
-                            checked={editTournamentData.isTeam}
-                            onChange={(e) => setEditTournamentData({ ...editTournamentData, isTeam: e.target.checked })}
-                            style={{ width: '20px', height: '20px' }}
-                          />
-                          <div>
-                            <strong style={{ display: 'block' }}>Командні змагання</strong>
-                            <small style={{ color: '#64748b' }}>Матчі проводяться між командами (групами)</small>
-                          </div>
-                        </label>
+                          <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                            <input
+                              type="checkbox"
+                              checked={editTournamentData.isTeam}
+                              onChange={(e) => setEditTournamentData({ ...editTournamentData, isTeam: e.target.checked })}
+                              style={{ width: '20px', height: '20px' }}
+                            />
+                            <div>
+                              <strong style={{ display: 'block' }}>Командні змагання</strong>
+                              <small style={{ color: '#64748b' }}>Матчі проводяться між командами (групами)</small>
+                            </div>
+                          </label>
                         )}
 
                         <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f0f9ff', padding: '12px', borderRadius: '8px', border: '1px solid #bae6fd' }}>
                           <input
                             type="checkbox"
                             checked={editTournamentData.isPublic}
-                            onChange={(e) => setEditTournamentData({ 
-                              ...editTournamentData, 
+                            onChange={(e) => setEditTournamentData({
+                              ...editTournamentData,
                               isPublic: e.target.checked,
                               isModerated: e.target.checked ? false : editTournamentData.isModerated
                             })}
@@ -2880,8 +2880,8 @@ const TournamentViewPage = () => {
                           <input
                             type="checkbox"
                             checked={editTournamentData.isModerated}
-                            onChange={(e) => setEditTournamentData({ 
-                              ...editTournamentData, 
+                            onChange={(e) => setEditTournamentData({
+                              ...editTournamentData,
                               isModerated: e.target.checked,
                               isPublic: e.target.checked ? false : editTournamentData.isPublic
                             })}
@@ -2895,22 +2895,22 @@ const TournamentViewPage = () => {
                       </div>
                     )}
                     {editTournamentData.level !== 'CollegeGroup' && (
-                       <div className={styles.formGroup} style={{ gridColumn: '1 / -1', display: 'flex', gap: '20px' }}>
+                      <div className={styles.formGroup} style={{ gridColumn: '1 / -1', display: 'flex', gap: '20px' }}>
                         {!isMandatoryTeamSport && (
-                        <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                          <input
-                            type="checkbox"
-                            checked={editTournamentData.isTeam}
-                            onChange={(e) => setEditTournamentData({ ...editTournamentData, isTeam: e.target.checked })}
-                            style={{ width: '20px', height: '20px' }}
-                          />
-                          <div>
-                            <strong style={{ display: 'block' }}>Командні змагання</strong>
-                            <small style={{ color: '#64748b' }}>Матчі проводяться між командами (групами)</small>
-                          </div>
-                        </label>
+                          <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                            <input
+                              type="checkbox"
+                              checked={editTournamentData.isTeam}
+                              onChange={(e) => setEditTournamentData({ ...editTournamentData, isTeam: e.target.checked })}
+                              style={{ width: '20px', height: '20px' }}
+                            />
+                            <div>
+                              <strong style={{ display: 'block' }}>Командні змагання</strong>
+                              <small style={{ color: '#64748b' }}>Матчі проводяться між командами (групами)</small>
+                            </div>
+                          </label>
                         )}
-                       </div>
+                      </div>
                     )}
                     <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
                       <label>Судді</label>
@@ -2940,53 +2940,53 @@ const TournamentViewPage = () => {
                           <div className={styles.mainPhotoPreview}>
                             <img src={getImageUrl(details.mainPhotoUrl)} alt="Main" />
                             <div className={styles.mainPhotoActions}>
-                                <button 
+                              <button
                                 className={styles.changeMainPhotoBtn}
                                 onClick={() => {
-                                    const input = document.createElement('input');
-                                    input.type = 'file';
-                                    input.accept = 'image/*';
-                                    input.onchange = async (e: any) => {
+                                  const input = document.createElement('input');
+                                  input.type = 'file';
+                                  input.accept = 'image/*';
+                                  input.onchange = async (e: any) => {
                                     const file = e.target.files?.[0];
                                     if (file) {
-                                        try {
+                                      try {
                                         setIsUploading(true);
                                         await setMainPhoto(id!, file);
                                         toast.success("Головне фото оновлено");
                                         fetchTournament(true);
-                                        } catch (err) {
+                                      } catch (err) {
                                         toast.error("Помилка при оновленні");
-                                        } finally {
+                                      } finally {
                                         setIsUploading(false);
-                                        }
+                                      }
                                     }
-                                    };
-                                    input.click();
+                                  };
+                                  input.click();
                                 }}
-                                >
+                              >
                                 <i className="fas fa-edit"></i> Змінити афішу
-                                </button>
-                                <button 
+                              </button>
+                              <button
                                 className={styles.removeMainPhotoBtn}
                                 onClick={async () => {
-                                    if (!window.confirm("Видалити афішу? Змагання буде використовувати перше фото з галереї.")) return;
-                                    try {
-                                        // We can just call an update with null or a dedicated delete
-                                        // For now let's just use the markAsMain with null logic if supported or just add a simple setter
-                                        await api.post(`/event-media/${id}/mark-as-main/0`); // 0 or null logic
-                                        toast.success("Афішу видалено");
-                                        fetchTournament(true);
-                                    } catch (err) {
-                                        toast.error("Помилка");
-                                    }
+                                  if (!window.confirm("Видалити афішу? Змагання буде використовувати перше фото з галереї.")) return;
+                                  try {
+                                    // We can just call an update with null or a dedicated delete
+                                    // For now let's just use the markAsMain with null logic if supported or just add a simple setter
+                                    await api.post(`/event-media/${id}/mark-as-main/0`); // 0 or null logic
+                                    toast.success("Афішу видалено");
+                                    fetchTournament(true);
+                                  } catch (err) {
+                                    toast.error("Помилка");
+                                  }
                                 }}
-                                >
+                              >
                                 <i className="fas fa-trash"></i>
-                                </button>
+                              </button>
                             </div>
                           </div>
                         ) : (
-                          <div 
+                          <div
                             className={styles.mainPhotoPlaceholder}
                             onClick={() => {
                               const input = document.createElement('input');
