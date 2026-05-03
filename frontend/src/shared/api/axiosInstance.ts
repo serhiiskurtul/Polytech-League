@@ -8,6 +8,19 @@ const api = axios.create({
   withCredentials: true
 });
 
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 let isRefreshing = false;
 let failedQueue: any[] = [];
 
@@ -46,13 +59,20 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        await axios.post(`${API_URL}/refresh`, {}, { withCredentials: true });
-        processQueue(null);
+        const refreshToken = localStorage.getItem('refreshToken');
+        const response = await axios.post(`${API_URL}/refresh`, { refreshToken }, { withCredentials: true });
+        
+        const { accessToken, refreshToken: newRefreshToken } = response.data;
+        localStorage.setItem('token', accessToken);
+        localStorage.setItem('refreshToken', newRefreshToken);
+
+        processQueue(null, accessToken);
         return api(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        // Опціонально: перенаправлення на логін або очищення стану
-        // window.location.href = '/login';
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        window.location.href = '/login';
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

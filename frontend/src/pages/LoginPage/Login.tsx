@@ -37,7 +37,11 @@ export default function Login() {
 
   const onSubmit = async (data: LoginFormInputs) => {
     try {
-      await loginApi({ email: data.email, password: data.password });
+      const response = await loginApi({ email: data.email, password: data.password });
+      
+      // Save tokens to localStorage
+      localStorage.setItem('token', response.accessToken);
+      localStorage.setItem('refreshToken', response.refreshToken);
 
       const meResponse = await api.get("/users/me");
       login(meResponse.data);
