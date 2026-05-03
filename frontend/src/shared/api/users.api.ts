@@ -9,6 +9,7 @@ export interface UserResponse {
   isBlocked: boolean;
   isDeleted: boolean;
   createdAt: string;
+  isEmailConfirmed: boolean;
 }
 
 export interface PagedResponse<T> {

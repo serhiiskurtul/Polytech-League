@@ -185,6 +185,7 @@ export const AdminUsersPage = () => {
               <thead>
                 <tr>
                   <th>Користувач</th>
+                  <th>Пошта підтверджена</th>
                   <th>Роль</th>
                   <th>Статус</th>
                   <th>Дата реєстрації</th>
@@ -204,6 +205,11 @@ export const AdminUsersPage = () => {
                           <span className={styles.userEmail}>{user.email}</span>
                         </div>
                       </div>
+                    </td>
+                    <td>
+                      <span className={`${styles.statusBadge} ${user.isEmailConfirmed ? styles.verifiedStatus : styles.unverifiedStatus}`}>
+                        {user.isEmailConfirmed ? 'Підтверджена' : 'Не підтверджена'}
+                      </span>
                     </td>
                     <td>
                       <span className={`${styles.roleBadge} ${user.role === 1 || user.role === 'Admin' ? styles.adminRole : styles.userRole}`}>
