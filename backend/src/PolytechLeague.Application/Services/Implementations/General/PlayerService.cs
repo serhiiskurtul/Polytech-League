@@ -307,6 +307,12 @@ public class PlayerService : IPlayerService
                 .GroupBy(g => g.PlayerId)
                 .Select(g => new { Id = g.Key, Goals = g.Sum(x => x.GoalsCount) })
                 .ToListAsync(cancellationToken);
+
+            // Load Team Sports Matches
+            var futsalMatches = await _dbContext.FutsalMatches.Include(m => m.HomeRoster).Include(m => m.AwayRoster).Where(m => eventIds.Contains(m.EventId)).ToListAsync(cancellationToken);
+            var volleyballMatches = await _dbContext.VolleyballMatches.Include(m => m.HomeRoster).Include(m => m.AwayRoster).Where(m => eventIds.Contains(m.EventId)).ToListAsync(cancellationToken);
+            var basketballMatches = await _dbContext.Basketball3x3Matches.Include(m => m.HomeRoster).Include(m => m.AwayRoster).Where(m => eventIds.Contains(m.EventId)).ToListAsync(cancellationToken);
+            var beachVolleyballMatches = await _dbContext.BeachVolleyballMatches.Include(m => m.HomeRoster).Include(m => m.AwayRoster).Where(m => eventIds.Contains(m.EventId)).ToListAsync(cancellationToken);
             var playerDtos = new List<PlayerDto>();
             foreach (var player in players)
             {
@@ -498,6 +504,35 @@ public class PlayerService : IPlayerService
                 AddStats("table_tennis", (t1?.Count ?? 0) + (t2?.Count ?? 0), (t1?.Wins ?? 0) + (t2?.Wins ?? 0));
                 AddStats("armwrestling", (a1?.Count ?? 0) + (a2?.Count ?? 0), (a1?.Wins ?? 0) + (a2?.Wins ?? 0));
                 AddStats("badminton", (b1?.Count ?? 0) + (b2?.Count ?? 0), (b1?.Wins ?? 0) + (b2?.Wins ?? 0));
+
+                // Team Sports Match Stats
+                var pFutsalMatches = futsalMatches.Where(m => (m.HomeRoster?.Any(p => p.Id == playerId) ?? false) || (m.AwayRoster?.Any(p => p.Id == playerId) ?? false)).ToList();
+                var fWins = pFutsalMatches.Count(m => {
+                    var teamId = (m.HomeRoster?.Any(p => p.Id == playerId) ?? false) ? m.HomeTeamId : m.AwayTeamId;
+                    return m.WinnerTeamId == teamId;
+                });
+                AddStats("futsal", pFutsalMatches.Count, fWins);
+
+                var pVolleyballMatches = volleyballMatches.Where(m => (m.HomeRoster?.Any(p => p.Id == playerId) ?? false) || (m.AwayRoster?.Any(p => p.Id == playerId) ?? false)).ToList();
+                var vWins = pVolleyballMatches.Count(m => {
+                    var teamId = (m.HomeRoster?.Any(p => p.Id == playerId) ?? false) ? m.HomeTeamId : m.AwayTeamId;
+                    return m.WinnerTeamId == teamId;
+                });
+                AddStats("volleyball", pVolleyballMatches.Count, vWins);
+
+                var pBasketballMatches = basketballMatches.Where(m => (m.HomeRoster?.Any(p => p.Id == playerId) ?? false) || (m.AwayRoster?.Any(p => p.Id == playerId) ?? false)).ToList();
+                var bWins = pBasketballMatches.Count(m => {
+                    var teamId = (m.HomeRoster?.Any(p => p.Id == playerId) ?? false) ? m.HomeTeamId : m.AwayTeamId;
+                    return m.WinnerTeamId == teamId;
+                });
+                AddStats("basketball_3x3", pBasketballMatches.Count, bWins);
+
+                var pBeachVolleyballMatches = beachVolleyballMatches.Where(m => (m.HomeRoster?.Any(p => p.Id == playerId) ?? false) || (m.AwayRoster?.Any(p => p.Id == playerId) ?? false)).ToList();
+                var bvWins = pBeachVolleyballMatches.Count(m => {
+                    var teamId = (m.HomeRoster?.Any(p => p.Id == playerId) ?? false) ? m.HomeTeamId : m.AwayTeamId;
+                    return m.WinnerTeamId == teamId;
+                });
+                AddStats("beach_volleyball", pBeachVolleyballMatches.Count, bvWins);
                 // 4. Team Sport Stats & Goals
                 var pGoals = goalsS.FirstOrDefault(x => x.Id == playerId)?.Goals ?? 0;
                 if (pGoals > 0) {
