@@ -161,8 +161,7 @@ const Tournaments = () => {
     total: pagination.totalCount,
     ongoing: tournaments.filter(t => t.status === 'ongoing').length, // Це лише для поточної сторінки, в ідеалі теж з бекенду
     upcoming: tournaments.filter(t => t.status === 'upcoming').length,
-    totalParticipants: tournaments.reduce((acc, t) => acc + t.participants, 0),
-    registeredCount: 0 // Mock value
+    totalParticipants: tournaments.reduce((acc, t) => acc + t.participants, 0)
   };
 
   const handleRegister = (id: string) => {

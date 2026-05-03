@@ -38,11 +38,24 @@ public class EmailSender(IOptions<EmailSettings> emailSettings, ILogger<EmailSen
                 {
                     new { to = new[] { new { email = email } } }
                 },
-                from = new { email = emailSettings.Value.Email },
+                from = new { 
+                    email = emailSettings.Value.Email,
+                    name = emailSettings.Value.FromName ?? "Polytech League"
+                },
                 subject = subject,
                 content = new[]
                 {
-                    new { type = "text/plain", value = message }
+                    new { type = "text/plain", value = message },
+                    new { type = "text/html", value = message.Contains("<html>") || message.Contains("</div>") || message.Contains("<p>") 
+                        ? message 
+                        : $@"
+                        <div style='font-family: sans-serif; padding: 20px; color: #333;'>
+                            <h2 style='color: #2563eb;'>Polytech League</h2>
+                            <p style='font-size: 16px;'>{message}</p>
+                            <hr style='border: none; border-top: 1px solid #eee; margin: 20px 0;' />
+                            <p style='font-size: 12px; color: #666;'>Це автоматичне повідомлення. Будь ласка, не відповідайте на нього.</p>
+                        </div>" 
+                    }
                 }
             };
 
@@ -81,7 +94,10 @@ public class EmailSender(IOptions<EmailSettings> emailSettings, ILogger<EmailSen
             Credentials = new NetworkCredential(emailSettings.Value.Email, emailSettings.Value.Password)
         };
 
-        var mailMessage = new MailMessage(from: emailSettings.Value.Email, to: email, subject, message);
+        var mailMessage = new MailMessage(from: emailSettings.Value.Email, to: email, subject, message)
+        {
+            IsBodyHtml = true
+        };
 
         try
         {
