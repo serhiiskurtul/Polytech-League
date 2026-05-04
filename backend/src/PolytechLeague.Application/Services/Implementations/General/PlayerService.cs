@@ -1337,21 +1337,23 @@ public class PlayerService : IPlayerService
 
         // 2. Checkers
         var checkersMatches = await _dbContext.CheckersGames
-            .Include(g => g.Tournament)
-            .Where(g => (g.WhitePlayerId == player1Id && g.BlackPlayerId == player2Id) ||
-                        (g.WhitePlayerId == player2Id && g.BlackPlayerId == player1Id))
+            .Include(g => g.Event)
+            .Include(g => g.WhitePlayer)
+            .Include(g => g.BlackPlayer)
+            .Where(g => (g.WhitePlayer.PlayerId == player1Id && g.BlackPlayer.PlayerId == player2Id) ||
+                        (g.WhitePlayer.PlayerId == player2Id && g.BlackPlayer.PlayerId == player1Id))
             .ToListAsync(cancellationToken);
 
         foreach (var m in checkersMatches)
         {
             var matchDto = new HeadToHeadMatchDto {
                 SportType = "checkers",
-                TournamentName = m.Tournament?.Name ?? "Турнір з шашок",
-                Date = m.Tournament?.Date ?? DateTime.MinValue,
+                TournamentName = m.Event?.Name ?? "Турнір з шашок",
+                Date = m.Event?.Date ?? DateTime.MinValue,
                 TournamentId = m.TournamentId,
                 Score = m.Result.ToString()
             };
-            bool p1IsWhite = m.WhitePlayerId == player1Id;
+            bool p1IsWhite = m.WhitePlayer.PlayerId == player1Id;
             if (m.Result == GameResult.Draw) { result.Draws++; matchDto.Result = "Draw"; }
             else if ((p1IsWhite && m.Result == GameResult.WhiteWin) || (!p1IsWhite && m.Result == GameResult.BlackWin)) { result.Player1Wins++; matchDto.Result = "P1 Won"; }
             else { result.Player2Wins++; matchDto.Result = "P2 Won"; }
@@ -1383,7 +1385,7 @@ public class PlayerService : IPlayerService
 
         // 4. Armwrestling
         var armMatches = await _dbContext.ArmwrestlingMatches
-            .Include(m => m.Tournament)
+            .Include(m => m.Event)
             .Where(m => (m.Player1Id == player1Id && m.Player2Id == player2Id) ||
                         (m.Player1Id == player2Id && m.Player2Id == player1Id))
             .ToListAsync(cancellationToken);
@@ -1392,9 +1394,9 @@ public class PlayerService : IPlayerService
         {
             var matchDto = new HeadToHeadMatchDto {
                 SportType = "armwrestling",
-                TournamentName = m.Tournament?.Name ?? "Турнір з армрестлінгу",
-                Date = m.Tournament?.Date ?? DateTime.MinValue,
-                TournamentId = m.TournamentId,
+                TournamentName = m.Event?.Name ?? "Турнір з армрестлінгу",
+                Date = m.Event?.Date ?? DateTime.MinValue,
+                TournamentId = m.EventId,
                 Score = m.Stage ?? "Match"
             };
             if (m.WinnerId == player1Id) { result.Player1Wins++; matchDto.Result = "P1 Won"; }
@@ -1411,10 +1413,10 @@ public class PlayerService : IPlayerService
             .Include(m => m.AwayTeam).ThenInclude(t => t.Players)
             .Include(m => m.HomeRoster)
             .Include(m => m.AwayRoster)
-            .Where(m => (m.HomeTeam.Players.Any(p => p.Id == player1Id) && m.AwayTeam.Players.Any(p => p.Id == player2Id)) ||
-                        (m.HomeTeam.Players.Any(p => p.Id == player2Id) && m.AwayTeam.Players.Any(p => p.Id == player1Id)) ||
-                        (m.HomeRoster.Any(p => p.Id == player1Id) && m.AwayRoster.Any(p => p.Id == player2Id)) ||
-                        (m.HomeRoster.Any(p => p.Id == player2Id) && m.AwayRoster.Any(p => p.Id == player1Id)))
+            .Where(m => (m.HomeTeam!.Players!.Any(p => p.Id == player1Id) && m.AwayTeam!.Players!.Any(p => p.Id == player2Id)) ||
+                        (m.HomeTeam!.Players!.Any(p => p.Id == player2Id) && m.AwayTeam!.Players!.Any(p => p.Id == player1Id)) ||
+                        (m.HomeRoster!.Any(p => p.Id == player1Id) && m.AwayRoster!.Any(p => p.Id == player2Id)) ||
+                        (m.HomeRoster!.Any(p => p.Id == player2Id) && m.AwayRoster!.Any(p => p.Id == player1Id)))
             .ToListAsync(cancellationToken);
 
         foreach (var m in futsalMatches)
@@ -1441,10 +1443,10 @@ public class PlayerService : IPlayerService
             .Include(m => m.AwayTeam).ThenInclude(t => t.Players)
             .Include(m => m.HomeRoster)
             .Include(m => m.AwayRoster)
-            .Where(m => (m.HomeTeam.Players.Any(p => p.Id == player1Id) && m.AwayTeam.Players.Any(p => p.Id == player2Id)) ||
-                        (m.HomeTeam.Players.Any(p => p.Id == player2Id) && m.AwayTeam.Players.Any(p => p.Id == player1Id)) ||
-                        (m.HomeRoster.Any(p => p.Id == player1Id) && m.AwayRoster.Any(p => p.Id == player2Id)) ||
-                        (m.HomeRoster.Any(p => p.Id == player2Id) && m.AwayRoster.Any(p => p.Id == player1Id)))
+            .Where(m => (m.HomeTeam!.Players!.Any(p => p.Id == player1Id) && m.AwayTeam!.Players!.Any(p => p.Id == player2Id)) ||
+                        (m.HomeTeam!.Players!.Any(p => p.Id == player2Id) && m.AwayTeam!.Players!.Any(p => p.Id == player1Id)) ||
+                        (m.HomeRoster!.Any(p => p.Id == player1Id) && m.AwayRoster!.Any(p => p.Id == player2Id)) ||
+                        (m.HomeRoster!.Any(p => p.Id == player2Id) && m.AwayRoster!.Any(p => p.Id == player1Id)))
             .ToListAsync(cancellationToken);
 
         foreach (var m in basketballMatches)
@@ -1469,8 +1471,8 @@ public class PlayerService : IPlayerService
             .Include(m => m.Event)
             .Include(m => m.HomeTeam).ThenInclude(t => t.Players)
             .Include(m => m.AwayTeam).ThenInclude(t => t.Players)
-            .Where(m => (m.HomeTeam.Players.Any(p => p.Id == player1Id) && m.AwayTeam.Players.Any(p => p.Id == player2Id)) ||
-                        (m.HomeTeam.Players.Any(p => p.Id == player2Id) && m.AwayTeam.Players.Any(p => p.Id == player1Id)))
+            .Where(m => (m.HomeTeam!.Players!.Any(p => p.Id == player1Id) && m.AwayTeam!.Players!.Any(p => p.Id == player2Id)) ||
+                        (m.HomeTeam!.Players!.Any(p => p.Id == player2Id) && m.AwayTeam!.Players!.Any(p => p.Id == player1Id)))
             .ToListAsync(cancellationToken);
 
         foreach (var m in volleyballMatches)
@@ -1497,10 +1499,10 @@ public class PlayerService : IPlayerService
             .Include(m => m.AwayTeam).ThenInclude(t => t.Players)
             .Include(m => m.HomeRoster)
             .Include(m => m.AwayRoster)
-            .Where(m => (m.HomeTeam.Players.Any(p => p.Id == player1Id) && m.AwayTeam.Players.Any(p => p.Id == player2Id)) ||
-                        (m.HomeTeam.Players.Any(p => p.Id == player2Id) && m.AwayTeam.Players.Any(p => p.Id == player1Id)) ||
-                        (m.HomeRoster.Any(p => p.Id == player1Id) && m.AwayRoster.Any(p => p.Id == player2Id)) ||
-                        (m.HomeRoster.Any(p => p.Id == player2Id) && m.AwayRoster.Any(p => p.Id == player1Id)))
+            .Where(m => (m.HomeTeam!.Players!.Any(p => p.Id == player1Id) && m.AwayTeam!.Players!.Any(p => p.Id == player2Id)) ||
+                        (m.HomeTeam!.Players!.Any(p => p.Id == player2Id) && m.AwayTeam!.Players!.Any(p => p.Id == player1Id)) ||
+                        (m.HomeRoster!.Any(p => p.Id == player1Id) && m.AwayRoster!.Any(p => p.Id == player2Id)) ||
+                        (m.HomeRoster!.Any(p => p.Id == player2Id) && m.AwayRoster!.Any(p => p.Id == player1Id)))
             .ToListAsync(cancellationToken);
 
         foreach (var m in beachVolleyballMatches)
