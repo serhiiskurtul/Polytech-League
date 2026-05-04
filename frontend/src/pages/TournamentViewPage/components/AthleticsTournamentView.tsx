@@ -105,19 +105,36 @@ const AthleticsTournamentView: React.FC<AthleticsTournamentViewProps> = ({
     }
     setIsSearching(true);
     try {
-      // Search in existing players first (client-side filter for now or add API if needed)
-      // For simplicity, we'll use searchUsers which searches both users and potentially players if implemented so
+      const q = query.toLowerCase();
+      // 1. Search in existing Players
+      const playerResults: SearchResult[] = allPlayers
+        .filter(p =>
+          (p.firstName + ' ' + p.lastName).toLowerCase().includes(q) ||
+          p.group?.toLowerCase().includes(q)
+        )
+        .map(p => ({
+          type: 'player',
+          id: p.id!,
+          userId: p.userId,
+          firstName: p.firstName,
+          lastName: p.lastName,
+          group: p.group
+        }));
+
+      // 2. Search in Users (remote search)
       const users = await searchUsers(query);
-      const results: SearchResult[] = users.map(u => ({
-        type: 'user',
-        id: u.id,
-        userId: u.id,
-        firstName: u.firstName,
-        lastName: u.lastName,
-        email: u.email,
-        group: u.group
-      }));
-      setSearchResults(results);
+      const userResults: SearchResult[] = users
+        .filter(u => !playerResults.some(pr => pr.userId === u.id))
+        .map(u => ({
+          type: 'user',
+          id: u.id,
+          userId: u.id,
+          firstName: u.firstName,
+          lastName: u.lastName,
+          email: u.email
+        }));
+
+      setSearchResults([...playerResults, ...userResults]);
     } catch (err) {
       console.error(err);
     } finally {
