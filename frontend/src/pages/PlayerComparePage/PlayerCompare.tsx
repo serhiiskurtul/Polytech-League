@@ -614,7 +614,7 @@ const HeadToHeadSection = ({ data, loading, p1Name, p2Name }: { data: any, loadi
               <div className={styles.h2hMatchDate}>{new Date(m.date).toLocaleDateString()}</div>
             </div>
             <div className={`${styles.h2hMatchResult} ${m.result === 'P1 Won' ? styles.resP1 : m.result === 'P2 Won' ? styles.resP2 : ''}`}>
-              {m.score}
+              {translateResult(m.result)}
             </div>
           </div>
         ))}
