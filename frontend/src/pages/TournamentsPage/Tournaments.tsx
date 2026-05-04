@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthContext';
 import TournamentCard from './TournamentCard';
@@ -19,6 +19,7 @@ interface TournamentUI extends Tournament {
 }
 
 const Tournaments = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const sportFromUrl = searchParams.get('sport');
@@ -137,7 +138,9 @@ const Tournaments = () => {
 
   useEffect(() => {
     fetchTournamentsData(pagination.page);
-    window.scrollTo({ top: 0, behavior: 'auto' });
+    if (containerRef.current) {
+      containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }, [pagination.page, activeStatus, activeSport, activeLevel]);
 
 
@@ -199,7 +202,7 @@ const Tournaments = () => {
       />
 
 
-      <div className="tournaments-controls">
+      <div className="tournaments-controls" ref={containerRef}>
         <div className="search-container">
           <i className="fas fa-search search-icon"></i>
           <input 
