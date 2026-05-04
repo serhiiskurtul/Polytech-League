@@ -508,7 +508,7 @@ const PointsDistributionChart = ({ player, color1 }: { player: PlayerDto, color1
           </Pie>
           <Tooltip 
             contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-            formatter={(value: number) => [`${value} очок`, 'Бали']}
+            formatter={(value: any) => [`${value} очок`, 'Бали']}
           />
         </PieChart>
       </ResponsiveContainer>
