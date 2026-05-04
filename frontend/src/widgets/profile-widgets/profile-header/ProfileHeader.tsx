@@ -39,7 +39,6 @@ interface ProfileHeaderProps {
 }
 
 const ProfileHeader = ({ userData, isAdmin, onEdit, onAvatarUpload, onLogout, onCompare, onMessage }: ProfileHeaderProps) => {
-  console.log('PROFILE HEADER USER DATA:', userData);
   return (
     <div className={styles.profileHeader}>
       <div className={styles.profileHeaderCard}>
