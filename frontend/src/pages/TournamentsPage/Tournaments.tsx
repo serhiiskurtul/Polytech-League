@@ -137,6 +137,7 @@ const Tournaments = () => {
 
   useEffect(() => {
     fetchTournamentsData(pagination.page);
+    window.scrollTo({ top: 0, behavior: 'auto' });
   }, [pagination.page, activeStatus, activeSport, activeLevel]);
 
 
@@ -153,7 +154,6 @@ const Tournaments = () => {
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= pagination.totalPages) {
       setPagination(prev => ({ ...prev, page: newPage }));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
