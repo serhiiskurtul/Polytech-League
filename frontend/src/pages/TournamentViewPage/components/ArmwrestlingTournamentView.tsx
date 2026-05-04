@@ -371,18 +371,18 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
         secondPlaceId: winners.secondPlaceId || null,
         thirdPlaceId: winners.thirdPlaceId || null
       });
-      alert('Призерів успішно збережено!');
+      toast.success('Призерів успішно збережено!');
       setShowSetWinners(false);
       onRefresh();
     } catch (err) {
       console.error(err);
-      alert('Помилка при збереженні призерів');
+      toast.error('Помилка при збереженні призерів');
     }
   };
 
   const handleAddParticipant = async () => {
     if (!newParticipant.firstName || !newParticipant.lastName || !newParticipant.group) {
-      alert("Заповніть всі поля!");
+      toast.error("Заповніть всі поля!");
       return;
     }
 
@@ -392,7 +392,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
       if (!playerId) {
         // Check if player is already in the tournament (by userId)
         if (newParticipant.userId && details.participants?.some((p: any) => (p.userId === newParticipant.userId))) {
-          alert("Цей користувач вже бере участь у змаганні!");
+          toast.error("Цей користувач вже бере участь у змаганні!");
           return;
         }
 
@@ -406,12 +406,11 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
           gender: newParticipant.gender
         });
         playerId = created.id!;
-        alert('Гравця створено та додано у базу!');
       } else {
         // Check if player is already in the tournament
         const isAlreadyInEvent = details.participants?.some((p: any) => (p.playerId || p.id) === playerId);
         if (isAlreadyInEvent) {
-          alert("Цей гравець вже бере участь у змаганні!");
+          toast.error("Цей гравець вже бере участь у змаганні!");
           return;
         }
       }
@@ -426,7 +425,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
       onRefresh();
     } catch (err) {
       console.error(err);
-      alert('Помилка при додаванні гравця');
+      toast.error('Помилка при додаванні гравця');
     }
   };
 
