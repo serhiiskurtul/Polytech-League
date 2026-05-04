@@ -80,7 +80,8 @@ export const PlayerComparePage = () => {
               winsCount: rankingInfo.winsCount,
               goalsScored: rankingInfo.goalsScored,
               competitionsCount: rankingInfo.competitionsCount,
-              globalRank: rankingInfo.globalRank
+              globalRank: rankingInfo.globalRank,
+              sportStats: rankingInfo.sportStats
             };
           }
           return {
@@ -90,7 +91,8 @@ export const PlayerComparePage = () => {
             winsCount: 0,
             goalsScored: 0,
             competitionsCount: 0,
-            globalRank: undefined
+            globalRank: undefined,
+            sportStats: []
           };
         };
 
@@ -564,12 +566,18 @@ const HeadToHeadSection = ({ data, loading, p1Name, p2Name }: { data: any, loadi
   };
 
   const translateResult = (res: string) => {
-    // Map backend results to player names
-    if (res === 'P1 Won') return p1Name;
-    if (res === 'P2 Won') return p2Name;
-    if (res === 'WhiteWin') return p1Name; // Assuming P1 was white in this context or fallback
-    if (res === 'BlackWin') return p2Name; // Assuming P2 was black in this context or fallback
-    if (res === 'Draw') return 'Нічия';
+    if (!res) return '—';
+    const lowRes = res.toLowerCase();
+    
+    // Most aggressive check for winner names
+    if (lowRes.includes('p1') || lowRes === 'whitewin' || lowRes === 'white') return p1Name;
+    if (lowRes.includes('p2') || lowRes === 'blackwin' || lowRes === 'black') return p2Name;
+    
+    // Specific check for strings like "BlackWin" or "blackwins"
+    if (lowRes.includes('black')) return p2Name;
+    if (lowRes.includes('white')) return p1Name;
+    
+    if (lowRes === 'draw' || lowRes.includes('draw')) return 'Нічия';
     return res;
   };
 
