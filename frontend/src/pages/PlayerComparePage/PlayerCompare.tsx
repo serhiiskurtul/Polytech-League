@@ -252,11 +252,15 @@ export const PlayerComparePage = () => {
                 suffix="%"
                 isBetterHigh={true}
               />
-               <StatRow 
-                 label="Забито голів" 
-                 val1={player1.goalsScored} 
-                 val2={player2?.goalsScored}
-               />
+               {/* Only show goals if both played Futsal */}
+               {player1.sportStats?.some(s => s.sportType === 'futsal') && 
+                player2?.sportStats?.some(s => s.sportType === 'futsal') && (
+                 <StatRow 
+                   label="Забито голів" 
+                   val1={player1.goalsScored} 
+                   val2={player2?.goalsScored}
+                 />
+               )}
                <StatRow 
                  label="Участь у змаганнях" 
                  val1={player1.competitionsCount} 
@@ -276,12 +280,12 @@ export const PlayerComparePage = () => {
               </div>
               <div className={styles.distributionContainer}>
                 <div className={styles.distributionChart}>
-                  <PointsDistributionChart player={player1} color1="#3b82f6" />
+                  <PointsDistributionChart player={player1} />
                   <p className={styles.chartLabel}>{player1.firstName}</p>
                 </div>
                 {player2 && (
                   <div className={styles.distributionChart}>
-                    <PointsDistributionChart player={player2} color1="#ef4444" />
+                    <PointsDistributionChart player={player2} />
                     <p className={styles.chartLabel}>{player2.firstName}</p>
                   </div>
                 )}
@@ -303,8 +307,9 @@ export const PlayerComparePage = () => {
             </div>
           </div>
 
-          {/* Chess Comparison (if applicable) */}
-          {(player1.chessRating || player2?.chessRating) && (
+          {/* Chess Comparison (if applicable and BOTH played) */}
+          {player1.sportStats?.some(s => s.sportType === 'chess') && 
+           player2?.sportStats?.some(s => s.sportType === 'chess') && (
             <div className={styles.statsSection}>
               <div className={styles.sectionHeader}>
                 <i className="fa-solid fa-chess"></i>
@@ -437,10 +442,21 @@ const PlayerCard = ({ player, color, selectedSeason }: {
 
   const getMedalCounts = () => {
     if (!player.achievements) return { gold: 0, silver: 0, bronze: 0 };
+    
+    // Filter achievements by season if selected
+    let filtered = player.achievements.filter(a => a.result !== 'Спеціальне досягнення');
+    
+    if (selectedSeason) {
+      const yearStr = selectedSeason.name.match(/\d{4}/)?.[0];
+      if (yearStr) {
+        filtered = filtered.filter(a => a.date.includes(yearStr));
+      }
+    }
+
     return {
-      gold: player.achievements.filter(a => a.rank === 1).length,
-      silver: player.achievements.filter(a => a.rank === 2).length,
-      bronze: player.achievements.filter(a => a.rank === 3).length
+      gold: filtered.filter(a => a.rank === 1).length,
+      silver: filtered.filter(a => a.rank === 2).length,
+      bronze: filtered.filter(a => a.rank === 3).length
     };
   };
 
@@ -478,19 +494,23 @@ const PlayerCard = ({ player, color, selectedSeason }: {
   );
 };
 
-const PointsDistributionChart = ({ player, color1 }: { player: PlayerDto, color1: string }) => {
+const PointsDistributionChart = ({ player }: { player: PlayerDto }) => {
   const data = React.useMemo(() => {
-    if (!player.sportStats || player.sportStats.length === 0) return [{ name: 'Немає даних', value: 1 }];
+    if (!player.sportStats || player.sportStats.length === 0) return [];
     return player.sportStats.map(s => ({
-      name: s.sportType,
+      name: translateSport(s.sportType),
       value: s.performanceScore
     })).filter(s => s.value > 0);
   }, [player]);
 
   const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
+  if (data.length === 0) {
+    return <div className={styles.noDataChart}>Немає балів</div>;
+  }
+
   return (
-    <div style={{ width: '100%', height: 200 }}>
+    <div style={{ width: '100%', height: 260 }}>
       <ResponsiveContainer>
         <PieChart>
           <Pie
@@ -501,6 +521,7 @@ const PointsDistributionChart = ({ player, color1 }: { player: PlayerDto, color1
             outerRadius={70}
             paddingAngle={5}
             dataKey="value"
+            label={({ name, percent }) => percent > 0.1 ? name : ''}
           >
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -510,10 +531,26 @@ const PointsDistributionChart = ({ player, color1 }: { player: PlayerDto, color1
             contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
             formatter={(value: any) => [`${value} очок`, 'Бали']}
           />
+          <Legend iconType="circle" />
         </PieChart>
       </ResponsiveContainer>
     </div>
   );
+};
+
+const translateSport = (sport: string) => {
+  const translations: Record<string, string> = {
+    chess: 'Шахи',
+    checkers: 'Шашки',
+    futsal: 'Футзал',
+    volleyball: 'Волейбол',
+    basketball_3x3: 'Баскетбол 3х3',
+    table_tennis: 'Настільний теніс',
+    armwrestling: 'Армрестлінг',
+    badminton: 'Бадмінтон',
+    beach_volleyball: 'Пляжний волейбол'
+  };
+  return translations[sport] || sport;
 };
 
 const HeadToHeadSection = ({ data, loading, p1Name, p2Name }: { data: any, loading: boolean, p1Name: string, p2Name: string }) => {
