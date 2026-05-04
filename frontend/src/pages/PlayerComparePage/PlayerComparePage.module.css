@@ -574,10 +574,10 @@
 }
 
 .chartLabel {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
-  color: #64748b;
-  margin-top: -20px;
+  color: #1e293b;
+  margin-bottom: 12px;
 }
 
 /* Head to Head Styles */

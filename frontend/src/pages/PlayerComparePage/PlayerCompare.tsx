@@ -280,13 +280,13 @@ export const PlayerComparePage = () => {
               </div>
               <div className={styles.distributionContainer}>
                 <div className={styles.distributionChart}>
-                  <PointsDistributionChart player={player1} />
                   <p className={styles.chartLabel}>{player1.firstName}</p>
+                  <PointsDistributionChart player={player1} />
                 </div>
                 {player2 && (
                   <div className={styles.distributionChart}>
-                    <PointsDistributionChart player={player2} />
                     <p className={styles.chartLabel}>{player2.firstName}</p>
+                    <PointsDistributionChart player={player2} />
                   </div>
                 )}
               </div>
@@ -553,10 +553,33 @@ const translateSport = (sport: string) => {
 };
 
 const HeadToHeadSection = ({ data, loading, p1Name, p2Name }: { data: any, loading: boolean, p1Name: string, p2Name: string }) => {
+  const navigate = useNavigate();
   if (loading) return <div className={styles.h2hLoading}><div className={styles.spinnerSmall}></div> Пошук матчів...</div>;
   if (!data || !data.matches || data.matches.length === 0) {
-    return <div className={styles.noH2H}>Спільних матчів не знайдено</div>;
+    return <div className={styles.noH2H}>Гравці ще не зустрічалися в офіційних матчах</div>;
   }
+
+  const getTournamentUrl = (sport: string, id: number) => {
+    const map: Record<string, string> = {
+      chess: 'chess',
+      checkers: 'checkers',
+      futsal: 'futsal',
+      volleyball: 'volleyball',
+      basketball_3x3: 'basketball',
+      table_tennis: 'table-tennis',
+      armwrestling: 'armwrestling',
+      badminton: 'badminton',
+      beach_volleyball: 'beach-volleyball'
+    };
+    return `/tournaments/${map[sport] || sport}/${id}`;
+  };
+
+  const translateResult = (res: string) => {
+    if (res === 'P1 Won') return p1Name;
+    if (res === 'P2 Won') return p2Name;
+    if (res === 'Draw') return 'Нічия';
+    return res;
+  };
 
   return (
     <div className={styles.h2hContainer}>
@@ -569,13 +592,20 @@ const HeadToHeadSection = ({ data, loading, p1Name, p2Name }: { data: any, loadi
           <span className={styles.h2hDraws}>{data.draws} нічиїх</span>
         </div>
         <div className={styles.h2hScoreBlock}>
-          <span className={styles.h2hScore}>{data.player2Wins}</span>
           <span className={styles.h2hPlayerName}>{p2Name}</span>
+          <span className={styles.h2hScore}>{data.player2Wins}</span>
         </div>
       </div>
+
       <div className={styles.h2hMatchesList}>
-        {data.matches.map((m: any, i: number) => (
-          <div key={i} className={styles.h2hMatchItem}>
+        {data.matches.map((m: any, idx: number) => (
+          <div 
+            key={idx} 
+            className={styles.h2hMatchItem}
+            onClick={() => navigate(getTournamentUrl(m.sportType, m.tournamentId))}
+            title="Перейти до турніру"
+            style={{ cursor: 'pointer' }}
+          >
             <div className={styles.h2hMatchSport}>
               <i className={`fa-solid ${getSportIcon(m.sportType)}`}></i>
             </div>
@@ -602,7 +632,8 @@ const getSportIcon = (sport: string) => {
     basketball_3x3: 'fa-basketball',
     table_tennis: 'fa-table-tennis-paddle-ball',
     armwrestling: 'fa-handshake',
-    badminton: 'fa-shuttlecock'
+    badminton: 'fa-shuttlecock',
+    beach_volleyball: 'fa-umbrella-beach'
   };
   return icons[sport] || 'fa-trophy';
 };
