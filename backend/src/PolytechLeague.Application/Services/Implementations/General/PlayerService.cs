@@ -1303,4 +1303,224 @@ public class PlayerService : IPlayerService
             _logger.LogError(ex, "Error populating special chess stats for player {PlayerId}", playerId);
         }
     }
+
+    public async Task<HeadToHeadDto> GetHeadToHeadAsync(long player1Id, long player2Id, CancellationToken cancellationToken)
+    {
+        var result = new HeadToHeadDto
+        {
+            Player1Id = player1Id,
+            Player2Id = player2Id
+        };
+
+        // 1. Chess
+        var chessMatches = await _dbContext.ChessGames
+            .Include(g => g.Tournament)
+            .Where(g => (g.WhitePlayerId == player1Id && g.BlackPlayerId == player2Id) ||
+                        (g.WhitePlayerId == player2Id && g.BlackPlayerId == player1Id))
+            .ToListAsync(cancellationToken);
+
+        foreach (var m in chessMatches)
+        {
+            var matchDto = new HeadToHeadMatchDto {
+                SportType = "chess",
+                TournamentName = m.Tournament?.Name ?? "Турнір з шахів",
+                Date = m.Tournament?.Date ?? DateTime.MinValue,
+                TournamentId = m.TournamentId,
+                Score = m.Result.ToString()
+            };
+            bool p1IsWhite = m.WhitePlayerId == player1Id;
+            if (m.Result == GameResult.Draw) { result.Draws++; matchDto.Result = "Draw"; }
+            else if ((p1IsWhite && m.Result == GameResult.WhiteWin) || (!p1IsWhite && m.Result == GameResult.BlackWin)) { result.Player1Wins++; matchDto.Result = "P1 Won"; }
+            else { result.Player2Wins++; matchDto.Result = "P2 Won"; }
+            result.Matches.Add(matchDto);
+        }
+
+        // 2. Checkers
+        var checkersMatches = await _dbContext.CheckersGames
+            .Include(g => g.Tournament)
+            .Where(g => (g.WhitePlayerId == player1Id && g.BlackPlayerId == player2Id) ||
+                        (g.WhitePlayerId == player2Id && g.BlackPlayerId == player1Id))
+            .ToListAsync(cancellationToken);
+
+        foreach (var m in checkersMatches)
+        {
+            var matchDto = new HeadToHeadMatchDto {
+                SportType = "checkers",
+                TournamentName = m.Tournament?.Name ?? "Турнір з шашок",
+                Date = m.Tournament?.Date ?? DateTime.MinValue,
+                TournamentId = m.TournamentId,
+                Score = m.Result.ToString()
+            };
+            bool p1IsWhite = m.WhitePlayerId == player1Id;
+            if (m.Result == GameResult.Draw) { result.Draws++; matchDto.Result = "Draw"; }
+            else if ((p1IsWhite && m.Result == GameResult.WhiteWin) || (!p1IsWhite && m.Result == GameResult.BlackWin)) { result.Player1Wins++; matchDto.Result = "P1 Won"; }
+            else { result.Player2Wins++; matchDto.Result = "P2 Won"; }
+            result.Matches.Add(matchDto);
+        }
+
+        // 3. Table Tennis
+        var ttMatches = await _dbContext.TableTennisMatches
+            .Include(m => m.Tournament)
+            .Where(m => (m.Player1Id == player1Id && m.Player2Id == player2Id) ||
+                        (m.Player1Id == player2Id && m.Player2Id == player1Id))
+            .ToListAsync(cancellationToken);
+        
+        foreach (var m in ttMatches)
+        {
+            var matchDto = new HeadToHeadMatchDto {
+                SportType = "table_tennis",
+                TournamentName = m.Tournament?.Name ?? "Турнір з настільного тенісу",
+                Date = m.Tournament?.Date ?? DateTime.MinValue,
+                TournamentId = m.TournamentId,
+                Score = $"{m.HomeTeamScore}:{m.AwayTeamScore}"
+            };
+            bool p1IsFirst = m.Player1Id == player1Id;
+            if (m.WinnerId == player1Id) { result.Player1Wins++; matchDto.Result = "P1 Won"; }
+            else if (m.WinnerId == player2Id) { result.Player2Wins++; matchDto.Result = "P2 Won"; }
+            else { result.Draws++; matchDto.Result = "Draw"; }
+            result.Matches.Add(matchDto);
+        }
+
+        // 4. Armwrestling
+        var armMatches = await _dbContext.ArmwrestlingMatches
+            .Include(m => m.Tournament)
+            .Where(m => (m.Player1Id == player1Id && m.Player2Id == player2Id) ||
+                        (m.Player1Id == player2Id && m.Player2Id == player1Id))
+            .ToListAsync(cancellationToken);
+            
+        foreach (var m in armMatches)
+        {
+            var matchDto = new HeadToHeadMatchDto {
+                SportType = "armwrestling",
+                TournamentName = m.Tournament?.Name ?? "Турнір з армрестлінгу",
+                Date = m.Tournament?.Date ?? DateTime.MinValue,
+                TournamentId = m.TournamentId,
+                Score = m.Stage ?? "Match"
+            };
+            if (m.WinnerId == player1Id) { result.Player1Wins++; matchDto.Result = "P1 Won"; }
+            else if (m.WinnerId == player2Id) { result.Player2Wins++; matchDto.Result = "P2 Won"; }
+            else { result.Draws++; matchDto.Result = "Draw"; }
+            result.Matches.Add(matchDto);
+        }
+
+        // 5. Team Sports (Futsal, Basketball, Volleyball)
+        // Futsal
+        var futsalMatches = await _dbContext.FutsalMatches
+            .Include(m => m.Event)
+            .Include(m => m.HomeTeam).ThenInclude(t => t.Players)
+            .Include(m => m.AwayTeam).ThenInclude(t => t.Players)
+            .Include(m => m.HomeRoster)
+            .Include(m => m.AwayRoster)
+            .Where(m => (m.HomeTeam.Players.Any(p => p.Id == player1Id) && m.AwayTeam.Players.Any(p => p.Id == player2Id)) ||
+                        (m.HomeTeam.Players.Any(p => p.Id == player2Id) && m.AwayTeam.Players.Any(p => p.Id == player1Id)) ||
+                        (m.HomeRoster.Any(p => p.Id == player1Id) && m.AwayRoster.Any(p => p.Id == player2Id)) ||
+                        (m.HomeRoster.Any(p => p.Id == player2Id) && m.AwayRoster.Any(p => p.Id == player1Id)))
+            .ToListAsync(cancellationToken);
+
+        foreach (var m in futsalMatches)
+        {
+            var matchDto = new HeadToHeadMatchDto {
+                SportType = "futsal",
+                TournamentName = m.Event?.Name ?? "Турнір з футзалу",
+                Date = m.Event?.Date ?? DateTime.MinValue,
+                TournamentId = m.EventId,
+                Score = $"{m.HomeTeamScore}:{m.AwayTeamScore}"
+            };
+            bool p1IsHome = (m.HomeTeam?.Players?.Any(p => p.Id == player1Id) ?? false) || (m.HomeRoster?.Any(p => p.Id == player1Id) ?? false);
+            if (m.WinnerTeamId != null) {
+                bool p1Won = (p1IsHome && m.WinnerTeamId == m.HomeTeamId) || (!p1IsHome && m.WinnerTeamId == m.AwayTeamId);
+                if (p1Won) { result.Player1Wins++; matchDto.Result = "P1 Won"; } else { result.Player2Wins++; matchDto.Result = "P2 Won"; }
+            } else { result.Draws++; matchDto.Result = "Draw"; }
+            result.Matches.Add(matchDto);
+        }
+
+        // Basketball 3x3
+        var basketballMatches = await _dbContext.Basketball3x3Matches
+            .Include(m => m.Event)
+            .Include(m => m.HomeTeam).ThenInclude(t => t.Players)
+            .Include(m => m.AwayTeam).ThenInclude(t => t.Players)
+            .Include(m => m.HomeRoster)
+            .Include(m => m.AwayRoster)
+            .Where(m => (m.HomeTeam.Players.Any(p => p.Id == player1Id) && m.AwayTeam.Players.Any(p => p.Id == player2Id)) ||
+                        (m.HomeTeam.Players.Any(p => p.Id == player2Id) && m.AwayTeam.Players.Any(p => p.Id == player1Id)) ||
+                        (m.HomeRoster.Any(p => p.Id == player1Id) && m.AwayRoster.Any(p => p.Id == player2Id)) ||
+                        (m.HomeRoster.Any(p => p.Id == player2Id) && m.AwayRoster.Any(p => p.Id == player1Id)))
+            .ToListAsync(cancellationToken);
+
+        foreach (var m in basketballMatches)
+        {
+            var matchDto = new HeadToHeadMatchDto {
+                SportType = "basketball_3x3",
+                TournamentName = m.Event?.Name ?? "Турнір з баскетболу 3х3",
+                Date = m.Event?.Date ?? DateTime.MinValue,
+                TournamentId = m.EventId,
+                Score = $"{m.HomeTeamScore}:{m.AwayTeamScore}"
+            };
+            bool p1IsHome = (m.HomeTeam?.Players?.Any(p => p.Id == player1Id) ?? false) || (m.HomeRoster?.Any(p => p.Id == player1Id) ?? false);
+            if (m.WinnerTeamId != null) {
+                bool p1Won = (p1IsHome && m.WinnerTeamId == m.HomeTeamId) || (!p1IsHome && m.WinnerTeamId == m.AwayTeamId);
+                if (p1Won) { result.Player1Wins++; matchDto.Result = "P1 Won"; } else { result.Player2Wins++; matchDto.Result = "P2 Won"; }
+            } else { result.Draws++; matchDto.Result = "Draw"; }
+            result.Matches.Add(matchDto);
+        }
+
+        // Volleyball
+        var volleyballMatches = await _dbContext.VolleyballMatches
+            .Include(m => m.Event)
+            .Include(m => m.HomeTeam).ThenInclude(t => t.Players)
+            .Include(m => m.AwayTeam).ThenInclude(t => t.Players)
+            .Where(m => (m.HomeTeam.Players.Any(p => p.Id == player1Id) && m.AwayTeam.Players.Any(p => p.Id == player2Id)) ||
+                        (m.HomeTeam.Players.Any(p => p.Id == player2Id) && m.AwayTeam.Players.Any(p => p.Id == player1Id)))
+            .ToListAsync(cancellationToken);
+
+        foreach (var m in volleyballMatches)
+        {
+            var matchDto = new HeadToHeadMatchDto {
+                SportType = "volleyball",
+                TournamentName = m.Event?.Name ?? "Турнір з волейболу",
+                Date = m.Event?.Date ?? DateTime.MinValue,
+                TournamentId = m.EventId,
+                Score = $"{m.HomeSetsWon}:{m.AwaySetsWon}"
+            };
+            bool p1IsHome = (m.HomeTeam?.Players?.Any(p => p.Id == player1Id) ?? false) || (m.HomeRoster?.Any(p => p.Id == player1Id) ?? false);
+            if (m.WinnerTeamId != null) {
+                bool p1Won = (p1IsHome && m.WinnerTeamId == m.HomeTeamId) || (!p1IsHome && m.WinnerTeamId == m.AwayTeamId);
+                if (p1Won) { result.Player1Wins++; matchDto.Result = "P1 Won"; } else { result.Player2Wins++; matchDto.Result = "P2 Won"; }
+            } else { result.Draws++; matchDto.Result = "Draw"; }
+            result.Matches.Add(matchDto);
+        }
+
+        // Beach Volleyball
+        var beachVolleyballMatches = await _dbContext.BeachVolleyballMatches
+            .Include(m => m.Event)
+            .Include(m => m.HomeTeam).ThenInclude(t => t.Players)
+            .Include(m => m.AwayTeam).ThenInclude(t => t.Players)
+            .Include(m => m.HomeRoster)
+            .Include(m => m.AwayRoster)
+            .Where(m => (m.HomeTeam.Players.Any(p => p.Id == player1Id) && m.AwayTeam.Players.Any(p => p.Id == player2Id)) ||
+                        (m.HomeTeam.Players.Any(p => p.Id == player2Id) && m.AwayTeam.Players.Any(p => p.Id == player1Id)) ||
+                        (m.HomeRoster.Any(p => p.Id == player1Id) && m.AwayRoster.Any(p => p.Id == player2Id)) ||
+                        (m.HomeRoster.Any(p => p.Id == player2Id) && m.AwayRoster.Any(p => p.Id == player1Id)))
+            .ToListAsync(cancellationToken);
+
+        foreach (var m in beachVolleyballMatches)
+        {
+            var matchDto = new HeadToHeadMatchDto {
+                SportType = "beach_volleyball",
+                TournamentName = m.Event?.Name ?? "Турнір з пляжного волейболу",
+                Date = m.Event?.Date ?? DateTime.MinValue,
+                TournamentId = m.EventId,
+                Score = $"{m.HomeSetsWon}:{m.AwaySetsWon}"
+            };
+            bool p1IsHome = (m.HomeTeam?.Players?.Any(p => p.Id == player1Id) ?? false) || (m.HomeRoster?.Any(p => p.Id == player1Id) ?? false);
+            if (m.WinnerTeamId != null) {
+                bool p1Won = (p1IsHome && m.WinnerTeamId == m.HomeTeamId) || (!p1IsHome && m.WinnerTeamId == m.AwayTeamId);
+                if (p1Won) { result.Player1Wins++; matchDto.Result = "P1 Won"; } else { result.Player2Wins++; matchDto.Result = "P2 Won"; }
+            } else { result.Draws++; matchDto.Result = "Draw"; }
+            result.Matches.Add(matchDto);
+        }
+
+        result.Matches = result.Matches.OrderByDescending(m => m.Date).ToList();
+        return result;
+    }
 }

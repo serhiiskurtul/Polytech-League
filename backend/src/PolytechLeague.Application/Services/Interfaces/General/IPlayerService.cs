@@ -22,5 +22,7 @@ public interface IPlayerService
     Task ApproveMergeRequestAsync(long requestId, CancellationToken cancellationToken = default);
     Task RejectMergeRequestAsync(long requestId, string comment, CancellationToken cancellationToken = default);
     Task IgnoreMergeRequestAsync(long userId, long targetPlayerId, CancellationToken cancellationToken = default);
+
+    Task<HeadToHeadDto> GetHeadToHeadAsync(long player1Id, long player2Id, CancellationToken cancellationToken = default);
 }
 

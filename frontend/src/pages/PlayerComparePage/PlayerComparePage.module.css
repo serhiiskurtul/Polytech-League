@@ -535,3 +535,194 @@
     justify-content: center;
   }
 }
+
+/* New Enriched Styles */
+.medalsRow {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.medalItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 14px;
+  color: #475569;
+  background: #f8fafc;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.extraStatsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+.distributionContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.distributionChart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chartLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  margin-top: -20px;
+}
+
+/* Head to Head Styles */
+.h2hContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.h2hSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+  padding: 16px 24px;
+  border-radius: 16px;
+}
+
+.h2hScoreBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.h2hPlayerName {
+  font-size: 12px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.h2hScore {
+  font-size: 28px;
+  font-weight: 900;
+  color: #1e293b;
+}
+
+.h2hDivider {
+  flex: 0.5;
+  text-align: center;
+  border-left: 2px solid #e2e8f0;
+  border-right: 2px solid #e2e8f0;
+  margin: 0 10px;
+}
+
+.h2hDraws {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.h2hMatchesList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.h2hMatchItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+
+.h2hMatchItem:hover {
+  background: #f1f5f9;
+}
+
+.h2hMatchSport {
+  width: 36px;
+  height: 36px;
+  background: white;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3b82f6;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.h2hMatchInfo {
+  flex: 1;
+}
+
+.h2hMatchName {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.h2hMatchDate {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.h2hMatchResult {
+  font-weight: 800;
+  font-size: 14px;
+  color: #64748b;
+  padding: 4px 8px;
+  background: white;
+  border-radius: 6px;
+}
+
+.resP1 { color: #10b981; }
+.resP2 { color: #ef4444; }
+
+.h2hLoading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.spinnerSmall {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f1f5f9;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.noH2H {
+  text-align: center;
+  padding: 40px;
+  color: #94a3b8;
+  font-weight: 600;
+  font-style: italic;
+}
+
+@media (max-width: 900px) {
+  .extraStatsRow {
+    grid-template-columns: 1fr;
+  }
+}
+

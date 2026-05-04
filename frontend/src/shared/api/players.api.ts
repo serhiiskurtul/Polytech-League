@@ -90,3 +90,8 @@ export const getAllMergeRequests = async (): Promise<any[]> => {
     return response.data;
 };
 
+export const getHeadToHead = async (p1: number | string, p2: number | string): Promise<any> => {
+    const response = await api.get(`/players/head-to-head?p1=${p1}&p2=${p2}`);
+    return response.data;
+};
+

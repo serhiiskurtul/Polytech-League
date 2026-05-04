@@ -219,5 +219,12 @@ public class PlayersController : ControllerBase
         await _playerService.IgnoreMergeRequestAsync(userId, targetPlayerId, cancellationToken);
         return Ok();
     }
+
+    [HttpGet("head-to-head")]
+    public async Task<ActionResult<HeadToHeadDto>> GetHeadToHead([FromQuery] long p1, [FromQuery] long p2, CancellationToken cancellationToken)
+    {
+        var result = await _playerService.GetHeadToHeadAsync(p1, p2, cancellationToken);
+        return Ok(result);
+    }
 }
 
