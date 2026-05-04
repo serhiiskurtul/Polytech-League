@@ -283,11 +283,11 @@ const TournamentViewPage = () => {
         } else if (sportKey === 'checkers') {
           payload.variant = (details as any).variant;
         } else if (sportKey === 'armwrestling') {
-          payload.hand = (details as any).hand;
-          payload.weightClass = (details as any).weightClass;
-          payload.category = (details as any).category;
-          payload.timeControl = editTournamentData.timeControl;
-          payload.participantsCount = editTournamentData.participantsCount;
+          payload.hand = (details as any).hand || 'Both';
+          payload.weightClass = (details as any).weightClass || 'UpTo70';
+          payload.category = editTournamentData.category || (details as any).category || 'Mixed';
+          payload.timeControl = editTournamentData.timeControl || (details as any).timeControl || '';
+          payload.participantsCount = editTournamentData.participantsCount || (details as any).participantsCount || 0;
         }
       }
 
@@ -314,7 +314,7 @@ const TournamentViewPage = () => {
       fetchTournament(true);
     } catch (err) {
       console.error(err);
-      alert("Помилка при збереженні призерів");
+      toast.error("Помилка при збереженні призерів");
     }
   };
 
@@ -371,7 +371,7 @@ const TournamentViewPage = () => {
       fetchTournament(true);
     } catch (err: any) {
       console.error(err);
-      alert('Помилка при імпорті даних з файлу: ' + (err.response?.data?.message || err.message));
+      toast.error('Помилка при імпорті даних з файлу: ' + (err.response?.data?.message || err.message));
     } finally {
       setIsImporting(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -402,7 +402,7 @@ const TournamentViewPage = () => {
         const endpoint = sportEndpointRecord[s] || sportEndpointRecord[tournament?.sport || ''];
 
         if (!endpoint) {
-          alert('Неможливо видалити змагання: невідомий вид спорту.');
+          toast.error('Неможливо видалити змагання: невідомий вид спорту.');
           return;
         }
 
@@ -411,7 +411,7 @@ const TournamentViewPage = () => {
         navigate('/tournaments');
       } catch (error) {
         console.error('Помилка при видаленні змагання:', error);
-        alert('Помилка при видаленні змагань. Деталі в консолі.');
+        toast.error('Помилка при видаленні змагань. Деталі в консолі.');
       }
     }
   };
@@ -534,12 +534,12 @@ const TournamentViewPage = () => {
   const handleSaveTournament = async () => {
     try {
       if (!editTournamentData.name || !editTournamentData.date) {
-        alert("Назва та дата обов'язкові!");
+        toast.error("Назва та дата обов'язкові!");
         return;
       }
       const sport = tournament?.sport;
       if (!sport) {
-        alert("Помилка: Вид спорту не визначений");
+        toast.error("Помилка: Вид спорту не визначений");
         return;
       }
 
@@ -579,11 +579,11 @@ const TournamentViewPage = () => {
       } else if (sportKey === 'armwrestling') {
         await updateArmwrestlingEvent(id!, {
           ...payload,
-          hand: (details as any).hand,
-          weightClass: (details as any).weightClass,
-          category: editTournamentData.category,
-          timeControl: editTournamentData.timeControl,
-          participantsCount: editTournamentData.participantsCount
+          hand: (details as any).hand || 'Both',
+          weightClass: (details as any).weightClass || 'UpTo70',
+          category: editTournamentData.category || (details as any).category || 'Mixed',
+          timeControl: editTournamentData.timeControl || (details as any).timeControl || '',
+          participantsCount: editTournamentData.participantsCount || (details as any).participantsCount || 0
         });
       } else if (sportKey === 'volleyball' || sportKey === 'beach_volleyball') {
         const updateFn = sportKey === 'volleyball' ? updateVolleyballEvent : updateBeachVolleyballEvent;
@@ -612,7 +612,7 @@ const TournamentViewPage = () => {
       fetchTournament(true);
     } catch (err) {
       console.error(err);
-      alert("Помилка при оновленні змагань");
+      toast.error("Помилка при оновленні змагань");
     }
   };
 
@@ -644,11 +644,11 @@ const TournamentViewPage = () => {
 
   const handleSaveEdit = async (gameId: number) => {
     if (!editingGameData.whitePlayerId || !editingGameData.blackPlayerId) {
-      alert("Оберіть обох супротивників!");
+      toast.error("Оберіть обох супротивників!");
       return;
     }
     if (editingGameData.whitePlayerId === editingGameData.blackPlayerId) {
-      alert("Гравець не може грати сам проти себе!");
+      toast.error("Гравець не може грати сам проти себе!");
       return;
     }
 
@@ -681,7 +681,7 @@ const TournamentViewPage = () => {
       fetchTournament(true);
     } catch (err) {
       console.error(err);
-      alert("Помилка при оновленні матчу");
+      toast.error("Помилка при оновленні матчу");
     }
   };
 
@@ -757,7 +757,7 @@ const TournamentViewPage = () => {
       fetchTournament(true);
     } catch (err) {
       console.error(err);
-      alert("Помилка при оновленні учасника");
+      toast.error("Помилка при оновленні учасника");
     }
   };
 
@@ -998,6 +998,7 @@ const TournamentViewPage = () => {
               isModerated: !!d.isModerated,
               isPublic: d.isPublic !== undefined ? !!d.isPublic : true,
               seasonId: d.seasonId || null,
+              category: d.category || (data.category === 'Чоловіки' ? 'Men' : data.category === 'Жінки' ? 'Women' : data.category === 'Змішаний' ? 'Mixed' : data.category) || (sportKey === 'volleyball' || sportKey === 'beach_volleyball' ? 'Men' : 'Mixed'),
               firstPlaceId: d.firstPlace?.id || null,
               secondPlaceId: d.secondPlace?.id || null,
               thirdPlaceId: d.thirdPlace?.id || null,
@@ -1116,11 +1117,11 @@ const TournamentViewPage = () => {
 
   const handleAddPlayer = async () => {
     if (!newPlayer.firstName || !newPlayer.lastName) {
-      alert("Заповніть ім'я та прізвище користувача!");
+      toast.error("Заповніть ім'я та прізвище користувача!");
       return;
     }
     if (tournament?.sport !== 'chess' && !newPlayer.group) {
-      alert("Група є обов'язковою для цього виду спорту!");
+      toast.error("Група є обов'язковою для цього виду спорту!");
       return;
     }
     try {
@@ -1129,7 +1130,7 @@ const TournamentViewPage = () => {
       if (!playerId) {
         // Check if player is already in the tournament (by userId)
         if (newPlayer.userId && (details?.players || details?.participants || []).some((p: any) => p.userId === newPlayer.userId)) {
-          alert("Цей користувач вже бере участь у змаганнях!");
+          toast.error("Цей користувач вже бере участь у змаганнях!");
           return;
         }
 
@@ -1157,7 +1158,7 @@ const TournamentViewPage = () => {
         // Check if player is already in the tournament
         const isAlreadyParticipant = (details?.players || details?.participants || []).some((p: any) => p.playerId === playerId);
         if (isAlreadyParticipant) {
-          alert("Цей гравець вже бере участь у змаганнях!");
+          toast.error("Цей гравець вже бере участь у змаганнях!");
           return;
         }
       }
@@ -1228,17 +1229,17 @@ const TournamentViewPage = () => {
       fetchTournament(true); // Refresh
     } catch (err) {
       console.error(err);
-      alert("Помилка при додаванні учасника");
+      toast.error("Помилка при додаванні учасника");
     }
   };
 
   const handleAddGame = async () => {
     if (!newGame.whitePlayerId || !newGame.blackPlayerId) {
-      alert("Оберіть обох супротивників!");
+      toast.error("Оберіть обох супротивників!");
       return;
     }
     if (newGame.whitePlayerId === newGame.blackPlayerId) {
-      alert("Гравець не може грати сам проти себе!");
+      toast.error("Гравець не може грати сам проти себе!");
       return;
     }
     try {
@@ -1268,7 +1269,7 @@ const TournamentViewPage = () => {
       fetchTournament(true); // Refresh
     } catch (err) {
       console.error(err);
-      alert("Помилка при додаванні матчу");
+      toast.error("Помилка при додаванні матчу");
     }
   };
 

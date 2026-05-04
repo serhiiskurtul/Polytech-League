@@ -225,11 +225,11 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
 
   const handleCreateMatch = async () => {
     if (!newMatch.player1Id || !newMatch.player2Id) {
-      alert('Оберіть обох учасників!');
+      toast.error('Оберіть обох учасників!');
       return;
     }
     if (newMatch.player1Id === newMatch.player2Id) {
-      alert('Учасник не може боротися сам із собою!');
+      toast.error('Учасник не може боротися сам із собою!');
       return;
     }
 
@@ -246,7 +246,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
       onRefresh();
     } catch (err) {
       console.error(err);
-      alert('Помилка при створенні матчу');
+      toast.error('Помилка при створенні матчу');
     }
   };
 
@@ -262,7 +262,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
       onRefresh();
     } catch (err) {
       console.error(err);
-      alert('Помилка при збереженні результату');
+      toast.error('Помилка при збереженні результату');
     }
   };
 
@@ -274,7 +274,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
       onRefresh();
     } catch (err) {
       console.error(err);
-      alert('Помилка при видаленні матчу');
+      toast.error('Помилка при видаленні матчу');
     }
   };
 

@@ -351,9 +351,14 @@ public class FutsalEventService :
     {
         // 0. Clear player references
         // Using raw SQL with correct quoting for PascalCase columns ("Id", "EventId")
-        await _dbcontext.Database.ExecuteSqlRawAsync(
-            $"UPDATE players SET futsal_team_id = NULL WHERE futsal_team_id IN (SELECT \"Id\" FROM futsal_teams WHERE \"EventId\" = {id})", 
-            cancellationToken);
+        var teamIds = await _dbcontext.FutsalTeams
+            .Where(t => t.EventId == id)
+            .Select(t => t.Id)
+            .ToListAsync(cancellationToken);
+
+        await _dbcontext.Players
+            .Where(p => p.FutsalTeamId != null && teamIds.Contains(p.FutsalTeamId.Value))
+            .ExecuteUpdateAsync(s => s.SetProperty(p => p.FutsalTeamId, (long?)null), cancellationToken);
 
         // 1. Fetch event with matches to handle Restrict constraints
         var entity = await _dbcontext.FutsalEvents

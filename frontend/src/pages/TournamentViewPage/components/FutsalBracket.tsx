@@ -56,7 +56,7 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
     if (!team) return null;
     const player = team?.players?.find((p: any) => p.id === playerId);
     if (!player) return null;
-    return `${player.lastName} ${player.firstName[0]}.`;
+    return `${player.lastName} ${player.firstName?.[0] || ''}.`;
   };
 
   const renderMatchCard = (match: FutsalMatchResponse) => {

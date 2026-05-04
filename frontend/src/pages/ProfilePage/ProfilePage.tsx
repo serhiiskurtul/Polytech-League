@@ -55,7 +55,6 @@ const ProfilePage = () => {
     const fetchProfile = async () => {
       try {
         const data = await getProfile();
-        console.log('PLAYER PROFILE DATA:', data);
         setPlayerProfile(data);
         if (data.hasPendingMergeRequest) {
           setIsMergeRequestSent(true);

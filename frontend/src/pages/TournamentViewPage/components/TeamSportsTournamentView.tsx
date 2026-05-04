@@ -1382,7 +1382,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                     <div key={p.id} className={`${styles.pMiniTag} ${team?.captainId === p.id ? styles.captainTag : ''} ${team?.goalkeeperId === p.id ? styles.goalkeeperTag : ''}`}>
                       {team?.captainId === p.id && <i className="fas fa-copyright" style={{marginRight: '4px', fontSize: '10px'}} title="Капітан"></i>}
                       {team?.goalkeeperId === p.id && <i className="fas fa-hands" style={{marginRight: '4px', fontSize: '10px'}} title="Воротар"></i>}
-                      {p.lastName} {p.firstName[0]}.
+                      {p.lastName} {p.firstName?.[0] || ''}.
                     </div>
                   ))}
                   {team?.players?.length > 5 && <span className={styles.morePlayers}>+{team.players.length - 5}</span>}

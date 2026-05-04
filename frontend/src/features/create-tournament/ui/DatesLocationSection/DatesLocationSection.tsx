@@ -22,7 +22,7 @@ const DatesLocationSection = ({ formData, handleInputChange, calculateDuration }
           <>
             <div className={shared.formGroup}>
               <label className={shared.formLabel}>
-                <i className="fas fa-sign-in-alt"></i> Початок реєстрації
+                <i className="fas fa-sign-in-alt"></i> Початок реєстрації (опціонально)
               </label>
               <div className={styles.dateTimeRow}>
                 <input
@@ -46,7 +46,7 @@ const DatesLocationSection = ({ formData, handleInputChange, calculateDuration }
             {/* Кінець реєстрації */}
             <div className={shared.formGroup}>
               <label className={shared.formLabel}>
-                <i className="fas fa-user-clock"></i> Кінець реєстрації
+                <i className="fas fa-user-clock"></i> Кінець реєстрації (опціонально)
               </label>
               <div className={styles.dateTimeRow}>
                 <input
