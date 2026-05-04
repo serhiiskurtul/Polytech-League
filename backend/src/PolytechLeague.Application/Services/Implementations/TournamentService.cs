@@ -601,7 +601,7 @@ public class TournamentService : ITournamentService
             _ => "Mixed"
         };
     }
-    public async Task<IEnumerable<PolytechLeague.Application.Dto.General.ChampionDto>> GetChampionsAsync(string? sportType = null)
+    public async Task<IEnumerable<PolytechLeague.Application.Dto.General.ChampionDto>> GetChampionsAsync(string? sportType = null, PolytechLeague.Domain.Entities.Enums.Gender? gender = null)
     {
         var query = _context.Set<PolytechLeague.Domain.Entities.Event>()
             .Where(e => e.Level == CompetitionLevel.CollegeGroup && e.FirstPlaceId != null)
@@ -622,6 +622,11 @@ public class TournamentService : ITournamentService
                 (sportType == "volleyball" && e is VolleyballEvent) ||
                 (sportType == "beach-volleyball" && e is BeachVolleyballEvent)
             );
+        }
+
+        if (gender.HasValue)
+        {
+            query = query.Where(e => e.FirstPlace!.Gender == gender.Value);
         }
 
         var results = await query

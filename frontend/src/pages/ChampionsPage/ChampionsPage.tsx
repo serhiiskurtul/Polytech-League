@@ -8,6 +8,7 @@ const ChampionsPage: React.FC = () => {
   const { sport } = useParams<{ sport: string }>();
   const [champions, setChampions] = useState<Champion[]>([]);
   const [loading, setLoading] = useState(true);
+  const [gender, setGender] = useState<number | undefined>(undefined);
 
   const getSportTitle = (sportType: string) => {
     switch (sportType) {
@@ -38,7 +39,7 @@ const ChampionsPage: React.FC = () => {
     const fetchChampions = async () => {
       setLoading(true);
       try {
-        const data = await getChampions(sport === 'all' ? undefined : sport);
+        const data = await getChampions(sport === 'all' ? undefined : sport, gender);
         setChampions(data);
       } catch (error) {
         console.error('Error fetching champions:', error);
@@ -48,6 +49,11 @@ const ChampionsPage: React.FC = () => {
     };
 
     fetchChampions();
+  }, [sport, gender]);
+
+  // Reset gender filter when sport changes
+  useEffect(() => {
+    setGender(undefined);
   }, [sport]);
 
   if (loading) {
@@ -76,6 +82,29 @@ const ChampionsPage: React.FC = () => {
           <Link to="/hall-of-fame/table-tennis" className={`${styles.filterBtn} ${sport === 'table-tennis' ? styles.active : ''}`}>Теніс</Link>
           <Link to="/hall-of-fame/armwrestling" className={`${styles.filterBtn} ${sport === 'armwrestling' ? styles.active : ''}`}>Армреслінг</Link>
         </div>
+
+        {(sport === 'chess' || sport === 'checkers') && (
+          <div className={styles.genderFilters}>
+            <button 
+              className={`${styles.genderBtn} ${gender === undefined ? styles.activeGender : ''}`}
+              onClick={() => setGender(undefined)}
+            >
+              Усі
+            </button>
+            <button 
+              className={`${styles.genderBtn} ${gender === 1 ? styles.activeGender : ''}`}
+              onClick={() => setGender(1)}
+            >
+              Чоловіки
+            </button>
+            <button 
+              className={`${styles.genderBtn} ${gender === 2 ? styles.activeGender : ''}`}
+              onClick={() => setGender(2)}
+            >
+              Жінки
+            </button>
+          </div>
+        )}
 
         {champions.length === 0 ? (
           <div className={styles.emptyState}>

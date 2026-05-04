@@ -66,10 +66,10 @@ export const getTournamentsStats = async (): Promise<TournamentStats> => {
     }
 };
 
-export const getChampions = async (sport?: string): Promise<Champion[]> => {
+export const getChampions = async (sport?: string, gender?: number): Promise<Champion[]> => {
     try {
         const response = await api.get<Champion[]>('/tournaments/champions', {
-            params: { sport }
+            params: { sport, gender }
         });
         return response.data;
     } catch (error) {
