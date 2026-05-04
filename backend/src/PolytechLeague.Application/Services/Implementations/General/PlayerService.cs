@@ -1224,7 +1224,17 @@ public class PlayerService : IPlayerService
         var playerId = dto.Id.Value;
         try
         {
-            // 1. Get all inter-group chess performances
+            // Update ChessRating to be the highest rating from any chess tournament
+            var maxRating = await _dbContext.ChessEventParticipants
+                .Where(p => p.PlayerId == playerId)
+                .MaxAsync(p => (int?)p.Rating, cancellationToken);
+                
+            if (maxRating.HasValue && maxRating > (dto.ChessRating ?? 0))
+            {
+                dto.ChessRating = maxRating.Value;
+            }
+
+            // 1. Get all inter-group chess performances for badges
             var chessPerformances = await _dbContext.ChessEventParticipants
                 .Include(p => p.Tournament)
                 .Where(p => p.PlayerId == playerId && p.Tournament != null && p.Tournament.Level == CompetitionLevel.CollegeGroup)
