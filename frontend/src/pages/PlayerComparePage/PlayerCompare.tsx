@@ -559,24 +559,16 @@ const HeadToHeadSection = ({ data, loading, p1Name, p2Name }: { data: any, loadi
     return <div className={styles.noH2H}>Гравці ще не зустрічалися в офіційних матчах</div>;
   }
 
-  const getTournamentUrl = (sport: string, id: number) => {
-    const map: Record<string, string> = {
-      chess: 'chess',
-      checkers: 'checkers',
-      futsal: 'futsal',
-      volleyball: 'volleyball',
-      basketball_3x3: 'basketball',
-      table_tennis: 'table-tennis',
-      armwrestling: 'armwrestling',
-      badminton: 'badminton',
-      beach_volleyball: 'beach-volleyball'
-    };
-    return `/tournaments/${map[sport] || sport}/${id}`;
+  const getTournamentUrl = (id: number) => {
+    return `/tournaments/${id}`;
   };
 
   const translateResult = (res: string) => {
+    // Map backend results to player names
     if (res === 'P1 Won') return p1Name;
     if (res === 'P2 Won') return p2Name;
+    if (res === 'WhiteWin') return p1Name; // Assuming P1 was white in this context or fallback
+    if (res === 'BlackWin') return p2Name; // Assuming P2 was black in this context or fallback
     if (res === 'Draw') return 'Нічия';
     return res;
   };
@@ -602,7 +594,7 @@ const HeadToHeadSection = ({ data, loading, p1Name, p2Name }: { data: any, loadi
           <div 
             key={idx} 
             className={styles.h2hMatchItem}
-            onClick={() => navigate(getTournamentUrl(m.sportType, m.tournamentId))}
+            onClick={() => navigate(getTournamentUrl(m.tournamentId))}
             title="Перейти до турніру"
             style={{ cursor: 'pointer' }}
           >
