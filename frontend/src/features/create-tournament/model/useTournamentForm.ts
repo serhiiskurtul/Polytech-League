@@ -163,12 +163,6 @@ export const useTournamentForm = () => {
     if (!formData.name.trim()) errors.push('Назва турніру обов\'язкова');
     if (!formData.startDate) errors.push('Дата початку обов\'язкова');
     if (formData.level === 'CollegeGroup') {
-      const isFutureTournament = formData.startDate && new Date(formData.startDate) > new Date();
-      
-      if (isFutureTournament && !formData.registrationDeadline) {
-        errors.push('Термін реєстрації обов\'язковий для майбутніх змагань');
-      }
-      
       if (formData.registrationDeadline && formData.startDate && new Date(formData.registrationDeadline) > new Date(formData.startDate)) {
         errors.push('Термін реєстрації не може бути пізніше дати початку');
       }

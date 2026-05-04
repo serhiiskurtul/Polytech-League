@@ -46,7 +46,7 @@ const DatesLocationSection = ({ formData, handleInputChange, calculateDuration }
             {/* Кінець реєстрації */}
             <div className={shared.formGroup}>
               <label className={shared.formLabel}>
-                <i className="fas fa-user-clock"></i> Кінець реєстрації *
+                <i className="fas fa-user-clock"></i> Кінець реєстрації
               </label>
               <div className={styles.dateTimeRow}>
                 <input
@@ -55,7 +55,6 @@ const DatesLocationSection = ({ formData, handleInputChange, calculateDuration }
                   value={formData.registrationDeadline}
                   onChange={handleInputChange}
                   className={shared.formInput}
-                  required
                 />
                 <input
                   type="time"
@@ -63,7 +62,6 @@ const DatesLocationSection = ({ formData, handleInputChange, calculateDuration }
                   value={formData.registrationDeadlineTime}
                   onChange={handleInputChange}
                   className={shared.formInput}
-                  required
                   style={{ width: '120px' }}
                 />
               </div>
