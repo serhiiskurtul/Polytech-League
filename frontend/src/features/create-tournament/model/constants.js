@@ -13,7 +13,8 @@ export const AVAILABLE_SPORTS = [
   { id: 'beach_volleyball', name: 'Пляжний волейбол', icon: 'fas fa-umbrella-beach' },
   { id: 'badminton', name: 'Бадмінтон', icon: 'fas fa-feather-alt' },
   { id: 'armwrestling', name: 'Армреслінг', icon: 'fas fa-fist-raised' },
-  { id: 'table_tennis', name: 'Настільний теніс', icon: 'fas fa-table-tennis' }
+  { id: 'table_tennis', name: 'Настільний теніс', icon: 'fas fa-table-tennis' },
+  { id: 'athletics', name: 'Легка атлетика', icon: 'fas fa-running' }
 ];
 
 export const TOURNAMENT_TYPES = [

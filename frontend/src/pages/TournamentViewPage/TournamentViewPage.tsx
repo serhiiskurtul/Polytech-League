@@ -101,6 +101,7 @@ import ArmwrestlingTournamentView from './components/ArmwrestlingTournamentView'
 import TeamSportsTournamentView from './components/TeamSportsTournamentView';
 import TournamentPodium from './components/TournamentPodium';
 import ChessGameViewerModal from './components/ChessGameViewerModal';
+import AthleticsTournamentView from './components/AthleticsTournamentView';
 import { Tournament } from '@/shared/types/tournament.types';
 import {
   ChessEventResponse,
@@ -176,7 +177,9 @@ const TournamentViewPage = () => {
       'настільнийтеніс': 'table_tennis',
       'шахи': 'chess',
       'шашки': 'checkers',
-      'армрестлінг': 'armwrestling'
+      'армрестлінг': 'armwrestling',
+      'легка_атлетика': 'athletics',
+      'легкаатлетика': 'athletics'
     };
     return sportMap[rawSport] || rawSport;
   };
@@ -189,6 +192,7 @@ const TournamentViewPage = () => {
   const isFutsal = sportKey === 'futsal';
   const isVolleyball = sportKey === 'volleyball' || sportKey === 'beach_volleyball';
   const isBasketball3x3 = sportKey === 'basketball_3x3' || sportKey === 'basketball3x3';
+  const isAthletics = sportKey === 'athletics';
 
   // Admin Form States
   const [newPlayer, setNewPlayer] = useState({
@@ -301,6 +305,7 @@ const TournamentViewPage = () => {
         case 'basketball_3x3':
         case 'basketball3x3': await updateBasketball3x3Event(id, payload as any); break;
         case 'badminton': await updateBadmintonEvent(id, payload as any); break;
+        case 'athletics': await api.put(`/athletics-events/${id}`, payload); break;
         case 'table_tennis': await updateTableTennisEvent(id, {
           ...payload,
           tournamentType: (details as any).tournamentType || 'RoundRobin',
@@ -396,7 +401,8 @@ const TournamentViewPage = () => {
           table_tennis: '/table-tennis-events',
           tabletennis: '/table-tennis-events',
           armwrestling: '/armwrestling-events',
-          badminton: '/badminton-events'
+          badminton: '/badminton-events',
+          athletics: '/athletics-events'
         };
         const s = (tournament?.sport || '').toLowerCase().replace(/-/g, '_').replace(/\s/g, '');
         const endpoint = sportEndpointRecord[s] || sportEndpointRecord[tournament?.sport || ''];
@@ -908,6 +914,7 @@ const TournamentViewPage = () => {
         case 'basketball_3x3': await registerForBasketball3x3Event(id, playerId); break;
         case 'beachvolleyball':
         case 'beach_volleyball': await registerForBeachVolleyballEvent(id, playerId); break;
+        case 'athletics': await api.post(`/athletics-events/${id}/participants`, { playerId }); break;
         default: await registerForChessEvent(id, playerId);
       }
 
@@ -940,7 +947,7 @@ const TournamentViewPage = () => {
       const sportKey = data.sport.toLowerCase().replace(/-/g, '_').replace(/\s/g, '');
       setTournament({ ...data, sport: sportKey }); // Sync normalized sport back to state
 
-      if (['chess', 'checkers', 'armwrestling', 'volleyball', 'beach_volleyball', 'futsal', 'basketball_3x3', 'basketball3x3', 'badminton', 'table_tennis', 'tabletennis'].includes(sportKey)) {
+      if (['chess', 'checkers', 'armwrestling', 'volleyball', 'beach_volleyball', 'futsal', 'basketball_3x3', 'basketball_3x3', 'basketball3x3', 'badminton', 'table_tennis', 'tabletennis', 'athletics'].includes(sportKey)) {
         try {
           const playersGetter = getAllPlayers;
           let detailsPromise;
@@ -956,6 +963,7 @@ const TournamentViewPage = () => {
             case 'badminton': detailsPromise = getBadmintonEventById(id); break;
             case 'table_tennis':
             case 'tabletennis': detailsPromise = getTableTennisEventById(id); break;
+            case 'athletics': detailsPromise = api.get(`/athletics-events/${id}`).then(res => res.data); break;
             default: detailsPromise = getChessEventById(id);
           }
 
@@ -1810,8 +1818,9 @@ const TournamentViewPage = () => {
                       tournament?.sport === 'badminton' ||
                         tournament?.sport === 'table_tennis' ||
                         tournament?.sport === 'tabletennis' ||
-                        tournament?.sport === 'armwrestling'
-                        ? "fas fa-project-diagram"
+                        tournament?.sport === 'armwrestling' ||
+                        tournament?.sport === 'athletics'
+                        ? (tournament?.sport === 'athletics' ? "fas fa-running" : "fas fa-project-diagram")
                         : "fas fa-chess-board"
                     }></i>
                   </div>
@@ -1870,6 +1879,17 @@ const TournamentViewPage = () => {
               return (
                 <ArmwrestlingTournamentView
                   details={details as any}
+                  isAdmin={isAdmin}
+                  onRefresh={() => fetchTournament(true)}
+                />
+              );
+            }
+
+            if (sportKey === 'athletics' && details) {
+              return (
+                <AthleticsTournamentView
+                  details={details as any}
+                  allPlayers={allPlayers}
                   isAdmin={isAdmin}
                   onRefresh={() => fetchTournament(true)}
                 />

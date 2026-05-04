@@ -12,6 +12,7 @@ using PolytechLeague.Domain.Entities.TableTennis;
 using PolytechLeague.Domain.Entities.Armwrestling;
 using PolytechLeague.Domain.Entities.Badminton;
 using PolytechLeague.Domain.Entities.BeachVolleyball;
+using PolytechLeague.Domain.Entities.Athletics;
 using PolytechLeague.Domain.Entities.Enums;
 
 namespace PolytechLeague.Application.Services.Implementations;
@@ -59,7 +60,8 @@ public class TournamentService : ITournamentService
                 (sport == "table-tennis" && e is TableTennisEvent) ||
                 (sport == "armwrestling" && e is ArmwrestlingEvent) ||
                 (sport == "badminton" && e is BadmintonEvent) ||
-                (sport == "beach-volleyball" && e is BeachVolleyballEvent)
+                (sport == "beach-volleyball" && e is BeachVolleyballEvent) ||
+                (sport == "athletics" && e is AthleticsEvent)
             );
         }
 
@@ -238,6 +240,14 @@ public class TournamentService : ITournamentService
                     dto.Participants = armEvent.ParticipantsCount;
                 }
                 break;
+            case "athletics":
+                dto.Participants = await _context.AthleticsResults
+                    .Where(r => r.AthleticsEventId == dto.Id)
+                    .Select(r => r.PlayerId)
+                    .Where(id => id != null)
+                    .Distinct()
+                    .CountAsync();
+                break;
         }
     }
 
@@ -254,6 +264,7 @@ public class TournamentService : ITournamentService
             TableTennisEvent => "table-tennis",
             ArmwrestlingEvent => "armwrestling",
             BadmintonEvent => "badminton",
+            AthleticsEvent => "athletics",
             _ => "other"
         };
     }
@@ -303,6 +314,7 @@ public class TournamentService : ITournamentService
                             _context.BeachVolleyballEventParticipants.Any(bvp => bvp.PlayerId == p.Id) ||
                             _context.TableTennisEventParticipants.Any(ttp => ttp.PlayerId == p.Id) ||
                             _context.BadmintonEventParticipants.Any(bmp => bmp.PlayerId == p.Id) ||
+                            _context.AthleticsResults.Any(ar => ar.PlayerId == p.Id) ||
                             _context.ArmwrestlingEventParticipants.Any(ap => ap.PlayerId == p.Id));
 
         var registeredPlayersCount = rankedPlayersCount;
@@ -620,7 +632,8 @@ public class TournamentService : ITournamentService
                 (sportType == "futsal" && e is FutsalEvent) ||
                 (sportType == "basketball-3x3" && e is Basketball3x3Event) ||
                 (sportType == "volleyball" && e is VolleyballEvent) ||
-                (sportType == "beach-volleyball" && e is BeachVolleyballEvent)
+                (sportType == "beach-volleyball" && e is BeachVolleyballEvent) ||
+                (sportType == "athletics" && e is AthleticsEvent)
             );
         }
 

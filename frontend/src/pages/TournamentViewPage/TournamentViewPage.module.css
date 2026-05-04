@@ -3443,3 +3443,184 @@ input:checked + .slider:before {
   margin-left: 8px;
   vertical-align: middle;
 }
+/* Athletics View Styles */
+.athleticsContainer {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.disciplinesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.disciplineCard {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+}
+
+.disciplineCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+
+.disciplineTitle {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 12px;
+}
+
+.disciplineTitle::before {
+  content: '💪';
+  font-size: 24px;
+}
+
+.resultsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.resultItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #f8fafc;
+  padding: 12px 16px;
+  border-radius: 14px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.resultItem:hover {
+  background: #f1f5f9;
+}
+
+.rankBadge {
+  width: 40px;
+  height: 40px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 18px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  flex-shrink: 0;
+}
+
+.resultInfo {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.participantName {
+  font-weight: 700;
+  color: #334155;
+  font-size: 15px;
+}
+
+.scoreValue {
+  font-weight: 800;
+  color: var(--primary);
+  background: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.addResultForm {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 32px;
+  border: 2px dashed var(--primary);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  align-items: flex-end;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formGroup label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.formGroup input {
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.submitBtn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submitBtn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+.deleteResultBtn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 20px;
+  font-weight: 400;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  line-height: 1;
+  opacity: 0.3;
+  transition: all 0.2s;
+}
+
+.resultItem:hover .deleteResultBtn {
+  opacity: 1;
+}
+
+.deleteResultBtn:hover {
+  background: #fee2e2;
+}
+
+.noResults {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px;
+  background: #f8fafc;
+  border-radius: 20px;
+  color: #94a3b8;
+  font-style: italic;
+  border: 1px dashed #cbd5e1;
+}

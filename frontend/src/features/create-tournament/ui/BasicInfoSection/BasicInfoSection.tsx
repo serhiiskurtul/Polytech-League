@@ -72,7 +72,7 @@ const BasicInfoSection = ({ formData, handleInputChange }: BasicInfoSectionProps
         </div>
 
         {/* Тип участі (тільки для гібридних видів) */}
-        {['chess', 'checkers', 'badminton', 'table_tennis'].includes(formData.sport) && (
+        {['chess', 'checkers', 'badminton', 'table_tennis', 'athletics'].includes(formData.sport) && (
           <div className={shared.formGroup}>
             <label className={shared.formLabel}>
               <i className="fas fa-users-cog"></i> Формат участі *
@@ -111,7 +111,7 @@ const BasicInfoSection = ({ formData, handleInputChange }: BasicInfoSectionProps
         )}
 
         {/* Формат змагань (не для армреслінгу) */}
-        {formData.sport !== 'armwrestling' && (
+        {formData.sport !== 'armwrestling' && formData.sport !== 'athletics' && (
         <div className={shared.formGroup}>
           <label className={shared.formLabel}>
             <i className="fas fa-chess-board"></i> Система проведення

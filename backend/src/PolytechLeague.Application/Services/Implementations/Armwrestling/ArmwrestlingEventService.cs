@@ -17,9 +17,7 @@ public class ArmwrestlingEventService :
     AbstractEntityService<ArmwrestlingEvent>,
     IArmwrestlingEventService
 {
-    private readonly ApplicationDbContext _dbcontext;
-    private readonly ILogger<AbstractEntityService<ArmwrestlingEvent>> _logger;
-    private readonly INotificationService _notificationService;
+
 
     public ArmwrestlingEventService(
         ApplicationDbContext dbcontext,
@@ -27,10 +25,8 @@ public class ArmwrestlingEventService :
         INotificationService notificationService
     ) : base(dbcontext, logger, notificationService)
     {
-        _dbcontext = dbcontext;
-        _logger = logger;
-        _notificationService = notificationService;
     }
+
     public override async Task<ArmwrestlingEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)
     {
         _logger.LogDebug("Fetching ArmwrestlingEvent with id {Id} including matches and players", id);

@@ -14,6 +14,7 @@ const TOURNAMENT_CREATE_ENDPOINTS: Record<string, string> = {
   volleyball: '/volleyball-events',
   'beach_volleyball': '/beach-volleyball-events',
   badminton: '/badminton-events',
+  athletics: '/athletics-events',
 };
 
 export interface TournamentFormData {

@@ -14,6 +14,7 @@ using PolytechLeague.Domain.Entities.Futsal;
 using PolytechLeague.Domain.Entities.Volleyball;
 using PolytechLeague.Domain.Entities.Basketball3x3;
 using PolytechLeague.Domain.Entities.BeachVolleyball;
+using PolytechLeague.Domain.Entities.Athletics;
 using PolytechLeague.Domain.Entities.Shared;
 using PolytechLeague.Domain.Entities.Enums;
 using PolytechLeague.Application.Utilities;
@@ -409,6 +410,7 @@ public class PlayerService : IPlayerService
                         ArmwrestlingEvent => "armwrestling",
                         TableTennisEvent => "table_tennis",
                         BadmintonEvent => "badminton",
+                        AthleticsEvent => "athletics",
                         _ => "other"
                     };
                     var existing = achievements.FirstOrDefault(a => a.TournamentId == e.Id && a.SportType == sportType);
@@ -869,6 +871,28 @@ public class PlayerService : IPlayerService
         } catch (Exception ex) {
             _logger.LogError(ex, "Error populating other team achievements for player {PlayerId}", playerId);
         }
+
+        // Athletics
+        try {
+            var athleticsResults = await _dbContext.AthleticsResults
+                .Include(r => r.AthleticsEvent)
+                .Where(r => r.PlayerId == playerId)
+                .ToListAsync(cancellationToken);
+            foreach (var r in athleticsResults) {
+                if (r.AthleticsEvent == null) continue;
+                achievements.Add(new AchievementDto {
+                    TournamentName = $"{r.AthleticsEvent.Name} ({r.DisciplineName})",
+                    SportType = "athletics",
+                    Date = r.AthleticsEvent.Date,
+                    Rank = r.Rank,
+                    TournamentId = r.AthleticsEventId,
+                    Result = $"{r.Rank} місце - {r.Score}"
+                });
+            }
+        } catch (Exception ex) {
+            _logger.LogError(ex, "Error populating Athletics achievements for player {PlayerId}", playerId);
+        }
+
         dto.Achievements = achievements.OrderByDescending(a => a.Date).ToList();
         dto.CompetitionsCount = achievements.Select(a => a.TournamentId).Distinct().Count();
     }

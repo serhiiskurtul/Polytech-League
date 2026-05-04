@@ -28,6 +28,8 @@ using PolytechLeague.Domain.Entities.Badminton.Enums;
 using PolytechLeague.Persistence.DbConfigurations.BadmintonConfigurations;
 using PolytechLeague.Domain.Entities.BeachVolleyball;
 using PolytechLeague.Persistence.DbConfigurations.BeachVolleyballConfigurations;
+using PolytechLeague.Domain.Entities.Athletics;
+using PolytechLeague.Persistence.DbConfigurations.AthleticsConfigurations;
 
 namespace PolytechLeague.Persistence.Database;
 
@@ -109,6 +111,11 @@ public class ApplicationDbContext : DbContext
     public DbSet<BadmintonEventParticipant> BadmintonEventParticipants { get; set; }
     public DbSet<BadmintonMatch> BadmintonMatches { get; set; }
     public DbSet<BadmintonSet> BadmintonSets { get; set; }
+
+    // Athletics
+    public DbSet<AthleticsEvent> AthleticsEvents { get; set; }
+    public DbSet<AthleticsResult> AthleticsResults { get; set; }
+    public DbSet<AthleticsEventParticipant> AthleticsEventParticipants { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -208,6 +215,11 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new BadmintonEventParticipantConfiguration());
         modelBuilder.ApplyConfiguration(new BadmintonMatchConfiguration());
         modelBuilder.ApplyConfiguration(new BadmintonSetConfiguration());
+
+        // Athletics configurations
+        modelBuilder.ApplyConfiguration(new AthleticsEventConfiguration());
+        modelBuilder.ApplyConfiguration(new AthleticsResultConfiguration());
+        modelBuilder.ApplyConfiguration(new AthleticsEventParticipantConfiguration());
 
         base.OnModelCreating(modelBuilder);
     }
