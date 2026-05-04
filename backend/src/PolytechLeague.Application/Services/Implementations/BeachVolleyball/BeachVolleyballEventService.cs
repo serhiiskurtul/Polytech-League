@@ -334,7 +334,7 @@ public class BeachVolleyballEventService(
     {
         // 0. Clear player references
         await _dbcontext.Database.ExecuteSqlRawAsync(
-            $"UPDATE players SET beach_volleyball_team_id = NULL WHERE beach_volleyball_team_id IN (SELECT id FROM beach_volleyball_teams WHERE \"EventId\" = {id})", 
+            $"UPDATE players SET beach_volleyball_team_id = NULL WHERE beach_volleyball_team_id IN (SELECT \"Id\" FROM beach_volleyball_teams WHERE \"EventId\" = {id})", 
             cancellationToken);
 
         // 1. Fetch event

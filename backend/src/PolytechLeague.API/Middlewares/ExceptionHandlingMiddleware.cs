@@ -17,11 +17,13 @@ public class ExceptionHandlingMiddleware(RequestDelegate _next, ILogger<Exceptio
         {
             _logger.LogError(
                 ex,
-                "Could not process a request on machine {MachineName}.",
+                "An unhandled exception has occurred. Message: {Message}. InnerException: {InnerMessage}. Machine: {MachineName}.",
+                ex.Message,
+                ex.InnerException?.Message ?? "None",
                 Environment.MachineName
             );
 
-            await HandleExceptionAsync(httpContext,ex);
+            await HandleExceptionAsync(httpContext, ex);
         }
     }
 

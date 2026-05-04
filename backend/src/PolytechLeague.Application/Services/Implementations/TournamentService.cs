@@ -633,18 +633,50 @@ public class TournamentService : ITournamentService
             .OrderByDescending(e => e.Date)
             .ToListAsync();
 
-        return results.Select(e => new PolytechLeague.Application.Dto.General.ChampionDto
+        var dtos = new List<PolytechLeague.Application.Dto.General.ChampionDto>();
+
+        foreach (var e in results)
         {
-            PlayerId = e.FirstPlaceId!.Value,
-            PlayerName = $"{e.FirstPlace!.FirstName} {e.FirstPlace.LastName}",
-            PlayerPhotoUrl = e.FirstPlace.PhotoUrl,
-            SeasonName = e.Season?.Name ?? e.Date.Year.ToString(),
-            TournamentId = e.Id,
-            TournamentName = e.Name,
-            SportType = GetSportName(e),
-            Date = e.Date,
-            Points = 0,
-            Gender = e.FirstPlace.Gender
-        });
+            double points = 0;
+            
+            // Try to fetch points from specific participant tables for individual sports
+            if (e is ChessEvent)
+            {
+                points = await _context.ChessEventParticipants
+                    .Where(p => p.TournamentId == e.Id && p.PlayerId == e.FirstPlaceId)
+                    .Select(p => p.Points)
+                    .FirstOrDefaultAsync();
+            }
+            else if (e is CheckersEvent)
+            {
+                points = await _context.CheckersEventParticipants
+                    .Where(p => p.TournamentId == e.Id && p.PlayerId == e.FirstPlaceId)
+                    .Select(p => p.Points)
+                    .FirstOrDefaultAsync();
+            }
+            else if (e is TableTennisEvent)
+            {
+                points = await _context.TableTennisEventParticipants
+                    .Where(p => p.TournamentId == e.Id && p.PlayerId == e.FirstPlaceId)
+                    .Select(p => p.Points)
+                    .FirstOrDefaultAsync();
+            }
+
+            dtos.Add(new PolytechLeague.Application.Dto.General.ChampionDto
+            {
+                PlayerId = e.FirstPlaceId!.Value,
+                PlayerName = $"{e.FirstPlace!.FirstName} {e.FirstPlace.LastName}",
+                PlayerPhotoUrl = e.FirstPlace.PhotoUrl,
+                SeasonName = e.Season?.Name ?? e.Date.Year.ToString(),
+                TournamentId = e.Id,
+                TournamentName = e.Name,
+                SportType = GetSportName(e),
+                Date = e.Date,
+                Points = points,
+                Gender = e.FirstPlace.Gender
+            });
+        }
+
+        return dtos;
     }
 }

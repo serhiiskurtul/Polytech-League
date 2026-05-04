@@ -349,9 +349,10 @@ public class FutsalEventService :
 
     public override async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
     {
-        // 0. Clear player references using raw SQL (as ExecuteUpdate doesn't support TPT hierarchies like Player)
+        // 0. Clear player references
+        // Using raw SQL with correct quoting for PascalCase columns ("Id", "EventId")
         await _dbcontext.Database.ExecuteSqlRawAsync(
-            $"UPDATE players SET futsal_team_id = NULL WHERE futsal_team_id IN (SELECT id FROM futsal_teams WHERE \"EventId\" = {id})", 
+            $"UPDATE players SET futsal_team_id = NULL WHERE futsal_team_id IN (SELECT \"Id\" FROM futsal_teams WHERE \"EventId\" = {id})", 
             cancellationToken);
 
         // 1. Fetch event with matches to handle Restrict constraints
