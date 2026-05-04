@@ -521,7 +521,6 @@ const PointsDistributionChart = ({ player }: { player: PlayerDto }) => {
             outerRadius={70}
             paddingAngle={5}
             dataKey="value"
-            label={({ name, percent }) => (percent && percent > 0.1) ? name : ''}
           >
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
