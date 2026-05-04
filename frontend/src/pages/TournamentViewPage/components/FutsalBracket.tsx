@@ -54,7 +54,7 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
     if (!playerId) return null;
     const team = teams.find(t => t.id === teamId);
     if (!team) return null;
-    const player = team.players?.find((p: any) => p.id === playerId);
+    const player = team?.players?.find((p: any) => p.id === playerId);
     if (!player) return null;
     return `${player.lastName} ${player.firstName[0]}.`;
   };

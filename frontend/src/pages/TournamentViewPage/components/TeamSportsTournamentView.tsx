@@ -633,7 +633,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const handleTogglePlayerInTeam = async (teamId: number, playerId: number) => {
     try {
       const updateApi = getTeamUpdateApi();
-      const team = details.teams.find((t: any) => t.id === teamId);
+      const team = details.teams?.find((t: any) => t.id === teamId);
       if (!team) return;
 
       const playerIds = team.players?.map((p: any) => p.id) || [];
@@ -716,7 +716,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   };
   const handleSetCaptain = async (teamId: number, playerId: number | null) => {
     try {
-      const team = details.teams.find((t: any) => t.id === teamId);
+      const team = details.teams?.find((t: any) => t.id === teamId);
       if (!team) return;
 
       const updateApi = getTeamUpdateApi();
@@ -742,7 +742,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
   const handleSetGoalkeeper = async (teamId: number, playerId: number | null) => {
     try {
-      const team = details.teams.find((t: any) => t.id === teamId);
+      const team = details.teams?.find((t: any) => t.id === teamId);
       if (!team) return;
 
       const updateApi = getTeamUpdateApi();
@@ -768,7 +768,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   
   const handleToggleGeneralTable = async (teamId: number) => {
     try {
-      const team = details.teams.find((t: any) => t.id === teamId);
+      const team = details.teams?.find((t: any) => t.id === teamId);
       if (!team) return;
 
       const updateApi = getTeamUpdateApi();
@@ -833,6 +833,10 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         default: deleteApi = deleteVolleyballTeam;
       }
       await deleteApi(teamId);
+      if (editingTeamId === teamId) {
+        setEditingTeamId(null);
+        setIsTeamRosterModalOpen(false);
+      }
       onRefresh();
     } catch (err) {
       console.error(err);
@@ -1374,15 +1378,15 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   )}
                 </div>
                 <div className={styles.teamPlayersPreview}>
-                  {team.players?.slice(0, 5).map((p: any) => (
-                    <div key={p.id} className={`${styles.pMiniTag} ${team.captainId === p.id ? styles.captainTag : ''} ${team.goalkeeperId === p.id ? styles.goalkeeperTag : ''}`}>
-                      {team.captainId === p.id && <i className="fas fa-copyright" style={{marginRight: '4px', fontSize: '10px'}} title="Капітан"></i>}
-                      {team.goalkeeperId === p.id && <i className="fas fa-hands" style={{marginRight: '4px', fontSize: '10px'}} title="Воротар"></i>}
+                  {team?.players?.slice(0, 5).map((p: any) => (
+                    <div key={p.id} className={`${styles.pMiniTag} ${team?.captainId === p.id ? styles.captainTag : ''} ${team?.goalkeeperId === p.id ? styles.goalkeeperTag : ''}`}>
+                      {team?.captainId === p.id && <i className="fas fa-copyright" style={{marginRight: '4px', fontSize: '10px'}} title="Капітан"></i>}
+                      {team?.goalkeeperId === p.id && <i className="fas fa-hands" style={{marginRight: '4px', fontSize: '10px'}} title="Воротар"></i>}
                       {p.lastName} {p.firstName[0]}.
                     </div>
                   ))}
-                  {team.players?.length > 5 && <span className={styles.morePlayers}>+{team.players.length - 5}</span>}
-                  {(!team.players || team.players.length === 0) && <p className={styles.noPlayersHint}>Гравців ще не додано</p>}
+                  {team?.players?.length > 5 && <span className={styles.morePlayers}>+{team.players.length - 5}</span>}
+                  {(!team?.players || team.players.length === 0) && <p className={styles.noPlayersHint}>Гравців ще не додано</p>}
                 </div>
               </div>
             ))}
@@ -1671,8 +1675,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                 <div className={styles.modalBody} style={{maxHeight: '400px'}}>
                     <div className={styles.playersList}>
                         {isAdmin ? filteredPlayers.map(player => {
-                            const team = details.teams.find((t: any) => t.id === editingTeamId);
-                            const isSelected = team.players?.some((p: any) => p.id === player.id);
+                            const team = details.teams?.find((t: any) => t.id === editingTeamId);
+                            const isSelected = team?.players?.some((p: any) => p.id === player.id);
                             
                             return (
                                 <div key={player.id} className={`${styles.playerPickItem} ${isSelected ? styles.selected : ''}`}>
