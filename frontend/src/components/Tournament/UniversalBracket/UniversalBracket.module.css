@@ -1,0 +1,201 @@
+.bracketContainer {
+  display: flex;
+  padding: 60px 40px;
+  overflow-x: auto;
+  min-width: fit-content;
+  background: #f8fafc;
+  min-height: 800px;
+  position: relative;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.bracketWrapper {
+  display: flex;
+  gap: 120px; /* Space between rounds */
+  position: relative;
+  margin: 0 auto;
+}
+
+.roundColumn {
+  display: flex;
+  flex-direction: column;
+  width: 280px;
+  position: relative;
+  z-index: 2;
+}
+
+.roundHeader {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.roundTitle {
+  background: #1e293b;
+  color: white;
+  padding: 8px 24px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.matchesList {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  flex: 1;
+  position: relative;
+}
+
+.matchCardWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0;
+  flex: 1;
+}
+
+.matchCard {
+  width: 100%;
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.matchCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border-color: #cbd5e1;
+}
+
+.teamRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  position: relative;
+}
+
+.teamRow:not(:last-child) {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.teamInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.teamName {
+  font-size: 14px;
+  font-weight: 500;
+  color: #475569;
+}
+
+.isWinner .teamName {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.score {
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: #64748b;
+  padding: 2px 8px;
+  background: #f8fafc;
+  border-radius: 6px;
+  min-width: 32px;
+  text-align: center;
+}
+
+.isWinner .score {
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.winnerIndicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #10b981;
+}
+
+.cardDeleteBtn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  background: #fee2e2;
+  color: #ef4444;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.matchCard:hover .cardDeleteBtn {
+  opacity: 1;
+}
+
+.protocolBtn {
+  width: calc(100% - 24px);
+  margin: 8px 12px 12px;
+  background: #f1f5f9;
+  border: none;
+  padding: 6px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.protocolBtn:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+/* SVG Overlay Styles */
+.svgOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.connectorLine {
+  fill: none;
+  stroke: #cbd5e1;
+  stroke-width: 2px;
+  stroke-linecap: round;
+  transition: stroke 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .bracketContainer {
+    padding: 30px 20px;
+  }
+}
