@@ -35,7 +35,8 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
     'table-tennis': 'fas fa-table-tennis',
     'badminton': 'fas fa-feather-alt',
     'armwrestling': 'fas fa-fist-raised',
-    'beach-volleyball': 'fas fa-umbrella-beach'
+    'beach-volleyball': 'fas fa-umbrella-beach',
+    'athletics': 'fas fa-running'
   };
 
   // Кольори для статусів
@@ -64,7 +65,8 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
     'table-tennis': 'Настільний теніс',
     'badminton': 'Бадмінтон',
     'armwrestling': 'Армреслінг',
-    'beach-volleyball': 'Пляжний волейбол'
+    'beach-volleyball': 'Пляжний волейбол',
+    'athletics': 'Легка атлетика'
   };
 
   const levelLabels: Record<string, string> = {
