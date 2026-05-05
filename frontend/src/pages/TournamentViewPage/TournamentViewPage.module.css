@@ -2789,9 +2789,9 @@ input:checked + .slider:before {
 .stagesRow {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: minmax(280px, 1fr);
-  gap: 120px;
-  min-height: 1200px;
+  grid-auto-columns: minmax(260px, 1fr);
+  gap: 80px;
+  min-height: 1600px;
   align-items: stretch;
 }
 
@@ -2983,8 +2983,8 @@ input:checked + .slider:before {
 
 .pairConnector {
   position: absolute;
-  right: -80px;
-  width: 80px;
+  left: calc(50% + 120px); /* Start exactly after the 240px centered card */
+  width: 60px;
   height: 100%;
   display: flex;
   align-items: center;
