@@ -170,7 +170,7 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
                 <span className={styles.stageNameBadge}>{stageName}</span>
               </div>
               
-              <div className={styles.matchList}>
+              <div className={styles.matchList} style={{ gridTemplateRows: `repeat(${pairs.length}, 1fr)`, display: 'grid' }}>
                 {pairs.map((pair, pIdx) => (
                   <div key={pIdx} className={`${styles.matchPairContainer} ${pair.length === 1 ? styles.singleMatch : ''}`}>
                     <div className={styles.pairMatches}>

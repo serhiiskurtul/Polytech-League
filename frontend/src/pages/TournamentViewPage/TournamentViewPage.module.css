@@ -2799,12 +2799,15 @@ input:checked + .slider:before {
   display: flex;
   flex-direction: column;
   height: 100%;
+  flex-shrink: 0;
 }
 
 .stageHeader {
-  margin-bottom: 40px;
-  position: relative;
-  text-align: center; /* Center the badge */
+  height: 80px; /* Fixed height for all headers */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0; /* Remove margin to keep structure rigid */
 }
 
 .stageNameBadge {
@@ -2821,9 +2824,7 @@ input:checked + .slider:before {
 }
 
 .matchList {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid; /* Rows are set dynamically in JSX */
   flex: 1;
   height: 100%;
   width: 240px;
@@ -2966,10 +2967,9 @@ input:checked + .slider:before {
 .matchPairContainer {
   position: relative;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   width: 100%;
-  flex: 1;
-  min-height: 200px;
+  height: 100%;
 }
 
 .pairMatches {
@@ -2977,8 +2977,8 @@ input:checked + .slider:before {
   flex-direction: column;
   justify-content: space-around;
   height: 100%;
-  flex: 1;
-  padding: 20px 0;
+  width: 100%;
+  padding: 10px 0;
 }
 
 .pairConnector {
@@ -2995,7 +2995,7 @@ input:checked + .slider:before {
   position: absolute;
   left: 0;
   top: 25%;
-  bottom: 25%;
+  height: 50%;
   width: 25px;
   border: 2px solid #cbd5e1;
   border-left: none;
@@ -3013,6 +3013,8 @@ input:checked + .slider:before {
 .connectorArrow {
   position: absolute;
   left: 25px;
+  top: 50%;
+  transform: translateY(-50%);
   right: 0;
   height: 2px;
   background: #cbd5e1;
