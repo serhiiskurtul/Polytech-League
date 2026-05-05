@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import React, { useMemo } from 'react';
 import styles from './UniversalBracket.module.css';
 
 export interface BracketTeam {
@@ -28,9 +28,10 @@ interface UniversalBracketProps {
   cardHeight?: number;
 }
 
-const BASE_GAP = 40;
+const HEADER_HEIGHT = 100;
 const COLUMN_WIDTH = 280;
 const COLUMN_GAP = 120;
+const BASE_GAP = 40;
 
 const UniversalBracket: React.FC<UniversalBracketProps> = ({ 
   rounds, 
@@ -40,61 +41,62 @@ const UniversalBracket: React.FC<UniversalBracketProps> = ({
   renderMatchCard,
   cardHeight = 140 
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+  // 1. DETERMINISTIC COORDINATE CALCULATION
+  const { matchPositions, totalWidth, totalHeight } = useMemo(() => {
+    const positions: number[][] = []; // positions[roundIndex][matchIndex] = Y-coordinate
 
-  // 1. Calculate absolute Y-coordinates for every match mathematically
-  const matchPositions = useMemo(() => {
-    const positions: number[][] = []; // positions[round][matchIndex] = yCoordinate
-
+    // Calculate Y for each match
     rounds.forEach((round, rIdx) => {
       positions[rIdx] = [];
-        round.matches.forEach((_, mIdx) => {
+      round.matches.forEach((_, mIdx) => {
         if (rIdx === 0) {
-          // First round matches are evenly spaced
-          positions[rIdx][mIdx] = mIdx * (cardHeight + BASE_GAP) + (cardHeight / 2);
+          // Round 1: index * (height + gap) + half-height + initial offset
+          positions[rIdx][mIdx] = HEADER_HEIGHT + mIdx * (cardHeight + BASE_GAP) + cardHeight / 2;
         } else {
-          // Subsequent rounds: Match is centered between its two "parents" from previous round
+          // Subsequent rounds: Average of parents' Y positions
           const p1Y = positions[rIdx - 1][mIdx * 2];
           const p2Y = positions[rIdx - 1][mIdx * 2 + 1];
 
           if (p1Y !== undefined && p2Y !== undefined) {
             positions[rIdx][mIdx] = (p1Y + p2Y) / 2;
           } else if (p1Y !== undefined) {
-            // Handle single child (e.g. bye)
             positions[rIdx][mIdx] = p1Y;
           } else {
-            // Fallback for missing parents (shouldn't happen in clean data)
-            positions[rIdx][mIdx] = mIdx * (cardHeight + BASE_GAP * Math.pow(2, rIdx)) + (cardHeight / 2);
+            // Fallback for missing data
+            positions[rIdx][mIdx] = HEADER_HEIGHT + mIdx * (cardHeight + BASE_GAP * Math.pow(2, rIdx)) + cardHeight / 2;
           }
         }
       });
     });
 
-    return positions;
+    const maxRoundIdx = rounds.length - 1;
+    const maxMatchesFirstRound = rounds[0]?.matches.length || 0;
+    
+    return {
+      matchPositions: positions,
+      totalWidth: rounds.length * COLUMN_WIDTH + (rounds.length - 1) * COLUMN_GAP + 80,
+      totalHeight: HEADER_HEIGHT + maxMatchesFirstRound * (cardHeight + BASE_GAP) + 100
+    };
   }, [rounds, cardHeight]);
 
-  // 2. Generate SVG paths based on the calculated positions
+  // 2. DETERMINISTIC SVG PATH GENERATION
   const svgPaths = useMemo(() => {
     const paths: string[] = [];
 
     for (let r = 0; r < rounds.length - 1; r++) {
-      const currentRoundY = matchPositions[r];
-      const nextRoundY = matchPositions[r + 1];
+      const currentY = matchPositions[r];
+      const nextY = matchPositions[r + 1];
 
-      currentRoundY.forEach((startY, mIdx) => {
+      currentY.forEach((startY, mIdx) => {
         const nextMatchIdx = Math.floor(mIdx / 2);
-        const endY = nextRoundY[nextMatchIdx];
+        const endY = nextY[nextMatchIdx];
 
         if (endY !== undefined) {
-          // X coordinates
           const startX = r * (COLUMN_WIDTH + COLUMN_GAP) + COLUMN_WIDTH;
           const endX = (r + 1) * (COLUMN_WIDTH + COLUMN_GAP);
-          const midX = startX + COLUMN_GAP / 2;
+          const midX = (startX + endX) / 2;
 
-          // Draw the "elbow" connector
-          // From match to midpoint X
-          // Vertical line at midpoint X to target Y
-          // From midpoint X to target match X
+          // Precision bracket path: horizontal -> vertical -> horizontal
           const path = `M ${startX} ${startY} L ${midX} ${startY} L ${midX} ${endY} L ${endX} ${endY}`;
           paths.push(path);
         }
@@ -104,85 +106,97 @@ const UniversalBracket: React.FC<UniversalBracketProps> = ({
     return paths;
   }, [matchPositions, rounds]);
 
-  // Calculate total area height
-  const totalHeight = useMemo(() => {
-    if (matchPositions[0]?.length > 0) {
-      return matchPositions[0][matchPositions[0].length - 1] + cardHeight / 2 + BASE_GAP;
-    }
-    return 800;
-  }, [matchPositions, cardHeight]);
-
   return (
-    <div className={styles.bracketContainer} ref={containerRef}>
-      <div className={styles.bracketWrapper} style={{ height: totalHeight + 100 }}>
-        {/* SVG Connections Layer */}
+    <div className={styles.bracketContainer}>
+      <div 
+        className={styles.bracketWrapper} 
+        style={{ width: totalWidth, height: totalHeight }}
+      >
+        {/* SVG CONNECTOR LAYER - Covers the entire coordinate space */}
         <svg 
           className={styles.svgLayer} 
-          width={rounds.length * (COLUMN_WIDTH + COLUMN_GAP)} 
-          height={totalHeight + 100}
+          width={totalWidth} 
+          height={totalHeight}
         >
           {svgPaths.map((d, idx) => (
             <path key={idx} d={d} className={styles.connectorLine} />
           ))}
         </svg>
 
-        {/* Rounds Columns */}
-        {rounds.map((round, rIdx) => (
-          <div key={rIdx} className={styles.roundColumn}>
-            <div className={styles.roundHeader}>
-              <div className={styles.roundTitle}>{round.title}</div>
-            </div>
+        {/* ROUNDS & MATCHES - Strictly positioned by X/Y coordinates */}
+        {rounds.map((round, rIdx) => {
+          const left = rIdx * (COLUMN_WIDTH + COLUMN_GAP);
 
-            <div className={styles.matchesArea}>
-              {round.matches.map((match, mIdx) => (
-                <div 
-                  key={match.id} 
-                  className={styles.matchCardPositioner}
-                  style={{ top: matchPositions[rIdx][mIdx] }}
-                >
-                  <div className={styles.matchCard} style={{ height: cardHeight }}>
-                    {renderMatchCard ? (
-                      renderMatchCard(match)
-                    ) : (
-                      <>
-                        {isAdmin && onDeleteMatch && (
-                          <button 
-                            className={styles.cardDeleteBtn} 
-                            onClick={() => onDeleteMatch(match.id)}
-                          >
-                            ×
-                          </button>
-                        )}
-                        {match.teams.map((team, tIdx) => (
-                          <div 
-                            key={tIdx} 
-                            className={`${styles.teamRow} ${team.isWinner ? styles.isWinner : ''}`}
-                          >
-                            {team.isWinner && <div className={styles.winnerIndicator} />}
-                            <div className={styles.teamInfo}>
-                              <span className={styles.teamName}>{team.name}</span>
-                            </div>
-                            {team.score !== undefined && (
-                              <div className={styles.score}>{team.score}</div>
-                            )}
-                          </div>
-                        ))}
-                        {isAdmin && onOpenScorers && (
-                          <button 
-                            className={styles.protocolBtn} 
-                            onClick={() => onOpenScorers(match)}
-                          >
-                            Протокол
-                          </button>
-                        )}
-                      </>
-                    )}
-                  </div>
+          return (
+            <React.Fragment key={rIdx}>
+              {/* Round Header */}
+              <div 
+                className={styles.roundColumn} 
+                style={{ left, top: 0, height: HEADER_HEIGHT }}
+              >
+                <div className={styles.roundHeader}>
+                  <div className={styles.roundTitle}>{round.title}</div>
                 </div>
-              ))}
-            </div>
-          </div>
-        ))}
+              </div>
+
+              {/* Match Cards */}
+              {round.matches.map((match, mIdx) => {
+                const top = matchPositions[rIdx][mIdx];
+
+                return (
+                  <div 
+                    key={match.id} 
+                    className={styles.matchCardPositioner}
+                    style={{ 
+                      left, 
+                      top, 
+                      width: COLUMN_WIDTH 
+                    }}
+                  >
+                    <div className={styles.matchCard} style={{ height: cardHeight }}>
+                      {renderMatchCard ? (
+                        renderMatchCard(match)
+                      ) : (
+                        <>
+                          {isAdmin && onDeleteMatch && (
+                            <button 
+                              className={styles.cardDeleteBtn} 
+                              onClick={() => onDeleteMatch(match.id)}
+                            >
+                              ×
+                            </button>
+                          )}
+                          {match.teams.map((team, tIdx) => (
+                            <div 
+                              key={tIdx} 
+                              className={`${styles.teamRow} ${team.isWinner ? styles.isWinner : ''}`}
+                            >
+                              {team.isWinner && <div className={styles.winnerIndicator} />}
+                              <div className={styles.teamInfo}>
+                                <span className={styles.teamName}>{team.name}</span>
+                              </div>
+                              {team.score !== undefined && (
+                                <div className={styles.score}>{team.score}</div>
+                              )}
+                            </div>
+                          ))}
+                          {isAdmin && onOpenScorers && (
+                            <button 
+                              className={styles.protocolBtn} 
+                              onClick={() => onOpenScorers(match)}
+                            >
+                              Протокол
+                            </button>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </React.Fragment>
+          );
+        })}
       </div>
     </div>
   );
