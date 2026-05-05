@@ -170,7 +170,7 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
           onDeleteMatch={(id) => onDeleteMatch && onDeleteMatch(Number(id))}
           onOpenScorers={(match: any) => onOpenScorers && onOpenScorers(match.originalMatch)}
           renderMatchCard={renderFutsalMatchCard}
-          cardHeight={180}
+          cardHeight={160}
         />
       ) : (
 
