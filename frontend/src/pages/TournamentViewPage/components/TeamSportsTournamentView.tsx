@@ -952,12 +952,12 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           )}
           {isAdmin && activeTab === 'matches' && (
             <button className={styles.addMatchGlobalBtn} onClick={() => setIsCreateMatchModalOpen(true)}>
-              <i className="fas fa-plus-circle"></i> Додати матч
+              <i className="fas fa-plus-circle"></i> <span>Додати матч</span>
             </button>
           )}
           {isAdmin && activeTab === 'teams' && (
             <button className={styles.addMatchGlobalBtn} onClick={() => setIsCreateTeamModalOpen(true)}>
-              <i className="fas fa-users-cog"></i> Створити команду
+              <i className="fas fa-users-cog"></i> <span>Створити команду</span>
             </button>
           )}
         </div>

@@ -232,7 +232,7 @@ const AthleticsTournamentView: React.FC<AthleticsTournamentViewProps> = ({
               }}
             >
               <i className={`fas ${showAddResult ? 'fa-times' : 'fa-plus-circle'}`}></i>
-              {showAddResult ? 'Скасувати' : 'Додати результат'}
+              <span>{showAddResult ? 'Скасувати' : 'Додати результат'}</span>
             </button>
 
             <button 
@@ -244,7 +244,7 @@ const AthleticsTournamentView: React.FC<AthleticsTournamentViewProps> = ({
               }}
             >
               <i className="fas fa-users"></i>
-              {showParticipants ? 'Сховати учасників' : 'Керувати учасниками'}
+              <span>{showParticipants ? 'Сховати учасників' : 'Керувати учасниками'}</span>
             </button>
           </div>
 

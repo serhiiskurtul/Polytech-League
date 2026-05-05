@@ -478,7 +478,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
               className={styles.actionBtn}
               onClick={() => setShowSetWinners(!showSetWinners)}
             >
-              <i className="fas fa-medal"></i> Встановити призерів
+              <i className="fas fa-medal"></i> <span>Встановити призерів</span>
             </button>
           )}
         </div>
@@ -807,7 +807,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
                   {(newParticipant.userId || newParticipant.existingPlayerId) && (
                     <button
                       type="button"
-                      onClick={() => setNewParticipant({ firstName: '', lastName: '', group: '', userId: null, existingPlayerId: null, gender: 'None' })}
+                      onClick={() => setNewParticipant({ firstName: '', lastName: '', patronymic: '', group: '', userId: null, existingPlayerId: null, gender: 'None' })}
                       style={{ padding: '8px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
                     >
                       <i className="fas fa-times"></i>

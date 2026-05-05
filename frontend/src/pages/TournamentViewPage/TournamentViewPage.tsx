@@ -1420,23 +1420,29 @@ const TournamentViewPage = () => {
             <i className="fas fa-arrow-left"></i> Назад
           </button>
 
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div className={styles.adminActions}>
             {isAdmin && (
               <button
                 onClick={() => setShowWinnersAdmin(!showWinnersAdmin)}
-                style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
+                className={`${styles.adminBtn} ${styles.winnersBtn}`}
               >
-                <i className="fas fa-medal"></i> Призначити переможців
+                <i className="fas fa-medal"></i> <span>Призначити переможців</span>
               </button>
             )}
             {isAdmin && (
-              <button onClick={handleEditTournament} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: '#3b82f6', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
-                <i className="fas fa-edit"></i> Редагувати змагання
+              <button 
+                onClick={handleEditTournament} 
+                className={`${styles.adminBtn} ${styles.editBtn}`}
+              >
+                <i className="fas fa-edit"></i> <span>Редагувати змагання</span>
               </button>
             )}
             {isAdmin && (
-              <button onClick={handleDeleteTournament} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', backgroundColor: '#ef4444', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
-                <i className="fas fa-trash"></i> Видалити
+              <button 
+                onClick={handleDeleteTournament} 
+                className={`${styles.adminBtn} ${styles.deleteBtn}`}
+              >
+                <i className="fas fa-trash"></i> <span>Видалити</span>
               </button>
             )}
           </div>

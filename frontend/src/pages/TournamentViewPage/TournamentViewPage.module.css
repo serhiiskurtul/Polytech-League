@@ -3574,6 +3574,19 @@ input:checked + .slider:before {
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
 
+@media (max-width: 768px) {
+  .addBtn {
+    flex: 1;
+    justify-content: center;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  
+  .addBtn span {
+    display: none;
+  }
+}
+
 .addBtn.active {
   background: var(--danger-light);
   color: var(--danger);
@@ -3634,6 +3647,130 @@ input:checked + .slider:before {
   transform: translateY(-2px);
 }
 
+.tabsNav {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  flex: 1;
+}
+
+.tabsNav::-webkit-scrollbar {
+  display: none;
+}
+
+.tabsNav button {
+  padding: 8px 16px;
+  border: none;
+  background: #f1f5f9;
+  color: #64748b;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tabsNav button.activeTab {
+  background: var(--primary);
+  color: white;
+}
+
+.addMatchGlobalBtn {
+  background: var(--success);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.addMatchGlobalBtn:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.adminActions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.adminBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.adminBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.winnersBtn { background-color: #10b981; }
+.editBtn { background-color: #3b82f6; }
+.deleteBtn { background-color: #ef4444; }
+
+@media (max-width: 1024px) {
+  .sportHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .tabsNav {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .adminActions {
+    width: 100%;
+    gap: 8px;
+  }
+
+  .adminBtn {
+    flex: 1;
+    justify-content: center;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .adminBtn span, .addBtn span, .addMatchGlobalBtn span, .actionBtn span {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .adminBtn {
+    padding: 10px 8px;
+  }
+  
+  .tabsNav button {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}
+
 .cancelBtn {
   background: #f1f5f9;
   color: #64748b;
@@ -3682,4 +3819,80 @@ input:checked + .slider:before {
   color: #94a3b8;
   font-style: italic;
   border: 1px dashed #cbd5e1;
+}
+
+/* Armwrestling Specific Styles */
+.armwCategoryNav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  background: white;
+  padding: 16px 24px;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.categoryBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.categoryBtn.active {
+  background: var(--primary);
+  color: white;
+}
+
+.categoryInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.actionBtn {
+  background: var(--warning-light);
+  color: var(--warning);
+  border: 1px solid var(--warning);
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.actionBtn:hover {
+  background: var(--warning);
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .armwCategoryNav {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px;
+  }
+  
+  .categoryInfo {
+    justify-content: space-between;
+    width: 100%;
+  }
+  
+  .actionBtn {
+    flex: 1;
+    justify-content: center;
+  }
 }
