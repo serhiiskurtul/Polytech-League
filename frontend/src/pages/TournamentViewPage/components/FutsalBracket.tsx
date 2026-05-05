@@ -2,6 +2,7 @@ import React from 'react';
 import { FutsalMatchResponse } from '@/shared/types/futsal.types';
 import UniversalBracket, { BracketRound, BracketMatch } from '@/components/Tournament/UniversalBracket/UniversalBracket';
 import styles from '../TournamentViewPage.module.css';
+import bracketStyles from '@/components/Tournament/UniversalBracket/UniversalBracket.module.css';
 
 interface FutsalBracketProps {
   matches: FutsalMatchResponse[];
@@ -99,77 +100,60 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
       <div 
         className={styles.futsalMatchCard} 
         onClick={() => onViewInfo && onViewInfo(match)}
-        style={{ cursor: onViewInfo ? 'pointer' : 'default', border: 'none', boxShadow: 'none', background: 'transparent' }}
+        style={{ cursor: onViewInfo ? 'pointer' : 'default', border: 'none', boxShadow: 'none', background: 'transparent', padding: 0, width: '100%' }}
       >
         {isAdmin && onDeleteMatch && (
           <button 
-            className={styles.cardDeleteBtn}
+            className={bracketStyles.cardDeleteBtn}
             onClick={(e) => { e.stopPropagation(); onDeleteMatch(match.id); }}
             title="Видалити матч"
-            style={{ top: '-4px', right: '-4px' }}
           >
-            <i className="fas fa-trash" style={{ fontSize: '10px' }}></i>
+            <i className="fas fa-times"></i>
           </button>
         )}
         
-        <div className={`${styles.futsalTeamRow} ${isHomeWinner ? styles.futsalWinner : isDraw ? styles.futsalDraw : ''}`}>
-          <div className={styles.futsalTeamInfo}>
-             <div className={styles.futsalTeamHeader}>
-               <span 
-                 className={styles.futsalTeamName}
-                 onClick={(e) => { e.stopPropagation(); onViewRoster && onViewRoster(match.homeTeamId); }}
-                 style={{ cursor: onViewRoster ? 'pointer' : 'default' }}
-               >
-                 {match.homeTeam?.name || 'TBD'}
-               </span>
-               {onViewRoster && (
-                 <button className={styles.rosterMiniBtn} onClick={(e) => { e.stopPropagation(); onViewRoster(match.homeTeamId); }}>
-                   <i className="fas fa-users"></i>
-                 </button>
-               )}
-             </div>
-             <div className={styles.futsalTeamRoles}>
-               {homeCaptain && <span className={styles.roleBadge}><b>C:</b> {homeCaptain}</span>}
-               {homeGK && <span className={styles.roleBadge}><b>GK:</b> {homeGK}</span>}
-             </div>
+        <div className={`${bracketStyles.teamRow} ${isHomeWinner ? bracketStyles.isWinner : ''}`}>
+          {isHomeWinner && <div className={bracketStyles.winnerIndicator} />}
+          <div className={bracketStyles.teamInfo}>
+             <span 
+               className={bracketStyles.teamName}
+               onClick={(e) => { e.stopPropagation(); onViewRoster && onViewRoster(match.homeTeamId); }}
+               style={{ cursor: onViewRoster ? 'pointer' : 'default' }}
+             >
+               {match.homeTeam?.name || 'TBD'}
+             </span>
+             {isHomeWinner && <i className={`fas fa-trophy ${bracketStyles.trophyIcon}`}></i>}
           </div>
-          <div className={styles.futsalTeamScore}>
+          <div className={bracketStyles.score}>
             {match.homeTeamScore ?? '-'}
-            {isHomeWinner && <i className="fas fa-trophy"></i>}
           </div>
         </div>
 
-        <div className={styles.futsalVsDivider}>vs</div>
+        <div className={bracketStyles.vsDivider}>
+          <div className={bracketStyles.vsLine} />
+          <span className={bracketStyles.vsText}>vs</span>
+          <div className={bracketStyles.vsLine} />
+        </div>
 
-        <div className={`${styles.futsalTeamRow} ${isAwayWinner ? styles.futsalWinner : isDraw ? styles.futsalDraw : ''}`}>
-          <div className={styles.futsalTeamInfo}>
-             <div className={styles.futsalTeamHeader}>
-               <span 
-                 className={styles.futsalTeamName}
-                 onClick={(e) => { e.stopPropagation(); onViewRoster && onViewRoster(match.awayTeamId); }}
-                 style={{ cursor: onViewRoster ? 'pointer' : 'default' }}
-               >
-                 {match.awayTeam?.name || 'TBD'}
-               </span>
-               {onViewRoster && (
-                 <button className={styles.rosterMiniBtn} onClick={(e) => { e.stopPropagation(); onViewRoster(match.awayTeamId); }}>
-                   <i className="fas fa-users"></i>
-                 </button>
-               )}
-             </div>
-             <div className={styles.futsalTeamRoles}>
-               {awayCaptain && <span className={styles.roleBadge}><b>C:</b> {awayCaptain}</span>}
-               {awayGK && <span className={styles.roleBadge}><b>GK:</b> {awayGK}</span>}
-             </div>
+        <div className={`${bracketStyles.teamRow} ${isAwayWinner ? bracketStyles.isWinner : ''}`}>
+          {isAwayWinner && <div className={bracketStyles.winnerIndicator} />}
+          <div className={bracketStyles.teamInfo}>
+             <span 
+               className={bracketStyles.teamName}
+               onClick={(e) => { e.stopPropagation(); onViewRoster && onViewRoster(match.awayTeamId); }}
+               style={{ cursor: onViewRoster ? 'pointer' : 'default' }}
+             >
+               {match.awayTeam?.name || 'TBD'}
+             </span>
+             {isAwayWinner && <i className={`fas fa-trophy ${bracketStyles.trophyIcon}`}></i>}
           </div>
-          <div className={styles.futsalTeamScore}>
+          <div className={bracketStyles.score}>
             {match.awayTeamScore ?? '-'}
-            {isAwayWinner && <i className="fas fa-trophy"></i>}
           </div>
         </div>
 
         {isAdmin && onOpenScorers && (
-          <button className={styles.futsalProtocolBtn} onClick={(e) => { e.stopPropagation(); onOpenScorers(match); }}>
+          <button className={bracketStyles.protocolBtn} onClick={(e) => { e.stopPropagation(); onOpenScorers(match); }}>
              <i className="fas fa-file-alt"></i> Протокол
           </button>
         )}
@@ -186,7 +170,7 @@ const FutsalBracket: React.FC<FutsalBracketProps> = ({
           onDeleteMatch={(id) => onDeleteMatch && onDeleteMatch(Number(id))}
           onOpenScorers={(match: any) => onOpenScorers && onOpenScorers(match.originalMatch)}
           renderMatchCard={renderFutsalMatchCard}
-          cardHeight={160}
+          cardHeight={180}
         />
       ) : (
 

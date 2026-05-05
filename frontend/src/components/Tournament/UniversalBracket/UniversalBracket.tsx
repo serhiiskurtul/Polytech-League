@@ -167,25 +167,34 @@ const UniversalBracket: React.FC<UniversalBracketProps> = ({
                             </button>
                           )}
                           {match.teams.map((team, tIdx) => (
-                            <div 
-                              key={tIdx} 
-                              className={`${styles.teamRow} ${team.isWinner ? styles.isWinner : ''}`}
-                            >
-                              {team.isWinner && <div className={styles.winnerIndicator} />}
-                              <div className={styles.teamInfo}>
-                                <span className={styles.teamName}>{team.name}</span>
+                            <React.Fragment key={tIdx}>
+                              <div 
+                                className={`${styles.teamRow} ${team.isWinner ? styles.isWinner : ''}`}
+                              >
+                                {team.isWinner && <div className={styles.winnerIndicator} />}
+                                <div className={styles.teamInfo}>
+                                  <span className={styles.teamName}>{team.name}</span>
+                                  {team.isWinner && <i className={`fas fa-trophy ${styles.trophyIcon}`} />}
+                                </div>
+                                {team.score !== undefined && (
+                                  <div className={styles.score}>{team.score}</div>
+                                )}
                               </div>
-                              {team.score !== undefined && (
-                                <div className={styles.score}>{team.score}</div>
+                              {tIdx === 0 && (
+                                <div className={styles.vsDivider}>
+                                  <div className={styles.vsLine} />
+                                  <span className={styles.vsText}>vs</span>
+                                  <div className={styles.vsLine} />
+                                </div>
                               )}
-                            </div>
+                            </React.Fragment>
                           ))}
                           {isAdmin && onOpenScorers && (
                             <button 
                               className={styles.protocolBtn} 
                               onClick={() => onOpenScorers(match)}
                             >
-                              Протокол
+                              <i className="fas fa-file-alt" /> Протокол
                             </button>
                           )}
                         </>
