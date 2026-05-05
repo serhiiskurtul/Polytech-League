@@ -971,7 +971,7 @@
 /* Armwrestling Bracket Styles */
 .bracketContainer {
   display: flex;
-  gap: 48px;
+  
   overflow-x: auto;
   padding: 60px 40px;
   background: radial-gradient(circle at top left, #f8fafc, #f1f5f9);
@@ -1060,7 +1060,7 @@
 
 .stagesRow {
   display: flex;
-  gap: 48px;
+  
 }
 
 .connectorLine {
@@ -2835,12 +2835,10 @@ input:checked + .slider:before {
 .matchList {
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Center matches vertically */
-  align-items: center; /* Center matches horizontally */
-  gap: 48px;
+  align-items: center;
   padding: 20px;
-  flex: 1; /* Take full height to allow centering */
-  min-height: 600px; /* Base height for the bracket */
+  flex: 1;
+  min-height: 800px;
 }
 
 .matchBoxContainer {
@@ -2978,12 +2976,14 @@ input:checked + .slider:before {
   display: flex;
   align-items: center;
   width: 100%;
+  flex: 1;
 }
 
 .pairMatches {
   display: flex;
   flex-direction: column;
-  gap: 48px; /* Vertical gap between matches in a pair */
+  justify-content: space-around;
+  height: 100%;
   flex: 1;
 }
 
@@ -2991,7 +2991,7 @@ input:checked + .slider:before {
   position: absolute;
   right: -80px;
   width: 80px;
-  height: calc(100% - 100px); /* Subtracting half heights of cards approx */
+  height: 100%;
   display: flex;
   align-items: center;
   pointer-events: none;
@@ -3000,12 +3000,20 @@ input:checked + .slider:before {
 .connectorFork {
   position: absolute;
   left: 0;
-  top: 0;
-  bottom: 0;
+  top: 25%;
+  bottom: 25%;
   width: 30px;
   border: 2px solid #cbd5e1;
   border-left: none;
   border-radius: 0 12px 12px 0;
+}
+
+.singleMatch .connectorFork {
+  display: none;
+}
+
+.singleMatch .connectorArrow {
+  left: 0;
 }
 
 .connectorArrow {
