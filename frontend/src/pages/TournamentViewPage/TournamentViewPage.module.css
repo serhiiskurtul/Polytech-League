@@ -1509,6 +1509,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 32px;
   margin-bottom: 24px;
   background: white;
   padding: 16px 24px;
@@ -1542,6 +1543,7 @@
   color: #64748b;
   border-radius: 8px;
   font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -3651,7 +3653,6 @@ input:checked + .slider:before {
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding-bottom: 4px;
   scrollbar-width: none;
   -ms-overflow-style: none;
   flex: 1;
@@ -3668,6 +3669,7 @@ input:checked + .slider:before {
   color: #64748b;
   border-radius: 8px;
   font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
@@ -3741,7 +3743,7 @@ input:checked + .slider:before {
   .sportHeader {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
+    gap: 24px;
   }
   
   .tabsNav {
