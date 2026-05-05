@@ -27,13 +27,25 @@ const AboutPage: React.FC = () => {
 
         <div className={styles.card}>
           <h2>
-            <i className="fas fa-shield-alt"></i>
-            Наша мета
+            <i className="fas fa-medal"></i>
+            Твоя спортивна історія
           </h2>
           <p>
-            Створити прозору та справедливу систему оцінки спортивних результатів у Політехніці. 
-            Ми прагнемо популяризувати активний спосіб життя через гейміфікацію 
-            та надання гравцям детальної статистики їхнього прогресу.
+            Ставай частиною легендарного руху! Реєструйся на змагання онлайн у кілька кліків, 
+            стеж за результатами в реальному часі та вкарбовуй своє ім'я в золоті сторінки 
+            спортивної історії Політехніки через систему глобальних рейтингів.
+          </p>
+        </div>
+
+        <div className={styles.card}>
+          <h2>
+            <i className="fas fa-chart-line"></i>
+            Аналітика та прогрес
+          </h2>
+          <p>
+            Слідкуй за останніми змаганнями, аналізуй гру суперників та відстежуй 
+            власний прогрес. Наша мета — створити прозору та справедливу систему 
+            спортивних досягнень для кожного студента.
           </p>
         </div>
       </div>
@@ -42,12 +54,7 @@ const AboutPage: React.FC = () => {
         <div className={styles.metaGrid}>
           <div className={styles.metaItem}>
             <div className={styles.metaLabel}>Створено</div>
-            <div className={styles.metaValue}>Вересень 2024</div>
-          </div>
-
-          <div className={styles.metaItem}>
-            <div className={styles.metaLabel}>Статус проєкту</div>
-            <div className={styles.metaValue}>Активна розробка</div>
+            <div className={styles.metaValue}>Травень 2026</div>
           </div>
 
           <div className={styles.metaItem}>
@@ -59,7 +66,7 @@ const AboutPage: React.FC = () => {
                 rel="noopener noreferrer"
                 className={styles.authorLink}
               >
-                Андрій Думіч
+                Андрій Думітращук
               </a>
             </div>
           </div>
