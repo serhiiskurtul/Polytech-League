@@ -82,15 +82,15 @@ export default function Header() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/national-ratings" onClick={closeMenu}>
-                    <i className="fas fa-university"></i>
-                    Всеукраїнський залік
-                  </Link>
-                </li>
-                <li>
                   <Link to="/regional-ratings" onClick={closeMenu}>
                     <i className="fas fa-map-marked-alt"></i>
                     Обласний залік
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/national-ratings" onClick={closeMenu}>
+                    <i className="fas fa-university"></i>
+                    Всеукраїнський залік
                   </Link>
                 </li>
               </ul>
