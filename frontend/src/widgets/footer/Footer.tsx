@@ -20,7 +20,8 @@ const Footer = () => {
   const quickLinks = [
     { name: 'Календар подій', path: '/calendar' },
     { name: 'Рейтинг гравців', path: '/ratings' },
-    { name: 'Список змагань', path: '/tournaments' }
+    { name: 'Список змагань', path: '/tournaments' },
+    { name: 'Про проєкт', path: '/about' }
   ];
 
   const socialLinks = [

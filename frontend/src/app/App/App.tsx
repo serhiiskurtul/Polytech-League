@@ -26,6 +26,7 @@ import { AdminCollegesPage } from '@/pages/AdminCollegesPage';
 import { RegionalRatingsPage } from '@/pages/RegionalRatingsPage';
 import { CollegesPage } from '@/pages/CollegesPage';
 import ChampionsPage from '@/pages/ChampionsPage/ChampionsPage';
+import { AboutPage } from '@/pages/AboutPage';
 
 import ProtectedRoute from '../providers/ProtectedRoute';
 import ScrollToTop from '../providers/ScrollToTop';
@@ -201,6 +202,17 @@ export default function App() {
           element={
             <ProtectedRoute requireAuth={false}>
               <ChampionsPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/about"
+          element={
+            <ProtectedRoute requireAuth={false}>
+              <div className="page-wrapper">
+                <AboutPage />
+              </div>
             </ProtectedRoute>
           }
         />
