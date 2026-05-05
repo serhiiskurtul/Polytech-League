@@ -615,6 +615,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
                         type="number"
                         min="1"
                         value={roundNumber}
+                        onFocus={(e) => e.target.select()}
                         onChange={(e) => {
                           const num = Number(e.target.value);
                           setRoundNumber(num);
@@ -657,6 +658,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
                   <input
                     type="number"
                     value={newMatch.tableNumber}
+                    onFocus={(e) => e.target.select()}
                     onChange={(e) => setNewMatch({ ...newMatch, tableNumber: Number(e.target.value) })}
                     style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0', height: '42px', fontSize: '14px', color: '#1e293b' }}
                   />

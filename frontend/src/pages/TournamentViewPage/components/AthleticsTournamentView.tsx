@@ -292,6 +292,7 @@ const AthleticsTournamentView: React.FC<AthleticsTournamentViewProps> = ({
                 <input 
                   type="number" 
                   value={newResult.rank}
+                  onFocus={(e) => e.target.select()}
                   onChange={e => setNewResult({...newResult, rank: parseInt(e.target.value)})}
                 />
               </div>

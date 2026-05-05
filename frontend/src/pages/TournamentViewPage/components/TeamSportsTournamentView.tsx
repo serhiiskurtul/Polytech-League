@@ -1045,6 +1045,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                                 type="number" 
                                 min="1"
                                 value={roundNumber}
+                                onFocus={(e) => e.target.select()}
                                 onChange={e => {
                                     const num = parseInt(e.target.value) || 1;
                                     setRoundNumber(num);
@@ -1127,6 +1128,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                           step={isChessLike ? "0.5" : "1"}
                           key={`${match.id}-home-${homeScore}`}
                           defaultValue={homeScore}
+                          onFocus={(e) => e.target.select()}
                           onBlur={(e) => handleUpdateScore(match.id, parseFloat(e.target.value) || 0, awayScore)}
                           disabled={!isAdmin}
                         />
@@ -1158,6 +1160,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                           step={isChessLike ? "0.5" : "1"}
                           key={`${match.id}-away-${awayScore}`}
                           defaultValue={awayScore}
+                          onFocus={(e) => e.target.select()}
                           onBlur={(e) => handleUpdateScore(match.id, homeScore, parseFloat(e.target.value) || 0)}
                           disabled={!isAdmin}
                         />
@@ -1275,6 +1278,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                                       min="0"
                                       className={styles.pointsInlineInput}
                                       defaultValue={team.points}
+                                      onFocus={(e) => e.target.select()}
                                       onBlur={(e) => handleUpdateTeamPoints(team.id, parseInt(e.target.value) || 0)}
                                     />
                                   ) : (
@@ -1321,6 +1325,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                                     min="0"
                                     className={styles.pointsInlineInput}
                                     defaultValue={team.points}
+                                    onFocus={(e) => e.target.select()}
                                     onBlur={(e) => handleUpdateTeamPoints(team.id, parseInt(e.target.value) || 0)}
                                   />
                                 ) : (
@@ -1371,7 +1376,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       <button className={styles.editTeamBtn} onClick={() => { setEditingTeamId(team.id); setIsTeamRosterModalOpen(true); }}>
                         <i className="fas fa-user-edit"></i> Склад
                       </button>
-                      <button className={styles.deleteTeamBtn} onClick={() => handleDeleteTeam(team.id, team.name)} title="Видалити команду">
+                      <button 
+                        className={styles.deleteTeamBtn} 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteTeam(team.id, team.name);
+                        }} 
+                        title="Видалити команду"
+                      >
                         <i className="fas fa-trash"></i>
                       </button>
                     </div>
@@ -1523,6 +1535,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                             min="1" 
                             style={{ flex: 1, width: '60px', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
                             value={roundNumber}
+                            onFocus={(e) => e.target.select()}
                             onChange={e => {
                                 const num = parseInt(e.target.value) || 1;
                                 setRoundNumber(num);
@@ -1844,6 +1857,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       min="0"
                       style={{ width: '80px', height: '60px', fontSize: '32px', fontWeight: 800, textAlign: 'center', borderRadius: '12px', border: '2px solid #3b82f6', color: '#1e293b' }}
                       value={matchScores.home}
+                      onFocus={(e) => e.target.select()}
                       onChange={e => setMatchScores({...matchScores, home: parseInt(e.target.value) || 0})}
                     />
                  </div>
@@ -1855,6 +1869,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       min="0"
                       style={{ width: '80px', height: '60px', fontSize: '32px', fontWeight: 800, textAlign: 'center', borderRadius: '12px', border: '2px solid #3b82f6', color: '#1e293b' }}
                       value={matchScores.away}
+                      onFocus={(e) => e.target.select()}
                       onChange={e => setMatchScores({...matchScores, away: parseInt(e.target.value) || 0})}
                     />
                  </div>
@@ -1914,6 +1929,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                           type="number" 
                           min="0"
                           value={tempScorers[player.id] || 0}
+                          onFocus={(e) => e.target.select()}
                           onChange={(e) => setTempScorers({
                             ...tempScorers,
                             [player.id]: Math.max(0, parseInt(e.target.value) || 0)
@@ -1982,6 +1998,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                           type="number" 
                           min="0"
                           value={tempScorers[player.id] || 0}
+                          onFocus={(e) => e.target.select()}
                           onChange={(e) => setTempScorers({
                             ...tempScorers,
                             [player.id]: Math.max(0, parseInt(e.target.value) || 0)
