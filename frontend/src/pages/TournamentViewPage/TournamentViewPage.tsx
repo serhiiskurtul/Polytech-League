@@ -1415,7 +1415,7 @@ const TournamentViewPage = () => {
         />
       )}
       <div className={styles.container}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <div className={styles.headerActions}>
           <button className={styles.backButton} onClick={() => navigate('/tournaments')}>
             <i className="fas fa-arrow-left"></i> Назад
           </button>

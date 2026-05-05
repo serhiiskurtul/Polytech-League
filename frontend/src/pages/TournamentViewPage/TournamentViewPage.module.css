@@ -3730,6 +3730,13 @@ input:checked + .slider:before {
 .editBtn { background-color: #3b82f6; }
 .deleteBtn { background-color: #ef4444; }
 
+.headerActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
 @media (max-width: 1024px) {
   .sportHeader {
     flex-direction: column;
