@@ -2787,18 +2787,17 @@ input:checked + .slider:before {
 }
 
 .stagesRow {
-  display: flex;
-  gap: 100px;
-  flex: 1;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(280px, 1fr);
+  gap: 120px;
+  min-height: 1200px;
   align-items: stretch;
 }
 
 .bracketColumn {
-  min-width: 300px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  flex: 1; /* Allow columns to grow and fill stagesRow */
   height: 100%;
 }
 
@@ -2825,10 +2824,10 @@ input:checked + .slider:before {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
   flex: 1;
   height: 100%;
   width: 100%;
+  padding: 0;
 }
 
 .matchBoxContainer {
@@ -2970,6 +2969,7 @@ input:checked + .slider:before {
   align-items: center;
   width: 100%;
   flex: 1;
+  min-height: 200px;
 }
 
 .pairMatches {
@@ -2978,6 +2978,7 @@ input:checked + .slider:before {
   justify-content: space-around;
   height: 100%;
   flex: 1;
+  padding: 20px 0;
 }
 
 .pairConnector {
