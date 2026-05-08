@@ -1473,6 +1473,39 @@ namespace PolytechLeague.Persistence.Migrations
                     b.ToTable("ProfileMergeRequests");
                 });
 
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.PushSubscription", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Auth")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Endpoint")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("P256DH")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PushSubscriptions");
+                });
+
             modelBuilder.Entity("PolytechLeague.Domain.Entities.RefreshToken", b =>
                 {
                     b.Property<long>("Id")
@@ -3424,6 +3457,17 @@ namespace PolytechLeague.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("TargetPlayer");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.PushSubscription", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });

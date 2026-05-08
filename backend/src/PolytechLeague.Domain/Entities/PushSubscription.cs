@@ -9,7 +9,7 @@ public class PushSubscription
     public int Id { get; set; }
 
     [Required]
-    public int UserId { get; set; }
+    public long UserId { get; set; }
 
     [ForeignKey(nameof(UserId))]
     public User User { get; set; }

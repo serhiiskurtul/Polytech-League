@@ -39,7 +39,7 @@ public class NotificationsController(
         {
             var subscription = new PushSubscription
             {
-                UserId = (int)userId,
+                UserId = userId,
                 Endpoint = dto.Endpoint,
                 P256DH = dto.Keys.P256dh,
                 Auth = dto.Keys.Auth
