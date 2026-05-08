@@ -22,6 +22,19 @@ public class WebPushNotificationService(
 
         if (subscriptions.Count == 0) return;
 
+        await SendToSubscriptionsAsync(subscriptions, title, message, url);
+    }
+
+    public async Task SendPushNotificationToAllAsync(string title, string message, string? url = null)
+    {
+        var subscriptions = await _context.PushSubscriptions.ToListAsync();
+        if (subscriptions.Count == 0) return;
+
+        await SendToSubscriptionsAsync(subscriptions, title, message, url);
+    }
+
+    private async Task SendToSubscriptionsAsync(List<PushSubscription> subscriptions, string title, string message, string? url = null)
+    {
         var vapidDetails = new VapidDetails(
             _vapidOptions.Value.Subject,
             _vapidOptions.Value.PublicKey,
@@ -40,7 +53,7 @@ public class WebPushNotificationService(
         {
             try
             {
-                var pushSubscription = new PushSubscription(sub.Endpoint, sub.P256DH, sub.Auth);
+                var pushSubscription = new WebPush.PushSubscription(sub.Endpoint, sub.P256DH, sub.Auth);
                 await webPushClient.SendNotificationAsync(pushSubscription, payload, vapidDetails);
             }
             catch (WebPushException ex)
@@ -48,7 +61,6 @@ public class WebPushNotificationService(
                 if (ex.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.Gone || 
                     ex.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
-                    // Subscription is no longer valid
                     _context.PushSubscriptions.Remove(sub);
                 }
                 _logger.LogError(ex, "Error sending push notification to endpoint {Endpoint}", sub.Endpoint);

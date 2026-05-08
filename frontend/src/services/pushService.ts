@@ -14,10 +14,23 @@ export async function requestNotificationPermission() {
 
 export async function subscribeUserToPush() {
   try {
+    if (!('serviceWorker' in navigator)) {
+      console.warn('Service Worker is not supported in this browser');
+      return null;
+    }
+    if (!('PushManager' in window)) {
+      console.warn('Push Notifications are not supported in this browser');
+      return null;
+    }
+
     const registration = await navigator.serviceWorker.ready;
+    console.log('Service Worker is ready for push subscription');
     
     // Check for existing subscription
     const existingSubscription = await registration.pushManager.getSubscription();
+    if (existingSubscription) {
+      console.log('Existing push subscription found');
+    }
     
     const subscribeOptions = {
       userVisibleOnly: true,
@@ -25,14 +38,14 @@ export async function subscribeUserToPush() {
     };
 
     const subscription = await registration.pushManager.subscribe(subscribeOptions);
-    console.log('User is subscribed:', subscription);
+    console.log('User is subscribed to Push:', subscription);
     
     // Send subscription to backend
     await sendSubscriptionToBackend(subscription);
     
     return subscription;
   } catch (error) {
-    console.error('Failed to subscribe the user: ', error);
+    console.error('Failed to subscribe the user to push: ', error);
     throw error;
   }
 }

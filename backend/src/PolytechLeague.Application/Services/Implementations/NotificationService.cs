@@ -17,7 +17,7 @@ public class NotificationService(
     public async Task SendNotificationToAllAsync(string title, string message, NotificationType type, string? link = null)
     {
         var users = await _context.Users
-            .Where(u => !u.IsDeleted && u.Role != UserRole.Admin)
+            .Where(u => !u.IsDeleted) // Removed admin exclusion
             .ToListAsync();
 
         foreach (var user in users)
@@ -32,12 +32,12 @@ public class NotificationService(
                 CreatedAt = DateTime.UtcNow
             };
             _context.Notifications.Add(notification);
-            
-            // Send push notification asynchronously
-            _ = _pushNotificationService.SendPushNotificationAsync(user.Id, title, message, link);
         }
 
         await _context.SaveChangesAsync();
+        
+        // Send broadcast push notification
+        await _pushNotificationService.SendPushNotificationToAllAsync(title, message, link);
     }
 
     public async Task SendNotificationToAdminsAsync(string title, string message, NotificationType type, string? link = null)
@@ -45,6 +45,8 @@ public class NotificationService(
         var admins = await _context.Users
             .Where(u => !u.IsDeleted && u.Role == UserRole.Admin)
             .ToListAsync();
+
+        var pushTasks = new List<Task>();
 
         foreach (var admin in admins)
         {
@@ -59,11 +61,11 @@ public class NotificationService(
             };
             _context.Notifications.Add(notification);
             
-            // Send push notification asynchronously
-            _ = _pushNotificationService.SendPushNotificationAsync(admin.Id, title, message, link);
+            pushTasks.Add(_pushNotificationService.SendPushNotificationAsync(admin.Id, title, message, link));
         }
 
         await _context.SaveChangesAsync();
+        await Task.WhenAll(pushTasks);
     }
 
     public async Task SendNotificationToUserAsync(long userId, string title, string message, NotificationType type, string? link = null)

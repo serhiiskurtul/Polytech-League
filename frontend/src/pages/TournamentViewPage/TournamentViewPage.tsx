@@ -243,25 +243,27 @@ const TournamentViewPage = () => {
       const isTeamSport = !!(details as any).isTeam || ['futsal', 'volleyball', 'beach_volleyball', 'basketball_3x3', 'badminton'].includes(sportKey);
 
       // Build clean base payload with common fields to avoid "Extra fields" 400 error
+      // Ensuring ALL required fields from the backend DTO are present
       const payload: any = {
-        name: editTournamentData.name,
-        date: formatToISO(editTournamentData.date),
-        location: editTournamentData.location,
-        refereeIds: editTournamentData.refereeIds,
-        level: editTournamentData.level,
-        description: editTournamentData.description,
-        rules: editTournamentData.rules,
-        prizes: editTournamentData.prizes,
-        headRefereeName: editTournamentData.headRefereeName,
-        referees: editTournamentData.referees,
-        schedule: editTournamentData.schedule,
-        registrationStart: editTournamentData.level === 'CollegeGroup' ? formatToISO(editTournamentData.registrationStart) : null,
-        registrationEnd: editTournamentData.level === 'CollegeGroup' ? formatToISO(editTournamentData.registrationEnd) : null,
-        endDate: formatToISO(editTournamentData.endDate),
-        isModerated: editTournamentData.level === 'CollegeGroup' ? editTournamentData.isModerated : false,
-        isTeam: !!(details as any).isTeam,
-        seasonId: editTournamentData.seasonId || null,
-        category: editTournamentData.category || (isVolleyball ? 'Men' : 'Mixed')
+        name: editTournamentData.name || (details as any).name || tournament?.title || '',
+        date: formatToISO(editTournamentData.date) || (details as any).date,
+        location: editTournamentData.location || (details as any).location || tournament?.location || '',
+        refereeIds: editTournamentData.refereeIds || (details as any).refereeIds || [],
+        level: editTournamentData.level || (details as any).level || 'CollegeGroup',
+        description: editTournamentData.description || (details as any).description || tournament?.description || '',
+        rules: editTournamentData.rules || (details as any).rules || '',
+        prizes: editTournamentData.prizes || (details as any).prizes || '',
+        headRefereeName: editTournamentData.headRefereeName || (details as any).headRefereeName || '',
+        referees: editTournamentData.referees || (details as any).referees || '',
+        schedule: editTournamentData.schedule || (details as any).schedule || '',
+        registrationStart: editTournamentData.level === 'CollegeGroup' ? formatToISO(editTournamentData.registrationStart) : (details as any).registrationStart || null,
+        registrationEnd: editTournamentData.level === 'CollegeGroup' ? formatToISO(editTournamentData.registrationEnd) : (details as any).registrationEnd || null,
+        endDate: formatToISO(editTournamentData.endDate) || (details as any).endDate || null,
+        isModerated: editTournamentData.level === 'CollegeGroup' ? !!editTournamentData.isModerated : !!(details as any).isModerated,
+        isPublic: editTournamentData.isPublic !== undefined ? !!editTournamentData.isPublic : ((details as any).isPublic !== undefined ? !!(details as any).isPublic : true),
+        isTeam: isTeamSport,
+        seasonId: editTournamentData.seasonId || (details as any).seasonId || null,
+        category: editTournamentData.category || (details as any).category || (isVolleyball ? 'Men' : 'Mixed')
       };
 
       if (isTeamSport) {
@@ -285,7 +287,7 @@ const TournamentViewPage = () => {
           payload.timeControl = editTournamentData.timeControl;
           payload.participantsCount = editTournamentData.participantsCount;
         } else if (sportKey === 'checkers') {
-          payload.variant = (details as any).variant;
+          payload.variant = (details as any).variant || 'Russian';
         } else if (sportKey === 'armwrestling') {
           payload.hand = (details as any).hand || 'Both';
           payload.weightClass = (details as any).weightClass || 'UpTo70';
@@ -294,6 +296,8 @@ const TournamentViewPage = () => {
           payload.participantsCount = editTournamentData.participantsCount || (details as any).participantsCount || 0;
         }
       }
+
+      console.log("Saving winners with payload:", payload);
 
       switch (sportKey) {
         case 'checkers': await updateCheckersEvent(id, payload as any); break;
@@ -308,8 +312,7 @@ const TournamentViewPage = () => {
         case 'athletics': await api.put(`/athletics-events/${id}`, payload); break;
         case 'table_tennis': await updateTableTennisEvent(id, {
           ...payload,
-          tournamentType: (details as any).tournamentType || 'RoundRobin',
-          category: editTournamentData.category || (isVolleyball ? 'Men' : 'Mixed')
+          tournamentType: (details as any).tournamentType || 'RoundRobin'
         } as any); break;
         default: await updateChessEvent(id, payload as any);
       }
@@ -317,11 +320,15 @@ const TournamentViewPage = () => {
       toast.success("Призерів успішно встановлено!");
       setShowWinnersAdmin(false);
       fetchTournament(true);
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error("Error saving winners:", err);
+      if (err.response?.data) {
+        console.error("Server response:", err.response.data);
+      }
       toast.error("Помилка при збереженні призерів");
     }
   };
+
 
   const [editTournamentData, setEditTournamentData] = useState<ChessEventRequest>({
     name: '',
@@ -553,32 +560,34 @@ const TournamentViewPage = () => {
 
       // Build clean base payload
       const payload: any = {
-        name: editTournamentData.name,
-        date: formatToISO(editTournamentData.date),
-        location: editTournamentData.location,
-        refereeIds: editTournamentData.refereeIds,
-        level: editTournamentData.level,
-        description: editTournamentData.description,
-        rules: editTournamentData.rules,
-        prizes: editTournamentData.prizes,
-        headRefereeName: editTournamentData.headRefereeName,
-        referees: editTournamentData.referees,
-        schedule: editTournamentData.schedule,
-        isTeam: editTournamentData.isTeam,
-        registrationStart: editTournamentData.level === 'CollegeGroup' ? formatToISO(editTournamentData.registrationStart) : null,
-        registrationEnd: editTournamentData.level === 'CollegeGroup' ? formatToISO(editTournamentData.registrationEnd) : null,
-        endDate: formatToISO(editTournamentData.endDate),
-        isModerated: editTournamentData.level === 'CollegeGroup' ? editTournamentData.isModerated : false,
-        isPublic: editTournamentData.level === 'CollegeGroup' ? editTournamentData.isPublic : false,
-        seasonId: editTournamentData.seasonId || null,
-        category: editTournamentData.category || (isVolleyball ? 'Men' : 'Mixed'),
-        firstPlaceId: (editTournamentData as any).firstPlaceId || null,
-        secondPlaceId: (editTournamentData as any).secondPlaceId || null,
-        thirdPlaceId: (editTournamentData as any).thirdPlaceId || null,
-        firstPlaceTeamId: (editTournamentData as any).firstPlaceTeamId || null,
-        secondPlaceTeamId: (editTournamentData as any).secondPlaceTeamId || null,
-        thirdPlaceTeamId: (editTournamentData as any).thirdPlaceTeamId || null
+        name: editTournamentData.name || (details as any).name || tournament?.title || '',
+        date: formatToISO(editTournamentData.date) || (details as any).date,
+        location: editTournamentData.location || (details as any).location || tournament?.location || '',
+        refereeIds: editTournamentData.refereeIds || (details as any).refereeIds || [],
+        level: editTournamentData.level || (details as any).level || 'CollegeGroup',
+        description: editTournamentData.description || (details as any).description || tournament?.description || '',
+        rules: editTournamentData.rules || (details as any).rules || '',
+        prizes: editTournamentData.prizes || (details as any).prizes || '',
+        headRefereeName: editTournamentData.headRefereeName || (details as any).headRefereeName || '',
+        referees: editTournamentData.referees || (details as any).referees || '',
+        schedule: editTournamentData.schedule || (details as any).schedule || '',
+        isTeam: editTournamentData.isTeam !== undefined ? !!editTournamentData.isTeam : !!(details as any).isTeam,
+        registrationStart: editTournamentData.level === 'CollegeGroup' ? formatToISO(editTournamentData.registrationStart) : (details as any).registrationStart || null,
+        registrationEnd: editTournamentData.level === 'CollegeGroup' ? formatToISO(editTournamentData.registrationEnd) : (details as any).registrationEnd || null,
+        endDate: formatToISO(editTournamentData.endDate) || (details as any).endDate || null,
+        isModerated: editTournamentData.level === 'CollegeGroup' ? !!editTournamentData.isModerated : !!(details as any).isModerated,
+        isPublic: editTournamentData.isPublic !== undefined ? !!editTournamentData.isPublic : ((details as any).isPublic !== undefined ? !!(details as any).isPublic : true),
+        seasonId: editTournamentData.seasonId || (details as any).seasonId || null,
+        category: editTournamentData.category || (details as any).category || (isVolleyball ? 'Men' : 'Mixed'),
+        firstPlaceId: (editTournamentData as any).firstPlaceId || (details as any).firstPlace?.id || null,
+        secondPlaceId: (editTournamentData as any).secondPlaceId || (details as any).secondPlace?.id || null,
+        thirdPlaceId: (editTournamentData as any).thirdPlaceId || (details as any).thirdPlace?.id || null,
+        firstPlaceTeamId: (editTournamentData as any).firstPlaceTeamId || (details as any).firstPlaceTeam?.id || null,
+        secondPlaceTeamId: (editTournamentData as any).secondPlaceTeamId || (details as any).secondPlaceTeam?.id || null,
+        thirdPlaceTeamId: (editTournamentData as any).thirdPlaceTeamId || (details as any).thirdPlaceTeam?.id || null
       };
+
+      console.log("Updating tournament with payload:", payload);
 
       if (sportKey === 'checkers') {
         await updateCheckersEvent(id!, { ...payload, variant: (details as any).variant || 'Russian' } as any);
