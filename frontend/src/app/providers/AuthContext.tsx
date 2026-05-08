@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import api from "../../shared/api/axiosInstance";
 import { AuthResponse } from "../../shared/types/auth.types";
+import { subscribeUserToPush } from "../../services/pushService";
 
 type User = AuthResponse['user'];
 
@@ -49,6 +50,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = (userData: User) => {
     setUser(userData);
   };
+
+  useEffect(() => {
+    if (user) {
+      subscribeUserToPush().catch(err => console.error("Push subscription failed", err));
+    }
+  }, [user]);
 
   const logout = async () => {
     try {

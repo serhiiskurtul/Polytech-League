@@ -46,8 +46,15 @@ public class NotificationsController(
             };
 
             _context.PushSubscriptions.Add(subscription);
-            await _context.SaveChangesAsync();
         }
+        else
+        {
+            existingSubscription.P256DH = dto.Keys.P256dh;
+            existingSubscription.Auth = dto.Keys.Auth;
+            _context.PushSubscriptions.Update(existingSubscription);
+        }
+
+        await _context.SaveChangesAsync();
 
         return Ok(new { message = "Subscription successful" });
     }

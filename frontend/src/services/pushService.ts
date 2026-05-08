@@ -18,10 +18,7 @@ export async function subscribeUserToPush() {
     
     // Check for existing subscription
     const existingSubscription = await registration.pushManager.getSubscription();
-    if (existingSubscription) {
-      return existingSubscription;
-    }
-
+    
     const subscribeOptions = {
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY)
