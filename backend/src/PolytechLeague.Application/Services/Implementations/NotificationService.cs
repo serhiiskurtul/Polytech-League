@@ -10,26 +10,33 @@ using PolytechLeague.Persistence.Database;
 
 namespace PolytechLeague.Application.Services.Implementations;
 
-public class NotificationService(ApplicationDbContext _context) : INotificationService
+public class NotificationService(
+    ApplicationDbContext _context,
+    IPushNotificationService _pushNotificationService) : INotificationService
 {
     public async Task SendNotificationToAllAsync(string title, string message, NotificationType type, string? link = null)
     {
         var users = await _context.Users
             .Where(u => !u.IsDeleted && u.Role != UserRole.Admin)
-            .Select(u => u.Id)
             .ToListAsync();
 
-        var notifications = users.Select(userId => new Notification
+        foreach (var user in users)
         {
-            UserId = userId,
-            Title = title,
-            Message = message,
-            Type = type,
-            Link = link,
-            CreatedAt = DateTime.UtcNow
-        });
+            var notification = new Notification
+            {
+                UserId = user.Id,
+                Title = title,
+                Message = message,
+                Type = type,
+                Link = link,
+                CreatedAt = DateTime.UtcNow
+            };
+            _context.Notifications.Add(notification);
+            
+            // Send push notification asynchronously
+            _ = _pushNotificationService.SendPushNotificationAsync(user.Id, title, message, link);
+        }
 
-        _context.Notifications.AddRange(notifications);
         await _context.SaveChangesAsync();
     }
 
@@ -37,20 +44,25 @@ public class NotificationService(ApplicationDbContext _context) : INotificationS
     {
         var admins = await _context.Users
             .Where(u => !u.IsDeleted && u.Role == UserRole.Admin)
-            .Select(u => u.Id)
             .ToListAsync();
 
-        var notifications = admins.Select(adminId => new Notification
+        foreach (var admin in admins)
         {
-            UserId = adminId,
-            Title = title,
-            Message = message,
-            Type = type,
-            Link = link,
-            CreatedAt = DateTime.UtcNow
-        });
+            var notification = new Notification
+            {
+                UserId = admin.Id,
+                Title = title,
+                Message = message,
+                Type = type,
+                Link = link,
+                CreatedAt = DateTime.UtcNow
+            };
+            _context.Notifications.Add(notification);
+            
+            // Send push notification asynchronously
+            _ = _pushNotificationService.SendPushNotificationAsync(admin.Id, title, message, link);
+        }
 
-        _context.Notifications.AddRange(notifications);
         await _context.SaveChangesAsync();
     }
 
@@ -75,6 +87,9 @@ public class NotificationService(ApplicationDbContext _context) : INotificationS
 
         _context.Notifications.Add(notification);
         await _context.SaveChangesAsync();
+        
+        // Send actual push notification
+        await _pushNotificationService.SendPushNotificationAsync(userId, title, message, link);
     }
 
     public async Task<IEnumerable<NotificationDto>> GetUserNotificationsAsync(long userId)

@@ -2,7 +2,7 @@
  * Utility to handle PWA Push Notifications subscription
  */
 
-const PUBLIC_VAPID_KEY = 'BB47cRWxaTwglHKmdQMGkRTn1bMJvD2GGG7a8wr5eEpdCi-KMABJXIUdjG0URYBEcb8PWOcQudBEs9FlsCrsYi0';
+const PUBLIC_VAPID_KEY = 'BHAMlRWGwNmfo6Ruf65Idm8TkT9U0H41N6-PXxxqfT9x11GlET16XjgRYmHMb8PVNFs1y321b6ohh1k7HPRnT4w';
 
 export async function requestNotificationPermission() {
   const permission = await Notification.requestPermission();

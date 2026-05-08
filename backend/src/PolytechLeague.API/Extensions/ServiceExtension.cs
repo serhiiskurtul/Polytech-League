@@ -28,6 +28,7 @@ using PolytechLeague.Infrastructure.Email;
 using PolytechLeague.Infrastructure.Redis;
 using StackExchange.Redis;
 using PolytechLeague.Application.Configuration;
+using PolytechLeague.Infrastructure.Notifications;
 
 namespace PolytechLeague.API.Extensions;
 
@@ -90,6 +91,9 @@ public static class ServiceExtension
 
         services.AddScoped<ISeasonRatingService, SeasonRatingService>();
         services.AddScoped<ICollegeService, CollegeService>();
+
+        services.Configure<VapidSettings>(configuration.GetSection("VapidSettings"));
+        services.AddScoped<IPushNotificationService, WebPushNotificationService>();
 
         return services;
     }

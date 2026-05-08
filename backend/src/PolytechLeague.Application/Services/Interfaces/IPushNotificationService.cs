@@ -1,0 +1,8 @@
+using System.Threading.Tasks;
+
+namespace PolytechLeague.Application.Services.Interfaces;
+
+public interface IPushNotificationService
+{
+    Task SendPushNotificationAsync(long userId, string title, string message, string? url = null);
+}
