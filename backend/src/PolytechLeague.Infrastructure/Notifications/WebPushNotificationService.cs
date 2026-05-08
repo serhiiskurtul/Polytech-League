@@ -6,6 +6,7 @@ using WebPush;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
+using EntityPushSubscription = PolytechLeague.Domain.Entities.PushSubscription;
 
 namespace PolytechLeague.Infrastructure.Notifications;
 
@@ -33,7 +34,7 @@ public class WebPushNotificationService(
         await SendToSubscriptionsAsync(subscriptions, title, message, url);
     }
 
-    private async Task SendToSubscriptionsAsync(List<PushSubscription> subscriptions, string title, string message, string? url = null)
+    private async Task SendToSubscriptionsAsync(List<EntityPushSubscription> subscriptions, string title, string message, string? url = null)
     {
         var vapidDetails = new VapidDetails(
             _vapidOptions.Value.Subject,
