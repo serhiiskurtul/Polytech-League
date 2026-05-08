@@ -50,6 +50,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<College> Colleges { get; set; }
     public DbSet<NationalRatingManualEntry> NationalRatingManualEntries { get; set; }
     public DbSet<RegionalRatingManualEntry> RegionalRatingManualEntries { get; set; }
+    public DbSet<PushSubscription> PushSubscriptions { get; set; }
 
 
     
