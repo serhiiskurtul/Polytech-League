@@ -13,22 +13,14 @@ export async function requestNotificationPermission() {
 }
 
 export async function subscribeUserToPush() {
-  console.log('Attempting to subscribe user to push notifications...');
   try {
-    if (!('serviceWorker' in navigator)) {
-      console.warn('Service Worker is not supported in this browser');
-      return null;
-    }
-    if (!('PushManager' in window)) {
-      console.warn('Push Notifications are not supported in this browser');
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
       return null;
     }
 
     // Register service worker if not already registered
     let registration = await navigator.serviceWorker.getRegistration();
     if (!registration) {
-      console.log('Registering Service Worker...');
-      // In Vite PWA, the service worker path depends on the environment
       const swPath = import.meta.env.DEV ? '/dev-sw.js?dev-sw' : '/sw.js';
       registration = await navigator.serviceWorker.register(swPath, {
         scope: '/'
@@ -36,17 +28,12 @@ export async function subscribeUserToPush() {
     }
 
     await navigator.serviceWorker.ready;
-    console.log('Service Worker is ready for push subscription');
 
     // Request permission explicitly
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
-      console.warn('Notification permission not granted');
       return null;
     }
-
-    // Check for existing subscription
-    const existingSubscription = await registration.pushManager.getSubscription();
 
     const subscribeOptions = {
       userVisibleOnly: true,
@@ -54,7 +41,6 @@ export async function subscribeUserToPush() {
     };
 
     const subscription = await registration.pushManager.subscribe(subscribeOptions);
-    console.log('User is subscribed to Push:', subscription);
 
     // Send subscription to backend
     await sendSubscriptionToBackend(subscription);
@@ -67,12 +53,16 @@ export async function subscribeUserToPush() {
 }
 
 async function sendSubscriptionToBackend(subscription: PushSubscription) {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/notifications/subscribe`, {
+  // Use /api/notifications/subscribe because the controller is under the [Route("api/[controller]")]
+  const apiUrl = import.meta.env.VITE_API_URL || '';
+  const url = `${apiUrl.endsWith('/') ? apiUrl.slice(0, -1) : apiUrl}/api/notifications/subscribe`;
+
+  const response = await fetch(url, {
     method: 'POST',
     body: JSON.stringify(subscription.toJSON()),
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem('token')}` // Assuming JWT is stored here
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
     }
   });
 

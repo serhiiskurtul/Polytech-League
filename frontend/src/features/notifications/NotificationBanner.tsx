@@ -2,45 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { subscribeUserToPush } from '@/services/pushService';
 import { useAuth } from '@/app/providers/AuthContext';
 
-// Цей alert має з'явитися відразу при завантаженні сторінки
-alert('DEBUG: Файл NotificationBanner завантажено!');
-console.error('--- CRITICAL: NotificationBanner.tsx file loaded ---');
-
 export const NotificationBanner: React.FC = () => {
-  console.error('--- CRITICAL: NotificationBanner component rendered ---');
   const { isAuthenticated, loading } = useAuth();
   const [showBanner, setShowBanner] = useState(false);
   const [isSubscribing, setIsSubscribing] = useState(false);
 
   useEffect(() => {
-    console.log('NotificationBanner state:', { isAuthenticated, loading, permission: Notification.permission });
-
     if (loading) return;
 
-    if (!isAuthenticated) {
-      console.log('Banner NOT showing: user not authenticated');
-      return;
-    }
-
-    if (!('Notification' in window)) {
-      console.log('Banner NOT showing: Notification API not supported');
-      return;
-    }
-
-    if (Notification.permission === 'default') {
-      const hasDismissed = localStorage.getItem('notification_banner_dismissed');
-      console.log('Banner dismiss status:', hasDismissed);
-      
-      if (!hasDismissed) {
-        console.log('Setting timer to show banner...');
-        const timer = setTimeout(() => {
-          console.log('SHOWING BANNER NOW');
-          setShowBanner(true);
-        }, 2000);
-        return () => clearTimeout(timer);
+    if (isAuthenticated && 'Notification' in window && 'serviceWorker' in navigator) {
+      if (Notification.permission === 'default') {
+        const hasDismissed = localStorage.getItem('notification_banner_dismissed');
+        if (!hasDismissed) {
+          const timer = setTimeout(() => {
+            setShowBanner(true);
+          }, 2000);
+          return () => clearTimeout(timer);
+        }
       }
-    } else {
-      console.log('Banner NOT showing: permission is already', Notification.permission);
     }
   }, [isAuthenticated, loading]);
 
@@ -96,13 +75,13 @@ export const NotificationBanner: React.FC = () => {
       <style>{`
         .notification-banner-container {
           position: fixed;
-          bottom: 24px;
+          top: 24px;
           left: 50%;
           transform: translateX(-50%);
           width: calc(100% - 48px);
           max-width: 500px;
           z-index: 9999;
-          animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+          animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .notification-banner-content {
@@ -199,9 +178,9 @@ export const NotificationBanner: React.FC = () => {
           color: #1a1a1a;
         }
 
-        @keyframes slideUp {
+        @keyframes slideDown {
           from {
-            transform: translate(-50%, 100%);
+            transform: translate(-50%, -100%);
             opacity: 0;
           }
           to {
