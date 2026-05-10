@@ -51,11 +51,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(userData);
   };
 
-  useEffect(() => {
-    if (user) {
-      subscribeUserToPush().catch(err => console.error("Push subscription failed", err));
-    }
-  }, [user]);
 
   const logout = async () => {
     try {
