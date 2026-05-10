@@ -88,7 +88,8 @@ public class ArmwrestlingEventService :
             "Нове змагання!",
             $"Створено нове змагання з армреслінгу: {entity.Name}",
             NotificationType.Tournament,
-            $"/tournaments/{entity.Id}"
+            $"/tournaments/{entity.Id}",
+            true
         );
     }
 
@@ -120,7 +121,8 @@ public class ArmwrestlingEventService :
                 "Змагання завершено!",
                 $"Визначено переможців у змаганні з армреслінгу: {newEntity.Name}",
                 NotificationType.Tournament,
-                $"/tournaments/{newEntity.Id}"
+                $"/tournaments/{newEntity.Id}",
+                true
             );
         }
     }

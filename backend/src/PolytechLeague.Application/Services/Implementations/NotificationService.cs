@@ -18,11 +18,17 @@ public class NotificationService(
         await _hubContext.Clients.Group($"User_{userId}").SendAsync("ReceiveNotification");
     }
 
-    public async Task SendNotificationToAllAsync(string title, string message, NotificationType type, string? link = null)
+    public async Task SendNotificationToAllAsync(string title, string message, NotificationType type, string? link = null, bool excludeAdmins = false)
     {
-        var users = await _context.Users
-            .Where(u => !u.IsDeleted) // Removed admin exclusion
-            .ToListAsync();
+        var usersQuery = _context.Users
+            .Where(u => !u.IsDeleted);
+
+        if (excludeAdmins)
+        {
+            usersQuery = usersQuery.Where(u => u.Role != UserRole.Admin);
+        }
+
+        var users = await usersQuery.ToListAsync();
 
         foreach (var user in users)
         {
@@ -41,9 +47,9 @@ public class NotificationService(
         await _context.SaveChangesAsync();
         
         // Send broadcast push notification
-        await _pushNotificationService.SendPushNotificationToAllAsync(title, message, link);
+        await _pushNotificationService.SendPushNotificationToAllAsync(title, message, link, excludeAdmins);
         
-        // Notify all via SignalR
+        // Notify all via SignalR (we don't easily filter SignalR broadcast here but clients check their own user id)
         await _hubContext.Clients.All.SendAsync("ReceiveNotification");
     }
 

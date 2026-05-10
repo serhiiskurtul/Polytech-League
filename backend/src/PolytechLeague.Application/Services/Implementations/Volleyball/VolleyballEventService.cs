@@ -78,7 +78,8 @@ public class VolleyballEventService(
                 "Нове змагання!",
                 $"Створено нове змагання з волейболу: {entity.Name}",
                 NotificationType.Tournament,
-                $"/tournaments/{entity.Id}"
+                $"/tournaments/{entity.Id}",
+                true
             );
         }
     }
@@ -113,7 +114,8 @@ public class VolleyballEventService(
                     "Турнір завершено!",
                     $"Змагання з волейболу \"{newEntity.Name}\" завершено. Перегляньте результати!",
                     NotificationType.Tournament,
-                    $"/tournaments/{newEntity.Id}"
+                    $"/tournaments/{newEntity.Id}",
+                    true
                 );
             }
         }

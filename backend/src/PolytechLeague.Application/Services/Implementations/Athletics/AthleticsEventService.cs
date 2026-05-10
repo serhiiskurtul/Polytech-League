@@ -79,7 +79,8 @@ public class AthleticsEventService(
                 "Нове змагання!",
                 $"Створено нове змагання з легкої атлетики: {entity.Name}",
                 NotificationType.Tournament,
-                $"/tournaments/{entity.Id}"
+                $"/tournaments/{entity.Id}",
+                true
             );
         }
     }

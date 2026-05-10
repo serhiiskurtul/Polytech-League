@@ -77,7 +77,8 @@ public class TableTennisEventService(
             "Нове змагання!",
             $"Створено нове змагання з настільного тенісу: {entity.Name}",
             NotificationType.Tournament,
-            $"/tournaments/{entity.Id}"
+            $"/tournaments/{entity.Id}",
+            true
         );
     }
 
@@ -110,7 +111,8 @@ public class TableTennisEventService(
                 "Змагання завершено!",
                 $"Визначено переможців у змаганні з настільного тенісу: {newEntity.Name}",
                 NotificationType.Tournament,
-                $"/tournaments/{newEntity.Id}"
+                $"/tournaments/{newEntity.Id}",
+                true
             );
         }
     }

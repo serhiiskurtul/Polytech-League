@@ -79,7 +79,8 @@ public class Basketball3x3EventService(
                 "Нове змагання!",
                 $"Створено нове змагання з баскетболу 3х3: {entity.Name}",
                 NotificationType.Tournament,
-                $"/tournaments/{entity.Id}"
+                $"/tournaments/{entity.Id}",
+                true
             );
         }
     }
@@ -112,7 +113,8 @@ public class Basketball3x3EventService(
                 "Турнір завершено!",
                 $"Змагання з баскетболу 3х3 \"{newEntity.Name}\" завершено. Перегляньте результати!",
                 NotificationType.Tournament,
-                $"/tournaments/{newEntity.Id}"
+                $"/tournaments/{newEntity.Id}",
+                true
             );
         }
     }

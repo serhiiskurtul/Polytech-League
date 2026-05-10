@@ -187,7 +187,8 @@ public class CheckersEventService :
             "Нове змагання!",
             $"Створено нове змагання з шашок: {entity.Name}",
             NotificationType.Tournament,
-            $"/tournaments/{entity.Id}"
+            $"/tournaments/{entity.Id}",
+            true
         );
     }
 
@@ -202,7 +203,8 @@ public class CheckersEventService :
                 "Змагання завершено!",
                 $"Визначено переможців у змаганні з шашок: {newEntity.Name}",
                 NotificationType.Tournament,
-                $"/tournaments/{newEntity.Id}"
+                $"/tournaments/{newEntity.Id}",
+                true
             );
         }
     }

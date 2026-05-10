@@ -26,9 +26,16 @@ public class WebPushNotificationService(
         await SendToSubscriptionsAsync(subscriptions, title, message, url);
     }
 
-    public async Task SendPushNotificationToAllAsync(string title, string message, string? url = null)
+    public async Task SendPushNotificationToAllAsync(string title, string message, string? url = null, bool excludeAdmins = false)
     {
-        var subscriptions = await _context.PushSubscriptions.ToListAsync();
+        var query = _context.PushSubscriptions.AsQueryable();
+
+        if (excludeAdmins)
+        {
+            query = query.Where(s => s.User!.Role != Domain.Entities.UserRole.Admin);
+        }
+
+        var subscriptions = await query.ToListAsync();
         if (subscriptions.Count == 0) return;
 
         await SendToSubscriptionsAsync(subscriptions, title, message, url);

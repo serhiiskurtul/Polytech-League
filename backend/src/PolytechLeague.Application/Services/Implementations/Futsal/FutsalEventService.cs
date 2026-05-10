@@ -98,7 +98,8 @@ public class FutsalEventService :
             "Нове змагання!",
             $"Створено нове змагання з футзалу: {entity.Name}",
             NotificationType.Tournament,
-            $"/tournaments/{entity.Id}"
+            $"/tournaments/{entity.Id}",
+            true
         );
     }
 
@@ -130,7 +131,8 @@ public class FutsalEventService :
                 "Змагання завершено!",
                 $"Визначено переможців у змаганні з футзалу: {newEntity.Name}",
                 NotificationType.Tournament,
-                $"/tournaments/{newEntity.Id}"
+                $"/tournaments/{newEntity.Id}",
+                true
             );
         }
     }

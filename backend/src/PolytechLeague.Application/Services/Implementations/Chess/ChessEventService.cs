@@ -201,7 +201,8 @@ public class ChessEventService :
             "Нове змагання!",
             $"Створено нове змагання з шахів: {entity.Name}",
             NotificationType.Tournament,
-            $"/tournaments/{entity.Id}"
+            $"/tournaments/{entity.Id}",
+            true
         );
     }
 
@@ -233,7 +234,8 @@ public class ChessEventService :
                 "Змагання завершено!",
                 $"Визначено переможців у змаганні з шахів: {newEntity.Name}",
                 NotificationType.Tournament,
-                $"/tournaments/{newEntity.Id}"
+                $"/tournaments/{newEntity.Id}",
+                true
             );
         }
     }

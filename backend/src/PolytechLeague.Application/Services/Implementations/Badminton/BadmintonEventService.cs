@@ -86,7 +86,8 @@ public class BadmintonEventService(
             "Нове змагання!",
             $"Створено нове змагання з бадмінтону: {entity.Name}",
             NotificationType.Tournament,
-            $"/tournaments/{entity.Id}"
+            $"/tournaments/{entity.Id}",
+            true
         );
     }
 
@@ -101,7 +102,8 @@ public class BadmintonEventService(
                 "Змагання завершено!",
                 $"Визначено переможців у змаганні з бадмінтону: {newEntity.Name}",
                 NotificationType.Tournament,
-                $"/tournaments/{newEntity.Id}"
+                $"/tournaments/{newEntity.Id}",
+                true
             );
         }
     }

@@ -78,7 +78,8 @@ public class BeachVolleyballEventService(
                 "Нове змагання!",
                 $"Створено нове змагання з пляжного волейболу: {entity.Name}",
                 NotificationType.Tournament,
-                $"/tournaments/{entity.Id}"
+                $"/tournaments/{entity.Id}",
+                true
             );
         }
     }
@@ -110,7 +111,8 @@ public class BeachVolleyballEventService(
                 "Змагання завершено!",
                 $"Визначено переможців у змаганні з пляжного волейболу: {newEntity.Name}",
                 NotificationType.Tournament,
-                $"/tournaments/{newEntity.Id}"
+                $"/tournaments/{newEntity.Id}",
+                true
             );
         }
     }
