@@ -84,23 +84,28 @@ public class NotificationService(
 
     public async Task SendNotificationToUserAsync(long userId, string title, string message, NotificationType type, string? link = null, string? tag = null)
     {
-        var notification = new Notification
+        // Don't save to the Notifications table if it's a chat message
+        // Chat messages are managed by the ChatService and shown in the Chat UI
+        if (type != NotificationType.Message)
         {
-            UserId = userId,
-            Title = title,
-            Message = message,
-            Type = type,
-            Link = link,
-            CreatedAt = DateTime.UtcNow
-        };
+            var notification = new Notification
+            {
+                UserId = userId,
+                Title = title,
+                Message = message,
+                Type = type,
+                Link = link,
+                CreatedAt = DateTime.UtcNow
+            };
 
-        _context.Notifications.Add(notification);
-        await _context.SaveChangesAsync();
+            _context.Notifications.Add(notification);
+            await _context.SaveChangesAsync();
+        }
         
-        // Send actual push notification
+        // Still send actual push notification
         await _pushNotificationService.SendPushNotificationAsync(userId, title, message, link, tag);
         
-        // Notify via SignalR
+        // Notify via SignalR (this triggers the notification bell animation or unread count refresh)
         await NotifyUserViaSignalR(userId);
     }
 
