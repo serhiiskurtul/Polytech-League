@@ -15,10 +15,11 @@ export async function requestNotificationPermission() {
 export async function subscribeUserToPush() {
   try {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      console.warn('Push Notifications are not supported in this browser');
       return null;
     }
 
-    // Register service worker if not already registered
+    // Register service worker if not already registered (using Vite PWA auto-generated paths)
     let registration = await navigator.serviceWorker.getRegistration();
     if (!registration) {
       const swPath = import.meta.env.DEV ? '/dev-sw.js?dev-sw' : '/sw.js';
@@ -27,11 +28,13 @@ export async function subscribeUserToPush() {
       });
     }
 
+    // Wait for the service worker to be ready
     await navigator.serviceWorker.ready;
 
     // Request permission explicitly
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
+      console.warn('Notification permission not granted');
       return null;
     }
 
@@ -47,7 +50,7 @@ export async function subscribeUserToPush() {
 
     return subscription;
   } catch (error) {
-    console.error('Failed to subscribe the user to push: ', error);
+    console.error('ПОМИЛКА ПРИ ПІДПИСЦІ:', error);
     throw error;
   }
 }
@@ -57,17 +60,23 @@ async function sendSubscriptionToBackend(subscription: PushSubscription) {
   const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://polytech-league-production.up.railway.app';
   const url = `${apiUrl.endsWith('/') ? apiUrl.slice(0, -1) : apiUrl}/api/notifications/subscribe`;
 
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('User token not found. Please log in again.');
+  }
+
   const response = await fetch(url, {
     method: 'POST',
     body: JSON.stringify(subscription.toJSON()),
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem('token')}`
+      'Authorization': `Bearer ${token}`
     }
   });
 
   if (!response.ok) {
-    throw new Error('Failed to send subscription to backend');
+    const errorBody = await response.text();
+    throw new Error(`Server error (${response.status}): ${errorBody || 'Unknown error'}`);
   }
 }
 
