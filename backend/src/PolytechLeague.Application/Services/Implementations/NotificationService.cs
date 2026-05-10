@@ -18,7 +18,7 @@ public class NotificationService(
         await _hubContext.Clients.Group($"User_{userId}").SendAsync("ReceiveNotification");
     }
 
-    public async Task SendNotificationToAllAsync(string title, string message, NotificationType type, string? link = null, bool excludeAdmins = false)
+    public async Task SendNotificationToAllAsync(string title, string message, NotificationType type, string? link = null, bool excludeAdmins = false, string? tag = null)
     {
         var usersQuery = _context.Users
             .Where(u => !u.IsDeleted);
@@ -47,13 +47,13 @@ public class NotificationService(
         await _context.SaveChangesAsync();
         
         // Send broadcast push notification
-        await _pushNotificationService.SendPushNotificationToAllAsync(title, message, link, excludeAdmins);
+        await _pushNotificationService.SendPushNotificationToAllAsync(title, message, link, excludeAdmins, tag);
         
         // Notify all via SignalR (we don't easily filter SignalR broadcast here but clients check their own user id)
         await _hubContext.Clients.All.SendAsync("ReceiveNotification");
     }
 
-    public async Task SendNotificationToAdminsAsync(string title, string message, NotificationType type, string? link = null)
+    public async Task SendNotificationToAdminsAsync(string title, string message, NotificationType type, string? link = null, string? tag = null)
     {
         var admins = await _context.Users
             .Where(u => !u.IsDeleted && u.Role == UserRole.Admin)
@@ -74,7 +74,7 @@ public class NotificationService(
             };
             _context.Notifications.Add(notification);
             
-            pushTasks.Add(_pushNotificationService.SendPushNotificationAsync(admin.Id, title, message, link));
+            pushTasks.Add(_pushNotificationService.SendPushNotificationAsync(admin.Id, title, message, link, tag));
             pushTasks.Add(NotifyUserViaSignalR(admin.Id));
         }
 
@@ -82,7 +82,7 @@ public class NotificationService(
         await Task.WhenAll(pushTasks);
     }
 
-    public async Task SendNotificationToUserAsync(long userId, string title, string message, NotificationType type, string? link = null)
+    public async Task SendNotificationToUserAsync(long userId, string title, string message, NotificationType type, string? link = null, string? tag = null)
     {
         var notification = new Notification
         {
@@ -98,7 +98,7 @@ public class NotificationService(
         await _context.SaveChangesAsync();
         
         // Send actual push notification
-        await _pushNotificationService.SendPushNotificationAsync(userId, title, message, link);
+        await _pushNotificationService.SendPushNotificationAsync(userId, title, message, link, tag);
         
         // Notify via SignalR
         await NotifyUserViaSignalR(userId);

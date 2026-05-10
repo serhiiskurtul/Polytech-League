@@ -18,7 +18,7 @@ clientsClaim();
 self.addEventListener('push', (event) => {
   console.log('[Service Worker] Push Received.');
   
-  let data = { title: 'Polytech League', body: 'Нове сповіщення!', url: '/' };
+  let data = { title: 'Polytech League', body: 'Нове сповіщення!', url: '/', tag: 'general' };
   
   if (event.data) {
     try {
@@ -28,14 +28,18 @@ self.addEventListener('push', (event) => {
     }
   }
 
-  const options = {
+  const options: any = {
     body: data.body,
     icon: '/pwa-icon-512.png',
-    badge: '/favicon.svg',
+    badge: '/favicon.svg', // Monochrome icon for Android status bar
+    tag: data.tag || 'general-notification',
+    renotify: true, // Vibrate even if a notification with the same tag exists
+    timestamp: Date.now(),
     data: {
       url: data.url
     },
-    vibrate: [100, 50, 100],
+    vibrate: [200, 100, 200],
+    requireInteraction: false, // Set to true if you want the notification to stay until user clicks
     actions: [
       { action: 'open', title: 'Переглянути' }
     ]

@@ -7,9 +7,9 @@ namespace PolytechLeague.Application.Services.Interfaces;
 
 public interface INotificationService
 {
-    Task SendNotificationToAllAsync(string title, string message, NotificationType type, string? link = null, bool excludeAdmins = false);
-    Task SendNotificationToUserAsync(long userId, string title, string message, NotificationType type, string? link = null);
-    Task SendNotificationToAdminsAsync(string title, string message, NotificationType type, string? link = null);
+    Task SendNotificationToAllAsync(string title, string message, NotificationType type, string? link = null, bool excludeAdmins = false, string? tag = null);
+    Task SendNotificationToUserAsync(long userId, string title, string message, NotificationType type, string? link = null, string? tag = null);
+    Task SendNotificationToAdminsAsync(string title, string message, NotificationType type, string? link = null, string? tag = null);
     Task<IEnumerable<NotificationDto>> GetUserNotificationsAsync(long userId);
     Task MarkAsReadAsync(long notificationId);
     Task MarkAllAsReadAsync(long userId);

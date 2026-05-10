@@ -97,7 +97,8 @@ public class ChatService(
             $"Нове повідомлення від {sender?.FirstName} {sender?.LastName}",
             content.Length > 50 ? content.Substring(0, 47) + "..." : content,
             NotificationType.Message,
-            $"/chat?userId={senderId}"
+            $"/chat?userId={senderId}",
+            $"chat_msg_{senderId}"
         );
 
         return new MessageDto

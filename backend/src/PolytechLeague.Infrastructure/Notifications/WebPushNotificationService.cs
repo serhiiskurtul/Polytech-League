@@ -15,7 +15,7 @@ public class WebPushNotificationService(
     ApplicationDbContext _context,
     ILogger<WebPushNotificationService> _logger) : IPushNotificationService
 {
-    public async Task SendPushNotificationAsync(long userId, string title, string message, string? url = null)
+    public async Task SendPushNotificationAsync(long userId, string title, string message, string? url = null, string? tag = null)
     {
         var subscriptions = await _context.PushSubscriptions
             .Where(s => s.UserId == userId)
@@ -23,10 +23,10 @@ public class WebPushNotificationService(
 
         if (subscriptions.Count == 0) return;
 
-        await SendToSubscriptionsAsync(subscriptions, title, message, url);
+        await SendToSubscriptionsAsync(subscriptions, title, message, url, tag);
     }
 
-    public async Task SendPushNotificationToAllAsync(string title, string message, string? url = null, bool excludeAdmins = false)
+    public async Task SendPushNotificationToAllAsync(string title, string message, string? url = null, bool excludeAdmins = false, string? tag = null)
     {
         var query = _context.PushSubscriptions
             .Include(s => s.User)
@@ -40,10 +40,10 @@ public class WebPushNotificationService(
         var subscriptions = await query.ToListAsync();
         if (subscriptions.Count == 0) return;
 
-        await SendToSubscriptionsAsync(subscriptions, title, message, url);
+        await SendToSubscriptionsAsync(subscriptions, title, message, url, tag);
     }
 
-    private async Task SendToSubscriptionsAsync(List<EntityPushSubscription> subscriptions, string title, string message, string? url = null)
+    private async Task SendToSubscriptionsAsync(List<EntityPushSubscription> subscriptions, string title, string message, string? url = null, string? tag = null)
     {
         var vapidDetails = new VapidDetails(
             _vapidOptions.Value.Subject,
@@ -56,7 +56,8 @@ public class WebPushNotificationService(
         {
             title,
             body = message,
-            url = url ?? "/"
+            url = url ?? "/",
+            tag = tag ?? "general"
         });
 
         foreach (var sub in subscriptions)
