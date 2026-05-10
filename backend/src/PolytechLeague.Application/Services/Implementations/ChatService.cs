@@ -10,7 +10,9 @@ using PolytechLeague.Persistence.Database;
 
 namespace PolytechLeague.Application.Services.Implementations;
 
-public class ChatService(ApplicationDbContext _context) : IChatService
+public class ChatService(
+    ApplicationDbContext _context,
+    INotificationService _notificationService) : IChatService
 {
     public async Task<IEnumerable<ConversationDto>> GetConversationsAsync(long userId)
     {
@@ -88,6 +90,15 @@ public class ChatService(ApplicationDbContext _context) : IChatService
         await _context.SaveChangesAsync();
 
         var sender = await _context.Users.FindAsync(senderId);
+
+        // Send push notification to recipient
+        await _notificationService.SendNotificationToUserAsync(
+            recipientId,
+            $"Нове повідомлення від {sender?.FirstName} {sender?.LastName}",
+            content.Length > 50 ? content.Substring(0, 47) + "..." : content,
+            NotificationType.Message,
+            $"/chat?userId={senderId}"
+        );
 
         return new MessageDto
         {
