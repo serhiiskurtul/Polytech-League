@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { subscribeUserToPush } from '@/services/pushService';
 import { useAuth } from '@/app/providers/AuthContext';
 
+console.log('--- FILE LOADED: NotificationBanner.tsx ---');
+
 export const NotificationBanner: React.FC = () => {
+  console.log('--- COMPONENT RENDERED: NotificationBanner ---');
   const { isAuthenticated, loading } = useAuth();
   const [showBanner, setShowBanner] = useState(false);
   const [isSubscribing, setIsSubscribing] = useState(false);
