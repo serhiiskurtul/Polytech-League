@@ -53,6 +53,7 @@ export async function subscribeUserToPush() {
     return subscription;
   } catch (error) {
     console.error('ПОМИЛКА ПРИ ПІДПИСЦІ:', error);
+    alert('ПОМИЛКА МЕРЕЖІ: ' + (error instanceof Error ? error.message : 'Невідома помилка'));
     // Log more details if it's a fetch error
     if (error instanceof Error) {
       console.error('Error message:', error.message);

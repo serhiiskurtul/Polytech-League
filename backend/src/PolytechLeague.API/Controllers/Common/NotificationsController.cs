@@ -14,7 +14,8 @@ namespace PolytechLeague.API.Controllers.Common;
 [Route("api/[controller]")]
 public class NotificationsController(
     INotificationService _notificationService,
-    ApplicationDbContext _context) : ControllerBase
+    ApplicationDbContext _context,
+    ILogger<NotificationsController> _logger) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<NotificationDto>>> GetMyNotifications()
@@ -29,6 +30,7 @@ public class NotificationsController(
     [HttpPost("subscribe")]
     public async Task<IActionResult> Subscribe([FromBody] PushSubscriptionDto dto)
     {
+        _logger.LogInformation("Subscribe request received for endpoint: {Endpoint}", dto.Endpoint);
         var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!long.TryParse(userIdStr, out var userId)) return Unauthorized();
 
