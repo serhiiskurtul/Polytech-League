@@ -28,7 +28,9 @@ export async function subscribeUserToPush() {
     let registration = await navigator.serviceWorker.getRegistration();
     if (!registration) {
       console.log('Registering Service Worker...');
-      registration = await navigator.serviceWorker.register('/sw.js', {
+      // In Vite PWA, the service worker path depends on the environment
+      const swPath = import.meta.env.DEV ? '/dev-sw.js?dev-sw' : '/sw.js';
+      registration = await navigator.serviceWorker.register(swPath, {
         scope: '/'
       });
     }
