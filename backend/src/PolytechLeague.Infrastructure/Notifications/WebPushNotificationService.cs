@@ -28,7 +28,9 @@ public class WebPushNotificationService(
 
     public async Task SendPushNotificationToAllAsync(string title, string message, string? url = null, bool excludeAdmins = false)
     {
-        var query = _context.PushSubscriptions.AsQueryable();
+        var query = _context.PushSubscriptions
+            .Include(s => s.User)
+            .AsQueryable();
 
         if (excludeAdmins)
         {

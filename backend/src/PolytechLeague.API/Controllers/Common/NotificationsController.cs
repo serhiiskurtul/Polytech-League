@@ -59,23 +59,6 @@ public class NotificationsController(
         return Ok(new { message = "Subscription successful" });
     }
 
-    [HttpGet("test-push")]
-    public async Task<IActionResult> TestPush()
-    {
-        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!long.TryParse(userIdStr, out long userId)) return Unauthorized();
-
-        await _notificationService.SendNotificationToUserAsync(
-            userId,
-            "Тестове сповіщення",
-            "Якщо ви це бачите, значить пуш-сповіщення працюють!",
-            NotificationType.System,
-            "/"
-        );
-
-        return Ok(new { message = "Test notification sent. Check your device." });
-    }
-
     [HttpPut("{id}/read")]
     public async Task<IActionResult> MarkAsRead(long id)
     {
