@@ -53,8 +53,8 @@ export async function subscribeUserToPush() {
 }
 
 async function sendSubscriptionToBackend(subscription: PushSubscription) {
-  // Use /api/notifications/subscribe because the controller is under the [Route("api/[controller]")]
-  const apiUrl = import.meta.env.VITE_API_URL || '';
+  // Use VITE_API_BASE_URL or fallback to production URL
+  const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://polytech-league-production.up.railway.app';
   const url = `${apiUrl.endsWith('/') ? apiUrl.slice(0, -1) : apiUrl}/api/notifications/subscribe`;
 
   const response = await fetch(url, {
