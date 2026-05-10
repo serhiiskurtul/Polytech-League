@@ -66,12 +66,17 @@ public class WebPushNotificationService(
             }
             catch (WebPushException ex)
             {
-                if (ex.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.Gone || 
-                    ex.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
+                var statusCode = ex.HttpResponseMessage.StatusCode;
+                if (statusCode == System.Net.HttpStatusCode.Gone || 
+                    statusCode == System.Net.HttpStatusCode.NotFound)
                 {
                     _context.PushSubscriptions.Remove(sub);
+                    _logger.LogWarning("Push subscription expired or not found. Removing from database: {Endpoint}", sub.Endpoint);
                 }
-                _logger.LogError(ex, "Error sending push notification to endpoint {Endpoint}", sub.Endpoint);
+                else
+                {
+                    _logger.LogError(ex, "Error sending push notification. Status code: {StatusCode}. Endpoint: {Endpoint}", statusCode, sub.Endpoint);
+                }
             }
             catch (Exception ex)
             {

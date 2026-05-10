@@ -21,5 +21,6 @@ public enum NotificationType
     Tournament,
     Achievement,
     Match,
-    Team
+    Team,
+    Message
 }
