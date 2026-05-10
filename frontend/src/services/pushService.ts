@@ -2,7 +2,7 @@
  * Utility to handle PWA Push Notifications subscription
  */
 
-const PUBLIC_VAPID_KEY = 'BHAMlRWGwNmfo6Ruf65Idm8TkT9U0H41N6-PXxxqfT9x11GlET16XjgRYmHMb8PVNFs1y321b6ohh1k7HPRnT4w';
+const PUBLIC_VAPID_KEY = 'BB47cRWxaTwglHKmdQMGkRTn1bMJvD2GGG7a8wr5eEpdCi-KMABJXIUdjG0URYBEcb8PWOcQudBEs9FlsCrsYi0';
 
 export async function requestNotificationPermission() {
   const permission = await Notification.requestPermission();
@@ -44,10 +44,10 @@ export async function subscribeUserToPush() {
       console.warn('Notification permission not granted');
       return null;
     }
-    
+
     // Check for existing subscription
     const existingSubscription = await registration.pushManager.getSubscription();
-    
+
     const subscribeOptions = {
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY)
@@ -55,10 +55,10 @@ export async function subscribeUserToPush() {
 
     const subscription = await registration.pushManager.subscribe(subscribeOptions);
     console.log('User is subscribed to Push:', subscription);
-    
+
     // Send subscription to backend
     await sendSubscriptionToBackend(subscription);
-    
+
     return subscription;
   } catch (error) {
     console.error('Failed to subscribe the user to push: ', error);
