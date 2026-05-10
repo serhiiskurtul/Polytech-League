@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { subscribeUserToPush } from '@/services/pushService';
 import { useAuth } from '@/app/providers/AuthContext';
 
-console.log('--- FILE LOADED: NotificationBanner.tsx ---');
+// Цей alert має з'явитися відразу при завантаженні сторінки
+alert('DEBUG: Файл NotificationBanner завантажено!');
+console.error('--- CRITICAL: NotificationBanner.tsx file loaded ---');
 
 export const NotificationBanner: React.FC = () => {
-  console.log('--- COMPONENT RENDERED: NotificationBanner ---');
+  console.error('--- CRITICAL: NotificationBanner component rendered ---');
   const { isAuthenticated, loading } = useAuth();
   const [showBanner, setShowBanner] = useState(false);
   const [isSubscribing, setIsSubscribing] = useState(false);
