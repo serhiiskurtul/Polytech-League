@@ -100,13 +100,13 @@ public class NotificationService(
 
             _context.Notifications.Add(notification);
             await _context.SaveChangesAsync();
+
+            // Notify via SignalR for the general notification bell
+            await NotifyUserViaSignalR(userId);
         }
         
-        // Still send actual push notification
+        // Still send actual push notification to the device
         await _pushNotificationService.SendPushNotificationAsync(userId, title, message, link, tag);
-        
-        // Notify via SignalR (this triggers the notification bell animation or unread count refresh)
-        await NotifyUserViaSignalR(userId);
     }
 
     public async Task<IEnumerable<NotificationDto>> GetUserNotificationsAsync(long userId)

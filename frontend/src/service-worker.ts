@@ -31,9 +31,9 @@ self.addEventListener('push', (event) => {
   const options: any = {
     body: data.body,
     icon: '/favicon.png',
-    badge: '/favicon.png', // Monochrome icon for Android status bar
+    badge: '/favicon.png',
     tag: data.tag || 'general-notification',
-    renotify: true, // Vibrate even if a notification with the same tag exists
+    renotify: true,
     timestamp: Date.now(),
     data: {
       url: data.url
