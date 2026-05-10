@@ -8,22 +8,34 @@ export const NotificationBanner: React.FC = () => {
   const [isSubscribing, setIsSubscribing] = useState(false);
 
   useEffect(() => {
-    // Wait for auth to load
+    console.log('NotificationBanner state:', { isAuthenticated, loading, permission: Notification.permission });
+
     if (loading) return;
 
-    // Check if user is authenticated and notifications are supported
-    if (isAuthenticated && 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window) {
-      // Only show if permission is 'default' (not granted/denied yet)
-      if (Notification.permission === 'default') {
-        const hasDismissed = localStorage.getItem('notification_banner_dismissed');
-        if (!hasDismissed) {
-          // Delay showing slightly for better UX
-          const timer = setTimeout(() => {
-            setShowBanner(true);
-          }, 2000);
-          return () => clearTimeout(timer);
-        }
+    if (!isAuthenticated) {
+      console.log('Banner NOT showing: user not authenticated');
+      return;
+    }
+
+    if (!('Notification' in window)) {
+      console.log('Banner NOT showing: Notification API not supported');
+      return;
+    }
+
+    if (Notification.permission === 'default') {
+      const hasDismissed = localStorage.getItem('notification_banner_dismissed');
+      console.log('Banner dismiss status:', hasDismissed);
+      
+      if (!hasDismissed) {
+        console.log('Setting timer to show banner...');
+        const timer = setTimeout(() => {
+          console.log('SHOWING BANNER NOW');
+          setShowBanner(true);
+        }, 2000);
+        return () => clearTimeout(timer);
       }
+    } else {
+      console.log('Banner NOT showing: permission is already', Notification.permission);
     }
   }, [isAuthenticated, loading]);
 
