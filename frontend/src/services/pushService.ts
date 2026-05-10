@@ -23,14 +23,27 @@ export async function subscribeUserToPush() {
       return null;
     }
 
-    const registration = await navigator.serviceWorker.ready;
+    // Register service worker if not already registered
+    let registration = await navigator.serviceWorker.getRegistration();
+    if (!registration) {
+      console.log('Registering Service Worker...');
+      registration = await navigator.serviceWorker.register('/sw.js', {
+        scope: '/'
+      });
+    }
+
+    await navigator.serviceWorker.ready;
     console.log('Service Worker is ready for push subscription');
+
+    // Request permission explicitly
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      console.warn('Notification permission not granted');
+      return null;
+    }
     
     // Check for existing subscription
     const existingSubscription = await registration.pushManager.getSubscription();
-    if (existingSubscription) {
-      console.log('Existing push subscription found');
-    }
     
     const subscribeOptions = {
       userVisibleOnly: true,
@@ -51,7 +64,7 @@ export async function subscribeUserToPush() {
 }
 
 async function sendSubscriptionToBackend(subscription: PushSubscription) {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/notifications/subscribe`, {
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/notifications/subscribe`, {
     method: 'POST',
     body: JSON.stringify(subscription),
     headers: {

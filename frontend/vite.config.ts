@@ -34,8 +34,9 @@ export default defineConfig({
             type: 'image/png',
             purpose: 'any'
           }
-        ]
-      },
+        ],
+        gcm_sender_id: '103953800507'
+      } as any,
       devOptions: {
         enabled: true,
         type: 'module'

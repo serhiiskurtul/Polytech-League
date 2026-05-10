@@ -41,3 +41,14 @@ self.addEventListener('notificationclick', function (event) {
     })
   );
 });
+self.addEventListener('pushsubscriptionchange', function (event) {
+  event.waitUntil(
+    self.registration.pushManager.subscribe(event.oldSubscription.options)
+      .then(function (newSubscription) {
+        // In a real app, you would send the new subscription to your server
+        console.log('Push subscription changed, new subscription:', newSubscription);
+        // We can't easily call our API here without more setup, 
+        // but the next time the user opens the app, AuthContext will re-subscribe them.
+      })
+  );
+});
