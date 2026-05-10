@@ -13,6 +13,7 @@ export async function requestNotificationPermission() {
 }
 
 export async function subscribeUserToPush() {
+  console.log('Attempting to subscribe user to push notifications...');
   try {
     if (!('serviceWorker' in navigator)) {
       console.warn('Service Worker is not supported in this browser');

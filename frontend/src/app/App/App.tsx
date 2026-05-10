@@ -31,6 +31,7 @@ import { AboutPage } from '@/pages/AboutPage';
 import ProtectedRoute from '../providers/ProtectedRoute';
 import ScrollToTop from '../providers/ScrollToTop';
 import { Toaster } from 'react-hot-toast';
+import { NotificationBanner } from '@/features/notifications/NotificationBanner';
 
 
 
@@ -62,6 +63,7 @@ export default function App() {
           },
         }}
       />
+      <NotificationBanner />
 
       {!hideLayout && <Header />}
 
