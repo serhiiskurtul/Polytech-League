@@ -26,12 +26,26 @@ export const NotificationBanner: React.FC = () => {
   const handleEnable = async () => {
     setIsSubscribing(true);
     try {
+      console.log('Starting notification subscription...');
       const subscription = await subscribeUserToPush();
+      
       if (subscription) {
+        console.log('Successfully subscribed!');
         setShowBanner(false);
+      } else {
+        // If subscription is null but we didn't throw, 
+        // it means permission was denied or browser doesn't support it
+        const permission = Notification.permission;
+        if (permission === 'denied' || permission === 'granted') {
+          setShowBanner(false);
+        }
       }
     } catch (error) {
       console.error('Failed to enable notifications', error);
+      // Even on error, if the user already granted permission, hide the banner
+      if (Notification.permission === 'granted') {
+        setShowBanner(false);
+      }
     } finally {
       setIsSubscribing(false);
     }

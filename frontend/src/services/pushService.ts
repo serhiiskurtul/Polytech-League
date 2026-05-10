@@ -44,13 +44,19 @@ export async function subscribeUserToPush() {
     };
 
     const subscription = await registration.pushManager.subscribe(subscribeOptions);
+    console.log('Push Subscription generated:', JSON.stringify(subscription));
 
     // Send subscription to backend
     await sendSubscriptionToBackend(subscription);
+    console.log('Subscription successfully sent to backend!');
 
     return subscription;
   } catch (error) {
     console.error('ПОМИЛКА ПРИ ПІДПИСЦІ:', error);
+    // Log more details if it's a fetch error
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+    }
     throw error;
   }
 }
