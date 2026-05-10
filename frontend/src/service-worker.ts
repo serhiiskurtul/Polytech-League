@@ -30,7 +30,7 @@ self.addEventListener('push', (event) => {
 
   const options: any = {
     body: data.body,
-    icon: '/pwa-icon-512.png',
+    icon: '/favicon.svg',
     badge: '/favicon.svg', // Monochrome icon for Android status bar
     tag: data.tag || 'general-notification',
     renotify: true, // Vibrate even if a notification with the same tag exists
