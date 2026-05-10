@@ -17,13 +17,13 @@ createRoot(rootElement).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <NotificationProvider>
-          <ChatProvider>
+        <ChatProvider>
+          <NotificationProvider>
             <App />
             <Analytics />
             <SpeedInsights />
-          </ChatProvider>
-        </NotificationProvider>
+          </NotificationProvider>
+        </ChatProvider>
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>

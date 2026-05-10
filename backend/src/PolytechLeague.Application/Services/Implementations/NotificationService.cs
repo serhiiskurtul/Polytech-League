@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
+using PolytechLeague.API.Hubs;
 using Microsoft.EntityFrameworkCore;
 using PolytechLeague.Application.Dto;
 using PolytechLeague.Application.Services.Interfaces;
@@ -12,8 +10,14 @@ namespace PolytechLeague.Application.Services.Implementations;
 
 public class NotificationService(
     ApplicationDbContext _context,
-    IPushNotificationService _pushNotificationService) : INotificationService
+    IPushNotificationService _pushNotificationService,
+    IHubContext<ChatHub> _hubContext) : INotificationService
 {
+    private async Task NotifyUserViaSignalR(long userId)
+    {
+        await _hubContext.Clients.Group($"User_{userId}").SendAsync("ReceiveNotification");
+    }
+
     public async Task SendNotificationToAllAsync(string title, string message, NotificationType type, string? link = null)
     {
         var users = await _context.Users
@@ -38,6 +42,9 @@ public class NotificationService(
         
         // Send broadcast push notification
         await _pushNotificationService.SendPushNotificationToAllAsync(title, message, link);
+        
+        // Notify all via SignalR
+        await _hubContext.Clients.All.SendAsync("ReceiveNotification");
     }
 
     public async Task SendNotificationToAdminsAsync(string title, string message, NotificationType type, string? link = null)
@@ -62,6 +69,7 @@ public class NotificationService(
             _context.Notifications.Add(notification);
             
             pushTasks.Add(_pushNotificationService.SendPushNotificationAsync(admin.Id, title, message, link));
+            pushTasks.Add(NotifyUserViaSignalR(admin.Id));
         }
 
         await _context.SaveChangesAsync();
@@ -85,6 +93,9 @@ public class NotificationService(
         
         // Send actual push notification
         await _pushNotificationService.SendPushNotificationAsync(userId, title, message, link);
+        
+        // Notify via SignalR
+        await NotifyUserViaSignalR(userId);
     }
 
     public async Task<IEnumerable<NotificationDto>> GetUserNotificationsAsync(long userId)

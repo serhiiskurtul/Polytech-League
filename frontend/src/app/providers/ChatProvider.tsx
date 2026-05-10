@@ -12,6 +12,7 @@ interface ChatContextType {
     unreadTotal: number;
     markAsRead: (conversationId: number) => Promise<void>;
     refreshConversations: () => Promise<void>;
+    connection: HubConnection | null;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -169,7 +170,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             sendMessage,
             unreadTotal,
             markAsRead,
-            refreshConversations
+            refreshConversations,
+            connection
         }}>
             {children}
         </ChatContext.Provider>

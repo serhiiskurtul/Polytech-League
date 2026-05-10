@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useAuth } from './AuthContext';
+import { useChat } from './ChatProvider';
 import { getMyNotifications, markAsRead as apiMarkAsRead, markAllAsRead as apiMarkAllAsRead, deleteNotification as apiDeleteNotification, clearReadNotifications as apiClearReadNotifications } from '@/shared/api/notifications.api';
 import { Notification } from '@/shared/types/notification.types';
 
@@ -69,12 +70,38 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   };
 
+  const { connection } = useChat();
+
+  useEffect(() => {
+    if (!connection) return;
+
+    connection.on('ReceiveNotification', () => {
+      refreshNotifications();
+    });
+
+    return () => {
+      connection.off('ReceiveNotification');
+    };
+  }, [connection, refreshNotifications]);
+
   useEffect(() => {
     if (isAuthenticated) {
       setLoading(true);
       refreshNotifications().finally(() => setLoading(false));
+      
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+          refreshNotifications();
+        }
+      };
+
+      document.addEventListener('visibilitychange', handleVisibilityChange);
       const interval = setInterval(refreshNotifications, 60000);
-      return () => clearInterval(interval);
+      
+      return () => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        clearInterval(interval);
+      };
     } else {
       setNotifications([]);
       setUnreadCount(0);

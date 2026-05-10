@@ -67,7 +67,7 @@ export async function subscribeUserToPush() {
 async function sendSubscriptionToBackend(subscription: PushSubscription) {
   const response = await fetch(`${import.meta.env.VITE_API_URL}/notifications/subscribe`, {
     method: 'POST',
-    body: JSON.stringify(subscription),
+    body: JSON.stringify(subscription.toJSON()),
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${localStorage.getItem('token')}` // Assuming JWT is stored here
