@@ -53,11 +53,6 @@ export async function subscribeUserToPush() {
     return subscription;
   } catch (error) {
     console.error('ПОМИЛКА ПРИ ПІДПИСЦІ:', error);
-    alert('ПОМИЛКА МЕРЕЖІ: ' + (error instanceof Error ? error.message : 'Невідома помилка'));
-    // Log more details if it's a fetch error
-    if (error instanceof Error) {
-      console.error('Error message:', error.message);
-    }
     throw error;
   }
 }
@@ -70,11 +65,10 @@ async function sendSubscriptionToBackend(subscription: PushSubscription) {
   const url = `${secureApiUrl.endsWith('/') ? secureApiUrl.slice(0, -1) : secureApiUrl}/api/notifications/subscribe`;
 
   console.log('Sending subscription to:', url);
-  alert('Спроба відправити підписку на сервер...');
 
   const token = localStorage.getItem('token');
   if (!token) {
-    throw new Error('User token not found. Please log in again.');
+    throw new Error('User token not found. Please log in inside the PWA.');
   }
 
   const response = await fetch(url, {
@@ -88,10 +82,8 @@ async function sendSubscriptionToBackend(subscription: PushSubscription) {
 
   if (!response.ok) {
     const errorBody = await response.text();
-    alert('Помилка сервера при підписці: ' + response.status);
     throw new Error(`Server error (${response.status}): ${errorBody || 'Unknown error'}`);
   }
-  alert('Підписка успішно додана в БД!');
 }
 
 function urlBase64ToUint8Array(base64String: string) {
