@@ -64,7 +64,12 @@ export async function subscribeUserToPush() {
 async function sendSubscriptionToBackend(subscription: PushSubscription) {
   // Use VITE_API_BASE_URL or fallback to production URL
   const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://polytech-league-production.up.railway.app';
-  const url = `${apiUrl.endsWith('/') ? apiUrl.slice(0, -1) : apiUrl}/api/notifications/subscribe`;
+  // Ensure we use HTTPS for production to avoid Mixed Content issues
+  const secureApiUrl = apiUrl.replace('http://', 'https://');
+  const url = `${secureApiUrl.endsWith('/') ? secureApiUrl.slice(0, -1) : secureApiUrl}/api/notifications/subscribe`;
+
+  console.log('Sending subscription to:', url);
+  alert('Спроба відправити підписку на сервер...');
 
   const token = localStorage.getItem('token');
   if (!token) {
@@ -82,8 +87,10 @@ async function sendSubscriptionToBackend(subscription: PushSubscription) {
 
   if (!response.ok) {
     const errorBody = await response.text();
+    alert('Помилка сервера при підписці: ' + response.status);
     throw new Error(`Server error (${response.status}): ${errorBody || 'Unknown error'}`);
   }
+  alert('Підписка успішно додана в БД!');
 }
 
 function urlBase64ToUint8Array(base64String: string) {
