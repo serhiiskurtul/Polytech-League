@@ -63,9 +63,6 @@ export default function App() {
           },
         }}
       />
-      <div style={{ position: 'fixed', top: 0, left: 0, background: 'red', color: 'white', zIndex: 10000, padding: '10px', pointerEvents: 'none' }}>
-        DEBUG: BUILD UPDATED (VAPID FIX)
-      </div>
       <NotificationBanner />
 
       {!hideLayout && <Header />}
