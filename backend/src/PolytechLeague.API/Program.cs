@@ -12,7 +12,7 @@ using PolytechLeague.API.Extensions;
 using Serilog;
 using PolytechLeague.API.Middlewares;
 using Microsoft.OpenApi.Models;
-using PolytechLeague.API.Hubs;
+using PolytechLeague.Application.Hubs;
 using Microsoft.EntityFrameworkCore;
 
 

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using PolytechLeague.Application.Services.Interfaces;
 
-namespace PolytechLeague.API.Hubs;
+namespace PolytechLeague.Application.Hubs;
 
 [Authorize]
 public class ChatHub(IChatService chatService) : Hub

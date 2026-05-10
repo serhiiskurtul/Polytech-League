@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.SignalR;
-using PolytechLeague.API.Hubs;
+using PolytechLeague.Application.Hubs;
 using Microsoft.EntityFrameworkCore;
 using PolytechLeague.Application.Dto;
 using PolytechLeague.Application.Services.Interfaces;
