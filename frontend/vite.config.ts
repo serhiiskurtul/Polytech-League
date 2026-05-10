@@ -29,7 +29,7 @@ export default defineConfig({
             purpose: 'any'
           },
           {
-            src: 'pwa-icon-512.png',
+            src: 'favicon.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any'
