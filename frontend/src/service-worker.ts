@@ -17,9 +17,9 @@ clientsClaim();
 // Handle Push Notifications
 self.addEventListener('push', (event) => {
   console.log('[Service Worker] Push Received.');
-  
+
   let data = { title: 'Polytech League', body: 'Нове сповіщення!', url: '/', tag: 'general' };
-  
+
   if (event.data) {
     try {
       data = event.data.json();
@@ -30,8 +30,8 @@ self.addEventListener('push', (event) => {
 
   const options: any = {
     body: data.body,
-    icon: '/favicon.svg',
-    badge: '/favicon.svg', // Monochrome icon for Android status bar
+    icon: '/favicon.png',
+    badge: '/favicon.png', // Monochrome icon for Android status bar
     tag: data.tag || 'general-notification',
     renotify: true, // Vibrate even if a notification with the same tag exists
     timestamp: Date.now(),
@@ -73,7 +73,7 @@ self.addEventListener('notificationclick', (event) => {
     })
   );
 });
- 
+
 self.addEventListener('pushsubscriptionchange', (event: any) => {
   event.waitUntil(
     self.registration.pushManager.subscribe(event.oldSubscription.options)
