@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from '../MessengerView.module.css';
 import { ConversationDto } from '@/shared/api/chat.api';
+import { formatConversationDate } from '@/shared/utils/date.utils';
 
 interface ConversationListProps {
     conversations: ConversationDto[];
@@ -29,7 +30,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                             <div className={styles.convHeader}>
                                 <span className={styles.convName}>{conv.otherUserName}</span>
                                 <span className={styles.convTime}>
-                                    {conv.lastMessageAt ? new Date(conv.lastMessageAt).toLocaleDateString() : ''}
+                                {conv.lastMessageAt ? formatConversationDate(conv.lastMessageAt) : ''}
                                 </span>
                             </div>
                             <div className={styles.convPreview}>

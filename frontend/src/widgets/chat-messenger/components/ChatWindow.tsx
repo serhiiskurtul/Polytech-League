@@ -7,6 +7,8 @@ interface ChatWindowProps {
     onBack?: () => void;
 }
 
+import { formatMessageDate } from '@/shared/utils/date.utils';
+
 export const ChatWindow: React.FC<ChatWindowProps> = ({ onBack }) => {
     const { user } = useAuth();
     const { 
@@ -40,10 +42,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ onBack }) => {
         return conversations.find(c => c.id === convId);
     };
 
-    const formatTime = (dateStr: string) => {
-        const date = new Date(dateStr);
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    };
+
 
     if (!activeConversationId) return null;
 
@@ -73,7 +72,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ onBack }) => {
                             className={`${styles.messageBubble} ${msg.senderId === user?.id ? styles.msgSent : styles.msgReceived}`}
                         >
                             <div className={styles.msgContent}>{msg.content}</div>
-                            <span className={styles.msgTime}>{formatTime(msg.sentAt)}</span>
+                            <span className={styles.msgTime}>{formatMessageDate(msg.sentAt)}</span>
                         </div>
                     ))
                 ) : (
