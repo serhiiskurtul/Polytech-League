@@ -55,7 +55,7 @@ self.addEventListener('notificationclick', (event) => {
   console.log('[Service Worker] Notification click Received.');
   event.notification.close();
 
-  const urlToOpen = event.notification.data?.url || '/';
+  const urlToOpen = new URL(event.notification.data?.url || '/', self.location.origin).href;
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
@@ -66,6 +66,18 @@ self.addEventListener('notificationclick', (event) => {
           return client.focus();
         }
       }
+      
+      // Also try to find any client if we just want to navigate it
+      if (windowClients.length > 0) {
+        const client = windowClients[0];
+        if ('navigate' in client) {
+            client.navigate(urlToOpen);
+        }
+        if ('focus' in client) {
+            return client.focus();
+        }
+      }
+
       // If not, open a new window
       if (self.clients.openWindow) {
         return self.clients.openWindow(urlToOpen);

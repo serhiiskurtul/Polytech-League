@@ -22,11 +22,20 @@ const NotificationsPage = () => {
   } = useNotifications();
 
   const [filter, setFilter] = useState<'all' | 'unread' | 'read'>('all');
+  const [userId, setUserId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'notifications' | 'messages'>('notifications');
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const tabParam = params.get('tab');
+    const userParam = params.get('userId');
+
+    if (userParam) {
+      setUserId(parseInt(userParam, 10));
+    } else {
+      setUserId(null);
+    }
+
     if (tabParam === 'messages') {
       setActiveTab('messages');
     } else if (tabParam === 'notifications') {
@@ -234,7 +243,7 @@ const NotificationsPage = () => {
           </div>
         </>
       ) : (
-        <MessengerView />
+        <MessengerView initialUserId={userId} />
       )}
       </div>
     </div>
