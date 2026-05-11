@@ -13,7 +13,7 @@ export default function Header() {
   const { unreadCount } = useNotifications();
   const { unreadTotal } = useChat();
 
-  const totalUnread = unreadCount + unreadTotal;
+  const totalUnread = (unreadCount || 0) + (unreadTotal || 0);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const initials = user ? `${user.firstName[0] || ''}${user.lastName[0] || ''}`.toUpperCase() : '';

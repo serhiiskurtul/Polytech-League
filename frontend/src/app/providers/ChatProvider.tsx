@@ -35,7 +35,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             const data = await chatApi.getConversations();
             setConversations(data);
-            setUnreadTotal(data.reduce((acc, conv) => acc + conv.unreadCount, 0));
+            const total = (data || []).reduce((acc, conv) => acc + (conv.unreadCount || 0), 0);
+            setUnreadTotal(total);
         } catch (error) {
             console.error("Failed to fetch conversations", error);
         }
@@ -44,6 +45,22 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     useEffect(() => {
         if (isAuthenticated) {
             refreshConversations();
+
+            // Set up polling interval as a fallback for SignalR
+            const interval = setInterval(refreshConversations, 60000);
+
+            // Refresh when tab becomes visible
+            const handleVisibilityChange = () => {
+                if (document.visibilityState === 'visible') {
+                    refreshConversations();
+                }
+            };
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+
+            return () => {
+                clearInterval(interval);
+                document.removeEventListener('visibilitychange', handleVisibilityChange);
+            };
         } else {
             setConversations([]);
             setUnreadTotal(0);
