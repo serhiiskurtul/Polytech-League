@@ -82,7 +82,7 @@ const PlayersRatingPage = () => {
     { id: 'chess', name: 'Шахи', icon: 'fa-chess', key: 'chess' },
     { id: 'checkers', name: 'Шашки', icon: 'fa-chess-board', key: 'checkers' },
     { id: 'tt', name: 'Настільний теніс', icon: 'fa-table-tennis-paddle-ball', key: 'table_tennis' },
-    { id: 'futsal', name: 'Футзал', icon: 'fa-futbol', key: 'futsal' },
+    { id: 'football', name: 'Футзал', icon: 'fa-futbol', key: 'football' },
     { id: 'volleyball', name: 'Волейбол', icon: 'fa-volleyball-ball', key: 'volleyball' },
     { id: 'basketball', name: 'Баскетбол 3х3', icon: 'fa-basketball-ball', key: 'basketball_3x3' },
     { id: 'beach', name: 'Пляжний волейбол', icon: 'fa-umbrella-beach', key: 'beach_volleyball' },
@@ -155,7 +155,7 @@ const PlayersRatingPage = () => {
 
     // Sorting
     return result.sort((a, b) => {
-      if (activeTab.toLowerCase() === 'futsal' && sortBy === 'goals') {
+      if (activeTab.toLowerCase() === 'football' && sortBy === 'goals') {
         return (b.goalsScored || 0) - (a.goalsScored || 0);
       }
       
@@ -172,7 +172,7 @@ const PlayersRatingPage = () => {
     switch (sportKey.toLowerCase()) {
       case 'chess': return { icon: '♟️', color: '#8b4513' };
       case 'checkers': return { icon: '🏁', color: '#555' };
-      case 'futsal': return { icon: '⚽', color: '#2c3e50' };
+      case 'football': return { icon: '⚽', color: '#2c3e50' };
       case 'basketball_3x3': return { icon: '🏀', color: '#e67e22' };
       case 'volleyball': return { icon: '🏐', color: '#f1c40f' };
       case 'table_tennis': return { icon: '🏓', color: '#e74c3c' };
@@ -242,7 +242,7 @@ const PlayersRatingPage = () => {
               </div>
             )}
 
-            {activeTab.toLowerCase() === 'futsal' && (
+            {activeTab.toLowerCase() === 'football' && (
               <div className={styles.weightFilter}>
                 <i className="fa-solid fa-sort"></i>
                 <select 
@@ -424,7 +424,7 @@ const PlayersRatingPage = () => {
                                   : player.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase())?.matchesPlayed || 0}
                               </span> ігор
                             </div>
-                            {(activeTab.toLowerCase() === 'futsal' || (activeTab === 'Загальний' && player.sports?.includes('futsal'))) && (
+                            {(activeTab.toLowerCase() === 'football' || (activeTab === 'Загальний' && player.sports?.includes('football'))) && (
                               <div className={`${styles.statMiniItem} ${sortBy === 'goals' ? styles.highlightStat : ''}`}>
                                 <span className={styles.statMiniVal}>{player.goalsScored || 0}</span> голів
                               </div>

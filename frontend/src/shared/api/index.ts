@@ -7,7 +7,7 @@ export * from './tournaments.api';
 export * from './users.api';
 export * from './volleyball.api';
 export * from './beachVolleyball.api';
-export * from './futsal.api';
+export * from './football.api';
 export * from './basketball3x3.api';
 export * from './badminton.api';
 export * from './armwrestling.api';

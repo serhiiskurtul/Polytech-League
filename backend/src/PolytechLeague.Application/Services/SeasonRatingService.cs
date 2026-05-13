@@ -34,7 +34,7 @@ public class SeasonRatingService : ISeasonRatingService
             .Distinct()
             .ToListAsync();
             
-        var futsalGroups = await _context.FutsalTeams.Select(t => t.Name).Distinct().ToListAsync();
+        var FootballGroups = await _context.FootballTeams.Select(t => t.Name).Distinct().ToListAsync();
         var volleyballGroups = await _context.VolleyballTeams.Select(t => t.Name).Distinct().ToListAsync();
         var basketballGroups = await _context.Basketball3x3Teams.Select(t => t.Name).Distinct().ToListAsync();
         var beachVolleyballGroups = await _context.BeachVolleyballTeams.Select(t => t.Name).Distinct().ToListAsync();
@@ -45,7 +45,7 @@ public class SeasonRatingService : ISeasonRatingService
         var badGroups = await _context.BadmintonEventParticipants.Select(p => p.GroupName).Distinct().ToListAsync();
 
         var allGroups = playerGroups
-            .Union(futsalGroups)
+            .Union(FootballGroups)
             .Union(volleyballGroups)
             .Union(basketballGroups)
             .Union(beachVolleyballGroups)
@@ -122,15 +122,15 @@ public class SeasonRatingService : ISeasonRatingService
             }
         }
 
-        // 3. Futsal
-        var futsalEvents = await _context.FutsalEvents
+        // 3. Football
+        var FootballEvents = await _context.FootballEvents
             .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) 
                         && e.Level == CompetitionLevel.CollegeGroup)
             .Include(e => e.Teams)
             .ToListAsync();
-        foreach (var e in futsalEvents)
+        foreach (var e in FootballEvents)
         {
-            foreach (var t in e.Teams ?? new List<Domain.Entities.Futsal.FutsalTeam>())
+            foreach (var t in e.Teams ?? new List<Domain.Entities.Football.FootballTeam>())
             {
                 if (string.IsNullOrEmpty(t.Name)) continue;
                 var normalizedTGroup = t.Name.Length >= 3 ? t.Name.Substring(0, 3) : t.Name;

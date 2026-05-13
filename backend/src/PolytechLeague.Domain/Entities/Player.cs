@@ -1,6 +1,6 @@
 using PolytechLeague.Domain.Entities.TableTennis.Enums;
 using PolytechLeague.Domain.Entities.Armwrestling.Enums;
-using PolytechLeague.Domain.Entities.Futsal.Enums;
+using PolytechLeague.Domain.Entities.Football.Enums;
 using PolytechLeague.Domain.Entities.Volleyball.Enums;
 using PolytechLeague.Domain.Entities.Enums;
 
@@ -36,9 +36,9 @@ public class Player : Person
     public ArmwrestlingWeightClass? ArmwrestlingPreferredWeightClass { get; set; }
 
     // Team Sports Metadata 
-    public FutsalPosition? FutsalPosition { get; set; }
-    public int? FutsalShirtNumber { get; set; }
-    public long? FutsalTeamId { get; set; }
+    public FootballPosition? FootballPosition { get; set; }
+    public int? FootballShirtNumber { get; set; }
+    public long? FootballTeamId { get; set; }
 
     public VolleyballPosition? VolleyballPosition { get; set; }
     public int? VolleyballShirtNumber { get; set; }

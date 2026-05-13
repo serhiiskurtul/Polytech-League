@@ -3,7 +3,7 @@ using PolytechLeague.Application.Dto;
 using PolytechLeague.Application.Services.Interfaces;
 using PolytechLeague.Persistence.Database;
 using PolytechLeague.Domain.Entities;
-using PolytechLeague.Domain.Entities.Futsal;
+using PolytechLeague.Domain.Entities.Football;
 using PolytechLeague.Domain.Entities.Basketball3x3;
 using PolytechLeague.Domain.Entities.Volleyball;
 using PolytechLeague.Domain.Entities.Chess;
@@ -52,7 +52,7 @@ public class TournamentService : ITournamentService
         if (!string.IsNullOrEmpty(sport) && sport != "all")
         {
             query = query.Where(e =>
-                (sport == "futsal" && e is FutsalEvent) ||
+                (sport == "football" && e is FootballEvent) ||
                 (sport == "basketball-3x3" && e is Basketball3x3Event) ||
                 (sport == "volleyball" && e is VolleyballEvent) ||
                 (sport == "chess" && e is ChessEvent) ||
@@ -181,8 +181,8 @@ public class TournamentService : ITournamentService
     {
         switch (dto.Sport)
         {
-            case "futsal":
-                dto.Teams = await _context.FutsalTeams.CountAsync(t => t.EventId == dto.Id);
+            case "football":
+                dto.Teams = await _context.FootballTeams.CountAsync(t => t.EventId == dto.Id);
                 dto.Participants = dto.Teams; // Typically show team count for team sports
                 break;
             case "basketball-3x3":
@@ -255,7 +255,7 @@ public class TournamentService : ITournamentService
     {
         return e switch
         {
-            FutsalEvent => "futsal",
+            FootballEvent => "football",
             Basketball3x3Event => "basketball-3x3",
             VolleyballEvent => "volleyball",
             BeachVolleyballEvent => "beach-volleyball",
@@ -306,7 +306,7 @@ public class TournamentService : ITournamentService
             .Where(p => p.User == null || p.User.Role != UserRole.Admin)
             .Where(p => !p.IsExternal && !p.IsGuest)
             .CountAsync(p => _context.Set<Event>().Any(e => e.FirstPlaceId == p.Id || e.SecondPlaceId == p.Id || e.ThirdPlaceId == p.Id) ||
-                            _context.FutsalEventParticipants.Any(fp => fp.PlayerId == p.Id) ||
+                            _context.FootballEventParticipants.Any(fp => fp.PlayerId == p.Id) ||
                             _context.VolleyballEventParticipants.Any(vp => vp.PlayerId == p.Id) ||
                             _context.Basketball3x3EventParticipants.Any(bp => bp.PlayerId == p.Id) ||
                             _context.ChessEventParticipants.Any(cp => cp.PlayerId == p.Id) ||
@@ -321,7 +321,7 @@ public class TournamentService : ITournamentService
 
         // Count total matches across all sport tables
         int totalMatches = 0;
-        totalMatches += await _context.FutsalMatches.CountAsync();
+        totalMatches += await _context.FootballMatches.CountAsync();
         totalMatches += await _context.VolleyballMatches.CountAsync();
         totalMatches += await _context.Basketball3x3Matches.CountAsync();
         totalMatches += await _context.ChessGames.CountAsync();
@@ -351,7 +351,7 @@ public class TournamentService : ITournamentService
             RegisteredPlayersCount = registeredPlayersCount,
             TotalMatchesCount = totalMatches,
             SeasonProgress = progress,
-            TopSport = "Футзал" // Could be dynamic based on match counts
+            TopSport = "Футбол" // Could be dynamic based on match counts
         };
     }
 
@@ -362,10 +362,10 @@ public class TournamentService : ITournamentService
 
         var allMatches = new List<RecentMatchDto>();
 
-        // 1. Futsal
-        if (sport == null || sport == "futsal")
+        // 1. Football
+        if (sport == null || sport == "football")
         {
-            var futsalMatches = await _context.FutsalMatches
+            var footballMatches = await _context.FootballMatches
                 .Include(m => m.Event)
                 .Include(m => m.HomeTeam)
                 .Include(m => m.AwayTeam)
@@ -375,7 +375,7 @@ public class TournamentService : ITournamentService
                 .Select(m => new RecentMatchDto
                 {
                     Id = m.Id,
-                    Sport = "futsal",
+                    Sport = "football",
                     Team1Name = m.HomeTeam!.Name,
                     Team2Name = m.AwayTeam!.Name,
                     Score1 = m.HomeTeamScore.ToString(),
@@ -387,7 +387,7 @@ public class TournamentService : ITournamentService
                     TournamentId = m.Event.Id
                 })
                 .ToListAsync();
-            allMatches.AddRange(futsalMatches);
+            allMatches.AddRange(footballMatches);
         }
 
         // 2. Volleyball
@@ -629,7 +629,7 @@ public class TournamentService : ITournamentService
                 (sportType == "table-tennis" && e is TableTennisEvent) ||
                 (sportType == "armwrestling" && e is ArmwrestlingEvent) ||
                 (sportType == "badminton" && e is BadmintonEvent) ||
-                (sportType == "futsal" && e is FutsalEvent) ||
+                (sportType == "football" && e is FootballEvent) ||
                 (sportType == "basketball-3x3" && e is Basketball3x3Event) ||
                 (sportType == "volleyball" && e is VolleyballEvent) ||
                 (sportType == "beach-volleyball" && e is BeachVolleyballEvent) ||

@@ -40,10 +40,10 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
         builder.Property(x => x.ArmwrestlingWeight).HasColumnName("armwrestling_weight");
         builder.Property(x => x.ArmwrestlingPreferredWeightClass).HasColumnName("armwrestling_preferred_weight_class");
 
-        // Futsal
-        builder.Property(x => x.FutsalPosition).HasColumnName("futsal_position");
-        builder.Property(x => x.FutsalShirtNumber).HasColumnName("futsal_shirt_number");
-        builder.Property(x => x.FutsalTeamId).HasColumnName("futsal_team_id");
+        // Football
+        builder.Property(x => x.FootballPosition).HasColumnName("Football_position");
+        builder.Property(x => x.FootballShirtNumber).HasColumnName("Football_shirt_number");
+        builder.Property(x => x.FootballTeamId).HasColumnName("Football_team_id");
 
         // Volleyball
         builder.Property(x => x.VolleyballPosition).HasColumnName("volleyball_position");

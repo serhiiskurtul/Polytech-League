@@ -15,7 +15,7 @@ const TopPlayersCompact = () => {
 
   const sports = [
     { label: 'Всі', slug: 'all' },
-    { label: 'Футзал', slug: 'futsal' },
+    { label: 'Футзал', slug: 'football' },
     { label: 'Баскетбол', slug: 'basketball-3x3' },
     { label: 'Волейбол', slug: 'volleyball' },
     { label: 'Шахи', slug: 'chess' },
@@ -64,7 +64,7 @@ const TopPlayersCompact = () => {
 
   const getSportIcon = (sportSlug: string) => {
     const icons: Record<string, string> = {
-      'futsal': 'fas fa-futbol',
+      'football': 'fas fa-futbol',
       'football': 'fas fa-futbol',
       'basketball-3x3': 'fas fa-basketball-ball',
       'volleyball': 'fas fa-volleyball-ball',

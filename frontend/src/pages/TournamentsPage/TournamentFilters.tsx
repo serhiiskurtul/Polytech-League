@@ -32,7 +32,7 @@ const TournamentFilters = ({ activeStatus, activeSport, activeLevel, onStatusCha
   ];
 
   const sports: Sport[] = [
-    { id: 'futsal', label: 'Футзал', icon: 'fas fa-futbol' },
+    { id: 'football', label: 'Футбол', icon: 'fas fa-futbol' },
     { id: 'basketball-3x3', label: 'Баскетбол 3х3', icon: 'fas fa-basketball-ball' },
     { id: 'volleyball', label: 'Волейбол', icon: 'fas fa-volleyball-ball' },
     { id: 'chess', label: 'Шахи', icon: 'fas fa-chess' },

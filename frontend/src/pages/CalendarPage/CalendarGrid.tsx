@@ -30,7 +30,7 @@ const CalendarGrid = ({
   
   // Іконки для видів спорту
   const sportIcons: Record<string, string> = {
-    'futsal': 'fas fa-futbol',
+    'football': 'fas fa-futbol',
     'basketball-3x3': 'fas fa-basketball-ball',
     'volleyball': 'fas fa-volleyball-ball',
     'beach-volleyball': 'fas fa-umbrella-beach',

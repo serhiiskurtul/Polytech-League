@@ -12,8 +12,8 @@ using PolytechLeague.Application.Services.Implementations.TableTennis;
 using PolytechLeague.Application.Services.Interfaces.TableTennis;
 using PolytechLeague.Application.Services.Implementations.Armwrestling;
 using PolytechLeague.Application.Services.Interfaces.Armwrestling;
-using PolytechLeague.Application.Services.Implementations.Futsal;
-using PolytechLeague.Application.Services.Interfaces.Futsal;
+using PolytechLeague.Application.Services.Implementations.Football;
+using PolytechLeague.Application.Services.Interfaces.Football;
 using PolytechLeague.Application.Services.Implementations.Basketball3x3;
 using PolytechLeague.Application.Services.Interfaces.Basketball3x3;
 using PolytechLeague.Application.Services.Implementations.Volleyball;
@@ -60,9 +60,9 @@ public static class ServiceExtension
 
         services.AddScoped<IArmwrestlingEventService, ArmwrestlingEventService>();
         services.AddScoped<IArmwrestlingMatchService, ArmwrestlingMatchService>();
-        services.AddScoped<IFutsalTeamService, FutsalTeamService>();
-        services.AddScoped<IFutsalEventService, FutsalEventService>();
-        services.AddScoped<IFutsalMatchService, FutsalMatchService>();
+        services.AddScoped<IFootballTeamService, FootballTeamService>();
+        services.AddScoped<IFootballEventService, FootballEventService>();
+        services.AddScoped<IFootballMatchService, FootballMatchService>();
         services.AddScoped<IEmailVerificationService, EmailVerificationService>();
         services.AddScoped<IEmailSender, EmailSender>();
         services.AddSingleton<IRedisService, RedisService>();

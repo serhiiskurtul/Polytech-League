@@ -9,7 +9,7 @@ const TOURNAMENT_CREATE_ENDPOINTS: Record<string, string> = {
   checkers: '/checkers-events',
   table_tennis: '/table-tennis-events',
   armwrestling: '/armwrestling-events',
-  futsal: '/futsal-events',
+  football: '/football-events',
   'basketball_3x3': '/basketball3x3-events',
   volleyball: '/volleyball-events',
   'beach_volleyball': '/beach-volleyball-events',
@@ -120,7 +120,7 @@ export const useTournamentForm = () => {
 
   useEffect(() => {
     // Автоматично встановлюємо IsTeam для видів спорту, що завжди є командними
-    const teamSports = ['futsal', 'basketball_3x3', 'volleyball', 'beach_volleyball'];
+    const teamSports = ['football', 'basketball_3x3', 'volleyball', 'beach_volleyball'];
     if (teamSports.includes(formData.sport)) {
       setFormData(prev => ({ ...prev, isTeam: true }));
     } else if (['table_tennis', 'armwrestling'].includes(formData.sport)) {
@@ -230,7 +230,7 @@ export const useTournamentForm = () => {
 
       // Додаємо специфічні поля залежно від виду спорту
       switch (sportKey) {
-        case 'futsal':
+        case 'football':
         case 'basketball_3x3':
         case 'volleyball':
         case 'beach_volleyball':

@@ -13,9 +13,9 @@ using PolytechLeague.Domain.Entities.Armwrestling;
 using PolytechLeague.Domain.Entities.Armwrestling.Enums;
 using PolytechLeague.Persistence.DbConfigurations.TableTennisConfigurations;
 using PolytechLeague.Persistence.DbConfigurations.ArmwrestlingConfigurations;
-using PolytechLeague.Domain.Entities.Futsal;
-using PolytechLeague.Domain.Entities.Futsal.Enums;
-using PolytechLeague.Persistence.DbConfigurations.FutsalConfigurations;
+using PolytechLeague.Domain.Entities.Football;
+using PolytechLeague.Domain.Entities.Football.Enums;
+using PolytechLeague.Persistence.DbConfigurations.FootballConfigurations;
 using PolytechLeague.Domain.Entities.Basketball3x3;
 using PolytechLeague.Domain.Entities.Basketball3x3.Enums;
 using PolytechLeague.Persistence.DbConfigurations.Basketball3x3Configurations;
@@ -79,12 +79,12 @@ public class ApplicationDbContext : DbContext
     public DbSet<ArmwrestlingEventParticipant> ArmwrestlingEventParticipants { get; set; }
     public DbSet<ArmwrestlingMatch> ArmwrestlingMatches { get; set; }
 
-    // Futsal
-    public DbSet<FutsalTeam> FutsalTeams { get; set; }
-    public DbSet<FutsalEvent> FutsalEvents { get; set; }
-    public DbSet<FutsalEventParticipant> FutsalEventParticipants { get; set; }
-    public DbSet<FutsalMatch> FutsalMatches { get; set; }
-    public DbSet<FutsalGoal> FutsalGoals { get; set; }
+    // Football
+    public DbSet<FootballTeam> FootballTeams { get; set; }
+    public DbSet<FootballEvent> FootballEvents { get; set; }
+    public DbSet<FootballEventParticipant> FootballEventParticipants { get; set; }
+    public DbSet<FootballMatch> FootballMatches { get; set; }
+    public DbSet<FootballGoal> FootballGoals { get; set; }
 
     // Basketball 3x3
     public DbSet<Basketball3x3Team> Basketball3x3Teams { get; set; }
@@ -131,7 +131,7 @@ public class ApplicationDbContext : DbContext
             .HasPostgresEnum<EventCategory>()
             .HasPostgresEnum<ArmwrestlingHand>()
             .HasPostgresEnum<ArmwrestlingWeightClass>()
-            .HasPostgresEnum<FutsalPosition>()
+            .HasPostgresEnum<FootballPosition>()
             .HasPostgresEnum<Basketball3x3TournamentType>()
             .HasPostgresEnum<VolleyballTournamentType>()
             .HasPostgresEnum<VolleyballPosition>()
@@ -183,12 +183,12 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new ArmwrestlingEventParticipantConfiguration());
         modelBuilder.ApplyConfiguration(new ArmwrestlingMatchConfiguration());
 
-        // Futsal configurations
-        modelBuilder.ApplyConfiguration(new FutsalTeamConfiguration());
-        modelBuilder.ApplyConfiguration(new FutsalEventConfiguration());
-        modelBuilder.ApplyConfiguration(new FutsalEventParticipantConfiguration());
-        modelBuilder.ApplyConfiguration(new FutsalMatchConfiguration());
-        modelBuilder.ApplyConfiguration(new FutsalGoalConfiguration());
+        // Football configurations
+        modelBuilder.ApplyConfiguration(new FootballTeamConfiguration());
+        modelBuilder.ApplyConfiguration(new FootballEventConfiguration());
+        modelBuilder.ApplyConfiguration(new FootballEventParticipantConfiguration());
+        modelBuilder.ApplyConfiguration(new FootballMatchConfiguration());
+        modelBuilder.ApplyConfiguration(new FootballGoalConfiguration());
 
         // Basketball 3x3 configurations
         modelBuilder.ApplyConfiguration(new Basketball3x3TeamConfiguration());

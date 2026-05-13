@@ -13,7 +13,7 @@ const CategoriesSection = ({ selectedCategories, handleCategoryToggle, sport, is
   const filteredCategories = CATEGORIES.filter(cat => {
     if (cat === 'Змішані') {
       const sportsWithoutMixed = [
-        'futsal', 'basketball-3x3', 'volleyball', 'beach-volleyball', 
+        'football', 'basketball-3x3', 'volleyball', 'beach-volleyball', 
         'armwrestling', 'table_tennis', 'badminton'
       ];
       if (sportsWithoutMixed.includes(sport)) return false;

@@ -60,13 +60,13 @@ import {
   approveBeachVolleyballParticipant,
   rejectBeachVolleyballParticipant,
   removeBeachVolleyballParticipant,
-  // Futsal
-  getFutsalEventById,
-  updateFutsalEvent,
-  registerForFutsalEvent,
-  approveFutsalParticipant,
-  rejectFutsalParticipant,
-  removeFutsalParticipant,
+  // football
+  getfootballEventById,
+  updatefootballEvent,
+  registerForfootballEvent,
+  approvefootballParticipant,
+  rejectfootballParticipant,
+  removefootballParticipant,
   // Basketball 3x3
   getBasketball3x3EventById,
   updateBasketball3x3Event,
@@ -166,7 +166,7 @@ const TournamentViewPage = () => {
   const getNormalizedSportKey = () => {
     const rawSport = (tournament?.sport || '').toLowerCase().replace(/-/g, '_').replace(/\s/g, '');
     const sportMap: Record<string, string> = {
-      'футзал': 'futsal',
+      'футзал': 'football',
       'волейбол': 'volleyball',
       'пляжний_волейбол': 'beach_volleyball',
       'пляжнийволейбол': 'beach_volleyball',
@@ -189,7 +189,7 @@ const TournamentViewPage = () => {
   const isCheckers = sportKey === 'checkers';
   const isBadminton = sportKey === 'badminton';
   const isTableTennis = sportKey === 'tabletennis' || sportKey === 'table_tennis';
-  const isFutsal = sportKey === 'futsal';
+  const isfootball = sportKey === 'football';
   const isVolleyball = sportKey === 'volleyball' || sportKey === 'beach_volleyball';
   const isBasketball3x3 = sportKey === 'basketball_3x3' || sportKey === 'basketball3x3';
   const isAthletics = sportKey === 'athletics';
@@ -229,7 +229,7 @@ const TournamentViewPage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isEditingTournament, setIsEditingTournament] = useState(false);
-  const isMandatoryTeamSport = ['futsal', 'volleyball', 'beach-volleyball', 'beach_volleyball', 'basketball-3x3', 'basketball_3x3', 'basketball3x3'].includes(sportKey);
+  const isMandatoryTeamSport = ['football', 'volleyball', 'beach-volleyball', 'beach_volleyball', 'basketball-3x3', 'basketball_3x3', 'basketball3x3'].includes(sportKey);
   const [showWinnersAdmin, setShowWinnersAdmin] = useState(false);
   const [winners, setWinners] = useState({
     firstPlaceId: 0,
@@ -240,7 +240,7 @@ const TournamentViewPage = () => {
   const handleSaveWinners = async () => {
     if (!details || !id) return;
     try {
-      const isTeamSport = !!(details as any).isTeam || ['futsal', 'volleyball', 'beach_volleyball', 'basketball_3x3', 'badminton'].includes(sportKey);
+      const isTeamSport = !!(details as any).isTeam || ['football', 'volleyball', 'beach_volleyball', 'basketball_3x3', 'badminton'].includes(sportKey);
 
       // Build clean base payload with common fields to avoid "Extra fields" 400 error
       // Ensuring ALL required fields from the backend DTO are present
@@ -271,7 +271,7 @@ const TournamentViewPage = () => {
         payload.secondPlaceTeamId = winners.secondPlaceId || null;
         payload.thirdPlaceTeamId = winners.thirdPlaceId || null;
 
-        if (['futsal', 'badminton', 'basketball_3x3', 'basketball3x3'].includes(sportKey)) {
+        if (['football', 'badminton', 'basketball_3x3', 'basketball3x3'].includes(sportKey)) {
           payload.tournamentType = (details as any).tournamentType || 'RoundRobin';
         }
         if (['volleyball', 'beach_volleyball'].includes(sportKey)) {
@@ -303,7 +303,7 @@ const TournamentViewPage = () => {
         case 'checkers': await updateCheckersEvent(id, payload as any); break;
         case 'chess': await updateChessEvent(id, payload as any); break;
         case 'armwrestling': await updateArmwrestlingEvent(id, payload as any); break;
-        case 'futsal': await updateFutsalEvent(id, payload as any); break;
+        case 'football': await updatefootballEvent(id, payload as any); break;
         case 'volleyball': await updateVolleyballEvent(id, payload as any); break;
         case 'beach_volleyball': await updateBeachVolleyballEvent(id, payload as any); break;
         case 'basketball_3x3':
@@ -399,7 +399,7 @@ const TournamentViewPage = () => {
         const sportEndpointRecord: Record<string, string> = {
           checkers: '/checkers-events',
           chess: '/chess-events',
-          futsal: '/futsal-events',
+          football: '/football-events',
           volleyball: '/volleyball-events',
           beach_volleyball: '/beach-volleyball-events',
           beachvolleyball: '/beach-volleyball-events',
@@ -475,7 +475,7 @@ const TournamentViewPage = () => {
         headRefereeName: details.headRefereeName || '',
         referees: (details as any).referees || '',
         schedule: details.schedule || '',
-        isTeam: (['volleyball', 'beach_volleyball', 'futsal', 'basketball_3x3', 'basketball3x3'].includes((tournament?.sport || '').toLowerCase().replace(/-/g, '_'))) ? true : !!(details as any).isTeam,
+        isTeam: (['volleyball', 'beach_volleyball', 'football', 'basketball_3x3', 'basketball3x3'].includes((tournament?.sport || '').toLowerCase().replace(/-/g, '_'))) ? true : !!(details as any).isTeam,
         registrationStart: formatDateForInput(tournament?.registrationStart || details.registrationStart),
         registrationEnd: formatDateForInput(tournament?.registrationEnd || details.registrationEnd),
         endDate: formatDateForInput(tournament?.endDate || details.endDate),
@@ -603,8 +603,8 @@ const TournamentViewPage = () => {
       } else if (sportKey === 'volleyball' || sportKey === 'beach_volleyball') {
         const updateFn = sportKey === 'volleyball' ? updateVolleyballEvent : updateBeachVolleyballEvent;
         await updateFn(id!, { ...payload, setsToWin: (details as any).setsToWin || 2 });
-      } else if (sportKey === 'futsal' || sportKey === 'badminton') {
-        const updateFn = sportKey === 'futsal' ? updateFutsalEvent : updateBadmintonEvent;
+      } else if (sportKey === 'football' || sportKey === 'badminton') {
+        const updateFn = sportKey === 'football' ? updatefootballEvent : updateBadmintonEvent;
         await updateFn(id!, { ...payload, tournamentType: (details as any).tournamentType || 'RoundRobin' });
       } else if (sportKey === 'basketball_3x3' || sportKey === 'basketball3x3') {
         await updateBasketball3x3Event(id!, { ...payload, tournamentType: (details as any).tournamentType || 'RoundRobin' });
@@ -801,8 +801,8 @@ const TournamentViewPage = () => {
           case 'beach_volleyball':
             await removeBeachVolleyballParticipant(id!, playerId);
             break;
-          case 'futsal':
-            await removeFutsalParticipant(id!, playerId);
+          case 'football':
+            await removefootballParticipant(id!, playerId);
             break;
           case 'basketball_3x3':
           case 'basketball3x3':
@@ -832,7 +832,7 @@ const TournamentViewPage = () => {
         case 'table_tennis': await approveTableTennisParticipant(id!, playerId); break;
         case 'volleyball': await approveVolleyballParticipant(id!, playerId); break;
         case 'beach_volleyball': await approveBeachVolleyballParticipant(id!, playerId); break;
-        case 'futsal': await approveFutsalParticipant(id!, playerId); break;
+        case 'football': await approvefootballParticipant(id!, playerId); break;
         case 'basketball_3x3':
         case 'basketball3x3': await approveBasketball3x3Participant(id!, playerId); break;
         default: await approveChessParticipant(id!, playerId);
@@ -857,7 +857,7 @@ const TournamentViewPage = () => {
         case 'table_tennis': await rejectTableTennisParticipant(id!, playerId); break;
         case 'volleyball': await rejectVolleyballParticipant(id!, playerId); break;
         case 'beach_volleyball': await rejectBeachVolleyballParticipant(id!, playerId); break;
-        case 'futsal': await rejectFutsalParticipant(id!, playerId); break;
+        case 'football': await rejectfootballParticipant(id!, playerId); break;
         case 'basketball_3x3':
         case 'basketball3x3': await rejectBasketball3x3Participant(id!, playerId); break;
         default: await rejectChessParticipant(id!, playerId);
@@ -917,7 +917,7 @@ const TournamentViewPage = () => {
         case 'badminton': await registerForBadmintonEvent(id, playerId); break;
         case 'tabletennis':
         case 'table_tennis': await registerForTableTennisEvent(id, playerId); break;
-        case 'futsal': await registerForFutsalEvent(id, playerId); break;
+        case 'football': await registerForfootballEvent(id, playerId); break;
         case 'volleyball': await registerForVolleyballEvent(id, playerId); break;
         case 'basketball3x3':
         case 'basketball_3x3': await registerForBasketball3x3Event(id, playerId); break;
@@ -956,7 +956,7 @@ const TournamentViewPage = () => {
       const sportKey = data.sport.toLowerCase().replace(/-/g, '_').replace(/\s/g, '');
       setTournament({ ...data, sport: sportKey }); // Sync normalized sport back to state
 
-      if (['chess', 'checkers', 'armwrestling', 'volleyball', 'beach_volleyball', 'futsal', 'basketball_3x3', 'basketball_3x3', 'basketball3x3', 'badminton', 'table_tennis', 'tabletennis', 'athletics'].includes(sportKey)) {
+      if (['chess', 'checkers', 'armwrestling', 'volleyball', 'beach_volleyball', 'football', 'basketball_3x3', 'basketball_3x3', 'basketball3x3', 'badminton', 'table_tennis', 'tabletennis', 'athletics'].includes(sportKey)) {
         try {
           const playersGetter = getAllPlayers;
           let detailsPromise;
@@ -966,7 +966,7 @@ const TournamentViewPage = () => {
             case 'armwrestling': detailsPromise = getArmwrestlingEventById(id); break;
             case 'volleyball': detailsPromise = getVolleyballEventById(id); break;
             case 'beach_volleyball': detailsPromise = getBeachVolleyballEventById(id); break;
-            case 'futsal': detailsPromise = getFutsalEventById(id); break;
+            case 'football': detailsPromise = getfootballEventById(id); break;
             case 'basketball_3x3':
             case 'basketball3x3': detailsPromise = getBasketball3x3EventById(id); break;
             case 'badminton': detailsPromise = getBadmintonEventById(id); break;
@@ -1370,7 +1370,7 @@ const TournamentViewPage = () => {
   const totalRounds = allGamesOrMatches.reduce((acc: number, game: any) =>
     Math.max(acc, game.round || game.roundNumber || 0), 0
   );
-  const isTeamSport = !!(details as any)?.isTeam || ['futsal', 'volleyball', 'beach_volleyball', 'basketball3x3', 'basketball_3x3'].includes(tournament?.sport || '');
+  const isTeamSport = !!(details as any)?.isTeam || ['football', 'volleyball', 'beach_volleyball', 'basketball3x3', 'basketball_3x3'].includes(tournament?.sport || '');
 
   const actualParticipants = isTeamSport
     ? (details?.teams?.length || 0)
@@ -1632,7 +1632,7 @@ const TournamentViewPage = () => {
                 <i className={
                   tournament?.sport === 'checkers' ? "fas fa-braille" :
                     tournament?.sport === 'armwrestling' ? "fas fa-hand-rock" :
-                      tournament?.sport === 'futsal' ? "fas fa-futbol" :
+                      tournament?.sport === 'football' ? "fas fa-futbol" :
                         tournament?.sport === 'volleyball' || tournament?.sport === 'beach_volleyball' ? "fas fa-volleyball-ball" :
                           tournament?.sport === 'basketball_3x3' ? "fas fa-basketball-ball" :
                             tournament?.sport === 'badminton' ? "fas fa-shuttlecock" :
@@ -1876,7 +1876,7 @@ const TournamentViewPage = () => {
           </div>
 
           {(() => {
-            const mandatoryTeamSports = ['volleyball', 'beach_volleyball', 'futsal', 'basketball_3_3', 'basketball_3x3', 'basketball3x3'];
+            const mandatoryTeamSports = ['volleyball', 'beach_volleyball', 'football', 'basketball_3_3', 'basketball_3x3', 'basketball3x3'];
             const isTeam = !!(details as any)?.isTeam || mandatoryTeamSports.includes(sportKey);
 
             if (details && isTeam) {

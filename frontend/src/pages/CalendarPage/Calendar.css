@@ -237,7 +237,7 @@
 }
 
 /* Кольори спорту */
-.event-futsal { background: rgba(16, 185, 129, 0.1); color: #059669; border-left-color: #10b981; }
+.event-football { background: rgba(16, 185, 129, 0.1); color: #059669; border-left-color: #10b981; }
 .event-basketball-3x3 { background: rgba(245, 158, 11, 0.1); color: #d97706; border-left-color: #f59e0b; }
 .event-volleyball { background: rgba(59, 130, 246, 0.1); color: #2563eb; border-left-color: #3b82f6; }
 .event-beach-volleyball { background: rgba(14, 165, 233, 0.1); color: #0284c7; border-left-color: #0ea5e9; }

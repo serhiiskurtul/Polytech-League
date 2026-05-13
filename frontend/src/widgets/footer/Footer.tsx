@@ -5,7 +5,7 @@ import { Logo } from '@/shared/ui';
 const Footer = () => {
 
   const sports = [
-    { id: 'futsal', label: 'Футзал' },
+    { id: 'football', label: 'Футзал' },
     { id: 'basketball-3x3', label: 'Баскетбол 3х3' },
     { id: 'volleyball', label: 'Волейбол' },
     { id: 'beach-volleyball', label: 'Пляжний волейбол' },
@@ -30,7 +30,7 @@ const Footer = () => {
 
   const getSportIcon = (sportId: string) => {
     const icons: Record<string, string> = {
-      'futsal': 'fas fa-futbol',
+      'football': 'fas fa-futbol',
       'basketball-3x3': 'fas fa-basketball-ball',
       'volleyball': 'fas fa-volleyball-ball',
       'chess': 'fas fa-chess',

@@ -2680,8 +2680,8 @@ input:checked + .slider:before {
   border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
-/* Futsal Admin Panel (Horizontal) */
-.futsalAdminPanel {
+/* football Admin Panel (Horizontal) */
+.footballAdminPanel {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 20px;
@@ -2777,8 +2777,8 @@ input:checked + .slider:before {
   box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
 }
 
-/* Futsal Bracket & Match Cards */
-.futsalBracketWrapper {
+/* football Bracket & Match Cards */
+.footballBracketWrapper {
   padding: 40px 0;
   overflow-x: auto;
   display: flex;
@@ -2840,7 +2840,7 @@ input:checked + .slider:before {
   width: 100%;
 }
 
-.futsalMatchCard {
+.footballMatchCard {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(226, 232, 240, 0.6);
@@ -2852,7 +2852,7 @@ input:checked + .slider:before {
   transition: all 0.3s ease;
 }
 
-.futsalMatchCard:hover {
+.footballMatchCard:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
 }
@@ -2876,7 +2876,7 @@ input:checked + .slider:before {
   z-index: 5;
 }
 
-.futsalTeamRow {
+.footballTeamRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -2886,24 +2886,24 @@ input:checked + .slider:before {
   margin-bottom: 6px;
 }
 
-.futsalWinner {
+.footballWinner {
   background: #dcfce7 !important;
   border: 1px solid #86efac;
 }
 
-.futsalDraw {
+.footballDraw {
   background: #f0f9ff !important;
   border: 1px solid #bae6fd;
 }
 
-.futsalTeamName {
+.footballTeamName {
   font-size: 14px;
   font-weight: 700;
   color: #1e293b;
   display: block;
 }
 
-.futsalTeamGroup {
+.footballTeamGroup {
   font-size: 10px;
   color: #94a3b8;
   background: white;
@@ -2912,7 +2912,7 @@ input:checked + .slider:before {
   margin-left: 4px;
 }
 
-.futsalTeamScore {
+.footballTeamScore {
   font-size: 14px;
   font-weight: 800;
   color: #1e293b;
@@ -2921,20 +2921,20 @@ input:checked + .slider:before {
   gap: 6px;
 }
 
-.futsalWinner .futsalTeamName {
+.footballWinner .footballTeamName {
   color: #166534;
 }
 
-.futsalWinner .futsalTeamScore {
+.footballWinner .footballTeamScore {
   color: #15803d;
 }
 
-.futsalTeamScore i {
+.footballTeamScore i {
   font-size: 12px;
   color: #f59e0b;
 }
 
-.futsalVsDivider {
+.footballVsDivider {
   text-align: center;
   font-size: 10px;
   font-weight: 800;
@@ -2944,7 +2944,7 @@ input:checked + .slider:before {
   letter-spacing: 2px;
 }
 
-.futsalProtocolBtn {
+.footballProtocolBtn {
   width: 100%;
   margin-top: 10px;
   background: white;
@@ -2958,7 +2958,7 @@ input:checked + .slider:before {
   transition: all 0.2s;
 }
 
-.futsalProtocolBtn:hover {
+.footballProtocolBtn:hover {
   background: #f1f5f9;
   color: #3b82f6;
 }
@@ -3099,15 +3099,15 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
-.futsalAdminPanel input:checked + .sliderMini {
+.footballAdminPanel input:checked + .sliderMini {
   background-color: #3b82f6;
 }
 
-.futsalAdminPanel input:checked + .sliderMini:before {
+.footballAdminPanel input:checked + .sliderMini:before {
   transform: translateX(14px);
 }
 
-.futsalTeamHeader {
+.footballTeamHeader {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -3131,7 +3131,7 @@ input:checked + .slider:before {
   transform: scale(1.2);
 }
 
-.futsalTeamRoles {
+.footballTeamRoles {
   display: flex;
   flex-direction: column;
   gap: 2px;

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Entities.TableTennis.Enums;
 using PolytechLeague.Domain.Entities.Armwrestling.Enums;
-using PolytechLeague.Domain.Entities.Futsal.Enums;
+using PolytechLeague.Domain.Entities.Football.Enums;
 using PolytechLeague.Domain.Entities.Volleyball.Enums;
 using PolytechLeague.Domain.Entities.Enums;
 
@@ -57,9 +57,9 @@ public class PlayerDto
     public List<ArmwrestlingWeightClass> ArmwrestlingWeightClasses { get; set; } = new();
 
     // Team Sports
-    public FutsalPosition? FutsalPosition { get; set; }
-    public int? FutsalShirtNumber { get; set; }
-    public long? FutsalTeamId { get; set; }
+    public FootballPosition? FootballPosition { get; set; }
+    public int? FootballShirtNumber { get; set; }
+    public long? FootballTeamId { get; set; }
 
     public VolleyballPosition? VolleyballPosition { get; set; }
     public int? VolleyballShirtNumber { get; set; }
@@ -150,9 +150,9 @@ public static class PlayerDtoExtensions
             TableTennisHand = player.TableTennisHand,
             ArmwrestlingWeight = player.ArmwrestlingWeight,
             ArmwrestlingPreferredWeightClass = player.ArmwrestlingPreferredWeightClass,
-            FutsalPosition = player.FutsalPosition,
-            FutsalShirtNumber = player.FutsalShirtNumber,
-            FutsalTeamId = player.FutsalTeamId,
+            FootballPosition = player.FootballPosition,
+            FootballShirtNumber = player.FootballShirtNumber,
+            FootballTeamId = player.FootballTeamId,
             VolleyballPosition = player.VolleyballPosition,
             VolleyballShirtNumber = player.VolleyballShirtNumber,
             VolleyballTeamId = player.VolleyballTeamId,
@@ -204,9 +204,9 @@ public static class PlayerDtoExtensions
             TableTennisHand = dto.TableTennisHand,
             ArmwrestlingWeight = dto.ArmwrestlingWeight,
             ArmwrestlingPreferredWeightClass = dto.ArmwrestlingPreferredWeightClass,
-            FutsalPosition = dto.FutsalPosition,
-            FutsalShirtNumber = dto.FutsalShirtNumber,
-            FutsalTeamId = dto.FutsalTeamId,
+            FootballPosition = dto.FootballPosition,
+            FootballShirtNumber = dto.FootballShirtNumber,
+            FootballTeamId = dto.FootballTeamId,
             VolleyballPosition = dto.VolleyballPosition,
             VolleyballShirtNumber = dto.VolleyballShirtNumber,
             VolleyballTeamId = dto.VolleyballTeamId,

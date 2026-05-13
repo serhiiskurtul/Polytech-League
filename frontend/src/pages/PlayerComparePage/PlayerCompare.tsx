@@ -254,9 +254,9 @@ export const PlayerComparePage = () => {
                 suffix="%"
                 isBetterHigh={true}
               />
-               {/* Only show goals if both played Futsal */}
-               {player1.sportStats?.some(s => s.sportType === 'futsal') && 
-                player2?.sportStats?.some(s => s.sportType === 'futsal') && (
+               {/* Only show goals if both played football */}
+               {player1.sportStats?.some(s => s.sportType === 'football') && 
+                player2?.sportStats?.some(s => s.sportType === 'football') && (
                  <StatRow 
                    label="Забито голів" 
                    val1={player1.goalsScored} 
@@ -543,7 +543,7 @@ const translateSport = (sport: string) => {
   const translations: Record<string, string> = {
     chess: 'Шахи',
     checkers: 'Шашки',
-    futsal: 'Футзал',
+    football: 'Футзал',
     volleyball: 'Волейбол',
     basketball_3x3: 'Баскетбол 3х3',
     table_tennis: 'Настільний теніс',
@@ -627,7 +627,7 @@ const getSportIcon = (sport: string) => {
   const icons: Record<string, string> = {
     chess: 'fa-chess',
     checkers: 'fa-chess-board',
-    futsal: 'fa-soccer-ball',
+    football: 'fa-soccer-ball',
     volleyball: 'fa-volleyball',
     basketball_3x3: 'fa-basketball',
     table_tennis: 'fa-table-tennis-paddle-ball',

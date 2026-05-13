@@ -17,7 +17,7 @@ const CalendarSidebar = ({ selectedDate, monthNames, events, sportNames }: Calen
   
   const getSportClass = (sport: string) => {
     const classes: Record<string, string> = {
-      'futsal': 'event-football',
+      'football': 'event-football',
       'basketball-3x3': 'event-basketball',
       'volleyball': 'event-volleyball',
       'beach-volleyball': 'event-beach-volleyball',

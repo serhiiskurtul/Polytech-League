@@ -30,7 +30,7 @@ const getSportIcon = (type: string) => {
     case 'table_tennis': return 'fa-table-tennis';
     case 'armwrestling': return 'fa-hand-rock';
     case 'badminton': return 'fa-shuttlecock';
-    case 'futsal': return 'fa-futbol';
+    case 'football': return 'fa-futbol';
     case 'volleyball': return 'fa-volleyball-ball';
     case 'basketball_3x3': return 'fa-basketball-ball';
     case 'beach_volleyball': return 'fa-umbrella-beach';
@@ -45,7 +45,7 @@ const getSportName = (type: string) => {
     case 'table_tennis': return 'Настільний теніс';
     case 'armwrestling': return 'Армрестлинг';
     case 'badminton': return 'Бадмінтон';
-    case 'futsal': return 'Футзал';
+    case 'football': return 'Футзал';
     case 'volleyball': return 'Волейбол';
     case 'basketball_3x3': return 'Баскетбол 3x3';
     case 'beach_volleyball': return 'Пляжний волейбол';

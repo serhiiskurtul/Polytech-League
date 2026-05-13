@@ -87,7 +87,7 @@ const PlayerViewPage = () => {
     previousNames: playerProfile.previousNames,
     isFounder: playerProfile.isFounder,
     automaticBadges: playerProfile.automaticBadges,
-    futsalShirtNumber: playerProfile.futsalShirtNumber,
+    footballShirtNumber: playerProfile.footballShirtNumber,
     volleyballShirtNumber: playerProfile.volleyballShirtNumber,
     basketballShirtNumber: playerProfile.basketballShirtNumber
   };

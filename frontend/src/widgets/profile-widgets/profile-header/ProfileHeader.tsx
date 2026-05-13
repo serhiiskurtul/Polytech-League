@@ -13,7 +13,7 @@ interface UserData {
   instagramUrl?: string | null;
   photoUrl?: string | null;
   globalRank?: number;
-  futsalShirtNumber?: number | null;
+  footballShirtNumber?: number | null;
   volleyballShirtNumber?: number | null;
   basketballShirtNumber?: number | null;
   previousNames?: string | null;
@@ -176,10 +176,10 @@ const ProfileHeader = ({ userData, isAdmin, onEdit, onAvatarUpload, onLogout, on
                   </span>
                 </div>
               )}
-              {userData.futsalShirtNumber !== null && userData.futsalShirtNumber !== undefined && (
+              {userData.footballShirtNumber !== null && userData.footballShirtNumber !== undefined && (
                 <div className={styles.detailItem}>
                   <span className={styles.detailLabel}><i className="fas fa-tshirt" style={{ color: '#e11d48' }}></i> № Футзал</span>
-                  <span className={styles.detailValue} style={{ fontWeight: 'bold' }}>{userData.futsalShirtNumber}</span>
+                  <span className={styles.detailValue} style={{ fontWeight: 'bold' }}>{userData.footballShirtNumber}</span>
                 </div>
               )}
               {userData.volleyballShirtNumber !== null && userData.volleyballShirtNumber !== undefined && (

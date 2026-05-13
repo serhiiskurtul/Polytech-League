@@ -5,7 +5,7 @@ export const CATEGORIES = [
 ];
 
 export const AVAILABLE_SPORTS = [
-  { id: 'futsal', name: 'Футзал', icon: 'fas fa-futbol' },
+  { id: 'football', name: 'Футзал', icon: 'fas fa-futbol' },
   { id: 'basketball-3x3', name: 'Баскетбол 3x3', icon: 'fas fa-basketball-ball' },
   { id: 'volleyball', name: 'Волейбол', icon: 'fas fa-volleyball-ball' },
   { id: 'chess', name: 'Шахи', icon: 'fas fa-chess' },

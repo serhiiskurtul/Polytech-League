@@ -50,9 +50,9 @@ export interface PlayerDto {
     armwrestlingWeightClasses?: string[];
 
     // Team Sports
-    futsalPosition?: string | null;
-    futsalShirtNumber?: number | null;
-    futsalTeamId?: number | null;
+    footballPosition?: string | null;
+    footballShirtNumber?: number | null;
+    footballTeamId?: number | null;
 
     volleyballPosition?: string | null;
     volleyballShirtNumber?: number | null;

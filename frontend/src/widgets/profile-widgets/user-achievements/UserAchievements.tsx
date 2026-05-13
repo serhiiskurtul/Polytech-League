@@ -20,7 +20,7 @@ const UserAchievements = ({ achievements }: UserAchievementsProps) => {
     switch (sportType.toLowerCase()) {
       case 'chess': return 'fas fa-chess';
       case 'checkers': return 'fas fa-square';
-      case 'futsal': return 'fas fa-futbol';
+      case 'football': return 'fas fa-futbol';
       case 'volleyball':
       case 'beach_volleyball': return 'fas fa-volleyball-ball';
       case 'basketball_3x3': return 'fas fa-basketball-ball';

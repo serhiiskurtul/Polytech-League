@@ -27,7 +27,7 @@ interface TournamentCardProps {
 const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: TournamentCardProps) => {
   // Іконки для видів спорту
   const sportIcons: Record<string, string> = {
-    'futsal': 'fas fa-futbol',
+    'football': 'fas fa-futbol',
     'basketball-3x3': 'fas fa-basketball-ball',
     'volleyball': 'fas fa-volleyball-ball',
     'chess': 'fas fa-chess',
@@ -57,7 +57,7 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
 
   // Назви видів спорту
   const sportNames: Record<string, string> = {
-    'futsal': 'Футзал',
+    'football': 'Футзал',
     'basketball-3x3': 'Баскетбол 3х3',
     'volleyball': 'Волейбол',
     'chess': 'Шахи',

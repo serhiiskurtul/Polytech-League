@@ -5,7 +5,7 @@ import { getAllPlayers } from '@/shared/api';
 import { 
   updateVolleyballMatch, 
   updateBeachVolleyballMatch, 
-  updateFutsalMatch, 
+  updatefootballMatch, 
   updateBasketball3x3Match,
   updateBadmintonMatch,
   updateChessGame,
@@ -13,7 +13,7 @@ import {
   updateTableTennisMatch,
   createVolleyballMatch,
   createBeachVolleyballMatch,
-  createFutsalMatch,
+  createfootballMatch,
   createBasketball3x3Match,
   createBadmintonMatch,
   createChessGame,
@@ -21,7 +21,7 @@ import {
   createTableTennisMatch,
   createVolleyballTeam,
   createBeachVolleyballTeam,
-  createFutsalTeam,
+  createfootballTeam,
   createBasketball3x3Team,
   createBadmintonTeam,
   createChessTeam,
@@ -30,7 +30,7 @@ import {
   createPlayer,
   updateVolleyballTeam,
   updateBeachVolleyballTeam,
-  updateFutsalTeam,
+  updatefootballTeam,
   updateBasketball3x3Team,
   updateBadmintonTeam,
   updateChessTeam,
@@ -41,20 +41,20 @@ import {
   deleteTableTennisMatch,
   deleteVolleyballMatch,
   deleteBeachVolleyballMatch,
-  deleteFutsalMatch,
+  deletefootballMatch,
   deleteBasketball3x3Match,
   deleteBadmintonMatch,
   deleteVolleyballTeam,
   deleteBeachVolleyballTeam,
-  deleteFutsalTeam,
+  deletefootballTeam,
   deleteBasketball3x3Team,
   deleteBadmintonTeam,
   deleteChessTeam,
   deleteCheckersTeam,
   deleteTableTennisTeam,
-  approveFutsalParticipant,
-  rejectFutsalParticipant,
-  removeFutsalParticipant,
+  approvefootballParticipant,
+  rejectfootballParticipant,
+  removefootballParticipant,
   approveVolleyballParticipant,
   rejectVolleyballParticipant,
   removeVolleyballParticipant,
@@ -73,11 +73,11 @@ import {
 } from '@/shared/api';
 import { RegistrationStatus } from '@/shared/types/tournament.types';
 import TournamentPodium from './TournamentPodium';
-import FutsalBracket from './FutsalBracket';
+import footballBracket from './footballBracket';
 import styles from '../TournamentViewPage.module.css';
 import { Link } from 'react-router-dom';
 
-type Sport = 'volleyball' | 'волейбол' | 'beach_volleyball' | 'beach-volleyball' | 'пляжний_волейбол' | 'futsal' | 'футзал' | 'basketball_3x3' | 'basketball3x3' | 'basketball-3x3' | 'баскетбол_3х3' | 'badminton' | 'бадмінтон' | 'chess' | 'шахи' | 'checkers' | 'шашки' | 'tabletennis' | 'table_tennis' | 'table-tennis' | 'настільний_теніс';
+type Sport = 'volleyball' | 'волейбол' | 'beach_volleyball' | 'beach-volleyball' | 'пляжний_волейбол' | 'football' | 'футзал' | 'basketball_3x3' | 'basketball3x3' | 'basketball-3x3' | 'баскетбол_3х3' | 'badminton' | 'бадмінтон' | 'chess' | 'шахи' | 'checkers' | 'шашки' | 'tabletennis' | 'table_tennis' | 'table-tennis' | 'настільний_теніс';
 
 interface TeamSportsTournamentViewProps {
   sport: Sport;
@@ -92,7 +92,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   isAdmin,
   onRefresh
 }) => {
-  const [activeTab, setActiveTab] = useState<'standings' | 'matches' | 'teams' | 'info' | 'bracket' | 'participants'>((sport === 'futsal' || sport === 'футзал') ? 'bracket' : 'matches');
+  const [activeTab, setActiveTab] = useState<'standings' | 'matches' | 'teams' | 'info' | 'bracket' | 'participants'>((sport === 'football' || sport === 'футзал') ? 'bracket' : 'matches');
   const [allPlayers, setAllPlayers] = useState<PlayerDto[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const isRegionalOrNational = details?.level === 'Regional' || details?.level === 'National';
@@ -155,7 +155,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     switch (sport) {
       case 'volleyball': return updateVolleyballMatch;
       case 'beach_volleyball': return updateBeachVolleyballMatch;
-      case 'futsal': return updateFutsalMatch;
+      case 'football': return updatefootballMatch;
       case 'basketball_3x3': return updateBasketball3x3Match;
       case 'badminton': return updateBadmintonMatch;
       case 'chess': return updateChessGame;
@@ -222,7 +222,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           eventId: details.id,
           homeTeamId: match.homeTeamId,
           awayTeamId: match.awayTeamId,
-          homeTeamScore: finalHomeScore, // For Futsal, Basketball, Table Tennis
+          homeTeamScore: finalHomeScore, // For football, Basketball, Table Tennis
           awayTeamScore: finalAwayScore,
           homeScore: finalHomeScore,     // For Badminton
           awayScore: finalAwayScore,
@@ -309,7 +309,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       };
 
 
-      await updateFutsalMatch(selectedMatchForScorers.id, payload);
+      await updatefootballMatch(selectedMatchForScorers.id, payload);
       setIsScorersModalOpen(false);
       onRefresh();
     } catch (err) {
@@ -328,7 +328,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       switch (sport) {
         case 'volleyball': deleteApi = deleteVolleyballMatch; break;
         case 'beach_volleyball': deleteApi = deleteBeachVolleyballMatch; break;
-        case 'futsal': deleteApi = deleteFutsalMatch; break;
+        case 'football': deleteApi = deletefootballMatch; break;
         case 'basketball_3x3': deleteApi = (id: number) => deleteBasketball3x3Match(id); break;
         case 'badminton': deleteApi = deleteBadmintonMatch; break;
         case 'chess': deleteApi = (id: number) => deleteChessGame(id, details.id); break;
@@ -352,7 +352,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     switch (sport) {
       case 'volleyball': return updateVolleyballTeam;
       case 'beach_volleyball': return updateBeachVolleyballTeam;
-      case 'futsal': return updateFutsalTeam;
+      case 'football': return updatefootballTeam;
       case 'basketball_3x3': return updateBasketball3x3Team;
       case 'badminton': return updateBadmintonTeam;
       case 'chess': return updateChessTeam;
@@ -533,7 +533,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       switch (sport) {
         case 'volleyball': createApi = createVolleyballMatch; break;
         case 'beach_volleyball': createApi = createBeachVolleyballMatch; break;
-        case 'futsal': createApi = createFutsalMatch; break;
+        case 'football': createApi = createfootballMatch; break;
         case 'basketball_3x3': createApi = createBasketball3x3Match; break;
         case 'badminton': 
           createApi = createBadmintonMatch; 
@@ -607,7 +607,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       switch (sport) {
         case 'volleyball': createApi = createVolleyballTeam; break;
         case 'beach_volleyball': createApi = createBeachVolleyballTeam; break;
-        case 'futsal': createApi = createFutsalTeam; break;
+        case 'football': createApi = createfootballTeam; break;
         case 'basketball_3x3': createApi = createBasketball3x3Team; break;
         case 'badminton': createApi = createBadmintonTeam; break;
         case 'chess': createApi = createChessTeam; break;
@@ -655,14 +655,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     try {
       let approveApi;
       switch (sport) {
-        case 'futsal': approveApi = approveFutsalParticipant; break;
+        case 'football': approveApi = approvefootballParticipant; break;
         case 'volleyball': approveApi = approveVolleyballParticipant; break;
         case 'beach_volleyball': approveApi = approveBeachVolleyballParticipant; break;
         case 'basketball_3x3': approveApi = approveBasketball3x3Participant; break;
         case 'badminton': approveApi = approveBadmintonParticipant; break;
         case 'table_tennis':
         case 'tabletennis': approveApi = approveTableTennisParticipant; break;
-        default: approveApi = approveFutsalParticipant;
+        default: approveApi = approvefootballParticipant;
       }
       await approveApi(details.id, playerId);
       onRefresh();
@@ -676,14 +676,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     try {
       let rejectApi;
       switch (sport) {
-        case 'futsal': rejectApi = rejectFutsalParticipant; break;
+        case 'football': rejectApi = rejectfootballParticipant; break;
         case 'volleyball': rejectApi = rejectVolleyballParticipant; break;
         case 'beach_volleyball': rejectApi = rejectBeachVolleyballParticipant; break;
         case 'basketball_3x3': rejectApi = rejectBasketball3x3Participant; break;
         case 'badminton': rejectApi = rejectBadmintonParticipant; break;
         case 'table_tennis':
         case 'tabletennis': rejectApi = rejectTableTennisParticipant; break;
-        default: rejectApi = rejectFutsalParticipant;
+        default: rejectApi = rejectfootballParticipant;
       }
       await rejectApi(details.id, playerId);
       onRefresh();
@@ -698,14 +698,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     try {
       let removeApi;
       switch (sport) {
-        case 'futsal': removeApi = removeFutsalParticipant; break;
+        case 'football': removeApi = removefootballParticipant; break;
         case 'volleyball': removeApi = removeVolleyballParticipant; break;
         case 'beach_volleyball': removeApi = removeBeachVolleyballParticipant; break;
         case 'basketball_3x3': removeApi = removeBasketball3x3Participant; break;
         case 'badminton': removeApi = removeBadmintonParticipant; break;
         case 'table_tennis':
         case 'tabletennis': removeApi = removeTableTennisParticipant; break;
-        default: removeApi = removeFutsalParticipant;
+        default: removeApi = removefootballParticipant;
       }
       await removeApi(details.id, playerId);
       onRefresh();
@@ -822,7 +822,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       switch (sport) {
         case 'volleyball': deleteApi = deleteVolleyballTeam; break;
         case 'beach_volleyball': deleteApi = deleteBeachVolleyballTeam; break;
-        case 'futsal': deleteApi = deleteFutsalTeam; break;
+        case 'football': deleteApi = deletefootballTeam; break;
         case 'basketball_3x3': deleteApi = deleteBasketball3x3Team; break;
         case 'badminton': deleteApi = deleteBadmintonTeam; break;
         case 'chess': deleteApi = deleteChessTeam; break;
@@ -850,7 +850,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
   const getEligibleTeams = (stage: string) => {
     const allTeams = details.teams || [];
-    if (!useStrictFiltering || sport !== 'futsal') return allTeams;
+    if (!useStrictFiltering || sport !== 'football') return allTeams;
     
     const currentStageIdx = STAGE_ORDER.indexOf(stage);
     if (currentStageIdx <= 0) return allTeams;
@@ -891,7 +891,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       case 'beach_volleyball':
       case 'beach-volleyball':
       case 'пляжний_волейбол': return 'Пляжний Волейбол';
-      case 'futsal':
+      case 'football':
       case 'футзал': return 'Футзал';
       case 'basketball_3x3':
       case 'basketball3x3':
@@ -924,11 +924,11 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           <i className="fas fa-trophy"></i> {getSportLabel()}
         </div>
         <div className={styles.tabsNav}>
-          {!(sport === 'futsal' || sport === 'футзал') && (
+          {!(sport === 'football' || sport === 'футзал') && (
             <button className={activeTab === 'matches' ? styles.activeTab : ''} onClick={() => setActiveTab('matches')}>Матчі</button>
           )}
           <button className={activeTab === 'standings' ? styles.activeTab : ''} onClick={() => setActiveTab('standings')}>Таблиця</button>
-          {(sport === 'futsal' || sport === 'футзал') && (
+          {(sport === 'football' || sport === 'футзал') && (
             <button className={activeTab === 'bracket' ? styles.activeTab : ''} onClick={() => setActiveTab('bracket')}>Сітка</button>
           )}
           <button className={activeTab === 'teams' ? styles.activeTab : ''} onClick={() => setActiveTab('teams')}>Команди</button>
@@ -978,9 +978,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
       {/* Main Content Areas */}
       <div className={styles.tabContent}>
-        {/* Futsal Admin Panel (Horizontal) */}
-        {isAdmin && activeTab === 'bracket' && (sport === 'futsal' || sport === 'футзал') && (
-            <div className={styles.futsalAdminPanel}>
+        {/* football Admin Panel (Horizontal) */}
+        {isAdmin && activeTab === 'bracket' && (sport === 'football' || sport === 'футзал') && (
+            <div className={styles.footballAdminPanel}>
                 <div className={styles.panelHeader}>
                     <i className="fas fa-plus-circle"></i> Додати новий поєдинок
                 </div>
@@ -1170,7 +1170,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
                   {isAdmin && (
                     <div className={styles.matchActions}>
-                      {(sport === 'futsal' || sport === 'футзал') && (
+                      {(sport === 'football' || sport === 'футзал') && (
                         <button 
                           className={styles.scorersBtn}
                           onClick={() => handleOpenScorers(match)}
@@ -1205,7 +1205,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                            )}
                            {match.goals?.filter((g: any) => match.homeRoster?.some((p: any) => p.id === g.playerId)).map((g: any) => (
                               <span key={g.id} className={styles.scorerItem}>
-                                {g.player?.futsalShirtNumber ? `№${g.player.futsalShirtNumber} ` : ''}{g.player?.lastName} ({g.goalsCount})
+                                {g.player?.footballShirtNumber ? `№${g.player.footballShirtNumber} ` : ''}{g.player?.lastName} ({g.goalsCount})
                               </span>
                            ))}
                         </div>
@@ -1222,7 +1222,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                            )}
                            {match.goals?.filter((g: any) => match.awayRoster?.some((p: any) => p.id === g.playerId)).map((g: any) => (
                               <span key={g.id} className={styles.scorerItem}>
-                                {g.player?.futsalShirtNumber ? `№${g.player.futsalShirtNumber} ` : ''}{g.player?.lastName} ({g.goalsCount})
+                                {g.player?.footballShirtNumber ? `№${g.player.footballShirtNumber} ` : ''}{g.player?.lastName} ({g.goalsCount})
                               </span>
                            ))}
                         </div>
@@ -1349,8 +1349,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           </div>
         )}
 
-        {activeTab === 'bracket' && (sport === 'futsal' || sport === 'футзал') && (
-          <FutsalBracket 
+        {activeTab === 'bracket' && (sport === 'football' || sport === 'футзал') && (
+          <footballBracket 
             matches={details.matches || details.games || []}
             isAdmin={isAdmin}
             onDeleteMatch={handleDeleteMatch}
@@ -1546,7 +1546,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   </div>
                 </div>
 
-                {(sport === 'futsal' || sport === 'футзал') && (
+                {(sport === 'football' || sport === 'футзал') && (
                   <div className={styles.formGroup} style={{ marginBottom: '20px' }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#64748b' }}>
                       <i className="fas fa-filter"></i> Розумна фільтрація
@@ -1698,7 +1698,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                                         <span className={styles.pGroup}>{player.group}</span>
                                     </div>
                                     <div className={styles.pickStatus}>
-                                        {(isSelected && (sport === 'futsal' || sport === 'футзал')) && (
+                                        {(isSelected && (sport === 'football' || sport === 'футзал')) && (
                                           <div className={styles.roleToggles}>
                                             <button 
                                               className={`${styles.roleToggleBtn} ${team?.captainId === player.id ? styles.isCaptain : ''}`}
@@ -1737,7 +1737,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                                     <span className={styles.pGroup}>{player.group}</span>
                                 </div>
                                 <div className={styles.pickStatus}>
-                                   {((sport === 'futsal' || sport === 'футзал')) && (
+                                   {((sport === 'football' || sport === 'футзал')) && (
                                       <div className={styles.roleToggles}>
                                         {details?.teams?.find((t: any) => t.id === editingTeamId)?.captainId === player.id && (
                                           <span className={styles.isCaptain} title="Капітан"><i className="fas fa-copyright"></i></span>
@@ -1892,7 +1892,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                             : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players || []
                         ).map((p: any) => (
                           <option key={p.id} value={p.id}>
-                            {p.futsalShirtNumber ? `№${p.futsalShirtNumber} ` : ''}{p.lastName} {p.firstName}
+                            {p.footballShirtNumber ? `№${p.footballShirtNumber} ` : ''}{p.lastName} {p.firstName}
                           </option>
                         ))}
                       </select>
@@ -1909,7 +1909,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                             : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players || []
                         ).map((p: any) => (
                           <option key={p.id} value={p.id}>
-                            {p.futsalShirtNumber ? `№${p.futsalShirtNumber} ` : ''}{p.lastName} {p.firstName}
+                            {p.footballShirtNumber ? `№${p.footballShirtNumber} ` : ''}{p.lastName} {p.firstName}
                           </option>
                         ))}
                       </select>
@@ -1922,7 +1922,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                     ).map((player: any) => (
                       <div key={player.id} className={styles.scorerInputItem}>
                         <span className={styles.playerNameMini}>
-                          {player.futsalShirtNumber ? `№${player.futsalShirtNumber} ` : ''}
+                          {player.footballShirtNumber ? `№${player.footballShirtNumber} ` : ''}
                           {player.lastName} {player.firstName[0]}.
                         </span>
                         <input 
@@ -1961,7 +1961,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                             : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players || []
                         ).map((p: any) => (
                           <option key={p.id} value={p.id}>
-                            {p.futsalShirtNumber ? `№${p.futsalShirtNumber} ` : ''}{p.lastName} {p.firstName}
+                            {p.footballShirtNumber ? `№${p.footballShirtNumber} ` : ''}{p.lastName} {p.firstName}
                           </option>
                         ))}
                       </select>
@@ -1978,7 +1978,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                             : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players || []
                         ).map((p: any) => (
                           <option key={p.id} value={p.id}>
-                            {p.futsalShirtNumber ? `№${p.futsalShirtNumber} ` : ''}{p.lastName} {p.firstName}
+                            {p.footballShirtNumber ? `№${p.footballShirtNumber} ` : ''}{p.lastName} {p.firstName}
                           </option>
                         ))}
                       </select>
@@ -1991,7 +1991,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                     ).map((player: any) => (
                       <div key={player.id} className={styles.scorerInputItem}>
                         <span className={styles.playerNameMini}>
-                          {player.futsalShirtNumber ? `№${player.futsalShirtNumber} ` : ''}
+                          {player.footballShirtNumber ? `№${player.footballShirtNumber} ` : ''}
                           {player.lastName} {player.firstName[0]}.
                         </span>
                         <input 

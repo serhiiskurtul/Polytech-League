@@ -27,7 +27,7 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
     bio: initialData.bio || '',
     instagramUrl: initialData.instagramUrl || '',
     isExternal: initialData.isExternal || false,
-    futsalShirtNumber: initialData.futsalShirtNumber !== null && initialData.futsalShirtNumber !== undefined ? initialData.futsalShirtNumber : '',
+    footballShirtNumber: initialData.footballShirtNumber !== null && initialData.footballShirtNumber !== undefined ? initialData.footballShirtNumber : '',
     volleyballShirtNumber: initialData.volleyballShirtNumber !== null && initialData.volleyballShirtNumber !== undefined ? initialData.volleyballShirtNumber : '',
     basketballShirtNumber: initialData.basketballShirtNumber !== null && initialData.basketballShirtNumber !== undefined ? initialData.basketballShirtNumber : '',
     previousNames: initialData.previousNames || '',
@@ -49,7 +49,7 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
         bio: initialData.bio || '',
         instagramUrl: initialData.instagramUrl || '',
         isExternal: initialData.isExternal || false,
-        futsalShirtNumber: initialData.futsalShirtNumber !== null && initialData.futsalShirtNumber !== undefined ? initialData.futsalShirtNumber : '',
+        footballShirtNumber: initialData.footballShirtNumber !== null && initialData.footballShirtNumber !== undefined ? initialData.footballShirtNumber : '',
         volleyballShirtNumber: initialData.volleyballShirtNumber !== null && initialData.volleyballShirtNumber !== undefined ? initialData.volleyballShirtNumber : '',
         basketballShirtNumber: initialData.basketballShirtNumber !== null && initialData.basketballShirtNumber !== undefined ? initialData.basketballShirtNumber : '',
         previousNames: initialData.previousNames || '',
@@ -90,7 +90,7 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
     const sanitizedData = {
       ...formData,
       studentId: formData.studentId.toUpperCase(),
-      futsalShirtNumber: (formData.futsalShirtNumber === '' || formData.futsalShirtNumber === null) ? null : parseInt(formData.futsalShirtNumber.toString()),
+      footballShirtNumber: (formData.footballShirtNumber === '' || formData.footballShirtNumber === null) ? null : parseInt(formData.footballShirtNumber.toString()),
       volleyballShirtNumber: (formData.volleyballShirtNumber === '' || formData.volleyballShirtNumber === null) ? null : parseInt(formData.volleyballShirtNumber.toString()),
       basketballShirtNumber: (formData.basketballShirtNumber === '' || formData.basketballShirtNumber === null) ? null : parseInt(formData.basketballShirtNumber.toString()),
     };
@@ -263,18 +263,18 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
             </div>
             
             {/* Conditional Shirt Numbers based on participation */}
-            {(initialData.sports?.includes('futsal') || 
+            {(initialData.sports?.includes('football') || 
               initialData.sports?.includes('volleyball') || 
               initialData.sports?.includes('basketball_3x3')) && (
               <div className={styles.shirtNumbersGrid}>
-                {initialData.sports?.includes('futsal') && (
+                {initialData.sports?.includes('football') && (
                   <div className={styles.formGroup}>
-                    <label htmlFor="futsalShirtNumber">Номер у футзалі</label>
+                    <label htmlFor="footballShirtNumber">Номер у футзалі</label>
                     <input
                       type="number"
-                      id="futsalShirtNumber"
-                      name="futsalShirtNumber"
-                      value={formData.futsalShirtNumber}
+                      id="footballShirtNumber"
+                      name="footballShirtNumber"
+                      value={formData.footballShirtNumber}
                       onChange={handleChange}
                       placeholder="№"
                     />
