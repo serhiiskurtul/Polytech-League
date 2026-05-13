@@ -318,16 +318,26 @@ public class PlayerService : IPlayerService
             var arm2S = await _dbContext.ArmwrestlingMatches.Where(g => eventIds.Contains(g.EventId) && playerIds.Contains(g.Player2Id)).GroupBy(g => g.Player2Id).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
             var bad1S = await _dbContext.BadmintonMatches.Where(g => eventIds.Contains(g.EventId) && g.Player1Id != null && playerIds.Contains(g.Player1Id.Value)).GroupBy(g => g.Player1Id).Select(g => new { Id = g.Key!.Value, Count = g.Count(), Wins = g.Count(x => x.WinnerPlayerId == g.Key) }).ToListAsync(cancellationToken);
             var bad2S = await _dbContext.BadmintonMatches.Where(g => eventIds.Contains(g.EventId) && g.Player2Id != null && playerIds.Contains(g.Player2Id.Value)).GroupBy(g => g.Player2Id).Select(g => new { Id = g.Key!.Value, Count = g.Count(), Wins = g.Count(x => x.WinnerPlayerId == g.Key) }).ToListAsync(cancellationToken);
-            var goalsS = await _dbContext.FootballGoals
-                .Include(g => g.Match)
-                    .ThenInclude(m => m.Event)
-                .Where(g => playerIds.Contains(g.PlayerId) && g.Match != null && eventIds.Contains(g.Match.EventId))
+            var goalsSQuery = _dbContext.FootballGoals.AsQueryable();
+            if (seasonId != null)
+            {
+                goalsSQuery = goalsSQuery.Where(g => g.Match != null && eventIds.Contains(g.Match.EventId));
+            }
+
+            var goalsS = await goalsSQuery
+                .Where(g => playerIds.Contains(g.PlayerId))
                 .GroupBy(g => g.PlayerId)
                 .Select(g => new { Id = g.Key, Goals = g.Sum(x => x.GoalsCount) })
                 .ToListAsync(cancellationToken);
-            var cardsS = await _dbContext.FootballCards
-                .Include(c => c.Match)
-                .Where(c => playerIds.Contains(c.PlayerId) && c.Match != null && eventIds.Contains(c.Match.EventId))
+            
+            var cardsSQuery = _dbContext.FootballCards.AsQueryable();
+            if (seasonId != null)
+            {
+                cardsSQuery = cardsSQuery.Where(c => c.Match != null && eventIds.Contains(c.Match.EventId));
+            }
+            
+            var cardsS = await cardsSQuery
+                .Where(c => playerIds.Contains(c.PlayerId))
                 .Select(c => new { c.PlayerId, c.Type })
                 .ToListAsync(cancellationToken);
 
@@ -631,7 +641,7 @@ public class PlayerService : IPlayerService
                 }
                 dto.MatchesPlayed = played;
                 dto.WinsCount = won;
-                dto.GoalsScored = pGoals;
+                dto.GoalsCount = pGoals;
                 dto.PerformanceScore = (int)Math.Round(totalScore);
                 dto.SportStats = sportStatsMap.Values.ToList();
                 dto.PointsBreakdown = pointsBreakdown.OrderByDescending(x => x.Points).ToList();
@@ -1033,7 +1043,7 @@ public class PlayerService : IPlayerService
                 Category = "Goals"
             });
         }
-        dto.GoalsScored = FootballGoals;
+        dto.GoalsCount = FootballGoals;
         dto.PerformanceScore = (int)Math.Round(totalScore);
         dto.PointsBreakdown = pointsBreakdown.OrderByDescending(x => x.Points).ToList();
     }
@@ -1243,6 +1253,35 @@ public class PlayerService : IPlayerService
         // Football Goals
         var goals = await _dbContext.FootballGoals.Where(g => g.PlayerId == sourceId).ToListAsync(cancellationToken);
         foreach (var g in goals) g.PlayerId = targetId;
+        
+        // Football Cards
+        var cards = await _dbContext.FootballCards.Where(c => c.PlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var c in cards) c.PlayerId = targetId;
+
+        // Football Event Participants
+        var footballParts = await _dbContext.FootballEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var p in footballParts) p.PlayerId = targetId;
+
+        // Athletics Results
+        var athleticsResults = await _dbContext.AthleticsResults.Where(r => r.PlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var r in athleticsResults) r.PlayerId = targetId;
+
+        // Volleyball Event Participants
+        var volleyParts = await _dbContext.VolleyballEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var p in volleyParts) p.PlayerId = targetId;
+
+        // Basketball Event Participants
+        var bballParts = await _dbContext.Basketball3x3EventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var p in bballParts) p.PlayerId = targetId;
+
+        // Beach Volleyball Event Participants
+        var beachVParts = await _dbContext.BeachVolleyballEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var p in beachVParts) p.PlayerId = targetId;
+
+        // Badminton Event Participants
+        var badParts = await _dbContext.BadmintonEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var p in badParts) p.PlayerId = targetId;
+
         // General Event Winners
         var events1 = await _dbContext.Set<Event>().Where(e => e.FirstPlaceId == sourceId).ToListAsync(cancellationToken);
         foreach (var e in events1) e.FirstPlaceId = targetId;
@@ -1632,22 +1671,22 @@ public class PlayerService : IPlayerService
 
         try
         {
-        try {
-            _logger.LogInformation("[DEBUG] PopulateFootballStatsAsync for Player ID: {PlayerId}, User ID: {UserId}", dto.Id, dto.UserId);
+            var playerId = dto.Id.Value;
+            _logger.LogInformation("[DEBUG] PopulateFootballStatsAsync for Player ID: {PlayerId}, User ID: {UserId}", playerId, dto.UserId);
             
             var goals = await _dbContext.FootballGoals
-                .Where(g => g.PlayerId == dto.Id)
+                .Where(g => g.PlayerId == playerId)
                 .SumAsync(g => (int?)g.GoalsCount, cancellationToken) ?? 0;
             
             int yellowCards = await _dbContext.FootballCards
-                .CountAsync(c => c.PlayerId == dto.Id && c.Type == FootballCardType.Yellow, cancellationToken);
+                .CountAsync(c => c.PlayerId == playerId && c.Type == FootballCardType.Yellow, cancellationToken);
                 
             int redCards = await _dbContext.FootballCards
-                .CountAsync(c => c.PlayerId == dto.Id && c.Type == FootballCardType.Red, cancellationToken);
+                .CountAsync(c => c.PlayerId == playerId && c.Type == FootballCardType.Red, cancellationToken);
 
-            _logger.LogInformation("[DEBUG] FOUND {Yellow} yellow and {Red} red cards for player {Id}", yellowCards, redCards, dto.Id);
+            _logger.LogInformation("[DEBUG] FOUND {Yellow} yellow and {Red} red cards for player {Id}", yellowCards, redCards, playerId);
 
-            dto.GoalsScored = goals;
+            dto.GoalsCount = goals;
             dto.YellowCardsCount = yellowCards;
             dto.RedCardsCount = redCards;
 
@@ -1658,7 +1697,7 @@ public class PlayerService : IPlayerService
 
             if (isFootballer)
             {
-                var footballStats = dto.SportStats?.FirstOrDefault(s => s.SportType == "football");
+                var footballStats = dto.SportStats?.FirstOrDefault(s => s.SportType.Equals("football", StringComparison.OrdinalIgnoreCase));
                 if (footballStats == null)
                 {
                     footballStats = new SportStatsDto { SportType = "football" };
@@ -1669,9 +1708,6 @@ public class PlayerService : IPlayerService
                 footballStats.YellowCardsCount = yellowCards;
                 footballStats.RedCardsCount = redCards;
             }
-        } catch (Exception ex) {
-            _logger.LogError(ex, "Error populating football stats for player {PlayerId}", dto.Id);
-        }
         }
         catch (Exception ex)
         {

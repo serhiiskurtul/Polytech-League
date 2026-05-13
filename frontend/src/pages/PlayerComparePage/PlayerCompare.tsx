@@ -78,7 +78,7 @@ export const PlayerComparePage = () => {
               performanceScore: rankingInfo.performanceScore,
               matchesPlayed: rankingInfo.matchesPlayed,
               winsCount: rankingInfo.winsCount,
-              goalsScored: rankingInfo.goalsScored,
+              goalsCount: rankingInfo.goalsCount,
               yellowCardsCount: rankingInfo.yellowCardsCount,
               redCardsCount: rankingInfo.redCardsCount,
               competitionsCount: rankingInfo.competitionsCount,
@@ -91,7 +91,7 @@ export const PlayerComparePage = () => {
             performanceScore: 0,
             matchesPlayed: 0,
             winsCount: 0,
-            goalsScored: 0,
+            goalsCount: 0,
             yellowCardsCount: 0,
             redCardsCount: 0,
             competitionsCount: 0,
@@ -261,14 +261,14 @@ export const PlayerComparePage = () => {
                {/* Only show goals if both played football */}
                {(player1.sportStats?.some(s => s.sportType === 'football') || 
                  player2?.sportStats?.some(s => s.sportType === 'football') ||
-                 (player1.goalsScored || 0) > 0 || (player2?.goalsScored || 0) > 0 ||
+                (player1.goalsCount || 0) > 0 || (player2?.goalsCount || 0) > 0 ||
                  (player1.yellowCardsCount || 0) > 0 || (player2?.yellowCardsCount || 0) > 0 ||
                  (player1.redCardsCount || 0) > 0 || (player2?.redCardsCount || 0) > 0) && (
                   <>
                     <StatRow 
                       label="Забито голів" 
-                      val1={player1.goalsScored} 
-                      val2={player2?.goalsScored}
+                      val1={player1.goalsCount} 
+                      val2={player2?.goalsCount}
                     />
                     <StatRow 
                       label="Жовті картки" 

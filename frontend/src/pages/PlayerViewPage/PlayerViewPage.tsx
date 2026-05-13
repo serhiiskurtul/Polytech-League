@@ -98,7 +98,7 @@ const PlayerViewPage = () => {
     matchesPlayed: playerProfile.matchesPlayed || 0,
     wins: playerProfile.winsCount || 0,
     eloRating: playerProfile.chessRating || 0,
-    goalsScored: playerProfile.goalsScored || 0,
+    goalsCount: playerProfile.goalsCount || 0,
     competitionsCount: playerProfile.competitionsCount || 0,
     globalRank: playerProfile.globalRank,
     sportStats: playerProfile.sportStats,
@@ -141,7 +141,7 @@ const PlayerViewPage = () => {
         performanceScore, 
         winsCount, 
         matchesPlayed, 
-        goalsScored,
+        goalsCount,
         sports,
         armwrestlingWeightClasses,
         ...updatableFields 

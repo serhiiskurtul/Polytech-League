@@ -156,7 +156,7 @@ const PlayersRatingPage = () => {
     // Sorting
     return result.sort((a, b) => {
       if (activeTab.toLowerCase() === 'football' && sortBy === 'goals') {
-        return (b.goalsScored || 0) - (a.goalsScored || 0);
+        return (b.goalsCount || 0) - (a.goalsCount || 0);
       }
       
       if (activeTab !== 'Загальний') {
@@ -426,7 +426,7 @@ const PlayersRatingPage = () => {
                             </div>
                             {(activeTab.toLowerCase() === 'football' || (activeTab === 'Загальний' && player.sports?.includes('football'))) && (
                               <div className={`${styles.statMiniItem} ${sortBy === 'goals' ? styles.highlightStat : ''}`}>
-                                <span className={styles.statMiniVal}>{player.goalsScored || 0}</span> голів
+                                <span className={styles.statMiniVal}>{player.goalsCount || 0}</span> голів
                               </div>
                             )}
                             <div className={styles.statMiniItem}>

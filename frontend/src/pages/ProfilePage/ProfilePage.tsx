@@ -28,7 +28,7 @@ interface Stats {
   matchesPlayed: number;
   wins: number;
   eloRating: number;
-  goalsScored: number;
+  goalsCount: number;
   chessTotalPoints?: number | null;
   chessTotalPossiblePoints?: number | null;
   isChessUndefeatedFourSeasons?: boolean;
@@ -137,7 +137,7 @@ const ProfilePage = () => {
     wins: playerProfile?.winsCount || 0,
     competitionsCount: playerProfile?.competitionsCount || 0,
     eloRating: playerProfile?.chessRating || 0,
-    goalsCount: playerProfile?.goalsScored || 0,
+    goalsCount: playerProfile?.goalsCount || 0,
     globalRank: playerProfile?.globalRank,
     sportStats: playerProfile?.sportStats,
     chessTotalPoints: playerProfile?.chessTotalPoints,

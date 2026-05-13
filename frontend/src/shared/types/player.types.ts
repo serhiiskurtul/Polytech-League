@@ -67,7 +67,7 @@ export interface PlayerDto {
     achievements?: AchievementDto[];
     matchesPlayed?: number;
     winsCount?: number;
-    goalsScored?: number;
+    goalsCount?: number;
     yellowCardsCount?: number;
     redCardsCount?: number;
     performanceScore?: number;

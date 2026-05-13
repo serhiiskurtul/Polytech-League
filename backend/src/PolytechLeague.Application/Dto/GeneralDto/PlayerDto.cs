@@ -80,7 +80,7 @@ public class PlayerDto
     // Stats
     public int MatchesPlayed { get; set; }
     public int WinsCount { get; set; }
-    public int GoalsScored { get; set; }
+    public int GoalsCount { get; set; }
     public int YellowCardsCount { get; set; }
     public int RedCardsCount { get; set; }
     public int PerformanceScore { get; set; }
@@ -170,7 +170,7 @@ public static class PlayerDtoExtensions
             Achievements = new List<AchievementDto>(),
             MatchesPlayed = 0,
             WinsCount = 0,
-            GoalsScored = 0,
+            GoalsCount = 0,
             YellowCardsCount = 0,
             RedCardsCount = 0,
             PerformanceScore = 0,
