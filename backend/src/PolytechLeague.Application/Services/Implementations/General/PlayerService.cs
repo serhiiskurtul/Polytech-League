@@ -312,6 +312,12 @@ public class PlayerService : IPlayerService
                 .GroupBy(g => g.PlayerId)
                 .Select(g => new { Id = g.Key, Goals = g.Sum(x => x.GoalsCount) })
                 .ToListAsync(cancellationToken);
+            var cardsS = await _dbContext.FootballCards
+                .Include(c => c.Match)
+                .Where(c => playerIds.Contains(c.PlayerId) && c.Match != null && eventIds.Contains(c.Match.EventId))
+                .GroupBy(c => new { c.PlayerId, c.Type })
+                .Select(g => new { PlayerId = g.Key.PlayerId, Type = g.Key.Type, Count = g.Count() })
+                .ToListAsync(cancellationToken);
 
             // Optimized Team Sports Match Stats loading (pre-calculate stats per player)
             var FootballHomeStats = await _dbContext.FootballMatches.Where(m => eventIds.Contains(m.EventId))
@@ -571,6 +577,17 @@ public class PlayerService : IPlayerService
                         Category = "Goals",
                         SportType = "Football"
                     });
+                }
+                var pYellow = cardsS.Where(x => x.PlayerId == playerId && x.Type == FootballCardType.Yellow).Sum(x => x.Count);
+                var pRed = cardsS.Where(x => x.PlayerId == playerId && x.Type == FootballCardType.Red).Sum(x => x.Count);
+                if (pYellow > 0 || pRed > 0)
+                {
+                    if (!sportStatsMap.ContainsKey("Football")) sportStatsMap["Football"] = new SportStatsDto { SportType = "Football" };
+                    var s = sportStatsMap["Football"];
+                    s.YellowCardsCount = pYellow;
+                    s.RedCardsCount = pRed;
+                    dto.YellowCardsCount = pYellow;
+                    dto.RedCardsCount = pRed;
                 }
                 dto.MatchesPlayed = played;
                 dto.WinsCount = won;

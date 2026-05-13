@@ -19,6 +19,8 @@ public class FootballMatchRequest
     public long? HomeCaptainId { get; set; }
     public long? AwayCaptainId { get; set; }
     public ICollection<FootballGoalRequest>? Goals { get; set; }
+    public ICollection<FootballCardRequest>? YellowCards { get; set; }
+    public ICollection<FootballCardRequest>? RedCards { get; set; }
 }
 
 public class FootballMatchResponse
@@ -52,6 +54,8 @@ public class FootballMatchResponse
     public long? AwayCaptainId { get; set; }
     public PlayerDto? AwayCaptain { get; set; }
     public ICollection<FootballGoalResponse>? Goals { get; set; }
+    public ICollection<FootballCardResponse>? YellowCards { get; set; }
+    public ICollection<FootballCardResponse>? RedCards { get; set; }
 }
 
 public static class FootballMatchDtoExtensions
@@ -73,7 +77,10 @@ public static class FootballMatchDtoExtensions
             AwayGoalkeeperId = request.AwayGoalkeeperId,
             HomeCaptainId = request.HomeCaptainId,
             AwayCaptainId = request.AwayCaptainId,
-            Goals = request.Goals?.Select(g => g.FromRequest(0)).ToList() // MatchId will be set in service
+            Goals = request.Goals?.Select(g => g.FromRequest(0)).ToList(),
+            Cards = (request.YellowCards?.Select(c => c.FromRequest(0, FootballCardType.Yellow)) ?? Enumerable.Empty<FootballCard>())
+                .Concat(request.RedCards?.Select(c => c.FromRequest(0, FootballCardType.Red)) ?? Enumerable.Empty<FootballCard>())
+                .ToList()
         };
     }
 
@@ -102,7 +109,9 @@ public static class FootballMatchDtoExtensions
             HomeCaptain = entity.HomeCaptain?.ToDto(),
             AwayCaptainId = entity.AwayCaptainId,
             AwayCaptain = entity.AwayCaptain?.ToDto(),
-            Goals = entity.Goals?.Select(g => g.ToResponse()).ToList()
+            Goals = entity.Goals?.Select(g => g.ToResponse()).ToList(),
+            YellowCards = entity.Cards?.Where(c => c.Type == FootballCardType.Yellow).Select(c => c.ToResponse()).ToList(),
+            RedCards = entity.Cards?.Where(c => c.Type == FootballCardType.Red).Select(c => c.ToResponse()).ToList()
         };
     }
 }

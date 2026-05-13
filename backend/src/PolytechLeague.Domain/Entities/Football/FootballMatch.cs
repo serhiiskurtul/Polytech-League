@@ -30,6 +30,7 @@ public class FootballMatch
     public ICollection<long>? AwayRosterIds { get; set; }
 
     public virtual ICollection<FootballGoal>? Goals { get; set; }
+    public virtual ICollection<FootballCard>? Cards { get; set; }
     
     public long? HomeGoalkeeperId { get; set; }
     public Player? HomeGoalkeeper { get; set; }

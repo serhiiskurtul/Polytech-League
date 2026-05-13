@@ -81,6 +81,8 @@ public class PlayerDto
     public int MatchesPlayed { get; set; }
     public int WinsCount { get; set; }
     public int GoalsScored { get; set; }
+    public int YellowCardsCount { get; set; }
+    public int RedCardsCount { get; set; }
     public int PerformanceScore { get; set; }
     public int GlobalRank { get; set; }
     public int CompetitionsCount { get; set; }
@@ -103,6 +105,8 @@ public class SportStatsDto
     public int MatchesPlayed { get; set; }
     public int WinsCount { get; set; }
     public int GoalsCount { get; set; }
+    public int YellowCardsCount { get; set; }
+    public int RedCardsCount { get; set; }
     public int Rank { get; set; }
 }
 
@@ -167,6 +171,8 @@ public static class PlayerDtoExtensions
             MatchesPlayed = 0,
             WinsCount = 0,
             GoalsScored = 0,
+            YellowCardsCount = 0,
+            RedCardsCount = 0,
             PerformanceScore = 0,
             Sports = new List<string>(),
             CompetitionsCount = 0,

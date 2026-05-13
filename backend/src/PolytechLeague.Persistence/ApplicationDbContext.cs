@@ -85,6 +85,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<FootballEventParticipant> FootballEventParticipants { get; set; }
     public DbSet<FootballMatch> FootballMatches { get; set; }
     public DbSet<FootballGoal> FootballGoals { get; set; }
+    public DbSet<FootballCard> FootballCards { get; set; }
 
     // Basketball 3x3
     public DbSet<Basketball3x3Team> Basketball3x3Teams { get; set; }
@@ -189,6 +190,7 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new FootballEventParticipantConfiguration());
         modelBuilder.ApplyConfiguration(new FootballMatchConfiguration());
         modelBuilder.ApplyConfiguration(new FootballGoalConfiguration());
+        modelBuilder.ApplyConfiguration(new FootballCardConfiguration());
 
         // Basketball 3x3 configurations
         modelBuilder.ApplyConfiguration(new Basketball3x3TeamConfiguration());

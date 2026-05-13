@@ -56,6 +56,7 @@ public class FootballMatchService :
             .Include(m => m.HomeRoster)
             .Include(m => m.AwayRoster)
             .Include(m => m.Goals)
+            .Include(m => m.Cards)
             .FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
         
         if (oldEntity == null)
@@ -66,6 +67,7 @@ public class FootballMatchService :
         UpdateValues(oldEntity, newEntity);
         await MapRoster(oldEntity, newEntity, cancellationToken);
         SyncGoals(oldEntity, newEntity);
+        SyncCards(oldEntity, newEntity);
 
         await _dbcontext.SaveChangesAsync(cancellationToken);
     }
@@ -99,6 +101,24 @@ public class FootballMatchService :
                 sourceGoal.MatchId = target.Id;
                 target.Goals.Add(sourceGoal);
             }
+        }
+    }
+
+    private void SyncCards(FootballMatch target, FootballMatch source)
+    {
+        if (source.Cards == null) return;
+
+        target.Cards ??= new List<FootballCard>();
+
+        // Remove old cards
+        _dbcontext.FootballCards.RemoveRange(target.Cards);
+        target.Cards.Clear();
+
+        // Add new cards
+        foreach (var card in source.Cards)
+        {
+            card.MatchId = target.Id;
+            target.Cards.Add(card);
         }
     }
 
