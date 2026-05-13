@@ -272,7 +272,6 @@ public class PlayerService : IPlayerService
                 { CompetitionLevel.Regional, 2.5 },
                 { CompetitionLevel.National, 5.0 }
             };
-            var sportStatsMap = new Dictionary<string, SportStatsDto>(StringComparer.OrdinalIgnoreCase);
             var allEventsQuery = _dbContext.Set<Event>().AsQueryable();
             if (seasonId.HasValue)
             {
@@ -500,7 +499,7 @@ public class PlayerService : IPlayerService
                 // Stats
                 int played = 0, won = 0;
                 double totalScore = 0;
-                                var sportStatsMap = new Dictionary<string, SportStatsDto>();
+                var sportStatsMap = new Dictionary<string, SportStatsDto>(StringComparer.OrdinalIgnoreCase);
                 var pointsBreakdown = new List<PointEntryDto>();
                 foreach (var sport in sportTypes) sportStatsMap[sport] = new SportStatsDto { SportType = sport };
                 foreach (var ach in achievements) {
