@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using PolytechLeague.Application.Services.Interfaces.Football;
 using PolytechLeague.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
+using PolytechLeague.Domain.Params;
 
 namespace PolytechLeague.Application.Services.Implementations.Football;
 
@@ -11,16 +12,11 @@ public class FootballMatchService :
     AbstractEntityService<FootballMatch>,
     IFootballMatchService
 {
-    private readonly ApplicationDbContext _dbcontext;
-    private readonly ILogger<AbstractEntityService<FootballMatch>> _logger;
-
     public FootballMatchService(
         ApplicationDbContext dbcontext,
         ILogger<AbstractEntityService<FootballMatch>> logger
     ) : base(dbcontext, logger)
     {
-        _dbcontext = dbcontext;
-        _logger = logger;
     }
     public override async Task<IEnumerable<FootballMatch>> GetAllAsync(FilterParams? filterParams = null, SortParams? sortParams = null, CancellationToken cancellationToken = default)
     {

@@ -13,18 +13,14 @@ namespace PolytechLeague.Application.Services.Implementations;
 
 public class UserService : AbstractEntityService<User>, IUserService
 {
-    private readonly ApplicationDbContext _dbcontext;
     private readonly IPasswordEncoder _passwordEncoder;
-    private readonly ILogger<UserService> _logger;
 
     public UserService(
         ApplicationDbContext context,
         IPasswordEncoder passwordEncoder,
         ILogger<UserService> logger) : base(context, logger)
     {
-        _dbcontext = context;
         _passwordEncoder = passwordEncoder;
-        _logger = logger;
     }
 
     public async Task<IEnumerable<User>> GetAllWithDeletedAsync(
