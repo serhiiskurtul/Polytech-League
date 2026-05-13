@@ -412,7 +412,7 @@ public class PlayerService : IPlayerService
                     string sportType = e switch {
                         ChessEvent => "chess",
                         CheckersEvent => "checkers",
-                        FootballEvent => "Football",
+                        FootballEvent => "football",
                         VolleyballEvent => "volleyball",
                         Basketball3x3Event => "basketball_3x3",
                         BeachVolleyballEvent => "beach_volleyball",
@@ -445,8 +445,8 @@ public class PlayerService : IPlayerService
                 // Team Sports
                 foreach (var t in FootballTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
                     int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "Football", Date = t.Event.Date, Rank = r, TournamentId = t.EventId, Result = GetResultLabel(r), IsCaptain = t.CaptainId == playerId });
-                    sportTypes.Add("Football");
+                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "football", Date = t.Event.Date, Rank = r, TournamentId = t.EventId, Result = GetResultLabel(r), IsCaptain = t.CaptainId == playerId });
+                    sportTypes.Add("football");
                 }
                 foreach (var t in volleyballTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
                     int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
@@ -486,13 +486,13 @@ public class PlayerService : IPlayerService
                 foreach (var ach in achievements) {
                     double pts = 0;
                     double mult = 1.0;
-                    string levelName = "Міжгрупові";
+                    string levelName = "РњС–Р¶РіСЂСѓРїРѕРІС–";
                     if (allEvents.TryGetValue(ach.TournamentId, out var lvl)) {
                         if (levelMultipliers.TryGetValue(lvl, out var m)) mult = m;
                         levelName = lvl switch {
-                            CompetitionLevel.Regional => "Обласні",
-                            CompetitionLevel.National => "Всеукраїнські",
-                            _ => "Міжгрупові"
+                            CompetitionLevel.Regional => "РћР±Р»Р°СЃРЅС–",
+                            CompetitionLevel.National => "Р’СЃРµСѓРєСЂР°С—РЅСЃСЊРєС–",
+                            _ => "РњС–Р¶РіСЂСѓРїРѕРІС–"
                         };
                         pts = 10; // Participation points for all levels
                     } else {
@@ -508,8 +508,8 @@ public class PlayerService : IPlayerService
                     if (sportStatsMap.TryGetValue(ach.SportType, out var s)) s.PerformanceScore += finalPts;
                     pointsBreakdown.Add(new PointEntryDto {
                         Description = ach.Rank > 0
-                            ? $"{ach.Rank} місце: {ach.TournamentName} ({levelName})"
-                            : $"Участь: {ach.TournamentName} ({levelName})",
+                            ? $"{ach.Rank} РјС–СЃС†Рµ: {ach.TournamentName} ({levelName})"
+                            : $"РЈС‡Р°СЃС‚СЊ: {ach.TournamentName} ({levelName})",
                         Points = finalPts,
                         Category = "Achievements",
                         SportType = ach.SportType
@@ -528,8 +528,8 @@ public class PlayerService : IPlayerService
                         s.PerformanceScore += totalPts;
                         totalScore += totalPts;
                         string sportName = sport switch {
-                            "chess" => "Шахи", "checkers" => "Шашки", "table_tennis" => "Настільний теніс",
-                            "armwrestling" => "Армрестлинг", "badminton" => "Бадмінтон", _ => sport
+                            "chess" => "РЁР°С…Рё", "checkers" => "РЁР°С€РєРё", "table_tennis" => "РќР°СЃС‚С–Р»СЊРЅРёР№ С‚РµРЅС–СЃ",
+                            "armwrestling" => "РђСЂРјСЂРµСЃС‚Р»РёРЅРі", "badminton" => "Р‘Р°РґРјС–РЅС‚РѕРЅ", _ => sport
                         };
                     }
                 }
@@ -552,7 +552,7 @@ public class PlayerService : IPlayerService
                 // Team Sports Match Stats from dictionaries
                 var fPlayed = (fH.TryGetValue(playerId, out var fh) ? fh.Played : 0) + (fA.TryGetValue(playerId, out var fa) ? fa.Played : 0);
                 var fWins = (fH.TryGetValue(playerId, out var fhw) ? fhw.Wins : 0) + (fA.TryGetValue(playerId, out var faw) ? faw.Wins : 0);
-                AddStats("Football", fPlayed, fWins);
+                AddStats("football", fPlayed, fWins);
 
                 var vPlayed = (vH.TryGetValue(playerId, out var vh) ? vh.Played : 0) + (vA.TryGetValue(playerId, out var va) ? va.Played : 0);
                 var vWins = (vH.TryGetValue(playerId, out var vhw) ? vhw.Wins : 0) + (vA.TryGetValue(playerId, out var vaw) ? vaw.Wins : 0);
@@ -568,8 +568,8 @@ public class PlayerService : IPlayerService
                 // 4. Team Sport Stats & Goals
                 var pGoals = goalsS.FirstOrDefault(x => x.Id == playerId)?.Goals ?? 0;
                 if (pGoals > 0) {
-                    if (!sportStatsMap.ContainsKey("Football")) sportStatsMap["Football"] = new SportStatsDto { SportType = "Football" };
-                    var s = sportStatsMap["Football"];
+                    if (!sportStatsMap.ContainsKey("football")) sportStatsMap["football"] = new SportStatsDto { SportType = "football" };
+                    var s = sportStatsMap["football"];
                     s.GoalsCount += pGoals;
                     int goalPts = pGoals * 5;
                     s.PerformanceScore += goalPts;
@@ -578,15 +578,15 @@ public class PlayerService : IPlayerService
                         Description = $"Забиті голи (Футбол): {pGoals} голів",
                         Points = goalPts,
                         Category = "Goals",
-                        SportType = "Football"
+                        SportType = "football"
                     });
                 }
                 var pYellow = cardsS.Where(x => x.PlayerId == playerId && x.Type == FootballCardType.Yellow).Sum(x => x.Count);
                 var pRed = cardsS.Where(x => x.PlayerId == playerId && x.Type == FootballCardType.Red).Sum(x => x.Count);
                 if (pYellow > 0 || pRed > 0)
                 {
-                    if (!sportStatsMap.ContainsKey("Football")) sportStatsMap["Football"] = new SportStatsDto { SportType = "Football" };
-                    var s = sportStatsMap["Football"];
+                    if (!sportStatsMap.ContainsKey("football")) sportStatsMap["football"] = new SportStatsDto { SportType = "football" };
+                    var s = sportStatsMap["football"];
                     s.YellowCardsCount = pYellow;
                     s.RedCardsCount = pRed;
                     dto.YellowCardsCount = pYellow;
@@ -669,7 +669,7 @@ public class PlayerService : IPlayerService
                     Date = p.Tournament.Date,
                     Rank = rank,
                     TournamentId = p.TournamentId,
-                    Result = rank > 0 ? $"{rank} місце ({p.Points} очок)" : $"{p.Points} очок"
+                    Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ ({p.Points} РѕС‡РѕРє)" : $"{p.Points} РѕС‡РѕРє"
                 });
             }
         } catch (Exception ex) {
@@ -700,7 +700,7 @@ public class PlayerService : IPlayerService
                     Date = p.Event.Date,
                     Rank = rank,
                     TournamentId = p.TournamentId,
-                    Result = rank > 0 ? $"{rank} місце ({p.Points} очок)" : $"{p.Points} очок"
+                    Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ ({p.Points} РѕС‡РѕРє)" : $"{p.Points} РѕС‡РѕРє"
                 });
             }
         } catch (Exception ex) {
@@ -731,7 +731,7 @@ public class PlayerService : IPlayerService
                     Date = p.Tournament.Date,
                     Rank = rank,
                     TournamentId = p.TournamentId,
-                    Result = rank > 0 ? $"{rank} місце" : "Учасник"
+                    Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ" : "РЈС‡Р°СЃРЅРёРє"
                 });
             }
         } catch (Exception ex) {
@@ -762,7 +762,7 @@ public class PlayerService : IPlayerService
                     Date = p.Event.Date,
                     Rank = rank,
                     TournamentId = p.EventId,
-                    Result = rank > 0 ? $"{rank} місце" : "Учасник"
+                    Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ" : "РЈС‡Р°СЃРЅРёРє"
                 });
             }
         } catch (Exception ex) {
@@ -783,7 +783,7 @@ public class PlayerService : IPlayerService
                     Date = p.Tournament.Date,
                     Rank = rank,
                     TournamentId = p.TournamentId,
-                    Result = rank > 0 ? $"{rank} місце" : "Учасник"
+                    Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ" : "РЈС‡Р°СЃРЅРёРє"
                 });
             }
             var genericWinners = await _dbContext.Set<Event>()
@@ -799,7 +799,7 @@ public class PlayerService : IPlayerService
                     Date = e.Date,
                     Rank = rank,
                     TournamentId = e.Id,
-                    Result = $"{rank} місце"
+                    Result = $"{rank} РјС–СЃС†Рµ"
                 });
             }
         } catch (Exception ex) {
@@ -825,7 +825,7 @@ public class PlayerService : IPlayerService
                 }
                 achievements.Add(new AchievementDto {
                     TournamentName = team.Event.Name,
-                    SportType = "Football",
+                    SportType = "football",
                     Date = team.Event.Date,
                     Rank = rank,
                     TournamentId = team.EventId,
@@ -876,7 +876,7 @@ public class PlayerService : IPlayerService
             foreach (var t in ttTeams) {
                 if (t.Event == null) continue;
                 int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "table_tennis", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId, Result = rank > 0 ? $"{rank} місце ({t.Name})" : $"Учасник ({t.Name})" });
+                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "table_tennis", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId, Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ ({t.Name})" : $"РЈС‡Р°СЃРЅРёРє ({t.Name})" });
             }
             // Badminton Teams
             var badTeams = await _dbContext.BadmintonTeams
@@ -886,7 +886,7 @@ public class PlayerService : IPlayerService
             foreach (var t in badTeams) {
                 if (t.Event == null || !t.EventId.HasValue) continue;
                 int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "badminton", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId.Value, Result = rank > 0 ? $"{rank} місце ({t.Name})" : $"Учасник ({t.Name})" });
+                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "badminton", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId.Value, Result = rank > 0 ? $"{rank} РјС–СЃС†Рµ ({t.Name})" : $"РЈС‡Р°СЃРЅРёРє ({t.Name})" });
             }
         } catch (Exception ex) {
             _logger.LogError(ex, "Error populating other team achievements for player {PlayerId}", playerId);
@@ -906,7 +906,7 @@ public class PlayerService : IPlayerService
                     Date = r.AthleticsEvent.Date,
                     Rank = r.Rank,
                     TournamentId = r.AthleticsEventId,
-                    Result = $"{r.Rank} місце - {r.Score}"
+                    Result = $"{r.Rank} РјС–СЃС†Рµ - {r.Score}"
                 });
             }
         } catch (Exception ex) {
@@ -938,19 +938,19 @@ public class PlayerService : IPlayerService
             double basePts = (ach.Rank == 1) ? 100 : (ach.Rank == 2 ? 50 : (ach.Rank == 3 ? 30 : 0));
             if (basePts <= 0) continue;
             double mult = 1.0;
-            string levelName = "Міжгрупові";
+            string levelName = "РњС–Р¶РіСЂСѓРїРѕРІС–";
             if (eventLevels.TryGetValue(ach.TournamentId, out var lvl)) {
                 if (levelMultipliers.TryGetValue(lvl, out var m)) mult = m;
                 levelName = lvl switch {
-                    CompetitionLevel.Regional => "Обласні",
-                    CompetitionLevel.National => "Всеукраїнські",
-                    _ => "Міжгрупові"
+                    CompetitionLevel.Regional => "РћР±Р»Р°СЃРЅС–",
+                    CompetitionLevel.National => "Р’СЃРµСѓРєСЂР°С—РЅСЃСЊРєС–",
+                    _ => "РњС–Р¶РіСЂСѓРїРѕРІС–"
                 };
             }
             int finalPts = (int)Math.Round(basePts * mult);
             totalScore += finalPts;
             pointsBreakdown.Add(new PointEntryDto {
-                Description = $"{ach.Rank} місце: {ach.TournamentName} ({levelName})",
+                Description = $"{ach.Rank} РјС–СЃС†Рµ: {ach.TournamentName} ({levelName})",
                 Points = finalPts,
                 Category = "Achievements"
             });
@@ -970,13 +970,13 @@ public class PlayerService : IPlayerService
             if (p <= 0) return;
             int pts = (w * 2);
             totalScore += pts;
-            if (w > 0) pointsBreakdown.Add(new PointEntryDto { Description = $"Перемоги ({sportName}): {w} ігор", Points = w * 2, Category = "Activity" });
+            if (w > 0) pointsBreakdown.Add(new PointEntryDto { Description = $"РџРµСЂРµРјРѕРіРё ({sportName}): {w} С–РіРѕСЂ", Points = w * 2, Category = "Activity" });
         }
-        AddActivityStats("Шахи", chessMatches, chessWins);
-        AddActivityStats("Шашки", checkersMatches, checkersWins);
-        AddActivityStats("Настільний теніс", ttMatches, ttWins);
-        AddActivityStats("Армрестлинг", armMatches, armWins);
-        AddActivityStats("Бадмінтон", badMatches, badWins);
+        AddActivityStats("РЁР°С…Рё", chessMatches, chessWins);
+        AddActivityStats("РЁР°С€РєРё", checkersMatches, checkersWins);
+        AddActivityStats("РќР°СЃС‚С–Р»СЊРЅРёР№ С‚РµРЅС–СЃ", ttMatches, ttWins);
+        AddActivityStats("РђСЂРјСЂРµСЃС‚Р»РёРЅРі", armMatches, armWins);
+        AddActivityStats("Р‘Р°РґРјС–РЅС‚РѕРЅ", badMatches, badWins);
         dto.MatchesPlayed = chessMatches + checkersMatches + ttMatches + armMatches + badMatches;
         dto.WinsCount = chessWins + checkersWins + ttWins + armWins + badWins;
         // 3. Football Goals
@@ -999,9 +999,9 @@ public class PlayerService : IPlayerService
 
     private string GetResultLabel(int? rank)
     {
-        if (rank == 1) return "Переможець";
-        if (rank == 2 || rank == 3) return "Призер";
-        return "Учасник";
+        if (rank == 1) return "РџРµСЂРµРјРѕР¶РµС†СЊ";
+        if (rank == 2 || rank == 3) return "РџСЂРёР·РµСЂ";
+        return "РЈС‡Р°СЃРЅРёРє";
     }
     // Profile Merging Logic
 
@@ -1037,8 +1037,8 @@ public class PlayerService : IPlayerService
         var user = await _dbContext.Users.FindAsync(new object[] { userId }, cancellationToken);
         var player = await _dbContext.Players.FindAsync(new object[] { targetPlayerId }, cancellationToken);
         await _notificationService.SendNotificationToAdminsAsync(
-            "Запит на об'єднання профілю",
-            $"Користувач {user?.FirstName} {user?.LastName} стверджує, що він — це гравець {player?.FirstName} {player?.LastName} ({player?.Group}).",
+            "Р—Р°РїРёС‚ РЅР° РѕР±'С”РґРЅР°РЅРЅСЏ РїСЂРѕС„С–Р»СЋ",
+            $"РљРѕСЂРёСЃС‚СѓРІР°С‡ {user?.FirstName} {user?.LastName} СЃС‚РІРµСЂРґР¶СѓС”, С‰Рѕ РІС–РЅ вЂ” С†Рµ РіСЂР°РІРµС†СЊ {player?.FirstName} {player?.LastName} ({player?.Group}).",
             NotificationType.System,
             $"/admin/merges"
         );
@@ -1090,8 +1090,8 @@ public class PlayerService : IPlayerService
         await _dbContext.SaveChangesAsync(cancellationToken);
         await _notificationService.SendNotificationToUserAsync(
             request.UserId,
-            "Р—Р°РїРёС‚ СЃС…РІР°Р»РµРЅРѕ",
-            "Р’Р°С€ Р·Р°РїРёС‚ РЅР° РѕР±'С”РґРЅР°РЅРЅСЏ РїСЂРѕС„С–Р»СЋ Р±СѓР»Рѕ СЃС…РІР°Р»РµРЅРѕ. РўРµРїРµСЂ РІР°С€Р° С–СЃС‚РѕСЂС–СЏ РґРѕСЃСЏРіРЅРµРЅСЊ РґРѕСЃС‚СѓРїРЅР° Сѓ РІР°С€РѕРјСѓ Р°РєРєР°СѓРЅС‚С–.",
+            "Р вЂ”Р В°Р С—Р С‘РЎвЂљ РЎРѓРЎвЂ¦Р Р†Р В°Р В»Р ВµР Р…Р С•",
+            "Р вЂ™Р В°РЎв‚¬ Р В·Р В°Р С—Р С‘РЎвЂљ Р Р…Р В° Р С•Р В±'РЎвЂќР Т‘Р Р…Р В°Р Р…Р Р…РЎРЏ Р С—РЎР‚Р С•РЎвЂћРЎвЂ“Р В»РЎР‹ Р В±РЎС“Р В»Р С• РЎРѓРЎвЂ¦Р Р†Р В°Р В»Р ВµР Р…Р С•. Р СћР ВµР С—Р ВµРЎР‚ Р Р†Р В°РЎв‚¬Р В° РЎвЂ“РЎРѓРЎвЂљР С•РЎР‚РЎвЂ“РЎРЏ Р Т‘Р С•РЎРѓРЎРЏР С–Р Р…Р ВµР Р…РЎРЉ Р Т‘Р С•РЎРѓРЎвЂљРЎС“Р С—Р Р…Р В° РЎС“ Р Р†Р В°РЎв‚¬Р С•Р СРЎС“ Р В°Р С”Р С”Р В°РЎС“Р Р…РЎвЂљРЎвЂ“.",
             NotificationType.System
         );
     }
@@ -1105,8 +1105,8 @@ public class PlayerService : IPlayerService
         await _dbContext.SaveChangesAsync(cancellationToken);
         await _notificationService.SendNotificationToUserAsync(
             request.UserId,
-            "Запит відхилено",
-            $"Ваш запит на об'єднання профілю було відхилено. Причина: {comment}",
+            "Р—Р°РїРёС‚ РІС–РґС…РёР»РµРЅРѕ",
+            $"Р’Р°С€ Р·Р°РїРёС‚ РЅР° РѕР±'С”РґРЅР°РЅРЅСЏ РїСЂРѕС„С–Р»СЋ Р±СѓР»Рѕ РІС–РґС…РёР»РµРЅРѕ. РџСЂРёС‡РёРЅР°: {comment}",
             NotificationType.System
         );
     }
@@ -1226,7 +1226,7 @@ public class PlayerService : IPlayerService
             {
                 badges.Add(new AutomaticBadgeDto {
                     Type = "TopScorer",
-                    Label = "Найкращий бомбардир в історії",
+                    Label = "РќР°Р№РєСЂР°С‰РёР№ Р±РѕРјР±Р°СЂРґРёСЂ РІ С–СЃС‚РѕСЂС–С—",
                     Icon = "fire"
                 });
             }
@@ -1252,7 +1252,7 @@ public class PlayerService : IPlayerService
             {
                 badges.Add(new AutomaticBadgeDto {
                     Type = "SeasonTopScorer",
-                    Label = $"Найкращий бомбардир ({top.SeasonName})",
+                    Label = $"РќР°Р№РєСЂР°С‰РёР№ Р±РѕРјР±Р°СЂРґРёСЂ ({top.SeasonName})",
                     Icon = "soccer-ball"
                 });
             }
@@ -1296,19 +1296,19 @@ public class PlayerService : IPlayerService
                     dto.AutomaticBadges.Add(new AutomaticBadgeDto
                     {
                         Type = "ChessTotalWins4",
-                        Label = "4-разовий переможець міжгрупових шахів",
+                        Label = "4-СЂР°Р·РѕРІРёР№ РїРµСЂРµРјРѕР¶РµС†СЊ РјС–Р¶РіСЂСѓРїРѕРІРёС… С€Р°С…С–РІ",
                         Icon = "trophy"
                     });
                 }
-                if (!dto.Achievements.Any(a => a.TournamentName == "4-разовий переможець міжгрупових шахів"))
+                if (!dto.Achievements.Any(a => a.TournamentName == "4-СЂР°Р·РѕРІРёР№ РїРµСЂРµРјРѕР¶РµС†СЊ РјС–Р¶РіСЂСѓРїРѕРІРёС… С€Р°С…С–РІ"))
                 {
                     dto.Achievements.Add(new AchievementDto
                     {
-                        TournamentName = "4-разовий переможець міжгрупових шахів",
+                        TournamentName = "4-СЂР°Р·РѕРІРёР№ РїРµСЂРµРјРѕР¶РµС†СЊ РјС–Р¶РіСЂСѓРїРѕРІРёС… С€Р°С…С–РІ",
                         SportType = "chess",
                         Date = wins.OrderByDescending(p => p.Tournament!.Date).First().Tournament!.Date,
                         Rank = 1,
-                        Result = "Спеціальне досягнення"
+                        Result = "РЎРїРµС†С–Р°Р»СЊРЅРµ РґРѕСЃСЏРіРЅРµРЅРЅСЏ"
                     });
                 }
             }
@@ -1377,7 +1377,7 @@ public class PlayerService : IPlayerService
         {
             var matchDto = new HeadToHeadMatchDto {
                 SportType = "chess",
-                TournamentName = m.Tournament?.Name ?? "Турнір з шахів",
+                TournamentName = m.Tournament?.Name ?? "РўСѓСЂРЅС–СЂ Р· С€Р°С…С–РІ",
                 Date = m.Tournament?.Date ?? DateTime.MinValue,
                 TournamentId = m.TournamentId,
                 Score = m.Result.ToString()
@@ -1402,7 +1402,7 @@ public class PlayerService : IPlayerService
         {
             var matchDto = new HeadToHeadMatchDto {
                 SportType = "checkers",
-                TournamentName = m.Event?.Name ?? "Турнір з шашок",
+                TournamentName = m.Event?.Name ?? "РўСѓСЂРЅС–СЂ Р· С€Р°С€РѕРє",
                 Date = m.Event?.Date ?? DateTime.MinValue,
                 TournamentId = m.TournamentId,
                 Score = m.Result.ToString()
@@ -1425,7 +1425,7 @@ public class PlayerService : IPlayerService
         {
             var matchDto = new HeadToHeadMatchDto {
                 SportType = "table_tennis",
-                TournamentName = m.Tournament?.Name ?? "Турнір з настільного тенісу",
+                TournamentName = m.Tournament?.Name ?? "РўСѓСЂРЅС–СЂ Р· РЅР°СЃС‚С–Р»СЊРЅРѕРіРѕ С‚РµРЅС–СЃСѓ",
                 Date = m.Tournament?.Date ?? DateTime.MinValue,
                 TournamentId = m.TournamentId,
                 Score = $"{m.HomeTeamScore}:{m.AwayTeamScore}"
@@ -1448,7 +1448,7 @@ public class PlayerService : IPlayerService
         {
             var matchDto = new HeadToHeadMatchDto {
                 SportType = "armwrestling",
-                TournamentName = m.Event?.Name ?? "Турнір з армрестлінгу",
+                TournamentName = m.Event?.Name ?? "РўСѓСЂРЅС–СЂ Р· Р°СЂРјСЂРµСЃС‚Р»С–РЅРіСѓ",
                 Date = m.Event?.Date ?? DateTime.MinValue,
                 TournamentId = m.EventId,
                 Score = m.Stage ?? "Match"
@@ -1476,8 +1476,8 @@ public class PlayerService : IPlayerService
         foreach (var m in FootballMatches)
         {
             var matchDto = new HeadToHeadMatchDto {
-                SportType = "Football",
-                TournamentName = m.Event?.Name ?? "Турнір з Футболу",
+                SportType = "football",
+                TournamentName = m.Event?.Name ?? "РўСѓСЂРЅС–СЂ Р· Р¤СѓС‚Р±РѕР»Сѓ",
                 Date = m.Event?.Date ?? DateTime.MinValue,
                 TournamentId = m.EventId,
                 Score = $"{m.HomeTeamScore}:{m.AwayTeamScore}"
@@ -1507,7 +1507,7 @@ public class PlayerService : IPlayerService
         {
             var matchDto = new HeadToHeadMatchDto {
                 SportType = "basketball_3x3",
-                TournamentName = m.Event?.Name ?? "Турнір з баскетболу 3х3",
+                TournamentName = m.Event?.Name ?? "РўСѓСЂРЅС–СЂ Р· Р±Р°СЃРєРµС‚Р±РѕР»Сѓ 3С…3",
                 Date = m.Event?.Date ?? DateTime.MinValue,
                 TournamentId = m.EventId,
                 Score = $"{m.HomeTeamScore}:{m.AwayTeamScore}"
@@ -1533,7 +1533,7 @@ public class PlayerService : IPlayerService
         {
             var matchDto = new HeadToHeadMatchDto {
                 SportType = "volleyball",
-                TournamentName = m.Event?.Name ?? "Турнір з волейболу",
+                TournamentName = m.Event?.Name ?? "РўСѓСЂРЅС–СЂ Р· РІРѕР»РµР№Р±РѕР»Сѓ",
                 Date = m.Event?.Date ?? DateTime.MinValue,
                 TournamentId = m.EventId,
                 Score = $"{m.HomeSetsWon}:{m.AwaySetsWon}"
@@ -1563,7 +1563,7 @@ public class PlayerService : IPlayerService
         {
             var matchDto = new HeadToHeadMatchDto {
                 SportType = "beach_volleyball",
-                TournamentName = m.Event?.Name ?? "Турнір з пляжного волейболу",
+                TournamentName = m.Event?.Name ?? "РўСѓСЂРЅС–СЂ Р· РїР»СЏР¶РЅРѕРіРѕ РІРѕР»РµР№Р±РѕР»Сѓ",
                 Date = m.Event?.Date ?? DateTime.MinValue,
                 TournamentId = m.EventId,
                 Score = $"{m.HomeSetsWon}:{m.AwaySetsWon}"
@@ -1602,10 +1602,10 @@ public class PlayerService : IPlayerService
 
             if (goals > 0 || yellowCards > 0 || redCards > 0)
             {
-                var footballStats = dto.SportStats?.FirstOrDefault(s => s.SportType == "Football");
+                var footballStats = dto.SportStats?.FirstOrDefault(s => s.SportType == "football");
                 if (footballStats == null)
                 {
-                    footballStats = new SportStatsDto { SportType = "Football" };
+                    footballStats = new SportStatsDto { SportType = "football" };
                     dto.SportStats ??= new List<SportStatsDto>();
                     dto.SportStats.Add(footballStats);
                 }

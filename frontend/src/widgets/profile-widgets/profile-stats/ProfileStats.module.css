@@ -228,3 +228,12 @@
 .statCard:hover .redCardValue {
   color: white !important;
 }
+
+.extraStat {
+  font-size: 14px;
+  font-weight: 600;
+  margin-right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}

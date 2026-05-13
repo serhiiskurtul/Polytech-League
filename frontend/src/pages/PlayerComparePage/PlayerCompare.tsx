@@ -259,8 +259,8 @@ export const PlayerComparePage = () => {
                 isBetterHigh={true}
               />
                {/* Only show goals if both played football */}
-               {player1.sportStats?.some(s => s.sportType === 'football') && 
-                player2?.sportStats?.some(s => s.sportType === 'football') && (
+               {(player1.sportStats?.some(s => s.sportType === 'football') || 
+                 player2?.sportStats?.some(s => s.sportType === 'football')) && (
                   <>
                     <StatRow 
                       label="Забито голів" 
