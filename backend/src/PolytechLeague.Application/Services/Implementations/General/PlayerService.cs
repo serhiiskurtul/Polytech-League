@@ -577,8 +577,6 @@ public class PlayerService : IPlayerService
                 AddStats("beach_volleyball", bvPlayed, bvWins);
                 // 4. Team Sport Stats & Goals
                 var pGoals = goalsS.FirstOrDefault(x => x.Id == playerId)?.Goals ?? 0;
-                int fPlayed = (fH.TryGetValue(playerId, out var fHStats) ? fHStats.Played : 0) + (fA.TryGetValue(playerId, out var fAStats) ? fAStats.Played : 0);
-                int fWins = (fH.TryGetValue(playerId, out var fHWins) ? fHWins.Wins : 0) + (fA.TryGetValue(playerId, out var fAWins) ? fAWins.Wins : 0);
                 if (fPlayed > 0)
                 {
                     if (!sportStatsMap.ContainsKey("football")) sportStatsMap["football"] = new SportStatsDto { SportType = "football" };
