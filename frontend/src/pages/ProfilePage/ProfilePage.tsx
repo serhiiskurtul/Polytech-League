@@ -137,14 +137,14 @@ const ProfilePage = () => {
     wins: playerProfile?.winsCount || 0,
     competitionsCount: playerProfile?.competitionsCount || 0,
     eloRating: playerProfile?.chessRating || 0,
-    goalsScored: playerProfile?.goalsScored || 0,
+    goalsCount: playerProfile?.goalsScored || 0,
     globalRank: playerProfile?.globalRank,
     sportStats: playerProfile?.sportStats,
     chessTotalPoints: playerProfile?.chessTotalPoints,
     chessTotalPossiblePoints: playerProfile?.chessTotalPossiblePoints,
     isChessUndefeatedFourSeasons: playerProfile?.isChessUndefeatedFourSeasons,
-    yellowCards: playerProfile?.yellowCardsCount,
-    redCards: playerProfile?.redCardsCount
+    yellowCardsCount: playerProfile?.yellowCardsCount,
+    redCardsCount: playerProfile?.redCardsCount
   };
 
   const handleEditProfile = () => {

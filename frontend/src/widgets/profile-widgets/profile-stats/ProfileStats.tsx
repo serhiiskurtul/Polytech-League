@@ -14,9 +14,9 @@ interface Stats {
   wins: number;
   competitionsCount: number;
   eloRating: number;
-  goalsScored: number;
-  yellowCards?: number;
-  redCards?: number;
+  goalsCount: number;
+  yellowCardsCount?: number;
+  redCardsCount?: number;
   globalRank?: number;
   sportStats?: SportStat[];
   chessTotalPoints?: number | null;
@@ -60,9 +60,9 @@ const getSportName = (type: string) => {
 
 const ProfileStats = ({ stats }: ProfileStatsProps) => {
   const isFootballer = stats.sportStats?.some(s => s.sportType.toLowerCase() === 'football') || 
-                       (stats.goalsScored !== undefined && stats.goalsScored > 0) ||
-                       (stats.yellowCards !== undefined && stats.yellowCards > 0) ||
-                       (stats.redCards !== undefined && stats.redCards > 0);
+                       (stats.goalsCount !== undefined && stats.goalsCount > 0) ||
+                       (stats.yellowCardsCount !== undefined && stats.yellowCardsCount > 0) ||
+                       (stats.redCardsCount !== undefined && stats.redCardsCount > 0);
 
   return (
     <section className={styles.card}>
