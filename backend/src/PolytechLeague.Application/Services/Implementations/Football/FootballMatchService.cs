@@ -22,6 +22,44 @@ public class FootballMatchService :
         _dbcontext = dbcontext;
         _logger = logger;
     }
+    public override async Task<IEnumerable<FootballMatch>> GetAllAsync(FilterParams? filterParams = null, SortParams? sortParams = null, CancellationToken cancellationToken = default)
+    {
+        return await _dbcontext.FootballMatches
+            .Include(m => m.Goals!)
+                .ThenInclude(g => g.Player)
+            .Include(m => m.Cards!)
+                .ThenInclude(c => c.Player)
+            .Include(m => m.HomeTeam)
+            .Include(m => m.AwayTeam)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+    }
+
+    public override async Task<FootballMatch> GetByIdAsync(long id, CancellationToken cancellationToken = default)
+    {
+        var entity = await _dbcontext.FootballMatches
+            .Include(m => m.HomeRoster)
+            .Include(m => m.AwayRoster)
+            .Include(m => m.HomeGoalkeeper)
+            .Include(m => m.AwayGoalkeeper)
+            .Include(m => m.HomeCaptain)
+            .Include(m => m.AwayCaptain)
+            .Include(m => m.Goals!)
+                .ThenInclude(g => g.Player)
+            .Include(m => m.Cards!)
+                .ThenInclude(c => c.Player)
+            .Include(m => m.HomeTeam)
+            .Include(m => m.AwayTeam)
+            .FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
+
+        if (entity == null)
+        {
+            throw new EntityNotFoundException(nameof(FootballMatch), id);
+        }
+
+        return entity;
+    }
+
     public override async Task<FootballMatch> CreateAsync(FootballMatch entity, CancellationToken cancellationToken = default)
     {
         _logger.LogDebug("Creating Football match with rosters.");
@@ -67,9 +105,13 @@ public class FootballMatchService :
         UpdateValues(oldEntity, newEntity);
         await MapRoster(oldEntity, newEntity, cancellationToken);
         SyncGoals(oldEntity, newEntity);
+        _logger.LogInformation("UpdateAsync: Match {Id}. NewEntity Cards Count: {Count}", 
+            oldEntity.Id, newEntity.Cards?.Count ?? 0);
         SyncCards(oldEntity, newEntity);
+        _logger.LogInformation("UpdateAsync: Match {Id}. Cards synced. Count in oldEntity: {Count}", oldEntity.Id, oldEntity.Cards?.Count ?? 0);
 
         await _dbcontext.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("UpdateAsync: Match {Id}. SaveChangesAsync completed.", oldEntity.Id);
     }
 
     private void SyncGoals(FootballMatch target, FootballMatch source)
@@ -106,23 +148,35 @@ public class FootballMatchService :
 
     private void SyncCards(FootballMatch target, FootballMatch source)
     {
-        if (source.Cards == null) return;
+        if (source.Cards == null)
+        {
+            _logger.LogWarning("SyncCards: Source cards collection is null for match {Id}", target.Id);
+            return;
+        }
 
         target.Cards ??= new List<FootballCard>();
 
-        // Remove old cards
-        if (target.Cards.Any())
+        // Explicitly load and remove all cards for this match from the DB context
+        // This ensures no stale cards remain regardless of collection state
+        var matchId = target.Id;
+        var existingCards = _dbcontext.FootballCards.Where(c => c.MatchId == matchId).ToList();
+        
+        _logger.LogInformation("SyncCards: Removing {Count} existing cards for match {Id}", existingCards.Count, matchId);
+        if (existingCards.Any())
         {
-            _dbcontext.FootballCards.RemoveRange(target.Cards);
-            target.Cards.Clear();
+            _dbcontext.FootballCards.RemoveRange(existingCards);
         }
+        target.Cards.Clear();
 
         // Add new cards
         foreach (var sourceCard in source.Cards)
         {
+            _logger.LogInformation("SyncCards: Adding card for player {PlayerId}, Type {Type} to match {MatchId}", 
+                sourceCard.PlayerId, sourceCard.Type, matchId);
+            
             target.Cards.Add(new FootballCard
             {
-                MatchId = target.Id,
+                MatchId = matchId,
                 PlayerId = sourceCard.PlayerId,
                 Type = sourceCard.Type
             });

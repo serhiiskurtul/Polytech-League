@@ -1196,7 +1196,6 @@ public class PlayerService : IPlayerService
             };
             _dbContext.ProfileMergeRequests.Add(request);
         }
-
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
@@ -1639,6 +1638,21 @@ public class PlayerService : IPlayerService
             var redCards = await _dbContext.FootballCards
                 .Where(c => c.PlayerId == dto.Id && c.Type == FootballCardType.Red)
                 .CountAsync(cancellationToken);
+
+            _logger.LogInformation("Populating stats for player {PlayerId} ({FirstName} {LastName}): Goals: {Goals}, Yellow: {Yellow}, Red: {Red}", 
+                dto.Id, dto.FirstName, dto.LastName, goals, yellowCards, redCards);
+            
+            var allCardsForPlayer = await _dbContext.FootballCards
+                .Where(c => c.PlayerId == dto.Id)
+                .Select(c => new { c.Type, c.MatchId })
+                .ToListAsync(cancellationToken);
+
+            _logger.LogInformation("Stats for player {PlayerId}: Goals: {Goals}, Yellow: {Yellow}, Red: {Red}. Total cards in DB: {Count}", 
+                dto.Id, goals, yellowCards, redCards, allCardsForPlayer.Count);
+            
+            foreach(var c in allCardsForPlayer) {
+                _logger.LogInformation("  - Card in DB: Match {MatchId}, Type {Type}", c.MatchId, c.Type);
+            }
 
             dto.GoalsScored = goals;
             dto.YellowCardsCount = yellowCards;
