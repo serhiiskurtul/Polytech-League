@@ -79,6 +79,8 @@ export const PlayerComparePage = () => {
               matchesPlayed: rankingInfo.matchesPlayed,
               winsCount: rankingInfo.winsCount,
               goalsScored: rankingInfo.goalsScored,
+              yellowCardsCount: rankingInfo.yellowCardsCount,
+              redCardsCount: rankingInfo.redCardsCount,
               competitionsCount: rankingInfo.competitionsCount,
               globalRank: rankingInfo.globalRank,
               sportStats: rankingInfo.sportStats
@@ -90,6 +92,8 @@ export const PlayerComparePage = () => {
             matchesPlayed: 0,
             winsCount: 0,
             goalsScored: 0,
+            yellowCardsCount: 0,
+            redCardsCount: 0,
             competitionsCount: 0,
             globalRank: undefined,
             sportStats: []
@@ -257,12 +261,27 @@ export const PlayerComparePage = () => {
                {/* Only show goals if both played football */}
                {player1.sportStats?.some(s => s.sportType === 'football') && 
                 player2?.sportStats?.some(s => s.sportType === 'football') && (
-                 <StatRow 
-                   label="Забито голів" 
-                   val1={player1.goalsScored} 
-                   val2={player2?.goalsScored}
-                 />
-               )}
+                  <>
+                    <StatRow 
+                      label="Забито голів" 
+                      val1={player1.goalsScored} 
+                      val2={player2?.goalsScored}
+                    />
+                    <StatRow 
+                      label="Жовті картки" 
+                      val1={player1.yellowCardsCount} 
+                      val2={player2?.yellowCardsCount}
+                      isBetterHigh={false}
+                    />
+                    <StatRow 
+                      label="Червоні картки" 
+                      val1={player1.redCardsCount} 
+                      val2={player2?.redCardsCount}
+                      isBetterHigh={false}
+                    />
+                  </>
+                )}
+
                <StatRow 
                  label="Участь у змаганнях" 
                  val1={player1.competitionsCount} 

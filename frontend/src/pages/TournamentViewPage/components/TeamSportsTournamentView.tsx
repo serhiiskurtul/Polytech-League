@@ -121,6 +121,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const [isScorersModalOpen, setIsScorersModalOpen] = useState(false);
   const [selectedMatchForScorers, setSelectedMatchForScorers] = useState<any>(null);
   const [tempScorers, setTempScorers] = useState<{[playerId: number]: number}>({});
+  const [tempYellowCards, setTempYellowCards] = useState<{[playerId: number]: number}>({});
+  const [tempRedCards, setTempRedCards] = useState<{[playerId: number]: number}>({});
   const [matchGoalkeepers, setMatchGoalkeepers] = useState<{home: string, away: string}>({ home: '', away: '' });
   const [matchCaptains, setMatchCaptains] = useState<{home: string, away: string}>({ home: '', away: '' });
   const [matchScores, setMatchScores] = useState<{home: number, away: number}>({ home: 0, away: 0 });
@@ -249,10 +251,22 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const handleOpenScorers = (match: any) => {
     setSelectedMatchForScorers(match);
     const initialScorers: {[playerId: number]: number} = {};
+    const initialYellowCards: {[playerId: number]: number} = {};
+    const initialRedCards: {[playerId: number]: number} = {};
+    
     match.goals?.forEach((g: any) => {
       initialScorers[g.playerId] = g.goalsCount;
     });
+    match.yellowCards?.forEach((c: any) => {
+      initialYellowCards[c.playerId] = (initialYellowCards[c.playerId] || 0) + 1;
+    });
+    match.redCards?.forEach((c: any) => {
+      initialRedCards[c.playerId] = (initialRedCards[c.playerId] || 0) + 1;
+    });
+
     setTempScorers(initialScorers);
+    setTempYellowCards(initialYellowCards);
+    setTempRedCards(initialRedCards);
     
     // Default match goalkeepers to team defaults if not set for the match
     const homeTeam = details.teams?.find((t: any) => t.id === match.homeTeamId);
@@ -284,6 +298,22 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           goalsCount: count
         }));
 
+      const yellowCardsPayload = Object.entries(tempYellowCards)
+        .filter(([_, count]) => count > 0)
+        .map(([playerId, count]) => {
+          const cards = [];
+          for(let i=0; i<count; i++) cards.push({ playerId: parseInt(playerId) });
+          return cards;
+        }).flat();
+
+      const redCardsPayload = Object.entries(tempRedCards)
+        .filter(([_, count]) => count > 0)
+        .map(([playerId, count]) => {
+          const cards = [];
+          for(let i=0; i<count; i++) cards.push({ playerId: parseInt(playerId) });
+          return cards;
+        }).flat();
+
       const payload = {
         id: selectedMatchForScorers.id,
         eventId: details.id,
@@ -305,7 +335,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         awayTeamScore: matchScores.away,
         homeScore: matchScores.home,
         awayScore: matchScores.away,
-        goals: goalsPayload
+        goals: goalsPayload,
+        yellowCards: yellowCardsPayload,
+        redCards: redCardsPayload
       };
 
 
@@ -1925,16 +1957,55 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                           {player.footballShirtNumber ? `№${player.footballShirtNumber} ` : ''}
                           {player.lastName} {player.firstName[0]}.
                         </span>
-                        <input 
-                          type="number" 
-                          min="0"
-                          value={tempScorers[player.id] || 0}
-                          onFocus={(e) => e.target.select()}
-                          onChange={(e) => setTempScorers({
-                            ...tempScorers,
-                            [player.id]: Math.max(0, parseInt(e.target.value) || 0)
-                          })}
-                        />
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <div title="Голи" style={{ position: 'relative' }}>
+                            <i className="fas fa-futbol" style={{ fontSize: '12px', position: 'absolute', left: '-14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }}></i>
+                            <input 
+                              type="number" 
+                              min="0"
+                              value={tempScorers[player.id] || 0}
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) => setTempScorers({
+                                ...tempScorers,
+                                [player.id]: Math.max(0, parseInt(e.target.value) || 0)
+                              })}
+                              style={{ width: '40px', padding: '4px', borderRadius: '4px', border: '1px solid #cbd5e1' }}
+                            />
+                          </div>
+                          
+                          <div title="Жовті картки" style={{ position: 'relative' }}>
+                            <div style={{ width: '10px', height: '14px', background: '#fbbf24', borderRadius: '2px', position: 'absolute', left: '-14px', top: '50%', transform: 'translateY(-50%)' }}></div>
+                            <input 
+                              type="number" 
+                              min="0"
+                              max="2"
+                              value={tempYellowCards[player.id] || 0}
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) => setTempYellowCards({
+                                ...tempYellowCards,
+                                [player.id]: Math.max(0, parseInt(e.target.value) || 0)
+                              })}
+                              style={{ width: '40px', padding: '4px', borderRadius: '4px', border: '1px solid #cbd5e1' }}
+                            />
+                          </div>
+
+                          <div title="Червоні картки" style={{ position: 'relative' }}>
+                            <div style={{ width: '10px', height: '14px', background: '#ef4444', borderRadius: '2px', position: 'absolute', left: '-14px', top: '50%', transform: 'translateY(-50%)' }}></div>
+                            <input 
+                              type="number" 
+                              min="0"
+                              max="1"
+                              value={tempRedCards[player.id] || 0}
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) => setTempRedCards({
+                                ...tempRedCards,
+                                [player.id]: Math.max(0, parseInt(e.target.value) || 0)
+                              })}
+                              style={{ width: '40px', padding: '4px', borderRadius: '4px', border: '1px solid #cbd5e1' }}
+                            />
+                          </div>
+                        </div>
+
                       </div>
                     ))}
                     {!(selectedMatchForScorers.homeRoster?.length > 0 || details?.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players?.length > 0) && (
@@ -1994,16 +2065,55 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                           {player.footballShirtNumber ? `№${player.footballShirtNumber} ` : ''}
                           {player.lastName} {player.firstName[0]}.
                         </span>
-                        <input 
-                          type="number" 
-                          min="0"
-                          value={tempScorers[player.id] || 0}
-                          onFocus={(e) => e.target.select()}
-                          onChange={(e) => setTempScorers({
-                            ...tempScorers,
-                            [player.id]: Math.max(0, parseInt(e.target.value) || 0)
-                          })}
-                        />
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <div title="Голи" style={{ position: 'relative' }}>
+                            <i className="fas fa-futbol" style={{ fontSize: '12px', position: 'absolute', left: '-14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }}></i>
+                            <input 
+                              type="number" 
+                              min="0"
+                              value={tempScorers[player.id] || 0}
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) => setTempScorers({
+                                ...tempScorers,
+                                [player.id]: Math.max(0, parseInt(e.target.value) || 0)
+                              })}
+                              style={{ width: '40px', padding: '4px', borderRadius: '4px', border: '1px solid #cbd5e1' }}
+                            />
+                          </div>
+                          
+                          <div title="Жовті картки" style={{ position: 'relative' }}>
+                            <div style={{ width: '10px', height: '14px', background: '#fbbf24', borderRadius: '2px', position: 'absolute', left: '-14px', top: '50%', transform: 'translateY(-50%)' }}></div>
+                            <input 
+                              type="number" 
+                              min="0"
+                              max="2"
+                              value={tempYellowCards[player.id] || 0}
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) => setTempYellowCards({
+                                ...tempYellowCards,
+                                [player.id]: Math.max(0, parseInt(e.target.value) || 0)
+                              })}
+                              style={{ width: '40px', padding: '4px', borderRadius: '4px', border: '1px solid #cbd5e1' }}
+                            />
+                          </div>
+
+                          <div title="Червоні картки" style={{ position: 'relative' }}>
+                            <div style={{ width: '10px', height: '14px', background: '#ef4444', borderRadius: '2px', position: 'absolute', left: '-14px', top: '50%', transform: 'translateY(-50%)' }}></div>
+                            <input 
+                              type="number" 
+                              min="0"
+                              max="1"
+                              value={tempRedCards[player.id] || 0}
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) => setTempRedCards({
+                                ...tempRedCards,
+                                [player.id]: Math.max(0, parseInt(e.target.value) || 0)
+                              })}
+                              style={{ width: '40px', padding: '4px', borderRadius: '4px', border: '1px solid #cbd5e1' }}
+                            />
+                          </div>
+                        </div>
+
                       </div>
                     ))}
                     {!(selectedMatchForScorers.awayRoster?.length > 0 || details?.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players?.length > 0) && (

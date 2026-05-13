@@ -68,6 +68,8 @@ export interface PlayerDto {
     matchesPlayed?: number;
     winsCount?: number;
     goalsScored?: number;
+    yellowCardsCount?: number;
+    redCardsCount?: number;
     performanceScore?: number;
     globalRank?: number;
     sports?: string[];
@@ -77,6 +79,8 @@ export interface PlayerDto {
         matchesPlayed: number;
         winsCount: number;
         goalsCount: number;
+        yellowCardsCount?: number;
+        redCardsCount?: number;
         rank: number;
     }[];
     pointsBreakdown?: PointEntryDto[];

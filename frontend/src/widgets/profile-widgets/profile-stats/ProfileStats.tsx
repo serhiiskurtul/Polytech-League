@@ -12,6 +12,8 @@ interface Stats {
   competitionsCount: number;
   eloRating: number;
   goalsScored: number;
+  yellowCards?: number;
+  redCards?: number;
   globalRank?: number;
   sportStats?: SportStat[];
   chessTotalPoints?: number | null;
@@ -83,6 +85,18 @@ const ProfileStats = ({ stats }: ProfileStatsProps) => {
           <div className={styles.statCard}>
             <div className={styles.statValue}>{stats.goalsScored}</div>
             <div className={styles.statLabel}>Забитих голів</div>
+          </div>
+        )}
+        {stats.yellowCards !== undefined && stats.yellowCards > 0 && (
+          <div className={styles.statCard} title="Жовті картки отримані у футбольних матчах">
+            <div className={`${styles.statValue} ${styles.yellowCardValue}`}>{stats.yellowCards}</div>
+            <div className={styles.statLabel}>Жовті картки</div>
+          </div>
+        )}
+        {stats.redCards !== undefined && stats.redCards > 0 && (
+          <div className={styles.statCard} title="Червоні картки отримані у футбольних матчах">
+            <div className={`${styles.statValue} ${styles.redCardValue}`}>{stats.redCards}</div>
+            <div className={styles.statLabel}>Червоні картки</div>
           </div>
         )}
         {stats.chessTotalPoints !== null && stats.chessTotalPoints !== undefined && (
