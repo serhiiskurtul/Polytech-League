@@ -46,7 +46,12 @@ public class PlayerService : IPlayerService
     {
         var allWithRankings = await GetAllWithRankingsAsync(null, cancellationToken);
         var ranked = allWithRankings.FirstOrDefault(p => p.Id == id);
-        if (ranked != null) { await PopulateAutomaticBadgesAsync(ranked, cancellationToken); await PopulateChessSpecialStatsAsync(ranked, cancellationToken); return ranked; }
+        if (ranked != null) { 
+            await PopulateAutomaticBadgesAsync(ranked, cancellationToken); 
+            await PopulateChessSpecialStatsAsync(ranked, cancellationToken); 
+            await PopulateFootballStatsAsync(ranked, cancellationToken);
+            return ranked; 
+        }
         // Fallback for players not in rankings (Admins, External)
         var player = await _dbContext.Players
             .Include(p => p.User)
@@ -71,7 +76,12 @@ public class PlayerService : IPlayerService
     {
         var allWithRankings = await GetAllWithRankingsAsync(null, cancellationToken);
         var ranked = allWithRankings.FirstOrDefault(p => p.UserId == userId);
-        if (ranked != null) { await PopulateAutomaticBadgesAsync(ranked, cancellationToken); await PopulateChessSpecialStatsAsync(ranked, cancellationToken); return ranked; }
+        if (ranked != null) { 
+            await PopulateAutomaticBadgesAsync(ranked, cancellationToken); 
+            await PopulateChessSpecialStatsAsync(ranked, cancellationToken); 
+            await PopulateFootballStatsAsync(ranked, cancellationToken);
+            return ranked; 
+        }
         // Fallback for players not in rankings (Admins, External)
         var player = await _dbContext.Players
             .Include(p => p.User)
