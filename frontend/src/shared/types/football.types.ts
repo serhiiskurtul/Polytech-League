@@ -23,6 +23,18 @@ export interface footballGoalRequest {
   goalsCount: number;
 }
 
+export interface footballCard {
+  id: number;
+  matchId: number;
+  playerId: number;
+  player?: PlayerDto;
+  type: 'Yellow' | 'Red';
+}
+
+export interface footballCardRequest {
+  playerId: number;
+}
+
 export interface footballMatchResponse {
   id: number;
   eventId: number;
@@ -48,6 +60,8 @@ export interface footballMatchResponse {
   homeCaptainId?: number | null;
   awayCaptainId?: number | null;
   goals?: footballGoal[];
+  yellowCards?: footballCard[];
+  redCards?: footballCard[];
 }
 
 export interface footballEventResponse {

@@ -59,7 +59,10 @@ const getSportName = (type: string) => {
 };
 
 const ProfileStats = ({ stats }: ProfileStatsProps) => {
-  const isFootballer = stats.sportStats?.some(s => s.sportType.toLowerCase() === 'football');
+  const isFootballer = stats.sportStats?.some(s => s.sportType.toLowerCase() === 'football') || 
+                       (stats.goalsScored !== undefined && stats.goalsScored > 0) ||
+                       (stats.yellowCards !== undefined && stats.yellowCards > 0) ||
+                       (stats.redCards !== undefined && stats.redCards > 0);
 
   return (
     <section className={styles.card}>

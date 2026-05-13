@@ -111,14 +111,21 @@ public class FootballMatchService :
         target.Cards ??= new List<FootballCard>();
 
         // Remove old cards
-        _dbcontext.FootballCards.RemoveRange(target.Cards);
-        target.Cards.Clear();
+        if (target.Cards.Any())
+        {
+            _dbcontext.FootballCards.RemoveRange(target.Cards);
+            target.Cards.Clear();
+        }
 
         // Add new cards
-        foreach (var card in source.Cards)
+        foreach (var sourceCard in source.Cards)
         {
-            card.MatchId = target.Id;
-            target.Cards.Add(card);
+            target.Cards.Add(new FootballCard
+            {
+                MatchId = target.Id,
+                PlayerId = sourceCard.PlayerId,
+                Type = sourceCard.Type
+            });
         }
     }
 

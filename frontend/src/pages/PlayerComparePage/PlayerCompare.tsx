@@ -260,7 +260,10 @@ export const PlayerComparePage = () => {
               />
                {/* Only show goals if both played football */}
                {(player1.sportStats?.some(s => s.sportType === 'football') || 
-                 player2?.sportStats?.some(s => s.sportType === 'football')) && (
+                 player2?.sportStats?.some(s => s.sportType === 'football') ||
+                 (player1.goalsScored || 0) > 0 || (player2?.goalsScored || 0) > 0 ||
+                 (player1.yellowCardsCount || 0) > 0 || (player2?.yellowCardsCount || 0) > 0 ||
+                 (player1.redCardsCount || 0) > 0 || (player2?.redCardsCount || 0) > 0) && (
                   <>
                     <StatRow 
                       label="Забито голів" 

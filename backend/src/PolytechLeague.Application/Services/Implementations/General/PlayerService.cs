@@ -577,6 +577,36 @@ public class PlayerService : IPlayerService
                 AddStats("beach_volleyball", bvPlayed, bvWins);
                 // 4. Team Sport Stats & Goals
                 var pGoals = goalsS.FirstOrDefault(x => x.Id == playerId)?.Goals ?? 0;
+                int fPlayed = (fH.TryGetValue(playerId, out var fHStats) ? fHStats.Played : 0) + (fA.TryGetValue(playerId, out var fAStats) ? fAStats.Played : 0);
+                int fWins = (fH.TryGetValue(playerId, out var fHWins) ? fHWins.Wins : 0) + (fA.TryGetValue(playerId, out var fAWins) ? fAWins.Wins : 0);
+                if (fPlayed > 0)
+                {
+                    if (!sportStatsMap.ContainsKey("football")) sportStatsMap["football"] = new SportStatsDto { SportType = "football" };
+                    var s = sportStatsMap["football"];
+                    s.MatchesPlayed += fPlayed;
+                    s.WinsCount += fWins;
+                    
+                    int winPts = fWins * 10;
+                    int playPts = fPlayed * 5;
+                    s.PerformanceScore += winPts + playPts;
+                    totalScore += winPts + playPts;
+                    
+                    pointsBreakdown.Add(new PointEntryDto {
+                        Description = $"Участь у матчах (Футбол): {fPlayed} ігор",
+                        Points = playPts,
+                        Category = "Participation",
+                        SportType = "football"
+                    });
+                    if (fWins > 0) {
+                        pointsBreakdown.Add(new PointEntryDto {
+                            Description = $"Перемоги у матчах (Футбол): {fWins} перемог",
+                            Points = winPts,
+                            Category = "Wins",
+                            SportType = "football"
+                        });
+                    }
+                }
+
                 if (pGoals > 0) {
                     if (!sportStatsMap.ContainsKey("football")) sportStatsMap["football"] = new SportStatsDto { SportType = "football" };
                     var s = sportStatsMap["football"];
@@ -1579,7 +1609,7 @@ public class PlayerService : IPlayerService
         {
             var matchDto = new HeadToHeadMatchDto {
                 SportType = "beach_volleyball",
-                TournamentName = m.Event?.Name ?? "РўСѓСЂРЅС–СЂ Р· РїР»СЏР¶РЅРѕРіРѕ РІРѕР»РµР№Р±РѕР»Сѓ",
+                TournamentName = m.Event?.Name ?? "Турнір з пляжного волейболу",
                 Date = m.Event?.Date ?? DateTime.MinValue,
                 TournamentId = m.EventId,
                 Score = $"{m.HomeSetsWon}:{m.AwaySetsWon}"
@@ -1616,7 +1646,12 @@ public class PlayerService : IPlayerService
             dto.YellowCardsCount = yellowCards;
             dto.RedCardsCount = redCards;
 
-            if (goals > 0 || yellowCards > 0 || redCards > 0)
+            // Always add football to sportStats if they are a football player, even if stats are 0
+            bool isFootballer = goals > 0 || yellowCards > 0 || redCards > 0 || 
+                                dto.FootballTeamId != null || dto.FootballPosition != null || 
+                                dto.FootballShirtNumber != null;
+
+            if (isFootballer)
             {
                 var footballStats = dto.SportStats?.FirstOrDefault(s => s.SportType == "football");
                 if (footballStats == null)
