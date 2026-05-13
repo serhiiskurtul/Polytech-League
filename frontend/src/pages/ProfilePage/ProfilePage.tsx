@@ -142,7 +142,9 @@ const ProfilePage = () => {
     sportStats: playerProfile?.sportStats,
     chessTotalPoints: playerProfile?.chessTotalPoints,
     chessTotalPossiblePoints: playerProfile?.chessTotalPossiblePoints,
-    isChessUndefeatedFourSeasons: playerProfile?.isChessUndefeatedFourSeasons
+    isChessUndefeatedFourSeasons: playerProfile?.isChessUndefeatedFourSeasons,
+    yellowCards: playerProfile?.yellowCardsCount,
+    redCards: playerProfile?.redCardsCount
   };
 
   const handleEditProfile = () => {
