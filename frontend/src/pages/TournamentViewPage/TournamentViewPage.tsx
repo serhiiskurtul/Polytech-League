@@ -1004,8 +1004,10 @@ const TournamentViewPage = () => {
             setWinners({
               firstPlaceId: d.firstPlace?.id || d.firstPlaceTeam?.id || 0,
               secondPlaceId: d.secondPlace?.id || d.secondPlaceTeam?.id || 0,
-              thirdPlaceId: d.thirdPlace?.id || d.thirdPlaceTeam?.id || 0
+              thirdPlaceId: d.thirdPlace?.id || d.thirdPlaceTeam?.id || 0,
+              mvpId: d.mvpId || 0
             });
+
 
             // Initialize editTournamentData to prevent 400 errors when saving winners
             setEditTournamentData({

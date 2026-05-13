@@ -1059,6 +1059,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("main_photo_url");
 
+                    b.Property<long?>("MvpId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
@@ -1111,6 +1114,8 @@ namespace PolytechLeague.Persistence.Migrations
 
                     b.HasIndex("Level")
                         .HasDatabaseName("IX_events_level");
+
+                    b.HasIndex("MvpId");
 
                     b.HasIndex("SeasonId");
 
@@ -3274,6 +3279,10 @@ namespace PolytechLeague.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("FirstPlaceId");
 
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "Mvp")
+                        .WithMany()
+                        .HasForeignKey("MvpId");
+
                     b.HasOne("PolytechLeague.Domain.Entities.Season", "Season")
                         .WithMany("Events")
                         .HasForeignKey("SeasonId")
@@ -3288,6 +3297,8 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasForeignKey("ThirdPlaceId");
 
                     b.Navigation("FirstPlace");
+
+                    b.Navigation("Mvp");
 
                     b.Navigation("Season");
 
