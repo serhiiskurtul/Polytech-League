@@ -45,7 +45,7 @@ const getSportName = (type: string) => {
     case 'table_tennis': return 'Настільний теніс';
     case 'armwrestling': return 'Армрестлинг';
     case 'badminton': return 'Бадмінтон';
-    case 'football': return 'Футзал';
+    case 'football': return 'Футбол';
     case 'volleyball': return 'Волейбол';
     case 'basketball_3x3': return 'Баскетбол 3x3';
     case 'beach_volleyball': return 'Пляжний волейбол';

@@ -4,7 +4,7 @@ import UniversalBracket, { BracketRound, BracketMatch } from '@/components/Tourn
 import styles from '../TournamentViewPage.module.css';
 import bracketStyles from '@/components/Tournament/UniversalBracket/UniversalBracket.module.css';
 
-interface footballBracketProps {
+interface FootballBracketProps {
   matches: footballMatchResponse[];
   isAdmin?: boolean;
   onDeleteMatch?: (matchId: number) => void;
@@ -14,7 +14,7 @@ interface footballBracketProps {
   teams?: any[]; // For name lookup
 }
 
-const footballBracket: React.FC<footballBracketProps> = ({
+const FootballBracket: React.FC<FootballBracketProps> = ({
   matches,
   isAdmin,
   onDeleteMatch,
@@ -84,7 +84,7 @@ const footballBracket: React.FC<footballBracketProps> = ({
     return `${player.lastName} ${player.firstName?.[0] || ''}.`;
   };
 
-  const renderfootballMatchCard = (bracketMatch: any) => {
+  const renderFootballMatchCard = (bracketMatch: any) => {
     const match: footballMatchResponse = bracketMatch.originalMatch;
     const isHomeWinner = (match.homeTeamScore || 0) > (match.awayTeamScore || 0);
     const isAwayWinner = (match.awayTeamScore || 0) > (match.homeTeamScore || 0);
@@ -169,7 +169,7 @@ const footballBracket: React.FC<footballBracketProps> = ({
           isAdmin={isAdmin}
           onDeleteMatch={(id) => onDeleteMatch && onDeleteMatch(Number(id))}
           onOpenScorers={(match: any) => onOpenScorers && onOpenScorers(match.originalMatch)}
-          renderMatchCard={renderfootballMatchCard}
+          renderMatchCard={renderFootballMatchCard}
           cardHeight={160}
         />
       ) : (
@@ -183,4 +183,4 @@ const footballBracket: React.FC<footballBracketProps> = ({
   );
 };
 
-export default footballBracket;
+export default FootballBracket;

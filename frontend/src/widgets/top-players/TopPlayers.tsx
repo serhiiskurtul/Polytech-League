@@ -33,7 +33,7 @@ const TopPlayers = () => {
   const [timeFilter, setTimeFilter] = useState('Тиждень');
   const [expandedPlayer, setExpandedPlayer] = useState<number | null>(null);
 
-  const sports = ['Всі', 'Футзал', 'Баскетбол', 'Волейбол', 'Шахи', 'Настільний теніс'];
+  const sports = ['Всі', 'Футбол', 'Баскетбол', 'Волейбол', 'Шахи', 'Настільний теніс'];
   const timeFilters = ['Тиждень', 'Місяць', 'Сезон', 'Всі часи'];
 
   const players: Player[] = [
@@ -58,7 +58,7 @@ const TopPlayers = () => {
       rank: 2,
       name: 'Влад Ковальчук',
       initials: 'ВК',
-      sport: 'Футзал',
+      sport: 'Футбол',
       rating: 1850,
       ratingChange: '+18',
       goals: 21,
@@ -130,7 +130,7 @@ const TopPlayers = () => {
 
   const getSportIcon = (sport: string) => {
     const icons: Record<string, string> = {
-      'Футзал': '⚽',
+      'Футбол': '⚽',
       'Баскетбол': '🏀',
       'Волейбол': '🏐',
       'Шахи': '♟️',
@@ -246,7 +246,7 @@ const TopPlayers = () => {
 
                 <div className={styles.statsColumn}>
                   <div className={styles.statsText}>
-                    {player.sport === 'Футзал' && `${player.goals} голів • ${player.assists} пасів`}
+                    {player.sport === 'Футбол' && `${player.goals} голів • ${player.assists} пасів`}
                     {player.sport === 'Шахи' && `${player.wins}W • ${player.losses}L • ${player.draws}D`}
                     {player.sport === 'Настільний теніс' && `${player.setsWon}S+ • ${player.setsLost}S-`}
                     {player.sport === 'Баскетбол' && `${player.points} pts • ${player.rebounds} reb`}
@@ -289,7 +289,7 @@ const TopPlayers = () => {
                           Детальна статистика
                         </h4>
                         <div className={styles.statsGrid}>
-                          {player.sport === 'Футзал' && (
+                          {player.sport === 'Футбол' && (
                             <>
                               <div className={styles.statCard}>
                                 <div className={styles.statValue}>{player.goals}</div>

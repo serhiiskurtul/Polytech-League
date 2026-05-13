@@ -5,7 +5,7 @@ import { Logo } from '@/shared/ui';
 const Footer = () => {
 
   const sports = [
-    { id: 'football', label: 'Футзал' },
+    { id: 'football', label: 'Футбол' },
     { id: 'basketball-3x3', label: 'Баскетбол 3х3' },
     { id: 'volleyball', label: 'Волейбол' },
     { id: 'beach-volleyball', label: 'Пляжний волейбол' },
@@ -112,3 +112,4 @@ const Footer = () => {
 };
 
 export default Footer;
+

@@ -269,7 +269,7 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
               <div className={styles.shirtNumbersGrid}>
                 {initialData.sports?.includes('football') && (
                   <div className={styles.formGroup}>
-                    <label htmlFor="footballShirtNumber">Номер у футзалі</label>
+                    <label htmlFor="footballShirtNumber">Номер у футболі</label>
                     <input
                       type="number"
                       id="footballShirtNumber"

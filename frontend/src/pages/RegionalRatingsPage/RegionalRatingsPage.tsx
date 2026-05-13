@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 import * as XLSX from 'xlsx';
 
 const ALL_SPORTS = [
-  "Шахи", "Шашки", "Футзал", "Армреслінг", 
+  "Шахи", "Шашки", "Футбол", "Армреслінг", 
   "Настільний теніс", "Бадмінтон", "Волейбол", 
   "Баскетбол 3x3", "Пляжний волейбол", "Легка атлетика"
 ];
@@ -403,3 +403,4 @@ const RegionalRatingsPage: React.FC = () => {
 };
 
 export default RegionalRatingsPage;
+

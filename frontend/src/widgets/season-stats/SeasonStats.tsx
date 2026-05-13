@@ -24,7 +24,7 @@ const SeasonStats= () => {
           activeTournaments: data.activeTournamentsCount,
           registeredPlayers: data.registeredPlayersCount,
           progress: data.seasonProgress,
-          topSport: data.topSport === 'Футзал' ? '⚽' : '🏆'
+          topSport: data.topSport === 'Футбол' ? '⚽' : '🏆'
         });
       } catch (error) {
         console.error('Помилка при завантаженні статистики:', error);

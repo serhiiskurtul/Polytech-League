@@ -543,7 +543,7 @@ const translateSport = (sport: string) => {
   const translations: Record<string, string> = {
     chess: 'Шахи',
     checkers: 'Шашки',
-    football: 'Футзал',
+    football: 'Футбол',
     volleyball: 'Волейбол',
     basketball_3x3: 'Баскетбол 3х3',
     table_tennis: 'Настільний теніс',
@@ -665,3 +665,4 @@ const StatRow = ({ label, val1, val2, suffix = '', isBetterHigh = true, customVa
     </div>
   );
 };
+

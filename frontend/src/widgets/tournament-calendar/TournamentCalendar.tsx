@@ -5,7 +5,7 @@ import { getTournaments } from '@/shared/api/tournaments.api';
 import { Tournament } from '@/shared/types/tournament.types';
 
 const SPORT_CONFIG: Record<string, { label: string; icon: string; color: string }> = {
-  'football': { label: 'Футзал', icon: 'fa-futbol', color: 'var(--accent)' },
+  'football': { label: 'Футбол', icon: 'fa-futbol', color: 'var(--accent)' },
   'basketball-3x3': { label: 'Баскетбол 3x3', icon: 'fa-basketball-ball', color: 'var(--primary)' },
   'volleyball': { label: 'Волейбол', icon: 'fa-volleyball-ball', color: 'var(--primary)' },
   'beach-volleyball': { label: 'Пляжний волейбол', icon: 'fa-umbrella-beach', color: 'var(--warning)' },

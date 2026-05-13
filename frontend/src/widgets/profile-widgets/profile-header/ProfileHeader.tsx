@@ -178,7 +178,7 @@ const ProfileHeader = ({ userData, isAdmin, onEdit, onAvatarUpload, onLogout, on
               )}
               {userData.footballShirtNumber !== null && userData.footballShirtNumber !== undefined && (
                 <div className={styles.detailItem}>
-                  <span className={styles.detailLabel}><i className="fas fa-tshirt" style={{ color: '#e11d48' }}></i> № Футзал</span>
+                  <span className={styles.detailLabel}><i className="fas fa-tshirt" style={{ color: '#e11d48' }}></i> № Футбол</span>
                   <span className={styles.detailValue} style={{ fontWeight: 'bold' }}>{userData.footballShirtNumber}</span>
                 </div>
               )}

@@ -5,7 +5,7 @@ import { getAllPlayers } from '@/shared/api';
 import { 
   updateVolleyballMatch, 
   updateBeachVolleyballMatch, 
-  updatefootballMatch, 
+  updateFootballMatch, 
   updateBasketball3x3Match,
   updateBadmintonMatch,
   updateChessGame,
@@ -13,7 +13,7 @@ import {
   updateTableTennisMatch,
   createVolleyballMatch,
   createBeachVolleyballMatch,
-  createfootballMatch,
+  createFootballMatch,
   createBasketball3x3Match,
   createBadmintonMatch,
   createChessGame,
@@ -21,7 +21,7 @@ import {
   createTableTennisMatch,
   createVolleyballTeam,
   createBeachVolleyballTeam,
-  createfootballTeam,
+  createFootballTeam,
   createBasketball3x3Team,
   createBadmintonTeam,
   createChessTeam,
@@ -30,7 +30,7 @@ import {
   createPlayer,
   updateVolleyballTeam,
   updateBeachVolleyballTeam,
-  updatefootballTeam,
+  updateFootballTeam,
   updateBasketball3x3Team,
   updateBadmintonTeam,
   updateChessTeam,
@@ -41,20 +41,20 @@ import {
   deleteTableTennisMatch,
   deleteVolleyballMatch,
   deleteBeachVolleyballMatch,
-  deletefootballMatch,
+  deleteFootballMatch,
   deleteBasketball3x3Match,
   deleteBadmintonMatch,
   deleteVolleyballTeam,
   deleteBeachVolleyballTeam,
-  deletefootballTeam,
+  deleteFootballTeam,
   deleteBasketball3x3Team,
   deleteBadmintonTeam,
   deleteChessTeam,
   deleteCheckersTeam,
   deleteTableTennisTeam,
-  approvefootballParticipant,
-  rejectfootballParticipant,
-  removefootballParticipant,
+  approveFootballParticipant,
+  rejectFootballParticipant,
+  removeFootballParticipant,
   approveVolleyballParticipant,
   rejectVolleyballParticipant,
   removeVolleyballParticipant,
@@ -73,11 +73,11 @@ import {
 } from '@/shared/api';
 import { RegistrationStatus } from '@/shared/types/tournament.types';
 import TournamentPodium from './TournamentPodium';
-import footballBracket from './footballBracket';
+import FootballBracket from './FootballBracket';
 import styles from '../TournamentViewPage.module.css';
 import { Link } from 'react-router-dom';
 
-type Sport = 'volleyball' | 'волейбол' | 'beach_volleyball' | 'beach-volleyball' | 'пляжний_волейбол' | 'football' | 'футзал' | 'basketball_3x3' | 'basketball3x3' | 'basketball-3x3' | 'баскетбол_3х3' | 'badminton' | 'бадмінтон' | 'chess' | 'шахи' | 'checkers' | 'шашки' | 'tabletennis' | 'table_tennis' | 'table-tennis' | 'настільний_теніс';
+type Sport = 'volleyball' | 'волейбол' | 'beach_volleyball' | 'beach-volleyball' | 'пляжний_волейбол' | 'football' | 'футбол' | 'basketball_3x3' | 'basketball3x3' | 'basketball-3x3' | 'баскетбол_3х3' | 'badminton' | 'бадмінтон' | 'chess' | 'шахи' | 'checkers' | 'шашки' | 'tabletennis' | 'table_tennis' | 'table-tennis' | 'настільний_теніс';
 
 interface TeamSportsTournamentViewProps {
   sport: Sport;
@@ -92,7 +92,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   isAdmin,
   onRefresh
 }) => {
-  const [activeTab, setActiveTab] = useState<'standings' | 'matches' | 'teams' | 'info' | 'bracket' | 'participants'>((sport === 'football' || sport === 'футзал') ? 'bracket' : 'matches');
+  const [activeTab, setActiveTab] = useState<'standings' | 'matches' | 'teams' | 'info' | 'bracket' | 'participants'>((sport === 'football' || sport === 'футбол') ? 'bracket' : 'matches');
   const [allPlayers, setAllPlayers] = useState<PlayerDto[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const isRegionalOrNational = details?.level === 'Regional' || details?.level === 'National';
@@ -155,7 +155,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     switch (sport) {
       case 'volleyball': return updateVolleyballMatch;
       case 'beach_volleyball': return updateBeachVolleyballMatch;
-      case 'football': return updatefootballMatch;
+      case 'football': return updateFootballMatch;
       case 'basketball_3x3': return updateBasketball3x3Match;
       case 'badminton': return updateBadmintonMatch;
       case 'chess': return updateChessGame;
@@ -309,7 +309,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       };
 
 
-      await updatefootballMatch(selectedMatchForScorers.id, payload);
+      await updateFootballMatch(selectedMatchForScorers.id, payload);
       setIsScorersModalOpen(false);
       onRefresh();
     } catch (err) {
@@ -328,7 +328,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       switch (sport) {
         case 'volleyball': deleteApi = deleteVolleyballMatch; break;
         case 'beach_volleyball': deleteApi = deleteBeachVolleyballMatch; break;
-        case 'football': deleteApi = deletefootballMatch; break;
+        case 'football': deleteApi = deleteFootballMatch; break;
         case 'basketball_3x3': deleteApi = (id: number) => deleteBasketball3x3Match(id); break;
         case 'badminton': deleteApi = deleteBadmintonMatch; break;
         case 'chess': deleteApi = (id: number) => deleteChessGame(id, details.id); break;
@@ -352,7 +352,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     switch (sport) {
       case 'volleyball': return updateVolleyballTeam;
       case 'beach_volleyball': return updateBeachVolleyballTeam;
-      case 'football': return updatefootballTeam;
+      case 'football': return updateFootballTeam;
       case 'basketball_3x3': return updateBasketball3x3Team;
       case 'badminton': return updateBadmintonTeam;
       case 'chess': return updateChessTeam;
@@ -533,7 +533,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       switch (sport) {
         case 'volleyball': createApi = createVolleyballMatch; break;
         case 'beach_volleyball': createApi = createBeachVolleyballMatch; break;
-        case 'football': createApi = createfootballMatch; break;
+        case 'football': createApi = createFootballMatch; break;
         case 'basketball_3x3': createApi = createBasketball3x3Match; break;
         case 'badminton': 
           createApi = createBadmintonMatch; 
@@ -607,7 +607,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       switch (sport) {
         case 'volleyball': createApi = createVolleyballTeam; break;
         case 'beach_volleyball': createApi = createBeachVolleyballTeam; break;
-        case 'football': createApi = createfootballTeam; break;
+        case 'football': createApi = createFootballTeam; break;
         case 'basketball_3x3': createApi = createBasketball3x3Team; break;
         case 'badminton': createApi = createBadmintonTeam; break;
         case 'chess': createApi = createChessTeam; break;
@@ -655,14 +655,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     try {
       let approveApi;
       switch (sport) {
-        case 'football': approveApi = approvefootballParticipant; break;
+        case 'football': approveApi = approveFootballParticipant; break;
         case 'volleyball': approveApi = approveVolleyballParticipant; break;
         case 'beach_volleyball': approveApi = approveBeachVolleyballParticipant; break;
         case 'basketball_3x3': approveApi = approveBasketball3x3Participant; break;
         case 'badminton': approveApi = approveBadmintonParticipant; break;
         case 'table_tennis':
         case 'tabletennis': approveApi = approveTableTennisParticipant; break;
-        default: approveApi = approvefootballParticipant;
+        default: approveApi = approveFootballParticipant;
       }
       await approveApi(details.id, playerId);
       onRefresh();
@@ -676,14 +676,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     try {
       let rejectApi;
       switch (sport) {
-        case 'football': rejectApi = rejectfootballParticipant; break;
+        case 'football': rejectApi = rejectFootballParticipant; break;
         case 'volleyball': rejectApi = rejectVolleyballParticipant; break;
         case 'beach_volleyball': rejectApi = rejectBeachVolleyballParticipant; break;
         case 'basketball_3x3': rejectApi = rejectBasketball3x3Participant; break;
         case 'badminton': rejectApi = rejectBadmintonParticipant; break;
         case 'table_tennis':
         case 'tabletennis': rejectApi = rejectTableTennisParticipant; break;
-        default: rejectApi = rejectfootballParticipant;
+        default: rejectApi = rejectFootballParticipant;
       }
       await rejectApi(details.id, playerId);
       onRefresh();
@@ -698,14 +698,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     try {
       let removeApi;
       switch (sport) {
-        case 'football': removeApi = removefootballParticipant; break;
+        case 'football': removeApi = removeFootballParticipant; break;
         case 'volleyball': removeApi = removeVolleyballParticipant; break;
         case 'beach_volleyball': removeApi = removeBeachVolleyballParticipant; break;
         case 'basketball_3x3': removeApi = removeBasketball3x3Participant; break;
         case 'badminton': removeApi = removeBadmintonParticipant; break;
         case 'table_tennis':
         case 'tabletennis': removeApi = removeTableTennisParticipant; break;
-        default: removeApi = removefootballParticipant;
+        default: removeApi = removeFootballParticipant;
       }
       await removeApi(details.id, playerId);
       onRefresh();
@@ -822,7 +822,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       switch (sport) {
         case 'volleyball': deleteApi = deleteVolleyballTeam; break;
         case 'beach_volleyball': deleteApi = deleteBeachVolleyballTeam; break;
-        case 'football': deleteApi = deletefootballTeam; break;
+        case 'football': deleteApi = deleteFootballTeam; break;
         case 'basketball_3x3': deleteApi = deleteBasketball3x3Team; break;
         case 'badminton': deleteApi = deleteBadmintonTeam; break;
         case 'chess': deleteApi = deleteChessTeam; break;
@@ -892,7 +892,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       case 'beach-volleyball':
       case 'пляжний_волейбол': return 'Пляжний Волейбол';
       case 'football':
-      case 'футзал': return 'Футзал';
+      case 'футбол': return 'Футбол';
       case 'basketball_3x3':
       case 'basketball3x3':
       case 'basketball-3x3':
@@ -924,11 +924,11 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           <i className="fas fa-trophy"></i> {getSportLabel()}
         </div>
         <div className={styles.tabsNav}>
-          {!(sport === 'football' || sport === 'футзал') && (
+          {!(sport === 'football' || sport === 'футбол') && (
             <button className={activeTab === 'matches' ? styles.activeTab : ''} onClick={() => setActiveTab('matches')}>Матчі</button>
           )}
           <button className={activeTab === 'standings' ? styles.activeTab : ''} onClick={() => setActiveTab('standings')}>Таблиця</button>
-          {(sport === 'football' || sport === 'футзал') && (
+          {(sport === 'football' || sport === 'футбол') && (
             <button className={activeTab === 'bracket' ? styles.activeTab : ''} onClick={() => setActiveTab('bracket')}>Сітка</button>
           )}
           <button className={activeTab === 'teams' ? styles.activeTab : ''} onClick={() => setActiveTab('teams')}>Команди</button>
@@ -979,7 +979,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       {/* Main Content Areas */}
       <div className={styles.tabContent}>
         {/* football Admin Panel (Horizontal) */}
-        {isAdmin && activeTab === 'bracket' && (sport === 'football' || sport === 'футзал') && (
+        {isAdmin && activeTab === 'bracket' && (sport === 'football' || sport === 'футбол') && (
             <div className={styles.footballAdminPanel}>
                 <div className={styles.panelHeader}>
                     <i className="fas fa-plus-circle"></i> Додати новий поєдинок
@@ -1170,7 +1170,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
                   {isAdmin && (
                     <div className={styles.matchActions}>
-                      {(sport === 'football' || sport === 'футзал') && (
+                      {(sport === 'football' || sport === 'футбол') && (
                         <button 
                           className={styles.scorersBtn}
                           onClick={() => handleOpenScorers(match)}
@@ -1349,8 +1349,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           </div>
         )}
 
-        {activeTab === 'bracket' && (sport === 'football' || sport === 'футзал') && (
-          <footballBracket 
+        {activeTab === 'bracket' && (sport === 'football' || sport === 'футбол') && (
+          <FootballBracket 
             matches={details.matches || details.games || []}
             isAdmin={isAdmin}
             onDeleteMatch={handleDeleteMatch}
@@ -1546,7 +1546,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   </div>
                 </div>
 
-                {(sport === 'football' || sport === 'футзал') && (
+                {(sport === 'football' || sport === 'футбол') && (
                   <div className={styles.formGroup} style={{ marginBottom: '20px' }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#64748b' }}>
                       <i className="fas fa-filter"></i> Розумна фільтрація
@@ -1698,7 +1698,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                                         <span className={styles.pGroup}>{player.group}</span>
                                     </div>
                                     <div className={styles.pickStatus}>
-                                        {(isSelected && (sport === 'football' || sport === 'футзал')) && (
+                                        {(isSelected && (sport === 'football' || sport === 'футбол')) && (
                                           <div className={styles.roleToggles}>
                                             <button 
                                               className={`${styles.roleToggleBtn} ${team?.captainId === player.id ? styles.isCaptain : ''}`}
@@ -1737,7 +1737,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                                     <span className={styles.pGroup}>{player.group}</span>
                                 </div>
                                 <div className={styles.pickStatus}>
-                                   {((sport === 'football' || sport === 'футзал')) && (
+                                   {((sport === 'football' || sport === 'футбол')) && (
                                       <div className={styles.roleToggles}>
                                         {details?.teams?.find((t: any) => t.id === editingTeamId)?.captainId === player.id && (
                                           <span className={styles.isCaptain} title="Капітан"><i className="fas fa-copyright"></i></span>
@@ -2107,3 +2107,4 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 };
 
 export default TeamSportsTournamentView;
+

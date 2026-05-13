@@ -15,7 +15,7 @@ const TopPlayersCompact = () => {
 
   const sports = [
     { label: 'Всі', slug: 'all' },
-    { label: 'Футзал', slug: 'football' },
+    { label: 'Футбол', slug: 'football' },
     { label: 'Баскетбол', slug: 'basketball-3x3' },
     { label: 'Волейбол', slug: 'volleyball' },
     { label: 'Шахи', slug: 'chess' },

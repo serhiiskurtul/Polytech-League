@@ -166,7 +166,7 @@ const TournamentViewPage = () => {
   const getNormalizedSportKey = () => {
     const rawSport = (tournament?.sport || '').toLowerCase().replace(/-/g, '_').replace(/\s/g, '');
     const sportMap: Record<string, string> = {
-      'футзал': 'football',
+      'футбол': 'football',
       'волейбол': 'volleyball',
       'пляжний_волейбол': 'beach_volleyball',
       'пляжнийволейбол': 'beach_volleyball',
@@ -3106,3 +3106,4 @@ const TournamentViewPage = () => {
 };
 
 export default TournamentViewPage;
+

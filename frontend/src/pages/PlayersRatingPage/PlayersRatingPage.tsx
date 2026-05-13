@@ -82,7 +82,7 @@ const PlayersRatingPage = () => {
     { id: 'chess', name: 'Шахи', icon: 'fa-chess', key: 'chess' },
     { id: 'checkers', name: 'Шашки', icon: 'fa-chess-board', key: 'checkers' },
     { id: 'tt', name: 'Настільний теніс', icon: 'fa-table-tennis-paddle-ball', key: 'table_tennis' },
-    { id: 'football', name: 'Футзал', icon: 'fa-futbol', key: 'football' },
+    { id: 'football', name: 'Футбол', icon: 'fa-futbol', key: 'football' },
     { id: 'volleyball', name: 'Волейбол', icon: 'fa-volleyball-ball', key: 'volleyball' },
     { id: 'basketball', name: 'Баскетбол 3х3', icon: 'fa-basketball-ball', key: 'basketball_3x3' },
     { id: 'beach', name: 'Пляжний волейбол', icon: 'fa-umbrella-beach', key: 'beach_volleyball' },
@@ -503,7 +503,7 @@ const PlayersRatingPage = () => {
                 <div className={styles.formulaIcon} style={{ background: '#ffedd5', color: '#ea580c' }}>
                   <i className="fa-solid fa-futbol"></i>
                 </div>
-                <h3>Забиті голи (Футзал)</h3>
+                <h3>Забиті голи (Футбол)</h3>
                 <p>Додаткові бали за індивідуальну результативність:</p>
                 <ul>
                   <li><span>Кожен забитий гол:</span> +5 балів</li>

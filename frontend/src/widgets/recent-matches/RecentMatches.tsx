@@ -12,7 +12,7 @@ const RecentMatches = () => {
 
   const sportSlugMap: Record<string, string> = {
     'Всі': 'all',
-    'Футзал': 'football',
+    'Футбол': 'football',
     'Баскетбол': 'basketball-3x3',
     'Баскетбол 3х3': 'basketball-3x3',
     'Волейбол': 'volleyball',
@@ -25,7 +25,7 @@ const RecentMatches = () => {
   };
 
   const reverseSportMap: Record<string, string> = {
-    'football': 'Футзал',
+    'football': 'Футбол',
     'basketball-3x3': 'Баскетбол 3х3',
     'volleyball': 'Волейбол',
     'table-tennis': 'Настільний теніс',
@@ -65,7 +65,7 @@ const RecentMatches = () => {
 
   const getSportIcon = (sport: string) => {
     const icons: Record<string, string> = {
-      'Футзал': 'fa-futbol',
+      'Футбол': 'fa-futbol',
       'Баскетбол': 'fa-basketball-ball',
       'Волейбол': 'fa-volleyball-ball',
       'Настільний теніс': 'fa-table-tennis',
@@ -78,7 +78,7 @@ const RecentMatches = () => {
 
   const getSportEmoji = (sport: string) => {
     const icons: Record<string, string> = {
-      'Футзал': 'fas fa-futbol',
+      'Футбол': 'fas fa-futbol',
       'Баскетбол': 'fas fa-basketball-ball',
       'Баскетбол 3х3': 'fas fa-basketball-ball',
       'Волейбол': 'fas fa-volleyball-ball',
