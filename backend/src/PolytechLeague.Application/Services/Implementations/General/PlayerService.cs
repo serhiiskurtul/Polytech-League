@@ -1689,6 +1689,27 @@ public class PlayerService : IPlayerService
                 .SumAsync(g => (int?)g.GoalsCount, cancellationToken) ?? 0;
             
             dto.GoalsCount = goals;
+
+            var goalDetails = await _dbContext.FootballGoals
+                .Include(g => g.Match)
+                    .ThenInclude(m => m!.Event)
+                .Include(g => g.Match)
+                    .ThenInclude(m => m!.HomeTeam)
+                .Include(g => g.Match)
+                    .ThenInclude(m => m!.AwayTeam)
+                .Where(g => g.PlayerId == playerId)
+                .ToListAsync(cancellationToken);
+
+            dto.FootballGoalMatches = goalDetails.Select(g => new FootballGoalMatchDto
+            {
+                MatchId = g.MatchId,
+                TournamentId = g.Match?.EventId ?? 0,
+                TournamentName = g.Match?.Event?.Name ?? "Турнір з футболу",
+                HomeTeamName = g.Match?.HomeTeam?.Name ?? "Домашня команда",
+                AwayTeamName = g.Match?.AwayTeam?.Name ?? "Гостьова команда",
+                GoalsScored = g.GoalsCount,
+                Date = g.Match?.Event?.Date ?? DateTime.MinValue
+            }).OrderByDescending(x => x.Date).ToList();
             
             // Try fetching cards using multiple methods to be absolutely sure
             int yellowCards = 0;

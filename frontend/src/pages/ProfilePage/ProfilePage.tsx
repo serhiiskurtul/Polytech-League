@@ -144,7 +144,8 @@ const ProfilePage = () => {
     chessTotalPossiblePoints: playerProfile?.chessTotalPossiblePoints,
     isChessUndefeatedFourSeasons: playerProfile?.isChessUndefeatedFourSeasons,
     yellowCardsCount: playerProfile?.yellowCardsCount,
-    redCardsCount: playerProfile?.redCardsCount
+    redCardsCount: playerProfile?.redCardsCount,
+    footballGoalMatches: playerProfile?.footballGoalMatches
   };
 
   const handleEditProfile = () => {

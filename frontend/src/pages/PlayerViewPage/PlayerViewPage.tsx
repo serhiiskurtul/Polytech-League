@@ -104,7 +104,8 @@ const PlayerViewPage = () => {
     sportStats: playerProfile.sportStats,
     chessTotalPoints: playerProfile.chessTotalPoints,
     chessTotalPossiblePoints: playerProfile.chessTotalPossiblePoints,
-    isChessUndefeatedFourSeasons: playerProfile.isChessUndefeatedFourSeasons
+    isChessUndefeatedFourSeasons: playerProfile.isChessUndefeatedFourSeasons,
+    footballGoalMatches: playerProfile.footballGoalMatches
   };
 
   const handleCompare = () => {

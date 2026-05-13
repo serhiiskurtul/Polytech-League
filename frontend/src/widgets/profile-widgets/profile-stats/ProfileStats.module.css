@@ -209,3 +209,95 @@
   align-items: center;
   gap: 4px;
 }
+
+.scoringHistory {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.matchesList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.matchItem {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  background: var(--primary-light);
+  border-radius: 12px;
+  gap: 20px;
+  transition: all 0.2s ease;
+}
+
+.matchItem:hover {
+  transform: translateX(5px);
+  background: #f1f5f9;
+}
+
+.matchDate {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+  min-width: 80px;
+}
+
+.matchInfo {
+  flex: 1;
+}
+
+.tournamentName {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.teams {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.vs {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0 4px;
+  text-transform: uppercase;
+}
+
+.goalsScored {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+
+.goalCount {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.goalsScored i {
+  color: #3b82f6;
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .matchItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .goalsScored {
+    align-self: flex-end;
+  }
+}

@@ -22,7 +22,17 @@ interface Stats {
   chessTotalPoints?: number | null;
   chessTotalPossiblePoints?: number | null;
   isChessUndefeatedFourSeasons?: boolean;
+  footballGoalMatches?: Array<{
+    matchId: number;
+    tournamentId: number;
+    tournamentName: string;
+    homeTeamName: string;
+    awayTeamName: string;
+    goalsScored: number;
+    date: string;
+  }>;
 }
+
 
 interface ProfileStatsProps {
   stats: Stats;
@@ -164,6 +174,31 @@ const ProfileStats = ({ stats }: ProfileStatsProps) => {
                 <div className={styles.sportRank}>
                   <span className={styles.rankNumber}>#{sport.rank}</span>
                   <span className={styles.score}>{sport.performanceScore} pts</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {stats.footballGoalMatches && stats.footballGoalMatches.length > 0 && (
+        <div className={styles.scoringHistory}>
+          <h3 className={styles.subTitle}><i className="fas fa-futbol"></i> Бомбардирська історія</h3>
+          <div className={styles.matchesList}>
+            {stats.footballGoalMatches.map((match, index) => (
+              <div key={index} className={styles.matchItem}>
+                <div className={styles.matchDate}>
+                  {new Date(match.date).toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                </div>
+                <div className={styles.matchInfo}>
+                  <div className={styles.tournamentName}>{match.tournamentName}</div>
+                  <div className={styles.teams}>
+                    {match.homeTeamName} <span className={styles.vs}>vs</span> {match.awayTeamName}
+                  </div>
+                </div>
+                <div className={styles.goalsScored}>
+                  <span className={styles.goalCount}>{match.goalsScored}</span>
+                  <i className="fas fa-futbol"></i>
                 </div>
               </div>
             ))}

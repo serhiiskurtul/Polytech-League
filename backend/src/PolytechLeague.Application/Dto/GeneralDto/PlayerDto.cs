@@ -88,7 +88,20 @@ public class PlayerDto
     public int CompetitionsCount { get; set; }
     public List<SportStatsDto> SportStats { get; set; } = new();
     public List<PointEntryDto> PointsBreakdown { get; set; } = new();
+    public List<FootballGoalMatchDto> FootballGoalMatches { get; set; } = new();
 }
+
+public class FootballGoalMatchDto
+{
+    public long MatchId { get; set; }
+    public long TournamentId { get; set; }
+    public string TournamentName { get; set; } = string.Empty;
+    public string HomeTeamName { get; set; } = string.Empty;
+    public string AwayTeamName { get; set; } = string.Empty;
+    public int GoalsScored { get; set; }
+    public DateTime Date { get; set; }
+}
+
 
 public class PointEntryDto
 {
@@ -176,7 +189,8 @@ public static class PlayerDtoExtensions
             PerformanceScore = 0,
             Sports = new List<string>(),
             CompetitionsCount = 0,
-            SportStats = new List<SportStatsDto>()
+            SportStats = new List<SportStatsDto>(),
+            FootballGoalMatches = new List<FootballGoalMatchDto>()
         };
     }
 
