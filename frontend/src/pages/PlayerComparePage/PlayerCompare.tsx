@@ -81,9 +81,11 @@ export const PlayerComparePage = () => {
               goalsCount: rankingInfo.goalsCount,
               yellowCardsCount: rankingInfo.yellowCardsCount,
               redCardsCount: rankingInfo.redCardsCount,
+              mvpCount: rankingInfo.mvpCount,
               competitionsCount: rankingInfo.competitionsCount,
               globalRank: rankingInfo.globalRank,
               sportStats: rankingInfo.sportStats
+
             };
           }
           return {
@@ -94,9 +96,11 @@ export const PlayerComparePage = () => {
             goalsCount: 0,
             yellowCardsCount: 0,
             redCardsCount: 0,
+            mvpCount: 0,
             competitionsCount: 0,
             globalRank: undefined,
             sportStats: []
+
           };
         };
 
@@ -258,6 +262,13 @@ export const PlayerComparePage = () => {
                 suffix="%"
                 isBetterHigh={true}
               />
+              <StatRow 
+                label="Звання MVP" 
+                val1={player1.mvpCount} 
+                val2={player2?.mvpCount}
+                suffix=" разів"
+              />
+
                {/* Only show goals if both played football */}
                {(player1.sportStats?.some(s => s.sportType === 'football') || 
                  player2?.sportStats?.some(s => s.sportType === 'football') ||

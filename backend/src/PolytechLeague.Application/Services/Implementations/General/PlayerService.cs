@@ -483,7 +483,9 @@ public class PlayerService : IPlayerService
                     {
                         achievements.Add(new AchievementDto { TournamentName = e.Name, SportType = sportType, Date = e.Date, Rank = 0, TournamentId = e.Id, Result = "MVP" });
                         sportTypes.Add(sportType);
+                        dto.MvpCount++;
                     }
+
                 }
                 // Team Sports
                 foreach (var t in FootballTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
@@ -673,7 +675,9 @@ public class PlayerService : IPlayerService
                 dto.MatchesPlayed = played;
                 dto.WinsCount = won;
                 dto.GoalsCount = pGoals;
+                dto.MvpCount = achievements.Count(a => a.Result == "MVP");
                 dto.PerformanceScore = (int)Math.Round(totalScore);
+
                 dto.SportStats = sportStatsMap.Values.ToList();
                 dto.PointsBreakdown = pointsBreakdown.OrderByDescending(x => x.Points).ToList();
                 // Only add player to rankings if they have participated in at least one competition

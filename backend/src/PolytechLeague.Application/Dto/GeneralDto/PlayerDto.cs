@@ -86,7 +86,9 @@ public class PlayerDto
     public int PerformanceScore { get; set; }
     public int GlobalRank { get; set; }
     public int CompetitionsCount { get; set; }
+    public int MvpCount { get; set; }
     public List<SportStatsDto> SportStats { get; set; } = new();
+
     public List<PointEntryDto> PointsBreakdown { get; set; } = new();
     public List<FootballGoalMatchDto> FootballGoalMatches { get; set; } = new();
 }

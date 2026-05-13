@@ -86,9 +86,11 @@ export interface PlayerDto {
     pointsBreakdown?: PointEntryDto[];
     footballGoalMatches?: FootballGoalMatchDto[];
     competitionsCount?: number;
+    mvpCount?: number;
     isExternal?: boolean;
     hasPendingMergeRequest?: boolean;
 }
+
 
 export interface FootballGoalMatchDto {
     matchId: number;
