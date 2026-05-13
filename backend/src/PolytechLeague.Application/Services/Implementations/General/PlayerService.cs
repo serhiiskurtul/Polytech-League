@@ -486,13 +486,13 @@ public class PlayerService : IPlayerService
                 foreach (var ach in achievements) {
                     double pts = 0;
                     double mult = 1.0;
-                    string levelName = "РњС–Р¶РіСЂСѓРїРѕРІС–";
+                    string levelName = "Міжгрупові";
                     if (allEvents.TryGetValue(ach.TournamentId, out var lvl)) {
                         if (levelMultipliers.TryGetValue(lvl, out var m)) mult = m;
                         levelName = lvl switch {
-                            CompetitionLevel.Regional => "РћР±Р»Р°СЃРЅС–",
-                            CompetitionLevel.National => "Р’СЃРµСѓРєСЂР°С—РЅСЃСЊРєС–",
-                            _ => "РњС–Р¶РіСЂСѓРїРѕРІС–"
+                            CompetitionLevel.Regional => "Обласні",
+                            CompetitionLevel.National => "Всеукраїнські",
+                            _ => "Міжгрупові"
                         };
                         pts = 10; // Participation points for all levels
                     } else {
@@ -938,13 +938,13 @@ public class PlayerService : IPlayerService
             double basePts = (ach.Rank == 1) ? 100 : (ach.Rank == 2 ? 50 : (ach.Rank == 3 ? 30 : 0));
             if (basePts <= 0) continue;
             double mult = 1.0;
-            string levelName = "РњС–Р¶РіСЂСѓРїРѕРІС–";
+            string levelName = "Міжгрупові";
             if (eventLevels.TryGetValue(ach.TournamentId, out var lvl)) {
                 if (levelMultipliers.TryGetValue(lvl, out var m)) mult = m;
                 levelName = lvl switch {
-                    CompetitionLevel.Regional => "РћР±Р»Р°СЃРЅС–",
-                    CompetitionLevel.National => "Р’СЃРµСѓРєСЂР°С—РЅСЃСЊРєС–",
-                    _ => "РњС–Р¶РіСЂСѓРїРѕРІС–"
+                    CompetitionLevel.Regional => "Обласні",
+                    CompetitionLevel.National => "Всеукраїнські",
+                    _ => "Міжгрупові"
                 };
             }
             int finalPts = (int)Math.Round(basePts * mult);
