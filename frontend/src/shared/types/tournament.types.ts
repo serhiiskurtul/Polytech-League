@@ -62,4 +62,5 @@ export interface Champion {
   date: string;
   points: number;
   gender: 'Male' | 'Female' | 'None';
+  weightClass?: string;
 }

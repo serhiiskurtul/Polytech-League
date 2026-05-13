@@ -39,7 +39,6 @@ const Tournaments = () => {
   const [activeLevel, setActiveLevel] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const [sortBy, setSortBy] = useState('date');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -58,7 +57,8 @@ const Tournaments = () => {
       );
     }
 
-    // Сортування
+    // Сортування (видалено за запитом користувача)
+    /*
     result.sort((a, b) => {
       switch (sortBy) {
         case 'date':
@@ -72,6 +72,7 @@ const Tournaments = () => {
           return 0;
       }
     });
+    */
 
     return result;
   };
@@ -102,10 +103,7 @@ const Tournaments = () => {
     setPagination(prev => ({ ...prev, page: 1 }));
   };
 
-  // Обробка зміни сортування
-  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSortBy(e.target.value);
-  };
+
 
   // Ініціалізація даних турнірів
   const fetchTournamentsData = async (page: number) => {
@@ -222,9 +220,7 @@ const Tournaments = () => {
             </button>
           )}
           
-          <select className="sort-select" value={sortBy} onChange={handleSortChange}>
-            <option value="date">За датою</option>
-            <option value="title">За назвою</option>          </select>
+
 
           <div className="view-toggle">
             <button 

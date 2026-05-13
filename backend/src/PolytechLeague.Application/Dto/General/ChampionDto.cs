@@ -12,4 +12,5 @@ public class ChampionDto
     public DateTime Date { get; set; }
     public double Points { get; set; }
     public PolytechLeague.Domain.Entities.Enums.Gender Gender { get; set; }
+    public string? WeightClass { get; set; }
 }

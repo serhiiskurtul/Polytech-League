@@ -9,6 +9,7 @@ const ChampionsPage: React.FC = () => {
   const [champions, setChampions] = useState<Champion[]>([]);
   const [loading, setLoading] = useState(true);
   const [gender, setGender] = useState<number | undefined>(undefined);
+  const [weightClass, setWeightClass] = useState<string | undefined>(undefined);
 
   const getSportTitle = (sportType: string) => {
     switch (sportType) {
@@ -21,6 +22,17 @@ const ChampionsPage: React.FC = () => {
       case 'basketball-3x3': return 'баскетболу 3x3';
       case 'volleyball': return 'волейболу';
       default: return '';
+    }
+  };
+
+  const getWeightClassLabel = (wc: string) => {
+    switch (wc) {
+      case 'Under60kg': return 'до 60 кг';
+      case 'Under70kg': return 'до 70 кг';
+      case 'Under80kg': return 'до 80 кг';
+      case 'Under90kg': return 'до 90 кг';
+      case 'Plus90kg': return 'понад 90 кг';
+      default: return wc;
     }
   };
 
@@ -39,7 +51,7 @@ const ChampionsPage: React.FC = () => {
     const fetchChampions = async () => {
       setLoading(true);
       try {
-        const data = await getChampions(sport === 'all' ? undefined : sport, gender);
+        const data = await getChampions(sport === 'all' ? undefined : sport, gender, weightClass);
         setChampions(data);
       } catch (error) {
         console.error('Error fetching champions:', error);
@@ -49,11 +61,12 @@ const ChampionsPage: React.FC = () => {
     };
 
     fetchChampions();
-  }, [sport, gender]);
+  }, [sport, gender, weightClass]);
 
-  // Reset gender filter when sport changes
+  // Reset filters when sport changes
   useEffect(() => {
     setGender(undefined);
+    setWeightClass(undefined);
   }, [sport]);
 
   if (loading) {
@@ -106,6 +119,47 @@ const ChampionsPage: React.FC = () => {
           </div>
         )}
 
+        {sport === 'armwrestling' && (
+          <div className={styles.genderFilters}>
+            <button 
+              className={`${styles.genderBtn} ${weightClass === undefined ? styles.activeGender : ''}`}
+              onClick={() => setWeightClass(undefined)}
+            >
+              Усі категорії
+            </button>
+            <button 
+              className={`${styles.genderBtn} ${weightClass === 'Under60kg' ? styles.activeGender : ''}`}
+              onClick={() => setWeightClass('Under60kg')}
+            >
+              до 60 кг
+            </button>
+            <button 
+              className={`${styles.genderBtn} ${weightClass === 'Under70kg' ? styles.activeGender : ''}`}
+              onClick={() => setWeightClass('Under70kg')}
+            >
+              до 70 кг
+            </button>
+            <button 
+              className={`${styles.genderBtn} ${weightClass === 'Under80kg' ? styles.activeGender : ''}`}
+              onClick={() => setWeightClass('Under80kg')}
+            >
+              до 80 кг
+            </button>
+            <button 
+              className={`${styles.genderBtn} ${weightClass === 'Under90kg' ? styles.activeGender : ''}`}
+              onClick={() => setWeightClass('Under90kg')}
+            >
+              до 90 кг
+            </button>
+            <button 
+              className={`${styles.genderBtn} ${weightClass === 'Plus90kg' ? styles.activeGender : ''}`}
+              onClick={() => setWeightClass('Plus90kg')}
+            >
+              понад 90 кг
+            </button>
+          </div>
+        )}
+
         {champions.length === 0 ? (
           <div className={styles.emptyState}>
             <i className="fas fa-award" style={{ fontSize: '4rem', opacity: 0.1, marginBottom: '1.5rem' }}></i>
@@ -144,6 +198,11 @@ const ChampionsPage: React.FC = () => {
                   <div className={styles.tournamentName}>
                     <i className="fas fa-calendar-check"></i> {champion.tournamentName}
                   </div>
+                  {champion.weightClass && (
+                    <div className={styles.points} style={{ color: '#fbbf24', marginTop: '0.25rem' }}>
+                      <i className="fas fa-weight-hanging"></i> {getWeightClassLabel(champion.weightClass)}
+                    </div>
+                  )}
                   {champion.points > 0 && (
                     <div className={styles.points}>
                       <strong>{champion.points}</strong> очок

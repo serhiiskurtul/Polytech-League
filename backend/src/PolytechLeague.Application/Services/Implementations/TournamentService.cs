@@ -613,7 +613,7 @@ public class TournamentService : ITournamentService
             _ => "Mixed"
         };
     }
-    public async Task<IEnumerable<PolytechLeague.Application.Dto.General.ChampionDto>> GetChampionsAsync(string? sportType = null, PolytechLeague.Domain.Entities.Enums.Gender? gender = null)
+    public async Task<IEnumerable<PolytechLeague.Application.Dto.General.ChampionDto>> GetChampionsAsync(string? sportType = null, PolytechLeague.Domain.Entities.Enums.Gender? gender = null, string? weightClass = null)
     {
         var query = _context.Set<PolytechLeague.Domain.Entities.Event>()
             .Where(e => e.Level == CompetitionLevel.CollegeGroup && e.FirstPlaceId != null)
@@ -640,6 +640,14 @@ public class TournamentService : ITournamentService
         if (gender.HasValue)
         {
             query = query.Where(e => e.FirstPlace!.Gender == gender.Value);
+        }
+
+        if (!string.IsNullOrEmpty(weightClass) && weightClass != "all")
+        {
+            if (Enum.TryParse<PolytechLeague.Domain.Entities.Armwrestling.Enums.ArmwrestlingWeightClass>(weightClass, true, out var wcEnum))
+            {
+                query = query.Where(e => (e as ArmwrestlingEvent)!.WeightClass == wcEnum);
+            }
         }
 
         var results = await query
@@ -686,7 +694,8 @@ public class TournamentService : ITournamentService
                 SportType = GetSportName(e),
                 Date = e.Date,
                 Points = points,
-                Gender = e.FirstPlace.Gender
+                Gender = e.FirstPlace.Gender,
+                WeightClass = (e is ArmwrestlingEvent armEvent) ? armEvent.WeightClass.ToString() : null
             });
         }
 

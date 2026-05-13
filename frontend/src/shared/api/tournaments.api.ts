@@ -66,10 +66,10 @@ export const getTournamentsStats = async (): Promise<TournamentStats> => {
     }
 };
 
-export const getChampions = async (sport?: string, gender?: number): Promise<Champion[]> => {
+export const getChampions = async (sport?: string, gender?: number, weightClass?: string): Promise<Champion[]> => {
     try {
         const response = await api.get<Champion[]>('/tournaments/champions', {
-            params: { sport, gender }
+            params: { sport, gender, weightClass: weightClass !== 'all' ? weightClass : undefined }
         });
         return response.data;
     } catch (error) {

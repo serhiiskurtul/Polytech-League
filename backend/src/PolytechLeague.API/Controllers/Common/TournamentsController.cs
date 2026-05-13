@@ -51,9 +51,9 @@ public class TournamentsController : ControllerBase
     }
 
     [HttpGet("champions")]
-    public async Task<ActionResult<IEnumerable<PolytechLeague.Application.Dto.General.ChampionDto>>> GetChampions([FromQuery] string? sport = null, [FromQuery] PolytechLeague.Domain.Entities.Enums.Gender? gender = null)
+    public async Task<ActionResult<IEnumerable<PolytechLeague.Application.Dto.General.ChampionDto>>> GetChampions([FromQuery] string? sport = null, [FromQuery] PolytechLeague.Domain.Entities.Enums.Gender? gender = null, [FromQuery] string? weightClass = null)
     {
-        var champions = await _tournamentService.GetChampionsAsync(sport, gender);
+        var champions = await _tournamentService.GetChampionsAsync(sport, gender, weightClass);
         return Ok(champions);
     }
 }
