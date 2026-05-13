@@ -4,12 +4,6 @@
   padding: 28px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
   border: 1px solid var(--border);
-  transition: all 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
 }
 
 .cardHeader {
@@ -46,22 +40,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  transition: all 0.3s ease;
   cursor: help;
-}
-
-.statCard:hover {
-  transform: translateY(-4px);
-  background: var(--primary);
-  color: white;
-}
-
-.statCard:hover .statValue {
-  color: white;
-}
-
-.statCard:hover .statLabel {
-  color: rgba(255, 255, 255, 0.9);
 }
 
 .statValue {
@@ -117,13 +96,6 @@
   background: #f8fafc;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
-  transition: all 0.2s;
-}
-
-.sportItem:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-  border-color: #3b82f6;
 }
 
 .sportInfo {
