@@ -272,6 +272,7 @@ public class PlayerService : IPlayerService
                 { CompetitionLevel.Regional, 2.5 },
                 { CompetitionLevel.National, 5.0 }
             };
+            var sportStatsMap = new Dictionary<string, SportStatsDto>(StringComparer.OrdinalIgnoreCase);
             var allEventsQuery = _dbContext.Set<Event>().AsQueryable();
             if (seasonId.HasValue)
             {
@@ -1690,22 +1691,35 @@ public class PlayerService : IPlayerService
             
             dto.GoalsCount = goals;
             
-            // DIAGNOSTIC: Count all cards for this player ID without any filters first
-            var totalCardsAnyType = await _dbContext.FootballCards
-                .Where(c => c.PlayerId == playerId)
-                .CountAsync(cancellationToken);
+            // Try fetching cards using multiple methods to be absolutely sure
+            int yellowCards = 0;
+            int redCards = 0;
+            
+            try 
+            {
+                // Method 1: LINQ with explicit int conversion
+                var playerCards = await _dbContext.FootballCards
+                    .AsNoTracking()
+                    .Where(c => c.PlayerId == playerId)
+                    .Select(c => new { c.Type })
+                    .ToListAsync(cancellationToken);
+
+                yellowCards = playerCards.Count(c => (int)c.Type == 1);
+                redCards = playerCards.Count(c => (int)c.Type == 2);
                 
-            // Fetch cards specifically by type using integer comparison
-            var playerCards = await _dbContext.FootballCards
-                .Where(c => c.PlayerId == playerId)
-                .Select(c => new { c.Type })
-                .ToListAsync(cancellationToken);
+                _logger.LogInformation("[DEBUG] Stats for Player {Id}: LINQ found {Count} cards. Y: {Yellow}, R: {Red}", 
+                    playerId, playerCards.Count, yellowCards, redCards);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "LINQ card counting failed for player {Id}", playerId);
+            }
 
-            int yellowCards = playerCards.Count(c => (int)c.Type == 1);
-            int redCards = playerCards.Count(c => (int)c.Type == 2);
-
-            _logger.LogInformation("[DEBUG] Stats for Player {Id}: Total cards in DB: {TotalCount}, Filtered Yellow: {Yellow}, Filtered Red: {Red}", 
-                playerId, totalCardsAnyType, yellowCards, redCards);
+            // DIAGNOSTIC: Total cards in table
+            try {
+                var globalCount = await _dbContext.FootballCards.CountAsync(cancellationToken);
+                _logger.LogInformation("[DEBUG] GLOBAL FootballCards count in DB: {Count}", globalCount);
+            } catch { }
 
             dto.YellowCardsCount = yellowCards;
             dto.RedCardsCount = redCards;

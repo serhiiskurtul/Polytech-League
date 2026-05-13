@@ -59,10 +59,14 @@ const getSportName = (type: string) => {
 };
 
 const ProfileStats = ({ stats }: ProfileStatsProps) => {
-  const isFootballer = stats.sportStats?.some(s => s.sportType.toLowerCase() === 'football') || 
-                       (stats.goalsCount !== undefined && stats.goalsCount > 0) ||
-                       (stats.yellowCardsCount !== undefined && stats.yellowCardsCount > 0) ||
-                       (stats.redCardsCount !== undefined && stats.redCardsCount > 0);
+  const isFootballer = stats.sportStats?.some(s => 
+    s.sportType.toLowerCase() === 'football' || 
+    s.sportType.toLowerCase() === 'футбол' ||
+    s.sportType.toLowerCase() === 'futsal'
+  ) || 
+  (stats.goalsCount !== undefined && stats.goalsCount > 0) ||
+  (stats.yellowCardsCount !== undefined && stats.yellowCardsCount > 0) ||
+  (stats.redCardsCount !== undefined && stats.redCardsCount > 0);
 
   return (
     <section className={styles.card}>
@@ -97,13 +101,17 @@ const ProfileStats = ({ stats }: ProfileStatsProps) => {
         )}
         {(isFootballer || (stats.yellowCardsCount !== undefined && stats.yellowCardsCount > 0)) && (
           <div className={styles.statCard} title="Жовті картки отримані у футбольних матчах">
-            <div className={`${styles.statValue} ${styles.yellowCardValue}`}>{stats.yellowCardsCount || 0}</div>
+            <div className={`${styles.statValue} ${styles.yellowCardValue}`}>
+              {stats.yellowCardsCount ?? stats.sportStats?.find(s => s.sportType.toLowerCase() === 'football')?.yellowCardsCount ?? 0}
+            </div>
             <div className={styles.statLabel}>Жовті картки</div>
           </div>
         )}
         {(isFootballer || (stats.redCardsCount !== undefined && stats.redCardsCount > 0)) && (
           <div className={styles.statCard} title="Червоні картки отримані у футбольних матчах">
-            <div className={`${styles.statValue} ${styles.redCardValue}`}>{stats.redCardsCount || 0}</div>
+            <div className={`${styles.statValue} ${styles.redCardValue}`}>
+              {stats.redCardsCount ?? stats.sportStats?.find(s => s.sportType.toLowerCase() === 'football')?.redCardsCount ?? 0}
+            </div>
             <div className={styles.statLabel}>Червоні картки</div>
           </div>
         )}
