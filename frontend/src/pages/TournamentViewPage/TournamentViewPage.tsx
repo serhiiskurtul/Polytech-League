@@ -61,12 +61,12 @@ import {
   rejectBeachVolleyballParticipant,
   removeBeachVolleyballParticipant,
   // football
-  getfootballEventById,
-  updatefootballEvent,
-  registerForfootballEvent,
-  approvefootballParticipant,
-  rejectfootballParticipant,
-  removefootballParticipant,
+  getFootballEventById,
+  updateFootballEvent,
+  registerForFootballEvent,
+  approveFootballParticipant,
+  rejectFootballParticipant,
+  removeFootballParticipant,
   // Basketball 3x3
   getBasketball3x3EventById,
   updateBasketball3x3Event,
@@ -303,7 +303,7 @@ const TournamentViewPage = () => {
         case 'checkers': await updateCheckersEvent(id, payload as any); break;
         case 'chess': await updateChessEvent(id, payload as any); break;
         case 'armwrestling': await updateArmwrestlingEvent(id, payload as any); break;
-        case 'football': await updatefootballEvent(id, payload as any); break;
+        case 'football': await updateFootballEvent(id, payload as any); break;
         case 'volleyball': await updateVolleyballEvent(id, payload as any); break;
         case 'beach_volleyball': await updateBeachVolleyballEvent(id, payload as any); break;
         case 'basketball_3x3':
@@ -604,7 +604,7 @@ const TournamentViewPage = () => {
         const updateFn = sportKey === 'volleyball' ? updateVolleyballEvent : updateBeachVolleyballEvent;
         await updateFn(id!, { ...payload, setsToWin: (details as any).setsToWin || 2 });
       } else if (sportKey === 'football' || sportKey === 'badminton') {
-        const updateFn = sportKey === 'football' ? updatefootballEvent : updateBadmintonEvent;
+        const updateFn = sportKey === 'football' ? updateFootballEvent : updateBadmintonEvent;
         await updateFn(id!, { ...payload, tournamentType: (details as any).tournamentType || 'RoundRobin' });
       } else if (sportKey === 'basketball_3x3' || sportKey === 'basketball3x3') {
         await updateBasketball3x3Event(id!, { ...payload, tournamentType: (details as any).tournamentType || 'RoundRobin' });
@@ -802,7 +802,7 @@ const TournamentViewPage = () => {
             await removeBeachVolleyballParticipant(id!, playerId);
             break;
           case 'football':
-            await removefootballParticipant(id!, playerId);
+            await removeFootballParticipant(id!, playerId);
             break;
           case 'basketball_3x3':
           case 'basketball3x3':
@@ -832,7 +832,7 @@ const TournamentViewPage = () => {
         case 'table_tennis': await approveTableTennisParticipant(id!, playerId); break;
         case 'volleyball': await approveVolleyballParticipant(id!, playerId); break;
         case 'beach_volleyball': await approveBeachVolleyballParticipant(id!, playerId); break;
-        case 'football': await approvefootballParticipant(id!, playerId); break;
+        case 'football': await approveFootballParticipant(id!, playerId); break;
         case 'basketball_3x3':
         case 'basketball3x3': await approveBasketball3x3Participant(id!, playerId); break;
         default: await approveChessParticipant(id!, playerId);
@@ -857,7 +857,7 @@ const TournamentViewPage = () => {
         case 'table_tennis': await rejectTableTennisParticipant(id!, playerId); break;
         case 'volleyball': await rejectVolleyballParticipant(id!, playerId); break;
         case 'beach_volleyball': await rejectBeachVolleyballParticipant(id!, playerId); break;
-        case 'football': await rejectfootballParticipant(id!, playerId); break;
+        case 'football': await rejectFootballParticipant(id!, playerId); break;
         case 'basketball_3x3':
         case 'basketball3x3': await rejectBasketball3x3Participant(id!, playerId); break;
         default: await rejectChessParticipant(id!, playerId);
@@ -917,7 +917,7 @@ const TournamentViewPage = () => {
         case 'badminton': await registerForBadmintonEvent(id, playerId); break;
         case 'tabletennis':
         case 'table_tennis': await registerForTableTennisEvent(id, playerId); break;
-        case 'football': await registerForfootballEvent(id, playerId); break;
+        case 'football': await registerForFootballEvent(id, playerId); break;
         case 'volleyball': await registerForVolleyballEvent(id, playerId); break;
         case 'basketball3x3':
         case 'basketball_3x3': await registerForBasketball3x3Event(id, playerId); break;
@@ -966,7 +966,7 @@ const TournamentViewPage = () => {
             case 'armwrestling': detailsPromise = getArmwrestlingEventById(id); break;
             case 'volleyball': detailsPromise = getVolleyballEventById(id); break;
             case 'beach_volleyball': detailsPromise = getBeachVolleyballEventById(id); break;
-            case 'football': detailsPromise = getfootballEventById(id); break;
+            case 'football': detailsPromise = getFootballEventById(id); break;
             case 'basketball_3x3':
             case 'basketball3x3': detailsPromise = getBasketball3x3EventById(id); break;
             case 'badminton': detailsPromise = getBadmintonEventById(id); break;
