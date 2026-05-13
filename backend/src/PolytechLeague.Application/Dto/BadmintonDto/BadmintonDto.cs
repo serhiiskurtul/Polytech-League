@@ -41,7 +41,9 @@ public class BadmintonEventRequest
     public long? SecondPlaceTeamId { get; set; }
     public long? ThirdPlaceTeamId { get; set; }
     public long? SeasonId { get; set; }
+    public long? MvpId { get; set; }
 }
+
 
 public class BadmintonTeamDto
 {
@@ -114,8 +116,11 @@ public class BadmintonEventResponse
     public ICollection<BadmintonTeamDto>? Teams { get; set; }
     public ICollection<BadmintonMatchResponse>? Matches { get; set; }
     public ICollection<BadmintonEventParticipantDto>? Participants { get; set; }
+    public long? MvpId { get; set; }
+    public string? MvpName { get; set; }
     public long? SeasonId { get; set; }
 }
+
 
 public class BadmintonMatchRequest
 {
@@ -197,7 +202,9 @@ public static class BadmintonDtoExtensions
             IsModerated = request.IsModerated,
             IsPublic = request.IsPublic,
             SeasonId = request.SeasonId,
+            MvpId = request.MvpId,
             Category = request.Category
+
         };
     }
 
@@ -234,8 +241,11 @@ public static class BadmintonDtoExtensions
             Teams = entity.Teams?.Select(t => t.ToDto()).ToList(),
             Matches = entity.Matches?.Select(m => m.ToResponse()).ToList(),
             Participants = entity.Participants?.Select(p => p.ToDto()).ToList(),
+            MvpId = entity.MvpId,
+            MvpName = entity.Mvp != null ? $"{entity.Mvp.FirstName} {entity.Mvp.LastName}" : null,
             SeasonId = entity.SeasonId,
             Category = entity.Category
+
         };
     }
 

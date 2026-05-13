@@ -25,7 +25,9 @@ public class AthleticsEventService(
             .Include(e => e.Participants).ThenInclude(p => p.Player)
             .Include(e => e.Photos)
             .Include(e => e.Season)
+            .Include(e => e.Mvp)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken)
+
             ?? throw new Exception("Athletics event not found");
     }
 
@@ -69,7 +71,9 @@ public class AthleticsEventService(
         existing.IsModerated = entity.IsModerated;
         existing.IsPublic = entity.IsPublic;
         existing.SeasonId = entity.SeasonId;
+        existing.MvpId = entity.MvpId;
     }
+
 
     protected override async Task OnCreatedAsync(AthleticsEvent entity, CancellationToken cancellationToken)
     {

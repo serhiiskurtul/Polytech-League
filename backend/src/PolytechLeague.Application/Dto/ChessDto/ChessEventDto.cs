@@ -45,8 +45,10 @@ public class ChessEventRequest
     public long? FirstPlaceTeamId { get; set; }
     public long? SecondPlaceTeamId { get; set; }
     public long? ThirdPlaceTeamId { get; set; }
+    public long? MvpId { get; set; }
     public long? SeasonId { get; set; }
 }
+
 
 public class ChessEventResponse
 {
@@ -93,8 +95,11 @@ public class ChessEventResponse
     public ChessTeamResponse? FirstPlaceTeam { get; set; }
     public ChessTeamResponse? SecondPlaceTeam { get; set; }
     public ChessTeamResponse? ThirdPlaceTeam { get; set; }
+    public long? MvpId { get; set; }
+    public string? MvpName { get; set; }
     public long? SeasonId { get; set; }
 }
+
 
 public static class ChessEventDtoExtension
 {
@@ -128,7 +133,9 @@ public static class ChessEventDtoExtension
             FirstPlaceTeamId = chessEventRequest.FirstPlaceTeamId,
             SecondPlaceTeamId = chessEventRequest.SecondPlaceTeamId,
             ThirdPlaceTeamId = chessEventRequest.ThirdPlaceTeamId,
+            MvpId = chessEventRequest.MvpId,
             SeasonId = chessEventRequest.SeasonId,
+
             Category = chessEventRequest.Category
         };
     }
@@ -167,8 +174,11 @@ public static class ChessEventDtoExtension
             Category = chessEvent.Category,
             FirstPlaceTeam = chessEvent.FirstPlaceTeam?.ToResponse(),
             SecondPlaceTeam = chessEvent.SecondPlaceTeam?.ToResponse(),
-            ThirdPlaceTeam = chessEvent.ThirdPlaceTeam?.ToResponse()
+            ThirdPlaceTeam = chessEvent.ThirdPlaceTeam?.ToResponse(),
+            MvpId = chessEvent.MvpId,
+            MvpName = chessEvent.Mvp != null ? $"{chessEvent.Mvp.FirstName} {chessEvent.Mvp.LastName}" : null
         };
+
 
         if (chessEvent.Players != null)
         {

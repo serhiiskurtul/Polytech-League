@@ -45,7 +45,9 @@ public class TableTennisEventRequest
     public long? FirstPlaceTeamId { get; set; }
     public long? SecondPlaceTeamId { get; set; }
     public long? ThirdPlaceTeamId { get; set; }
+    public long? MvpId { get; set; }
 }
+
 
 public class TableTennisTeamResponse
 {
@@ -98,8 +100,11 @@ public class TableTennisEventResponse
     public string? Schedule { get; set; }
     public bool IsTeam { get; set; }
     public bool IsModerated { get; set; }
+    public long? MvpId { get; set; }
+    public string? MvpName { get; set; }
     public long? SeasonId { get; set; }
 }
+
 
 public static class TableTennisEventDtoExtensions
 {
@@ -132,7 +137,10 @@ public static class TableTennisEventDtoExtensions
             ThirdPlaceId = request.ThirdPlaceId,
             FirstPlaceTeamId = request.FirstPlaceTeamId,
             SecondPlaceTeamId = request.SecondPlaceTeamId,
-            ThirdPlaceTeamId = request.ThirdPlaceTeamId
+            ThirdPlaceTeamId = request.ThirdPlaceTeamId,
+            MvpId = request.MvpId
+        };
+
         };
     }
 
@@ -165,7 +173,10 @@ public static class TableTennisEventDtoExtensions
             Schedule = entity.Schedule,
             IsTeam = entity.IsTeam,
             IsModerated = entity.IsModerated,
+            MvpId = entity.MvpId,
+            MvpName = entity.Mvp != null ? $"{entity.Mvp.FirstName} {entity.Mvp.LastName}" : null,
             SeasonId = entity.SeasonId
+
         };
 
         if (entity.Participants != null)

@@ -58,7 +58,9 @@ public class CheckersEventService :
         oldEntity.IsModerated = newEntity.IsModerated;
         oldEntity.IsPublic = newEntity.IsPublic;
         oldEntity.SeasonId = newEntity.SeasonId;
+        oldEntity.MvpId = newEntity.MvpId;
         oldEntity.Category = newEntity.Category;
+
     }
 
     public override async Task<CheckersEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)
@@ -85,7 +87,9 @@ public class CheckersEventService :
             .Include(e => e.FirstPlaceTeam)
             .Include(e => e.SecondPlaceTeam)
             .Include(e => e.ThirdPlaceTeam)
+            .Include(e => e.Mvp)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken)
+
             ?? throw new EntityNotFoundException(nameof(CheckersEvent), id);
     }
 

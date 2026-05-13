@@ -41,6 +41,8 @@ public class TableTennisEventService(
         oldEntity.SecondPlaceTeamId = newEntity.SecondPlaceTeamId;
         oldEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
         oldEntity.SeasonId = newEntity.SeasonId;
+        oldEntity.MvpId = newEntity.MvpId;
+
 
         oldEntity.UpdatedAt = DateTime.UtcNow;
     }
@@ -67,7 +69,9 @@ public class TableTennisEventService(
                 .ThenInclude(m => m.AwayTeam)
             .Include(e => e.Participants!)
                 .ThenInclude(p => p.Player)
+            .Include(e => e.Mvp)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken)
+
             ?? throw new PolytechLeague.Domain.Exceptions.EntityNotFoundException(nameof(TableTennisEvent), id);
     }
 

@@ -37,10 +37,14 @@ public class ArmwrestlingEventService :
                 .ThenInclude(m => m.Player1)
             .Include(e => e.Matches!)
                 .ThenInclude(m => m.Player2)
+            .Include(e => e.FirstPlace)
+            .Include(e => e.SecondPlace)
             .Include(e => e.ThirdPlace)
+            .Include(e => e.Mvp)
             .Include(e => e.Players!)
                 .ThenInclude(p => p.Player)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+
 
         if (entity is null)
         {
@@ -80,7 +84,9 @@ public class ArmwrestlingEventService :
         oldEntity.SecondPlaceId = newEntity.SecondPlaceId;
         oldEntity.ThirdPlaceId = newEntity.ThirdPlaceId;
         oldEntity.SeasonId = newEntity.SeasonId;
+        oldEntity.MvpId = newEntity.MvpId;
     }
+
 
     protected override async Task OnCreatedAsync(ArmwrestlingEvent entity, CancellationToken cancellationToken)
     {

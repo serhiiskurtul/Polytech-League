@@ -56,7 +56,9 @@ public class ChessEventService :
         oldEntity.IsModerated = newEntity.IsModerated;
         oldEntity.IsPublic = newEntity.IsPublic;
         oldEntity.SeasonId = newEntity.SeasonId;
+        oldEntity.MvpId = newEntity.MvpId;
         oldEntity.Category = newEntity.Category;
+
     }
 
     public override async Task<ChessEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)
@@ -81,7 +83,9 @@ public class ChessEventService :
             .Include(e => e.FirstPlaceTeam)
             .Include(e => e.SecondPlaceTeam)
             .Include(e => e.ThirdPlaceTeam)
+            .Include(e => e.Mvp)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken)
+
             ?? throw new EntityNotFoundException(nameof(ChessEvent), id);
     }
 

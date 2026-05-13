@@ -45,7 +45,9 @@ public class FootballEventService :
         oldEntity.IsPublic = newEntity.IsPublic;
         oldEntity.IsTeam = newEntity.IsTeam;
         oldEntity.SeasonId = newEntity.SeasonId;
+        oldEntity.MvpId = newEntity.MvpId;
         oldEntity.Category = newEntity.Category;
+
     }
 
     public override async Task<FootballEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)
@@ -85,7 +87,9 @@ public class FootballEventService :
             .Include(e => e.FirstPlaceTeam)
             .Include(e => e.SecondPlaceTeam)
             .Include(e => e.ThirdPlaceTeam)
+            .Include(e => e.Mvp)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+
 
         if (entity is null)
         {
