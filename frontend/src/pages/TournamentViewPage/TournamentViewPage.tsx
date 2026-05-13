@@ -286,6 +286,8 @@ const TournamentViewPage = () => {
         payload.firstPlaceId = winners.firstPlaceId || null;
         payload.secondPlaceId = winners.secondPlaceId || null;
         payload.thirdPlaceId = winners.thirdPlaceId || null;
+        payload.mvpId = winners.mvpId || null;
+
 
         if (sportKey === 'chess') {
           payload.system = editTournamentData.system;
@@ -1544,26 +1546,31 @@ const TournamentViewPage = () => {
                   </select>
                 </div>
 
-                {isTeamSport && (
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
-                      <i className="fas fa-star" style={{ color: '#f59e0b' }}></i> Найкращий гравець (MVP)
-                    </label>
-                    <select
-                      value={winners.mvpId}
-                      onChange={(e) => setWinners({ ...winners, mvpId: Number(e.target.value) })}
-                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
-                    >
-                      <option key="default-mvp" value="0">-- Оберіть MVP --</option>
-                      {details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
+                    <i className="fas fa-star" style={{ color: '#f59e0b' }}></i> Найкращий гравець (MVP)
+                  </label>
+                  <select
+                    value={winners.mvpId}
+                    onChange={(e) => setWinners({ ...winners, mvpId: Number(e.target.value) })}
+                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                  >
+                    <option key="default-mvp" value="0">-- Оберіть MVP --</option>
+                    {isTeamSport ? (
+                      details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
                         <option key={`mvp-p-${p.id}`} value={p.id}>
                           {p.firstName} {p.lastName} ({p.teamName})
                         </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
+                      ))
+                    ) : (
+                      sortedPlayers?.map((p: any) => (
+                        <option key={`mvp-p-${p.playerId}`} value={p.playerId}>{p.playerName}</option>
+                      ))
+                    )}
+                  </select>
+                </div>
               </div>
+
 
               <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
                 <button

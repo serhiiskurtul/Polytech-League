@@ -72,8 +72,11 @@ const UserAchievements = ({ achievements }: UserAchievementsProps) => {
                 <div className={styles.achievementName}>{achievement.tournamentName}</div>
                 <div className={styles.achievementResult}>
                   {achievement.isCaptain && <span className={styles.captainLabel} title="Капітан команди">© </span>}
-                  {achievement.result?.replace(`${achievement.rank} місце `, '').replace(`${achievement.rank} місце`, '') || 'Учасник'}
+                  {achievement.rank === 1 ? 'Переможець' : 
+                   (achievement.rank === 2 || achievement.rank === 3) ? 'Призер' : 
+                   achievement.result?.replace(`${achievement.rank} місце `, '').replace(`${achievement.rank} місце`, '') || 'Учасник'}
                 </div>
+
                 <div className={styles.achievementDate}>
                   {new Date(achievement.date).toLocaleDateString('uk-UA', { year: 'numeric', month: 'short' })}
                 </div>
