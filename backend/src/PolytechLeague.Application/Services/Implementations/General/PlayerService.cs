@@ -80,7 +80,10 @@ public class PlayerService : IPlayerService
         var dto = player.ToDto();
         dto.HasPendingMergeRequest = await _dbContext.ProfileMergeRequests
             .AnyAsync(r => r.UserId == userId && r.Status == RegistrationStatus.Pending, cancellationToken);
-        await PopulateAchievementsAsync(dto, cancellationToken); await PopulateAutomaticBadgesAsync(dto, cancellationToken); await PopulateChessSpecialStatsAsync(dto, cancellationToken);
+        await PopulateAchievementsAsync(dto, cancellationToken); 
+        await PopulateAutomaticBadgesAsync(dto, cancellationToken); 
+        await PopulateChessSpecialStatsAsync(dto, cancellationToken);
+        await PopulateFootballStatsAsync(dto, cancellationToken);
         return dto;
     }
 
@@ -596,7 +599,7 @@ public class PlayerService : IPlayerService
                 dto.SportStats = sportStatsMap.Values.ToList();
                 dto.PointsBreakdown = pointsBreakdown.OrderByDescending(x => x.Points).ToList();
                 // Only add player to rankings if they have participated in at least one competition
-                if (achievements.Count > 0 || played > 0 || pGoals > 0)
+                if (achievements.Count > 0 || played > 0 || pGoals > 0 || pYellow > 0 || pRed > 0)
                 {
                     playerDtos.Add(dto);
                 }
@@ -1575,5 +1578,45 @@ public class PlayerService : IPlayerService
 
         result.Matches = result.Matches.OrderByDescending(m => m.Date).ToList();
         return result;
+    }
+
+    private async Task PopulateFootballStatsAsync(PlayerDto dto, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var goals = await _dbContext.FootballGoals
+                .Where(g => g.PlayerId == dto.Id)
+                .SumAsync(g => g.GoalsCount, cancellationToken);
+            
+            var yellowCards = await _dbContext.FootballCards
+                .Where(c => c.PlayerId == dto.Id && c.Type == FootballCardType.Yellow)
+                .CountAsync(cancellationToken);
+            
+            var redCards = await _dbContext.FootballCards
+                .Where(c => c.PlayerId == dto.Id && c.Type == FootballCardType.Red)
+                .CountAsync(cancellationToken);
+
+            dto.GoalsScored = goals;
+            dto.YellowCardsCount = yellowCards;
+            dto.RedCardsCount = redCards;
+
+            if (goals > 0 || yellowCards > 0 || redCards > 0)
+            {
+                var footballStats = dto.SportStats?.FirstOrDefault(s => s.SportType == "Football");
+                if (footballStats == null)
+                {
+                    footballStats = new SportStatsDto { SportType = "Football" };
+                    dto.SportStats ??= new List<SportStatsDto>();
+                    dto.SportStats.Add(footballStats);
+                }
+                footballStats.GoalsCount = goals;
+                footballStats.YellowCardsCount = yellowCards;
+                footballStats.RedCardsCount = redCards;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error populating football stats for player {PlayerId}", dto.Id);
+        }
     }
 }
