@@ -59,6 +59,8 @@ const getSportName = (type: string) => {
 };
 
 const ProfileStats = ({ stats }: ProfileStatsProps) => {
+  const isFootballer = stats.sportStats?.some(s => s.sportType.toLowerCase() === 'football');
+
   return (
     <section className={styles.card}>
       <div className={styles.cardHeader}>
@@ -84,21 +86,21 @@ const ProfileStats = ({ stats }: ProfileStatsProps) => {
             <div className={styles.statLabel}>Шаховий рейтинг Elo</div>
           </div>
         )}
-        {(stats.goalsScored !== undefined && stats.goalsScored > 0) && (
+        {(isFootballer || (stats.goalsScored !== undefined && stats.goalsScored > 0)) && (
           <div className={styles.statCard} title="Загальна кількість забитих голів">
-            <div className={styles.statValue}>{stats.goalsScored}</div>
+            <div className={styles.statValue}>{stats.goalsScored || 0}</div>
             <div className={styles.statLabel}>Забитих голів</div>
           </div>
         )}
-        {(stats.yellowCards !== undefined && stats.yellowCards > 0) && (
+        {(isFootballer || (stats.yellowCards !== undefined && stats.yellowCards > 0)) && (
           <div className={styles.statCard} title="Жовті картки отримані у футбольних матчах">
-            <div className={`${styles.statValue} ${styles.yellowCardValue}`}>{stats.yellowCards}</div>
+            <div className={`${styles.statValue} ${styles.yellowCardValue}`}>{stats.yellowCards || 0}</div>
             <div className={styles.statLabel}>Жовті картки</div>
           </div>
         )}
-        {(stats.redCards !== undefined && stats.redCards > 0) && (
+        {(isFootballer || (stats.redCards !== undefined && stats.redCards > 0)) && (
           <div className={styles.statCard} title="Червоні картки отримані у футбольних матчах">
-            <div className={`${styles.statValue} ${styles.redCardValue}`}>{stats.redCards}</div>
+            <div className={`${styles.statValue} ${styles.redCardValue}`}>{stats.redCards || 0}</div>
             <div className={styles.statLabel}>Червоні картки</div>
           </div>
         )}
