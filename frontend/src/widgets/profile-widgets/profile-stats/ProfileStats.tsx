@@ -149,9 +149,6 @@ const ProfileStats = ({ stats }: ProfileStatsProps) => {
                   <span>{getSportName(sport.sportType)}</span>
                 </div>
                 <div className={styles.sportRank}>
-                  {sport.goalsCount !== undefined && sport.goalsCount > 0 && <span className={styles.extraStat} title="Голи">⚽ {sport.goalsCount}</span>}
-                  {sport.yellowCardsCount !== undefined && sport.yellowCardsCount > 0 && <span className={styles.extraStat} title="Жовті картки">🟨 {sport.yellowCardsCount}</span>}
-                  {sport.redCardsCount !== undefined && sport.redCardsCount > 0 && <span className={styles.extraStat} title="Червоні картки">🟥 {sport.redCardsCount}</span>}
                   <span className={styles.rankNumber}>#{sport.rank}</span>
                   <span className={styles.score}>{sport.performanceScore} pts</span>
                 </div>
