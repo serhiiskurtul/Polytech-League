@@ -1044,6 +1044,16 @@ public class PlayerService : IPlayerService
             });
         }
         dto.GoalsCount = FootballGoals;
+        
+        // 4. Football Cards
+        int yellowCards = await _dbContext.FootballCards
+            .CountAsync(c => c.PlayerId == playerId && (int)c.Type == 1, cancellationToken);
+        int redCards = await _dbContext.FootballCards
+            .CountAsync(c => c.PlayerId == playerId && (int)c.Type == 2, cancellationToken);
+            
+        dto.YellowCardsCount = yellowCards;
+        dto.RedCardsCount = redCards;
+
         dto.PerformanceScore = (int)Math.Round(totalScore);
         dto.PointsBreakdown = pointsBreakdown.OrderByDescending(x => x.Points).ToList();
     }
@@ -1678,15 +1688,25 @@ public class PlayerService : IPlayerService
                 .Where(g => g.PlayerId == playerId)
                 .SumAsync(g => (int?)g.GoalsCount, cancellationToken) ?? 0;
             
-            int yellowCards = await _dbContext.FootballCards
-                .CountAsync(c => c.PlayerId == playerId && c.Type == FootballCardType.Yellow, cancellationToken);
-                
-            int redCards = await _dbContext.FootballCards
-                .CountAsync(c => c.PlayerId == playerId && c.Type == FootballCardType.Red, cancellationToken);
-
-            _logger.LogInformation("[DEBUG] FOUND {Yellow} yellow and {Red} red cards for player {Id}", yellowCards, redCards, playerId);
-
             dto.GoalsCount = goals;
+            
+            // DIAGNOSTIC: Count all cards for this player ID without any filters first
+            var totalCardsAnyType = await _dbContext.FootballCards
+                .Where(c => c.PlayerId == playerId)
+                .CountAsync(cancellationToken);
+                
+            // Fetch cards specifically by type using integer comparison
+            var playerCards = await _dbContext.FootballCards
+                .Where(c => c.PlayerId == playerId)
+                .Select(c => new { c.Type })
+                .ToListAsync(cancellationToken);
+
+            int yellowCards = playerCards.Count(c => (int)c.Type == 1);
+            int redCards = playerCards.Count(c => (int)c.Type == 2);
+
+            _logger.LogInformation("[DEBUG] Stats for Player {Id}: Total cards in DB: {TotalCount}, Filtered Yellow: {Yellow}, Filtered Red: {Red}", 
+                playerId, totalCardsAnyType, yellowCards, redCards);
+
             dto.YellowCardsCount = yellowCards;
             dto.RedCardsCount = redCards;
 
