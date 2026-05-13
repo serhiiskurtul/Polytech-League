@@ -10,7 +10,7 @@ using PolytechLeague.Domain.Entities.TableTennis;
 using PolytechLeague.Domain.Entities.Badminton;
 using PolytechLeague.Domain.Entities.Armwrestling;
 using PolytechLeague.Domain.Entities.Armwrestling.Enums;
-using PolytechLeague.Domain.Entities.Futsal;
+using PolytechLeague.Domain.Entities.Football;
 using PolytechLeague.Domain.Entities.Volleyball;
 using PolytechLeague.Domain.Entities.Basketball3x3;
 using PolytechLeague.Domain.Entities.BeachVolleyball;
@@ -180,9 +180,9 @@ public class PlayerService : IPlayerService
         if (dto.ArmwrestlingWeight.HasValue) player.ArmwrestlingWeight = dto.ArmwrestlingWeight;
         if (dto.ArmwrestlingPreferredWeightClass.HasValue) player.ArmwrestlingPreferredWeightClass = dto.ArmwrestlingPreferredWeightClass;
         // Update team stats
-        if (dto.FutsalPosition.HasValue) player.FutsalPosition = dto.FutsalPosition;
-        if (dto.FutsalShirtNumber.HasValue) player.FutsalShirtNumber = dto.FutsalShirtNumber;
-        if (dto.FutsalTeamId.HasValue) player.FutsalTeamId = dto.FutsalTeamId;
+        if (dto.FootballPosition.HasValue) player.FootballPosition = dto.FootballPosition;
+        if (dto.FootballShirtNumber.HasValue) player.FootballShirtNumber = dto.FootballShirtNumber;
+        if (dto.FootballTeamId.HasValue) player.FootballTeamId = dto.FootballTeamId;
         if (dto.VolleyballPosition.HasValue) player.VolleyballPosition = dto.VolleyballPosition;
         if (dto.VolleyballShirtNumber.HasValue) player.VolleyballShirtNumber = dto.VolleyballShirtNumber;
         if (dto.VolleyballTeamId.HasValue) player.VolleyballTeamId = dto.VolleyballTeamId;
@@ -288,7 +288,7 @@ public class PlayerService : IPlayerService
                              (e.SecondPlaceId.HasValue && playerIds.Contains(e.SecondPlaceId.Value)) ||
                              (e.ThirdPlaceId.HasValue && playerIds.Contains(e.ThirdPlaceId.Value))))
                 .ToListAsync(cancellationToken);
-            var futsalTeams = await _dbContext.FutsalTeams.Include(t => t.Event).Include(t => t.Players).Where(t => eventIds.Contains(t.EventId) && t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
+            var FootballTeams = await _dbContext.FootballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => eventIds.Contains(t.EventId) && t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
             var volleyballTeams = await _dbContext.VolleyballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => eventIds.Contains(t.EventId) && t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
             var bballTeams = await _dbContext.Basketball3x3Teams.Include(t => t.Event).Include(t => t.Players).Where(t => eventIds.Contains(t.EventId) && t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
             var beachVTeams = await _dbContext.BeachVolleyballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => eventIds.Contains(t.EventId) && t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
@@ -305,7 +305,7 @@ public class PlayerService : IPlayerService
             var arm2S = await _dbContext.ArmwrestlingMatches.Where(g => eventIds.Contains(g.EventId) && playerIds.Contains(g.Player2Id)).GroupBy(g => g.Player2Id).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
             var bad1S = await _dbContext.BadmintonMatches.Where(g => eventIds.Contains(g.EventId) && g.Player1Id != null && playerIds.Contains(g.Player1Id.Value)).GroupBy(g => g.Player1Id).Select(g => new { Id = g.Key!.Value, Count = g.Count(), Wins = g.Count(x => x.WinnerPlayerId == g.Key) }).ToListAsync(cancellationToken);
             var bad2S = await _dbContext.BadmintonMatches.Where(g => eventIds.Contains(g.EventId) && g.Player2Id != null && playerIds.Contains(g.Player2Id.Value)).GroupBy(g => g.Player2Id).Select(g => new { Id = g.Key!.Value, Count = g.Count(), Wins = g.Count(x => x.WinnerPlayerId == g.Key) }).ToListAsync(cancellationToken);
-            var goalsS = await _dbContext.FutsalGoals
+            var goalsS = await _dbContext.FootballGoals
                 .Include(g => g.Match)
                     .ThenInclude(m => m.Event)
                 .Where(g => playerIds.Contains(g.PlayerId) && g.Match != null && eventIds.Contains(g.Match.EventId))
@@ -314,10 +314,10 @@ public class PlayerService : IPlayerService
                 .ToListAsync(cancellationToken);
 
             // Optimized Team Sports Match Stats loading (pre-calculate stats per player)
-            var futsalHomeStats = await _dbContext.FutsalMatches.Where(m => eventIds.Contains(m.EventId))
+            var FootballHomeStats = await _dbContext.FootballMatches.Where(m => eventIds.Contains(m.EventId))
                 .SelectMany(m => m.HomeRoster!.Select(p => new { PlayerId = p.Id, IsWinner = m.WinnerTeamId == m.HomeTeamId || (m.HomeTeamScore > m.AwayTeamScore && !m.WinnerTeamId.HasValue) }))
                 .GroupBy(x => x.PlayerId).Select(g => new { Id = g.Key, Played = g.Count(), Wins = g.Count(x => x.IsWinner) }).ToListAsync(cancellationToken);
-            var futsalAwayStats = await _dbContext.FutsalMatches.Where(m => eventIds.Contains(m.EventId))
+            var FootballAwayStats = await _dbContext.FootballMatches.Where(m => eventIds.Contains(m.EventId))
                 .SelectMany(m => m.AwayRoster!.Select(p => new { PlayerId = p.Id, IsWinner = m.WinnerTeamId == m.AwayTeamId || (m.AwayTeamScore > m.HomeTeamScore && !m.WinnerTeamId.HasValue) }))
                 .GroupBy(x => x.PlayerId).Select(g => new { Id = g.Key, Played = g.Count(), Wins = g.Count(x => x.IsWinner) }).ToListAsync(cancellationToken);
 
@@ -343,7 +343,7 @@ public class PlayerService : IPlayerService
                 .GroupBy(x => x.PlayerId).Select(g => new { Id = g.Key, Played = g.Count(), Wins = g.Count(x => x.IsWinner) }).ToListAsync(cancellationToken);
 
             // Convert to Dictionaries for O(1) lookup
-            var fH = futsalHomeStats.ToDictionary(x => x.Id); var fA = futsalAwayStats.ToDictionary(x => x.Id);
+            var fH = FootballHomeStats.ToDictionary(x => x.Id); var fA = FootballAwayStats.ToDictionary(x => x.Id);
             var vH = volleyHomeStats.ToDictionary(x => x.Id); var vA = volleyAwayStats.ToDictionary(x => x.Id);
             var bH = bballHomeStats.ToDictionary(x => x.Id); var bA = bballAwayStats.ToDictionary(x => x.Id);
             var bvH = beachHomeStats.ToDictionary(x => x.Id); var bvA = beachAwayStats.ToDictionary(x => x.Id);
@@ -403,7 +403,7 @@ public class PlayerService : IPlayerService
                     string sportType = e switch {
                         ChessEvent => "chess",
                         CheckersEvent => "checkers",
-                        FutsalEvent => "futsal",
+                        FootballEvent => "Football",
                         VolleyballEvent => "volleyball",
                         Basketball3x3Event => "basketball_3x3",
                         BeachVolleyballEvent => "beach_volleyball",
@@ -434,10 +434,10 @@ public class PlayerService : IPlayerService
                     }
                 }
                 // Team Sports
-                foreach (var t in futsalTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
+                foreach (var t in FootballTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
                     int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
-                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "futsal", Date = t.Event.Date, Rank = r, TournamentId = t.EventId, Result = GetResultLabel(r), IsCaptain = t.CaptainId == playerId });
-                    sportTypes.Add("futsal");
+                    achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "Football", Date = t.Event.Date, Rank = r, TournamentId = t.EventId, Result = GetResultLabel(r), IsCaptain = t.CaptainId == playerId });
+                    sportTypes.Add("Football");
                 }
                 foreach (var t in volleyballTeams.Where(x => x.Players!.Any(p => p.Id == playerId) && x.Event != null)) {
                     int r = (t.Id == t.Event!.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
@@ -543,7 +543,7 @@ public class PlayerService : IPlayerService
                 // Team Sports Match Stats from dictionaries
                 var fPlayed = (fH.TryGetValue(playerId, out var fh) ? fh.Played : 0) + (fA.TryGetValue(playerId, out var fa) ? fa.Played : 0);
                 var fWins = (fH.TryGetValue(playerId, out var fhw) ? fhw.Wins : 0) + (fA.TryGetValue(playerId, out var faw) ? faw.Wins : 0);
-                AddStats("futsal", fPlayed, fWins);
+                AddStats("Football", fPlayed, fWins);
 
                 var vPlayed = (vH.TryGetValue(playerId, out var vh) ? vh.Played : 0) + (vA.TryGetValue(playerId, out var va) ? va.Played : 0);
                 var vWins = (vH.TryGetValue(playerId, out var vhw) ? vhw.Wins : 0) + (vA.TryGetValue(playerId, out var vaw) ? vaw.Wins : 0);
@@ -559,8 +559,8 @@ public class PlayerService : IPlayerService
                 // 4. Team Sport Stats & Goals
                 var pGoals = goalsS.FirstOrDefault(x => x.Id == playerId)?.Goals ?? 0;
                 if (pGoals > 0) {
-                    if (!sportStatsMap.ContainsKey("futsal")) sportStatsMap["futsal"] = new SportStatsDto { SportType = "futsal" };
-                    var s = sportStatsMap["futsal"];
+                    if (!sportStatsMap.ContainsKey("Football")) sportStatsMap["Football"] = new SportStatsDto { SportType = "Football" };
+                    var s = sportStatsMap["Football"];
                     s.GoalsCount += pGoals;
                     int goalPts = pGoals * 5;
                     s.PerformanceScore += goalPts;
@@ -569,7 +569,7 @@ public class PlayerService : IPlayerService
                         Description = $"Забиті голи (Футзал): {pGoals} голів",
                         Points = goalPts,
                         Category = "Goals",
-                        SportType = "futsal"
+                        SportType = "Football"
                     });
                 }
                 dto.MatchesPlayed = played;
@@ -785,10 +785,10 @@ public class PlayerService : IPlayerService
         } catch (Exception ex) {
             _logger.LogError(ex, "Error populating Generic achievements for player {PlayerId}", playerId);
         }
-        // 6. Team Sports (Futsal, Volleyball, etc.)
-        // Futsal
+        // 6. Team Sports (Football, Volleyball, etc.)
+        // Football
         try {
-            var teams = await _dbContext.FutsalTeams
+            var teams = await _dbContext.FootballTeams
                 .Include(t => t.Event)
                 .Where(t => t.Players != null && t.Players.Any(pl => pl.Id == playerId))
                 .ToListAsync(cancellationToken);
@@ -799,13 +799,13 @@ public class PlayerService : IPlayerService
                 else if (team.Id == team.Event.SecondPlaceTeamId) rank = 2;
                 else if (team.Id == team.Event.ThirdPlaceTeamId) rank = 3;
                 else {
-                    rank = await _dbContext.FutsalTeams
+                    rank = await _dbContext.FootballTeams
                         .Where(others => others.EventId == team.EventId && others.Points > team.Points)
                         .CountAsync(cancellationToken) + 1;
                 }
                 achievements.Add(new AchievementDto {
                     TournamentName = team.Event.Name,
-                    SportType = "futsal",
+                    SportType = "Football",
                     Date = team.Event.Date,
                     Rank = rank,
                     TournamentId = team.EventId,
@@ -814,7 +814,7 @@ public class PlayerService : IPlayerService
                 });
             }
         } catch (Exception ex) {
-            _logger.LogError(ex, "Error populating Futsal achievements for player {PlayerId}", playerId);
+            _logger.LogError(ex, "Error populating Football achievements for player {PlayerId}", playerId);
         }
         // Other Team Sports (Volleyball, Basketball, Beach Volleyball)
         try {
@@ -959,20 +959,20 @@ public class PlayerService : IPlayerService
         AddActivityStats("Бадмінтон", badMatches, badWins);
         dto.MatchesPlayed = chessMatches + checkersMatches + ttMatches + armMatches + badMatches;
         dto.WinsCount = chessWins + checkersWins + ttWins + armWins + badWins;
-        // 3. Futsal Goals
-        int futsalGoals = await _dbContext.FutsalGoals
+        // 3. Football Goals
+        int FootballGoals = await _dbContext.FootballGoals
             .Where(g => g.PlayerId == playerId)
             .SumAsync(g => (int?)g.GoalsCount ?? 0, cancellationToken);
-        if (futsalGoals > 0) {
-            int goalPts = futsalGoals * 5;
+        if (FootballGoals > 0) {
+            int goalPts = FootballGoals * 5;
             totalScore += goalPts;
             pointsBreakdown.Add(new PointEntryDto {
-                Description = $"Забиті голи (Футзал): {futsalGoals} голів",
+                Description = $"Забиті голи (Футзал): {FootballGoals} голів",
                 Points = goalPts,
                 Category = "Goals"
             });
         }
-        dto.GoalsScored = futsalGoals;
+        dto.GoalsScored = FootballGoals;
         dto.PerformanceScore = (int)Math.Round(totalScore);
         dto.PointsBreakdown = pointsBreakdown.OrderByDescending(x => x.Points).ToList();
     }
@@ -1178,8 +1178,8 @@ public class PlayerService : IPlayerService
         foreach (var m in badMatches1) m.Player1Id = targetId;
         var badMatches2 = await _dbContext.BadmintonMatches.Where(m => m.Player2Id == sourceId).ToListAsync(cancellationToken);
         foreach (var m in badMatches2) m.Player2Id = targetId;
-        // Futsal Goals
-        var goals = await _dbContext.FutsalGoals.Where(g => g.PlayerId == sourceId).ToListAsync(cancellationToken);
+        // Football Goals
+        var goals = await _dbContext.FootballGoals.Where(g => g.PlayerId == sourceId).ToListAsync(cancellationToken);
         foreach (var g in goals) g.PlayerId = targetId;
         // General Event Winners
         var events1 = await _dbContext.Set<Event>().Where(e => e.FirstPlaceId == sourceId).ToListAsync(cancellationToken);
@@ -1197,7 +1197,7 @@ public class PlayerService : IPlayerService
         var badges = new List<AutomaticBadgeDto>();
         try {
             // 1. All-time Top Scorer
-            var allTimeTopScorer = await _dbContext.FutsalGoals
+            var allTimeTopScorer = await _dbContext.FootballGoals
                 .GroupBy(g => g.PlayerId)
                 .Select(group => new { PlayerId = group.Key, TotalGoals = group.Sum(g => g.GoalsCount) })
                 .OrderByDescending(x => x.TotalGoals)
@@ -1211,7 +1211,7 @@ public class PlayerService : IPlayerService
                 });
             }
             // 2. Season Top Scorers
-            var seasonTopScorersData = await _dbContext.FutsalGoals
+            var seasonTopScorersData = await _dbContext.FootballGoals
                 .Include(g => g.Match)
                     .ThenInclude(m => m.Event)
                         .ThenInclude(e => e.Season)
@@ -1439,9 +1439,9 @@ public class PlayerService : IPlayerService
             result.Matches.Add(matchDto);
         }
 
-        // 5. Team Sports (Futsal, Basketball, Volleyball)
-        // Futsal
-        var futsalMatches = await _dbContext.FutsalMatches
+        // 5. Team Sports (Football, Basketball, Volleyball)
+        // Football
+        var FootballMatches = await _dbContext.FootballMatches
             .Include(m => m.Event)
             .Include(m => m.HomeTeam).ThenInclude(t => t.Players)
             .Include(m => m.AwayTeam).ThenInclude(t => t.Players)
@@ -1453,10 +1453,10 @@ public class PlayerService : IPlayerService
                         (m.HomeRoster!.Any(p => p.Id == player2Id) && m.AwayRoster!.Any(p => p.Id == player1Id)))
             .ToListAsync(cancellationToken);
 
-        foreach (var m in futsalMatches)
+        foreach (var m in FootballMatches)
         {
             var matchDto = new HeadToHeadMatchDto {
-                SportType = "futsal",
+                SportType = "Football",
                 TournamentName = m.Event?.Name ?? "Турнір з футзалу",
                 Date = m.Event?.Date ?? DateTime.MinValue,
                 TournamentId = m.EventId,
