@@ -65,7 +65,6 @@ const TopPlayersCompact = () => {
   const getSportIcon = (sportSlug: string) => {
     const icons: Record<string, string> = {
       'football': 'fas fa-futbol',
-      'football': 'fas fa-futbol',
       'basketball-3x3': 'fas fa-basketball-ball',
       'volleyball': 'fas fa-volleyball-ball',
       'chess': 'fas fa-chess',

@@ -566,7 +566,7 @@ public class PlayerService : IPlayerService
                     s.PerformanceScore += goalPts;
                     totalScore += goalPts;
                     pointsBreakdown.Add(new PointEntryDto {
-                        Description = $"Забиті голи (Футзал): {pGoals} голів",
+                        Description = $"Забиті голи (Футбол): {pGoals} голів",
                         Points = goalPts,
                         Category = "Goals",
                         SportType = "Football"
@@ -967,7 +967,7 @@ public class PlayerService : IPlayerService
             int goalPts = FootballGoals * 5;
             totalScore += goalPts;
             pointsBreakdown.Add(new PointEntryDto {
-                Description = $"Забиті голи (Футзал): {FootballGoals} голів",
+                Description = $"Забиті голи (Футбол): {FootballGoals} голів",
                 Points = goalPts,
                 Category = "Goals"
             });
@@ -1457,7 +1457,7 @@ public class PlayerService : IPlayerService
         {
             var matchDto = new HeadToHeadMatchDto {
                 SportType = "Football",
-                TournamentName = m.Event?.Name ?? "Турнір з футзалу",
+                TournamentName = m.Event?.Name ?? "Турнір з Футболу",
                 Date = m.Event?.Date ?? DateTime.MinValue,
                 TournamentId = m.EventId,
                 Score = $"{m.HomeTeamScore}:{m.AwayTeamScore}"

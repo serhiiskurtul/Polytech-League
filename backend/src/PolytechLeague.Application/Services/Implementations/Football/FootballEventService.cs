@@ -96,7 +96,7 @@ public class FootballEventService :
     {
         await _notificationService.SendNotificationToAllAsync(
             "Нове змагання!",
-            $"Створено нове змагання з футзалу: {entity.Name}",
+            $"Створено нове змагання з Футболу: {entity.Name}",
             NotificationType.Tournament,
             $"/tournaments/{entity.Id}",
             true
@@ -129,7 +129,7 @@ public class FootballEventService :
         {
             await _notificationService.SendNotificationToAllAsync(
                 "Змагання завершено!",
-                $"Визначено переможців у змаганні з футзалу: {newEntity.Name}",
+                $"Визначено переможців у змаганні з Футболу: {newEntity.Name}",
                 NotificationType.Tournament,
                 $"/tournaments/{newEntity.Id}",
                 true
@@ -227,7 +227,7 @@ public class FootballEventService :
         if (status == RegistrationStatus.Pending)
         {
             await _notificationService.SendNotificationToAdminsAsync(
-                "Новий запит на реєстрацію (футзал)",
+                "Новий запит на реєстрацію (Футбол)",
                 $"Гравець {player.FirstName} {player.LastName} (група {groupName}) хоче зареєструватися на {tournament.Name}",
                 NotificationType.Tournament,
                 $"/tournaments/{eventId}"
@@ -236,7 +236,7 @@ public class FootballEventService :
         else
         {
             await _notificationService.SendNotificationToAdminsAsync(
-                "Нова реєстрація на футзал",
+                "Нова реєстрація на Футбол",
                 $"Гравець {player.FirstName} {player.LastName} (група {groupName}) зареєструвався на {tournament.Name}",
                 NotificationType.Tournament,
                 $"/tournaments/{eventId}"
@@ -289,7 +289,7 @@ public class FootballEventService :
                 await _notificationService.SendNotificationToUserAsync(
                     player.UserId.Value,
                     "Реєстрація схвалена",
-                    $"Вашу заявку на участь у змаганні з футзалу \"{tournament?.Name}\" схвалено!",
+                    $"Вашу заявку на участь у змаганні з Футболу \"{tournament?.Name}\" схвалено!",
                     NotificationType.Tournament,
                     $"/tournaments/{eventId}"
                 );
@@ -317,7 +317,7 @@ public class FootballEventService :
                 await _notificationService.SendNotificationToUserAsync(
                     player.UserId.Value,
                     "Реєстрація відхилена",
-                    $"Вашу заявку на участь у змаганні з футзалу \"{tournament?.Name}\" було відхилено.",
+                    $"Вашу заявку на участь у змаганні з Футболу \"{tournament?.Name}\" було відхилено.",
                     NotificationType.Tournament,
                     $"/tournaments/{eventId}"
                 );
