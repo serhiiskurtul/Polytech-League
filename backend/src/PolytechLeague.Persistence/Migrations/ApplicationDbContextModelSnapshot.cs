@@ -1149,6 +1149,32 @@ namespace PolytechLeague.Persistence.Migrations
                     b.ToTable("event_photos", (string)null);
                 });
 
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Football.FootballCard", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("MatchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PlayerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MatchId");
+
+                    b.HasIndex("PlayerId");
+
+                    b.ToTable("Football_cards", (string)null);
+                });
+
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Football.FootballEventParticipant", b =>
                 {
                     b.Property<long>("EventId")
@@ -3281,6 +3307,25 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Navigation("Event");
                 });
 
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Football.FootballCard", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Football.FootballMatch", "Match")
+                        .WithMany("Cards")
+                        .HasForeignKey("MatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "Player")
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Match");
+
+                    b.Navigation("Player");
+                });
+
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Football.FootballEventParticipant", b =>
                 {
                     b.HasOne("PolytechLeague.Domain.Entities.Football.FootballEvent", "Event")
@@ -4195,6 +4240,8 @@ namespace PolytechLeague.Persistence.Migrations
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Football.FootballMatch", b =>
                 {
+                    b.Navigation("Cards");
+
                     b.Navigation("Goals");
                 });
 
