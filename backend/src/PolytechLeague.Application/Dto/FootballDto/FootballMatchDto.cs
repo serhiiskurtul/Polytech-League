@@ -78,9 +78,11 @@ public static class FootballMatchDtoExtensions
             HomeCaptainId = request.HomeCaptainId,
             AwayCaptainId = request.AwayCaptainId,
             Goals = request.Goals?.Select(g => g.FromRequest(0)).ToList(),
-            Cards = (request.YellowCards?.Select(c => c.FromRequest(0, FootballCardType.Yellow)) ?? Enumerable.Empty<FootballCard>())
-                .Concat(request.RedCards?.Select(c => c.FromRequest(0, FootballCardType.Red)) ?? Enumerable.Empty<FootballCard>())
-                .ToList()
+            Cards = (request.YellowCards == null && request.RedCards == null) 
+                ? null 
+                : (request.YellowCards?.Select(c => c.FromRequest(0, FootballCardType.Yellow)) ?? Enumerable.Empty<FootballCard>())
+                    .Concat(request.RedCards?.Select(c => c.FromRequest(0, FootballCardType.Red)) ?? Enumerable.Empty<FootballCard>())
+                    .ToList()
         };
     }
 

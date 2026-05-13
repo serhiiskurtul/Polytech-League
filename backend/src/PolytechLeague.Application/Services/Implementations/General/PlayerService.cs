@@ -1625,6 +1625,12 @@ public class PlayerService : IPlayerService
 
     private async Task PopulateFootballStatsAsync(PlayerDto dto, CancellationToken cancellationToken)
     {
+        if (dto.Id == null)
+        {
+            _logger.LogWarning("PopulateFootballStatsAsync: Player ID is null for user {UserId}. Skipping stats population.", dto.UserId);
+            return;
+        }
+
         try
         {
         try {

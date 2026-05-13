@@ -315,29 +315,29 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         }).flat();
 
       const payload = {
-        Id: selectedMatchForScorers.id,
-        EventId: details.id,
-        HomeTeamId: selectedMatchForScorers.homeTeamId,
-        AwayTeamId: selectedMatchForScorers.awayTeamId,
-        Stage: selectedMatchForScorers.stage,
+        id: selectedMatchForScorers.id,
+        eventId: details.id,
+        homeTeamId: selectedMatchForScorers.homeTeamId,
+        awayTeamId: selectedMatchForScorers.awayTeamId,
+        stage: selectedMatchForScorers.stage,
         // Update rosters to match team players if they were empty
-        HomeRosterIds: selectedMatchForScorers.homeRoster?.length > 0 
+        homeRosterIds: selectedMatchForScorers.homeRoster?.length > 0 
             ? selectedMatchForScorers.homeRoster.map((p: any) => p.id) 
             : details.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players?.map((p: any) => p.id) || [],
-        AwayRosterIds: selectedMatchForScorers.awayRoster?.length > 0 
+        awayRosterIds: selectedMatchForScorers.awayRoster?.length > 0 
             ? selectedMatchForScorers.awayRoster.map((p: any) => p.id) 
             : details.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players?.map((p: any) => p.id) || [],
-        HomeGoalkeeperId: parseInt(matchGoalkeepers.home) || null,
-        AwayGoalkeeperId: parseInt(matchGoalkeepers.away) || null,
-        HomeCaptainId: parseInt(matchCaptains.home) || null,
-        AwayCaptainId: parseInt(matchCaptains.away) || null,
-        HomeTeamScore: matchScores.home,
-        AwayTeamScore: matchScores.away,
-        HomeScore: matchScores.home,
-        AwayScore: matchScores.away,
-        Goals: goalsPayload,
-        YellowCards: yellowCardsPayload,
-        RedCards: redCardsPayload
+        homeGoalkeeperId: parseInt(matchGoalkeepers.home) || null,
+        awayGoalkeeperId: parseInt(matchGoalkeepers.away) || null,
+        homeCaptainId: parseInt(matchCaptains.home) || null,
+        awayCaptainId: parseInt(matchCaptains.away) || null,
+        homeTeamScore: matchScores.home,
+        awayTeamScore: matchScores.away,
+        homeScore: matchScores.home,
+        awayScore: matchScores.away,
+        goals: goalsPayload,
+        yellowCards: yellowCardsPayload,
+        redCards: redCardsPayload
       };
 
 

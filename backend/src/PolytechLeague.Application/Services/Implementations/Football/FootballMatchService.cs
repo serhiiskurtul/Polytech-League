@@ -146,35 +146,30 @@ public class FootballMatchService :
     {
         if (source.Cards == null)
         {
-            _logger.LogWarning("SyncCards: Source cards collection is null for match {Id}", target.Id);
+            _logger.LogInformation("SyncCards: Source cards collection is null for match {Id}. Preserving existing cards.", target.Id);
             return;
         }
 
         target.Cards ??= new List<FootballCard>();
-        _logger.LogInformation("SyncCards: Received {Count} cards from source for match {MatchId}", 
-            source.Cards?.Count ?? 0, target.Id);
+        _logger.LogInformation("SyncCards: Syncing {Count} cards for match {MatchId} (Existing in target: {ExistingCount})", 
+            source.Cards.Count, target.Id, target.Cards.Count);
 
-        // Explicitly remove all existing cards for this match from the database
+        // We'll replace all cards for simplicity, but let's do it by removing from DB context explicitly
+        // to ensure EF knows what's going on.
         var existingCards = _dbcontext.FootballCards.Where(c => c.MatchId == target.Id).ToList();
-        _logger.LogInformation("SyncCards: Removing {Count} existing cards for match {Id}", existingCards.Count, target.Id);
-        if (existingCards.Any())
-        {
-            _dbcontext.FootballCards.RemoveRange(existingCards);
-            target.Cards.Clear();
-        }
+        _dbcontext.FootballCards.RemoveRange(existingCards);
+        target.Cards.Clear();
 
         // Add new cards
         foreach (var sourceCard in source.Cards)
         {
-            _logger.LogInformation("  - Syncing card: Player={PlayerId}, Type={Type} (int: {TypeInt})", 
-                sourceCard.PlayerId, sourceCard.Type, (int)sourceCard.Type);
-            
             var newCard = new FootballCard
             {
                 MatchId = target.Id,
                 PlayerId = sourceCard.PlayerId,
                 Type = sourceCard.Type
             };
+            _dbcontext.FootballCards.Add(newCard);
             target.Cards.Add(newCard);
         }
     }
