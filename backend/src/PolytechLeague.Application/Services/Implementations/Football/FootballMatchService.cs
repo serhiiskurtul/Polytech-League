@@ -151,31 +151,31 @@ public class FootballMatchService :
         }
 
         target.Cards ??= new List<FootballCard>();
+        _logger.LogInformation("SyncCards: Received {Count} cards from source for match {MatchId}", 
+            source.Cards?.Count ?? 0, target.Id);
 
-        // Explicitly load and remove all cards for this match from the DB context
-        // This ensures no stale cards remain regardless of collection state
-        var matchId = target.Id;
-        var existingCards = _dbcontext.FootballCards.Where(c => c.MatchId == matchId).ToList();
-        
-        _logger.LogInformation("SyncCards: Removing {Count} existing cards for match {Id}", existingCards.Count, matchId);
+        // Explicitly remove all existing cards for this match from the database
+        var existingCards = _dbcontext.FootballCards.Where(c => c.MatchId == target.Id).ToList();
+        _logger.LogInformation("SyncCards: Removing {Count} existing cards for match {Id}", existingCards.Count, target.Id);
         if (existingCards.Any())
         {
             _dbcontext.FootballCards.RemoveRange(existingCards);
+            target.Cards.Clear();
         }
-        target.Cards.Clear();
 
         // Add new cards
         foreach (var sourceCard in source.Cards)
         {
-            _logger.LogInformation("SyncCards: Adding card for player {PlayerId}, Type {Type} to match {MatchId}", 
-                sourceCard.PlayerId, sourceCard.Type, matchId);
+            _logger.LogInformation("  - Syncing card: Player={PlayerId}, Type={Type} (int: {TypeInt})", 
+                sourceCard.PlayerId, sourceCard.Type, (int)sourceCard.Type);
             
-            target.Cards.Add(new FootballCard
+            var newCard = new FootballCard
             {
-                MatchId = matchId,
+                MatchId = target.Id,
                 PlayerId = sourceCard.PlayerId,
                 Type = sourceCard.Type
-            });
+            };
+            target.Cards.Add(newCard);
         }
     }
 
