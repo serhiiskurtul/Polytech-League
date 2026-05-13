@@ -14,6 +14,11 @@ const ALL_SPORTS = [
   "Баскетбол 3x3", "Пляжний волейбол", "Легка атлетика"
 ];
 
+const normalizeSportName = (name: string) => {
+  if (name === 'Футзал') return 'Футбол';
+  return name;
+};
+
 const RegionalRatingsPage: React.FC = () => {
   const { user } = useAuth();
   const isAdmin = user?.role === 1 || user?.role === '1' || user?.role === 'Admin';
@@ -294,7 +299,7 @@ const RegionalRatingsPage: React.FC = () => {
               {ratingData?.sports && ratingData.sports.length > 0 && (
                 <tr>
                   {ratingData.sports.map(sport => (
-                    <th key={sport} className={styles.subHeader}>{sport}</th>
+                    <th key={sport} className={styles.subHeader}>{normalizeSportName(sport)}</th>
                   ))}
                 </tr>
               )}
