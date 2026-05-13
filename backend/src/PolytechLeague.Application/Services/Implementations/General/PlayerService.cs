@@ -909,7 +909,7 @@ public class PlayerService : IPlayerService
             // Table Tennis Teams
             var ttTeams = await _dbContext.TableTennisTeams
                 .Include(t => t.Event)
-                .Where(t => t.Players != null && t.Players.Any(pl => pl.Id == playerId))
+                .Where(t => t.Players.Any(pl => pl.Id == playerId))
                 .ToListAsync(cancellationToken);
             foreach (var t in ttTeams) {
                 if (t.Event == null) continue;
@@ -1627,38 +1627,29 @@ public class PlayerService : IPlayerService
     {
         try
         {
+        try {
+            _logger.LogInformation("[DEBUG] PopulateFootballStatsAsync for Player ID: {PlayerId}, User ID: {UserId}", dto.Id, dto.UserId);
+            
             var goals = await _dbContext.FootballGoals
                 .Where(g => g.PlayerId == dto.Id)
-                .SumAsync(g => g.GoalsCount, cancellationToken);
+                .SumAsync(g => (int?)g.GoalsCount, cancellationToken) ?? 0;
             
-            var yellowCards = await _dbContext.FootballCards
-                .Where(c => c.PlayerId == dto.Id && c.Type == FootballCardType.Yellow)
-                .CountAsync(cancellationToken);
-            
-            var redCards = await _dbContext.FootballCards
-                .Where(c => c.PlayerId == dto.Id && c.Type == FootballCardType.Red)
-                .CountAsync(cancellationToken);
-
-            _logger.LogInformation("Populating stats for player {PlayerId} ({FirstName} {LastName}): Goals: {Goals}, Yellow: {Yellow}, Red: {Red}", 
-                dto.Id, dto.FirstName, dto.LastName, goals, yellowCards, redCards);
-            
-            var allCardsForPlayer = await _dbContext.FootballCards
+            var playerCardStats = await _dbContext.FootballCards
                 .Where(c => c.PlayerId == dto.Id)
-                .Select(c => new { c.Type, c.MatchId })
+                .GroupBy(c => c.Type)
+                .Select(g => new { Type = g.Key, Count = g.Count() })
                 .ToListAsync(cancellationToken);
 
-            _logger.LogInformation("Stats for player {PlayerId}: Goals: {Goals}, Yellow: {Yellow}, Red: {Red}. Total cards in DB: {Count}", 
-                dto.Id, goals, yellowCards, redCards, allCardsForPlayer.Count);
-            
-            foreach(var c in allCardsForPlayer) {
-                _logger.LogInformation("  - Card in DB: Match {MatchId}, Type {Type}", c.MatchId, c.Type);
-            }
+            int yellowCards = playerCardStats.FirstOrDefault(s => s.Type == FootballCardType.Yellow)?.Count ?? 0;
+            int redCards = playerCardStats.FirstOrDefault(s => s.Type == FootballCardType.Red)?.Count ?? 0;
+
+            _logger.LogInformation("[DEBUG] FOUND {Yellow} yellow and {Red} red cards for player {Id}", yellowCards, redCards, dto.Id);
 
             dto.GoalsScored = goals;
             dto.YellowCardsCount = yellowCards;
             dto.RedCardsCount = redCards;
 
-            // Always add football to sportStats if they are a football player, even if stats are 0
+            // Always add football to sportStats if they have any stats or team info
             bool isFootballer = goals > 0 || yellowCards > 0 || redCards > 0 || 
                                 dto.FootballTeamId != null || dto.FootballPosition != null || 
                                 dto.FootballShirtNumber != null;
@@ -1676,6 +1667,9 @@ public class PlayerService : IPlayerService
                 footballStats.YellowCardsCount = yellowCards;
                 footballStats.RedCardsCount = redCards;
             }
+        } catch (Exception ex) {
+            _logger.LogError(ex, "Error populating football stats for player {PlayerId}", dto.Id);
+        }
         }
         catch (Exception ex)
         {
