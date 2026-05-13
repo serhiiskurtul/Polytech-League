@@ -131,7 +131,7 @@ const TopPlayersCompact = () => {
                   </div>
                 </div>
                 <div className={styles.playerAvatar}>
-                  {player.photoUrl ? (
+                  {getPhotoUrl(player.photoUrl) ? (
                     <img src={getPhotoUrl(player.photoUrl)!} alt={player.firstName} className={styles.avatarImage} />
                   ) : (
                     getInitials(player.firstName, player.lastName)

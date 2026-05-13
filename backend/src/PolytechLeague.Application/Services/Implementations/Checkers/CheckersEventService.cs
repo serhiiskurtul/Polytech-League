@@ -279,7 +279,7 @@ public class CheckersEventService :
                     EnrollmentYear = parsed.enrollmentYear,
                     SpecialtyCode = parsed.specialty,
                     GroupNumber = parsed.groupNumber,
-                    PhotoUrl = "/images/placeholders/user.png"
+                    PhotoUrl = null
                 };
                 _dbcontext.Set<Player>().Add(player);
                 await _dbcontext.SaveChangesAsync(cancellationToken);

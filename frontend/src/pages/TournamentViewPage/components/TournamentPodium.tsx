@@ -1,5 +1,5 @@
 import React from 'react';
-import { BASE_URL } from '@/shared/api/axiosInstance';
+import { getPhotoUrl } from '@/shared/utils/photo.utils';
 import styles from '../TournamentViewPage.module.css';
 
 interface TournamentPodiumProps {
@@ -19,12 +19,6 @@ const TournamentPodium: React.FC<TournamentPodiumProps> = ({
 }) => {
   if (!firstPlace && !secondPlace && !thirdPlace) return null;
 
-  const getImageUrl = (url: string) => {
-    if (!url) return '';
-    if (url.startsWith('http')) return url;
-    return `${BASE_URL}${url}`;
-  };
-
   const renderPlace = (participant: any | null | undefined, rank: number, className: string) => {
     if (!participant) return null;
 
@@ -36,7 +30,7 @@ const TournamentPodium: React.FC<TournamentPodiumProps> = ({
       ? (participant.name?.length > 10 ? participant.name.substring(0, 10) + '...' : participant.name)
       : `${participant.firstName?.[0] || ''}${participant.lastName?.[0] || ''}`;
 
-    const hasPhoto = !isTeam && participant.photoUrl;
+    const photoSrc = !isTeam ? getPhotoUrl(participant.photoUrl) : null;
 
     return (
       <div className={`${styles.podiumPlace} ${className}`}>
@@ -49,9 +43,9 @@ const TournamentPodium: React.FC<TournamentPodiumProps> = ({
           onClick={() => isTeam && participant.id && onViewRoster && onViewRoster(participant.id)}
           style={{ cursor: (isTeam && onViewRoster) ? 'pointer' : 'default' }}
         >
-          {hasPhoto ? (
+          {photoSrc ? (
             <img 
-              src={getImageUrl(participant.photoUrl)} 
+              src={photoSrc} 
               alt={displayName} 
               className={styles.podiumPhoto}
             />

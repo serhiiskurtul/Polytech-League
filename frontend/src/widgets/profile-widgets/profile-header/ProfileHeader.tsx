@@ -44,7 +44,7 @@ const ProfileHeader = ({ userData, isAdmin, onEdit, onAvatarUpload, onLogout, on
       <div className={styles.profileHeaderCard}>
         <div className={styles.profileAvatarSection}>
           <div className={styles.profileAvatar}>
-            {userData.photoUrl ? (
+            {getPhotoUrl(userData.photoUrl) ? (
               <img 
                 src={getPhotoUrl(userData.photoUrl)!} 
                 alt={userData.name} 

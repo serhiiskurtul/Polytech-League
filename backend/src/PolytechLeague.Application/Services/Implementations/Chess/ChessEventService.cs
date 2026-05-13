@@ -322,7 +322,7 @@ public class ChessEventService :
                     EnrollmentYear = parsed.enrollmentYear,
                     SpecialtyCode = parsed.specialty,
                     GroupNumber = parsed.groupNumber,
-                    PhotoUrl = "/images/placeholders/user.png",
+                    PhotoUrl = null,
                     ChessFideId = sp.FideId,
                     ChessRating = sp.Rating,
                     ChessTitle = sp.Title
