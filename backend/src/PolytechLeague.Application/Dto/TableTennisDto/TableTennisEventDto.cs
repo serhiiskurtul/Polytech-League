@@ -140,9 +140,8 @@ public static class TableTennisEventDtoExtensions
             ThirdPlaceTeamId = request.ThirdPlaceTeamId,
             MvpId = request.MvpId
         };
-
-        };
     }
+
 
     public static TableTennisEventResponse ToResponse(this TableTennisEvent entity)
     {
