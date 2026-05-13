@@ -89,21 +89,21 @@ const ProfileStats = ({ stats }: ProfileStatsProps) => {
             <div className={styles.statLabel}>Шаховий рейтинг Elo</div>
           </div>
         )}
-        {(isFootballer || (stats.goalsScored !== undefined && stats.goalsScored > 0)) && (
-          <div className={styles.statCard} title="Загальна кількість забитих голів">
-            <div className={styles.statValue}>{stats.goalsScored || 0}</div>
+        {(isFootballer || (stats.goalsCount !== undefined && stats.goalsCount > 0)) && (
+          <div className={styles.statCard} title="Кількість забитих голів у футбольних матчах">
+            <div className={styles.statValue}>{stats.goalsCount || 0}</div>
             <div className={styles.statLabel}>Забитих голів</div>
           </div>
         )}
-        {(isFootballer || (stats.yellowCards !== undefined && stats.yellowCards > 0)) && (
+        {(isFootballer || (stats.yellowCardsCount !== undefined && stats.yellowCardsCount > 0)) && (
           <div className={styles.statCard} title="Жовті картки отримані у футбольних матчах">
-            <div className={`${styles.statValue} ${styles.yellowCardValue}`}>{stats.yellowCards || 0}</div>
+            <div className={`${styles.statValue} ${styles.yellowCardValue}`}>{stats.yellowCardsCount || 0}</div>
             <div className={styles.statLabel}>Жовті картки</div>
           </div>
         )}
-        {(isFootballer || (stats.redCards !== undefined && stats.redCards > 0)) && (
+        {(isFootballer || (stats.redCardsCount !== undefined && stats.redCardsCount > 0)) && (
           <div className={styles.statCard} title="Червоні картки отримані у футбольних матчах">
-            <div className={`${styles.statValue} ${styles.redCardValue}`}>{stats.redCards || 0}</div>
+            <div className={`${styles.statValue} ${styles.redCardValue}`}>{stats.redCardsCount || 0}</div>
             <div className={styles.statLabel}>Червоні картки</div>
           </div>
         )}
