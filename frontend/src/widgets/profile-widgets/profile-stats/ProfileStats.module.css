@@ -43,6 +43,18 @@
   cursor: help;
 }
 
+.noHover {
+  cursor: default !important;
+  transition: none !important;
+}
+
+.noHover:hover {
+  transform: none !important;
+  background: var(--primary-light) !important;
+  box-shadow: none !important;
+}
+
+
 .statValue {
   font-size: 32px;
   font-weight: 700;
@@ -196,10 +208,19 @@
   color: #ef4444 !important;
 }
 
-.statCard:hover .yellowCardValue,
-.statCard:hover .redCardValue {
+.statCard:hover .statValue,
+.statCard:hover .statLabel {
   color: white !important;
 }
+
+.statCard:hover .yellowCardValue {
+  color: #fbbf24 !important;
+}
+
+.statCard:hover .redCardValue {
+  color: #ef4444 !important;
+}
+
 
 .extraStat {
   font-size: 14px;

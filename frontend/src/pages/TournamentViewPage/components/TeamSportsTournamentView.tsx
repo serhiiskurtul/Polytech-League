@@ -996,15 +996,18 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       </div>
 
       {/* Podium */}
-      {(details.firstPlaceTeam || details.secondPlaceTeam || details.thirdPlaceTeam) && (
+      {(details.firstPlaceTeam || details.secondPlaceTeam || details.thirdPlaceTeam || details.mvpId) && (
         <div className={styles.podiumSection}>
            <TournamentPodium 
              firstPlace={details.firstPlaceTeam}
              secondPlace={details.secondPlaceTeam}
              thirdPlace={details.thirdPlaceTeam}
+             mvpId={details.mvpId}
+             mvpName={details.mvpName}
              isTeam={true}
              onViewRoster={(teamId) => { setEditingTeamId(teamId); setIsTeamRosterModalOpen(true); }}
            />
+
         </div>
       )}
 

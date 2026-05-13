@@ -33,7 +33,11 @@ public abstract class Event
     public Player? SecondPlace { get; set; }
     public long? ThirdPlaceId { get; set; }
     public Player? ThirdPlace { get; set; }
+
+    public long? MvpId { get; set; }
+    public Player? Mvp { get; set; }
 }
+
 
 public enum CompetitionLevel
 {

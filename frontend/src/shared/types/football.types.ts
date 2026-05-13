@@ -93,7 +93,10 @@ export interface footballEventResponse {
   registrationStart?: string;
   registrationEnd?: string;
   endDate?: string;
+  mvpId?: number | null;
+  mvpName?: string | null;
 }
+
 
 export interface footballEventRequest {
   name: string;
@@ -115,4 +118,6 @@ export interface footballEventRequest {
   registrationStart?: string;
   registrationEnd?: string;
   endDate?: string;
+  mvpId?: number | null;
 }
+

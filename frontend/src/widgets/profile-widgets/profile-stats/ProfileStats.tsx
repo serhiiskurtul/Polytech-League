@@ -110,7 +110,7 @@ const ProfileStats = ({ stats }: ProfileStatsProps) => {
           </div>
         )}
         {(isFootballer || (stats.yellowCardsCount !== undefined && stats.yellowCardsCount > 0)) && (
-          <div className={styles.statCard} title="Жовті картки отримані у футбольних матчах">
+          <div className={`${styles.statCard} ${styles.noHover}`} title="Жовті картки отримані у футбольних матчах">
             <div className={`${styles.statValue} ${styles.yellowCardValue}`}>
               {stats.yellowCardsCount ?? stats.sportStats?.find(s => s.sportType.toLowerCase() === 'football')?.yellowCardsCount ?? 0}
             </div>
@@ -118,7 +118,7 @@ const ProfileStats = ({ stats }: ProfileStatsProps) => {
           </div>
         )}
         {(isFootballer || (stats.redCardsCount !== undefined && stats.redCardsCount > 0)) && (
-          <div className={styles.statCard} title="Червоні картки отримані у футбольних матчах">
+          <div className={`${styles.statCard} ${styles.noHover}`} title="Червоні картки отримані у футбольних матчах">
             <div className={`${styles.statValue} ${styles.redCardValue}`}>
               {stats.redCardsCount ?? stats.sportStats?.find(s => s.sportType.toLowerCase() === 'football')?.redCardsCount ?? 0}
             </div>

@@ -299,7 +299,8 @@ public class PlayerService : IPlayerService
                 .Where(e => eventIds.Contains(e.Id) &&
                             ((e.FirstPlaceId.HasValue && playerIds.Contains(e.FirstPlaceId.Value)) ||
                              (e.SecondPlaceId.HasValue && playerIds.Contains(e.SecondPlaceId.Value)) ||
-                             (e.ThirdPlaceId.HasValue && playerIds.Contains(e.ThirdPlaceId.Value))))
+                             (e.ThirdPlaceId.HasValue && playerIds.Contains(e.ThirdPlaceId.Value)) ||
+                             (e.MvpId.HasValue && playerIds.Contains(e.MvpId.Value))))
                 .ToListAsync(cancellationToken);
             var FootballTeams = await _dbContext.FootballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => eventIds.Contains(t.EventId) && t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
             var volleyballTeams = await _dbContext.VolleyballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => eventIds.Contains(t.EventId) && t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
@@ -459,6 +460,21 @@ public class PlayerService : IPlayerService
                         {
                             dto.ArmwrestlingPreferredWeightClass = armwEvent.WeightClass;
                         }
+                    }
+                }
+                foreach (var e in genericWinners.Where(x => x.MvpId == playerId)) {
+                    string sportType = e switch {
+                        FootballEvent => "football",
+                        VolleyballEvent => "volleyball",
+                        Basketball3x3Event => "basketball_3x3",
+                        _ => "other"
+                    };
+                    if (sportType == "other") continue; // MVP only for these sports as per request
+
+                    if (!achievements.Any(a => a.TournamentId == e.Id && a.Result == "MVP"))
+                    {
+                        achievements.Add(new AchievementDto { TournamentName = e.Name, SportType = sportType, Date = e.Date, Rank = 0, TournamentId = e.Id, Result = "MVP" });
+                        sportTypes.Add(sportType);
                     }
                 }
                 // Team Sports
@@ -960,6 +976,34 @@ public class PlayerService : IPlayerService
             _logger.LogError(ex, "Error populating Athletics achievements for player {PlayerId}", playerId);
         }
 
+        // 8. MVP Achievements
+        try {
+            var mvpEvents = await _dbContext.Set<Event>()
+                .Where(e => e.MvpId == playerId)
+                .ToListAsync(cancellationToken);
+            foreach (var e in mvpEvents) {
+                string sport = e switch {
+                    FootballEvent => "football",
+                    VolleyballEvent => "volleyball",
+                    Basketball3x3Event => "basketball_3x3",
+                    _ => "other"
+                };
+                if (sport == "other") continue;
+                if (achievements.Any(a => a.TournamentId == e.Id && a.Result == "MVP")) continue;
+                
+                achievements.Add(new AchievementDto {
+                    TournamentName = e.Name,
+                    SportType = sport,
+                    Date = e.Date,
+                    Rank = 0,
+                    TournamentId = e.Id,
+                    Result = "MVP"
+                });
+            }
+        } catch (Exception ex) {
+            _logger.LogError(ex, "Error populating MVP achievements for player {PlayerId}", playerId);
+        }
+
         dto.Achievements = achievements.OrderByDescending(a => a.Date).ToList();
         dto.CompetitionsCount = achievements.Select(a => a.TournamentId).Distinct().Count();
     }
@@ -1002,6 +1046,16 @@ public class PlayerService : IPlayerService
                 Category = "Achievements"
             });
         }
+        foreach (var ach in dto.Achievements.Where(a => a.Result == "MVP")) {
+            int mvpPts = 50;
+            totalScore += mvpPts;
+            pointsBreakdown.Add(new PointEntryDto {
+                Description = $"MVP: {ach.TournamentName}",
+                Points = mvpPts,
+                Category = "MVP"
+            });
+        }
+
         // 2. Individual Matches Played & Wins
         int chessMatches = await _dbContext.ChessGames.CountAsync(g => g.WhitePlayerId == playerId || g.BlackPlayerId == playerId, cancellationToken);
         int chessWins = await _dbContext.ChessGames.CountAsync(g => (g.WhitePlayerId == playerId && g.Result == GameResult.WhiteWin) || (g.BlackPlayerId == playerId && g.Result == GameResult.BlackWin), cancellationToken);

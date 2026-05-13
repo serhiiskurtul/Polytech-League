@@ -40,7 +40,9 @@ public class Basketball3x3EventRequest
     public long? SecondPlaceTeamId { get; set; }
     public long? ThirdPlaceTeamId { get; set; }
     public long? SeasonId { get; set; }
+    public long? MvpId { get; set; }
 }
+
 
 public class Basketball3x3EventResponse
 {
@@ -79,7 +81,10 @@ public class Basketball3x3EventResponse
     public bool IsModerated { get; set; }
     public bool IsPublic { get; set; }
     public bool IsTeam { get; set; }
+    public long? MvpId { get; set; }
+    public string? MvpName { get; set; }
 }
+
 
 public class Basketball3x3EventParticipantDto
 {
@@ -119,9 +124,11 @@ public static class Basketball3x3EventDtoExtensions
             SecondPlaceTeamId = request.SecondPlaceTeamId,
             ThirdPlaceTeamId = request.ThirdPlaceTeamId,
             SeasonId = request.SeasonId,
-            Category = request.Category
+            Category = request.Category,
+            MvpId = request.MvpId
         };
     }
+
 
     public static Basketball3x3EventResponse ToResponse(this Basketball3x3Event entity)
     {
@@ -158,7 +165,10 @@ public static class Basketball3x3EventDtoExtensions
             Category = entity.Category,
             IsModerated = entity.IsModerated,
             IsPublic = entity.IsPublic,
-            IsTeam = entity.IsTeam
+            IsTeam = entity.IsTeam,
+            MvpId = entity.MvpId,
+            MvpName = entity.Mvp != null ? $"{entity.Mvp.FirstName} {entity.Mvp.LastName}" : null
         };
     }
+
 }

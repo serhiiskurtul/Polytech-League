@@ -511,6 +511,18 @@ const PlayersRatingPage = () => {
               </div>
 
               <div className={styles.formulaCard}>
+                <div className={styles.formulaIcon} style={{ background: '#fef3c7', color: '#d97706' }}>
+                  <i className="fa-solid fa-star"></i>
+                </div>
+                <h3>MVP змагань</h3>
+                <p>Додаткові бали за звання найкращого гравця турніру (MVP):</p>
+                <ul>
+                  <li><span>Кожне звання MVP:</span> +50 балів</li>
+                </ul>
+              </div>
+
+
+              <div className={styles.formulaCard}>
                 <div className={styles.formulaIcon} style={{ background: '#f5f3ff', color: '#7c3aed' }}>
                   <i className="fa-solid fa-users"></i>
                 </div>

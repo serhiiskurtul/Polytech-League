@@ -1,23 +1,30 @@
-import React from 'react';
+import { Link } from 'react-router-dom';
 import { getPhotoUrl } from '@/shared/utils/photo.utils';
 import styles from '../TournamentViewPage.module.css';
+
 
 interface TournamentPodiumProps {
   firstPlace?: any | null;
   secondPlace?: any | null;
   thirdPlace?: any | null;
+  mvpId?: number | null;
+  mvpName?: string | null;
   isTeam?: boolean;
   onViewRoster?: (teamId: number) => void;
 }
+
 
 const TournamentPodium: React.FC<TournamentPodiumProps> = ({ 
   firstPlace, 
   secondPlace, 
   thirdPlace,
+  mvpId,
+  mvpName,
   isTeam = false,
   onViewRoster
 }) => {
-  if (!firstPlace && !secondPlace && !thirdPlace) return null;
+  if (!firstPlace && !secondPlace && !thirdPlace && !mvpId) return null;
+
 
   const renderPlace = (participant: any | null | undefined, rank: number, className: string) => {
     if (!participant) return null;
@@ -77,7 +84,25 @@ const TournamentPodium: React.FC<TournamentPodiumProps> = ({
       
       {/* 3rd Place */}
       {renderPlace(thirdPlace, 3, styles.thirdPlace)}
+
+      {/* MVP Section */}
+      {(mvpId || mvpName) && (
+        <div className={styles.mvpBadge}>
+          <div className={styles.mvpIcon}>
+            <i className="fas fa-star"></i>
+          </div>
+          <div className={styles.mvpInfo}>
+            <div className={styles.mvpLabel}>Найкращий гравець (MVP)</div>
+            <div className={styles.mvpName}>
+              <Link to={`/players/${mvpId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                {mvpName || 'Гравець'}
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+
   );
 };
 

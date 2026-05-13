@@ -54,7 +54,10 @@ export interface Basketball3x3EventResponse {
   firstPlaceTeam?: Basketball3x3TeamResponse | null;
   secondPlaceTeam?: Basketball3x3TeamResponse | null;
   thirdPlaceTeam?: Basketball3x3TeamResponse | null;
+  mvpId?: number | null;
+  mvpName?: string | null;
 }
+
 
 export interface Basketball3x3EventRequest {
   name: string;
@@ -73,4 +76,6 @@ export interface Basketball3x3EventRequest {
   firstPlaceTeamId?: number | null;
   secondPlaceTeamId?: number | null;
   thirdPlaceTeamId?: number | null;
+  mvpId?: number | null;
 }
+

@@ -64,7 +64,10 @@ export interface VolleyballEventResponse {
   firstPlaceTeam?: VolleyballTeamResponse | null;
   secondPlaceTeam?: VolleyballTeamResponse | null;
   thirdPlaceTeam?: VolleyballTeamResponse | null;
+  mvpId?: number | null;
+  mvpName?: string | null;
 }
+
 
 export interface VolleyballEventRequest {
   name: string;
@@ -84,4 +87,6 @@ export interface VolleyballEventRequest {
   firstPlaceTeamId?: number | null;
   secondPlaceTeamId?: number | null;
   thirdPlaceTeamId?: number | null;
+  mvpId?: number | null;
 }
+
