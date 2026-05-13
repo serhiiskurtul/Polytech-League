@@ -464,11 +464,19 @@ public class PlayerService : IPlayerService
                 }
                 foreach (var e in genericWinners.Where(x => x.MvpId == playerId)) {
                     string sportType = e switch {
+                        ChessEvent => "chess",
+                        CheckersEvent => "checkers",
                         FootballEvent => "football",
                         VolleyballEvent => "volleyball",
                         Basketball3x3Event => "basketball_3x3",
+                        BeachVolleyballEvent => "beach_volleyball",
+                        ArmwrestlingEvent => "armwrestling",
+                        TableTennisEvent => "table_tennis",
+                        BadmintonEvent => "badminton",
+                        AthleticsEvent => "athletics",
                         _ => "other"
                     };
+
                     if (sportType == "other") continue; // MVP only for these sports as per request
 
                     if (!achievements.Any(a => a.TournamentId == e.Id && a.Result == "MVP"))
@@ -537,18 +545,25 @@ public class PlayerService : IPlayerService
                     if (ach.Rank == 1) pts += 100;
                     else if (ach.Rank == 2) pts += 50;
                     else if (ach.Rank == 3) pts += 30;
+                    
+                    if (ach.Result == "MVP") pts += 15;
+
                     if (pts <= 0) continue;
+
                     var finalPts = (int)Math.Round(pts * mult);
                     totalScore += finalPts;
                     if (sportStatsMap.TryGetValue(ach.SportType, out var s)) s.PerformanceScore += finalPts;
                     pointsBreakdown.Add(new PointEntryDto {
-                        Description = ach.Rank > 0
-                            ? $"{ach.Rank} місце: {ach.TournamentName} ({levelName})"
-                            : $"Участь: {ach.TournamentName} ({levelName})",
+                        Description = ach.Result == "MVP" 
+                            ? $"Найкращий гравець (MVP): {ach.TournamentName} ({levelName})"
+                            : (ach.Rank > 0
+                                ? $"{ach.Rank} місце: {ach.TournamentName} ({levelName})"
+                                : $"Участь: {ach.TournamentName} ({levelName})"),
                         Points = finalPts,
                         Category = "Achievements",
                         SportType = ach.SportType
                     });
+
                 }
                 void AddStats(string sport, int p, int w) {
                     played += p; won += w;
