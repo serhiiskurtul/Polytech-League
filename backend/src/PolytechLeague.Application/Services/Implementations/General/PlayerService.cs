@@ -328,8 +328,7 @@ public class PlayerService : IPlayerService
             var cardsS = await _dbContext.FootballCards
                 .Include(c => c.Match)
                 .Where(c => playerIds.Contains(c.PlayerId) && c.Match != null && eventIds.Contains(c.Match.EventId))
-                .GroupBy(c => new { c.PlayerId, c.Type })
-                .Select(g => new { PlayerId = g.Key.PlayerId, Type = g.Key.Type, Count = g.Count() })
+                .Select(c => new { c.PlayerId, c.Type })
                 .ToListAsync(cancellationToken);
 
             // Optimized Team Sports Match Stats loading (pre-calculate stats per player)
@@ -619,8 +618,8 @@ public class PlayerService : IPlayerService
                         SportType = "football"
                     });
                 }
-                var pYellow = cardsS.Where(x => x.PlayerId == playerId && x.Type == FootballCardType.Yellow).Sum(x => x.Count);
-                var pRed = cardsS.Where(x => x.PlayerId == playerId && x.Type == FootballCardType.Red).Sum(x => x.Count);
+                var pYellow = cardsS.Count(x => x.PlayerId == playerId && x.Type == FootballCardType.Yellow);
+                var pRed = cardsS.Count(x => x.PlayerId == playerId && x.Type == FootballCardType.Red);
                 if (pYellow > 0 || pRed > 0)
                 {
                     if (!sportStatsMap.ContainsKey("football")) sportStatsMap["football"] = new SportStatsDto { SportType = "football" };
@@ -1640,14 +1639,11 @@ public class PlayerService : IPlayerService
                 .Where(g => g.PlayerId == dto.Id)
                 .SumAsync(g => (int?)g.GoalsCount, cancellationToken) ?? 0;
             
-            var playerCardStats = await _dbContext.FootballCards
-                .Where(c => c.PlayerId == dto.Id)
-                .GroupBy(c => c.Type)
-                .Select(g => new { Type = g.Key, Count = g.Count() })
-                .ToListAsync(cancellationToken);
-
-            int yellowCards = playerCardStats.FirstOrDefault(s => s.Type == FootballCardType.Yellow)?.Count ?? 0;
-            int redCards = playerCardStats.FirstOrDefault(s => s.Type == FootballCardType.Red)?.Count ?? 0;
+            int yellowCards = await _dbContext.FootballCards
+                .CountAsync(c => c.PlayerId == dto.Id && c.Type == FootballCardType.Yellow, cancellationToken);
+                
+            int redCards = await _dbContext.FootballCards
+                .CountAsync(c => c.PlayerId == dto.Id && c.Type == FootballCardType.Red, cancellationToken);
 
             _logger.LogInformation("[DEBUG] FOUND {Yellow} yellow and {Red} red cards for player {Id}", yellowCards, redCards, dto.Id);
 

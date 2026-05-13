@@ -144,24 +144,25 @@ public class FootballMatchService :
 
     private void SyncCards(FootballMatch target, FootballMatch source)
     {
-        if (source.Cards == null)
-        {
-            _logger.LogInformation("SyncCards: Source cards collection is null for match {Id}. Preserving existing cards.", target.Id);
-            return;
-        }
+        if (source.Cards == null) return;
 
         target.Cards ??= new List<FootballCard>();
-        _logger.LogInformation("SyncCards: Syncing {Count} cards for match {MatchId} (Existing in target: {ExistingCount})", 
-            source.Cards.Count, target.Id, target.Cards.Count);
 
-        // We'll replace all cards for simplicity, but let's do it by removing from DB context explicitly
-        // to ensure EF knows what's going on.
-        var existingCards = _dbcontext.FootballCards.Where(c => c.MatchId == target.Id).ToList();
-        _dbcontext.FootballCards.RemoveRange(existingCards);
+        // For cards, we cannot easily "update" since they are simple records without counts (unlike goals).
+        // Therefore, we group them by player and type, and adjust counts.
+        
+        var existingCards = target.Cards.ToList();
+        var newCards = source.Cards.ToList();
+
+        // Remove all existing cards for this match via DbContext explicitly
+        foreach (var card in existingCards)
+        {
+            _dbcontext.FootballCards.Remove(card);
+        }
         target.Cards.Clear();
 
-        // Add new cards
-        foreach (var sourceCard in source.Cards)
+        // Add the new cards
+        foreach (var sourceCard in newCards)
         {
             var newCard = new FootballCard
             {
@@ -169,7 +170,6 @@ public class FootballMatchService :
                 PlayerId = sourceCard.PlayerId,
                 Type = sourceCard.Type
             };
-            _dbcontext.FootballCards.Add(newCard);
             target.Cards.Add(newCard);
         }
     }
