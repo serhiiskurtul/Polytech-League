@@ -1269,7 +1269,7 @@ public class PlayerService : IPlayerService
             {
                 badges.Add(new AutomaticBadgeDto {
                     Type = "TopScorer",
-                    Label = "РќР°Р№РєСЂР°С‰РёР№ Р±РѕРјР±Р°СЂРґРёСЂ РІ С–СЃС‚РѕСЂС–С—",
+                    Label = "Найкращий бомбардир в історії",
                     Icon = "fire"
                 });
             }
@@ -1295,7 +1295,7 @@ public class PlayerService : IPlayerService
             {
                 badges.Add(new AutomaticBadgeDto {
                     Type = "SeasonTopScorer",
-                    Label = $"РќР°Р№РєСЂР°С‰РёР№ Р±РѕРјР±Р°СЂРґРёСЂ ({top.SeasonName})",
+                    Label = $"Найкращий бомбардир ({top.SeasonName})",
                     Icon = "soccer-ball"
                 });
             }

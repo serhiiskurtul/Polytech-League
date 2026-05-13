@@ -53,6 +53,11 @@ public class FootballMatchesController(
         [FromBody] FootballMatchRequest request,
         CancellationToken cancellationToken)
     {
+        Console.WriteLine($"[CONTROLLER] Updating match {id}. Yellow: {request.YellowCards?.Count ?? 0}, Red: {request.RedCards?.Count ?? 0}");
+        if (request.YellowCards != null) {
+            foreach(var c in request.YellowCards) Console.WriteLine($"  - Yellow for player: {c.PlayerId}");
+        }
+
         var entity = request.FromRequest();
         await FootballMatchService.UpdateAsync(id, entity, cancellationToken);
 
