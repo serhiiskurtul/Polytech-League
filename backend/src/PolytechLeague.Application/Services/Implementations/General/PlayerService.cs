@@ -491,8 +491,9 @@ public class PlayerService : IPlayerService
                 // Generic Winners
                 foreach (var e in winnersLookup[playerId].Where(x => x.FirstPlaceId == playerId || x.SecondPlaceId == playerId || x.ThirdPlaceId == playerId)) {
                     int r = (e.FirstPlaceId == playerId) ? 1 : ((e.SecondPlaceId == playerId) ? 2 : 3);
-                    string sportType = e switch { ChessEvent => "chess", CheckersEvent => "checkers", FootballEvent => "football", VolleyballEvent => "volleyball", Basketball3x3Event => "basketball_3x3", BeachVolleyballEvent => "beach_volleyball", ArmwrestlingEvent => "armwrestling", TableTennisEvent => "table_tennis", BadmintonEvent => "badminton", AthleticsEvent => "athletics", _ => "other" };
+                    string sportType = GetSportType(e);
                     if (sportType == "other") continue;
+                    
                     var existing = achievements.FirstOrDefault(a => a.TournamentId == e.Id && a.SportType == sportType);
                     if (existing == null) {
                         achievements.Add(new AchievementDto { TournamentName = e.Name, SportType = sportType, Date = e.Date, Rank = r, TournamentId = e.Id, Result = GetResultLabel(r) });
@@ -805,16 +806,16 @@ public class PlayerService : IPlayerService
                 .Where(e => e.FirstPlaceId == playerId || e.SecondPlaceId == playerId || e.ThirdPlaceId == playerId)
                 .ToListAsync(cancellationToken);
             foreach (var e in genericWinners) {
-                if (achievements.Any(a => a.TournamentId == e.Id && a.SportType == "armwrestling")) continue;
+                string sport = GetSportType(e);
+                if (achievements.Any(a => a.TournamentId == e.Id && (a.SportType == sport || a.SportType == "individual"))) continue;
                 int rank = e.FirstPlaceId == playerId ? 1 : (e.SecondPlaceId == playerId ? 2 : 3);
-                string sport = e is ArmwrestlingEvent ? "armwrestling" : "individual";
                 achievements.Add(new AchievementDto {
                     TournamentName = e.Name,
                     SportType = sport,
                     Date = e.Date,
                     Rank = rank,
                     TournamentId = e.Id,
-                    Result = $"{rank} місце"
+                    Result = GetResultLabel(rank)
                 });
             }
         } catch (Exception ex) {
@@ -1062,6 +1063,24 @@ public class PlayerService : IPlayerService
 
         dto.PerformanceScore = (int)Math.Round(totalScore);
         dto.PointsBreakdown = pointsBreakdown.OrderByDescending(x => x.Points).ToList();
+    }
+
+    private string GetSportType(Event e)
+    {
+        return e switch
+        {
+            ChessEvent => "chess",
+            CheckersEvent => "checkers",
+            FootballEvent => "football",
+            VolleyballEvent => "volleyball",
+            Basketball3x3Event => "basketball_3x3",
+            BeachVolleyballEvent => "beach_volleyball",
+            ArmwrestlingEvent => "armwrestling",
+            TableTennisEvent => "table_tennis",
+            BadmintonEvent => "badminton",
+            AthleticsEvent => "athletics",
+            _ => "other"
+        };
     }
 
     private string GetResultLabel(int? rank)
