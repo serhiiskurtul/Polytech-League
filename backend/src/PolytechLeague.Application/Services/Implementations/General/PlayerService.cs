@@ -1472,12 +1472,28 @@ public class PlayerService : IPlayerService
                     {
                         badges.Add(new AutomaticBadgeDto
                         {
-                            Type = "BestAthleteSport",
-                            Label = $"Найкращий в ({GetSportNameUa(sport.SportType)})",
+                            Type = "BestAthlete",
+                            Label = "Найкращий спортсмен",
                             SeasonName = season.Name,
-                            Icon = "star"
+                            Icon = "crown"
                         });
                     }
+
+                    foreach (var sport in meInSeason.SportStats)
+                    {
+                        if (sport.Rank == 1 && sport.PerformanceScore > 0)
+                        {
+                            badges.Add(new AutomaticBadgeDto
+                            {
+                                Type = "BestAthleteSport",
+                                Label = $"Найкращий гравець ({GetSportNameUa(sport.SportType)})",
+                                SeasonName = season.Name,
+                                Icon = "star"
+                            });
+                        }
+                    }
+                } catch (Exception ex) {
+                    _logger.LogWarning(ex, "Error getting rankings for season {SeasonId} in badges population", season.Id);
                 }
             }
         } catch (Exception ex) {
