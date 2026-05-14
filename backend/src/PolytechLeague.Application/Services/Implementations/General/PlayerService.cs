@@ -26,7 +26,7 @@ public class PlayerService : IPlayerService
     private readonly ILogger<PlayerService> _logger;
     private readonly INotificationService _notificationService;
 
-    private static readonly Dictionary<long?, (DateTime ExpiredAt, IEnumerable<PlayerDto> Data)> _rankingsCache = new();
+    private static readonly Dictionary<long, (DateTime ExpiredAt, IEnumerable<PlayerDto> Data)> _rankingsCache = new();
     private static readonly object _cacheLock = new object();
     private static readonly TimeSpan _cacheDuration = TimeSpan.FromMinutes(10);
 
@@ -265,9 +265,10 @@ public class PlayerService : IPlayerService
 
     public async Task<IEnumerable<PlayerDto>> GetAllWithRankingsAsync(long? seasonId = null, CancellationToken cancellationToken = default)
     {
+        long cacheKey = seasonId ?? 0;
         lock (_cacheLock)
         {
-            if (_rankingsCache.TryGetValue(seasonId, out var entry) && entry.ExpiredAt > DateTime.Now)
+            if (_rankingsCache.TryGetValue(cacheKey, out var entry) && entry.ExpiredAt > DateTime.Now)
             {
                 return entry.Data;
             }
@@ -277,7 +278,7 @@ public class PlayerService : IPlayerService
 
         lock (_cacheLock)
         {
-            _rankingsCache[seasonId] = (DateTime.Now.Add(_cacheDuration), data);
+            _rankingsCache[cacheKey] = (DateTime.Now.Add(_cacheDuration), data);
         }
 
         return data;
