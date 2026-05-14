@@ -877,13 +877,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   };
 
   const STAGE_ORDER = [
-    '1/16 Фіналу', '1/8 Фіналу', 'Чвертьфінал', 'Півфінал', 'Матч за 3-тє місце', 'За 3 місце', 'Фінал'
-  ].filter(s => {
-    if (sport === 'volleyball' || sport === 'волейбол' || sport === 'beach_volleyball' || sport === 'beach-volleyball' || sport === 'пляжний_волейбол') {
-      return s !== 'Матч за 3-тє місце' && s !== 'За 3 місце';
-    }
-    return true;
-  });
+    '1/16 Фіналу', '1/8 Фіналу', 'Чвертьфінал', 'Півфінал', 'Матч за 3-те місце', 'Фінал'
+  ];
 
   const getEligibleTeams = (stage: string) => {
     const allTeams = details.teams || [];
@@ -896,7 +891,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     const matches = details.matches || details.games || [];
     
     // For 3rd place match, we need losers of the previous stage (Semifinal)
-    const isThirdPlaceMatch = stage === 'Матч за 3-тє місце' || stage === 'За 3 місце';
+    const isThirdPlaceMatch = stage === 'Матч за 3-те місце';
     
     const winnersOfPrevStage = matches
       .filter((m: any) => m.stage === prevStage)
@@ -1073,8 +1068,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                             <option value="1/8 Фіналу">1/8 Фіналу</option>
                             <option value="Чвертьфінал">Чвертьфінал</option>
                             <option value="Півфінал">Півфінал</option>
-                            <option value="Матч за 3-тє місце">Матч за 3-тє місце</option>
-                            <option value="За 3 місце">За 3 місце</option>
+                            <option value="Матч за 3-те місце">Матч за 3-те місце</option>
                             <option value="Фінал">Фінал</option>
                         </select>
                     </div>
@@ -1124,12 +1118,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
         {activeTab === 'matches' && (
           <div className={styles.matchesGrid}>
-            {(details.matches || details.games)?.filter((m: any) => {
-              if (sport === 'volleyball' || sport === 'волейбол' || sport === 'beach_volleyball' || sport === 'beach-volleyball' || sport === 'пляжний_волейбол') {
-                return m.stage !== 'За 3 місце' && m.stage !== 'Матч за 3-тє місце';
-              }
-              return true;
-            }).map((match: any) => {
+            {(details.matches || details.games)?.map((match: any) => {
               const isVolleyball = sport.includes('volleyball') || sport === 'badminton';
               const isChessLike = sport === 'chess' || sport === 'checkers';
               

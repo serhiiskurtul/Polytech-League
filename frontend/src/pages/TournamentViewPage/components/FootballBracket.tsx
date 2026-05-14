@@ -29,8 +29,7 @@ const FootballBracket: React.FC<FootballBracketProps> = ({
     '1/8 Фіналу',
     'Чвертьфінал',
     'Півфінал',
-    'Матч за 3-тє місце',
-    'За 3 місце',
+    'Матч за 3-те місце',
     'Фінал'
   ];
 
@@ -50,7 +49,7 @@ const FootballBracket: React.FC<FootballBracketProps> = ({
   }, {} as Record<string, footballMatchResponse[]>);
 
   const otherStages = Object.keys(groupedMatches)
-    .filter(s => s !== 'Матч за 3-тє місце' && s !== 'За 3 місце')
+    .filter(s => s !== 'Матч за 3-те місце')
     .sort((a, b) => getStageRank(a) - getStageRank(b));
 
   const mappedRounds: BracketRound[] = otherStages.map(stageName => {
