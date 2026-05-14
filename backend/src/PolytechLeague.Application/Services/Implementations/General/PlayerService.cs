@@ -26,6 +26,11 @@ public class PlayerService : IPlayerService
     private readonly ILogger<PlayerService> _logger;
     private readonly INotificationService _notificationService;
 
+    private static readonly Dictionary<long?, (DateTime ExpiredAt, IEnumerable<PlayerDto> Data)> _rankingsCache = new();
+    private static readonly object _cacheLock = new object();
+    private static readonly TimeSpan _cacheDuration = TimeSpan.FromMinutes(10);
+
+
     public PlayerService(ApplicationDbContext dbContext, ILogger<PlayerService> logger, INotificationService notificationService)
     {
         _dbContext = dbContext;
@@ -256,6 +261,26 @@ public class PlayerService : IPlayerService
     }
 
     public async Task<IEnumerable<PlayerDto>> GetAllWithRankingsAsync(long? seasonId = null, CancellationToken cancellationToken = default)
+    {
+        lock (_cacheLock)
+        {
+            if (_rankingsCache.TryGetValue(seasonId, out var entry) && entry.ExpiredAt > DateTime.Now)
+            {
+                return entry.Data;
+            }
+        }
+
+        var data = await GetAllWithRankingsInternalAsync(seasonId, cancellationToken);
+
+        lock (_cacheLock)
+        {
+            _rankingsCache[seasonId] = (DateTime.Now.Add(_cacheDuration), data);
+        }
+
+        return data;
+    }
+
+    private async Task<IEnumerable<PlayerDto>> GetAllWithRankingsInternalAsync(long? seasonId = null, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -1226,8 +1251,8 @@ public class PlayerService : IPlayerService
         await _dbContext.SaveChangesAsync(cancellationToken);
         await _notificationService.SendNotificationToUserAsync(
             request.UserId,
-            "Р вЂ”Р В°Р С—Р С‘РЎвЂљ РЎРѓРЎвЂ¦Р Р†Р В°Р В»Р ВµР Р…Р С•",
-            "Р вЂ™Р В°РЎв‚¬ Р В·Р В°Р С—Р С‘РЎвЂљ Р Р…Р В° Р С•Р В±'РЎвЂќР Т‘Р Р…Р В°Р Р…Р Р…РЎРЏ Р С—РЎР‚Р С•РЎвЂћРЎвЂ“Р В»РЎР‹ Р В±РЎС“Р В»Р С• РЎРѓРЎвЂ¦Р Р†Р В°Р В»Р ВµР Р…Р С•. Р СћР ВµР С—Р ВµРЎР‚ Р Р†Р В°РЎв‚¬Р В° РЎвЂ“РЎРѓРЎвЂљР С•РЎР‚РЎвЂ“РЎРЏ Р Т‘Р С•РЎРѓРЎРЏР С–Р Р…Р ВµР Р…РЎРЉ Р Т‘Р С•РЎРѓРЎвЂљРЎС“Р С—Р Р…Р В° РЎС“ Р Р†Р В°РЎв‚¬Р С•Р СРЎС“ Р В°Р С”Р С”Р В°РЎС“Р Р…РЎвЂљРЎвЂ“.",
+            "Запит схвалено",
+            "Ваш запит на об'єднання профілю було схвалено. Тепер ваша історія досягнень доступна у вашому аккаунті.",
             NotificationType.System
         );
     }
@@ -1420,10 +1445,67 @@ public class PlayerService : IPlayerService
                     Icon = "soccer-ball"
                 });
             }
+
+            // 3. Overall Season Winners
+            var allSeasons = await _dbContext.Seasons
+                .OrderByDescending(s => s.StartDate)
+                .Take(5) // Limit to last 5 seasons for performance
+                .ToListAsync(cancellationToken);
+
+            foreach (var season in allSeasons)
+            {
+                var rankings = await GetAllWithRankingsAsync(season.Id, cancellationToken);
+                var me = rankings.FirstOrDefault(p => p.Id == playerId);
+                if (me == null) continue;
+
+                if (me.GlobalRank == 1 && me.PerformanceScore > 0)
+                {
+                    badges.Add(new AutomaticBadgeDto
+                    {
+                        Type = "BestAthlete",
+                        Label = "Найкращий спортсмен сезону",
+                        SeasonName = season.Name,
+                        Icon = "crown"
+                    });
+                }
+
+                foreach (var sport in me.SportStats)
+                {
+                    if (sport.Rank == 1 && sport.PerformanceScore > 0)
+                    {
+                        badges.Add(new AutomaticBadgeDto
+                        {
+                            Type = "BestAthleteSport",
+                            Label = $"Найкращий в ({GetSportNameUa(sport.SportType)})",
+                            SeasonName = season.Name,
+                            Icon = "star"
+                        });
+                    }
+                }
+            }
         } catch (Exception ex) {
             _logger.LogError(ex, "Error populating automatic badges for player {PlayerId}", playerId);
         }
         dto.AutomaticBadges = badges;
+    }
+
+
+    private string GetSportNameUa(string type)
+    {
+        return type.ToLower() switch
+        {
+            "chess" => "Шахи",
+            "checkers" => "Шашки",
+            "table_tennis" => "Настільний теніс",
+            "armwrestling" => "Армрестлінг",
+            "badminton" => "Бадмінтон",
+            "football" => "Футбол",
+            "volleyball" => "Волейбол",
+            "basketball_3x3" => "Баскетбол 3x3",
+            "beach_volleyball" => "Пляжний волейбол",
+            "athletics" => "Легка атлетика",
+            _ => type
+        };
     }
 
     private async Task PopulateChessSpecialStatsAsync(PlayerDto dto, CancellationToken cancellationToken)
@@ -1566,7 +1648,7 @@ public class PlayerService : IPlayerService
         {
             var matchDto = new HeadToHeadMatchDto {
                 SportType = "checkers",
-                TournamentName = m.Event?.Name ?? "РўСѓСЂРЅС–СЂ Р· С€Р°С€РѕРє",
+                TournamentName = m.Event?.Name ?? "Турнір з Шашок",
                 Date = m.Event?.Date ?? DateTime.MinValue,
                 TournamentId = m.TournamentId,
                 Score = m.Result.ToString()
@@ -1612,7 +1694,7 @@ public class PlayerService : IPlayerService
         {
             var matchDto = new HeadToHeadMatchDto {
                 SportType = "armwrestling",
-                TournamentName = m.Event?.Name ?? "РўСѓСЂРЅС–СЂ Р· Р°СЂРјСЂРµСЃС‚Р»С–РЅРіСѓ",
+                TournamentName = m.Event?.Name ?? "Турнір з Армрестлінгу",
                 Date = m.Event?.Date ?? DateTime.MinValue,
                 TournamentId = m.EventId,
                 Score = m.Stage ?? "Match"
@@ -1671,7 +1753,7 @@ public class PlayerService : IPlayerService
         {
             var matchDto = new HeadToHeadMatchDto {
                 SportType = "basketball_3x3",
-                TournamentName = m.Event?.Name ?? "РўСѓСЂРЅС–СЂ Р· Р±Р°СЃРєРµС‚Р±РѕР»Сѓ 3С…3",
+                TournamentName = m.Event?.Name ?? "Турнір з Баскетболу 3х3",
                 Date = m.Event?.Date ?? DateTime.MinValue,
                 TournamentId = m.EventId,
                 Score = $"{m.HomeTeamScore}:{m.AwayTeamScore}"
