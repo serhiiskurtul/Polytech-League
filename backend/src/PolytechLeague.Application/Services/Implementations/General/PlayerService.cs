@@ -830,11 +830,8 @@ public class PlayerService : IPlayerService
                 .ToListAsync(cancellationToken);
             foreach (var team in teams) {
                 if (team.Event == null) continue;
-                int rank = 0;
-                if (team.Id == team.Event.FirstPlaceTeamId) rank = 1;
-                else if (team.Id == team.Event.SecondPlaceTeamId) rank = 2;
-                else if (team.Id == team.Event.ThirdPlaceTeamId) rank = 3;
-                else {
+                int rank = GetTeamRank(team.Event, team.Id);
+                if (rank == 0 && team.Points > 0) {
                     rank = await _dbContext.FootballTeams
                         .Where(others => others.EventId == team.EventId && others.Points > team.Points)
                         .CountAsync(cancellationToken) + 1;
@@ -861,7 +858,7 @@ public class PlayerService : IPlayerService
                 .ToListAsync(cancellationToken);
             foreach (var t in vTeams) {
                 if (t.Event == null) continue;
-                int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
+                int rank = GetTeamRank(t.Event, t.Id);
                 achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "volleyball", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId, Result = rank > 0 ? $"{rank} місце ({t.Name})" : $"Учасник ({t.Name})" });
             }
             // Basketball 3x3
@@ -871,7 +868,7 @@ public class PlayerService : IPlayerService
                 .ToListAsync(cancellationToken);
             foreach (var t in bTeams) {
                 if (t.Event == null) continue;
-                int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
+                int rank = GetTeamRank(t.Event, t.Id);
                 achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "basketball_3x3", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId, Result = rank > 0 ? $"{rank} місце ({t.Name})" : $"Учасник ({t.Name})" });
             }
             // Beach Volleyball
@@ -881,7 +878,7 @@ public class PlayerService : IPlayerService
                 .ToListAsync(cancellationToken);
             foreach (var t in bvTeams) {
                 if (t.Event == null) continue;
-                int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
+                int rank = GetTeamRank(t.Event, t.Id);
                 achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "beach_volleyball", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId, Result = rank > 0 ? $"{rank} місце ({t.Name})" : $"Учасник ({t.Name})" });
             }
             // Table Tennis Teams
@@ -1090,6 +1087,42 @@ public class PlayerService : IPlayerService
         if (rank == 3) return "3 місце";
         if (rank > 0) return $"{rank} місце";
         return "Учасник";
+    }
+
+    private int GetTeamRank(Event e, long teamId)
+    {
+        if (e is FootballEvent fe)
+        {
+            if (fe.FirstPlaceTeamId == teamId) return 1;
+            if (fe.SecondPlaceTeamId == teamId) return 2;
+            if (fe.ThirdPlaceTeamId == teamId) return 3;
+        }
+        else if (e is VolleyballEvent ve)
+        {
+            if (ve.FirstPlaceTeamId == teamId) return 1;
+            if (ve.SecondPlaceTeamId == teamId) return 2;
+            if (ve.ThirdPlaceTeamId == teamId) return 3;
+        }
+        else if (e is Basketball3x3Event be)
+        {
+            if (be.FirstPlaceTeamId == teamId) return 1;
+            if (be.SecondPlaceTeamId == teamId) return 2;
+            if (be.ThirdPlaceTeamId == teamId) return 3;
+        }
+        else if (e is BeachVolleyballEvent bve)
+        {
+            if (bve.FirstPlaceTeamId == teamId) return 1;
+            if (bve.SecondPlaceTeamId == teamId) return 2;
+            if (bve.ThirdPlaceTeamId == teamId) return 3;
+        }
+        else if (e is TableTennisEvent tte)
+        {
+            if (tte.FirstPlaceTeamId == teamId) return 1;
+            if (tte.SecondPlaceTeamId == teamId) return 2;
+            if (tte.ThirdPlaceTeamId == teamId) return 3;
+        }
+
+        return 0;
     }
     // Profile Merging Logic
 
