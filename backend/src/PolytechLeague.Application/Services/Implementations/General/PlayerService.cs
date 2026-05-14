@@ -53,6 +53,7 @@ public class PlayerService : IPlayerService
         var allWithRankings = await GetAllWithRankingsAsync(null, cancellationToken);
         var ranked = allWithRankings.FirstOrDefault(p => p.Id == id);
         if (ranked != null) { 
+            await PopulateAchievementsAsync(ranked, cancellationToken);
             await PopulateAutomaticBadgesAsync(ranked, cancellationToken); 
             await PopulateChessSpecialStatsAsync(ranked, cancellationToken); 
             await PopulateFootballStatsAsync(ranked, cancellationToken);
@@ -83,6 +84,7 @@ public class PlayerService : IPlayerService
         var allWithRankings = await GetAllWithRankingsAsync(null, cancellationToken);
         var ranked = allWithRankings.FirstOrDefault(p => p.UserId == userId);
         if (ranked != null) { 
+            await PopulateAchievementsAsync(ranked, cancellationToken);
             await PopulateAutomaticBadgesAsync(ranked, cancellationToken); 
             await PopulateChessSpecialStatsAsync(ranked, cancellationToken); 
             await PopulateFootballStatsAsync(ranked, cancellationToken);
@@ -546,7 +548,7 @@ public class PlayerService : IPlayerService
                     sportTypes.Add("badminton");
                 }
 
-                dto.Achievements = achievements;
+                dto.Achievements = achievements.OrderByDescending(a => a.Date).ToList();
                 dto.Sports = sportTypes.ToList();
                 dto.ArmwrestlingWeightClasses = armwrestlingWeightClasses.ToList();
                 dto.CompetitionsCount = achievements.Select(a => a.TournamentId).Distinct().Count();
@@ -635,7 +637,6 @@ public class PlayerService : IPlayerService
                 dto.PointsBreakdown = pointsBreakdown.OrderByDescending(x => x.Points).ToList();
                 
                 if (achievements.Count > 0 || played > 0 || dto.GoalsCount > 0 || yellow > 0 || red > 0) {
-                    dto.Achievements = null;
                     playerDtos.Add(dto);
                 }
             }
