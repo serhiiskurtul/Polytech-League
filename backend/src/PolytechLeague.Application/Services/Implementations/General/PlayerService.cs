@@ -313,45 +313,54 @@ public class PlayerService : IPlayerService
             var allEvents = await allEventsQuery
                 .Select(e => new { e.Id, e.Level })
                 .ToDictionaryAsync(e => e.Id, e => e.Level, cancellationToken);
-            var eventIds = allEvents.Keys.ToList();
+            
+            // For subqueries in SQL
+            var eligibleEventIds = allEventsQuery.Select(e => e.Id);
+            var eligiblePlayerIds = _dbContext.Players
+                .Where(p => p.User == null || p.User.Role != UserRole.Admin)
+                .Where(p => !p.IsExternal && !p.IsGuest)
+                .Select(p => p.Id);
+
             // 2. Achievements
-            var chessAch = await _dbContext.ChessEventParticipants.Include(p => p.Tournament).Where(p => playerIds.Contains(p.PlayerId) && eventIds.Contains(p.TournamentId)).ToListAsync(cancellationToken);
-            var checkersAch = await _dbContext.CheckersEventParticipants.Include(p => p.Event).Where(p => playerIds.Contains(p.PlayerId) && eventIds.Contains(p.TournamentId)).ToListAsync(cancellationToken);
-            var ttAch = await _dbContext.TableTennisEventParticipants.Include(p => p.Tournament).Where(p => playerIds.Contains(p.PlayerId) && eventIds.Contains(p.TournamentId)).ToListAsync(cancellationToken);
-            var badmintonAch = await _dbContext.BadmintonEventParticipants.Include(p => p.Event).Where(p => playerIds.Contains(p.PlayerId) && eventIds.Contains(p.EventId)).ToListAsync(cancellationToken);
-            var armwAch = await _dbContext.ArmwrestlingEventParticipants.Include(p => p.Tournament).Where(p => playerIds.Contains(p.PlayerId) && eventIds.Contains(p.TournamentId)).ToListAsync(cancellationToken);
+            var chessAch = await _dbContext.ChessEventParticipants.Include(p => p.Tournament).Where(p => eligiblePlayerIds.Contains(p.PlayerId) && eligibleEventIds.Contains(p.TournamentId)).ToListAsync(cancellationToken);
+            var checkersAch = await _dbContext.CheckersEventParticipants.Include(p => p.Event).Where(p => eligiblePlayerIds.Contains(p.PlayerId) && eligibleEventIds.Contains(p.TournamentId)).ToListAsync(cancellationToken);
+            var ttAch = await _dbContext.TableTennisEventParticipants.Include(p => p.Tournament).Where(p => eligiblePlayerIds.Contains(p.PlayerId) && eligibleEventIds.Contains(p.TournamentId)).ToListAsync(cancellationToken);
+            var badmintonAch = await _dbContext.BadmintonEventParticipants.Include(p => p.Event).Where(p => eligiblePlayerIds.Contains(p.PlayerId) && eligibleEventIds.Contains(p.EventId)).ToListAsync(cancellationToken);
+            var armwAch = await _dbContext.ArmwrestlingEventParticipants.Include(p => p.Tournament).Where(p => eligiblePlayerIds.Contains(p.PlayerId) && eligibleEventIds.Contains(p.TournamentId)).ToListAsync(cancellationToken);
             var genericWinners = await _dbContext.Set<Event>()
-                .Where(e => eventIds.Contains(e.Id) &&
-                            ((e.FirstPlaceId.HasValue && playerIds.Contains(e.FirstPlaceId.Value)) ||
-                             (e.SecondPlaceId.HasValue && playerIds.Contains(e.SecondPlaceId.Value)) ||
-                             (e.ThirdPlaceId.HasValue && playerIds.Contains(e.ThirdPlaceId.Value)) ||
-                             (e.MvpId.HasValue && playerIds.Contains(e.MvpId.Value))))
+                .Where(e => eligibleEventIds.Contains(e.Id) &&
+                            ((e.FirstPlaceId.HasValue && eligiblePlayerIds.Contains(e.FirstPlaceId.Value)) ||
+                             (e.SecondPlaceId.HasValue && eligiblePlayerIds.Contains(e.SecondPlaceId.Value)) ||
+                             (e.ThirdPlaceId.HasValue && eligiblePlayerIds.Contains(e.ThirdPlaceId.Value)) ||
+                             (e.MvpId.HasValue && eligiblePlayerIds.Contains(e.MvpId.Value))))
                 .ToListAsync(cancellationToken);
-            var FootballTeams = await _dbContext.FootballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => eventIds.Contains(t.EventId) && t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
-            var volleyballTeams = await _dbContext.VolleyballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => eventIds.Contains(t.EventId) && t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
-            var bballTeams = await _dbContext.Basketball3x3Teams.Include(t => t.Event).Include(t => t.Players).Where(t => eventIds.Contains(t.EventId) && t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
-            var beachVTeams = await _dbContext.BeachVolleyballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => eventIds.Contains(t.EventId) && t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
-            var ttTeams = await _dbContext.TableTennisTeams.Include(t => t.Event).Include(t => t.Players).Where(t => eventIds.Contains(t.EventId) && t.Players!.Any(p => playerIds.Contains(p.Id))).ToListAsync(cancellationToken);
-            var badTeams = await _dbContext.BadmintonTeams.Include(t => t.Event).Where(t => t.EventId != null && eventIds.Contains(t.EventId.Value) && ((t.Player1Id != null && playerIds.Contains(t.Player1Id.Value)) || (t.Player2Id != null && playerIds.Contains(t.Player2Id.Value)))).ToListAsync(cancellationToken);
+            var FootballTeams = await _dbContext.FootballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => eligibleEventIds.Contains(t.EventId) && t.Players!.Any(p => eligiblePlayerIds.Contains(p.Id))).ToListAsync(cancellationToken);
+            var volleyballTeams = await _dbContext.VolleyballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => eligibleEventIds.Contains(t.EventId) && t.Players!.Any(p => eligiblePlayerIds.Contains(p.Id))).ToListAsync(cancellationToken);
+            var bballTeams = await _dbContext.Basketball3x3Teams.Include(t => t.Event).Include(t => t.Players).Where(t => eligibleEventIds.Contains(t.EventId) && t.Players!.Any(p => eligiblePlayerIds.Contains(p.Id))).ToListAsync(cancellationToken);
+            var beachVTeams = await _dbContext.BeachVolleyballTeams.Include(t => t.Event).Include(t => t.Players).Where(t => eligibleEventIds.Contains(t.EventId) && t.Players!.Any(p => eligiblePlayerIds.Contains(p.Id))).ToListAsync(cancellationToken);
+            var ttTeams = await _dbContext.TableTennisTeams.Include(t => t.Event).Include(t => t.Players).Where(t => eligibleEventIds.Contains(t.EventId) && t.Players!.Any(p => eligiblePlayerIds.Contains(p.Id))).ToListAsync(cancellationToken);
+            var badTeams = await _dbContext.BadmintonTeams.Include(t => t.Event).Where(t => t.EventId != null && eligibleEventIds.Contains(t.EventId.Value) && ((t.Player1Id != null && eligiblePlayerIds.Contains(t.Player1Id.Value)) || (t.Player2Id != null && eligiblePlayerIds.Contains(t.Player2Id.Value)))).ToListAsync(cancellationToken);
+
             // 3. Match Stats
-            var cwS = await _dbContext.ChessGames.Where(g => eventIds.Contains(g.TournamentId) && g.WhitePlayerId.HasValue && playerIds.Contains(g.WhitePlayerId.Value)).GroupBy(g => g.WhitePlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.WhiteWin) }).ToListAsync(cancellationToken);
-            var cbS = await _dbContext.ChessGames.Where(g => eventIds.Contains(g.TournamentId) && g.BlackPlayerId.HasValue && playerIds.Contains(g.BlackPlayerId.Value)).GroupBy(g => g.BlackPlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.BlackWin) }).ToListAsync(cancellationToken);
-            var chwS = await _dbContext.CheckersGames.Where(g => eventIds.Contains(g.TournamentId) && g.WhitePlayerId.HasValue && playerIds.Contains(g.WhitePlayerId.Value)).GroupBy(g => g.WhitePlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.WhiteWin) }).ToListAsync(cancellationToken);
-            var chbS = await _dbContext.CheckersGames.Where(g => eventIds.Contains(g.TournamentId) && g.BlackPlayerId.HasValue && playerIds.Contains(g.BlackPlayerId.Value)).GroupBy(g => g.BlackPlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.BlackWin) }).ToListAsync(cancellationToken);
-            var tt1S = await _dbContext.TableTennisMatches.Where(g => eventIds.Contains(g.TournamentId) && g.Player1Id.HasValue && playerIds.Contains(g.Player1Id.Value)).GroupBy(g => g.Player1Id!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
-            var tt2S = await _dbContext.TableTennisMatches.Where(g => eventIds.Contains(g.TournamentId) && g.Player2Id.HasValue && playerIds.Contains(g.Player2Id.Value)).GroupBy(g => g.Player2Id!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
-            var arm1S = await _dbContext.ArmwrestlingMatches.Where(g => eventIds.Contains(g.EventId) && playerIds.Contains(g.Player1Id)).GroupBy(g => g.Player1Id).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
-            var arm2S = await _dbContext.ArmwrestlingMatches.Where(g => eventIds.Contains(g.EventId) && playerIds.Contains(g.Player2Id)).GroupBy(g => g.Player2Id).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
-            var bad1S = await _dbContext.BadmintonMatches.Where(g => eventIds.Contains(g.EventId) && g.Player1Id != null && playerIds.Contains(g.Player1Id.Value)).GroupBy(g => g.Player1Id).Select(g => new { Id = g.Key!.Value, Count = g.Count(), Wins = g.Count(x => x.WinnerPlayerId == g.Key) }).ToListAsync(cancellationToken);
-            var bad2S = await _dbContext.BadmintonMatches.Where(g => eventIds.Contains(g.EventId) && g.Player2Id != null && playerIds.Contains(g.Player2Id.Value)).GroupBy(g => g.Player2Id).Select(g => new { Id = g.Key!.Value, Count = g.Count(), Wins = g.Count(x => x.WinnerPlayerId == g.Key) }).ToListAsync(cancellationToken);
+            var cwS = await _dbContext.ChessGames.Where(g => eligibleEventIds.Contains(g.TournamentId) && g.WhitePlayerId.HasValue && eligiblePlayerIds.Contains(g.WhitePlayerId.Value)).GroupBy(g => g.WhitePlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.WhiteWin) }).ToListAsync(cancellationToken);
+            var cbS = await _dbContext.ChessGames.Where(g => eligibleEventIds.Contains(g.TournamentId) && g.BlackPlayerId.HasValue && eligiblePlayerIds.Contains(g.BlackPlayerId.Value)).GroupBy(g => g.BlackPlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.BlackWin) }).ToListAsync(cancellationToken);
+            var chwS = await _dbContext.CheckersGames.Where(g => eligibleEventIds.Contains(g.TournamentId) && g.WhitePlayerId.HasValue && eligiblePlayerIds.Contains(g.WhitePlayerId.Value)).GroupBy(g => g.WhitePlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.WhiteWin) }).ToListAsync(cancellationToken);
+            var chbS = await _dbContext.CheckersGames.Where(g => eligibleEventIds.Contains(g.TournamentId) && g.BlackPlayerId.HasValue && eligiblePlayerIds.Contains(g.BlackPlayerId.Value)).GroupBy(g => g.BlackPlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.BlackWin) }).ToListAsync(cancellationToken);
+            var tt1S = await _dbContext.TableTennisMatches.Where(g => eligibleEventIds.Contains(g.TournamentId) && g.Player1Id.HasValue && eligiblePlayerIds.Contains(g.Player1Id.Value)).GroupBy(g => g.Player1Id!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
+            var tt2S = await _dbContext.TableTennisMatches.Where(g => eligibleEventIds.Contains(g.TournamentId) && g.Player2Id.HasValue && eligiblePlayerIds.Contains(g.Player2Id.Value)).GroupBy(g => g.Player2Id!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
+            var arm1S = await _dbContext.ArmwrestlingMatches.Where(g => eligibleEventIds.Contains(g.EventId) && eligiblePlayerIds.Contains(g.Player1Id)).GroupBy(g => g.Player1Id).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
+            var arm2S = await _dbContext.ArmwrestlingMatches.Where(g => eligibleEventIds.Contains(g.EventId) && eligiblePlayerIds.Contains(g.Player2Id)).GroupBy(g => g.Player2Id).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
+            var bad1S = await _dbContext.BadmintonMatches.Where(g => eligibleEventIds.Contains(g.EventId) && g.Player1Id != null && eligiblePlayerIds.Contains(g.Player1Id.Value)).GroupBy(g => g.Player1Id).Select(g => new { Id = g.Key!.Value, Count = g.Count(), Wins = g.Count(x => x.WinnerPlayerId == g.Key) }).ToListAsync(cancellationToken);
+            var bad2S = await _dbContext.BadmintonMatches.Where(g => eligibleEventIds.Contains(g.EventId) && g.Player2Id != null && eligiblePlayerIds.Contains(g.Player2Id.Value)).GroupBy(g => g.Player2Id).Select(g => new { Id = g.Key!.Value, Count = g.Count(), Wins = g.Count(x => x.WinnerPlayerId == g.Key) }).ToListAsync(cancellationToken);
+
             var goalsSQuery = _dbContext.FootballGoals.AsQueryable();
             if (seasonId != null)
             {
-                goalsSQuery = goalsSQuery.Where(g => g.Match != null && eventIds.Contains(g.Match.EventId));
+                goalsSQuery = goalsSQuery.Where(g => g.Match != null && eligibleEventIds.Contains(g.Match.EventId));
             }
 
             var goalsS = await goalsSQuery
-                .Where(g => playerIds.Contains(g.PlayerId))
+                .Where(g => eligiblePlayerIds.Contains(g.PlayerId))
                 .GroupBy(g => g.PlayerId)
                 .Select(g => new { Id = g.Key, Goals = g.Sum(x => x.GoalsCount) })
                 .ToListAsync(cancellationToken);
@@ -359,41 +368,41 @@ public class PlayerService : IPlayerService
             var cardsSQuery = _dbContext.FootballCards.AsQueryable();
             if (seasonId != null)
             {
-                cardsSQuery = cardsSQuery.Where(c => c.Match != null && eventIds.Contains(c.Match.EventId));
+                cardsSQuery = cardsSQuery.Where(c => c.Match != null && eligibleEventIds.Contains(c.Match.EventId));
             }
             
             var cardsS = await cardsSQuery
-                .Where(c => playerIds.Contains(c.PlayerId))
+                .Where(c => eligiblePlayerIds.Contains(c.PlayerId))
                 .Select(c => new { c.PlayerId, c.Type })
                 .ToListAsync(cancellationToken);
 
             // Optimized Team Sports Match Stats loading (pre-calculate stats per player)
-            var FootballHomeStats = await _dbContext.FootballMatches.Where(m => eventIds.Contains(m.EventId))
-                .SelectMany(m => m.HomeRoster!.Select(p => new { PlayerId = p.Id, IsWinner = m.WinnerTeamId == m.HomeTeamId || (m.HomeTeamScore > m.AwayTeamScore && !m.WinnerTeamId.HasValue) }))
+            var FootballHomeStats = await _dbContext.FootballMatches.Where(m => eligibleEventIds.Contains(m.EventId))
+                .SelectMany(m => m.HomeRoster!.Where(p => eligiblePlayerIds.Contains(p.Id)).Select(p => new { PlayerId = p.Id, IsWinner = m.WinnerTeamId == m.HomeTeamId || (m.HomeTeamScore > m.AwayTeamScore && !m.WinnerTeamId.HasValue) }))
                 .GroupBy(x => x.PlayerId).Select(g => new { Id = g.Key, Played = g.Count(), Wins = g.Count(x => x.IsWinner) }).ToListAsync(cancellationToken);
-            var FootballAwayStats = await _dbContext.FootballMatches.Where(m => eventIds.Contains(m.EventId))
-                .SelectMany(m => m.AwayRoster!.Select(p => new { PlayerId = p.Id, IsWinner = m.WinnerTeamId == m.AwayTeamId || (m.AwayTeamScore > m.HomeTeamScore && !m.WinnerTeamId.HasValue) }))
-                .GroupBy(x => x.PlayerId).Select(g => new { Id = g.Key, Played = g.Count(), Wins = g.Count(x => x.IsWinner) }).ToListAsync(cancellationToken);
-
-            var volleyHomeStats = await _dbContext.VolleyballMatches.Where(m => eventIds.Contains(m.EventId))
-                .SelectMany(m => m.HomeRoster!.Select(p => new { PlayerId = p.Id, IsWinner = m.WinnerTeamId == m.HomeTeamId || (m.HomeSetsWon > m.AwaySetsWon && !m.WinnerTeamId.HasValue) }))
-                .GroupBy(x => x.PlayerId).Select(g => new { Id = g.Key, Played = g.Count(), Wins = g.Count(x => x.IsWinner) }).ToListAsync(cancellationToken);
-            var volleyAwayStats = await _dbContext.VolleyballMatches.Where(m => eventIds.Contains(m.EventId))
-                .SelectMany(m => m.AwayRoster!.Select(p => new { PlayerId = p.Id, IsWinner = m.WinnerTeamId == m.AwayTeamId || (m.AwaySetsWon > m.HomeSetsWon && !m.WinnerTeamId.HasValue) }))
+            var FootballAwayStats = await _dbContext.FootballMatches.Where(m => eligibleEventIds.Contains(m.EventId))
+                .SelectMany(m => m.AwayRoster!.Where(p => eligiblePlayerIds.Contains(p.Id)).Select(p => new { PlayerId = p.Id, IsWinner = m.WinnerTeamId == m.AwayTeamId || (m.AwayTeamScore > m.HomeTeamScore && !m.WinnerTeamId.HasValue) }))
                 .GroupBy(x => x.PlayerId).Select(g => new { Id = g.Key, Played = g.Count(), Wins = g.Count(x => x.IsWinner) }).ToListAsync(cancellationToken);
 
-            var bballHomeStats = await _dbContext.Basketball3x3Matches.Where(m => eventIds.Contains(m.EventId))
-                .SelectMany(m => m.HomeRoster!.Select(p => new { PlayerId = p.Id, IsWinner = m.WinnerTeamId == m.HomeTeamId || (m.HomeTeamScore > m.AwayTeamScore && !m.WinnerTeamId.HasValue) }))
+            var volleyHomeStats = await _dbContext.VolleyballMatches.Where(m => eligibleEventIds.Contains(m.EventId))
+                .SelectMany(m => m.HomeRoster!.Where(p => eligiblePlayerIds.Contains(p.Id)).Select(p => new { PlayerId = p.Id, IsWinner = m.WinnerTeamId == m.HomeTeamId || (m.HomeSetsWon > m.AwaySetsWon && !m.WinnerTeamId.HasValue) }))
                 .GroupBy(x => x.PlayerId).Select(g => new { Id = g.Key, Played = g.Count(), Wins = g.Count(x => x.IsWinner) }).ToListAsync(cancellationToken);
-            var bballAwayStats = await _dbContext.Basketball3x3Matches.Where(m => eventIds.Contains(m.EventId))
-                .SelectMany(m => m.AwayRoster!.Select(p => new { PlayerId = p.Id, IsWinner = m.WinnerTeamId == m.AwayTeamId || (m.AwayTeamScore > m.HomeTeamScore && !m.WinnerTeamId.HasValue) }))
+            var volleyAwayStats = await _dbContext.VolleyballMatches.Where(m => eligibleEventIds.Contains(m.EventId))
+                .SelectMany(m => m.AwayRoster!.Where(p => eligiblePlayerIds.Contains(p.Id)).Select(p => new { PlayerId = p.Id, IsWinner = m.WinnerTeamId == m.AwayTeamId || (m.AwaySetsWon > m.HomeSetsWon && !m.WinnerTeamId.HasValue) }))
                 .GroupBy(x => x.PlayerId).Select(g => new { Id = g.Key, Played = g.Count(), Wins = g.Count(x => x.IsWinner) }).ToListAsync(cancellationToken);
 
-            var beachHomeStats = await _dbContext.BeachVolleyballMatches.Where(m => eventIds.Contains(m.EventId))
-                .SelectMany(m => m.HomeRoster!.Select(p => new { PlayerId = p.Id, IsWinner = m.WinnerTeamId == m.HomeTeamId || (m.HomeSetsWon > m.AwaySetsWon && !m.WinnerTeamId.HasValue) }))
+            var bballHomeStats = await _dbContext.Basketball3x3Matches.Where(m => eligibleEventIds.Contains(m.EventId))
+                .SelectMany(m => m.HomeRoster!.Where(p => eligiblePlayerIds.Contains(p.Id)).Select(p => new { PlayerId = p.Id, IsWinner = m.WinnerTeamId == m.HomeTeamId || (m.HomeTeamScore > m.AwayTeamScore && !m.WinnerTeamId.HasValue) }))
                 .GroupBy(x => x.PlayerId).Select(g => new { Id = g.Key, Played = g.Count(), Wins = g.Count(x => x.IsWinner) }).ToListAsync(cancellationToken);
-            var beachAwayStats = await _dbContext.BeachVolleyballMatches.Where(m => eventIds.Contains(m.EventId))
-                .SelectMany(m => m.AwayRoster!.Select(p => new { PlayerId = p.Id, IsWinner = m.WinnerTeamId == m.AwayTeamId || (m.AwaySetsWon > m.HomeSetsWon && !m.WinnerTeamId.HasValue) }))
+            var bballAwayStats = await _dbContext.Basketball3x3Matches.Where(m => eligibleEventIds.Contains(m.EventId))
+                .SelectMany(m => m.AwayRoster!.Where(p => eligiblePlayerIds.Contains(p.Id)).Select(p => new { PlayerId = p.Id, IsWinner = m.WinnerTeamId == m.AwayTeamId || (m.AwayTeamScore > m.HomeTeamScore && !m.WinnerTeamId.HasValue) }))
+                .GroupBy(x => x.PlayerId).Select(g => new { Id = g.Key, Played = g.Count(), Wins = g.Count(x => x.IsWinner) }).ToListAsync(cancellationToken);
+
+            var beachHomeStats = await _dbContext.BeachVolleyballMatches.Where(m => eligibleEventIds.Contains(m.EventId))
+                .SelectMany(m => m.HomeRoster!.Where(p => eligiblePlayerIds.Contains(p.Id)).Select(p => new { PlayerId = p.Id, IsWinner = m.WinnerTeamId == m.HomeTeamId || (m.HomeSetsWon > m.AwaySetsWon && !m.WinnerTeamId.HasValue) }))
+                .GroupBy(x => x.PlayerId).Select(g => new { Id = g.Key, Played = g.Count(), Wins = g.Count(x => x.IsWinner) }).ToListAsync(cancellationToken);
+            var beachAwayStats = await _dbContext.BeachVolleyballMatches.Where(m => eligibleEventIds.Contains(m.EventId))
+                .SelectMany(m => m.AwayRoster!.Where(p => eligiblePlayerIds.Contains(p.Id)).Select(p => new { PlayerId = p.Id, IsWinner = m.WinnerTeamId == m.AwayTeamId || (m.AwaySetsWon > m.HomeSetsWon && !m.WinnerTeamId.HasValue) }))
                 .GroupBy(x => x.PlayerId).Select(g => new { Id = g.Key, Played = g.Count(), Wins = g.Count(x => x.IsWinner) }).ToListAsync(cancellationToken);
 
             // Convert to Dictionaries for O(1) lookup
@@ -1454,24 +1463,12 @@ public class PlayerService : IPlayerService
 
             foreach (var season in allSeasons)
             {
-                var rankings = await GetAllWithRankingsAsync(season.Id, cancellationToken);
-                var me = rankings.FirstOrDefault(p => p.Id == playerId);
-                if (me == null) continue;
+                try {
+                    var rankings = await GetAllWithRankingsAsync(season.Id, cancellationToken);
+                    var meInSeason = rankings.FirstOrDefault(p => p.Id == playerId);
+                    if (meInSeason == null) continue;
 
-                if (me.GlobalRank == 1 && me.PerformanceScore > 0)
-                {
-                    badges.Add(new AutomaticBadgeDto
-                    {
-                        Type = "BestAthlete",
-                        Label = "Найкращий спортсмен сезону",
-                        SeasonName = season.Name,
-                        Icon = "crown"
-                    });
-                }
-
-                foreach (var sport in me.SportStats)
-                {
-                    if (sport.Rank == 1 && sport.PerformanceScore > 0)
+                    if (meInSeason.GlobalRank == 1 && meInSeason.PerformanceScore > 0)
                     {
                         badges.Add(new AutomaticBadgeDto
                         {
