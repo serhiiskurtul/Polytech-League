@@ -517,7 +517,7 @@ const PlayersRatingPage = () => {
                 <h3>MVP змагань</h3>
                 <p>Додаткові бали за звання найкращого гравця турніру (MVP):</p>
                 <ul>
-                  <li><span>Кожне звання MVP:</span> +15 балів</li>
+                  <li><span>Кожне звання MVP:</span> +25 балів</li>
                 </ul>
 
               </div>

@@ -90,7 +90,7 @@ const TopPlayersCompact = () => {
         <div className={styles.cardHeader}>
           <h2 className={styles.cardTitle}>
             <i className={`fas fa-crown ${styles.cardIcon}`}></i>
-            ТОП гравців
+            ТОП гравців сезону
           </h2>
           
           <div className={styles.sportSelector}>
