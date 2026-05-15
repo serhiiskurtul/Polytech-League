@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using PolytechLeague.Application.Dto;
 using PolytechLeague.Application.Services.Interfaces;
+using PolytechLeague.Infrastructure.Redis;
+
 
 namespace PolytechLeague.API.Controllers.Common;
 
@@ -9,11 +11,14 @@ namespace PolytechLeague.API.Controllers.Common;
 public class TournamentsController : ControllerBase
 {
     private readonly ITournamentService _tournamentService;
+    private readonly IRedisService _redisService;
 
-    public TournamentsController(ITournamentService tournamentService)
+    public TournamentsController(ITournamentService tournamentService, IRedisService redisService)
     {
         _tournamentService = tournamentService;
+        _redisService = redisService;
     }
+
 
     [HttpGet]
     public async Task<ActionResult<PagedResponse<TournamentDto>>> GetAllTournaments(
@@ -23,18 +28,32 @@ public class TournamentsController : ControllerBase
         string? sport = null,
         string? level = null)
     {
+        var cacheKey = $"tournaments_p{page}_s{pageSize}_{status ?? "all"}_{sport ?? "all"}_{level ?? "all"}";
+        var cached = await _redisService.GetDataAsync<PagedResponse<TournamentDto>>(cacheKey);
+        if (cached != null) return Ok(cached);
+
         var tournaments = await _tournamentService.GetAllTournamentsAsync(page, pageSize, status, sport, level);
+        
+        await _redisService.SetDataAsync(cacheKey, tournaments, TimeSpan.FromMinutes(30), "tournaments_group");
         return Ok(tournaments);
     }
+
 
 
     [HttpGet("{id}")]
     public async Task<ActionResult<TournamentDto>> GetTournamentById(long id)
     {
+        var cacheKey = $"tournament_{id}";
+        var cached = await _redisService.GetDataAsync<TournamentDto>(cacheKey);
+        if (cached != null) return Ok(cached);
+
         var tournament = await _tournamentService.GetTournamentByIdAsync(id);
         if (tournament == null) return NotFound();
+
+        await _redisService.SetDataAsync(cacheKey, tournament, TimeSpan.FromMinutes(60), "tournaments_byid_group");
         return Ok(tournament);
     }
+
 
     [HttpGet("stats")]
     public async Task<ActionResult<GeneralStatsDto>> GetStats()
