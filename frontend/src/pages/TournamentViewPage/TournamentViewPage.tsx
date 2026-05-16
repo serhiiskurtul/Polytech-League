@@ -321,10 +321,16 @@ const TournamentViewPage = () => {
           console.log("Board updates:", boardUpdates);
           console.log("All participants:", (details as any).participants);
 
+          const allTeamPlayers = (details as any).teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamId: t.id }))) || [];
+
           for (const update of boardUpdates) {
             if (update.playerId && update.playerId !== 0) {
               const participant = (details as any).participants?.find((p: any) => Number(p.playerId || p.id) === Number(update.playerId));
+              const player = allTeamPlayers.find((p: any) => Number(p.id) === Number(update.playerId));
+              
               console.log("Found participant for update:", participant);
+              console.log("Found player in team for update:", player);
+
               if (participant) {
                 const pPayload = { ...participant, boardRank: update.rank };
                 console.log("Setting board rank for player", update.playerId, "to", update.rank);
@@ -332,6 +338,19 @@ const TournamentViewPage = () => {
                   await updateParticipantInCheckersEvent(id!, update.playerId, pPayload);
                 } else {
                   await updateParticipantInEvent(id!, update.playerId, pPayload);
+                }
+              } else if (player) {
+                console.log("Creating new participant for player", update.playerId, "to", update.rank);
+                const pPayload = {
+                  playerId: update.playerId,
+                  boardRank: update.rank,
+                  status: 'Approved',
+                  chessEventId: Number(id)
+                };
+                if (sportKey === 'checkers') {
+                  await addParticipantToCheckersEvent(id!, pPayload as any);
+                } else {
+                  await addParticipantToEvent(id!, pPayload as any);
                 }
               }
             }
