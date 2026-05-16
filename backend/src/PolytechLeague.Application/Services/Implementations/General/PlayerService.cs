@@ -576,7 +576,12 @@ public class PlayerService : IPlayerService
                     var finalPts = (int)Math.Round(pts * mult);
                     totalScore += finalPts;
                     if (sportStatsMap.TryGetValue(ach.SportType, out var s)) s.PerformanceScore += finalPts;
-                    pointsBreakdown.Add(new PointEntryDto { Description = ach.Result == "MVP" ? $"MVP: {ach.TournamentName} ({levelName})" : (ach.Rank > 0 ? $"{ach.Rank} місце: {ach.TournamentName} ({levelName})" : $"Участь: {ach.TournamentName} ({levelName})"), Points = finalPts, Category = "Achievements", SportType = ach.SportType });
+
+                    string desc = ach.Result == "MVP" ? $"MVP: {ach.TournamentName} ({levelName})" : (ach.Rank > 0 ? $"{ach.Rank} місце: {ach.TournamentName} ({levelName})" : $"Участь: {ach.TournamentName} ({levelName})");
+                    if (ach.BoardRank.HasValue && ach.BoardRank.Value > 0) {
+                        desc += $", {ach.BoardRank.Value} місце на дошці";
+                    }
+                    pointsBreakdown.Add(new PointEntryDto { Description = desc, Points = finalPts, Category = "Achievements", SportType = ach.SportType });
                 }
 
                 void AddStats(string sport, int p, int w) {
