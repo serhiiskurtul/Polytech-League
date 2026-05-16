@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import styles from './UniversalBracket.module.css';
 
 export interface BracketTeam {
@@ -106,8 +106,44 @@ const UniversalBracket: React.FC<UniversalBracketProps> = ({
     return paths;
   }, [matchPositions, rounds]);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeftState, setScrollLeftState] = useState(0);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    setIsDragging(true);
+    setStartX(e.pageX - containerRef.current.offsetLeft);
+    setScrollLeftState(containerRef.current.scrollLeft);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !containerRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - containerRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5; // Scroll speed multiplier
+    containerRef.current.scrollLeft = scrollLeftState - walk;
+  };
+
   return (
-    <div className={styles.bracketContainer}>
+    <div 
+      ref={containerRef}
+      className={styles.bracketContainer}
+      onMouseDown={handleMouseDown}
+      onMouseLeave={handleMouseLeave}
+      onMouseUp={handleMouseUp}
+      onMouseMove={handleMouseMove}
+      style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+    >
       <div 
         className={styles.bracketWrapper} 
         style={{ width: totalWidth, height: totalHeight }}
