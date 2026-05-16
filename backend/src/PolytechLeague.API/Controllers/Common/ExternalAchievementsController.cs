@@ -50,7 +50,7 @@ namespace PolytechLeague.API.Controllers.Common
                 StudentName = studentName,
                 Title = title,
                 Content = content,
-                Date = date,
+                Date = DateTime.SpecifyKind(date, DateTimeKind.Utc),
                 ExternalLink = externalLink,
                 CreatedAt = DateTime.UtcNow
             };
