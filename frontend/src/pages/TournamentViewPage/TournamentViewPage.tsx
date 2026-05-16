@@ -294,9 +294,11 @@ const TournamentViewPage = () => {
 
         // Update Board Ranks for Chess/Checkers
         if (['chess', 'checkers'].includes(sportKey) && (details as any).level !== 'CollegeGroup') {
+          console.log("Updating board ranks for", sportKey);
           // 1. Clear boardRank for all participants in this tournament
           for (const p of (details as any).participants || []) {
             if (p.boardRank) {
+              console.log("Clearing board rank for player", p.playerId);
               const pPayload = { ...p, boardRank: null };
               if (sportKey === 'checkers') {
                 await updateParticipantInCheckersEvent(id!, p.playerId, pPayload);
@@ -316,11 +318,15 @@ const TournamentViewPage = () => {
             { playerId: winners.board2_3rd, rank: 3 },
           ];
 
+          console.log("Board updates:", boardUpdates);
+
           for (const update of boardUpdates) {
             if (update.playerId && update.playerId !== 0) {
               const participant = (details as any).participants?.find((p: any) => p.playerId === update.playerId);
+              console.log("Found participant for update:", participant);
               if (participant) {
                 const pPayload = { ...participant, boardRank: update.rank };
+                console.log("Setting board rank for player", update.playerId, "to", update.rank);
                 if (sportKey === 'checkers') {
                   await updateParticipantInCheckersEvent(id!, update.playerId, pPayload);
                 } else {
