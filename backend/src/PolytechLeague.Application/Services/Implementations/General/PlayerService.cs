@@ -706,7 +706,6 @@ public class PlayerService : IPlayerService
                     }
                 }
                 var resultStr = rank > 0 ? $"{rank} місце" : "Учасник";
-                if (p.Points > 0) resultStr += $" ({p.Points} очок)";
 
                 achievements.Add(new AchievementDto {
                     TournamentName = p.Tournament.Name,
@@ -752,7 +751,6 @@ public class PlayerService : IPlayerService
                     }
                 }
                 var resultStr = rank > 0 ? $"{rank} місце" : "Учасник";
-                if (p.Points > 0) resultStr += $" ({p.Points} очок)";
 
                 achievements.Add(new AchievementDto {
                     TournamentName = p.Event.Name,
