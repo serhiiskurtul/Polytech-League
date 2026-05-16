@@ -33,6 +33,7 @@ export const PlayerComparePage = () => {
   
   const [headToHead, setHeadToHead] = useState<any>(null);
   const [loadingH2H, setLoadingH2H] = useState(false);
+  const [selectedSport, setSelectedSport] = useState<string>('all');
 
   // Initial fetch of seasons
   useEffect(() => {
@@ -153,9 +154,21 @@ export const PlayerComparePage = () => {
   }, [p1Id, p2Id]);
 
 
+  const getSportVal = (player: PlayerDto | null, field: string) => {
+    if (!player) return undefined;
+    if (selectedSport === 'all') {
+      return (player as any)[field];
+    }
+    const sport = player.sportStats?.find(s => s.sportType === selectedSport);
+    return sport ? (sport as any)[field] : 0;
+  };
+
   const calculateWinRate = (player: PlayerDto | null) => {
-    if (!player || !player.matchesPlayed) return 0;
-    return Math.round(((player.winsCount || 0) / player.matchesPlayed) * 100);
+    if (!player) return 0;
+    const matches = getSportVal(player, 'matchesPlayed') || 0;
+    const wins = getSportVal(player, 'winsCount') || 0;
+    if (!matches) return 0;
+    return Math.round((wins / matches) * 100);
   };
 
   const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://polytech-league-production.up.railway.app';
@@ -243,26 +256,46 @@ export const PlayerComparePage = () => {
           {/* Metrics Table */}
           <div className={styles.statsSection}>
             <div className={styles.sectionHeader}>
-              <i className="fa-solid fa-table-list"></i>
-              <h2>Порівняльні метрики</h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <i className="fa-solid fa-table-list"></i>
+                <h2>Порівняльні метрики</h2>
+              </div>
+              
+              <div className={styles.sportSelector}>
+                <label htmlFor="sport-filter" style={{ marginRight: '8px', fontSize: '14px', color: '#6b7280' }}>Вид спорту:</label>
+                <select 
+                  id="sport-filter"
+                  value={selectedSport} 
+                  onChange={(e) => setSelectedSport(e.target.value)}
+                  style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #e5e7eb', outline: 'none' }}
+                >
+                  <option value="all">Всі види</option>
+                  {Array.from(new Set([
+                    ...(player1?.sportStats?.map(s => s.sportType) || []),
+                    ...(player2?.sportStats?.map(s => s.sportType) || [])
+                  ])).map(sport => (
+                    <option key={sport} value={sport}>{translateSport(sport)}</option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div className={styles.statsTable}>
               <StatRow 
-                label="Загальний рейтинг" 
-                val1={player1.performanceScore} 
-                val2={player2?.performanceScore}
+                label={selectedSport === 'all' ? "Загальний рейтинг" : "Очки в спорті"} 
+                val1={getSportVal(player1, 'performanceScore')} 
+                val2={getSportVal(player2, 'performanceScore')}
                 suffix=" очок"
               />
               <StatRow 
                 label="Зіграно матчів" 
-                val1={player1.matchesPlayed} 
-                val2={player2?.matchesPlayed}
+                val1={getSportVal(player1, 'matchesPlayed')} 
+                val2={getSportVal(player2, 'matchesPlayed')}
                 suffix=" ігор"
               />
               <StatRow 
                 label="Кількість перемог" 
-                val1={player1.winsCount} 
-                val2={player2?.winsCount}
+                val1={getSportVal(player1, 'winsCount')} 
+                val2={getSportVal(player2, 'winsCount')}
                 suffix=" перемог"
               />
               <StatRow 
@@ -279,8 +312,9 @@ export const PlayerComparePage = () => {
                 suffix=" разів"
               />
 
-               {/* Only show goals if both played football */}
-               {(player1.sportStats?.some(s => s.sportType === 'football') || 
+               {/* Only show goals if both played football and sport is all or football */}
+               {(selectedSport === 'all' || selectedSport === 'football') && 
+                (player1.sportStats?.some(s => s.sportType === 'football') || 
                  player2?.sportStats?.some(s => s.sportType === 'football') ||
                 (player1.goalsCount || 0) > 0 || (player2?.goalsCount || 0) > 0 ||
                  (player1.yellowCardsCount || 0) > 0 || (player2?.yellowCardsCount || 0) > 0 ||
@@ -386,7 +420,8 @@ export const PlayerComparePage = () => {
           </div>
 
           {/* Chess Comparison (if applicable and BOTH played) */}
-          {player1.sportStats?.some(s => s.sportType === 'chess') && 
+          {(selectedSport === 'all' || selectedSport === 'chess') && 
+           player1.sportStats?.some(s => s.sportType === 'chess') && 
            player2?.sportStats?.some(s => s.sportType === 'chess') && (
             <div className={styles.statsSection}>
               <div className={styles.sectionHeader}>
