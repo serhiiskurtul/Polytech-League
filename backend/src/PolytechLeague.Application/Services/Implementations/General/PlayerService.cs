@@ -344,6 +344,8 @@ public class PlayerService : IPlayerService
             var beachVTeams = await _dbContext.BeachVolleyballTeams.AsNoTracking().Include(t => t.Event).Include(t => t.Players).Where(t => eligibleEventIdsList.Contains(t.EventId) && t.Players!.Any(p => eligiblePlayerIdsList.Contains(p.Id))).ToListAsync(cancellationToken);
             var ttTeams = await _dbContext.TableTennisTeams.AsNoTracking().Include(t => t.Event).Include(t => t.Players).Where(t => eligibleEventIdsList.Contains(t.EventId) && t.Players!.Any(p => eligiblePlayerIdsList.Contains(p.Id))).ToListAsync(cancellationToken);
             var badTeams = await _dbContext.BadmintonTeams.AsNoTracking().Include(t => t.Event).Where(t => t.EventId != null && eligibleEventIdsList.Contains(t.EventId.Value) && ((t.Player1Id != null && eligiblePlayerIdsList.Contains(t.Player1Id.Value)) || (t.Player2Id != null && eligiblePlayerIdsList.Contains(t.Player2Id.Value)))).ToListAsync(cancellationToken);
+            var chessTeams = await _dbContext.Set<ChessTeam>().AsNoTracking().Include(t => t.Event).Include(t => t.Players).Where(t => eligibleEventIdsList.Contains(t.EventId) && t.Players!.Any(p => eligiblePlayerIdsList.Contains(p.Id))).ToListAsync(cancellationToken);
+            var checkersTeams = await _dbContext.Set<CheckersTeam>().AsNoTracking().Include(t => t.Event).Include(t => t.Players).Where(t => eligibleEventIdsList.Contains(t.EventId) && t.Players!.Any(p => eligiblePlayerIdsList.Contains(p.Id))).ToListAsync(cancellationToken);
 
             // 3. Match Stats
             var cwS = await _dbContext.ChessGames.AsNoTracking().Where(g => eligibleEventIdsList.Contains(g.TournamentId) && g.WhitePlayerId.HasValue && eligiblePlayerIdsList.Contains(g.WhitePlayerId.Value)).GroupBy(g => g.WhitePlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.WhiteWin) }).ToListAsync(cancellationToken);
@@ -433,6 +435,8 @@ public class PlayerService : IPlayerService
             var beachVPlayerEvents = beachVTeams.SelectMany(t => t.Players!.Select(p => new { PlayerId = p.Id, Team = t })).ToLookup(x => x.PlayerId);
             var ttTeamsLookup = ttTeams.SelectMany(t => t.Players!.Select(p => new { PlayerId = p.Id, Team = t })).ToLookup(x => x.PlayerId);
             var badmintonTeamsLookup = badTeams.SelectMany(t => new[] { t.Player1Id, t.Player2Id }.Where(id => id.HasValue).Select(id => new { PlayerId = id!.Value, Team = t })).ToLookup(x => x.PlayerId);
+            var chessPlayerEvents = chessTeams.SelectMany(t => t.Players!.Select(p => new { PlayerId = p.Id, Team = t })).ToLookup(x => x.PlayerId);
+            var checkersPlayerEvents = checkersTeams.SelectMany(t => t.Players!.Select(p => new { PlayerId = p.Id, Team = t })).ToLookup(x => x.PlayerId);
 
             var fH = FootballHomeStats.GroupBy(x => x.Id).ToDictionary(g => g.Key, g => g.First()); 
             var fA = FootballAwayStats.GroupBy(x => x.Id).ToDictionary(g => g.Key, g => g.First());
@@ -462,12 +466,26 @@ public class PlayerService : IPlayerService
 
                 foreach (var a in chessLookup[playerId]) {
                     if (a.Tournament == null) continue;
-                    achievements.Add(new AchievementDto { TournamentName = a.Tournament.Name, SportType = "chess", Date = a.Tournament.Date, Rank = a.Rank, BoardRank = a.BoardRank, TournamentId = a.TournamentId, Result = GetResultLabel(a.Rank) });
+                    int r = a.Rank;
+                    if (r <= 0) {
+                        var team = chessPlayerEvents[playerId].FirstOrDefault(x => x.Team.EventId == a.TournamentId)?.Team;
+                        if (team != null) {
+                            r = (team.Id == a.Tournament.FirstPlaceTeamId) ? 1 : ((team.Id == a.Tournament.SecondPlaceTeamId) ? 2 : ((team.Id == a.Tournament.ThirdPlaceTeamId) ? 3 : 0));
+                        }
+                    }
+                    achievements.Add(new AchievementDto { TournamentName = a.Tournament.Name, SportType = "chess", Date = a.Tournament.Date, Rank = r, BoardRank = a.BoardRank, TournamentId = a.TournamentId, Result = GetResultLabel(r) });
                     sportTypes.Add("chess");
                 }
                 foreach (var a in checkersLookup[playerId]) {
                     if (a.Event == null) continue;
-                    achievements.Add(new AchievementDto { TournamentName = a.Event.Name, SportType = "checkers", Date = a.Event.Date, Rank = a.Rank, BoardRank = a.BoardRank, TournamentId = a.TournamentId, Result = GetResultLabel(a.Rank) });
+                    int r = a.Rank;
+                    if (r <= 0) {
+                        var team = checkersPlayerEvents[playerId].FirstOrDefault(x => x.Team.EventId == a.TournamentId)?.Team;
+                        if (team != null) {
+                            r = (team.Id == a.Event.FirstPlaceTeamId) ? 1 : ((team.Id == a.Event.SecondPlaceTeamId) ? 2 : ((team.Id == a.Event.ThirdPlaceTeamId) ? 3 : 0));
+                        }
+                    }
+                    achievements.Add(new AchievementDto { TournamentName = a.Event.Name, SportType = "checkers", Date = a.Event.Date, Rank = r, BoardRank = a.BoardRank, TournamentId = a.TournamentId, Result = GetResultLabel(r) });
                     sportTypes.Add("checkers");
                 }
                 foreach (var a in ttLookup[playerId]) {
@@ -565,8 +583,8 @@ public class PlayerService : IPlayerService
                     if (allEvents.TryGetValue(ach.TournamentId, out var lvl)) {
                         if (levelMultipliers.TryGetValue(lvl, out var m)) mult = m;
                         levelName = lvl switch { CompetitionLevel.Regional => "Обласні", CompetitionLevel.National => "Всеукраїнські", _ => "Міжгрупові" };
-                        pts = 10;
-                    } else pts = 10;
+                        pts = (lvl == CompetitionLevel.CollegeGroup) ? 10 : 0;
+                    } else pts = 0;
                     if (ach.Rank == 1) pts += 100; else if (ach.Rank == 2) pts += 50; else if (ach.Rank == 3) pts += 30;
                     if (allEvents.TryGetValue(ach.TournamentId, out var eventLvl) && eventLvl != CompetitionLevel.CollegeGroup) {
                         if (ach.BoardRank == 1) pts += 40; else if (ach.BoardRank == 2) pts += 25; else if (ach.BoardRank == 3) pts += 15;
