@@ -226,7 +226,7 @@ public class SeasonRatingService : ISeasonRatingService
                     row.SportResults["Армрестлінг"] = new SportResultDto 
                     { 
                         Rank = rankStr, 
-                        Points = idx + 1 
+                        Points = groupArmSums[row.GroupName] 
                     };
                 }
                 idx += tieCount;
