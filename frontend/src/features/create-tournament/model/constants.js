@@ -12,7 +12,7 @@ export const AVAILABLE_SPORTS = [
   { id: 'checkers', name: 'Шашки', icon: 'fas fa-chess-board' },
   { id: 'beach_volleyball', name: 'Пляжний волейбол', icon: 'fas fa-umbrella-beach' },
   { id: 'badminton', name: 'Бадмінтон', icon: 'fas fa-feather-alt' },
-  { id: 'armwrestling', name: 'Армреслінг', icon: 'fas fa-fist-raised' },
+  { id: 'armwrestling', name: 'Армрестлінг', icon: 'fas fa-fist-raised' },
   { id: 'table_tennis', name: 'Настільний теніс', icon: 'fas fa-table-tennis' },
   { id: 'athletics', name: 'Легка атлетика', icon: 'fas fa-running' }
 ];

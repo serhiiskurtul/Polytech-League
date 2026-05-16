@@ -22,7 +22,7 @@ public class SeasonRatingService : ISeasonRatingService
 
         var sports = new List<string> 
         { 
-            "Шахи", "Шашки", "Футбол", "Армреслінг", 
+            "Шахи", "Шашки", "Футбол", "Армрестлінг", 
             "Настільний теніс", "Бадмінтон", "Волейбол", 
             "Баскетбол 3x3", "Пляжний волейбол" 
         };
@@ -174,9 +174,9 @@ public class SeasonRatingService : ISeasonRatingService
                 if (row != null)
                 {
                     int rank = p.Rank > 0 ? p.Rank : 4;
-                    if (row.SportResults["Армреслінг"].Rank == "-" || rank < int.Parse(row.SportResults["Армреслінг"].Rank!))
+                    if (row.SportResults["Армрестлінг"].Rank == "-" || rank < int.Parse(row.SportResults["Армрестлінг"].Rank!))
                     {
-                        row.SportResults["Армреслінг"] = new SportResultDto { Rank = rank.ToString(), Points = rank };
+                        row.SportResults["Армрестлінг"] = new SportResultDto { Rank = rank.ToString(), Points = rank };
                     }
                 }
             }
@@ -398,7 +398,7 @@ public class SeasonRatingService : ISeasonRatingService
 
         var allSports = new List<string> 
         { 
-            "Шахи", "Шашки", "Футбол", "Армреслінг", 
+            "Шахи", "Шашки", "Футбол", "Армрестлінг", 
             "Настільний теніс", "Бадмінтон", "Волейбол", 
             "Баскетбол 3x3", "Пляжний волейбол", "Легка атлетика"
         };
@@ -515,7 +515,7 @@ public class SeasonRatingService : ISeasonRatingService
 
         var allSports = new List<string> 
         { 
-            "Шахи", "Шашки", "Футбол", "Армреслінг", 
+            "Шахи", "Шашки", "Футбол", "Армрестлінг", 
             "Настільний теніс", "Бадмінтон", "Волейбол", 
             "Баскетбол 3x3", "Пляжний волейбол", "Легка атлетика"
         };

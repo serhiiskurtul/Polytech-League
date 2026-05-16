@@ -20,7 +20,7 @@ const CalendarFilters = ({ activeFilter, onFilterChange }: CalendarFiltersProps)
     { id: 'checkers', label: 'Шашки', icon: 'fas fa-chess-board' },
     { id: 'table-tennis', label: 'Настільний теніс', icon: 'fas fa-table-tennis' },
     { id: 'badminton', label: 'Бадмінтон', icon: 'fas fa-feather-alt' },
-    { id: 'armwrestling', label: 'Армреслінг', icon: 'fas fa-fist-raised' }
+    { id: 'armwrestling', label: 'Армрестлінг', icon: 'fas fa-fist-raised' }
   ];
 
   return (

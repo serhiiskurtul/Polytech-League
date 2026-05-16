@@ -12,7 +12,7 @@ const SPORT_CONFIG: Record<string, { label: string; icon: string; color: string 
   'chess': { label: 'Шахи', icon: 'fa-chess', color: 'var(--text)' },
   'checkers': { label: 'Шашки', icon: 'fa-chess-board', color: 'var(--text)' },
   'table-tennis': { label: 'Настільний теніс', icon: 'fa-table-tennis', color: 'var(--warning)' },
-  'armwrestling': { label: 'Армреслінг', icon: 'fa-fist-raised', color: 'var(--accent)' },
+  'armwrestling': { label: 'Армрестлінг', icon: 'fa-fist-raised', color: 'var(--accent)' },
   'badminton': { label: 'Бадмінтон', icon: 'fa-feather-alt', color: 'var(--success)' },
   'other': { label: 'Спорт', icon: 'fa-trophy', color: 'var(--primary)' }
 };

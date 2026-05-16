@@ -21,7 +21,7 @@ const RecentMatches = () => {
     'Шашки': 'checkers',
     'Пляжний волейбол': 'beach-volleyball',
     'Бадмінтон': 'badminton',
-    'Армреслінг': 'armwrestling'
+    'Армрестлінг': 'armwrestling'
   };
 
   const reverseSportMap: Record<string, string> = {
@@ -33,7 +33,7 @@ const RecentMatches = () => {
     'checkers': 'Шашки',
     'beach-volleyball': 'Пляжний волейбол',
     'badminton': 'Бадмінтон',
-    'armwrestling': 'Армреслінг'
+    'armwrestling': 'Армрестлінг'
   };
 
   const sports = Object.keys(sportSlugMap);
@@ -71,7 +71,7 @@ const RecentMatches = () => {
       'Настільний теніс': 'fa-table-tennis',
       'Шахи': 'fa-chess',
       'Бадмінтон': 'fa-table-tennis',
-      'Армреслінг': 'fa-hand-fist'
+      'Армрестлінг': 'fa-hand-fist'
     };
     return icons[sport] || 'fa-trophy';
   };
@@ -87,7 +87,7 @@ const RecentMatches = () => {
       'Шашки': 'fas fa-chess-board',
       'Пляжний волейбол': 'fas fa-umbrella-beach',
       'Бадмінтон': 'fas fa-feather-alt',
-      'Армреслінг': 'fas fa-fist-raised',
+      'Армрестлінг': 'fas fa-fist-raised',
       'Всі': 'fas fa-filter'
     };
     const iconClass = icons[sport] || 'fas fa-trophy';

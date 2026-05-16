@@ -64,7 +64,7 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
     'checkers': 'Шашки',
     'table-tennis': 'Настільний теніс',
     'badminton': 'Бадмінтон',
-    'armwrestling': 'Армреслінг',
+    'armwrestling': 'Армрестлінг',
     'beach-volleyball': 'Пляжний волейбол',
     'athletics': 'Легка атлетика'
   };

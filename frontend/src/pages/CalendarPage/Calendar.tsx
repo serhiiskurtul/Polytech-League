@@ -65,7 +65,7 @@ const Calendar = () => {
     'checkers': 'Шашки',
     'table-tennis': 'Настільний теніс',
     'badminton': 'Бадмінтон',
-    'armwrestling': 'Армреслінг'
+    'armwrestling': 'Армрестлінг'
   };
 
   // Отримати події для вибраного дня

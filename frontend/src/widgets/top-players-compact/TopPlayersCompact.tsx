@@ -23,7 +23,7 @@ const TopPlayersCompact = () => {
     { label: 'Настільний теніс', slug: 'table-tennis' },
     { label: 'Пляжний волейбол', slug: 'beach-volleyball' },
     { label: 'Бадмінтон', slug: 'badminton' },
-    { label: 'Армреслінг', slug: 'armwrestling' }
+    { label: 'Армрестлінг', slug: 'armwrestling' }
   ];
 
   useEffect(() => {

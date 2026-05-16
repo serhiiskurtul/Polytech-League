@@ -92,7 +92,7 @@ public class ArmwrestlingEventService :
     {
         await _notificationService.SendNotificationToAllAsync(
             "Нове змагання!",
-            $"Створено нове змагання з армреслінгу: {entity.Name}",
+            $"Створено нове змагання з армрестлінгу: {entity.Name}",
             NotificationType.Tournament,
             $"/tournaments/{entity.Id}",
             true
@@ -125,7 +125,7 @@ public class ArmwrestlingEventService :
         {
             await _notificationService.SendNotificationToAllAsync(
                 "Змагання завершено!",
-                $"Визначено переможців у змаганні з армреслінгу: {newEntity.Name}",
+                $"Визначено переможців у змаганні з армрестлінгу: {newEntity.Name}",
                 NotificationType.Tournament,
                 $"/tournaments/{newEntity.Id}",
                 true
@@ -295,7 +295,7 @@ public class ArmwrestlingEventService :
                 await _notificationService.SendNotificationToUserAsync(
                     player.UserId.Value,
                     "Реєстрація схвалена",
-                    $"Вашу заявку на участь у змаганні з армреслінгу схвалено!",
+                    $"Вашу заявку на участь у змаганні з армрестлінгу схвалено!",
                     NotificationType.Tournament,
                     $"/tournaments/{eventId}"
                 );
@@ -319,7 +319,7 @@ public class ArmwrestlingEventService :
                 await _notificationService.SendNotificationToUserAsync(
                     player.UserId.Value,
                     "Реєстрація відхилена",
-                    $"Вашу заявку на участь у змаганні з армреслінгу було відхилено.",
+                    $"Вашу заявку на участь у змаганні з армрестлінгу було відхилено.",
                     NotificationType.Tournament,
                     $"/tournaments/{eventId}"
                 );
@@ -334,8 +334,8 @@ public class ArmwrestlingEventService :
 
         string title = status == RegistrationStatus.Approved ? "Реєстрація схвалена" : "Реєстрація відхилена";
         string message = status == RegistrationStatus.Approved
-            ? "Вашу заявку на участь у змаганні з армреслінгу схвалено!"
-            : "Вашу заявку на участь у змаганні з армреслінгу було відхилено.";
+            ? "Вашу заявку на участь у змаганні з армрестлінгу схвалено!"
+            : "Вашу заявку на участь у змаганні з армрестлінгу було відхилено.";
 
         await _notificationService.SendNotificationToUserAsync(
             player.UserId.Value,

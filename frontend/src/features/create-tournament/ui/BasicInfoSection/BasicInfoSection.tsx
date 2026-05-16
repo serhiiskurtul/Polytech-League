@@ -110,7 +110,7 @@ const BasicInfoSection = ({ formData, handleInputChange }: BasicInfoSectionProps
           </div>
         )}
 
-        {/* Формат змагань (не для армреслінгу) */}
+        {/* Формат змагань (не для армрестлінгу) */}
         {formData.sport !== 'armwrestling' && formData.sport !== 'athletics' && (
         <div className={shared.formGroup}>
           <label className={shared.formLabel}>

@@ -16,7 +16,7 @@ const ChampionsPage: React.FC = () => {
       case 'chess': return 'шахів';
       case 'checkers': return 'шашок';
       case 'table-tennis': return 'настільного тенісу';
-      case 'armwrestling': return 'армреслінгу';
+      case 'armwrestling': return 'армрестлінгу';
       case 'badminton': return 'бадмінтону';
       case 'football': return 'футболу';
       case 'basketball-3x3': return 'баскетболу 3x3';
@@ -93,7 +93,7 @@ const ChampionsPage: React.FC = () => {
           <Link to="/hall-of-fame/chess" className={`${styles.filterBtn} ${sport === 'chess' ? styles.active : ''}`}>Шахи</Link>
           <Link to="/hall-of-fame/checkers" className={`${styles.filterBtn} ${sport === 'checkers' ? styles.active : ''}`}>Шашки</Link>
           <Link to="/hall-of-fame/table-tennis" className={`${styles.filterBtn} ${sport === 'table-tennis' ? styles.active : ''}`}>Теніс</Link>
-          <Link to="/hall-of-fame/armwrestling" className={`${styles.filterBtn} ${sport === 'armwrestling' ? styles.active : ''}`}>Армреслінг</Link>
+          <Link to="/hall-of-fame/armwrestling" className={`${styles.filterBtn} ${sport === 'armwrestling' ? styles.active : ''}`}>Армрестлінг</Link>
         </div>
 
         {(sport === 'chess' || sport === 'checkers') && (

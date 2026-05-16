@@ -51,7 +51,7 @@ export interface TournamentFormData {
   // Настільний теніс специфічні поля
   tournamentType: string;
   category: string;
-  // Армреслінг специфічні поля
+  // Армрестлінг специфічні поля
   armHand: string;
   armWeightClass: string;
   armCategory: string;
@@ -95,7 +95,7 @@ export const useTournamentForm = () => {
     // Настільний теніс та інші специфічні поля
     tournamentType: '',
     category: 'Men',
-    // Армреслінг специфічні поля
+    // Армрестлінг специфічні поля
     armHand: 'Right',
     armWeightClass: 'Under80kg',
     armCategory: 'Men',

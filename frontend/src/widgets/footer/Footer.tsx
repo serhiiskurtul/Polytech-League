@@ -13,7 +13,7 @@ const Footer = () => {
     { id: 'checkers', label: 'Шашки' },
     { id: 'table-tennis', label: 'Настільний теніс' },
     { id: 'badminton', label: 'Бадмінтон' },
-    { id: 'armwrestling', label: 'Армреслінг' },
+    { id: 'armwrestling', label: 'Армрестлінг' },
     { id: 'athletics', label: 'Легка атлетика' }
   ];
 

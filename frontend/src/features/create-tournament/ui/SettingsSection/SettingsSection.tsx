@@ -84,7 +84,7 @@ const SettingsSection = ({ formData, handleInputChange }: SettingsSectionProps) 
           )}
 
 
-          {/* Налаштування армреслінгу */}
+          {/* Налаштування армрестлінгу */}
           {formData.sport === 'armwrestling' && (
             <>
               <div className={shared.formGroup}>
