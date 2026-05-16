@@ -2239,16 +2239,18 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   <div style={{ textAlign: 'center', flex: 1 }}>
                     <div style={{ fontSize: '24px', fontWeight: 800, color: '#1e293b' }}>{selectedMatchForInfo.homeTeam?.name}</div>
                   </div>
-                  <div style={{ fontSize: '48px', fontWeight: 900, color: '#3b82f6', display: 'flex', gap: '20px', justifyContent: 'center' }}>
-                    <span>{selectedMatchForInfo.homeTeamScore ?? 0}</span>
-                    <span style={{ color: '#cbd5e1' }}>:</span>
-                    <span>{selectedMatchForInfo.awayTeamScore ?? 0}</span>
-                  </div>
-                  {selectedMatchForInfo.homePenaltyScore !== null && selectedMatchForInfo.awayPenaltyScore !== null && selectedMatchForInfo.homePenaltyScore !== undefined && selectedMatchForInfo.awayPenaltyScore !== undefined && (
-                    <div style={{ fontSize: '18px', fontWeight: 700, color: '#f59e0b', marginTop: '8px' }}>
-                      (пен. {selectedMatchForInfo.homePenaltyScore} : {selectedMatchForInfo.awayPenaltyScore})
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ fontSize: '48px', fontWeight: 900, color: '#3b82f6', display: 'flex', gap: '20px', justifyContent: 'center' }}>
+                      <span>{selectedMatchForInfo.homeTeamScore ?? 0}</span>
+                      <span style={{ color: '#cbd5e1' }}>:</span>
+                      <span>{selectedMatchForInfo.awayTeamScore ?? 0}</span>
                     </div>
-                  )}
+                    {selectedMatchForInfo.homePenaltyScore !== null && selectedMatchForInfo.awayPenaltyScore !== null && selectedMatchForInfo.homePenaltyScore !== undefined && selectedMatchForInfo.awayPenaltyScore !== undefined && (
+                      <div style={{ fontSize: '18px', fontWeight: 700, color: '#f59e0b', marginTop: '4px', textAlign: 'center' }}>
+                        (пен. {selectedMatchForInfo.homePenaltyScore} : {selectedMatchForInfo.awayPenaltyScore})
+                      </div>
+                    )}
+                  </div>
                   <div style={{ textAlign: 'center', flex: 1 }}>
                     <div style={{ fontSize: '24px', fontWeight: 800, color: '#1e293b' }}>{selectedMatchForInfo.awayTeam?.name}</div>
                   </div>
