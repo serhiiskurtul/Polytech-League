@@ -24,6 +24,7 @@ export interface CheckersEventParticipantResponse {
   rank: number;
   groupName?: string | null;
   status: RegistrationStatus;
+  boardRank?: number | null;
 }
 
 export interface CheckersGameResponse {
@@ -110,6 +111,7 @@ export interface CheckersEventParticipantDto {
     rank: number;
     groupName?: string;
     status: RegistrationStatus;
+    boardRank?: number;
 }
 
 export interface CheckersGameDto {

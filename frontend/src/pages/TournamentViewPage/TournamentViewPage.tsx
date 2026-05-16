@@ -223,7 +223,7 @@ const TournamentViewPage = () => {
   const [editingGameData, setEditingGameData] = useState<{ round: number; board: number; result: string; whitePlayerId: string; blackPlayerId: string, pgn: string }>({ round: 1, board: 1, result: 'WhiteWin', whitePlayerId: '', blackPlayerId: '', pgn: '' });
 
   const [editingParticipantId, setEditingParticipantId] = useState<number | null>(null);
-  const [editingParticipantData, setEditingParticipantData] = useState<{ points: number; rank: number; weight: number; rating?: number; status: RegistrationStatus; firstName: string; lastName: string; groupName: string }>({ points: 0, rank: 0, weight: 0, rating: 0, status: RegistrationStatus.Approved, firstName: '', lastName: '', groupName: '' });
+  const [editingParticipantData, setEditingParticipantData] = useState<{ points: number; rank: number; boardRank?: number; weight: number; rating?: number; status: RegistrationStatus; firstName: string; lastName: string; groupName: string }>({ points: 0, rank: 0, weight: 0, rating: 0, status: RegistrationStatus.Approved, firstName: '', lastName: '', groupName: '' });
   const [gameFilters, setGameFilters] = useState({ round: '', board: '', participant: '', result: '' });
   const [isImporting, setIsImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -665,6 +665,7 @@ const TournamentViewPage = () => {
     setEditingParticipantData({
       points: p.points || 0,
       rank: p.rank || 0,
+      boardRank: p.boardRank,
       weight: p.weight || 0,
       status: p.status || RegistrationStatus.Approved,
       firstName: p.firstName || '',
@@ -734,6 +735,7 @@ const TournamentViewPage = () => {
           playerId,
           points: editingParticipantData.points,
           rank: editingParticipantData.rank,
+          boardRank: editingParticipantData.boardRank,
           status: editingParticipantData.status,
           firstName: editingParticipantData.firstName,
           lastName: editingParticipantData.lastName,
@@ -775,6 +777,7 @@ const TournamentViewPage = () => {
           playerId,
           points: editingParticipantData.points,
           rank: editingParticipantData.rank,
+          boardRank: editingParticipantData.boardRank,
           status: editingParticipantData.status,
           firstName: editingParticipantData.firstName,
           lastName: editingParticipantData.lastName,
@@ -2013,6 +2016,9 @@ const TournamentViewPage = () => {
                             <thead>
                               <tr>
                                 <th>Місце</th>
+                                {(tournament?.sport?.toLowerCase() === 'chess' || tournament?.sport?.toLowerCase() === 'checkers') && details?.level !== 'CollegeGroup' && (
+                                  <th>Дошка</th>
+                                )}
                                 <th>Учасник</th>
                                 <th>Група</th>
                                 {isChess ? (
@@ -2035,6 +2041,11 @@ const TournamentViewPage = () => {
                                       <td>
                                         <input type="number" value={editingParticipantData.rank} onChange={(e) => setEditingParticipantData({ ...editingParticipantData, rank: parseInt(e.target.value) || 0 })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
                                       </td>
+                                      {(tournament?.sport?.toLowerCase() === 'chess' || tournament?.sport?.toLowerCase() === 'checkers') && details?.level !== 'CollegeGroup' && (
+                                        <td>
+                                          <input type="number" value={editingParticipantData.boardRank || ''} placeholder="Дошка" onChange={(e) => setEditingParticipantData({ ...editingParticipantData, boardRank: e.target.value ? parseInt(e.target.value) : undefined })} style={{ width: '60px', padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }} />
+                                        </td>
+                                      )}
                                       <td>
                                         {(tournament?.sport?.toLowerCase() === 'chess' || tournament?.sport?.toLowerCase() === 'checkers') ? (
                                           <div style={{ display: 'flex', gap: '4px' }}>
@@ -2100,6 +2111,9 @@ const TournamentViewPage = () => {
                                   ) : (
                                     <>
                                       <td>{p.rank || idx + 1}</td>
+                                      {(tournament?.sport?.toLowerCase() === 'chess' || tournament?.sport?.toLowerCase() === 'checkers') && details?.level !== 'CollegeGroup' && (
+                                        <td>{p.boardRank || '-'}</td>
+                                      )}
                                       <td>
                                         {p.playerId ? (
                                           !p.isGuest ? (
