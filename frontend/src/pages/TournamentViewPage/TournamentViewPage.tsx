@@ -1546,29 +1546,31 @@ const TournamentViewPage = () => {
                   </select>
                 </div>
 
-                <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
-                    <i className="fas fa-star" style={{ color: '#f59e0b' }}></i> Найкращий гравець (MVP)
-                  </label>
-                  <select
-                    value={winners.mvpId}
-                    onChange={(e) => setWinners({ ...winners, mvpId: Number(e.target.value) })}
-                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
-                  >
-                    <option key="default-mvp" value="0">-- Оберіть MVP --</option>
-                    {isTeamSport ? (
-                      details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
-                        <option key={`mvp-p-${p.id}`} value={p.id}>
-                          {p.firstName} {p.lastName} ({p.teamName})
-                        </option>
-                      ))
-                    ) : (
-                      sortedPlayers?.map((p: any) => (
-                        <option key={`mvp-p-${p.playerId}`} value={p.playerId}>{p.playerName}</option>
-                      ))
-                    )}
-                  </select>
-                </div>
+                {!['chess', 'checkers', 'athletics', 'table_tennis', 'tabletennis', 'badminton', 'beach_volleyball', 'beachvolleyball', 'armwrestling'].includes(tournament?.sport?.toLowerCase() || '') && (
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
+                      <i className="fas fa-star" style={{ color: '#f59e0b' }}></i> Найкращий гравець (MVP)
+                    </label>
+                    <select
+                      value={winners.mvpId}
+                      onChange={(e) => setWinners({ ...winners, mvpId: Number(e.target.value) })}
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                    >
+                      <option key="default-mvp" value="0">-- Оберіть MVP --</option>
+                      {isTeamSport ? (
+                        details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
+                          <option key={`mvp-p-${p.id}`} value={p.id}>
+                            {p.firstName} {p.lastName} ({p.teamName})
+                          </option>
+                        ))
+                      ) : (
+                        sortedPlayers?.map((p: any) => (
+                          <option key={`mvp-p-${p.playerId}`} value={p.playerId}>{p.playerName}</option>
+                        ))
+                      )}
+                    </select>
+                  </div>
+                )}
               </div>
 
 
@@ -1697,8 +1699,8 @@ const TournamentViewPage = () => {
                 firstPlace={details.firstPlace}
                 secondPlace={details.secondPlace}
                 thirdPlace={details.thirdPlace}
-                mvpId={details.mvpId}
-                mvpName={details.mvpName}
+                mvpId={['chess', 'checkers', 'athletics', 'table_tennis', 'tabletennis', 'badminton', 'beach_volleyball', 'beachvolleyball', 'armwrestling'].includes(tournament?.sport?.toLowerCase() || '') ? null : details.mvpId}
+                mvpName={['chess', 'checkers', 'athletics', 'table_tennis', 'tabletennis', 'badminton', 'beach_volleyball', 'beachvolleyball', 'armwrestling'].includes(tournament?.sport?.toLowerCase() || '') ? null : details.mvpName}
               />
 
             )}
