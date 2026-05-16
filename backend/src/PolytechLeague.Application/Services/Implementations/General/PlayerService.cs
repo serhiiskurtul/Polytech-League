@@ -568,7 +568,9 @@ public class PlayerService : IPlayerService
                         pts = 10;
                     } else pts = 10;
                     if (ach.Rank == 1) pts += 100; else if (ach.Rank == 2) pts += 50; else if (ach.Rank == 3) pts += 30;
-                    if (ach.BoardRank == 1) pts += 40; else if (ach.BoardRank == 2) pts += 25; else if (ach.BoardRank == 3) pts += 15;
+                    if (allEvents.TryGetValue(ach.TournamentId, out var eventLvl) && eventLvl != CompetitionLevel.CollegeGroup) {
+                        if (ach.BoardRank == 1) pts += 40; else if (ach.BoardRank == 2) pts += 25; else if (ach.BoardRank == 3) pts += 15;
+                    }
                     if (ach.Result == "MVP") pts += 15;
                     if (pts <= 0) continue;
                     var finalPts = (int)Math.Round(pts * mult);

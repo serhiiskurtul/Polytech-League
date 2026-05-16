@@ -91,6 +91,14 @@ public class ChessEventService :
 
     public async Task AddParticipantAsync(long eventId, PolytechLeague.Application.Dto.ChessDto.ChessEventParticipantDto dto, CancellationToken cancellationToken = default)
     {
+        var tournament = await _dbcontext.Set<ChessEvent>().FindAsync(new object[] { eventId }, cancellationToken)
+            ?? throw new EntityNotFoundException(nameof(ChessEvent), eventId);
+
+        if (tournament.Level == CompetitionLevel.CollegeGroup && dto.BoardRank.HasValue)
+        {
+            throw new InvalidOperationException("Individual board ranks are not allowed for college group tournaments.");
+        }
+
         var exists = await _dbcontext.Set<ChessEventParticipant>()
             .AnyAsync(p => p.TournamentId == eventId && p.PlayerId == dto.PlayerId, cancellationToken);
 
@@ -112,6 +120,7 @@ public class ChessEventService :
             PlayerId = dto.PlayerId,
             Points = dto.Points,
             Rank = dto.Rank,
+            BoardRank = dto.BoardRank,
             GroupName = dto.GroupName,
             Status = dto.Status
         };
@@ -136,6 +145,14 @@ public class ChessEventService :
 
     public async Task UpdateParticipantAsync(long eventId, long playerId, PolytechLeague.Application.Dto.ChessDto.ChessEventParticipantDto dto, CancellationToken cancellationToken = default)
     {
+        var tournament = await _dbcontext.Set<ChessEvent>().FindAsync(new object[] { eventId }, cancellationToken)
+            ?? throw new EntityNotFoundException(nameof(ChessEvent), eventId);
+
+        if (tournament.Level == CompetitionLevel.CollegeGroup && dto.BoardRank.HasValue)
+        {
+            throw new InvalidOperationException("Individual board ranks are not allowed for college group tournaments.");
+        }
+
         var participant = await _dbcontext.Set<ChessEventParticipant>()
             .Include(p => p.Player)
             .FirstOrDefaultAsync(p => p.TournamentId == eventId && p.PlayerId == playerId, cancellationToken);
@@ -145,6 +162,7 @@ public class ChessEventService :
             var oldStatus = participant.Status;
             participant.Points = dto.Points;
             participant.Rank = dto.Rank;
+            participant.BoardRank = dto.BoardRank;
             participant.Status = dto.Status;
             participant.GroupName = dto.GroupName;
 

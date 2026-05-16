@@ -95,6 +95,14 @@ public class CheckersEventService :
 
     public async Task AddParticipantAsync(long id, CheckersEventParticipantDto request, CancellationToken cancellationToken = default)
     {
+        var tournament = await _dbcontext.Set<CheckersEvent>().FindAsync(new object[] { id }, cancellationToken)
+            ?? throw new EntityNotFoundException(nameof(CheckersEvent), id);
+
+        if (tournament.Level == CompetitionLevel.CollegeGroup && request.BoardRank.HasValue)
+        {
+            throw new InvalidOperationException("Individual board ranks are not allowed for college group tournaments.");
+        }
+
         var exists = await _dbcontext.Set<CheckersEventParticipant>()
             .AnyAsync(p => p.TournamentId == id && p.PlayerId == request.PlayerId, cancellationToken);
         
@@ -124,6 +132,14 @@ public class CheckersEventService :
 
     public async Task UpdateParticipantAsync(long id, long playerId, CheckersEventParticipantDto request, CancellationToken cancellationToken = default)
     {
+        var tournament = await _dbcontext.Set<CheckersEvent>().FindAsync(new object[] { id }, cancellationToken)
+            ?? throw new EntityNotFoundException(nameof(CheckersEvent), id);
+
+        if (tournament.Level == CompetitionLevel.CollegeGroup && request.BoardRank.HasValue)
+        {
+            throw new InvalidOperationException("Individual board ranks are not allowed for college group tournaments.");
+        }
+
         var participant = await _dbcontext.Set<CheckersEventParticipant>()
             .Include(p => p.Player)
             .FirstOrDefaultAsync(p => p.TournamentId == id && p.PlayerId == playerId, cancellationToken);
@@ -133,6 +149,7 @@ public class CheckersEventService :
         var oldStatus = participant.Status;
         participant.Points = request.Points;
         participant.Rank = request.Rank;
+        participant.BoardRank = request.BoardRank;
         participant.Status = request.Status;
         participant.GroupName = request.GroupName;
 
