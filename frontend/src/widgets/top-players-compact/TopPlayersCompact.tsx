@@ -16,12 +16,12 @@ const TopPlayersCompact = () => {
   const sports = [
     { label: 'Всі', slug: 'all' },
     { label: 'Футбол', slug: 'football' },
-    { label: 'Баскетбол', slug: 'basketball-3x3' },
+    { label: 'Баскетбол', slug: 'basketball_3x3' },
     { label: 'Волейбол', slug: 'volleyball' },
     { label: 'Шахи', slug: 'chess' },
     { label: 'Шашки', slug: 'checkers' },
-    { label: 'Настільний теніс', slug: 'table-tennis' },
-    { label: 'Пляжний волейбол', slug: 'beach-volleyball' },
+    { label: 'Настільний теніс', slug: 'table_tennis' },
+    { label: 'Пляжний волейбол', slug: 'beach_volleyball' },
     { label: 'Бадмінтон', slug: 'badminton' },
     { label: 'Армрестлінг', slug: 'armwrestling' }
   ];
@@ -57,7 +57,13 @@ const TopPlayersCompact = () => {
 
     let filtered = players;
     if (slug !== 'all') {
-      filtered = players.filter(p => p.sports?.includes(slug));
+      filtered = players
+        .filter(p => p.sportStats?.some(s => s.sportType.toLowerCase() === slug.toLowerCase()))
+        .sort((a, b) => {
+          const aSport = a.sportStats?.find(s => s.sportType.toLowerCase() === slug.toLowerCase());
+          const bSport = b.sportStats?.find(s => s.sportType.toLowerCase() === slug.toLowerCase());
+          return (bSport?.performanceScore || 0) - (aSport?.performanceScore || 0);
+        });
     }
     return filtered.slice(0, 5);
   };
@@ -65,14 +71,14 @@ const TopPlayersCompact = () => {
   const getSportIcon = (sportSlug: string) => {
     const icons: Record<string, string> = {
       'football': 'fas fa-futbol',
-      'basketball-3x3': 'fas fa-basketball-ball',
+      'basketball_3x3': 'fas fa-basketball-ball',
       'volleyball': 'fas fa-volleyball-ball',
       'chess': 'fas fa-chess',
-      'table-tennis': 'fas fa-table-tennis',
+      'table_tennis': 'fas fa-table-tennis',
       'badminton': 'fas fa-feather-alt',
       'armwrestling': 'fas fa-fist-raised',
       'checkers': 'fas fa-chess-board',
-      'beach-volleyball': 'fas fa-umbrella-beach'
+      'beach_volleyball': 'fas fa-umbrella-beach'
     };
     return icons[sportSlug] || 'fas fa-trophy';
   };
@@ -143,7 +149,9 @@ const TopPlayersCompact = () => {
                 </div>
                 <div className={styles.playerRating}>
                   <div className={styles.ratingValue}>
-                    {player.performanceScore}
+                    {selectedSport === 'Всі' 
+                      ? player.performanceScore 
+                      : player.sportStats?.find(s => s.sportType.toLowerCase() === sports.find(sp => sp.label === selectedSport)?.slug.toLowerCase())?.performanceScore || 0}
                   </div>
                 </div>
               </div>
