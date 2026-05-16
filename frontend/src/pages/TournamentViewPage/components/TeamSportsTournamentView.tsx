@@ -611,7 +611,6 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
             whiteTeamId: parseInt(newMatchForm.homeTeamId),
             blackTeamId: parseInt(newMatchForm.awayTeamId),
             round: newMatchForm.stage === 'Фінал' ? 100 : (newMatchForm.stage.startsWith('Раунд') ? parseInt(newMatchForm.stage.replace('Раунд ', '')) : 1),
-            board: newMatchForm.board || 1,
             result: 'NotPlayed'
           };
           break;
@@ -1167,7 +1166,6 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                 <div key={match.id} className={styles.matchCard} onClick={() => { setSelectedMatchForInfo(match); setIsMatchInfoModalOpen(true); }} style={{ cursor: 'pointer' }}>
                   <div className={styles.matchStage}>
                     {match.stage || (match.round === 100 ? 'Фінал' : `Раунд ${match.round}`)}
-                    {sport === 'chess' && match.board && ` • Дошка ${match.board}`}
                   </div>
                   
                   <div className={styles.matchTeams}>
@@ -1446,7 +1444,51 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
               </>
             ) : (
               <div className={styles.standingsTable}>
-                {/* Regular Standing Table logic here if not GroupsPlayoff */}
+                <table className={styles.leagueTable}>
+                  <thead>
+                    <tr>
+                      <th title="Місце">#</th>
+                      <th title="Назва команди">Команда</th>
+                      <th title="Ігри">І</th>
+                      <th title="Виграші">В</th>
+                      <th title="Поразки">П</th>
+                      {(sport === 'chess' || sport === 'checkers') ? (
+                        <th title="Набрані очки">Очки (З-П)</th>
+                      ) : (
+                        <th title="Забиті - Пропущені">Сети (З-П)</th>
+                      )}
+                      <th title="Очки">Очки</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(standingsData || []).map((team: any) => (
+                      <tr key={team.id}>
+                        <td>{team.displayRank}</td>
+                        <td className={styles.tableName} onClick={() => { setEditingTeamId(team.id); setIsTeamRosterModalOpen(true); }} style={{ cursor: 'pointer' }}>
+                          {team.name}
+                        </td>
+                        <td>{team.gp}</td>
+                        <td>{team.w}</td>
+                        <td>{team.l}</td>
+                        <td>{team.gf} - {team.ga}</td>
+                        <td className={team.points > 0 ? styles.tablePointsHighlight : styles.tablePoints}>
+                          {isAdmin ? (
+                            <input 
+                              type="number" 
+                              min="0"
+                              className={styles.pointsInlineInput}
+                              defaultValue={team.points}
+                              onFocus={(e) => e.target.select()}
+                              onBlur={(e) => handleUpdateTeamPoints(team.id, parseInt(e.target.value) || 0)}
+                            />
+                          ) : (
+                            team.points
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
 
@@ -1694,19 +1736,6 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                     ))}
                   </select>
                 </div>
-
-                {sport === 'chess' && (
-                  <div className={styles.formGroup}>
-                    <label>Номер дошки</label>
-                    <input 
-                      type="number" 
-                      min="1" 
-                      style={{ padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
-                      value={newMatchForm.board}
-                      onChange={e => setNewMatchForm({...newMatchForm, board: parseInt(e.target.value) || 1})}
-                    />
-                  </div>
-                )}
 
                 <button className={styles.saveBtn} onClick={handleCreateMatch} style={{ marginTop: '10px' }}>
                   Створити матч

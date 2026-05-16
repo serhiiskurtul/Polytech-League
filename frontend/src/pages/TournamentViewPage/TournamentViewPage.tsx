@@ -235,7 +235,13 @@ const TournamentViewPage = () => {
     firstPlaceId: 0,
     secondPlaceId: 0,
     thirdPlaceId: 0,
-    mvpId: 0
+    mvpId: 0,
+    board1_1st: 0,
+    board1_2nd: 0,
+    board1_3rd: 0,
+    board2_1st: 0,
+    board2_2nd: 0,
+    board2_3rd: 0
   });
 
 
@@ -279,6 +285,46 @@ const TournamentViewPage = () => {
         if (['football', 'badminton', 'basketball_3x3', 'basketball3x3'].includes(sportKey)) {
           payload.tournamentType = (details as any).tournamentType || 'RoundRobin';
         }
+
+        // Update Board Ranks for Chess/Checkers
+        if (['chess', 'checkers'].includes(sportKey)) {
+          // 1. Clear boardRank for all participants in this tournament
+          for (const p of (details as any).participants || []) {
+            if (p.boardRank) {
+              const pPayload = { ...p, boardRank: null };
+              if (sportKey === 'checkers') {
+                await updateParticipantInCheckersEvent(id!, p.playerId, pPayload);
+              } else {
+                await updateParticipantInEvent(id!, p.playerId, pPayload);
+              }
+            }
+          }
+
+          // 2. Set new board ranks
+          const boardUpdates = [
+            { playerId: winners.board1_1st, rank: 1 },
+            { playerId: winners.board1_2nd, rank: 2 },
+            { playerId: winners.board1_3rd, rank: 3 },
+            { playerId: winners.board2_1st, rank: 1 },
+            { playerId: winners.board2_2nd, rank: 2 },
+            { playerId: winners.board2_3rd, rank: 3 },
+          ];
+
+          for (const update of boardUpdates) {
+            if (update.playerId && update.playerId !== 0) {
+              const participant = (details as any).participants?.find((p: any) => p.playerId === update.playerId);
+              if (participant) {
+                const pPayload = { ...participant, boardRank: update.rank };
+                if (sportKey === 'checkers') {
+                  await updateParticipantInCheckersEvent(id!, update.playerId, pPayload);
+                } else {
+                  await updateParticipantInEvent(id!, update.playerId, pPayload);
+                }
+              }
+            }
+          }
+        }
+      }
         if (['volleyball', 'beach_volleyball'].includes(sportKey)) {
           payload.setsToWin = (details as any).setsToWin || 2;
         }
@@ -503,11 +549,21 @@ const TournamentViewPage = () => {
         mvpId: details.mvpId || null
       } as any);
       
+      const board1_participants = (details as any).participants?.filter((p: any) => p.boardRank === 1) || [];
+      const board2_participants = (details as any).participants?.filter((p: any) => p.boardRank === 2) || [];
+      const board3_participants = (details as any).participants?.filter((p: any) => p.boardRank === 3) || [];
+
       setWinners({
         firstPlaceId: details.isTeam ? (details.firstPlaceTeam?.id || 0) : (details.firstPlace?.id || 0),
         secondPlaceId: details.isTeam ? (details.secondPlaceTeam?.id || 0) : (details.secondPlace?.id || 0),
         thirdPlaceId: details.isTeam ? (details.thirdPlaceTeam?.id || 0) : (details.thirdPlace?.id || 0),
-        mvpId: details.mvpId || 0
+        mvpId: details.mvpId || 0,
+        board1_1st: board1_participants[0]?.playerId || 0,
+        board2_1st: board1_participants[1]?.playerId || 0,
+        board1_2nd: board2_participants[0]?.playerId || 0,
+        board2_2nd: board2_participants[1]?.playerId || 0,
+        board1_3rd: board3_participants[0]?.playerId || 0,
+        board2_3rd: board3_participants[1]?.playerId || 0
       });
 
       setIsEditingTournament(true);
@@ -1573,6 +1629,86 @@ const TournamentViewPage = () => {
                       )}
                     </select>
                   </div>
+                )}
+
+                {['chess', 'checkers'].includes(tournament?.sport?.toLowerCase() || '') && (
+                  <>
+                    <div style={{ marginTop: '16px' }}>
+                      <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
+                        <i className="fas fa-medal" style={{ color: '#f59e0b' }}></i> Кращі на 1 дошці
+                      </label>
+                      <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                        <select
+                          value={winners.board1_1st || 0}
+                          onChange={(e) => setWinners({ ...winners, board1_1st: Number(e.target.value) })}
+                          style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                        >
+                          <option value="0">1 місце (Дошка 1)</option>
+                          {details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
+                            <option key={`b1-1-${p.id}`} value={p.id}>{p.firstName} {p.lastName} ({p.teamName})</option>
+                          ))}
+                        </select>
+                        <select
+                          value={winners.board1_2nd || 0}
+                          onChange={(e) => setWinners({ ...winners, board1_2nd: Number(e.target.value) })}
+                          style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                        >
+                          <option value="0">2 місце (Дошка 1)</option>
+                          {details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
+                            <option key={`b1-2-${p.id}`} value={p.id}>{p.firstName} {p.lastName} ({p.teamName})</option>
+                          ))}
+                        </select>
+                        <select
+                          value={winners.board1_3rd || 0}
+                          onChange={(e) => setWinners({ ...winners, board1_3rd: Number(e.target.value) })}
+                          style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                        >
+                          <option value="0">3 місце (Дошка 1)</option>
+                          {details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
+                            <option key={`b1-3-${p.id}`} value={p.id}>{p.firstName} {p.lastName} ({p.teamName})</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div style={{ marginTop: '16px' }}>
+                      <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
+                        <i className="fas fa-medal" style={{ color: '#f59e0b' }}></i> Кращі на 2 дошці
+                      </label>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <select
+                          value={winners.board2_1st || 0}
+                          onChange={(e) => setWinners({ ...winners, board2_1st: Number(e.target.value) })}
+                          style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                        >
+                          <option value="0">1 місце (Дошка 2)</option>
+                          {details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
+                            <option key={`b2-1-${p.id}`} value={p.id}>{p.firstName} {p.lastName} ({p.teamName})</option>
+                          ))}
+                        </select>
+                        <select
+                          value={winners.board2_2nd || 0}
+                          onChange={(e) => setWinners({ ...winners, board2_2nd: Number(e.target.value) })}
+                          style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                        >
+                          <option value="0">2 місце (Дошка 2)</option>
+                          {details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
+                            <option key={`b2-2-${p.id}`} value={p.id}>{p.firstName} {p.lastName} ({p.teamName})</option>
+                          ))}
+                        </select>
+                        <select
+                          value={winners.board2_3rd || 0}
+                          onChange={(e) => setWinners({ ...winners, board2_3rd: Number(e.target.value) })}
+                          style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                        >
+                          <option value="0">3 місце (Дошка 2)</option>
+                          {details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
+                            <option key={`b2-3-${p.id}`} value={p.id}>{p.firstName} {p.lastName} ({p.teamName})</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
 
