@@ -410,7 +410,11 @@ public class SeasonRatingService : ISeasonRatingService
                 var loadedSports = System.Text.Json.JsonSerializer.Deserialize<List<string>>(season.NationalRatingSports);
                 if (loadedSports != null)
                 {
-                    sports = loadedSports.Select(s => s == "Армреслінг" ? "Армрестлінг" : s).ToList();
+                    sports = loadedSports
+                        .Select(s => s == "Армреслінг" ? "Армрестлінг" : s)
+                        .Select(s => s == "Футзал" ? "Футбол" : s)
+                        .Distinct()
+                        .ToList();
                 }
             } catch { /* Use all sports if JSON is invalid */ }
         }
@@ -435,8 +439,9 @@ public class SeasonRatingService : ISeasonRatingService
                         {
                             foreach (var kvp in manualSportResults)
                             {
-                                //map legacy armwrestling key to correct spelling for standings
+                                //map legacy keys to correct spelling for standings
                                 string key = kvp.Key == "Армреслінг" ? "Армрестлінг" : kvp.Key;
+                                key = key == "Футзал" ? "Футбол" : key;
                                 if (sports.Contains(key))
                                 {
                                     sportResults[key] = new SportResultDto { Rank = kvp.Value, Points = 0 };
@@ -536,7 +541,11 @@ public class SeasonRatingService : ISeasonRatingService
                 var loadedSports = System.Text.Json.JsonSerializer.Deserialize<List<string>>(season.RegionalRatingSports);
                 if (loadedSports != null)
                 {
-                    sports = loadedSports.Select(s => s == "Армреслінг" ? "Армрестлінг" : s).ToList();
+                    sports = loadedSports
+                        .Select(s => s == "Армреслінг" ? "Армрестлінг" : s)
+                        .Select(s => s == "Футзал" ? "Футбол" : s)
+                        .Distinct()
+                        .ToList();
                 }
             } catch { /* Use all sports if JSON is invalid */ }
         }
@@ -562,6 +571,7 @@ public class SeasonRatingService : ISeasonRatingService
                             foreach (var kvp in manualSportResults)
                             {
                                 string key = kvp.Key == "Армреслінг" ? "Армрестлінг" : kvp.Key;
+                                key = key == "Футзал" ? "Футбол" : key;
                                 if (sports.Contains(key))
                                 {
                                     sportResults[key] = new SportResultDto { Rank = kvp.Value, Points = 0 };
