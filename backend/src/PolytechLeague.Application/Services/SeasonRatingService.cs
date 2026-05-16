@@ -204,7 +204,6 @@ public class SeasonRatingService : ISeasonRatingService
             }
 
             var armOrderedRows = rows
-                .Where(r => groupHasParticipated[r.GroupName])
                 .OrderBy(r => groupArmSums[r.GroupName])
                 .ToList();
 
