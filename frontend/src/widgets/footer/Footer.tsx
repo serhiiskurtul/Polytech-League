@@ -6,7 +6,7 @@ const Footer = () => {
 
   const sports = [
     { id: 'football', label: 'Футбол' },
-    { id: 'basketball-3x3', label: 'Баскетбол 3х3' },
+    { id: 'basketball-3x3', label: 'Баскетбол' },
     { id: 'volleyball', label: 'Волейбол' },
     { id: 'beach-volleyball', label: 'Пляжний волейбол' },
     { id: 'chess', label: 'Шахи' },

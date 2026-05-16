@@ -1,21 +1,21 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PolytechLeague.Application.Dto.Basketball3x3Dto;
-using PolytechLeague.Application.Services.Interfaces.Basketball3x3;
+using PolytechLeague.Application.Dto.BasketballDto;
+using PolytechLeague.Application.Services.Interfaces.Basketball;
 using PolytechLeague.Infrastructure.Redis;
 
-namespace PolytechLeague.API.Controllers.Basketball3x3;
+namespace PolytechLeague.API.Controllers.Basketball;
 
 [ApiController]
 [Route("api/basketball3x3-teams")]
-public class Basketball3x3TeamsController(
-    IBasketball3x3TeamService basketball3x3TeamService,
+public class BasketballTeamsController(
+    IBasketballTeamService basketball3x3TeamService,
     IRedisService redisService) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
-        var cached = await redisService.GetDataAsync<IEnumerable<Basketball3x3TeamResponse>>("basketball3x3_teams_all");
+        var cached = await redisService.GetDataAsync<IEnumerable<BasketballTeamResponse>>("basketball3x3_teams_all");
         if (cached != null) return Ok(cached);
 
         var entities = await basketball3x3TeamService.GetAllAsync(cancellationToken: cancellationToken);
@@ -35,7 +35,7 @@ public class Basketball3x3TeamsController(
     [Authorize(Policy = "Admin")]
     [HttpPost]
     public async Task<IActionResult> Create(
-        [FromBody] Basketball3x3TeamRequest request,
+        [FromBody] BasketballTeamRequest request,
         CancellationToken cancellationToken)
     {
         var entity = request.FromRequest();
@@ -51,7 +51,7 @@ public class Basketball3x3TeamsController(
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(
         long id,
-        [FromBody] Basketball3x3TeamRequest request,
+        [FromBody] BasketballTeamRequest request,
         CancellationToken cancellationToken)
     {
         var entity = request.FromRequest();

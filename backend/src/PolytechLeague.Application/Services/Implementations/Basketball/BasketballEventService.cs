@@ -1,6 +1,6 @@
-using PolytechLeague.Domain.Entities.Basketball3x3;
+using PolytechLeague.Domain.Entities.Basketball;
 using Microsoft.Extensions.Logging;
-using PolytechLeague.Application.Services.Interfaces.Basketball3x3;
+using PolytechLeague.Application.Services.Interfaces.Basketball;
 using PolytechLeague.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
 using PolytechLeague.Application.Services.Interfaces;
@@ -9,17 +9,17 @@ using PolytechLeague.Domain.Exceptions;
 using PolytechLeague.Domain.Entities.Shared;
 using PolytechLeague.Domain.Entities.Enums;
 
-namespace PolytechLeague.Application.Services.Implementations.Basketball3x3;
+namespace PolytechLeague.Application.Services.Implementations.Basketball;
 
-public class Basketball3x3EventService(
+public class BasketballEventService(
     ApplicationDbContext _dbcontext,
-    ILogger<AbstractEntityService<Basketball3x3Event>> _logger,
+    ILogger<AbstractEntityService<BasketballEvent>> _logger,
     INotificationService _notificationService
 ) :
-    AbstractEntityService<Basketball3x3Event>(_dbcontext, _logger, _notificationService),
-    IBasketball3x3EventService
+    AbstractEntityService<BasketballEvent>(_dbcontext, _logger, _notificationService),
+    IBasketballEventService
 {
-    protected override void UpdateValues(Basketball3x3Event oldEntity, Basketball3x3Event newEntity)
+    protected override void UpdateValues(BasketballEvent oldEntity, BasketballEvent newEntity)
     {
         oldEntity.Name = newEntity.Name;
         oldEntity.Date = newEntity.Date;
@@ -47,9 +47,9 @@ public class Basketball3x3EventService(
 
     }
 
-    public override async Task<Basketball3x3Event> GetByIdAsync(long id, CancellationToken cancellationToken = default)
+    public override async Task<BasketballEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)
     {
-        var entity = await _dbcontext.Basketball3x3Events
+        var entity = await _dbcontext.BasketballEvents
             .Include(e => e.Participants!)
                 .ThenInclude(p => p.Player)
             .Include(e => e.Teams!)
@@ -72,13 +72,13 @@ public class Basketball3x3EventService(
 
         if (entity is null)
         {
-            throw new PolytechLeague.Domain.Exceptions.EntityNotFoundException(nameof(Basketball3x3Event), id);
+            throw new PolytechLeague.Domain.Exceptions.EntityNotFoundException(nameof(BasketballEvent), id);
         }
 
         return entity;
     }
 
-    protected override async Task OnCreatedAsync(Basketball3x3Event entity, CancellationToken cancellationToken)
+    protected override async Task OnCreatedAsync(BasketballEvent entity, CancellationToken cancellationToken)
     {
         if (_notificationService != null)
         {
@@ -92,10 +92,10 @@ public class Basketball3x3EventService(
         }
     }
 
-    protected override async Task OnUpdatedAsync(Basketball3x3Event oldEntity, Basketball3x3Event newEntity, CancellationToken cancellationToken)
+    protected override async Task OnUpdatedAsync(BasketballEvent oldEntity, BasketballEvent newEntity, CancellationToken cancellationToken)
     {
         // Update ranks for teams based on winners
-        var eventWithTeams = await _dbcontext.Basketball3x3Events
+        var eventWithTeams = await _dbcontext.BasketballEvents
             .Include(e => e.Teams)
             .FirstOrDefaultAsync(e => e.Id == newEntity.Id, cancellationToken);
 
@@ -128,12 +128,12 @@ public class Basketball3x3EventService(
 
     public async Task RegisterPlayerAsync(long eventId, long playerId, CancellationToken cancellationToken = default)
     {
-        var tournament = await _dbcontext.Basketball3x3Events
+        var tournament = await _dbcontext.BasketballEvents
             .Include(e => e.Teams!)
             .ThenInclude(t => t.Players)
             .FirstOrDefaultAsync(e => e.Id == eventId, cancellationToken);
 
-        if (tournament == null) throw new PolytechLeague.Domain.Exceptions.EntityNotFoundException(nameof(Basketball3x3Event), eventId);
+        if (tournament == null) throw new PolytechLeague.Domain.Exceptions.EntityNotFoundException(nameof(BasketballEvent), eventId);
 
         if (tournament.Level != CompetitionLevel.CollegeGroup)
         {
@@ -171,8 +171,8 @@ public class Basketball3x3EventService(
             throw new InvalidOperationException("Player must have a group to register for inter-group competitions.");
         }
 
-        tournament.Teams ??= new List<Basketball3x3Team>();
-        tournament.Participants ??= new List<Basketball3x3EventParticipant>();
+        tournament.Teams ??= new List<BasketballTeam>();
+        tournament.Participants ??= new List<BasketballEventParticipant>();
 
         // Check if player is already registered as a participant
         var existingParticipant = tournament.Participants.FirstOrDefault(p => p.PlayerId == playerId);
@@ -180,7 +180,7 @@ public class Basketball3x3EventService(
 
         var status = tournament.IsModerated ? RegistrationStatus.Pending : RegistrationStatus.Approved;
 
-        var participant = new Basketball3x3EventParticipant
+        var participant = new BasketballEventParticipant
         {
             EventId = eventId,
             PlayerId = playerId,
@@ -197,7 +197,7 @@ public class Basketball3x3EventService(
                 var team = tournament.Teams.FirstOrDefault(t => t.Name == groupName);
                 if (team == null)
                 {
-                    team = new Basketball3x3Team
+                    team = new BasketballTeam
                     {
                         Name = groupName,
                         EventId = eventId,
@@ -238,7 +238,7 @@ public class Basketball3x3EventService(
 
     public async Task ApproveParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken = default)
     {
-        var tournament = await _dbcontext.Basketball3x3Events
+        var tournament = await _dbcontext.BasketballEvents
             .Include(e => e.Participants!)
             .Include(e => e.Teams!)
             .ThenInclude(t => t.Players)
@@ -260,7 +260,7 @@ public class Basketball3x3EventService(
                 var team = tournament.Teams?.FirstOrDefault(t => t.Name == groupName);
                 if (team == null)
                 {
-                    team = new Basketball3x3Team
+                    team = new BasketballTeam
                     {
                         Name = groupName,
                         EventId = eventId,
@@ -293,10 +293,10 @@ public class Basketball3x3EventService(
 
     public async Task RejectParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken = default)
     {
-        var participant = await _dbcontext.Basketball3x3EventParticipants
+        var participant = await _dbcontext.BasketballEventParticipants
             .FirstOrDefaultAsync(p => p.EventId == eventId && p.PlayerId == playerId, cancellationToken);
 
-        var tournament = await _dbcontext.Basketball3x3Events.FindAsync(eventId);
+        var tournament = await _dbcontext.BasketballEvents.FindAsync(eventId);
 
         if (participant != null)
         {
@@ -319,15 +319,15 @@ public class Basketball3x3EventService(
 
     public async Task RemoveParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken = default)
     {
-        var participant = await _dbcontext.Basketball3x3EventParticipants
+        var participant = await _dbcontext.BasketballEventParticipants
             .FirstOrDefaultAsync(p => p.EventId == eventId && p.PlayerId == playerId, cancellationToken);
 
         if (participant != null)
         {
-            _dbcontext.Basketball3x3EventParticipants.Remove(participant);
+            _dbcontext.BasketballEventParticipants.Remove(participant);
 
             // Also remove from team if exists
-            var teamWithPlayer = await _dbcontext.Basketball3x3Teams
+            var teamWithPlayer = await _dbcontext.BasketballTeams
                 .Include(t => t.Players)
                 .FirstOrDefaultAsync(t => t.EventId == eventId && t.Players!.Any(p => p.Id == playerId), cancellationToken);
 
@@ -349,11 +349,11 @@ public class Basketball3x3EventService(
             cancellationToken);
 
         // 1. Fetch event
-        var entity = await _dbcontext.Basketball3x3Events
+        var entity = await _dbcontext.BasketballEvents
             .Include(e => e.Matches)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 
-        if (entity == null) throw new EntityNotFoundException(nameof(Basketball3x3Event), id);
+        if (entity == null) throw new EntityNotFoundException(nameof(BasketballEvent), id);
 
         // 2. Clear winners
         entity.FirstPlaceTeamId = null;
@@ -364,12 +364,12 @@ public class Basketball3x3EventService(
         // 3. Delete matches
         if (entity.Matches != null && entity.Matches.Any())
         {
-            _dbcontext.Basketball3x3Matches.RemoveRange(entity.Matches);
+            _dbcontext.BasketballMatches.RemoveRange(entity.Matches);
             await _dbcontext.SaveChangesAsync(cancellationToken);
         }
 
         // 4. Delete event
-        _dbcontext.Basketball3x3Events.Remove(entity);
+        _dbcontext.BasketballEvents.Remove(entity);
         await _dbcontext.SaveChangesAsync(cancellationToken);
     }
 }

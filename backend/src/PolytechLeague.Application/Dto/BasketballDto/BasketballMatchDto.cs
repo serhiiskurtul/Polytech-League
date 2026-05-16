@@ -1,9 +1,9 @@
 using PolytechLeague.Application.Dto.GeneralDto;
-using PolytechLeague.Domain.Entities.Basketball3x3;
+using PolytechLeague.Domain.Entities.Basketball;
 
-namespace PolytechLeague.Application.Dto.Basketball3x3Dto;
+namespace PolytechLeague.Application.Dto.BasketballDto;
 
-public class Basketball3x3MatchRequest
+public class BasketballMatchRequest
 {
     public long EventId { get; set; }
     public long HomeTeamId { get; set; }
@@ -16,23 +16,23 @@ public class Basketball3x3MatchRequest
     public ICollection<long>? AwayRosterIds { get; set; }
 }
 
-public class Basketball3x3MatchResponse
+public class BasketballMatchResponse
 {
     public long Id { get; set; }
     public long EventId { get; set; }
-    public Basketball3x3EventResponse? Event { get; set; }
+    public BasketballEventResponse? Event { get; set; }
     
     public long HomeTeamId { get; set; }
-    public Basketball3x3TeamResponse? HomeTeam { get; set; }
+    public BasketballTeamResponse? HomeTeam { get; set; }
     
     public long AwayTeamId { get; set; }
-    public Basketball3x3TeamResponse? AwayTeam { get; set; }
+    public BasketballTeamResponse? AwayTeam { get; set; }
     
     public int? HomeTeamScore { get; set; }
     public int? AwayTeamScore { get; set; }
     
     public long? WinnerTeamId { get; set; }
-    public Basketball3x3TeamResponse? WinnerTeam { get; set; }
+    public BasketballTeamResponse? WinnerTeam { get; set; }
     
     public string? Stage { get; set; }
     
@@ -40,11 +40,11 @@ public class Basketball3x3MatchResponse
     public ICollection<PlayerDto>? AwayRoster { get; set; }
 }
 
-public static class Basketball3x3MatchDtoExtensions
+public static class BasketballMatchDtoExtensions
 {
-    public static Basketball3x3Match FromRequest(this Basketball3x3MatchRequest request)
+    public static BasketballMatch FromRequest(this BasketballMatchRequest request)
     {
-        return new Basketball3x3Match
+        return new BasketballMatch
         {
             EventId = request.EventId,
             HomeTeamId = request.HomeTeamId,
@@ -58,9 +58,9 @@ public static class Basketball3x3MatchDtoExtensions
         };
     }
 
-    public static Basketball3x3MatchResponse ToResponse(this Basketball3x3Match entity)
+    public static BasketballMatchResponse ToResponse(this BasketballMatch entity)
     {
-        return new Basketball3x3MatchResponse
+        return new BasketballMatchResponse
         {
             Id = entity.Id,
             EventId = entity.EventId,

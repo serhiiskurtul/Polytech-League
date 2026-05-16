@@ -956,7 +956,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       case 'basketball_3x3':
       case 'basketball3x3':
       case 'basketball-3x3':
-      case 'баскетбол_3х3': return 'Баскетбол 3х3';
+      case 'баскетбол_3х3': return 'Баскетбол';
       case 'badminton':
       case 'бадмінтон': return 'Бадмінтон';
       case 'chess':

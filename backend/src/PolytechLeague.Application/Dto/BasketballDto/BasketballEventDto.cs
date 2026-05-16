@@ -1,12 +1,12 @@
 using System.Text.Json.Serialization;
 using PolytechLeague.Domain.Entities;
-using PolytechLeague.Domain.Entities.Basketball3x3;
-using PolytechLeague.Domain.Entities.Basketball3x3.Enums;
+using PolytechLeague.Domain.Entities.Basketball;
+using PolytechLeague.Domain.Entities.Basketball.Enums;
 using PolytechLeague.Domain.Entities.Shared;
 
-namespace PolytechLeague.Application.Dto.Basketball3x3Dto;
+namespace PolytechLeague.Application.Dto.BasketballDto;
 
-public class Basketball3x3EventRequest
+public class BasketballEventRequest
 {
     public required string Name { get; set; }
     public required DateTime Date { get; set; }
@@ -17,7 +17,7 @@ public class Basketball3x3EventRequest
     public required CompetitionLevel Level { get; set; }
     
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public Basketball3x3TournamentType? TournamentType { get; set; }
+    public BasketballTournamentType? TournamentType { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public EventCategory Category { get; set; } = EventCategory.Mixed;
@@ -44,7 +44,7 @@ public class Basketball3x3EventRequest
 }
 
 
-public class Basketball3x3EventResponse
+public class BasketballEventResponse
 {
     public long Id { get; set; }
     public required string Name { get; set; }
@@ -58,7 +58,7 @@ public class Basketball3x3EventResponse
     public required CompetitionLevel Level { get; set; }
     
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public Basketball3x3TournamentType? TournamentType { get; set; }
+    public BasketballTournamentType? TournamentType { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public EventCategory Category { get; set; }
@@ -71,12 +71,12 @@ public class Basketball3x3EventResponse
     public string? Referees { get; set; }
     public string? Schedule { get; set; }
 
-    public Basketball3x3TeamResponse? FirstPlaceTeam { get; set; }
-    public Basketball3x3TeamResponse? SecondPlaceTeam { get; set; }
-    public Basketball3x3TeamResponse? ThirdPlaceTeam { get; set; }
-    public ICollection<Basketball3x3TeamResponse>? Teams { get; set; }
-    public ICollection<Basketball3x3MatchResponse>? Matches { get; set; }
-    public ICollection<Basketball3x3EventParticipantDto>? Participants { get; set; }
+    public BasketballTeamResponse? FirstPlaceTeam { get; set; }
+    public BasketballTeamResponse? SecondPlaceTeam { get; set; }
+    public BasketballTeamResponse? ThirdPlaceTeam { get; set; }
+    public ICollection<BasketballTeamResponse>? Teams { get; set; }
+    public ICollection<BasketballMatchResponse>? Matches { get; set; }
+    public ICollection<BasketballEventParticipantDto>? Participants { get; set; }
     public long? SeasonId { get; set; }
     public bool IsModerated { get; set; }
     public bool IsPublic { get; set; }
@@ -86,7 +86,7 @@ public class Basketball3x3EventResponse
 }
 
 
-public class Basketball3x3EventParticipantDto
+public class BasketballEventParticipantDto
 {
     public long PlayerId { get; set; }
     public string? PlayerName { get; set; }
@@ -96,11 +96,11 @@ public class Basketball3x3EventParticipantDto
     public RegistrationStatus Status { get; set; }
 }
 
-public static class Basketball3x3EventDtoExtensions
+public static class BasketballEventDtoExtensions
 {
-    public static Basketball3x3Event FromRequest(this Basketball3x3EventRequest request)
+    public static BasketballEvent FromRequest(this BasketballEventRequest request)
     {
-        return new Basketball3x3Event
+        return new BasketballEvent
         {
             Name = request.Name,
             Date = request.Date,
@@ -130,9 +130,9 @@ public static class Basketball3x3EventDtoExtensions
     }
 
 
-    public static Basketball3x3EventResponse ToResponse(this Basketball3x3Event entity)
+    public static BasketballEventResponse ToResponse(this BasketballEvent entity)
     {
-        return new Basketball3x3EventResponse
+        return new BasketballEventResponse
         {
             Id = entity.Id,
             Name = entity.Name,
@@ -154,7 +154,7 @@ public static class Basketball3x3EventDtoExtensions
             ThirdPlaceTeam = entity.ThirdPlaceTeam?.ToResponse(),
             Teams = entity.Teams?.Select(t => t.ToResponse()).ToList(),
             Matches = entity.Matches?.Select(m => m.ToResponse()).ToList(),
-            Participants = entity.Participants?.Select(p => new Basketball3x3EventParticipantDto
+            Participants = entity.Participants?.Select(p => new BasketballEventParticipantDto
             {
                 PlayerId = p.PlayerId,
                 PlayerName = p.Player != null ? $"{p.Player.FirstName} {p.Player.LastName}" : null,

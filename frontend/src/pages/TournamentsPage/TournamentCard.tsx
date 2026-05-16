@@ -58,7 +58,7 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
   // Назви видів спорту
   const sportNames: Record<string, string> = {
     'football': 'Футбол',
-    'basketball-3x3': 'Баскетбол 3х3',
+    'basketball-3x3': 'Баскетбол',
     'volleyball': 'Волейбол',
     'chess': 'Шахи',
     'checkers': 'Шашки',

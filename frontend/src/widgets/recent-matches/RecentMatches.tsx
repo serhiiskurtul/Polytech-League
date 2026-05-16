@@ -14,7 +14,6 @@ const RecentMatches = () => {
     'Всі': 'all',
     'Футбол': 'football',
     'Баскетбол': 'basketball-3x3',
-    'Баскетбол 3х3': 'basketball-3x3',
     'Волейбол': 'volleyball',
     'Настільний теніс': 'table-tennis',
     'Шахи': 'chess',
@@ -26,7 +25,7 @@ const RecentMatches = () => {
 
   const reverseSportMap: Record<string, string> = {
     'football': 'Футбол',
-    'basketball-3x3': 'Баскетбол 3х3',
+    'basketball-3x3': 'Баскетбол',
     'volleyball': 'Волейбол',
     'table-tennis': 'Настільний теніс',
     'chess': 'Шахи',
@@ -80,7 +79,6 @@ const RecentMatches = () => {
     const icons: Record<string, string> = {
       'Футбол': 'fas fa-futbol',
       'Баскетбол': 'fas fa-basketball-ball',
-      'Баскетбол 3х3': 'fas fa-basketball-ball',
       'Волейбол': 'fas fa-volleyball-ball',
       'Настільний теніс': 'fas fa-table-tennis',
       'Шахи': 'fas fa-chess',

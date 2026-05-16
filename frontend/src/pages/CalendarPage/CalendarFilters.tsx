@@ -13,7 +13,7 @@ const CalendarFilters = ({ activeFilter, onFilterChange }: CalendarFiltersProps)
   const filters: Filter[] = [
     { id: 'all', label: 'Всі види спорту', icon: 'fas fa-filter' },
     { id: 'football', label: 'Футбол', icon: 'fas fa-futbol' },
-    { id: 'basketball-3x3', label: 'Баскетбол 3х3', icon: 'fas fa-basketball-ball' },
+    { id: 'basketball-3x3', label: 'Баскетбол', icon: 'fas fa-basketball-ball' },
     { id: 'volleyball', label: 'Волейбол', icon: 'fas fa-volleyball-ball' },
     { id: 'beach-volleyball', label: 'Пляжний волейбол', icon: 'fas fa-umbrella-beach' },
     { id: 'chess', label: 'Шахи', icon: 'fas fa-chess' },

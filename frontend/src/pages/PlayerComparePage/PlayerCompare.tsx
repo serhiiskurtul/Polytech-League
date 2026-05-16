@@ -655,7 +655,7 @@ const translateSport = (sport: string) => {
     checkers: 'Шашки',
     football: 'Футбол',
     volleyball: 'Волейбол',
-    basketball_3x3: 'Баскетбол 3х3',
+    basketball_3x3: 'Баскетбол',
     table_tennis: 'Настільний теніс',
     armwrestling: 'Армрестлінг',
     badminton: 'Бадмінтон',

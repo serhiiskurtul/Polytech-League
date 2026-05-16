@@ -1,27 +1,27 @@
 using PolytechLeague.Application.Dto.GeneralDto;
-using PolytechLeague.Domain.Entities.Basketball3x3;
+using PolytechLeague.Domain.Entities.Basketball;
 
-namespace PolytechLeague.Application.Dto.Basketball3x3Dto;
+namespace PolytechLeague.Application.Dto.BasketballDto;
 
-public class Basketball3x3TeamRequest
+public class BasketballTeamRequest
 {
     public required string Name { get; set; }
     public long EventId { get; set; }
     public ICollection<long>? PlayerIds { get; set; }
 }
 
-public class Basketball3x3TeamResponse
+public class BasketballTeamResponse
 {
     public long Id { get; set; }
     public required string Name { get; set; }
     public ICollection<PlayerDto>? Players { get; set; }
 }
 
-public static class Basketball3x3TeamDtoExtensions
+public static class BasketballTeamDtoExtensions
 {
-    public static Basketball3x3Team FromRequest(this Basketball3x3TeamRequest request)
+    public static BasketballTeam FromRequest(this BasketballTeamRequest request)
     {
-        return new Basketball3x3Team
+        return new BasketballTeam
         {
             Name = request.Name,
             EventId = request.EventId,
@@ -29,9 +29,9 @@ public static class Basketball3x3TeamDtoExtensions
         };
     }
 
-    public static Basketball3x3TeamResponse ToResponse(this Basketball3x3Team entity)
+    public static BasketballTeamResponse ToResponse(this BasketballTeam entity)
     {
-        return new Basketball3x3TeamResponse
+        return new BasketballTeamResponse
         {
             Id = entity.Id,
             Name = entity.Name,

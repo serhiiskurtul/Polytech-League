@@ -24,7 +24,7 @@ public class SeasonRatingService : ISeasonRatingService
         { 
             "Шахи", "Шашки", "Футбол", "Армрестлінг", 
             "Настільний теніс", "Бадмінтон", "Волейбол", 
-            "Баскетбол 3x3", "Пляжний волейбол" 
+            "Баскетбол", "Пляжний волейбол" 
         };
 
         // Fetch all possible groups
@@ -36,7 +36,7 @@ public class SeasonRatingService : ISeasonRatingService
             
         var FootballGroups = await _context.FootballTeams.Select(t => t.Name).Distinct().ToListAsync();
         var volleyballGroups = await _context.VolleyballTeams.Select(t => t.Name).Distinct().ToListAsync();
-        var basketballGroups = await _context.Basketball3x3Teams.Select(t => t.Name).Distinct().ToListAsync();
+        var basketballGroups = await _context.BasketballTeams.Select(t => t.Name).Distinct().ToListAsync();
         var beachVolleyballGroups = await _context.BeachVolleyballTeams.Select(t => t.Name).Distinct().ToListAsync();
         var chessGroups = await _context.ChessEventParticipants.Select(p => p.GroupName).Distinct().ToListAsync();
         var checkersGroups = await _context.CheckersEventParticipants.Select(p => p.GroupName).Distinct().ToListAsync();
@@ -331,14 +331,14 @@ public class SeasonRatingService : ISeasonRatingService
         }
 
         // 8. Basketball 3x3
-        var bballEvents = await _context.Basketball3x3Events
+        var bballEvents = await _context.BasketballEvents
             .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) 
                         && e.Level == CompetitionLevel.CollegeGroup)
             .Include(e => e.Teams)
             .ToListAsync();
         foreach (var e in bballEvents)
         {
-            foreach (var t in e.Teams ?? new List<Domain.Entities.Basketball3x3.Basketball3x3Team>())
+            foreach (var t in e.Teams ?? new List<Domain.Entities.Basketball.BasketballTeam>())
             {
                 if (string.IsNullOrEmpty(t.Name)) continue;
                 var normalizedTGroup = t.Name.Length >= 3 ? t.Name.Substring(0, 3) : t.Name;
@@ -355,9 +355,9 @@ public class SeasonRatingService : ISeasonRatingService
                         else rank = 4;
                     }
                     
-                    if (row.SportResults["Баскетбол 3x3"].Rank == "-" || rank < int.Parse(row.SportResults["Баскетбол 3x3"].Rank!))
+                    if (row.SportResults["Баскетбол"].Rank == "-" || rank < int.Parse(row.SportResults["Баскетбол"].Rank!))
                     {
-                        row.SportResults["Баскетбол 3x3"] = new SportResultDto { Rank = rank.ToString(), Points = rank };
+                        row.SportResults["Баскетбол"] = new SportResultDto { Rank = rank.ToString(), Points = rank };
                     }
                 }
             }
@@ -461,7 +461,7 @@ public class SeasonRatingService : ISeasonRatingService
         { 
             "Шахи", "Шашки", "Футбол", "Армрестлінг", 
             "Настільний теніс", "Бадмінтон", "Волейбол", 
-            "Баскетбол 3x3", "Пляжний волейбол", "Легка атлетика"
+            "Баскетбол", "Пляжний волейбол", "Легка атлетика"
         };
 
         var sports = allSports;
@@ -592,7 +592,7 @@ public class SeasonRatingService : ISeasonRatingService
         { 
             "Шахи", "Шашки", "Футбол", "Армрестлінг", 
             "Настільний теніс", "Бадмінтон", "Волейбол", 
-            "Баскетбол 3x3", "Пляжний волейбол", "Легка атлетика"
+            "Баскетбол", "Пляжний волейбол", "Легка атлетика"
         };
 
         var sports = allSports;

@@ -58,7 +58,7 @@ const Calendar = () => {
   // Назви видів спорту
   const sportNames: Record<string, string> = {
     'football': 'Футбол',
-    'basketball-3x3': 'Баскетбол 3х3',
+    'basketball-3x3': 'Баскетбол',
     'volleyball': 'Волейбол',
     'beach-volleyball': 'Пляжний волейбол',
     'chess': 'Шахи',

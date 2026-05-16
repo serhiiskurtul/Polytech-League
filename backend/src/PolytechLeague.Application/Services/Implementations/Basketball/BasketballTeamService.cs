@@ -1,23 +1,23 @@
-using PolytechLeague.Domain.Entities.Basketball3x3;
+using PolytechLeague.Domain.Entities.Basketball;
 using Microsoft.Extensions.Logging;
-using PolytechLeague.Application.Services.Interfaces.Basketball3x3;
+using PolytechLeague.Application.Services.Interfaces.Basketball;
 using PolytechLeague.Application.Services.Implementations;
 using PolytechLeague.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
 using PolytechLeague.Domain.Entities;
 
-namespace PolytechLeague.Application.Services.Implementations.Basketball3x3;
+namespace PolytechLeague.Application.Services.Implementations.Basketball;
 
-public class Basketball3x3TeamService(
+public class BasketballTeamService(
     ApplicationDbContext _dbcontext,
-    ILogger<AbstractEntityService<Basketball3x3Team>> _logger
+    ILogger<AbstractEntityService<BasketballTeam>> _logger
 ) :
-    AbstractEntityService<Basketball3x3Team>(_dbcontext, _logger),
-    IBasketball3x3TeamService
+    AbstractEntityService<BasketballTeam>(_dbcontext, _logger),
+    IBasketballTeamService
 {
-    public override async Task UpdateAsync(long id, Basketball3x3Team newEntity, CancellationToken cancellationToken = default)
+    public override async Task UpdateAsync(long id, BasketballTeam newEntity, CancellationToken cancellationToken = default)
     {
-        var oldEntity = await _dbcontext.Set<Basketball3x3Team>()
+        var oldEntity = await _dbcontext.Set<BasketballTeam>()
             .Include(t => t.Players)
             .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
         
@@ -40,7 +40,7 @@ public class Basketball3x3TeamService(
     public override async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
     {
         // 1. Get EventId and PlayerIds directly
-        var eventId = await _dbcontext.Basketball3x3Teams
+        var eventId = await _dbcontext.BasketballTeams
             .Where(t => t.Id == id)
             .Select(t => t.EventId)
             .FirstOrDefaultAsync(cancellationToken);
@@ -59,7 +59,7 @@ public class Basketball3x3TeamService(
         if (playerIds.Any())
         {
             // 2. Bulk delete associated participants
-            await _dbcontext.Basketball3x3EventParticipants
+            await _dbcontext.BasketballEventParticipants
                 .Where(p => p.EventId == eventId && playerIds.Contains(p.PlayerId))
                 .ExecuteDeleteAsync(cancellationToken);
 
@@ -72,7 +72,7 @@ public class Basketball3x3TeamService(
         await base.DeleteAsync(id, cancellationToken);
     }
 
-    protected override void UpdateValues(Basketball3x3Team oldEntity, Basketball3x3Team newEntity)
+    protected override void UpdateValues(BasketballTeam oldEntity, BasketballTeam newEntity)
     {
         oldEntity.Name = newEntity.Name;
     }

@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PolytechLeague.Domain.Entities.Basketball3x3;
+using PolytechLeague.Domain.Entities.Basketball;
 
-namespace PolytechLeague.Persistence.DbConfigurations.Basketball3x3Configurations;
+namespace PolytechLeague.Persistence.DbConfigurations.BasketballConfigurations;
 
-public class Basketball3x3EventParticipantConfiguration : IEntityTypeConfiguration<Basketball3x3EventParticipant>
+public class BasketballEventParticipantConfiguration : IEntityTypeConfiguration<BasketballEventParticipant>
 {
-    public void Configure(EntityTypeBuilder<Basketball3x3EventParticipant> builder)
+    public void Configure(EntityTypeBuilder<BasketballEventParticipant> builder)
     {
         builder.ToTable("basketball3x3_event_participants");
 

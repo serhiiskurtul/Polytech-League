@@ -4,7 +4,7 @@ using PolytechLeague.Application.Services.Interfaces;
 using PolytechLeague.Persistence.Database;
 using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Entities.Football;
-using PolytechLeague.Domain.Entities.Basketball3x3;
+using PolytechLeague.Domain.Entities.Basketball;
 using PolytechLeague.Domain.Entities.Volleyball;
 using PolytechLeague.Domain.Entities.Chess;
 using PolytechLeague.Domain.Entities.Checkers;
@@ -53,7 +53,7 @@ public class TournamentService : ITournamentService
         {
             query = query.Where(e =>
                 (sport == "football" && e is FootballEvent) ||
-                (sport == "basketball-3x3" && e is Basketball3x3Event) ||
+                (sport == "basketball-3x3" && e is BasketballEvent) ||
                 (sport == "volleyball" && e is VolleyballEvent) ||
                 (sport == "chess" && e is ChessEvent) ||
                 (sport == "checkers" && e is CheckersEvent) ||
@@ -186,7 +186,7 @@ public class TournamentService : ITournamentService
                 dto.Participants = dto.Teams; // Typically show team count for team sports
                 break;
             case "basketball-3x3":
-                dto.Teams = await _context.Basketball3x3Teams.CountAsync(t => t.EventId == dto.Id);
+                dto.Teams = await _context.BasketballTeams.CountAsync(t => t.EventId == dto.Id);
                 dto.Participants = dto.Teams;
                 break;
             case "volleyball":
@@ -256,7 +256,7 @@ public class TournamentService : ITournamentService
         return e switch
         {
             FootballEvent => "football",
-            Basketball3x3Event => "basketball-3x3",
+            BasketballEvent => "basketball-3x3",
             VolleyballEvent => "volleyball",
             BeachVolleyballEvent => "beach-volleyball",
             ChessEvent => "chess",
@@ -313,7 +313,7 @@ public class TournamentService : ITournamentService
             .CountAsync(p => _context.Set<Event>().Any(e => eligibleEventIds.Contains(e.Id) && (e.FirstPlaceId == p.Id || e.SecondPlaceId == p.Id || e.ThirdPlaceId == p.Id)) ||
                             _context.FootballEventParticipants.Any(fp => fp.PlayerId == p.Id && eligibleEventIds.Contains(fp.EventId)) ||
                             _context.VolleyballEventParticipants.Any(vp => vp.PlayerId == p.Id && eligibleEventIds.Contains(vp.EventId)) ||
-                            _context.Basketball3x3EventParticipants.Any(bp => bp.PlayerId == p.Id && eligibleEventIds.Contains(bp.EventId)) ||
+                            _context.BasketballEventParticipants.Any(bp => bp.PlayerId == p.Id && eligibleEventIds.Contains(bp.EventId)) ||
                             _context.ChessEventParticipants.Any(cp => cp.PlayerId == p.Id && eligibleEventIds.Contains(cp.TournamentId)) ||
                             _context.CheckersEventParticipants.Any(cp => cp.PlayerId == p.Id && eligibleEventIds.Contains(cp.TournamentId)) ||
                             _context.BeachVolleyballEventParticipants.Any(bvp => bvp.PlayerId == p.Id && eligibleEventIds.Contains(bvp.EventId)) ||
@@ -328,7 +328,7 @@ public class TournamentService : ITournamentService
         int totalMatches = 0;
         totalMatches += await _context.FootballMatches.CountAsync();
         totalMatches += await _context.VolleyballMatches.CountAsync();
-        totalMatches += await _context.Basketball3x3Matches.CountAsync();
+        totalMatches += await _context.BasketballMatches.CountAsync();
         totalMatches += await _context.ChessGames.CountAsync();
         totalMatches += await _context.CheckersGames.CountAsync();
         totalMatches += await _context.BeachVolleyballMatches.CountAsync();
@@ -426,7 +426,7 @@ public class TournamentService : ITournamentService
         // 3. Basketball 3x3
         if (sport == null || sport == "basketball-3x3")
         {
-            var basketballMatches = await _context.Basketball3x3Matches
+            var basketballMatches = await _context.BasketballMatches
                 .Include(m => m.Event)
                 .Include(m => m.HomeTeam)
                 .Include(m => m.AwayTeam)
@@ -635,7 +635,7 @@ public class TournamentService : ITournamentService
                 (sportType == "armwrestling" && e is ArmwrestlingEvent) ||
                 (sportType == "badminton" && e is BadmintonEvent) ||
                 (sportType == "football" && e is FootballEvent) ||
-                (sportType == "basketball-3x3" && e is Basketball3x3Event) ||
+                (sportType == "basketball-3x3" && e is BasketballEvent) ||
                 (sportType == "volleyball" && e is VolleyballEvent) ||
                 (sportType == "beach-volleyball" && e is BeachVolleyballEvent) ||
                 (sportType == "athletics" && e is AthleticsEvent)
@@ -663,7 +663,7 @@ public class TournamentService : ITournamentService
         results = results.Where(e => e.FirstPlaceId != null || 
                                      (e is FootballEvent fe && fe.FirstPlaceTeamId != null) ||
                                      (e is VolleyballEvent ve && ve.FirstPlaceTeamId != null) ||
-                                     (e is Basketball3x3Event be && be.FirstPlaceTeamId != null) ||
+                                     (e is BasketballEvent be && be.FirstPlaceTeamId != null) ||
                                      (e is BeachVolleyballEvent bve && bve.FirstPlaceTeamId != null))
                          .ToList();
 
@@ -744,9 +744,9 @@ public class TournamentService : ITournamentService
                 var team = await _context.VolleyballTeams.FindAsync(ve.FirstPlaceTeamId);
                 playerName = team?.Name ?? "Команда";
             }
-            else if (e is Basketball3x3Event be && be.FirstPlaceTeamId != null)
+            else if (e is BasketballEvent be && be.FirstPlaceTeamId != null)
             {
-                var team = await _context.Basketball3x3Teams.FindAsync(be.FirstPlaceTeamId);
+                var team = await _context.BasketballTeams.FindAsync(be.FirstPlaceTeamId);
                 playerName = team?.Name ?? "Команда";
             }
             else if (e is BeachVolleyballEvent bve && bve.FirstPlaceTeamId != null)

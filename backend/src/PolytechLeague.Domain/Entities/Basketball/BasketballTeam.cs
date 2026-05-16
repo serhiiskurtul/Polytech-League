@@ -1,14 +1,14 @@
 using PolytechLeague.Domain.Entities;
 
-namespace PolytechLeague.Domain.Entities.Basketball3x3;
+namespace PolytechLeague.Domain.Entities.Basketball;
 
-public class Basketball3x3Team
+public class BasketballTeam
 {
     public long Id { get; set; }
     public required string Name { get; set; }
     public long EventId { get; set; }
     [System.Text.Json.Serialization.JsonIgnore]
-    public Basketball3x3Event? Event { get; set; }
+    public BasketballEvent? Event { get; set; }
     
     public ICollection<Player>? Players { get; set; }
     public int Rank { get; set; }

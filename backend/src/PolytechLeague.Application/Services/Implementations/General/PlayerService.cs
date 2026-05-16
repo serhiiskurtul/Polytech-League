@@ -12,7 +12,7 @@ using PolytechLeague.Domain.Entities.Armwrestling;
 using PolytechLeague.Domain.Entities.Armwrestling.Enums;
 using PolytechLeague.Domain.Entities.Football;
 using PolytechLeague.Domain.Entities.Volleyball;
-using PolytechLeague.Domain.Entities.Basketball3x3;
+using PolytechLeague.Domain.Entities.Basketball;
 using PolytechLeague.Domain.Entities.BeachVolleyball;
 using PolytechLeague.Domain.Entities.Athletics;
 using PolytechLeague.Domain.Entities.Shared;
@@ -340,7 +340,7 @@ public class PlayerService : IPlayerService
                 .ToListAsync(cancellationToken);
             var FootballTeams = await _dbContext.FootballTeams.AsNoTracking().Include(t => t.Event).Include(t => t.Players).Where(t => eligibleEventIdsList.Contains(t.EventId) && t.Players!.Any(p => eligiblePlayerIdsList.Contains(p.Id))).ToListAsync(cancellationToken);
             var volleyballTeams = await _dbContext.VolleyballTeams.AsNoTracking().Include(t => t.Event).Include(t => t.Players).Where(t => eligibleEventIdsList.Contains(t.EventId) && t.Players!.Any(p => eligiblePlayerIdsList.Contains(p.Id))).ToListAsync(cancellationToken);
-            var bballTeams = await _dbContext.Basketball3x3Teams.AsNoTracking().Include(t => t.Event).Include(t => t.Players).Where(t => eligibleEventIdsList.Contains(t.EventId) && t.Players!.Any(p => eligiblePlayerIdsList.Contains(p.Id))).ToListAsync(cancellationToken);
+            var bballTeams = await _dbContext.BasketballTeams.AsNoTracking().Include(t => t.Event).Include(t => t.Players).Where(t => eligibleEventIdsList.Contains(t.EventId) && t.Players!.Any(p => eligiblePlayerIdsList.Contains(p.Id))).ToListAsync(cancellationToken);
             var beachVTeams = await _dbContext.BeachVolleyballTeams.AsNoTracking().Include(t => t.Event).Include(t => t.Players).Where(t => eligibleEventIdsList.Contains(t.EventId) && t.Players!.Any(p => eligiblePlayerIdsList.Contains(p.Id))).ToListAsync(cancellationToken);
             var ttTeams = await _dbContext.TableTennisTeams.AsNoTracking().Include(t => t.Event).Include(t => t.Players).Where(t => eligibleEventIdsList.Contains(t.EventId) && t.Players!.Any(p => eligiblePlayerIdsList.Contains(p.Id))).ToListAsync(cancellationToken);
             var badTeams = await _dbContext.BadmintonTeams.AsNoTracking().Include(t => t.Event).Where(t => t.EventId != null && eligibleEventIdsList.Contains(t.EventId.Value) && ((t.Player1Id != null && eligiblePlayerIdsList.Contains(t.Player1Id.Value)) || (t.Player2Id != null && eligiblePlayerIdsList.Contains(t.Player2Id.Value)))).ToListAsync(cancellationToken);
@@ -397,10 +397,10 @@ public class PlayerService : IPlayerService
                 .SelectMany(m => m.AwayRoster!.Where(p => eligiblePlayerIdsList.Contains(p.Id)).Select(p => new { PlayerId = p.Id, IsWinner = m.WinnerTeamId == m.AwayTeamId || (m.AwaySetsWon > m.HomeSetsWon && !m.WinnerTeamId.HasValue) }))
                 .GroupBy(x => x.PlayerId).Select(g => new { Id = g.Key, Played = g.Count(), Wins = g.Count(x => x.IsWinner) }).ToListAsync(cancellationToken);
 
-            var bballHomeStats = await _dbContext.Basketball3x3Matches.AsNoTracking().Where(m => eligibleEventIdsList.Contains(m.EventId))
+            var bballHomeStats = await _dbContext.BasketballMatches.AsNoTracking().Where(m => eligibleEventIdsList.Contains(m.EventId))
                 .SelectMany(m => m.HomeRoster!.Where(p => eligiblePlayerIdsList.Contains(p.Id)).Select(p => new { PlayerId = p.Id, IsWinner = m.WinnerTeamId == m.HomeTeamId || (m.HomeTeamScore > m.AwayTeamScore && !m.WinnerTeamId.HasValue) }))
                 .GroupBy(x => x.PlayerId).Select(g => new { Id = g.Key, Played = g.Count(), Wins = g.Count(x => x.IsWinner) }).ToListAsync(cancellationToken);
-            var bballAwayStats = await _dbContext.Basketball3x3Matches.AsNoTracking().Where(m => eligibleEventIdsList.Contains(m.EventId))
+            var bballAwayStats = await _dbContext.BasketballMatches.AsNoTracking().Where(m => eligibleEventIdsList.Contains(m.EventId))
                 .SelectMany(m => m.AwayRoster!.Where(p => eligiblePlayerIdsList.Contains(p.Id)).Select(p => new { PlayerId = p.Id, IsWinner = m.WinnerTeamId == m.AwayTeamId || (m.AwayTeamScore > m.HomeTeamScore && !m.WinnerTeamId.HasValue) }))
                 .GroupBy(x => x.PlayerId).Select(g => new { Id = g.Key, Played = g.Count(), Wins = g.Count(x => x.IsWinner) }).ToListAsync(cancellationToken);
 
@@ -525,7 +525,7 @@ public class PlayerService : IPlayerService
                     }
                 }
                 foreach (var e in winnersLookup[playerId].Where(x => x.MvpId == playerId)) {
-                    string sportType = e switch { FootballEvent => "football", VolleyballEvent => "volleyball", Basketball3x3Event => "basketball_3x3", BeachVolleyballEvent => "beach_volleyball", _ => "other" };
+                    string sportType = e switch { FootballEvent => "football", VolleyballEvent => "volleyball", BasketballEvent => "basketball_3x3", BeachVolleyballEvent => "beach_volleyball", _ => "other" };
                     if (sportType == "other") continue;
                     if (!achievements.Any(a => a.TournamentId == e.Id && a.Result == "MVP")) {
                         achievements.Add(new AchievementDto { TournamentName = e.Name, SportType = sportType, Date = e.Date, Rank = 0, TournamentId = e.Id, Result = "MVP" });
@@ -916,7 +916,7 @@ public class PlayerService : IPlayerService
                 achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "volleyball", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId, Result = rank > 0 ? $"{rank} місце ({t.Name})" : $"Учасник ({t.Name})" });
             }
             // Basketball 3x3
-            var bTeams = await _dbContext.Basketball3x3Teams
+            var bTeams = await _dbContext.BasketballTeams
                 .Include(t => t.Event)
                 .Where(t => t.Players != null && t.Players.Any(pl => pl.Id == playerId))
                 .ToListAsync(cancellationToken);
@@ -989,7 +989,7 @@ public class PlayerService : IPlayerService
                 string sport = e switch {
                     FootballEvent => "football",
                     VolleyballEvent => "volleyball",
-                    Basketball3x3Event => "basketball_3x3",
+                    BasketballEvent => "basketball_3x3",
                     _ => "other"
                 };
                 if (sport == "other") continue;
@@ -1124,7 +1124,7 @@ public class PlayerService : IPlayerService
             CheckersEvent => "checkers",
             FootballEvent => "football",
             VolleyballEvent => "volleyball",
-            Basketball3x3Event => "basketball_3x3",
+            BasketballEvent => "basketball_3x3",
             BeachVolleyballEvent => "beach_volleyball",
             ArmwrestlingEvent => "armwrestling",
             TableTennisEvent => "table_tennis",
@@ -1157,7 +1157,7 @@ public class PlayerService : IPlayerService
             if (ve.SecondPlaceTeamId == teamId) return 2;
             if (ve.ThirdPlaceTeamId == teamId) return 3;
         }
-        else if (e is Basketball3x3Event be)
+        else if (e is BasketballEvent be)
         {
             if (be.FirstPlaceTeamId == teamId) return 1;
             if (be.SecondPlaceTeamId == teamId) return 2;
@@ -1393,7 +1393,7 @@ public class PlayerService : IPlayerService
         foreach (var p in volleyParts) p.PlayerId = targetId;
 
         // Basketball Event Participants
-        var bballParts = await _dbContext.Basketball3x3EventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        var bballParts = await _dbContext.BasketballEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
         foreach (var p in bballParts) p.PlayerId = targetId;
 
         // Beach Volleyball Event Participants
@@ -1519,7 +1519,7 @@ public class PlayerService : IPlayerService
             "badminton" => "Бадмінтон",
             "football" => "Футбол",
             "volleyball" => "Волейбол",
-            "basketball_3x3" => "Баскетбол 3x3",
+            "basketball_3x3" => "Баскетбол",
             "beach_volleyball" => "Пляжний волейбол",
             "athletics" => "Легка атлетика",
             _ => type
@@ -1755,7 +1755,7 @@ public class PlayerService : IPlayerService
         }
 
         // Basketball 3x3
-        var basketballMatches = await _dbContext.Basketball3x3Matches
+        var basketballMatches = await _dbContext.BasketballMatches
             .Include(m => m.Event)
             .Include(m => m.HomeTeam).ThenInclude(t => t.Players)
             .Include(m => m.AwayTeam).ThenInclude(t => t.Players)
@@ -1771,7 +1771,7 @@ public class PlayerService : IPlayerService
         {
             var matchDto = new HeadToHeadMatchDto {
                 SportType = "basketball_3x3",
-                TournamentName = m.Event?.Name ?? "Турнір з Баскетболу 3х3",
+                TournamentName = m.Event?.Name ?? "Турнір з Баскетболу",
                 Date = m.Event?.Date ?? DateTime.MinValue,
                 TournamentId = m.EventId,
                 Score = $"{m.HomeTeamScore}:{m.AwayTeamScore}"

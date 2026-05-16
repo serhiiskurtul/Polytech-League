@@ -1,13 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PolytechLeague.Domain.Entities.Basketball3x3;
+using PolytechLeague.Domain.Entities.Basketball;
 using PolytechLeague.Domain.Entities;
 
-namespace PolytechLeague.Persistence.DbConfigurations.Basketball3x3Configurations;
+namespace PolytechLeague.Persistence.DbConfigurations.BasketballConfigurations;
 
-public class Basketball3x3MatchConfiguration : IEntityTypeConfiguration<Basketball3x3Match>
+public class BasketballMatchConfiguration : IEntityTypeConfiguration<BasketballMatch>
 {
-    public void Configure(EntityTypeBuilder<Basketball3x3Match> builder)
+    public void Configure(EntityTypeBuilder<BasketballMatch> builder)
     {
         builder.ToTable("basketball3x3_matches");
         
@@ -35,7 +35,7 @@ public class Basketball3x3MatchConfiguration : IEntityTypeConfiguration<Basketba
             .UsingEntity<Dictionary<string, object>>(
                 "basketball3x3_match_home_roster",
                 j => j.HasOne<Player>().WithMany().HasForeignKey("PlayerId"),
-                j => j.HasOne<Basketball3x3Match>().WithMany().HasForeignKey("Basketball3x3MatchId")
+                j => j.HasOne<BasketballMatch>().WithMany().HasForeignKey("BasketballMatchId")
             );
 
         builder.HasMany(m => m.AwayRoster)
@@ -43,7 +43,7 @@ public class Basketball3x3MatchConfiguration : IEntityTypeConfiguration<Basketba
             .UsingEntity<Dictionary<string, object>>(
                 "basketball3x3_match_away_roster",
                 j => j.HasOne<Player>().WithMany().HasForeignKey("PlayerId"),
-                j => j.HasOne<Basketball3x3Match>().WithMany().HasForeignKey("Basketball3x3MatchId")
+                j => j.HasOne<BasketballMatch>().WithMany().HasForeignKey("BasketballMatchId")
             );
     }
 }

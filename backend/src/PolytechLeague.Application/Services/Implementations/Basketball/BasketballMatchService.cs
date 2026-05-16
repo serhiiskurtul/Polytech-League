@@ -1,40 +1,40 @@
-using PolytechLeague.Domain.Entities.Basketball3x3;
+using PolytechLeague.Domain.Entities.Basketball;
 using PolytechLeague.Domain.Exceptions;
 using Microsoft.Extensions.Logging;
-using PolytechLeague.Application.Services.Interfaces.Basketball3x3;
+using PolytechLeague.Application.Services.Interfaces.Basketball;
 using PolytechLeague.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
 
-namespace PolytechLeague.Application.Services.Implementations.Basketball3x3;
+namespace PolytechLeague.Application.Services.Implementations.Basketball;
 
-public class Basketball3x3MatchService(
+public class BasketballMatchService(
     ApplicationDbContext _dbcontext,
-    ILogger<AbstractEntityService<Basketball3x3Match>> _logger
+    ILogger<AbstractEntityService<BasketballMatch>> _logger
 ) :
-    AbstractEntityService<Basketball3x3Match>(_dbcontext, _logger),
-    IBasketball3x3MatchService
+    AbstractEntityService<BasketballMatch>(_dbcontext, _logger),
+    IBasketballMatchService
 {
-    public override async Task<Basketball3x3Match> CreateAsync(Basketball3x3Match entity, CancellationToken cancellationToken = default)
+    public override async Task<BasketballMatch> CreateAsync(BasketballMatch entity, CancellationToken cancellationToken = default)
     {
         _logger.LogDebug("Creating basketball 3x3 match with rosters.");
         await MapRoster(entity, cancellationToken);
-        _dbcontext.Basketball3x3Matches.Add(entity);
+        _dbcontext.BasketballMatches.Add(entity);
         await _dbcontext.SaveChangesAsync(cancellationToken);
         return entity;
     }
 
-    public override async Task UpdateAsync(long id, Basketball3x3Match newEntity, CancellationToken cancellationToken = default)
+    public override async Task UpdateAsync(long id, BasketballMatch newEntity, CancellationToken cancellationToken = default)
     {
         _logger.LogDebug("Updating basketball 3x3 match with rosters. Id: {Id}", id);
 
-        var oldEntity = await _dbcontext.Basketball3x3Matches
+        var oldEntity = await _dbcontext.BasketballMatches
             .Include(m => m.HomeRoster)
             .Include(m => m.AwayRoster)
             .FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
         
         if (oldEntity == null)
         {
-            throw new EntityNotFoundException(nameof(Basketball3x3Match), id);
+            throw new EntityNotFoundException(nameof(BasketballMatch), id);
         }
 
         UpdateValues(oldEntity, newEntity);
@@ -43,7 +43,7 @@ public class Basketball3x3MatchService(
         await _dbcontext.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task MapRoster(Basketball3x3Match target, Basketball3x3Match source, CancellationToken cancellationToken)
+    private async Task MapRoster(BasketballMatch target, BasketballMatch source, CancellationToken cancellationToken)
     {
         if (source.HomeRosterIds != null)
         {
@@ -60,7 +60,7 @@ public class Basketball3x3MatchService(
         }
     }
 
-    private async Task MapRoster(Basketball3x3Match entity, CancellationToken cancellationToken)
+    private async Task MapRoster(BasketballMatch entity, CancellationToken cancellationToken)
     {
         if (entity.HomeRosterIds != null)
         {
@@ -77,7 +77,7 @@ public class Basketball3x3MatchService(
         }
     }
 
-    protected override void UpdateValues(Basketball3x3Match oldEntity, Basketball3x3Match newEntity)
+    protected override void UpdateValues(BasketballMatch oldEntity, BasketballMatch newEntity)
     {
         oldEntity.EventId = newEntity.EventId;
         oldEntity.HomeTeamId = newEntity.HomeTeamId;

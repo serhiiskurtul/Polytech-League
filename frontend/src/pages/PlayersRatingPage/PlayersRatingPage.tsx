@@ -85,7 +85,7 @@ const PlayersRatingPage = () => {
     { id: 'tt', name: 'Настільний теніс', icon: 'fa-table-tennis-paddle-ball', key: 'table_tennis' },
     { id: 'football', name: 'Футбол', icon: 'fa-futbol', key: 'football' },
     { id: 'volleyball', name: 'Волейбол', icon: 'fa-volleyball-ball', key: 'volleyball' },
-    { id: 'basketball', name: 'Баскетбол 3х3', icon: 'fa-basketball-ball', key: 'basketball_3x3' },
+    { id: 'basketball', name: 'Баскетбол', icon: 'fa-basketball-ball', key: 'basketball_3x3' },
     { id: 'beach', name: 'Пляжний волейбол', icon: 'fa-umbrella-beach', key: 'beach_volleyball' },
     { id: 'arm', name: 'Армрестлинг', icon: 'fa-fist-raised', key: 'armwrestling' },
     { id: 'badm', name: 'Бадмінтон', icon: 'fa-feather-alt', key: 'badminton' }

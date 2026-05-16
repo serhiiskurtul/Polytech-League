@@ -1,8 +1,8 @@
-using PolytechLeague.Domain.Entities.Basketball3x3;
+using PolytechLeague.Domain.Entities.Basketball;
 
-namespace PolytechLeague.Application.Services.Interfaces.Basketball3x3;
+namespace PolytechLeague.Application.Services.Interfaces.Basketball;
 
-public interface IBasketball3x3EventService : IAbstractEntityService<Basketball3x3Event>
+public interface IBasketballEventService : IAbstractEntityService<BasketballEvent>
 {
     Task RegisterPlayerAsync(long eventId, long playerId, CancellationToken cancellationToken = default);
     Task ApproveParticipantAsync(long eventId, long playerId, CancellationToken cancellationToken = default);
