@@ -201,7 +201,7 @@ public class ChessEventService :
 
     protected override async Task OnCreatedAsync(ChessEvent entity, CancellationToken cancellationToken)
     {
-        await _notificationService.SendNotificationToAllAsync(
+        await _notificationService!.SendNotificationToAllAsync(
             "Нове змагання!",
             $"Створено нове змагання з шахів: {entity.Name}",
             NotificationType.Tournament,
@@ -234,7 +234,7 @@ public class ChessEventService :
         
         if (individualWinnersSet || teamWinnersSet)
         {
-            await _notificationService.SendNotificationToAllAsync(
+            await _notificationService!.SendNotificationToAllAsync(
                 "Змагання завершено!",
                 $"Визначено переможців у змаганні з шахів: {newEntity.Name}",
                 NotificationType.Tournament,
@@ -326,7 +326,7 @@ public class ChessEventService :
                     EnrollmentYear = parsed.enrollmentYear,
                     SpecialtyCode = parsed.specialty,
                     GroupNumber = parsed.groupNumber,
-                    PhotoUrl = null,
+                    PhotoUrl = null!,
                     ChessFideId = sp.FideId,
                     ChessRating = sp.Rating,
                     ChessTitle = sp.Title
@@ -406,7 +406,7 @@ public class ChessEventService :
 
         if (tournament.IsModerated)
         {
-            await _notificationService.SendNotificationToAdminsAsync(
+            await _notificationService!.SendNotificationToAdminsAsync(
                 "Новий запит на реєстрацію",
                 $"Гравець {player?.FirstName} {player?.LastName} хоче зареєструватися на {tournament.Name}",
                 NotificationType.Tournament,

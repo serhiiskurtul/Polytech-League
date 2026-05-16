@@ -101,7 +101,7 @@ public class FootballEventService :
 
     protected override async Task OnCreatedAsync(FootballEvent entity, CancellationToken cancellationToken)
     {
-        await _notificationService.SendNotificationToAllAsync(
+        await _notificationService!.SendNotificationToAllAsync(
             "Нове змагання!",
             $"Створено нове змагання з Футболу: {entity.Name}",
             NotificationType.Tournament,
@@ -134,7 +134,7 @@ public class FootballEventService :
         
         if (winnersSet)
         {
-            await _notificationService.SendNotificationToAllAsync(
+            await _notificationService!.SendNotificationToAllAsync(
                 "Змагання завершено!",
                 $"Визначено переможців у змаганні з Футболу: {newEntity.Name}",
                 NotificationType.Tournament,
@@ -233,7 +233,7 @@ public class FootballEventService :
         
         if (status == RegistrationStatus.Pending)
         {
-            await _notificationService.SendNotificationToAdminsAsync(
+            await _notificationService!.SendNotificationToAdminsAsync(
                 "Новий запит на реєстрацію (Футбол)",
                 $"Гравець {player.FirstName} {player.LastName} (група {groupName}) хоче зареєструватися на {tournament.Name}",
                 NotificationType.Tournament,
@@ -242,7 +242,7 @@ public class FootballEventService :
         }
         else
         {
-            await _notificationService.SendNotificationToAdminsAsync(
+            await _notificationService!.SendNotificationToAdminsAsync(
                 "Нова реєстрація на Футбол",
                 $"Гравець {player.FirstName} {player.LastName} (група {groupName}) зареєструвався на {tournament.Name}",
                 NotificationType.Tournament,
@@ -293,7 +293,7 @@ public class FootballEventService :
 
             if (player.UserId.HasValue)
             {
-                await _notificationService.SendNotificationToUserAsync(
+                await _notificationService!.SendNotificationToUserAsync(
                     player.UserId.Value,
                     "Реєстрація схвалена",
                     $"Вашу заявку на участь у змаганні з Футболу \"{tournament?.Name}\" схвалено!",
@@ -321,7 +321,7 @@ public class FootballEventService :
             var player = await _dbcontext.Players.FindAsync(new object[] { playerId }, cancellationToken);
             if (player?.UserId.HasValue == true)
             {
-                await _notificationService.SendNotificationToUserAsync(
+                await _notificationService!.SendNotificationToUserAsync(
                     player.UserId.Value,
                     "Реєстрація відхилена",
                     $"Вашу заявку на участь у змаганні з Футболу \"{tournament?.Name}\" було відхилено.",
