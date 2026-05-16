@@ -1939,7 +1939,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       {/* Match Scorers Modal */}
       {isScorersModalOpen && selectedMatchForScorers && (
         <div className={styles.rosterModalOverlay} onClick={() => setIsScorersModalOpen(false)}>
-          <div className={`${styles.rosterModal} ${styles.glassModal}`} style={{maxWidth: '1000px'}} onClick={e => e.stopPropagation()}>
+          <div className={`${styles.rosterModal} ${styles.glassModal}`} style={{ width: '90%', maxWidth: '1200px' }} onClick={e => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h3>Автори голів: {selectedMatchForScorers.homeTeam?.name} vs {selectedMatchForScorers.awayTeam?.name}</h3>
               <button className={styles.closeButton} onClick={() => setIsScorersModalOpen(false)}>&times;</button>
