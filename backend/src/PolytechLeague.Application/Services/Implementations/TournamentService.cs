@@ -616,7 +616,7 @@ public class TournamentService : ITournamentService
     public async Task<IEnumerable<PolytechLeague.Application.Dto.General.ChampionDto>> GetChampionsAsync(string? sportType = null, PolytechLeague.Domain.Entities.Enums.Gender? gender = null, string? weightClass = null)
     {
         var query = _context.Set<PolytechLeague.Domain.Entities.Event>()
-            .Where(e => e.Level == CompetitionLevel.CollegeGroup && e.FirstPlaceId != null)
+            .Where(e => e.Level == CompetitionLevel.CollegeGroup)
             .Include(e => e.Season)
             .Include(e => e.FirstPlace)
             .AsQueryable();
@@ -654,7 +654,41 @@ public class TournamentService : ITournamentService
             .OrderByDescending(e => e.Date)
             .ToListAsync();
 
+        // Filter in memory for events with winners (individual or team)
+        results = results.Where(e => e.FirstPlaceId != null || 
+                                     (e is FootballEvent fe && fe.FirstPlaceTeamId != null) ||
+                                     (e is VolleyballEvent ve && ve.FirstPlaceTeamId != null) ||
+                                     (e is Basketball3x3Event be && be.FirstPlaceTeamId != null) ||
+                                     (e is BeachVolleyballEvent bve && bve.FirstPlaceTeamId != null))
+                         .ToList();
+
         var dtos = new List<PolytechLeague.Application.Dto.General.ChampionDto>();
+
+        // Add manual entries
+        var manualEntriesQuery = _context.HallOfFameManualEntries.AsQueryable();
+        if (!string.IsNullOrEmpty(sportType) && sportType != "all")
+        {
+            manualEntriesQuery = manualEntriesQuery.Where(e => e.Sport == sportType);
+        }
+        var manualEntries = await manualEntriesQuery.ToListAsync();
+
+        foreach (var me in manualEntries)
+        {
+            dtos.Add(new PolytechLeague.Application.Dto.General.ChampionDto
+            {
+                PlayerId = 0,
+                PlayerName = me.TeamName,
+                PlayerPhotoUrl = me.PhotoUrl,
+                SeasonName = me.SeasonName,
+                TournamentId = 0,
+                TournamentName = "Архівні дані",
+                SportType = me.Sport,
+                Date = me.CreatedAt,
+                Points = 0,
+                Gender = Gender.None,
+                WeightClass = null
+            });
+        }
 
         foreach (var e in results)
         {
@@ -683,18 +717,51 @@ public class TournamentService : ITournamentService
                     .FirstOrDefaultAsync();
             }
 
+            string playerName = "";
+            long playerId = 0;
+            string? photoUrl = null;
+            Gender champGender = Gender.None;
+
+            if (e.FirstPlaceId != null)
+            {
+                playerName = $"{e.FirstPlace!.FirstName} {e.FirstPlace.LastName}";
+                playerId = e.FirstPlaceId.Value;
+                photoUrl = e.FirstPlace.PhotoUrl;
+                champGender = e.FirstPlace.Gender;
+            }
+            else if (e is FootballEvent fe && fe.FirstPlaceTeamId != null)
+            {
+                var team = await _context.FootballTeams.FindAsync(fe.FirstPlaceTeamId);
+                playerName = team?.Name ?? "Команда";
+            }
+            else if (e is VolleyballEvent ve && ve.FirstPlaceTeamId != null)
+            {
+                var team = await _context.VolleyballTeams.FindAsync(ve.FirstPlaceTeamId);
+                playerName = team?.Name ?? "Команда";
+            }
+            else if (e is Basketball3x3Event be && be.FirstPlaceTeamId != null)
+            {
+                var team = await _context.Basketball3x3Teams.FindAsync(be.FirstPlaceTeamId);
+                playerName = team?.Name ?? "Команда";
+            }
+            else if (e is BeachVolleyballEvent bve && bve.FirstPlaceTeamId != null)
+            {
+                var team = await _context.BeachVolleyballTeams.FindAsync(bve.FirstPlaceTeamId);
+                playerName = team?.Name ?? "Команда";
+            }
+
             dtos.Add(new PolytechLeague.Application.Dto.General.ChampionDto
             {
-                PlayerId = e.FirstPlaceId!.Value,
-                PlayerName = $"{e.FirstPlace!.FirstName} {e.FirstPlace.LastName}",
-                PlayerPhotoUrl = e.FirstPlace.PhotoUrl,
+                PlayerId = playerId,
+                PlayerName = playerName,
+                PlayerPhotoUrl = photoUrl,
                 SeasonName = e.Season?.Name ?? e.Date.Year.ToString(),
                 TournamentId = e.Id,
                 TournamentName = e.Name,
                 SportType = GetSportName(e),
                 Date = e.Date,
                 Points = points,
-                Gender = e.FirstPlace.Gender,
+                Gender = champGender,
                 WeightClass = (e is ArmwrestlingEvent armEvent) ? armEvent.WeightClass.ToString() : null
             });
         }

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { getChampions } from '@/shared/api/tournaments.api';
+import { getChampions, createHallOfFameEntry } from '@/shared/api/tournaments.api';
 import { Champion } from '@/shared/types/tournament.types';
 import styles from './ChampionsPage.module.css';
+import { useAuth } from '@/app/providers/AuthContext';
+import { toast } from 'react-hot-toast';
 
 const ChampionsPage: React.FC = () => {
   const { sport } = useParams<{ sport: string }>();
@@ -10,6 +12,17 @@ const ChampionsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [gender, setGender] = useState<number | undefined>(undefined);
   const [weightClass, setWeightClass] = useState<string | undefined>(undefined);
+  
+  const { user } = useAuth();
+  const isAdmin = user?.role === 1 || user?.role === 'Admin';
+  
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newEntry, setNewEntry] = useState({
+    seasonName: '',
+    teamName: '',
+    roster: '',
+    photoUrl: ''
+  });
 
   const getSportTitle = (sportType: string) => {
     switch (sportType) {
@@ -94,6 +107,9 @@ const ChampionsPage: React.FC = () => {
           <Link to="/hall-of-fame/checkers" className={`${styles.filterBtn} ${sport === 'checkers' ? styles.active : ''}`}>Шашки</Link>
           <Link to="/hall-of-fame/table-tennis" className={`${styles.filterBtn} ${sport === 'table-tennis' ? styles.active : ''}`}>Теніс</Link>
           <Link to="/hall-of-fame/armwrestling" className={`${styles.filterBtn} ${sport === 'armwrestling' ? styles.active : ''}`}>Армрестлінг</Link>
+          <Link to="/hall-of-fame/football" className={`${styles.filterBtn} ${sport === 'football' ? styles.active : ''}`}>Футбол</Link>
+          <Link to="/hall-of-fame/volleyball" className={`${styles.filterBtn} ${sport === 'volleyball' ? styles.active : ''}`}>Волейбол</Link>
+          <Link to="/hall-of-fame/basketball-3x3" className={`${styles.filterBtn} ${sport === 'basketball-3x3' ? styles.active : ''}`}>Баскетбол</Link>
         </div>
 
         {(sport === 'chess' || sport === 'checkers') && (
@@ -157,6 +173,80 @@ const ChampionsPage: React.FC = () => {
             >
               понад 90 кг
             </button>
+          </div>
+        )}
+
+        {isAdmin && sport && sport !== 'all' && (
+          <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
+            <button 
+              className={styles.filterBtn} 
+              style={{ background: '#fbbf24', color: '#000' }}
+              onClick={() => setShowAddForm(!showAddForm)}
+            >
+              {showAddForm ? 'Скасувати' : 'Додати легенду'}
+            </button>
+            
+            {showAddForm && (
+              <form 
+                style={{ 
+                  marginTop: '1rem', 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  gap: '0.5rem', 
+                  maxWidth: '400px', 
+                  margin: '1rem auto',
+                  padding: '1rem',
+                  background: 'rgba(255,255,255,0.05)',
+                  borderRadius: '10px'
+                }}
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  try {
+                    await createHallOfFameEntry({ ...newEntry, sport: sport });
+                    toast.success('Легенду додано!');
+                    setShowAddForm(false);
+                    setNewEntry({ seasonName: '', teamName: '', roster: '', photoUrl: '' });
+                    // Refresh champions
+                    const data = await getChampions(sport, gender, weightClass);
+                    setChampions(data);
+                  } catch (err) {
+                    toast.error('Помилка при додаванні');
+                  }
+                }}
+              >
+                <input 
+                  type="text" 
+                  placeholder="Сезон (напр. 2022-2023)" 
+                  value={newEntry.seasonName}
+                  onChange={(e) => setNewEntry({ ...newEntry, seasonName: e.target.value })}
+                  required
+                  style={{ padding: '0.5rem', borderRadius: '5px', border: '1px solid #444', background: '#222', color: '#fff' }}
+                />
+                <input 
+                  type="text" 
+                  placeholder="Назва команди / Ім'я" 
+                  value={newEntry.teamName}
+                  onChange={(e) => setNewEntry({ ...newEntry, teamName: e.target.value })}
+                  required
+                  style={{ padding: '0.5rem', borderRadius: '5px', border: '1px solid #444', background: '#222', color: '#fff' }}
+                />
+                <input 
+                  type="text" 
+                  placeholder="Склад команди (опціонально)" 
+                  value={newEntry.roster}
+                  onChange={(e) => setNewEntry({ ...newEntry, roster: e.target.value })}
+                  style={{ padding: '0.5rem', borderRadius: '5px', border: '1px solid #444', background: '#222', color: '#fff' }}
+                />
+                <input 
+                  type="text" 
+                  placeholder="URL фото (опціонально)" 
+                  value={newEntry.photoUrl}
+                  onChange={(e) => setNewEntry({ ...newEntry, photoUrl: e.target.value })}
+                  style={{ padding: '0.5rem', borderRadius: '5px', border: '1px solid #444', background: '#222', color: '#fff' }}
+                />
+                <button type="submit" className={styles.filterBtn} style={{ background: '#10b981', color: '#fff' }}>Зберегти</button>
+              </form>
+            )}
           </div>
         )}
 

@@ -1338,6 +1338,40 @@ namespace PolytechLeague.Persistence.Migrations
                     b.ToTable("Football_teams", (string)null);
                 });
 
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.HallOfFameManualEntry", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PhotoUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Roster")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SeasonName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Sport")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TeamName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("HallOfFameManualEntries");
+                });
+
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Message", b =>
                 {
                     b.Property<long>("Id")

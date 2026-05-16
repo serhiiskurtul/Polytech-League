@@ -77,3 +77,13 @@ export const getChampions = async (sport?: string, gender?: number, weightClass?
         throw error;
     }
 };
+
+export const createHallOfFameEntry = async (entry: { sport: string; seasonName: string; teamName: string; roster?: string; photoUrl?: string }) => {
+    try {
+        const response = await api.post('/halloffame', entry);
+        return response.data;
+    } catch (error) {
+        console.error('Помилка при створенні запису зали слави:', error);
+        throw error;
+    }
+};
