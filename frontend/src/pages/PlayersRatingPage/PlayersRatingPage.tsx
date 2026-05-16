@@ -18,6 +18,7 @@ const PlayersRatingPage = () => {
   const [selectedWeightClass, setSelectedWeightClass] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'performance' | 'goals'>('performance');
   const [selectedPlayers, setSelectedPlayers] = useState<PlayerDto[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
   
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [selectedSeasonId, setSelectedSeasonId] = useState<string>('all');
@@ -106,6 +107,10 @@ const PlayersRatingPage = () => {
     setSelectedGender('all');
   }, [activeTab]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, searchQuery, selectedWeightClass, sortBy, selectedGender, selectedSeasonId]);
+
   const filteredPlayers = useMemo(() => {
     let result = [...players];
 
@@ -167,6 +172,12 @@ const PlayersRatingPage = () => {
       return (b.performanceScore || 0) - (a.performanceScore || 0);
     });
   }, [players, activeTab, searchQuery, selectedWeightClass, sortBy, selectedGender]);
+
+  const itemsPerPage = 100;
+  const paginatedPlayers = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredPlayers.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredPlayers, currentPage]);
 
   const getSportInfo = (sportKey: string) => {
     switch (sportKey.toLowerCase()) {
@@ -325,14 +336,15 @@ const PlayersRatingPage = () => {
                 </div>
 
                 <div className={styles.tableBody}>
-                  {filteredPlayers.map((player, index) => {
+                  {paginatedPlayers.map((player, index) => {
                     const photoSrc = getPhotoUrl(player.photoUrl);
+                    const actualIndex = (currentPage - 1) * itemsPerPage + index;
 
                     return (
                       <div key={player.id} className={styles.tableRow}>
                         <div className={styles.cell}>
-                          <div className={`${styles.rankCircle} ${index < 3 ? styles.topRank : ''}`}>
-                            {index + 1}
+                          <div className={`${styles.rankCircle} ${actualIndex < 3 ? styles.topRank : ''}`}>
+                            {actualIndex + 1}
                           </div>
                         </div>
 
@@ -460,6 +472,31 @@ const PlayersRatingPage = () => {
 
                 {filteredPlayers.length === 0 && (
                   <div className={styles.noResults}>Гравців не знайдено</div>
+                )}
+
+                {/* Pagination */}
+                {filteredPlayers.length > itemsPerPage && (
+                  <div className={styles.pagination}>
+                    <button 
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                      className={styles.pageBtn}
+                    >
+                      <i className="fa-solid fa-chevron-left"></i>
+                    </button>
+                    
+                    <span className={styles.pageInfo}>
+                      Сторінка {currentPage} з {Math.ceil(filteredPlayers.length / itemsPerPage)}
+                    </span>
+                    
+                    <button 
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(filteredPlayers.length / itemsPerPage)))}
+                      disabled={currentPage === Math.ceil(filteredPlayers.length / itemsPerPage)}
+                      className={styles.pageBtn}
+                    >
+                      <i className="fa-solid fa-chevron-right"></i>
+                    </button>
+                  </div>
                 )}
               </div>
             )}
