@@ -1917,9 +1917,9 @@ const TournamentViewPage = () => {
                   <div>
                     <h4 style={{ fontSize: '14px', marginBottom: '8px', color: '#6b7280' }}>Дошка 1</h4>
                     <ul style={{ listStyle: 'none', padding: 0 }}>
-                      {b1_1st && <li style={{ fontSize: '14px', marginBottom: '4px' }}>🥇 1. {b1_1st.playerName} ({b1_1st.points} очок)</li>}
-                      {b1_2nd && <li style={{ fontSize: '14px', marginBottom: '4px' }}>🥈 2. {b1_2nd.playerName} ({b1_2nd.points} очок)</li>}
-                      {b1_3rd && <li style={{ fontSize: '14px', marginBottom: '4px' }}>🥉 3. {b1_3rd.playerName} ({b1_3rd.points} очок)</li>}
+                      {b1_1st && <li style={{ fontSize: '14px', marginBottom: '4px' }}>🥇 1. {b1_1st.playerName}</li>}
+                      {b1_2nd && <li style={{ fontSize: '14px', marginBottom: '4px' }}>🥈 2. {b1_2nd.playerName}</li>}
+                      {b1_3rd && <li style={{ fontSize: '14px', marginBottom: '4px' }}>🥉 3. {b1_3rd.playerName}</li>}
                     </ul>
                   </div>
                   
@@ -1927,9 +1927,9 @@ const TournamentViewPage = () => {
                   <div>
                     <h4 style={{ fontSize: '14px', marginBottom: '8px', color: '#6b7280' }}>Дошка 2</h4>
                     <ul style={{ listStyle: 'none', padding: 0 }}>
-                      {b2_1st && <li style={{ fontSize: '14px', marginBottom: '4px' }}>🥇 1. {b2_1st.playerName} ({b2_1st.points} очок)</li>}
-                      {b2_2nd && <li style={{ fontSize: '14px', marginBottom: '4px' }}>🥈 2. {b2_2nd.playerName} ({b2_2nd.points} очок)</li>}
-                      {b2_3rd && <li style={{ fontSize: '14px', marginBottom: '4px' }}>🥉 3. {b2_3rd.playerName} ({b2_3rd.points} очок)</li>}
+                      {b2_1st && <li style={{ fontSize: '14px', marginBottom: '4px' }}>🥇 1. {b2_1st.playerName}</li>}
+                      {b2_2nd && <li style={{ fontSize: '14px', marginBottom: '4px' }}>🥈 2. {b2_2nd.playerName}</li>}
+                      {b2_3rd && <li style={{ fontSize: '14px', marginBottom: '4px' }}>🥉 3. {b2_3rd.playerName}</li>}
                     </ul>
                   </div>
                 </div>
