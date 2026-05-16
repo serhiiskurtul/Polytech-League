@@ -98,3 +98,22 @@ export const createHallOfFameEntry = async (data: { sport: string; seasonName: s
         throw error;
     }
 };
+
+export const deleteHallOfFameEntry = async (id: number) => {
+    try {
+        await api.delete(`/halloffame/${id}`);
+    } catch (error) {
+        console.error('Помилка при видаленні запису зали слави:', error);
+        throw error;
+    }
+};
+
+export const updateHallOfFameEntry = async (id: number, data: { sport: string; seasonName: string; teamName: string; photoUrl?: string }) => {
+    try {
+        const response = await api.put(`/halloffame/${id}`, { id, ...data });
+        return response.data;
+    } catch (error) {
+        console.error('Помилка при оновленні запису зали слави:', error);
+        throw error;
+    }
+};

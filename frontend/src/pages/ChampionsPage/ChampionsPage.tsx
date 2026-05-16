@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { getChampions, createHallOfFameEntry } from '@/shared/api/tournaments.api';
+import { getChampions, createHallOfFameEntry, deleteHallOfFameEntry } from '@/shared/api/tournaments.api';
 import { Champion } from '@/shared/types/tournament.types';
 import styles from './ChampionsPage.module.css';
 import { useAuth } from '@/app/providers/AuthContext';
@@ -229,7 +229,7 @@ const ChampionsPage: React.FC = () => {
                 />
                 <input 
                   type="text" 
-                  placeholder="Назва команди / Ім'я" 
+                  placeholder="Ім'я" 
                   value={newEntry.teamName}
                   onChange={(e) => setNewEntry({ ...newEntry, teamName: e.target.value })}
                   required
@@ -257,50 +257,96 @@ const ChampionsPage: React.FC = () => {
           </div>
         ) : (
           <div className={styles.championsGrid}>
-            {champions.map((champion) => (
-              <Link
-                key={`${champion.playerId}-${champion.tournamentId}`}
-                to={`/tournaments/${champion.tournamentId}`}
-                className={styles.championCard}
-              >
-                <div className={styles.yearBadge}>{champion.seasonName}</div>
-                <div className={styles.photoWrapper}>
-                  <img
-                    src={champion.playerPhotoUrl || '/champion-placeholder.png'}
-                    alt={champion.playerName}
-                    className={styles.playerPhoto}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/champion-placeholder.png';
-                    }}
-                  />
-                  <div className={styles.medal}>
-                    <i className="fas fa-medal"></i>
+            {champions.map((champion) => {
+              const isManual = champion.playerId === 0;
+              const cardContent = (
+                <>
+                  <div className={styles.yearBadge}>{champion.seasonName}</div>
+                  <div className={styles.photoWrapper}>
+                    <img
+                      src={champion.playerPhotoUrl || '/champion-placeholder.png'}
+                      alt={champion.playerName}
+                      className={styles.playerPhoto}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/champion-placeholder.png';
+                      }}
+                    />
+                    <div className={styles.medal}>
+                      <i className="fas fa-medal"></i>
+                    </div>
                   </div>
-                </div>
-                <div className={styles.info}>
-                  <Link
-                    to={`/players/${champion.playerId}`}
-                    className={styles.playerName}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {champion.playerName}
-                  </Link>
-                  <div className={styles.tournamentName}>
-                    <i className="fas fa-calendar-check"></i> {champion.tournamentName}
+                  <div className={styles.info}>
+                    {isManual ? (
+                      <div className={styles.playerName}>{champion.playerName}</div>
+                    ) : (
+                      <Link
+                        to={`/players/${champion.playerId}`}
+                        className={styles.playerName}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {champion.playerName}
+                      </Link>
+                    )}
+                    <div className={styles.tournamentName}>
+                      <i className="fas fa-calendar-check"></i> {champion.tournamentName}
+                    </div>
+                    {champion.weightClass && (
+                      <div className={styles.points} style={{ color: '#fbbf24', marginTop: '0.25rem' }}>
+                        <i className="fas fa-weight-hanging"></i> {getWeightClassLabel(champion.weightClass)}
+                      </div>
+                    )}
+                    {champion.points > 0 && (
+                      <div className={styles.points}>
+                        <strong>{champion.points}</strong> очок
+                      </div>
+                    )}
                   </div>
-                  {champion.weightClass && (
-                    <div className={styles.points} style={{ color: '#fbbf24', marginTop: '0.25rem' }}>
-                      <i className="fas fa-weight-hanging"></i> {getWeightClassLabel(champion.weightClass)}
+                  {isManual && isAdmin && (
+                    <div style={{ position: 'absolute', top: '10px', right: '10px', display: 'flex', gap: '5px' }}>
+                      <button 
+                        onClick={async (e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (window.confirm('Видалити цей запис?')) {
+                            try {
+                              await deleteHallOfFameEntry(champion.tournamentId);
+                              toast.success('Видалено!');
+                              // Refresh
+                              const data = await getChampions(sport, gender, weightClass);
+                              setChampions(data);
+                            } catch (err) {
+                              toast.error('Помилка при видаленні');
+                            }
+                          }
+                        }}
+                        style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: '5px', padding: '0.25rem 0.5rem', cursor: 'pointer' }}
+                        title="Видалити"
+                      >
+                        <i className="fas fa-trash"></i>
+                      </button>
                     </div>
                   )}
-                  {champion.points > 0 && (
-                    <div className={styles.points}>
-                      <strong>{champion.points}</strong> очок
-                    </div>
-                  )}
+                </>
+              );
+
+              return isManual ? (
+                <div
+                  key={`${champion.playerId}-${champion.tournamentId}`}
+                  className={styles.championCard}
+                  style={{ position: 'relative' }}
+                >
+                  {cardContent}
                 </div>
-              </Link>
-            ))}
+              ) : (
+                <Link
+                  key={`${champion.playerId}-${champion.tournamentId}`}
+                  to={`/tournaments/${champion.tournamentId}`}
+                  className={styles.championCard}
+                >
+                  {cardContent}
+                </Link>
+              );
+            })}
           </div>
         )}
       </main>

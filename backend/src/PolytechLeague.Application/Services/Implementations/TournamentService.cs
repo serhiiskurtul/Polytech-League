@@ -680,7 +680,7 @@ public class TournamentService : ITournamentService
                 PlayerName = me.TeamName,
                 PlayerPhotoUrl = me.PhotoUrl,
                 SeasonName = me.SeasonName,
-                TournamentId = 0,
+                TournamentId = me.Id,
                 TournamentName = "Архівні дані",
                 SportType = me.Sport,
                 Date = me.CreatedAt,
