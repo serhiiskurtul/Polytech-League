@@ -2046,12 +2046,12 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         ? selectedMatchForScorers.homeRoster 
                         : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players || []
                     ).map((player: any) => (
-                      <div key={player.id} className={styles.scorerInputItem}>
-                        <span className={styles.playerNameMini}>
+                      <div key={player.id} className={styles.scorerInputItem} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 16px', background: '#fff', borderRadius: '10px', marginBottom: '8px', border: '1px solid #e2e8f0' }}>
+                        <div style={{ flex: 1, minWidth: '150px', fontWeight: 600, color: '#1e293b' }}>
                           {player.footballShirtNumber ? `№${player.footballShirtNumber} ` : ''}
                           {player.lastName} {player.firstName[0]}.
-                        </span>
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        </div>
+                        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                           <div title="Голи" style={{ position: 'relative' }}>
                             <i className="fas fa-futbol" style={{ fontSize: '12px', position: 'absolute', left: '-14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }}></i>
                             <input 
@@ -2063,7 +2063,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                                 ...tempScorers,
                                 [player.id]: Math.max(0, parseInt(e.target.value) || 0)
                               })}
-                              style={{ width: '40px', padding: '4px', borderRadius: '4px', border: '1px solid #cbd5e1' }}
+                              style={{ width: '50px', padding: '6px', borderRadius: '6px', border: '1px solid #cbd5e1', textAlign: 'center', fontWeight: 'bold' }}
                             />
                           </div>
                           
@@ -2079,7 +2079,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                                 ...tempYellowCards,
                                 [player.id]: Math.max(0, parseInt(e.target.value) || 0)
                               })}
-                              style={{ width: '40px', padding: '4px', borderRadius: '4px', border: '1px solid #cbd5e1' }}
+                              style={{ width: '50px', padding: '6px', borderRadius: '6px', border: '1px solid #cbd5e1', textAlign: 'center', fontWeight: 'bold' }}
                             />
                           </div>
 
@@ -2095,7 +2095,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                                 ...tempRedCards,
                                 [player.id]: Math.max(0, parseInt(e.target.value) || 0)
                               })}
-                              style={{ width: '40px', padding: '4px', borderRadius: '4px', border: '1px solid #cbd5e1' }}
+                              style={{ width: '50px', padding: '6px', borderRadius: '6px', border: '1px solid #cbd5e1', textAlign: 'center', fontWeight: 'bold' }}
                             />
                           </div>
                         </div>
@@ -2154,12 +2154,12 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         ? selectedMatchForScorers.awayRoster 
                         : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players || []
                     ).map((player: any) => (
-                      <div key={player.id} className={styles.scorerInputItem}>
-                        <span className={styles.playerNameMini}>
+                      <div key={player.id} className={styles.scorerInputItem} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 16px', background: '#fff', borderRadius: '10px', marginBottom: '8px', border: '1px solid #e2e8f0' }}>
+                        <div style={{ flex: 1, minWidth: '150px', fontWeight: 600, color: '#1e293b' }}>
                           {player.footballShirtNumber ? `№${player.footballShirtNumber} ` : ''}
                           {player.lastName} {player.firstName[0]}.
-                        </span>
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        </div>
+                        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                           <div title="Голи" style={{ position: 'relative' }}>
                             <i className="fas fa-futbol" style={{ fontSize: '12px', position: 'absolute', left: '-14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }}></i>
                             <input 
@@ -2171,7 +2171,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                                 ...tempScorers,
                                 [player.id]: Math.max(0, parseInt(e.target.value) || 0)
                               })}
-                              style={{ width: '40px', padding: '4px', borderRadius: '4px', border: '1px solid #cbd5e1' }}
+                              style={{ width: '50px', padding: '6px', borderRadius: '6px', border: '1px solid #cbd5e1', textAlign: 'center', fontWeight: 'bold' }}
                             />
                           </div>
                           
@@ -2187,7 +2187,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                                 ...tempYellowCards,
                                 [player.id]: Math.max(0, parseInt(e.target.value) || 0)
                               })}
-                              style={{ width: '40px', padding: '4px', borderRadius: '4px', border: '1px solid #cbd5e1' }}
+                              style={{ width: '50px', padding: '6px', borderRadius: '6px', border: '1px solid #cbd5e1', textAlign: 'center', fontWeight: 'bold' }}
                             />
                           </div>
 
@@ -2203,7 +2203,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                                 ...tempRedCards,
                                 [player.id]: Math.max(0, parseInt(e.target.value) || 0)
                               })}
-                              style={{ width: '40px', padding: '4px', borderRadius: '4px', border: '1px solid #cbd5e1' }}
+                              style={{ width: '50px', padding: '6px', borderRadius: '6px', border: '1px solid #cbd5e1', textAlign: 'center', fontWeight: 'bold' }}
                             />
                           </div>
                         </div>
