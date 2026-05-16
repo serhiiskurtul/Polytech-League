@@ -180,17 +180,20 @@ public class SeasonRatingService : ISeasonRatingService
                     .Where(p => !string.IsNullOrEmpty(p.GroupName ?? p.Player?.Group))
                     .Select(p => {
                         var g = p.GroupName ?? p.Player?.Group;
+                        var digits = new string(g!.Where(char.IsDigit).ToArray());
                         return new { 
-                            Group = g!, 
+                            Group = digits, 
                             Rank = p.Rank > 0 ? p.Rank : penalty 
                         };
                     })
+                    .Where(x => !string.IsNullOrEmpty(x.Group))
                     .GroupBy(x => x.Group)
                     .ToDictionary(g => g.Key, g => g.Min(x => x.Rank));
 
                 foreach (var row in rows)
                 {
-                    if (eventGroupResults.TryGetValue(row.GroupName, out int rank))
+                    var rowDigits = new string(row.GroupName.Where(char.IsDigit).ToArray());
+                    if (eventGroupResults.TryGetValue(rowDigits, out int rank))
                     {
                         groupArmSums[row.GroupName] += rank;
                         groupHasParticipated[row.GroupName] = true;
