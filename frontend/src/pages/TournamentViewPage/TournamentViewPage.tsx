@@ -275,6 +275,12 @@ const TournamentViewPage = () => {
         category: editTournamentData.category || (details as any).category || (isVolleyball ? 'Men' : 'Mixed')
       };
 
+      if (['chess', 'checkers'].includes(sportKey)) {
+        payload.timeControl = (details as any).timeControl || "Rapid";
+        payload.system = (details as any).system !== undefined ? (details as any).system : 0;
+        payload.participantsCount = (details as any).participantsCount || 0;
+      }
+
       if (isTeamSport) {
         payload.firstPlaceTeamId = winners.firstPlaceId || null;
         payload.secondPlaceTeamId = winners.secondPlaceId || null;
