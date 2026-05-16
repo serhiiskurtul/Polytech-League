@@ -319,6 +319,7 @@ const TournamentViewPage = () => {
           ];
 
           console.log("Board updates:", boardUpdates);
+          console.log("All participants:", (details as any).participants);
 
           for (const update of boardUpdates) {
             if (update.playerId && update.playerId !== 0) {
