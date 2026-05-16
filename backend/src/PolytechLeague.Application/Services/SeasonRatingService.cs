@@ -163,23 +163,74 @@ public class SeasonRatingService : ISeasonRatingService
                 .ThenInclude(p => p.Player)
             .ToListAsync();
 
-        foreach (var e in armEvents)
+        if (armEvents.Any())
         {
-            foreach (var p in e.Players ?? new List<Domain.Entities.Armwrestling.ArmwrestlingEventParticipant>())
+            var groupArmSums = rows.ToDictionary(r => r.GroupName, r => 0);
+            var groupHasParticipated = rows.ToDictionary(r => r.GroupName, r => false);
+
+            foreach (var e in armEvents)
             {
-                var groupName = p.GroupName ?? p.Player?.Group;
-                if (string.IsNullOrEmpty(groupName)) continue;
-                var normalizedPGroup = groupName.Length >= 3 ? groupName.Substring(0, 3) : groupName;
+                var participants = e.Players ?? new List<Domain.Entities.Armwrestling.ArmwrestlingEventParticipant>();
                 
-                var row = rows.FirstOrDefault(r => r.GroupName.Equals(normalizedPGroup, StringComparison.OrdinalIgnoreCase));
-                if (row != null)
+                int penalty = participants.Count + 2;
+
+                var eventGroupResults = participants
+                    .Where(p => !string.IsNullOrEmpty(p.GroupName ?? p.Player?.Group))
+                    .Select(p => {
+                        var g = p.GroupName ?? p.Player?.Group;
+                        var digits = new string(g!.Where(char.IsDigit).ToArray());
+                        return new { 
+                            Group = digits, 
+                            Rank = p.Rank > 0 ? p.Rank : penalty 
+                        };
+                    })
+                    .Where(x => !string.IsNullOrEmpty(x.Group))
+                    .GroupBy(x => x.Group)
+                    .ToDictionary(g => g.Key, g => g.Min(x => x.Rank));
+
+                foreach (var row in rows)
                 {
-                    int rank = p.Rank > 0 ? p.Rank : 4;
-                    if (row.SportResults["Армрестлінг"].Rank == "-" || rank < int.Parse(row.SportResults["Армрестлінг"].Rank!))
+                    var rowDigits = new string(row.GroupName.Where(char.IsDigit).ToArray());
+                    if (eventGroupResults.TryGetValue(rowDigits, out int rank))
                     {
-                        row.SportResults["Армрестлінг"] = new SportResultDto { Rank = rank.ToString(), Points = rank };
+                        groupArmSums[row.GroupName] += rank;
+                        groupHasParticipated[row.GroupName] = true;
+                    }
+                    else
+                    {
+                        groupArmSums[row.GroupName] += penalty;
                     }
                 }
+            }
+
+            var armOrderedRows = rows
+                .Where(r => groupHasParticipated[r.GroupName])
+                .OrderBy(r => groupArmSums[r.GroupName])
+                .ToList();
+
+            int idx = 0;
+            while (idx < armOrderedRows.Count)
+            {
+                int tieCount = 1;
+                while (idx + tieCount < armOrderedRows.Count && groupArmSums[armOrderedRows[idx + tieCount].GroupName] == groupArmSums[armOrderedRows[idx].GroupName])
+                {
+                    tieCount++;
+                }
+
+                string rankStr = tieCount > 1 
+                    ? $"{idx + 1}-{idx + tieCount}" 
+                    : (idx + 1).ToString();
+
+                for (int j = 0; j < tieCount; j++)
+                {
+                    var row = armOrderedRows[idx + j];
+                    row.SportResults["Армрестлінг"] = new SportResultDto 
+                    { 
+                        Rank = rankStr, 
+                        Points = groupArmSums[row.GroupName] 
+                    };
+                }
+                idx += tieCount;
             }
         }
 
