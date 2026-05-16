@@ -474,6 +474,7 @@ public class SeasonRatingService : ISeasonRatingService
                     sports = loadedSports
                         .Select(s => s == "Армреслінг" ? "Армрестлінг" : s)
                         .Select(s => s == "Футзал" ? "Футбол" : s)
+                        .Select(s => (s == "Баскетбол 3x3" || s == "Баскетбол 3х3") ? "Баскетбол" : s)
                         .Distinct()
                         .ToList();
                 }
@@ -503,6 +504,7 @@ public class SeasonRatingService : ISeasonRatingService
                                 //map legacy keys to correct spelling for standings
                                 string key = kvp.Key == "Армреслінг" ? "Армрестлінг" : kvp.Key;
                                 key = key == "Футзал" ? "Футбол" : key;
+                                key = (key == "Баскетбол 3x3" || key == "Баскетбол 3х3") ? "Баскетбол" : key;
                                 if (sports.Contains(key))
                                 {
                                     sportResults[key] = new SportResultDto { Rank = kvp.Value, Points = 0 };
@@ -605,6 +607,7 @@ public class SeasonRatingService : ISeasonRatingService
                     sports = loadedSports
                         .Select(s => s == "Армреслінг" ? "Армрестлінг" : s)
                         .Select(s => s == "Футзал" ? "Футбол" : s)
+                        .Select(s => (s == "Баскетбол 3x3" || s == "Баскетбол 3х3") ? "Баскетбол" : s)
                         .Distinct()
                         .ToList();
                 }
@@ -633,6 +636,7 @@ public class SeasonRatingService : ISeasonRatingService
                             {
                                 string key = kvp.Key == "Армреслінг" ? "Армрестлінг" : kvp.Key;
                                 key = key == "Футзал" ? "Футбол" : key;
+                                key = (key == "Баскетбол 3x3" || key == "Баскетбол 3х3") ? "Баскетбол" : key;
                                 if (sports.Contains(key))
                                 {
                                     sportResults[key] = new SportResultDto { Rank = kvp.Value, Points = 0 };

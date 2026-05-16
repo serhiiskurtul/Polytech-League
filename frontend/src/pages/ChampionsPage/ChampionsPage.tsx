@@ -31,7 +31,7 @@ const ChampionsPage: React.FC = () => {
       case 'armwrestling': return 'армрестлінгу';
       case 'badminton': return 'бадмінтону';
       case 'football': return 'футболу';
-      case 'basketball-3x3': return 'баскетболу 3x3';
+      case 'basketball-3x3': return 'баскетболу';
       case 'volleyball': return 'волейболу';
       default: return '';
     }
