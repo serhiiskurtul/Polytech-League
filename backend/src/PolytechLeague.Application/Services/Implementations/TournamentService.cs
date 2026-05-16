@@ -301,21 +301,26 @@ public class TournamentService : ITournamentService
         var activeTournamentsCount = await _context.Set<PolytechLeague.Domain.Entities.Event>()
             .CountAsync(e => e.Date >= startOfSeason);
 
-        // Count only players who are in the ranking (have at least one achievement or participation)
+        var eligibleEventIds = await _context.Set<PolytechLeague.Domain.Entities.Event>()
+            .Where(e => e.Date >= startOfSeason)
+            .Select(e => e.Id)
+            .ToListAsync();
+
+        // Count only players who are in the ranking (have at least one achievement or participation in the current season)
         var rankedPlayersCount = await _context.Players
             .Where(p => p.User == null || p.User.Role != UserRole.Admin)
             .Where(p => !p.IsExternal && !p.IsGuest)
-            .CountAsync(p => _context.Set<Event>().Any(e => e.FirstPlaceId == p.Id || e.SecondPlaceId == p.Id || e.ThirdPlaceId == p.Id) ||
-                            _context.FootballEventParticipants.Any(fp => fp.PlayerId == p.Id) ||
-                            _context.VolleyballEventParticipants.Any(vp => vp.PlayerId == p.Id) ||
-                            _context.Basketball3x3EventParticipants.Any(bp => bp.PlayerId == p.Id) ||
-                            _context.ChessEventParticipants.Any(cp => cp.PlayerId == p.Id) ||
-                            _context.CheckersEventParticipants.Any(cp => cp.PlayerId == p.Id) ||
-                            _context.BeachVolleyballEventParticipants.Any(bvp => bvp.PlayerId == p.Id) ||
-                            _context.TableTennisEventParticipants.Any(ttp => ttp.PlayerId == p.Id) ||
-                            _context.BadmintonEventParticipants.Any(bmp => bmp.PlayerId == p.Id) ||
-                            _context.AthleticsResults.Any(ar => ar.PlayerId == p.Id) ||
-                            _context.ArmwrestlingEventParticipants.Any(ap => ap.PlayerId == p.Id));
+            .CountAsync(p => _context.Set<Event>().Any(e => eligibleEventIds.Contains(e.Id) && (e.FirstPlaceId == p.Id || e.SecondPlaceId == p.Id || e.ThirdPlaceId == p.Id)) ||
+                            _context.FootballEventParticipants.Any(fp => fp.PlayerId == p.Id && eligibleEventIds.Contains(fp.EventId)) ||
+                            _context.VolleyballEventParticipants.Any(vp => vp.PlayerId == p.Id && eligibleEventIds.Contains(vp.EventId)) ||
+                            _context.Basketball3x3EventParticipants.Any(bp => bp.PlayerId == p.Id && eligibleEventIds.Contains(bp.EventId)) ||
+                            _context.ChessEventParticipants.Any(cp => cp.PlayerId == p.Id && eligibleEventIds.Contains(cp.TournamentId)) ||
+                            _context.CheckersEventParticipants.Any(cp => cp.PlayerId == p.Id && eligibleEventIds.Contains(cp.TournamentId)) ||
+                            _context.BeachVolleyballEventParticipants.Any(bvp => bvp.PlayerId == p.Id && eligibleEventIds.Contains(bvp.EventId)) ||
+                            _context.TableTennisEventParticipants.Any(ttp => ttp.PlayerId == p.Id && eligibleEventIds.Contains(ttp.TournamentId)) ||
+                            _context.BadmintonEventParticipants.Any(bmp => bmp.PlayerId == p.Id && eligibleEventIds.Contains(bmp.EventId)) ||
+                            _context.AthleticsResults.Any(ar => ar.PlayerId == p.Id && eligibleEventIds.Contains(ar.AthleticsEventId)) ||
+                            _context.ArmwrestlingEventParticipants.Any(ap => ap.PlayerId == p.Id && eligibleEventIds.Contains(ap.TournamentId)));
 
         var registeredPlayersCount = rankedPlayersCount;
 
