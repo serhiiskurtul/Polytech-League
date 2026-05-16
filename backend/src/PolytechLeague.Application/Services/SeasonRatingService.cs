@@ -207,29 +207,29 @@ public class SeasonRatingService : ISeasonRatingService
                 .OrderBy(r => groupArmSums[r.GroupName])
                 .ToList();
 
-            int i = 0;
-            while (i < armOrderedRows.Count)
+            int idx = 0;
+            while (idx < armOrderedRows.Count)
             {
                 int tieCount = 1;
-                while (i + tieCount < armOrderedRows.Count && groupArmSums[armOrderedRows[i + tieCount].GroupName] == groupArmSums[armOrderedRows[i].GroupName])
+                while (idx + tieCount < armOrderedRows.Count && groupArmSums[armOrderedRows[idx + tieCount].GroupName] == groupArmSums[armOrderedRows[idx].GroupName])
                 {
                     tieCount++;
                 }
 
                 string rankStr = tieCount > 1 
-                    ? $"{i + 1}-{i + tieCount}" 
-                    : (i + 1).ToString();
+                    ? $"{idx + 1}-{idx + tieCount}" 
+                    : (idx + 1).ToString();
 
                 for (int j = 0; j < tieCount; j++)
                 {
-                    var row = armOrderedRows[i + j];
+                    var row = armOrderedRows[idx + j];
                     row.SportResults["Армрестлінг"] = new SportResultDto 
                     { 
                         Rank = rankStr, 
-                        Points = i + 1 
+                        Points = idx + 1 
                     };
                 }
-                i += tieCount;
+                idx += tieCount;
             }
         }
 
