@@ -572,8 +572,8 @@ public class TournamentService : ITournamentService
                 {
                     Id = m.Id,
                     Sport = "badminton",
-                    Team1Name = m.Player1 != null ? $"{m.Player1.FirstName} {m.Player1.LastName}" : (m.HomeTeam?.Name ?? "TBD"),
-                    Team2Name = m.Player2 != null ? $"{m.Player2.FirstName} {m.Player2.LastName}" : (m.AwayTeam?.Name ?? "TBD"),
+                    Team1Name = m.Player1 != null ? $"{m.Player1.FirstName} {m.Player1.LastName}" : (m.HomeTeam != null ? (m.HomeTeam.Name ?? "TBD") : "TBD"),
+                    Team2Name = m.Player2 != null ? $"{m.Player2.FirstName} {m.Player2.LastName}" : (m.AwayTeam != null ? (m.AwayTeam.Name ?? "TBD") : "TBD"),
                     Score1 = m.HomeScore.ToString(),
                     Score2 = m.AwayScore.ToString(),
                     Status = "Completed",
