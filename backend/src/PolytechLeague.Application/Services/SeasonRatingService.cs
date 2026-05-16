@@ -181,7 +181,7 @@ public class SeasonRatingService : ISeasonRatingService
                     .Select(p => {
                         var g = p.GroupName ?? p.Player?.Group;
                         return new { 
-                            Group = g!.Length >= 3 ? g.Substring(0, 3) : g, 
+                            Group = g!, 
                             Rank = p.Rank > 0 ? p.Rank : penalty 
                         };
                     })
