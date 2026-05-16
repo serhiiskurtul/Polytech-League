@@ -707,19 +707,27 @@ public class PlayerService : IPlayerService
                 }
                 var resultStr = rank > 0 ? $"{rank} місце" : "Учасник";
                 if (p.Points > 0) resultStr += $" ({p.Points} очок)";
-                if (p.BoardRank.HasValue && p.BoardRank.Value > 0) {
-                    resultStr += $", {p.BoardRank.Value} місце на дошці";
-                }
 
                 achievements.Add(new AchievementDto {
                     TournamentName = p.Tournament.Name,
                     SportType = "chess",
                     Date = p.Tournament.Date,
                     Rank = rank,
-                    BoardRank = p.BoardRank,
                     TournamentId = p.TournamentId,
                     Result = resultStr
                 });
+
+                if (p.BoardRank.HasValue && p.BoardRank.Value > 0) {
+                    achievements.Add(new AchievementDto {
+                        TournamentName = p.Tournament.Name,
+                        SportType = "chess",
+                        Date = p.Tournament.Date,
+                        Rank = 0,
+                        BoardRank = p.BoardRank,
+                        TournamentId = p.TournamentId,
+                        Result = $"{p.BoardRank.Value} місце на дошці"
+                    });
+                }
             }
         } catch (Exception ex) {
             _logger.LogError(ex, "Error populating Chess achievements for player {PlayerId}", playerId);
@@ -745,19 +753,27 @@ public class PlayerService : IPlayerService
                 }
                 var resultStr = rank > 0 ? $"{rank} місце" : "Учасник";
                 if (p.Points > 0) resultStr += $" ({p.Points} очок)";
-                if (p.BoardRank.HasValue && p.BoardRank.Value > 0) {
-                    resultStr += $", {p.BoardRank.Value} місце на дошці";
-                }
 
                 achievements.Add(new AchievementDto {
                     TournamentName = p.Event.Name,
                     SportType = "checkers",
                     Date = p.Event.Date,
                     Rank = rank,
-                    BoardRank = p.BoardRank,
                     TournamentId = p.TournamentId,
                     Result = resultStr
                 });
+
+                if (p.BoardRank.HasValue && p.BoardRank.Value > 0) {
+                    achievements.Add(new AchievementDto {
+                        TournamentName = p.Event.Name,
+                        SportType = "checkers",
+                        Date = p.Event.Date,
+                        Rank = 0,
+                        BoardRank = p.BoardRank,
+                        TournamentId = p.TournamentId,
+                        Result = $"{p.BoardRank.Value} місце на дошці"
+                    });
+                }
             }
         } catch (Exception ex) {
             _logger.LogError(ex, "Error populating Checkers achievements for player {PlayerId}", playerId);
