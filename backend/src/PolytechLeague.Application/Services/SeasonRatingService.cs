@@ -335,20 +335,20 @@ public class SeasonRatingService : ISeasonRatingService
             }
         }
 
-        // Calculate Totals and use "total registered teams + 1" penalty per sport for those who didn't participate
-        int penaltyForNonParticipation = rows.Count + 1;
-
+        // Calculate Totals and use "sport participants + 2" penalty per sport for those who didn't participate
         foreach (var sport in sports)
         {
-            // Only apply penalty if at least one team participated in this sport during this season
-            bool anyParticipation = rows.Any(r => r.SportResults[sport].Rank != "-");
-            if (anyParticipation)
+            // Count how many teams actually participated in this sport
+            int participantsCount = rows.Count(r => r.SportResults[sport].Rank != "-");
+            
+            if (participantsCount > 0)
             {
+                int penalty = participantsCount + 2;
                 foreach (var row in rows)
                 {
                     if (row.SportResults[sport].Rank == "-")
                     {
-                        row.SportResults[sport].Points = penaltyForNonParticipation;
+                        row.SportResults[sport].Points = penalty;
                     }
                 }
             }
