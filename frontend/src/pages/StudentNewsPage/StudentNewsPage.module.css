@@ -2,7 +2,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
-  color: #fff;
+  color: #333; /* Dark text for light theme */
 }
 
 .header {
@@ -15,20 +15,18 @@
   font-size: 2.5rem;
   font-weight: 800;
   margin-bottom: 0.5rem;
-  background: linear-gradient(135deg, #fff 0%, #aaa 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #1a1a1a;
 }
 
 .subtitle {
-  color: #888;
+  color: #666;
   font-size: 1.1rem;
 }
 
 .addBtn {
   margin-top: 1.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #3b82f6;
+  border: none;
   color: #fff;
   padding: 0.75rem 1.5rem;
   border-radius: 50px;
@@ -37,22 +35,23 @@
   align-items: center;
   gap: 0.5rem;
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
 }
 
 .addBtn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #2563eb;
   transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
 }
 
 .formWrapper {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #fff;
+  border: 1px solid #e5e7eb;
   border-radius: 15px;
   padding: 2rem;
   margin-bottom: 3rem;
   animation: fadeIn 0.5s ease;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .form {
@@ -62,11 +61,11 @@
 }
 
 .form input, .form textarea {
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #f9fafb;
+  border: 1px solid #d1d5db;
   border-radius: 8px;
   padding: 0.75rem;
-  color: #fff;
+  color: #1f2937;
   font-size: 1rem;
   transition: all 0.3s ease;
 }
@@ -74,7 +73,8 @@
 .form input:focus, .form textarea:focus {
   border-color: #3b82f6;
   outline: none;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: #fff;
 }
 
 .fileInputWrapper {
@@ -92,11 +92,12 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
 }
 
 .submitBtn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
 }
 
 .grid {
@@ -106,41 +107,41 @@
 }
 
 .card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: #fff;
+  border: 1px solid #e5e7eb;
   border-radius: 15px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
   position: relative;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .card:hover {
   transform: translateY(-5px);
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border-color: #d1d5db;
 }
 
 .cardHeader {
-  padding: 1.5rem;
+  padding: 1.25rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .date {
   font-size: 0.85rem;
-  color: #666;
+  color: #6b7280;
 }
 
 .studentName {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #3b82f6;
-  background: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+  background: #eff6ff;
   padding: 0.25rem 0.75rem;
   border-radius: 50px;
 }
@@ -173,11 +174,11 @@
   font-size: 1.25rem;
   font-weight: 700;
   margin-bottom: 0.75rem;
-  color: #fff;
+  color: #111827;
 }
 
 .content {
-  color: #aaa;
+  color: #4b5563;
   font-size: 0.95rem;
   line-height: 1.5;
   margin-bottom: 1rem;
@@ -185,7 +186,7 @@
 }
 
 .link {
-  color: #3b82f6;
+  color: #2563eb;
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 600;
@@ -196,19 +197,19 @@
 }
 
 .link:hover {
-  color: #60a5fa;
+  color: #1d4ed8;
 }
 
 .adminActions {
   padding: 1rem 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid #e5e7eb;
   display: flex;
   justify-content: flex-end;
 }
 
 .deleteBtn {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
   color: #ef4444;
   padding: 0.5rem 1rem;
   border-radius: 5px;
@@ -218,14 +219,15 @@
 }
 
 .deleteBtn:hover {
-  background: rgba(239, 68, 68, 0.2);
+  background: #fee2e2;
+  color: #dc2626;
   transform: translateY(-2px);
 }
 
 .loading, .empty {
   text-align: center;
   padding: 3rem;
-  color: #666;
+  color: #6b7280;
   font-size: 1.2rem;
 }
 
