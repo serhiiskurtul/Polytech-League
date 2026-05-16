@@ -249,6 +249,27 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     }
   };
 
+  const handleUpdatePenalty = async (matchId: number, homePenalty: number | null, awayPenalty: number | null) => {
+    try {
+      const match = (details.matches || details.games || []).find((m: any) => m.id === matchId);
+      if (!match) return;
+
+      const payload = {
+        ...match,
+        homePenaltyScore: homePenalty,
+        awayPenaltyScore: awayPenalty,
+        homeRosterIds: match.homeRoster?.map((p: any) => p.id) || match.homeRosterIds || [],
+        awayRosterIds: match.awayRoster?.map((p: any) => p.id) || match.awayRosterIds || []
+      };
+
+      await updateFootballMatch(matchId, payload);
+      onRefresh();
+    } catch (err) {
+      console.error('Update Penalty Error:', err);
+      alert('Помилка при оновленні рахунку пенальті');
+    }
+  };
+
   const handleOpenScorers = (match: any) => {
     setSelectedMatchForScorers(match);
     const initialScorers: {[playerId: number]: number} = {};
@@ -1175,6 +1196,20 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                           disabled={!isAdmin}
                         />
                       </div>
+                      {homeScore === awayScore && (sport === 'football' || sport === 'футбол') && (
+                        <div style={{ marginLeft: '8px' }}>
+                          <input 
+                            type="number" 
+                            min="0"
+                            placeholder="П"
+                            style={{ width: '40px', padding: '4px', borderRadius: '4px', border: '1px solid #f59e0b', textAlign: 'center' }}
+                            defaultValue={match.homePenaltyScore ?? ''}
+                            onBlur={(e) => handleUpdatePenalty(match.id, e.target.value ? parseInt(e.target.value) : null, match.awayPenaltyScore)}
+                            disabled={!isAdmin}
+                            title="Пенальті"
+                          />
+                        </div>
+                      )}
                     </div>
 
                     <div className={styles.vsDivider}>
@@ -1214,6 +1249,20 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                           disabled={!isAdmin}
                         />
                       </div>
+                      {homeScore === awayScore && (sport === 'football' || sport === 'футбол') && (
+                        <div style={{ marginLeft: '8px' }}>
+                          <input 
+                            type="number" 
+                            min="0"
+                            placeholder="П"
+                            style={{ width: '40px', padding: '4px', borderRadius: '4px', border: '1px solid #f59e0b', textAlign: 'center' }}
+                            defaultValue={match.awayPenaltyScore ?? ''}
+                            onBlur={(e) => handleUpdatePenalty(match.id, match.homePenaltyScore, e.target.value ? parseInt(e.target.value) : null)}
+                            disabled={!isAdmin}
+                            title="Пенальті"
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
 
