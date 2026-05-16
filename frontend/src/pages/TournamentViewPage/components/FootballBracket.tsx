@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { footballMatchResponse } from '@/shared/types/football.types';
 import UniversalBracket, { BracketRound, BracketMatch } from '@/components/Tournament/UniversalBracket/UniversalBracket';
 import styles from '../TournamentViewPage.module.css';
@@ -23,6 +23,34 @@ const FootballBracket: React.FC<FootballBracketProps> = ({
   onViewInfo,
   teams = []
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeftState, setScrollLeftState] = useState(0);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    setIsDragging(true);
+    setStartX(e.pageX - containerRef.current.offsetLeft);
+    setScrollLeftState(containerRef.current.scrollLeft);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !containerRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - containerRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5; // Scroll speed multiplier
+    containerRef.current.scrollLeft = scrollLeftState - walk;
+  };
+
   const STAGE_ORDER = [
     'Груповий етап',
     '1/16 Фіналу',
@@ -169,7 +197,15 @@ const FootballBracket: React.FC<FootballBracketProps> = ({
   };
 
   return (
-    <div className={styles.footballBracketWrapper}>
+    <div 
+      ref={containerRef}
+      className={styles.footballBracketWrapper}
+      onMouseDown={handleMouseDown}
+      onMouseLeave={handleMouseLeave}
+      onMouseUp={handleMouseUp}
+      onMouseMove={handleMouseMove}
+      style={{ cursor: isDragging ? 'grabbing' : 'grab', overflowX: 'auto' }}
+    >
       {matches.length > 0 ? (
         <UniversalBracket 
           rounds={mappedRounds} 
