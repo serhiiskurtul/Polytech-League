@@ -1163,7 +1163,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
               const isDraw = Number(homeScore) === Number(awayScore) && Number(homeScore) > 0;
 
               return (
-                <div key={match.id} className={styles.matchCard}>
+                <div key={match.id} className={styles.matchCard} onClick={() => { setSelectedMatchForInfo(match); setIsMatchInfoModalOpen(true); }} style={{ cursor: 'pointer' }}>
                   <div className={styles.matchStage}>{match.stage || 'Груповий етап'}</div>
                   
                   <div className={styles.matchTeams}>
@@ -1173,7 +1173,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       </div>
                       <div 
                         className={`${styles.teamName} ${isHomeWinner ? styles.winnerName : ''} ${isDraw ? styles.drawName : ''}`}
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           const tId = match.whiteTeamId || match.homeTeamId;
                           if (tId) { setEditingTeamId(tId); setIsTeamRosterModalOpen(true); }
                         }}
@@ -1183,7 +1184,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         {isHomeWinner && <i className={`fas fa-crown ${styles.crownIcon}`}></i>}
                         {isDraw && <i className={`fas fa-handshake ${styles.drawIcon}`}></i>}
                       </div>
-                      <div className={styles.scoreInput}>
+                      <div className={styles.scoreInput} onClick={(e) => e.stopPropagation()}>
                         <input 
                           type="number" 
                           min="0"
@@ -1197,7 +1198,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         />
                       </div>
                       {homeScore === awayScore && (sport === 'football' || sport === 'футбол') && (
-                        <div style={{ marginLeft: '8px' }}>
+                        <div style={{ marginLeft: '8px' }} onClick={(e) => e.stopPropagation()}>
                           <input 
                             type="number" 
                             min="0"
@@ -1227,7 +1228,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       </div>
                       <div 
                         className={`${styles.teamName} ${isAwayWinner ? styles.winnerName : ''} ${isDraw ? styles.drawName : ''}`}
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           const tId = match.blackTeamId || match.awayTeamId;
                           if (tId) { setEditingTeamId(tId); setIsTeamRosterModalOpen(true); }
                         }}
@@ -1237,7 +1239,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         {isAwayWinner && <i className={`fas fa-crown ${styles.crownIcon}`}></i>}
                         {isDraw && <i className={`fas fa-handshake ${styles.drawIcon}`}></i>}
                       </div>
-                      <div className={styles.scoreInput}>
+                      <div className={styles.scoreInput} onClick={(e) => e.stopPropagation()}>
                         <input 
                           type="number" 
                           min="0"
@@ -1250,7 +1252,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         />
                       </div>
                       {homeScore === awayScore && (sport === 'football' || sport === 'футбол') && (
-                        <div style={{ marginLeft: '8px' }}>
+                        <div style={{ marginLeft: '8px' }} onClick={(e) => e.stopPropagation()}>
                           <input 
                             type="number" 
                             min="0"
@@ -1267,7 +1269,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   </div>
 
                   {isAdmin && (
-                    <div className={styles.matchActions}>
+                    <div className={styles.matchActions} onClick={(e) => e.stopPropagation()}>
                       {(sport === 'football' || sport === 'футбол') && (
                         <button 
                           className={styles.scorersBtn}
