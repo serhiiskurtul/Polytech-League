@@ -20,7 +20,8 @@ const StudentNewsPage: React.FC = () => {
     date: new Date().toISOString().split('T')[0],
     externalLink: ''
   });
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
+  const [selectedVideos, setSelectedVideos] = useState<File[]>([]);
 
   useEffect(() => {
     fetchAchievements();
@@ -43,7 +44,8 @@ const StudentNewsPage: React.FC = () => {
     try {
       await createExternalAchievement({
         ...newEntry,
-        file: selectedFile
+        photos: selectedPhotos,
+        videos: selectedVideos
       });
       toast.success('Статтю додано!');
       setShowAddForm(false);
@@ -54,7 +56,8 @@ const StudentNewsPage: React.FC = () => {
         date: new Date().toISOString().split('T')[0],
         externalLink: ''
       });
-      setSelectedFile(null);
+      setSelectedPhotos([]);
+      setSelectedVideos([]);
       fetchAchievements();
     } catch (error) {
       toast.error('Помилка при додаванні');
@@ -127,11 +130,22 @@ const StudentNewsPage: React.FC = () => {
               onChange={(e) => setNewEntry({ ...newEntry, externalLink: e.target.value })}
             />
             <div className={styles.fileInputWrapper}>
-              <label style={{ color: '#aaa', fontSize: '0.9rem' }}>Фото виступу (опціонально):</label>
+              <label style={{ color: '#aaa', fontSize: '0.9rem' }}>Фото (декілька):</label>
               <input 
                 type="file" 
                 accept="image/*"
-                onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                multiple
+                onChange={(e) => setSelectedPhotos(Array.from(e.target.files || []))}
+                style={{ background: '#222', color: '#fff', padding: '0.5rem', borderRadius: '5px', border: '1px solid #444' }}
+              />
+            </div>
+            <div className={styles.fileInputWrapper}>
+              <label style={{ color: '#aaa', fontSize: '0.9rem' }}>Відео (декілька):</label>
+              <input 
+                type="file" 
+                accept="video/*"
+                multiple
+                onChange={(e) => setSelectedVideos(Array.from(e.target.files || []))}
                 style={{ background: '#222', color: '#fff', padding: '0.5rem', borderRadius: '5px', border: '1px solid #444' }}
               />
             </div>
@@ -153,9 +167,17 @@ const StudentNewsPage: React.FC = () => {
                 <div className={styles.studentName}>{item.studentName}</div>
               </div>
               
-              {item.photoUrl && (
-                <div className={styles.photoWrapper}>
-                  <img src={getPhotoUrl(item.photoUrl)!} alt={item.title} className={styles.photo} />
+              {item.media && item.media.length > 0 && (
+                <div className={styles.mediaGallery}>
+                  {item.media.map((media) => (
+                    <div key={media.id} className={styles.mediaItem}>
+                      {media.type === 'photo' ? (
+                        <img src={getPhotoUrl(media.url)!} alt={item.title} className={styles.photo} />
+                      ) : (
+                        <video src={getPhotoUrl(media.url)!} controls className={styles.video} />
+                      )}
+                    </div>
+                  ))}
                 </div>
               )}
               

@@ -28,7 +28,10 @@ namespace PolytechLeague.API.Controllers.Common
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ExternalAchievement>>> GetEntries()
         {
-            return await _context.ExternalAchievements.OrderByDescending(e => e.Date).ToListAsync();
+            return await _context.ExternalAchievements
+                .Include(e => e.Media)
+                .OrderByDescending(e => e.Date)
+                .ToListAsync();
         }
 
         [HttpPost]
@@ -39,14 +42,9 @@ namespace PolytechLeague.API.Controllers.Common
             [FromForm] string content,
             [FromForm] DateTime date,
             [FromForm] string? externalLink,
-            IFormFile? file)
+            List<IFormFile>? photos,
+            List<IFormFile>? videos)
         {
-            string? photoUrl = null;
-            if (file != null)
-            {
-                photoUrl = await _fileService.SaveFileAsync(file, "external-achievements", default);
-            }
-
             var entry = new ExternalAchievement
             {
                 StudentName = studentName,
@@ -54,9 +52,26 @@ namespace PolytechLeague.API.Controllers.Common
                 Content = content,
                 Date = date,
                 ExternalLink = externalLink,
-                PhotoUrl = photoUrl,
                 CreatedAt = DateTime.UtcNow
             };
+
+            if (photos != null)
+            {
+                foreach (var photo in photos)
+                {
+                    var url = await _fileService.SaveFileAsync(photo, "external-achievements", default);
+                    entry.Media.Add(new ExternalAchievementMedia { Url = url, Type = "photo" });
+                }
+            }
+
+            if (videos != null)
+            {
+                foreach (var video in videos)
+                {
+                    var url = await _fileService.SaveFileAsync(video, "external-achievements", default);
+                    entry.Media.Add(new ExternalAchievementMedia { Url = url, Type = "video" });
+                }
+            }
 
             _context.ExternalAchievements.Add(entry);
             await _context.SaveChangesAsync();
@@ -67,13 +82,16 @@ namespace PolytechLeague.API.Controllers.Common
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteEntry(long id)
         {
-            var entry = await _context.ExternalAchievements.FindAsync(id);
+            var entry = await _context.ExternalAchievements
+                .Include(e => e.Media)
+                .FirstOrDefaultAsync(e => e.Id == id);
+                
             if (entry == null) return NotFound();
 
-            // Delete file if exists
-            if (!string.IsNullOrEmpty(entry.PhotoUrl))
+            // Delete files if exist
+            foreach (var media in entry.Media)
             {
-                try { _fileService.DeleteFile(entry.PhotoUrl); } catch { /* ignore */ }
+                try { _fileService.DeleteFile(media.Url); } catch { /* ignore */ }
             }
 
             _context.ExternalAchievements.Remove(entry);

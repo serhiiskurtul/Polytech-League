@@ -1175,9 +1175,6 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<string>("ExternalLink")
                         .HasColumnType("text");
 
-                    b.Property<string>("PhotoUrl")
-                        .HasColumnType("text");
-
                     b.Property<string>("StudentName")
                         .IsRequired()
                         .HasColumnType("text");
@@ -1189,6 +1186,35 @@ namespace PolytechLeague.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ExternalAchievements");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.ExternalAchievementMedia", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("ExternalAchievementId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExternalAchievementId");
+
+                    b.ToTable("ExternalAchievementMedias");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Football.FootballCard", b =>
@@ -3386,6 +3412,17 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Navigation("Event");
                 });
 
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.ExternalAchievementMedia", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.ExternalAchievement", "ExternalAchievement")
+                        .WithMany("Media")
+                        .HasForeignKey("ExternalAchievementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ExternalAchievement");
+                });
+
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Football.FootballCard", b =>
                 {
                     b.HasOne("PolytechLeague.Domain.Entities.Football.FootballMatch", "Match")
@@ -4315,6 +4352,11 @@ namespace PolytechLeague.Persistence.Migrations
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Event", b =>
                 {
                     b.Navigation("Photos");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.ExternalAchievement", b =>
+                {
+                    b.Navigation("Media");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Football.FootballMatch", b =>
