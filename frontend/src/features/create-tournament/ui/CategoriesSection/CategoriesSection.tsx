@@ -17,7 +17,6 @@ const CategoriesSection = ({ selectedCategories, handleCategoryToggle, sport, is
         'armwrestling', 'table_tennis', 'badminton'
       ];
       if (sportsWithoutMixed.includes(sport)) return false;
-      if ((sport === 'chess' || sport === 'checkers') && isTeam) return false;
     }
     return true;
   });
