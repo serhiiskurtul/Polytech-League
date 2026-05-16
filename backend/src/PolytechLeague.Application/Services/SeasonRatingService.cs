@@ -179,9 +179,19 @@ public class SeasonRatingService : ISeasonRatingService
                     .Select(p => {
                         var g = p.GroupName ?? p.Player?.Group;
                         var digits = new string(g!.Where(char.IsDigit).ToArray());
+                        
+                        int rank = p.Rank;
+                        if (rank <= 0)
+                        {
+                            if (e.FirstPlaceId != null && p.PlayerId == e.FirstPlaceId) rank = 1;
+                            else if (e.SecondPlaceId != null && p.PlayerId == e.SecondPlaceId) rank = 2;
+                            else if (e.ThirdPlaceId != null && p.PlayerId == e.ThirdPlaceId) rank = 3;
+                            else rank = penalty;
+                        }
+
                         return new { 
                             Group = digits, 
-                            Rank = p.Rank > 0 ? p.Rank : penalty 
+                            Rank = rank 
                         };
                     })
                     .Where(x => !string.IsNullOrEmpty(x.Group))
