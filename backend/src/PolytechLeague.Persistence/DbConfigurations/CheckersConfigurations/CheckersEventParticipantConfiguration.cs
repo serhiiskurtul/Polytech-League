@@ -26,6 +26,10 @@ public class CheckersEventParticipantConfiguration : IEntityTypeConfiguration<Ch
             .HasColumnName("starting_rating")
             .IsRequired();
 
+        builder.Property(x => x.BoardRank)
+            .HasColumnName("board_rank")
+            .IsRequired(false);
+
         builder.HasOne(x => x.Event)
             .WithMany(x => x.Players)
             .HasForeignKey(x => x.TournamentId)

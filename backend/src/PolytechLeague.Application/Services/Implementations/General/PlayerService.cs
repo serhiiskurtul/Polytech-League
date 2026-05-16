@@ -462,12 +462,12 @@ public class PlayerService : IPlayerService
 
                 foreach (var a in chessLookup[playerId]) {
                     if (a.Tournament == null) continue;
-                    achievements.Add(new AchievementDto { TournamentName = a.Tournament.Name, SportType = "chess", Date = a.Tournament.Date, Rank = a.Rank, TournamentId = a.TournamentId, Result = GetResultLabel(a.Rank) });
+                    achievements.Add(new AchievementDto { TournamentName = a.Tournament.Name, SportType = "chess", Date = a.Tournament.Date, Rank = a.Rank, BoardRank = a.BoardRank, TournamentId = a.TournamentId, Result = GetResultLabel(a.Rank) });
                     sportTypes.Add("chess");
                 }
                 foreach (var a in checkersLookup[playerId]) {
                     if (a.Event == null) continue;
-                    achievements.Add(new AchievementDto { TournamentName = a.Event.Name, SportType = "checkers", Date = a.Event.Date, Rank = a.Rank, TournamentId = a.TournamentId, Result = GetResultLabel(a.Rank) });
+                    achievements.Add(new AchievementDto { TournamentName = a.Event.Name, SportType = "checkers", Date = a.Event.Date, Rank = a.Rank, BoardRank = a.BoardRank, TournamentId = a.TournamentId, Result = GetResultLabel(a.Rank) });
                     sportTypes.Add("checkers");
                 }
                 foreach (var a in ttLookup[playerId]) {
@@ -568,6 +568,7 @@ public class PlayerService : IPlayerService
                         pts = 10;
                     } else pts = 10;
                     if (ach.Rank == 1) pts += 100; else if (ach.Rank == 2) pts += 50; else if (ach.Rank == 3) pts += 30;
+                    if (ach.BoardRank == 1) pts += 40; else if (ach.BoardRank == 2) pts += 25; else if (ach.BoardRank == 3) pts += 15;
                     if (ach.Result == "MVP") pts += 15;
                     if (pts <= 0) continue;
                     var finalPts = (int)Math.Round(pts * mult);
@@ -684,6 +685,7 @@ public class PlayerService : IPlayerService
                     SportType = "chess",
                     Date = p.Tournament.Date,
                     Rank = rank,
+                    BoardRank = p.BoardRank,
                     TournamentId = p.TournamentId,
                     Result = rank > 0 ? $"{rank} місце ({p.Points} очок)" : $"{p.Points} очок"
                 });
@@ -715,6 +717,7 @@ public class PlayerService : IPlayerService
                     SportType = "checkers",
                     Date = p.Event.Date,
                     Rank = rank,
+                    BoardRank = p.BoardRank,
                     TournamentId = p.TournamentId,
                     Result = rank > 0 ? $"{rank} місце ({p.Points} очок)" : $"{p.Points} очок"
                 });

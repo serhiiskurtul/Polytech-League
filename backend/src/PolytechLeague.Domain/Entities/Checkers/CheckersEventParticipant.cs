@@ -17,6 +17,7 @@ public class CheckersEventParticipant
     // Статистика гравця у цьому конкретному турнірі
     public double Points { get; set; } = 0;
     public int Rank { get; set; } // місце
+    public int? BoardRank { get; set; }
     public string? GroupName { get; set; }
     public string? PlayerFirstName { get; set; }
     public string? PlayerLastName { get; set; }

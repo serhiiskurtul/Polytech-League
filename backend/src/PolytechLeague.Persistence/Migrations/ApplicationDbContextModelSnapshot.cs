@@ -627,6 +627,10 @@ namespace PolytechLeague.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<int?>("BoardRank")
+                        .HasColumnType("integer")
+                        .HasColumnName("board_rank");
+
                     b.Property<long?>("CollegeId")
                         .HasColumnType("bigint");
 
@@ -795,6 +799,10 @@ namespace PolytechLeague.Persistence.Migrations
 
                     b.Property<long>("PlayerId")
                         .HasColumnType("bigint");
+
+                    b.Property<int?>("BoardRank")
+                        .HasColumnType("integer")
+                        .HasColumnName("board_rank");
 
                     b.Property<long?>("CollegeId")
                         .HasColumnType("bigint");

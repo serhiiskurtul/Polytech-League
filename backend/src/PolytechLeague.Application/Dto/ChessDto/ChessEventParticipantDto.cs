@@ -16,6 +16,7 @@ public class ChessEventParticipantDto
     public int Rating { get; set; }
     public double Points { get; set; }
     public int Rank { get; set; }
+    public int? BoardRank { get; set; }
     public double Buchholz { get; set; }
     public double SonnebornBerger { get; set; }
     public string? FideId { get; set; }
@@ -49,6 +50,7 @@ public static class ChessEventParticipantDtoExtensions
             Rating = participant.Rating != 0 ? participant.Rating : (participant.Player?.ChessRating ?? 0),
             Points = participant.Points,
             Rank = participant.Rank,
+            BoardRank = participant.BoardRank,
             Buchholz = 0,
             SonnebornBerger = 0,
             FideId = participant.Player?.ChessFideId,
@@ -67,6 +69,7 @@ public static class ChessEventParticipantDtoExtensions
             PlayerId = dto.PlayerId,
             Points = dto.Points,
             Rank = dto.Rank,
+            BoardRank = dto.BoardRank,
             GroupName = dto.GroupName,
             PlayerFirstName = dto.FirstName,
             PlayerLastName = dto.LastName,

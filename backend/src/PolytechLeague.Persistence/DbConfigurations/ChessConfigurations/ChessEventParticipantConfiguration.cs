@@ -25,6 +25,10 @@ public class ChessEventParticipantConfiguration : IEntityTypeConfiguration<Chess
             .HasColumnName("rank")
             .IsRequired();
 
+        builder.Property(x => x.BoardRank)
+            .HasColumnName("board_rank")
+            .IsRequired(false);
+
         builder.HasOne(x => x.Tournament)
             .WithMany(x => x.Players)
             .HasForeignKey(x => x.TournamentId)

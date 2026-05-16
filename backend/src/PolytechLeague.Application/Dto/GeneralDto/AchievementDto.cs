@@ -7,6 +7,7 @@ public class AchievementDto
     public string? Result { get; set; }
     public DateTime Date { get; set; }
     public int? Rank { get; set; }
+    public int? BoardRank { get; set; }
     public long TournamentId { get; set; }
     public bool IsCaptain { get; set; }
 }

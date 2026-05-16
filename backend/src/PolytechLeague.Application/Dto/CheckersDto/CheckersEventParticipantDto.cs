@@ -16,6 +16,7 @@ public class CheckersEventParticipantDto
     public double Points { get; set; }
     public int Rating { get; set; }
     public int Rank { get; set; }
+    public int? BoardRank { get; set; }
     public string? GroupName { get; set; }
     
     [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -44,6 +45,7 @@ public static class CheckersEventParticipantDtoExtensions
             Points = participant.Points,
             Rating = participant.StartingRating,
             Rank = participant.Rank,
+            BoardRank = participant.BoardRank,
             GroupName = participant.GroupName ?? participant.Player?.Group,
             Status = participant.Status
         };
@@ -58,6 +60,7 @@ public static class CheckersEventParticipantDtoExtensions
             StartingRating = dto.Rating,
             Points = dto.Points,
             Rank = dto.Rank,
+            BoardRank = dto.BoardRank,
             GroupName = dto.GroupName,
             PlayerFirstName = dto.FirstName,
             PlayerLastName = dto.LastName,
