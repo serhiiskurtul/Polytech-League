@@ -554,11 +554,22 @@ const PlayersRatingPage = () => {
                 <h3>MVP змагань</h3>
                 <p>Додаткові бали за звання найкращого гравця турніру (MVP):</p>
                 <ul>
-                  <li><span>Кожне звання MVP:</span> +25 балів</li>
+                  <li><span>Кожне звання MVP:</span> +15 балів</li>
                 </ul>
-
               </div>
 
+              <div className={styles.formulaCard}>
+                <div className={styles.formulaIcon} style={{ background: '#e0f2fe', color: '#0369a1' }}>
+                  <i className="fa-solid fa-chess-board"></i>
+                </div>
+                <h3>Індивідуальний залік (Дошки)</h3>
+                <p>Додаткові бали за зайняте місце на дошці (тільки для шахів та шашок, крім міжгрупових):</p>
+                <ul>
+                  <li><span>🥇 1 місце на дошці:</span> +40 балів</li>
+                  <li><span>🥈 2 місце на дошці:</span> +25 балів</li>
+                  <li><span>🥉 3 місце на дошці:</span> +15 балів</li>
+                </ul>
+              </div>
 
               <div className={styles.formulaCard}>
                 <div className={styles.formulaIcon} style={{ background: '#f5f3ff', color: '#7c3aed' }}>
