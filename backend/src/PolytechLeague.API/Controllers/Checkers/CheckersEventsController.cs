@@ -67,6 +67,7 @@ public class CheckersEventsController(ICheckersEventService checkersEventService
         await checkersEventService.CreateAsync(entity, cancellationToken);
 
         await redisService.RemoveGroupAsync("checkers_events_all");
+        await redisService.RemoveGroupAsync("tournaments_group");
 
         return Created();
     }
@@ -83,6 +84,7 @@ public class CheckersEventsController(ICheckersEventService checkersEventService
 
         await redisService.RemoveGroupAsync("checkers_events_all");
         await redisService.RemoveDataAsync($"checkers_event_{id}");
+        await redisService.RemoveGroupAsync("tournaments_group");
 
         return NoContent();
     }
@@ -95,6 +97,7 @@ public class CheckersEventsController(ICheckersEventService checkersEventService
 
         await redisService.RemoveGroupAsync("checkers_events_all");
         await redisService.RemoveDataAsync($"checkers_event_{id}");
+        await redisService.RemoveGroupAsync("tournaments_group");
 
         return NoContent();
     }

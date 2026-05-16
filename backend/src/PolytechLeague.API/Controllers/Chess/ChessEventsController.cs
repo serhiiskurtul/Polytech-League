@@ -70,6 +70,7 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
         await chessEventService.CreateAsync(entity, cancellationToken);
 
         await redisService.RemoveGroupAsync("chess_events_all");
+        await redisService.RemoveGroupAsync("tournaments_group");
 
         return Created();
     }
@@ -86,6 +87,7 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
 
         await redisService.RemoveGroupAsync("chess_events_all");
         await redisService.RemoveDataAsync($"chess_event_{id}");
+        await redisService.RemoveGroupAsync("tournaments_group");
 
         return NoContent();
     }
@@ -98,6 +100,7 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
 
         await redisService.RemoveGroupAsync("chess_events_all");
         await redisService.RemoveDataAsync($"chess_event_{id}");
+        await redisService.RemoveGroupAsync("tournaments_group");
 
         return NoContent();
     }
