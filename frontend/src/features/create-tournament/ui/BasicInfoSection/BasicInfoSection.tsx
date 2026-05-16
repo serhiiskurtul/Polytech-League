@@ -6,7 +6,7 @@ import {
   CHESS_SYSTEMS, 
   CHECKERS_SYSTEMS, 
   TABLE_TENNIS_TOURNAMENT_TYPES, 
-  BASKETBALL3X3_TOURNAMENT_TYPES, 
+  BASKETBALL_TOURNAMENT_TYPES, 
   BADMINTON_TOURNAMENT_TYPES 
 } from '../../model/constants';
 import { TournamentFormData } from '../../model/useTournamentForm';
@@ -142,7 +142,7 @@ const BasicInfoSection = ({ formData, handleInputChange }: BasicInfoSectionProps
                       <option key={type.id} value={type.id}>{type.name} - {type.description}</option>
                     ))
                     : formData.sport === 'basketball-3x3'
-                      ? BASKETBALL3X3_TOURNAMENT_TYPES.map(type => (
+                      ? BASKETBALL_TOURNAMENT_TYPES.map(type => (
                           <option key={type.id} value={type.id}>{type.name} - {type.description}</option>
                         ))
                       : formData.sport === 'badminton'

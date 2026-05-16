@@ -6,7 +6,7 @@ import {
   CHESS_SYSTEMS, 
   CHECKERS_SYSTEMS, 
   TABLE_TENNIS_TOURNAMENT_TYPES, 
-  BASKETBALL3X3_TOURNAMENT_TYPES, 
+  BASKETBALL_TOURNAMENT_TYPES, 
   ARMWRESTLING_HANDS, 
   ARMWRESTLING_WEIGHT_CLASSES, 
   ARMWRESTLING_CATEGORIES, 
@@ -33,7 +33,7 @@ const PreviewSection = ({ formData, selectedCategories }: PreviewSectionProps) =
       const wc = ARMWRESTLING_WEIGHT_CLASSES.find(w => w.id === formData.armWeightClass);
       return `${hand?.name || ''} · ${wc?.name || ''}`;
     } else if (formData.sport === 'basketball-3x3') {
-      const type = BASKETBALL3X3_TOURNAMENT_TYPES.find(t => t.id === formData.tournamentType);
+      const type = BASKETBALL_TOURNAMENT_TYPES.find(t => t.id === formData.tournamentType);
       return type ? type.name : formData.tournamentType;
     } else if (formData.sport === 'badminton') {
       const type = BADMINTON_TOURNAMENT_TYPES.find(t => t.id === formData.tournamentType);

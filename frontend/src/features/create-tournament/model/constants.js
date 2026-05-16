@@ -6,7 +6,7 @@ export const CATEGORIES = [
 
 export const AVAILABLE_SPORTS = [
   { id: 'football', name: 'Футбол', icon: 'fas fa-futbol' },
-  { id: 'basketball-3x3', name: 'Баскетбол 3x3', icon: 'fas fa-basketball-ball' },
+  { id: 'basketball-3x3', name: 'Баскетбол', icon: 'fas fa-basketball-ball' },
   { id: 'volleyball', name: 'Волейбол', icon: 'fas fa-volleyball-ball' },
   { id: 'chess', name: 'Шахи', icon: 'fas fa-chess' },
   { id: 'checkers', name: 'Шашки', icon: 'fas fa-chess-board' },
@@ -75,7 +75,7 @@ export const ARMWRESTLING_CATEGORIES = [
   { id: 'Open', name: 'Відкрита' }
 ];
 
-export const BASKETBALL3X3_TOURNAMENT_TYPES = [
+export const BASKETBALL_TOURNAMENT_TYPES = [
   { id: 'SingleElimination', name: 'Олімпійська система', description: 'Програєш - вилітаєш' },
   { id: 'DoubleElimination', name: 'Подвійна олімпійська система (є другий шанс)', description: 'Друга спроба при поразці' },
   { id: 'RoundRobin', name: 'Кругова система', description: 'Всі грають з усіма' },
