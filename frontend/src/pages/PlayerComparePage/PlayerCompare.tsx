@@ -281,6 +281,15 @@ export const PlayerComparePage = () => {
                       val1={player1.goalsCount} 
                       val2={player2?.goalsCount}
                     />
+                    {((player1.sportStats?.some(s => s.sportType === 'football') || (player1.goalsCount || 0) > 0) &&
+                      (player2?.sportStats?.some(s => s.sportType === 'football') || (player2?.goalsCount || 0) > 0)) && (
+                      <StatRow 
+                        label="Хет-трики" 
+                        val1={player1.hatTricksCount} 
+                        val2={player2?.hatTricksCount}
+                        suffix=" хет-триків"
+                      />
+                    )}
                     <StatRow 
                       label="Жовті картки" 
                       val1={player1.yellowCardsCount} 

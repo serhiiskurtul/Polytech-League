@@ -81,6 +81,7 @@ public class PlayerDto
     public int MatchesPlayed { get; set; }
     public int WinsCount { get; set; }
     public int GoalsCount { get; set; }
+    public int HatTricksCount { get; set; }
     public int YellowCardsCount { get; set; }
     public int RedCardsCount { get; set; }
     public int PerformanceScore { get; set; }
@@ -186,6 +187,7 @@ public static class PlayerDtoExtensions
             MatchesPlayed = 0,
             WinsCount = 0,
             GoalsCount = 0,
+            HatTricksCount = 0,
             YellowCardsCount = 0,
             RedCardsCount = 0,
             PerformanceScore = 0,

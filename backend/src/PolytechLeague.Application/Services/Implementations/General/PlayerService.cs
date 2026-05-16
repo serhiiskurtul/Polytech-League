@@ -1883,6 +1883,10 @@ public class PlayerService : IPlayerService
                 GoalsScored = g.GoalsCount,
                 Date = g.Match?.Event?.Date ?? DateTime.MinValue
             }).OrderByDescending(x => x.Date).ToList();
+
+            dto.HatTricksCount = goalDetails
+                .GroupBy(g => g.MatchId)
+                .Count(g => g.Sum(x => x.GoalsCount) >= 3);
             
             // Try fetching cards using multiple methods to be absolutely sure
             int yellowCards = 0;

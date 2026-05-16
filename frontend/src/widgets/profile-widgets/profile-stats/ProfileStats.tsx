@@ -18,6 +18,7 @@ interface Stats {
   yellowCardsCount?: number;
   redCardsCount?: number;
   globalRank?: number;
+  hatTricksCount?: number;
   sportStats?: SportStat[];
   chessTotalPoints?: number | null;
   chessTotalPossiblePoints?: number | null;
@@ -107,6 +108,12 @@ const ProfileStats = ({ stats }: ProfileStatsProps) => {
           <div className={styles.statCard} title="Кількість забитих голів у футбольних матчах">
             <div className={styles.statValue}>{stats.goalsCount || 0}</div>
             <div className={styles.statLabel}>Забитих голів</div>
+          </div>
+        )}
+        {(isFootballer || (stats.hatTricksCount !== undefined && stats.hatTricksCount > 0)) && (
+          <div className={styles.statCard} title="Кількість забитих хет-триків у футбольних матчах (3+ голи за матч)">
+            <div className={styles.statValue}>{stats.hatTricksCount || 0}</div>
+            <div className={styles.statLabel}>Хет-триків</div>
           </div>
         )}
         {(isFootballer || (stats.yellowCardsCount !== undefined && stats.yellowCardsCount > 0)) && (
