@@ -294,11 +294,9 @@ const TournamentViewPage = () => {
 
         // Update Board Ranks for Chess/Checkers
         if (['chess', 'checkers'].includes(sportKey) && (details as any).level !== 'CollegeGroup') {
-          console.log("Updating board ranks for", sportKey);
           // 1. Clear boardRank for all participants in this tournament
           for (const p of (details as any).participants || []) {
             if (p.boardRank) {
-              console.log("Clearing board rank for player", p.playerId);
               const pPayload = { ...p, boardRank: null };
               if (sportKey === 'checkers') {
                 await updateParticipantInCheckersEvent(id!, p.playerId, pPayload);
@@ -318,8 +316,6 @@ const TournamentViewPage = () => {
             { playerId: winners.board2_3rd, rank: 3 },
           ];
 
-          console.log("Board updates:", boardUpdates);
-          console.log("All participants:", (details as any).participants);
 
           const allTeamPlayers = (details as any).teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamId: t.id }))) || [];
 
@@ -328,19 +324,15 @@ const TournamentViewPage = () => {
               const participant = (details as any).participants?.find((p: any) => Number(p.playerId || p.id) === Number(update.playerId));
               const player = allTeamPlayers.find((p: any) => Number(p.id) === Number(update.playerId));
               
-              console.log("Found participant for update:", participant);
-              console.log("Found player in team for update:", player);
 
               if (participant) {
                 const pPayload = { ...participant, boardRank: update.rank };
-                console.log("Setting board rank for player", update.playerId, "to", update.rank);
                 if (sportKey === 'checkers') {
                   await updateParticipantInCheckersEvent(id!, update.playerId, pPayload);
                 } else {
                   await updateParticipantInEvent(id!, update.playerId, pPayload);
                 }
               } else if (player) {
-                console.log("Creating new participant for player", update.playerId, "to", update.rank);
                 const pPayload = {
                   playerId: update.playerId,
                   boardRank: update.rank,
@@ -381,7 +373,7 @@ const TournamentViewPage = () => {
         }
       }
 
-      console.log("Saving winners with payload:", payload);
+
 
       switch (sportKey) {
         case 'checkers': await updateCheckersEvent(id, payload as any); break;
