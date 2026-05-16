@@ -431,7 +431,8 @@ public class SeasonRatingService : ISeasonRatingService
                         {
                             foreach (var kvp in manualSportResults)
                             {
-                                sportResults[kvp.Key] = new SportResultDto { Rank = kvp.Value, Points = 0 };
+                                string key = kvp.Key == "Армреслінг" ? "Армрестлінг" : kvp.Key;
+                                sportResults[key] = new SportResultDto { Rank = kvp.Value, Points = 0 };
                             }
                         }
                     }
@@ -548,7 +549,8 @@ public class SeasonRatingService : ISeasonRatingService
                         {
                             foreach (var kvp in manualSportResults)
                             {
-                                sportResults[kvp.Key] = new SportResultDto { Rank = kvp.Value, Points = 0 };
+                                string key = kvp.Key == "Армреслінг" ? "Армрестлінг" : kvp.Key;
+                                sportResults[key] = new SportResultDto { Rank = kvp.Value, Points = 0 };
                             }
                         }
                     }
