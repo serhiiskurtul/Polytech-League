@@ -1093,21 +1093,33 @@ const TournamentViewPage = () => {
           // Initialize winners state
           if (detailsData) {
             const d = detailsData as any;
-            const board1_participants = d.participants?.filter((p: any) => p.boardRank === 1) || [];
-            const board2_participants = d.participants?.filter((p: any) => p.boardRank === 2) || [];
-            const board3_participants = d.participants?.filter((p: any) => p.boardRank === 3) || [];
+            const findBoardForPlayer = (playerId: number) => {
+              const team = d.teams?.find((t: any) => t.players?.some((p: any) => p.id === playerId));
+              if (!team) return 1;
+              const playerIndex = team.players.findIndex((p: any) => p.id === playerId);
+              return playerIndex + 1;
+            };
+
+            const board1_1st = d.participants?.find((p: any) => p.boardRank === 1 && findBoardForPlayer(p.playerId) === 1);
+            const board2_1st = d.participants?.find((p: any) => p.boardRank === 1 && findBoardForPlayer(p.playerId) === 2);
+            
+            const board1_2nd = d.participants?.find((p: any) => p.boardRank === 2 && findBoardForPlayer(p.playerId) === 1);
+            const board2_2nd = d.participants?.find((p: any) => p.boardRank === 2 && findBoardForPlayer(p.playerId) === 2);
+            
+            const board1_3rd = d.participants?.find((p: any) => p.boardRank === 3 && findBoardForPlayer(p.playerId) === 1);
+            const board2_3rd = d.participants?.find((p: any) => p.boardRank === 3 && findBoardForPlayer(p.playerId) === 2);
 
             setWinners({
               firstPlaceId: d.firstPlace?.id || d.firstPlaceTeam?.id || 0,
               secondPlaceId: d.secondPlace?.id || d.secondPlaceTeam?.id || 0,
               thirdPlaceId: d.thirdPlace?.id || d.thirdPlaceTeam?.id || 0,
               mvpId: d.mvpId || 0,
-              board1_1st: board1_participants[0]?.playerId || 0,
-              board2_1st: board1_participants[1]?.playerId || 0,
-              board1_2nd: board2_participants[0]?.playerId || 0,
-              board2_2nd: board2_participants[1]?.playerId || 0,
-              board1_3rd: board3_participants[0]?.playerId || 0,
-              board2_3rd: board3_participants[1]?.playerId || 0
+              board1_1st: board1_1st?.playerId || 0,
+              board2_1st: board2_1st?.playerId || 0,
+              board1_2nd: board1_2nd?.playerId || 0,
+              board2_2nd: board2_2nd?.playerId || 0,
+              board1_3rd: board1_3rd?.playerId || 0,
+              board2_3rd: board2_3rd?.playerId || 0
             });
 
 
@@ -1883,6 +1895,55 @@ const TournamentViewPage = () => {
               />
 
             )}
+
+          {['chess', 'checkers'].includes(tournament?.sport?.toLowerCase() || '') && details && (() => {
+            const findBoardForPlayer = (playerId: number) => {
+              const team = (details as any).teams?.find((t: any) => t.players?.some((p: any) => p.id === playerId));
+              if (!team) return 1;
+              const playerIndex = team.players.findIndex((p: any) => p.id === playerId);
+              return playerIndex + 1;
+            };
+
+            const b1_1st = (details as any).participants?.find((p: any) => p.boardRank === 1 && findBoardForPlayer(p.playerId) === 1);
+            const b1_2nd = (details as any).participants?.find((p: any) => p.boardRank === 2 && findBoardForPlayer(p.playerId) === 1);
+            const b1_3rd = (details as any).participants?.find((p: any) => p.boardRank === 3 && findBoardForPlayer(p.playerId) === 1);
+
+            const b2_1st = (details as any).participants?.find((p: any) => p.boardRank === 1 && findBoardForPlayer(p.playerId) === 2);
+            const b2_2nd = (details as any).participants?.find((p: any) => p.boardRank === 2 && findBoardForPlayer(p.playerId) === 2);
+            const b2_3rd = (details as any).participants?.find((p: any) => p.boardRank === 3 && findBoardForPlayer(p.playerId) === 2);
+
+            if (!b1_1st && !b1_2nd && !b1_3rd && !b2_1st && !b2_2nd && !b2_3rd) return null;
+
+            return (
+              <div style={{ marginTop: '20px', padding: '15px', background: '#f9fafb', borderRadius: '12px', border: '1px solid #e5e7eb', marginBottom: '20px' }}>
+                <h3 style={{ fontSize: '16px', marginBottom: '12px', color: '#374151', display: 'flex', alignItems: 'center' }}>
+                  <i className="fas fa-chess" style={{ marginRight: '8px', color: '#4b5563' }}></i> Призери по дошках
+                </h3>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                  {/* Board 1 */}
+                  <div>
+                    <h4 style={{ fontSize: '14px', marginBottom: '8px', color: '#6b7280' }}>Дошка 1</h4>
+                    <ul style={{ listStyle: 'none', padding: 0 }}>
+                      {b1_1st && <li style={{ fontSize: '14px', marginBottom: '4px' }}>🥇 1. {b1_1st.playerName} ({b1_1st.points} очок)</li>}
+                      {b1_2nd && <li style={{ fontSize: '14px', marginBottom: '4px' }}>🥈 2. {b1_2nd.playerName} ({b1_2nd.points} очок)</li>}
+                      {b1_3rd && <li style={{ fontSize: '14px', marginBottom: '4px' }}>🥉 3. {b1_3rd.playerName} ({b1_3rd.points} очок)</li>}
+                    </ul>
+                  </div>
+                  
+                  {/* Board 2 */}
+                  <div>
+                    <h4 style={{ fontSize: '14px', marginBottom: '8px', color: '#6b7280' }}>Дошка 2</h4>
+                    <ul style={{ listStyle: 'none', padding: 0 }}>
+                      {b2_1st && <li style={{ fontSize: '14px', marginBottom: '4px' }}>🥇 1. {b2_1st.playerName} ({b2_1st.points} очок)</li>}
+                      {b2_2nd && <li style={{ fontSize: '14px', marginBottom: '4px' }}>🥈 2. {b2_2nd.playerName} ({b2_2nd.points} очок)</li>}
+                      {b2_3rd && <li style={{ fontSize: '14px', marginBottom: '4px' }}>🥉 3. {b2_3rd.playerName} ({b2_3rd.points} очок)</li>}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
 
           <div className={styles.infoCard}>
             <h2><i className="fas fa-info-circle"></i> Про змагання</h2>

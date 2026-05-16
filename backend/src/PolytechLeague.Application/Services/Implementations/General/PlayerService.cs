@@ -682,6 +682,12 @@ public class PlayerService : IPlayerService
                             .CountAsync(cancellationToken) + 1;
                     }
                 }
+                var resultStr = rank > 0 ? $"{rank} місце" : "Учасник";
+                if (p.Points > 0) resultStr += $" ({p.Points} очок)";
+                if (p.BoardRank.HasValue && p.BoardRank.Value > 0) {
+                    resultStr += $", {p.BoardRank.Value} місце на дошці";
+                }
+
                 achievements.Add(new AchievementDto {
                     TournamentName = p.Tournament.Name,
                     SportType = "chess",
@@ -689,7 +695,7 @@ public class PlayerService : IPlayerService
                     Rank = rank,
                     BoardRank = p.BoardRank,
                     TournamentId = p.TournamentId,
-                    Result = rank > 0 ? $"{rank} місце ({p.Points} очок)" : $"{p.Points} очок"
+                    Result = resultStr
                 });
             }
         } catch (Exception ex) {
@@ -714,6 +720,12 @@ public class PlayerService : IPlayerService
                             .CountAsync(cancellationToken) + 1;
                     }
                 }
+                var resultStr = rank > 0 ? $"{rank} місце" : "Учасник";
+                if (p.Points > 0) resultStr += $" ({p.Points} очок)";
+                if (p.BoardRank.HasValue && p.BoardRank.Value > 0) {
+                    resultStr += $", {p.BoardRank.Value} місце на дошці";
+                }
+
                 achievements.Add(new AchievementDto {
                     TournamentName = p.Event.Name,
                     SportType = "checkers",
@@ -721,7 +733,7 @@ public class PlayerService : IPlayerService
                     Rank = rank,
                     BoardRank = p.BoardRank,
                     TournamentId = p.TournamentId,
-                    Result = rank > 0 ? $"{rank} місце ({p.Points} очок)" : $"{p.Points} очок"
+                    Result = resultStr
                 });
             }
         } catch (Exception ex) {
