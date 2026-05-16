@@ -324,7 +324,6 @@ const TournamentViewPage = () => {
             }
           }
         }
-      }
         if (['volleyball', 'beach_volleyball'].includes(sportKey)) {
           payload.setsToWin = (details as any).setsToWin || 2;
         }
