@@ -1154,6 +1154,43 @@ namespace PolytechLeague.Persistence.Migrations
                     b.ToTable("event_photos", (string)null);
                 });
 
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.ExternalAchievement", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ExternalLink")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhotoUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("StudentName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ExternalAchievements");
+                });
+
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Football.FootballCard", b =>
                 {
                     b.Property<long>("Id")

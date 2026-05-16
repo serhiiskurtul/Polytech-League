@@ -52,6 +52,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<RegionalRatingManualEntry> RegionalRatingManualEntries { get; set; }
     public DbSet<HallOfFameManualEntry> HallOfFameManualEntries { get; set; }
     public DbSet<PushSubscription> PushSubscriptions { get; set; }
+    public DbSet<ExternalAchievement> ExternalAchievements { get; set; }
 
 
     

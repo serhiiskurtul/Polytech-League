@@ -21,6 +21,7 @@ const Footer = () => {
     { name: 'Календар подій', path: '/calendar' },
     { name: 'Рейтинг гравців', path: '/ratings' },
     { name: 'Список змагань', path: '/tournaments' },
+    { name: 'Студенти поза коледжем', path: '/student-news' },
     { name: 'Про проєкт', path: '/about' }
   ];
 

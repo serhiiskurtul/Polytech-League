@@ -27,6 +27,7 @@ import { RegionalRatingsPage } from '@/pages/RegionalRatingsPage';
 import { CollegesPage } from '@/pages/CollegesPage';
 import ChampionsPage from '@/pages/ChampionsPage/ChampionsPage';
 import { AboutPage } from '@/pages/AboutPage';
+import StudentNewsPage from '@/pages/StudentNewsPage/StudentNewsPage';
 
 import ProtectedRoute from '../providers/ProtectedRoute';
 import ScrollToTop from '../providers/ScrollToTop';
@@ -222,6 +223,7 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/email-verification" element={<EmailVerificationPage />} />
+        <Route path="/student-news" element={<StudentNewsPage />} />
 
         {/* Профіль */}
         <Route
