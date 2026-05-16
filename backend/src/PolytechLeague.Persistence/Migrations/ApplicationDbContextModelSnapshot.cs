@@ -1306,6 +1306,9 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<long?>("AwayGoalkeeperId")
                         .HasColumnType("bigint");
 
+                    b.Property<int?>("AwayPenaltyScore")
+                        .HasColumnType("integer");
+
                     b.Property<long>("AwayTeamId")
                         .HasColumnType("bigint");
 
@@ -1320,6 +1323,9 @@ namespace PolytechLeague.Persistence.Migrations
 
                     b.Property<long?>("HomeGoalkeeperId")
                         .HasColumnType("bigint");
+
+                    b.Property<int?>("HomePenaltyScore")
+                        .HasColumnType("integer");
 
                     b.Property<long>("HomeTeamId")
                         .HasColumnType("bigint");

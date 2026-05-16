@@ -19,6 +19,9 @@ public class FootballMatch
     public int? HomeTeamScore { get; set; }
     public int? AwayTeamScore { get; set; }
     
+    public int? HomePenaltyScore { get; set; }
+    public int? AwayPenaltyScore { get; set; }
+    
     public long? WinnerTeamId { get; set; }
     public FootballTeam? WinnerTeam { get; set; }
     

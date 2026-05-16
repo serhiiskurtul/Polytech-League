@@ -47,6 +47,8 @@ export interface footballMatchResponse {
   
   homeTeamScore?: number;
   awayTeamScore?: number;
+  homePenaltyScore?: number;
+  awayPenaltyScore?: number;
   
   winnerTeamId?: number | null;
   winnerTeam?: footballTeamResponse;

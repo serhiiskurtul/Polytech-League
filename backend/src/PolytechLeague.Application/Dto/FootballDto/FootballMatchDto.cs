@@ -10,6 +10,8 @@ public class FootballMatchRequest
     public long AwayTeamId { get; set; }
     public int? HomeTeamScore { get; set; }
     public int? AwayTeamScore { get; set; }
+    public int? HomePenaltyScore { get; set; }
+    public int? AwayPenaltyScore { get; set; }
     public string? Stage { get; set; }
     public long? WinnerTeamId { get; set; }
     public ICollection<long>? HomeRosterIds { get; set; }
@@ -37,6 +39,8 @@ public class FootballMatchResponse
     
     public int? HomeTeamScore { get; set; }
     public int? AwayTeamScore { get; set; }
+    public int? HomePenaltyScore { get; set; }
+    public int? AwayPenaltyScore { get; set; }
     
     public long? WinnerTeamId { get; set; }
     public FootballTeamResponse? WinnerTeam { get; set; }
@@ -69,6 +73,8 @@ public static class FootballMatchDtoExtensions
             AwayTeamId = request.AwayTeamId,
             HomeTeamScore = request.HomeTeamScore,
             AwayTeamScore = request.AwayTeamScore,
+            HomePenaltyScore = request.HomePenaltyScore,
+            AwayPenaltyScore = request.AwayPenaltyScore,
             WinnerTeamId = request.WinnerTeamId,
             Stage = request.Stage,
             HomeRosterIds = request.HomeRosterIds,
@@ -98,6 +104,8 @@ public static class FootballMatchDtoExtensions
             AwayTeam = entity.AwayTeam?.ToResponse(),
             HomeTeamScore = entity.HomeTeamScore,
             AwayTeamScore = entity.AwayTeamScore,
+            HomePenaltyScore = entity.HomePenaltyScore,
+            AwayPenaltyScore = entity.AwayPenaltyScore,
             WinnerTeamId = entity.WinnerTeamId,
             WinnerTeam = entity.WinnerTeam?.ToResponse(),
             Stage = entity.Stage,

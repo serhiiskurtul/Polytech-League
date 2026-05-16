@@ -126,6 +126,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const [matchGoalkeepers, setMatchGoalkeepers] = useState<{home: string, away: string}>({ home: '', away: '' });
   const [matchCaptains, setMatchCaptains] = useState<{home: string, away: string}>({ home: '', away: '' });
   const [matchScores, setMatchScores] = useState<{home: number, away: number}>({ home: 0, away: 0 });
+  const [matchPenaltyScores, setMatchPenaltyScores] = useState<{home: number | null, away: number | null}>({ home: null, away: null });
 
   // Quick Add Player State
   const [isQuickAddMode, setIsQuickAddMode] = useState(false);
@@ -284,6 +285,10 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       home: match.homeTeamScore ?? 0,
       away: match.awayTeamScore ?? 0
     });
+    setMatchPenaltyScores({
+      home: match.homePenaltyScore ?? null,
+      away: match.awayPenaltyScore ?? null
+    });
     setIsScorersModalOpen(true);
   };
 
@@ -335,6 +340,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         awayTeamScore: matchScores.away,
         homeScore: matchScores.home,
         awayScore: matchScores.away,
+        homePenaltyScore: matchScores.home === matchScores.away ? matchPenaltyScores.home : null,
+        awayPenaltyScore: matchScores.home === matchScores.away ? matchPenaltyScores.away : null,
         goals: goalsPayload,
         yellowCards: yellowCardsPayload,
         redCards: redCardsPayload
@@ -1170,7 +1177,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       </div>
                     </div>
 
-                    <div className={styles.vsDivider}>VS</div>
+                    <div className={styles.vsDivider}>
+                      VS
+                      {match.homePenaltyScore !== null && match.awayPenaltyScore !== null && match.homePenaltyScore !== undefined && match.awayPenaltyScore !== undefined && (
+                        <div style={{ fontSize: '11px', color: '#b45309', background: '#fef3c7', padding: '2px 6px', borderRadius: '4px', marginTop: '4px', fontWeight: 'bold' }}>
+                          пен. {match.homePenaltyScore}:{match.awayPenaltyScore}
+                        </div>
+                      )}
+                    </div>
 
                     <div className={`${styles.teamRow} ${isAwayWinner ? styles.winnerRow : ''} ${isDraw ? styles.drawRow : ''}`}>
                       <div className={`${styles.teamLogo} ${isAwayWinner ? styles.winnerLogo : ''}`}>
@@ -1908,6 +1922,34 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                  </div>
               </div>
 
+              {matchScores.home === matchScores.away && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '32px', marginBottom: '32px', padding: '16px', background: '#fffbeb', borderRadius: '16px', border: '1px solid #fef3c7' }}>
+                   <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '11px', fontWeight: 700, color: '#b45309', marginBottom: '8px', textTransform: 'uppercase' }}>Пенальті</div>
+                      <input 
+                        type="number" 
+                        min="0"
+                        style={{ width: '60px', height: '45px', fontSize: '24px', fontWeight: 800, textAlign: 'center', borderRadius: '10px', border: '2px solid #f59e0b', color: '#78350f' }}
+                        value={matchPenaltyScores.home ?? ''}
+                        onFocus={(e) => e.target.select()}
+                        onChange={e => setMatchPenaltyScores({...matchPenaltyScores, home: e.target.value ? parseInt(e.target.value) : null})}
+                      />
+                   </div>
+                   <div style={{ fontSize: '20px', fontWeight: 800, color: '#fcd34d', paddingTop: '20px' }}>:</div>
+                   <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '11px', fontWeight: 700, color: '#b45309', marginBottom: '8px', textTransform: 'uppercase' }}>Пенальті</div>
+                      <input 
+                        type="number" 
+                        min="0"
+                        style={{ width: '60px', height: '45px', fontSize: '24px', fontWeight: 800, textAlign: 'center', borderRadius: '10px', border: '2px solid #f59e0b', color: '#78350f' }}
+                        value={matchPenaltyScores.away ?? ''}
+                        onFocus={(e) => e.target.select()}
+                        onChange={e => setMatchPenaltyScores({...matchPenaltyScores, away: e.target.value ? parseInt(e.target.value) : null})}
+                      />
+                   </div>
+                </div>
+              )}
+
               <div className={styles.scorersGrid}>
                 {/* Home Team Scorers */}
                 <div className={styles.teamScorersSection}>
@@ -2148,11 +2190,16 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   <div style={{ textAlign: 'center', flex: 1 }}>
                     <div style={{ fontSize: '24px', fontWeight: 800, color: '#1e293b' }}>{selectedMatchForInfo.homeTeam?.name}</div>
                   </div>
-                  <div style={{ fontSize: '48px', fontWeight: 900, color: '#3b82f6', display: 'flex', gap: '20px' }}>
+                  <div style={{ fontSize: '48px', fontWeight: 900, color: '#3b82f6', display: 'flex', gap: '20px', justifyContent: 'center' }}>
                     <span>{selectedMatchForInfo.homeTeamScore ?? 0}</span>
                     <span style={{ color: '#cbd5e1' }}>:</span>
                     <span>{selectedMatchForInfo.awayTeamScore ?? 0}</span>
                   </div>
+                  {selectedMatchForInfo.homePenaltyScore !== null && selectedMatchForInfo.awayPenaltyScore !== null && selectedMatchForInfo.homePenaltyScore !== undefined && selectedMatchForInfo.awayPenaltyScore !== undefined && (
+                    <div style={{ fontSize: '18px', fontWeight: 700, color: '#f59e0b', marginTop: '8px' }}>
+                      (пен. {selectedMatchForInfo.homePenaltyScore} : {selectedMatchForInfo.awayPenaltyScore})
+                    </div>
+                  )}
                   <div style={{ textAlign: 'center', flex: 1 }}>
                     <div style={{ fontSize: '24px', fontWeight: 800, color: '#1e293b' }}>{selectedMatchForInfo.awayTeam?.name}</div>
                   </div>

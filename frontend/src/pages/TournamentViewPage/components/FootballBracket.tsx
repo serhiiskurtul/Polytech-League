@@ -132,7 +132,13 @@ const FootballBracket: React.FC<FootballBracketProps> = ({
 
         <div className={bracketStyles.vsDivider}>
           <div className={bracketStyles.vsLine} />
-          <span className={bracketStyles.vsText}>vs</span>
+          <span className={bracketStyles.vsText}>
+            {match.homePenaltyScore !== null && match.awayPenaltyScore !== null && match.homePenaltyScore !== undefined && match.awayPenaltyScore !== undefined ? (
+              <span style={{ color: '#b45309', background: '#fef3c7', padding: '2px 5px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold' }}>
+                {match.homePenaltyScore}:{match.awayPenaltyScore}
+              </span>
+            ) : 'vs'}
+          </span>
           <div className={bracketStyles.vsLine} />
         </div>
 

@@ -215,6 +215,8 @@ public class FootballMatchService :
         oldEntity.AwayTeamId = newEntity.AwayTeamId;
         oldEntity.HomeTeamScore = newEntity.HomeTeamScore;
         oldEntity.AwayTeamScore = newEntity.AwayTeamScore;
+        oldEntity.HomePenaltyScore = newEntity.HomePenaltyScore;
+        oldEntity.AwayPenaltyScore = newEntity.AwayPenaltyScore;
         oldEntity.WinnerTeamId = newEntity.WinnerTeamId;
         oldEntity.Stage = newEntity.Stage;
         oldEntity.HomeGoalkeeperId = newEntity.HomeGoalkeeperId;
