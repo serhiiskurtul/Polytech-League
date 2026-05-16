@@ -108,3 +108,15 @@
     text-align: center;
   }
 }
+
+.sportOption.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: var(--border);
+  background: var(--bg);
+}
+
+.sportOption.disabled:hover {
+  transform: none;
+  border-color: var(--border);
+}

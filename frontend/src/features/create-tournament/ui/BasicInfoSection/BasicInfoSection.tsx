@@ -92,12 +92,16 @@ const BasicInfoSection = ({ formData, handleInputChange }: BasicInfoSectionProps
                 </div>
                 <span className={styles.sportName}>Індивідуальний</span>
               </label>
-              <label className={`${styles.sportOption} ${formData.isTeam ? styles.selected : ''}`}>
+              <label 
+                className={`${styles.sportOption} ${formData.isTeam ? styles.selected : ''} ${formData.sport === 'badminton' && formData.level === 'Regional' ? styles.disabled : ''}`}
+                title={formData.sport === 'badminton' && formData.level === 'Regional' ? "Для обласних змагань з бадмінтону доступний тільки індивідуальний формат" : ""}
+              >
                 <input
                   type="radio"
                   name="isTeam"
                   value="true"
                   checked={formData.isTeam}
+                  disabled={formData.sport === 'badminton' && formData.level === 'Regional'}
                   onChange={() => handleInputChange({ target: { name: 'isTeam', value: true } } as any)}
                   className={styles.radioInput}
                 />

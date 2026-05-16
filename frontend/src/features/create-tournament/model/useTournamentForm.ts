@@ -130,6 +130,12 @@ export const useTournamentForm = () => {
     // Badminton залишаємо як є або за замовчуванням true/false - користувач сам перемкне
   }, [formData.sport]);
 
+  useEffect(() => {
+    if (formData.sport === 'badminton' && formData.level === 'Regional') {
+      setFormData(prev => ({ ...prev, isTeam: false }));
+    }
+  }, [formData.sport, formData.level]);
+
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
