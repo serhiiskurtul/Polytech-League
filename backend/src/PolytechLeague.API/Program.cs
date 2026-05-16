@@ -100,7 +100,7 @@ builder.Services
 
 var redisConnectionString = builder.Configuration["RedisSettings:Redis"];
 var options = ConfigurationOptions.Parse(redisConnectionString);
-options.Ssl = !redisConnectionString.Contains("localhost");
+options.Ssl = true;
 options.AbortOnConnectFail = false;
 var multiplexer = ConnectionMultiplexer.Connect(options);
 builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
