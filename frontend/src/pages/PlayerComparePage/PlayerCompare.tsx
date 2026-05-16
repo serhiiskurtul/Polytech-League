@@ -262,12 +262,11 @@ export const PlayerComparePage = () => {
               </div>
               
               <div className={styles.sportSelector}>
-                <label htmlFor="sport-filter" style={{ marginRight: '8px', fontSize: '14px', color: '#6b7280' }}>Вид спорту:</label>
+                <label htmlFor="sport-filter">Вид спорту:</label>
                 <select 
                   id="sport-filter"
                   value={selectedSport} 
                   onChange={(e) => setSelectedSport(e.target.value)}
-                  style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #e5e7eb', outline: 'none' }}
                 >
                   <option value="all">Всі види</option>
                   {Array.from(new Set([

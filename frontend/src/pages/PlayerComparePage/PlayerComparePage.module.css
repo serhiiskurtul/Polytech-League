@@ -726,3 +726,49 @@
   }
 }
 
+.sportSelector {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: white;
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+}
+
+.sportSelector:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.sportSelector label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: #f8fafc;
+  padding: 0 12px;
+  border-right: 1.5px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  height: 36px;
+  margin: 0;
+  border-top-left-radius: 11px;
+  border-bottom-left-radius: 11px;
+}
+
+.sportSelector select {
+  padding: 0 12px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-weight: 700;
+  font-size: 14px;
+  color: #1e293b;
+  cursor: pointer;
+  border-top-right-radius: 11px;
+  border-bottom-right-radius: 11px;
+}
