@@ -80,6 +80,10 @@ export const PlayerComparePage = () => {
               winsCount: rankingInfo.winsCount,
               goalsCount: rankingInfo.goalsCount,
               hatTricksCount: rankingInfo.hatTricksCount,
+              finalGoalsCount: rankingInfo.finalGoalsCount,
+              semifinalGoalsCount: rankingInfo.semifinalGoalsCount,
+              finalMatchesCount: rankingInfo.finalMatchesCount,
+              semifinalMatchesCount: rankingInfo.semifinalMatchesCount,
               yellowCardsCount: rankingInfo.yellowCardsCount,
               redCardsCount: rankingInfo.redCardsCount,
               mvpCount: rankingInfo.mvpCount,
@@ -96,6 +100,10 @@ export const PlayerComparePage = () => {
             winsCount: 0,
             goalsCount: 0,
             hatTricksCount: 0,
+            finalGoalsCount: 0,
+            semifinalGoalsCount: 0,
+            finalMatchesCount: 0,
+            semifinalMatchesCount: 0,
             yellowCardsCount: 0,
             redCardsCount: 0,
             mvpCount: 0,
@@ -285,12 +293,36 @@ export const PlayerComparePage = () => {
                     />
                     {((player1.sportStats?.some(s => s.sportType === 'football') || (player1.goalsCount || 0) > 0) &&
                       (player2?.sportStats?.some(s => s.sportType === 'football') || (player2?.goalsCount || 0) > 0)) && (
-                      <StatRow 
-                        label="Хет-трики" 
-                        val1={player1.hatTricksCount} 
-                        val2={player2?.hatTricksCount}
-                        suffix=" хет-триків"
-                      />
+                      <>
+                        <StatRow 
+                          label="Хет-трики" 
+                          val1={player1.hatTricksCount} 
+                          val2={player2?.hatTricksCount}
+                          suffix=" хет-триків"
+                        />
+                        <StatRow 
+                          label="Голи у фіналах" 
+                          val1={player1.finalGoalsCount} 
+                          val2={player2?.finalGoalsCount}
+                        />
+                        <StatRow 
+                          label="Голи у півфіналах" 
+                          val1={player1.semifinalGoalsCount} 
+                          val2={player2?.semifinalGoalsCount}
+                        />
+                        <StatRow 
+                          label="Участь у фіналах" 
+                          val1={player1.finalMatchesCount} 
+                          val2={player2?.finalMatchesCount}
+                          suffix=" матчів"
+                        />
+                        <StatRow 
+                          label="Участь у півфіналах" 
+                          val1={player1.semifinalMatchesCount} 
+                          val2={player2?.semifinalMatchesCount}
+                          suffix=" матчів"
+                        />
+                      </>
                     )}
                     <StatRow 
                       label="Жовті картки" 

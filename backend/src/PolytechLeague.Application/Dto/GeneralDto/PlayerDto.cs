@@ -82,6 +82,10 @@ public class PlayerDto
     public int WinsCount { get; set; }
     public int GoalsCount { get; set; }
     public int HatTricksCount { get; set; }
+    public int FinalGoalsCount { get; set; }
+    public int SemifinalGoalsCount { get; set; }
+    public int FinalMatchesCount { get; set; }
+    public int SemifinalMatchesCount { get; set; }
     public int YellowCardsCount { get; set; }
     public int RedCardsCount { get; set; }
     public int PerformanceScore { get; set; }
@@ -188,6 +192,10 @@ public static class PlayerDtoExtensions
             WinsCount = 0,
             GoalsCount = 0,
             HatTricksCount = 0,
+            FinalGoalsCount = 0,
+            SemifinalGoalsCount = 0,
+            FinalMatchesCount = 0,
+            SemifinalMatchesCount = 0,
             YellowCardsCount = 0,
             RedCardsCount = 0,
             PerformanceScore = 0,

@@ -1887,6 +1887,27 @@ public class PlayerService : IPlayerService
             dto.HatTricksCount = goalDetails
                 .GroupBy(g => g.MatchId)
                 .Count(g => g.Sum(x => x.GoalsCount) >= 3);
+
+            dto.FinalGoalsCount = goalDetails
+                .Where(g => g.Match?.Stage?.ToLower().Contains("фінал") == true && !g.Match.Stage.ToLower().Contains("півфінал"))
+                .Sum(g => g.GoalsCount);
+
+            dto.SemifinalGoalsCount = goalDetails
+                .Where(g => g.Match?.Stage?.ToLower().Contains("півфінал") == true)
+                .Sum(g => g.GoalsCount);
+
+            var playedMatches = await _dbContext.FootballMatches
+                .Include(m => m.HomeRoster)
+                .Include(m => m.AwayRoster)
+                .Where(m => (m.HomeRoster != null && m.HomeRoster.Any(p => p.Id == playerId)) ||
+                            (m.AwayRoster != null && m.AwayRoster.Any(p => p.Id == playerId)))
+                .ToListAsync(cancellationToken);
+
+            dto.FinalMatchesCount = playedMatches
+                .Count(m => m.Stage?.ToLower().Contains("фінал") == true && !m.Stage.ToLower().Contains("півфінал"));
+
+            dto.SemifinalMatchesCount = playedMatches
+                .Count(m => m.Stage?.ToLower().Contains("півфінал") == true);
             
             // Try fetching cards using multiple methods to be absolutely sure
             int yellowCards = 0;

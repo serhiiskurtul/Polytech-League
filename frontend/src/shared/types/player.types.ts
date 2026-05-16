@@ -69,6 +69,10 @@ export interface PlayerDto {
     winsCount?: number;
     goalsCount?: number;
     hatTricksCount?: number;
+    finalGoalsCount?: number;
+    semifinalGoalsCount?: number;
+    finalMatchesCount?: number;
+    semifinalMatchesCount?: number;
     yellowCardsCount?: number;
     redCardsCount?: number;
     performanceScore?: number;
