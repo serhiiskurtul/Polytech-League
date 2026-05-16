@@ -78,6 +78,52 @@ namespace PolytechLeague.API.Controllers.Common
             return CreatedAtAction(nameof(GetEntries), new { id = entry.Id }, entry);
         }
 
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateEntry(
+            long id,
+            [FromForm] string studentName,
+            [FromForm] string title,
+            [FromForm] string content,
+            [FromForm] DateTime date,
+            [FromForm] string? externalLink,
+            List<IFormFile>? photos,
+            List<IFormFile>? videos)
+        {
+            var entry = await _context.ExternalAchievements
+                .Include(e => e.Media)
+                .FirstOrDefaultAsync(e => e.Id == id);
+
+            if (entry == null) return NotFound();
+
+            entry.StudentName = studentName;
+            entry.Title = title;
+            entry.Content = content;
+            entry.Date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+            entry.ExternalLink = externalLink;
+
+            if (photos != null)
+            {
+                foreach (var photo in photos)
+                {
+                    var url = await _fileService.SaveFileAsync(photo, "external-achievements", default);
+                    entry.Media.Add(new ExternalAchievementMedia { Url = url, Type = "photo" });
+                }
+            }
+
+            if (videos != null)
+            {
+                foreach (var video in videos)
+                {
+                    var url = await _fileService.SaveFileAsync(video, "external-achievements", default);
+                    entry.Media.Add(new ExternalAchievementMedia { Url = url, Type = "video" });
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteEntry(long id)
