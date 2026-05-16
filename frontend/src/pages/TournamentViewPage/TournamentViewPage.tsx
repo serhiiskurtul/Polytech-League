@@ -287,7 +287,7 @@ const TournamentViewPage = () => {
         }
 
         // Update Board Ranks for Chess/Checkers
-        if (['chess', 'checkers'].includes(sportKey)) {
+        if (['chess', 'checkers'].includes(sportKey) && (details as any).level !== 'CollegeGroup') {
           // 1. Clear boardRank for all participants in this tournament
           for (const p of (details as any).participants || []) {
             if (p.boardRank) {
@@ -1061,11 +1061,21 @@ const TournamentViewPage = () => {
           // Initialize winners state
           if (detailsData) {
             const d = detailsData as any;
+            const board1_participants = d.participants?.filter((p: any) => p.boardRank === 1) || [];
+            const board2_participants = d.participants?.filter((p: any) => p.boardRank === 2) || [];
+            const board3_participants = d.participants?.filter((p: any) => p.boardRank === 3) || [];
+
             setWinners({
               firstPlaceId: d.firstPlace?.id || d.firstPlaceTeam?.id || 0,
               secondPlaceId: d.secondPlace?.id || d.secondPlaceTeam?.id || 0,
               thirdPlaceId: d.thirdPlace?.id || d.thirdPlaceTeam?.id || 0,
-              mvpId: d.mvpId || 0
+              mvpId: d.mvpId || 0,
+              board1_1st: board1_participants[0]?.playerId || 0,
+              board2_1st: board1_participants[1]?.playerId || 0,
+              board1_2nd: board2_participants[0]?.playerId || 0,
+              board2_2nd: board2_participants[1]?.playerId || 0,
+              board1_3rd: board3_participants[0]?.playerId || 0,
+              board2_3rd: board3_participants[1]?.playerId || 0
             });
 
 
@@ -1631,7 +1641,7 @@ const TournamentViewPage = () => {
                   </div>
                 )}
 
-                {['chess', 'checkers'].includes(tournament?.sport?.toLowerCase() || '') && (
+                {['chess', 'checkers'].includes(tournament?.sport?.toLowerCase() || '') && details?.level !== 'CollegeGroup' && (
                   <>
                     <div style={{ marginTop: '24px' }}>
                       <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
