@@ -322,7 +322,7 @@ const TournamentViewPage = () => {
 
           for (const update of boardUpdates) {
             if (update.playerId && update.playerId !== 0) {
-              const participant = (details as any).participants?.find((p: any) => p.playerId === update.playerId);
+              const participant = (details as any).participants?.find((p: any) => Number(p.playerId || p.id) === Number(update.playerId));
               console.log("Found participant for update:", participant);
               if (participant) {
                 const pPayload = { ...participant, boardRank: update.rank };
