@@ -102,7 +102,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const [newMatchForm, setNewMatchForm] = useState({
     homeTeamId: '',
     awayTeamId: '',
-    stage: 'Груповий етап'
+    stage: 'Груповий етап',
+    board: 1
   });
 
   // Create Team State
@@ -609,8 +610,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
             tournamentId: details.id,
             whiteTeamId: parseInt(newMatchForm.homeTeamId),
             blackTeamId: parseInt(newMatchForm.awayTeamId),
-            round: 1, // Default to round 1
-            board: 1, // Default to board 1
+            round: newMatchForm.stage === 'Фінал' ? 100 : (newMatchForm.stage.startsWith('Раунд') ? parseInt(newMatchForm.stage.replace('Раунд ', '')) : 1),
+            board: newMatchForm.board || 1,
             result: 'NotPlayed'
           };
           break;
@@ -620,7 +621,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
             tournamentId: details.id,
             whiteTeamId: parseInt(newMatchForm.homeTeamId),
             blackTeamId: parseInt(newMatchForm.awayTeamId),
-            round: 1,
+            round: newMatchForm.stage === 'Фінал' ? 100 : (newMatchForm.stage.startsWith('Раунд') ? parseInt(newMatchForm.stage.replace('Раунд ', '')) : 1),
             result: 'NotPlayed'
           };
           break;
@@ -1164,7 +1165,10 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
               return (
                 <div key={match.id} className={styles.matchCard} onClick={() => { setSelectedMatchForInfo(match); setIsMatchInfoModalOpen(true); }} style={{ cursor: 'pointer' }}>
-                  <div className={styles.matchStage}>{match.stage || 'Груповий етап'}</div>
+                  <div className={styles.matchStage}>
+                    {match.stage || (match.round === 100 ? 'Фінал' : `Раунд ${match.round}`)}
+                    {sport === 'chess' && match.board && ` • Дошка ${match.board}`}
+                  </div>
                   
                   <div className={styles.matchTeams}>
                     <div className={`${styles.teamRow} ${isHomeWinner ? styles.winnerRow : ''} ${isDraw ? styles.drawRow : ''}`}>
@@ -1690,6 +1694,19 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                     ))}
                   </select>
                 </div>
+
+                {sport === 'chess' && (
+                  <div className={styles.formGroup}>
+                    <label>Номер дошки</label>
+                    <input 
+                      type="number" 
+                      min="1" 
+                      style={{ padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                      value={newMatchForm.board}
+                      onChange={e => setNewMatchForm({...newMatchForm, board: parseInt(e.target.value) || 1})}
+                    />
+                  </div>
+                )}
 
                 <button className={styles.saveBtn} onClick={handleCreateMatch} style={{ marginTop: '10px' }}>
                   Створити матч
