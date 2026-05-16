@@ -78,9 +78,20 @@ export const getChampions = async (sport?: string, gender?: number, weightClass?
     }
 };
 
-export const createHallOfFameEntry = async (entry: { sport: string; seasonName: string; teamName: string; roster?: string; photoUrl?: string }) => {
+export const createHallOfFameEntry = async (data: { sport: string; seasonName: string; teamName: string; file?: File | null }) => {
     try {
-        const response = await api.post('/halloffame', entry);
+        const formData = new FormData();
+        formData.append('sport', data.sport);
+        formData.append('seasonName', data.seasonName);
+        formData.append('teamName', data.teamName);
+        if (data.file) {
+            formData.append('file', data.file);
+        }
+        const response = await api.post('/halloffame', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
         return response.data;
     } catch (error) {
         console.error('Помилка при створенні запису зали слави:', error);

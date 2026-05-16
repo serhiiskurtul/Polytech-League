@@ -1352,9 +1352,6 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<string>("PhotoUrl")
                         .HasColumnType("text");
 
-                    b.Property<string>("Roster")
-                        .HasColumnType("text");
-
                     b.Property<string>("SeasonName")
                         .IsRequired()
                         .HasColumnType("text");

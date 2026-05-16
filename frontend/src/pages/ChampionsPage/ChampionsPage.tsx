@@ -19,10 +19,9 @@ const ChampionsPage: React.FC = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [newEntry, setNewEntry] = useState({
     seasonName: '',
-    teamName: '',
-    roster: '',
-    photoUrl: ''
+    teamName: ''
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const getSportTitle = (sportType: string) => {
     switch (sportType) {
@@ -202,10 +201,16 @@ const ChampionsPage: React.FC = () => {
                 onSubmit={async (e) => {
                   e.preventDefault();
                   try {
-                    await createHallOfFameEntry({ ...newEntry, sport: sport });
+                    await createHallOfFameEntry({ 
+                      sport: sport, 
+                      seasonName: newEntry.seasonName, 
+                      teamName: newEntry.teamName, 
+                      file: selectedFile 
+                    });
                     toast.success('Легенду додано!');
                     setShowAddForm(false);
-                    setNewEntry({ seasonName: '', teamName: '', roster: '', photoUrl: '' });
+                    setNewEntry({ seasonName: '', teamName: '' });
+                    setSelectedFile(null);
                     // Refresh champions
                     const data = await getChampions(sport, gender, weightClass);
                     setChampions(data);
@@ -230,20 +235,15 @@ const ChampionsPage: React.FC = () => {
                   required
                   style={{ padding: '0.5rem', borderRadius: '5px', border: '1px solid #444', background: '#222', color: '#fff' }}
                 />
-                <input 
-                  type="text" 
-                  placeholder="Склад команди (опціонально)" 
-                  value={newEntry.roster}
-                  onChange={(e) => setNewEntry({ ...newEntry, roster: e.target.value })}
-                  style={{ padding: '0.5rem', borderRadius: '5px', border: '1px solid #444', background: '#222', color: '#fff' }}
-                />
-                <input 
-                  type="text" 
-                  placeholder="URL фото (опціонально)" 
-                  value={newEntry.photoUrl}
-                  onChange={(e) => setNewEntry({ ...newEntry, photoUrl: e.target.value })}
-                  style={{ padding: '0.5rem', borderRadius: '5px', border: '1px solid #444', background: '#222', color: '#fff' }}
-                />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                  <label style={{ fontSize: '0.8rem', color: '#aaa' }}>Фото команди (опціонально):</label>
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                    style={{ padding: '0.5rem', borderRadius: '5px', border: '1px solid #444', background: '#222', color: '#fff' }}
+                  />
+                </div>
                 <button type="submit" className={styles.filterBtn} style={{ background: '#10b981', color: '#fff' }}>Зберегти</button>
               </form>
             )}
