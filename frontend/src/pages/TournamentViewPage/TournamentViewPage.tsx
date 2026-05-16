@@ -324,7 +324,6 @@ const TournamentViewPage = () => {
             }
           }
         }
-      }
         if (['volleyball', 'beach_volleyball'].includes(sportKey)) {
           payload.setsToWin = (details as any).setsToWin || 2;
         }
@@ -1604,9 +1603,10 @@ const TournamentViewPage = () => {
                     ))}
                   </select>
                 </div>
+              </div> {/* CLOSE GRID HERE */}
 
                 {!['chess', 'checkers', 'athletics', 'table_tennis', 'tabletennis', 'badminton', 'beach_volleyball', 'beachvolleyball', 'armwrestling'].includes(tournament?.sport?.toLowerCase() || '') && (
-                  <div>
+                  <div style={{ marginTop: '16px' }}>
                     <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
                       <i className="fas fa-star" style={{ color: '#f59e0b' }}></i> Найкращий гравець (MVP)
                     </label>
@@ -1633,7 +1633,7 @@ const TournamentViewPage = () => {
 
                 {['chess', 'checkers'].includes(tournament?.sport?.toLowerCase() || '') && (
                   <>
-                    <div style={{ marginTop: '16px' }}>
+                    <div style={{ marginTop: '24px' }}>
                       <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
                         <i className="fas fa-medal" style={{ color: '#f59e0b' }}></i> Кращі на 1 дошці
                       </label>
@@ -1708,9 +1708,7 @@ const TournamentViewPage = () => {
                         </select>
                       </div>
                     </div>
-                  </>
-                )}
-              </div>
+                  </>)}
 
 
               <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
