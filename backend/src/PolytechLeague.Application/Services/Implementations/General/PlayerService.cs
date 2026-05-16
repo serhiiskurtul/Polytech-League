@@ -722,7 +722,7 @@ public class PlayerService : IPlayerService
                         TournamentName = p.Tournament.Name,
                         SportType = "chess",
                         Date = p.Tournament.Date,
-                        Rank = 0,
+                        Rank = p.BoardRank.Value,
                         BoardRank = p.BoardRank,
                         TournamentId = p.TournamentId,
                         Result = $"{p.BoardRank.Value} місце на дошці"
@@ -768,7 +768,7 @@ public class PlayerService : IPlayerService
                         TournamentName = p.Event.Name,
                         SportType = "checkers",
                         Date = p.Event.Date,
-                        Rank = 0,
+                        Rank = p.BoardRank.Value,
                         BoardRank = p.BoardRank,
                         TournamentId = p.TournamentId,
                         Result = $"{p.BoardRank.Value} місце на дошці"
