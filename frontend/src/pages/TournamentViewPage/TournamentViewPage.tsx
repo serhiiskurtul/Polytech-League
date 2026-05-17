@@ -151,6 +151,7 @@ const TournamentViewPage = () => {
   const [userMediaComment, setUserMediaComment] = useState('');
   const [userMediaFile, setUserMediaFile] = useState<File | null>(null);
   const [pendingUserMedia, setPendingUserMedia] = useState<any[]>([]);
+  const [selectedUserPhotoIndex, setSelectedUserPhotoIndex] = useState<number | null>(null);
 
   const fetchUserMedia = async () => {
     if (!id) return;
@@ -3246,8 +3247,8 @@ const TournamentViewPage = () => {
             {/* Display Grid */}
             {userMedia && userMedia.length > 0 ? (
               <div className={styles.photoGrid}>
-                {userMedia.map((media: any) => (
-                  <div key={media.id} className={styles.galleryItem} style={{ height: 'auto', background: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
+                {userMedia.map((media: any, index: number) => (
+                  <div key={media.id} className={styles.galleryItem} onClick={() => setSelectedUserPhotoIndex(index)} style={{ cursor: 'pointer', height: 'auto', background: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
                     <div style={{ height: '200px', overflow: 'hidden', position: 'relative' }}>
                       {media.type === 'video' ? (
                         <video src={getImageUrl(media.url)} controls style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -3410,6 +3411,65 @@ const TournamentViewPage = () => {
                     onClick={(e) => {
                       e.stopPropagation();
                       setSelectedPhotoIndex((selectedPhotoIndex + 1) % details.photos.length);
+                    }}
+                  >
+                    Вперед <i className="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* User Media Lightbox / Fullscreen Preview */}
+          {selectedUserPhotoIndex !== null && userMedia && (
+            <div className={styles.lightboxOverlay} onClick={() => setSelectedUserPhotoIndex(null)}>
+              <div className={styles.lightboxContent} onClick={(e) => e.stopPropagation()}>
+                <button className={styles.lightboxClose} onClick={() => setSelectedUserPhotoIndex(null)}>
+                  <i className="fas fa-times"></i>
+                </button>
+
+                {userMedia[selectedUserPhotoIndex].type === 'video' ? (
+                  <video
+                    src={getImageUrl(userMedia[selectedUserPhotoIndex].url)}
+                    controls
+                    autoPlay
+                    className={styles.lightboxVideo}
+                  />
+                ) : (
+                  <img
+                    src={getImageUrl(userMedia[selectedUserPhotoIndex].url)}
+                    alt="User Fullscreen"
+                    className={styles.lightboxImage}
+                  />
+                )}
+
+                <div style={{ position: 'absolute', bottom: '20px', left: '0', right: '0', textAlign: 'center', color: '#fff', textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
+                  <div style={{ fontSize: '18px', fontWeight: 'bold' }}>
+                    <i className="fas fa-user" style={{ marginRight: '6px' }}></i>
+                    {userMedia[selectedUserPhotoIndex].authorName || 'Анонім'}
+                  </div>
+                  {userMedia[selectedUserPhotoIndex].comment && (
+                    <div style={{ fontSize: '16px', fontStyle: 'italic', marginTop: '8px' }}>
+                      "{userMedia[selectedUserPhotoIndex].comment}"
+                    </div>
+                  )}
+                </div>
+
+                <div className={styles.lightboxNav}>
+                  <button
+                    className={styles.lightboxBtn}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedUserPhotoIndex((selectedUserPhotoIndex - 1 + userMedia.length) % userMedia.length);
+                    }}
+                  >
+                    <i className="fas fa-chevron-left"></i> Назад
+                  </button>
+                  <button
+                    className={styles.lightboxBtn}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedUserPhotoIndex((selectedUserPhotoIndex + 1) % userMedia.length);
                     }}
                   >
                     Вперед <i className="fas fa-chevron-right"></i>
