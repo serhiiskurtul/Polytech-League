@@ -134,7 +134,7 @@ const TournamentViewPage = () => {
   const [tournament, setTournament] = useState<Tournament | null>(null);
   const [details, setDetails] = useState<any | null>(null);
   const [allPlayers, setAllPlayers] = useState<PlayerDto[]>([]);
-  const [activeTab, setActiveTab] = useState<'standings' | 'games' | 'participants' | 'schedule'>('standings');
+  const [activeTab, setActiveTab] = useState<'standings' | 'games' | 'participants' | 'schedule' | 'voting'>('standings');
   const [isLoading, setIsLoading] = useState(true);
   const [isRegistering, setIsRegistering] = useState(false);
   const [currentUserPlayer, setCurrentUserPlayer] = useState<PlayerDto | null>(null);
@@ -2238,50 +2238,7 @@ const TournamentViewPage = () => {
             if (sportKey === 'chess' || sportKey === 'checkers' || sportKey === 'badminton' || sportKey === 'tabletennis' || sportKey === 'table_tennis') {
               return (
                 <>
-                  {/* Voting Section */}
-                  <div className={styles.votingSection} style={{ marginBottom: '20px', background: '#fff', padding: '15px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-                    <h3 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '10px', color: '#1e293b', display: 'flex', alignItems: 'center' }}>
-                      <i className="fas fa-poll" style={{ marginRight: '8px', color: '#3b82f6' }}></i>
-                      Голосування за переможця (Всього голосів: {voteStats?.totalVotes || 0})
-                      <i className="fas fa-info-circle" title="Голосування має суто розважальний характер і не впливає на офіційні результати змагань" style={{ marginLeft: '6px', color: '#64748b', cursor: 'help', fontSize: '14px' }}></i>
-                    </h3>
-                    
-                    {voteStats?.hasVoted && (
-                      <p style={{ color: '#10b981', fontSize: '14px', marginBottom: '10px' }}>
-                        <i className="fas fa-check-circle" style={{ marginRight: '4px' }}></i>
-                        Ви вже проголосували!
-                      </p>
-                    )}
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {(sortedPlayers || []).map((player: any) => {
-                        const stats = voteStats?.optionStats?.find((s: any) => s.id === player.playerId);
-                        const votes = stats?.votes || 0;
-                        const percentage = stats?.percentage || 0;
-                        return (
-                          <div key={player.playerId} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <div style={{ width: '150px', fontSize: '14px', fontWeight: 500, color: '#334155' }}>
-                              {player.playerName}
-                            </div>
-                            <div style={{ flex: 1, height: '8px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
-                              <div style={{ width: `${percentage}%`, height: '100%', background: '#3b82f6' }}></div>
-                            </div>
-                            <div style={{ width: '100px', fontSize: '12px', color: '#64748b', textAlign: 'right' }}>
-                              {votes} ({percentage}%)
-                            </div>
-                            {!voteStats?.hasVoted && !isVoting && new Date(tournament?.rawDate || tournament?.date || '') > new Date() && (
-                              <button 
-                                onClick={() => handleVote(undefined, player.playerId)}
-                                style={{ padding: '2px 8px', fontSize: '12px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                              >
-                                Голосувати
-                              </button>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
 
                   <div className={styles.tabsContainer}>
                     <div className={styles.tabsHeader}>
@@ -2322,7 +2279,61 @@ const TournamentViewPage = () => {
                       >
                         <i className="fas fa-calendar-week"></i> Розклад турів
                       </button>
+                      <button
+                        className={`${styles.tabButton} ${activeTab === 'voting' ? styles.active : ''}`}
+                        onClick={() => setActiveTab('voting')}
+                      >
+                        <i className="fas fa-poll"></i> Голосування
+                      </button>
                     </div>
+
+                    {activeTab === 'voting' && (
+                      <div className={styles.tabContent}>
+                        <div className={styles.votingSection} style={{ background: '#fff', padding: '15px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                          <h3 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '10px', color: '#1e293b', display: 'flex', alignItems: 'center' }}>
+                            <i className="fas fa-poll" style={{ marginRight: '8px', color: '#3b82f6' }}></i>
+                            Голосування за переможця (Всього голосів: {voteStats?.totalVotes || 0})
+                            <i className="fas fa-info-circle" title="Голосування має суто розважальний характер і не впливає на офіційні результати змагань" style={{ marginLeft: '6px', color: '#64748b', cursor: 'help', fontSize: '14px' }}></i>
+                          </h3>
+                          
+                          {voteStats?.hasVoted && (
+                            <p style={{ color: '#10b981', fontSize: '14px', marginBottom: '10px' }}>
+                              <i className="fas fa-check-circle" style={{ marginRight: '4px' }}></i>
+                              Ви вже проголосували!
+                            </p>
+                          )}
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            {(sortedPlayers || []).map((player: any) => {
+                              const stats = voteStats?.optionStats?.find((s: any) => s.id === player.playerId);
+                              const votes = stats?.votes || 0;
+                              const percentage = stats?.percentage || 0;
+                              return (
+                                <div key={player.playerId} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                  <div style={{ width: '150px', fontSize: '14px', fontWeight: 500, color: '#334155' }}>
+                                    {player.playerName}
+                                  </div>
+                                  <div style={{ flex: 1, height: '8px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
+                                    <div style={{ width: `${percentage}%`, height: '100%', background: '#3b82f6' }}></div>
+                                  </div>
+                                  <div style={{ width: '100px', fontSize: '12px', color: '#64748b', textAlign: 'right' }}>
+                                    {votes} ({percentage}%)
+                                  </div>
+                                  {!voteStats?.hasVoted && !isVoting && new Date(tournament?.rawDate || tournament?.date || '') > new Date() && (
+                                    <button 
+                                      onClick={() => handleVote(undefined, player.playerId)}
+                                      style={{ padding: '2px 8px', fontSize: '12px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                                    >
+                                      Голосувати
+                                    </button>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     {activeTab === 'standings' && (
                       <div className={styles.tabContent}>

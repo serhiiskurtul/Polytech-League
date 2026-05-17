@@ -94,7 +94,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   isAdmin,
   onRefresh
 }) => {
-  const [activeTab, setActiveTab] = useState<'standings' | 'matches' | 'teams' | 'info' | 'bracket' | 'participants' | 'stats'>((sport === 'football' || sport === 'футбол') ? 'bracket' : 'matches');
+  const [activeTab, setActiveTab] = useState<'standings' | 'matches' | 'teams' | 'info' | 'bracket' | 'participants' | 'stats' | 'voting'>((sport === 'football' || sport === 'футбол') ? 'bracket' : 'matches');
   const [allPlayers, setAllPlayers] = useState<PlayerDto[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [voteStats, setVoteStats] = useState<any>(null);
@@ -1107,6 +1107,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
             <button className={activeTab === 'bracket' ? styles.activeTab : ''} onClick={() => setActiveTab('bracket')}>Сітка</button>
           )}
           <button className={activeTab === 'teams' ? styles.activeTab : ''} onClick={() => setActiveTab('teams')}>Команди</button>
+          <button className={activeTab === 'voting' ? styles.activeTab : ''} onClick={() => setActiveTab('voting')}>Голосування</button>
           {(sport === 'football' || sport === 'футбол') && (
             <button className={activeTab === 'stats' ? styles.activeTab : ''} onClick={() => setActiveTab('stats')}>Статистика</button>
           )}
@@ -1157,55 +1158,55 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         </div>
       )}
 
-      {/* Voting Section */}
-      <div className={styles.votingSection} style={{ marginBottom: '20px', background: '#fff', padding: '15px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-        <h3 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '10px', color: '#1e293b', display: 'flex', alignItems: 'center' }}>
-          <i className="fas fa-poll" style={{ marginRight: '8px', color: '#3b82f6' }}></i>
-          Голосування за переможця (Всього голосів: {voteStats?.totalVotes || 0})
-          <i className="fas fa-info-circle" title="Голосування має суто розважальний характер і не впливає на офіційні результати змагань" style={{ marginLeft: '6px', color: '#64748b', cursor: 'help', fontSize: '14px' }}></i>
-        </h3>
-        
-        {voteStats?.hasVoted && (
-          <p style={{ color: '#10b981', fontSize: '14px', marginBottom: '10px' }}>
-            <i className="fas fa-check-circle" style={{ marginRight: '4px' }}></i>
-            Ви вже проголосували!
-          </p>
-        )}
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {(details.teams || []).map((team: any) => {
-            const stats = voteStats?.optionStats?.find((s: any) => s.id === team.id);
-            const votes = stats?.votes || 0;
-            const percentage = stats?.percentage || 0;
-            return (
-              <div key={team.id} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{ width: '150px', fontSize: '14px', fontWeight: 500, color: '#334155' }}>
-                  {team.name}
-                </div>
-                <div style={{ flex: 1, height: '8px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
-                  <div style={{ width: `${percentage}%`, height: '100%', background: '#3b82f6' }}></div>
-                </div>
-                <div style={{ width: '100px', fontSize: '12px', color: '#64748b', textAlign: 'right' }}>
-                  {votes} ({percentage}%)
-                </div>
-                {!voteStats?.hasVoted && !isVoting && new Date(details.rawDate || details.date) > new Date() && (
-                  <button 
-                    onClick={() => handleVote(details.isTeam ? team.id : undefined, !details.isTeam ? team.id : undefined)}
-                    style={{ padding: '2px 8px', fontSize: '12px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                  >
-                    Голосувати
-                  </button>
-                )}
-              </div>
-            );
-          })}
-            
-
-          </div>
-        </div>
 
       {/* Main Content Areas */}
       <div className={styles.tabContent}>
+        {activeTab === 'voting' && (
+          <div className={styles.votingSection} style={{ marginBottom: '20px', background: '#fff', padding: '15px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '10px', color: '#1e293b', display: 'flex', alignItems: 'center' }}>
+              <i className="fas fa-poll" style={{ marginRight: '8px', color: '#3b82f6' }}></i>
+              Голосування за переможця (Всього голосів: {voteStats?.totalVotes || 0})
+              <i className="fas fa-info-circle" title="Голосування має суто розважальний характер і не впливає на офіційні результати змагань" style={{ marginLeft: '6px', color: '#64748b', cursor: 'help', fontSize: '14px' }}></i>
+            </h3>
+            
+            {voteStats?.hasVoted && (
+              <p style={{ color: '#10b981', fontSize: '14px', marginBottom: '10px' }}>
+                <i className="fas fa-check-circle" style={{ marginRight: '4px' }}></i>
+                Ви вже проголосували!
+              </p>
+            )}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {(details.teams || []).map((team: any) => {
+                const stats = voteStats?.optionStats?.find((s: any) => s.id === team.id);
+                const votes = stats?.votes || 0;
+                const percentage = stats?.percentage || 0;
+                return (
+                  <div key={team.id} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ width: '150px', fontSize: '14px', fontWeight: 500, color: '#334155' }}>
+                      {team.name}
+                    </div>
+                    <div style={{ flex: 1, height: '8px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
+                      <div style={{ width: `${percentage}%`, height: '100%', background: '#3b82f6' }}></div>
+                    </div>
+                    <div style={{ width: '100px', fontSize: '12px', color: '#64748b', textAlign: 'right' }}>
+                      {votes} ({percentage}%)
+                    </div>
+                    {!voteStats?.hasVoted && !isVoting && new Date(details.rawDate || details.date) > new Date() && (
+                      <button 
+                        onClick={() => handleVote(details.isTeam ? team.id : undefined, !details.isTeam ? team.id : undefined)}
+                        style={{ padding: '2px 8px', fontSize: '12px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                      >
+                        Голосувати
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
         {/* football Admin Panel (Horizontal) */}
         {isAdmin && activeTab === 'bracket' && (sport === 'football' || sport === 'футбол') && (
             <div className={styles.footballAdminPanel}>
