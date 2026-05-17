@@ -24,13 +24,13 @@ public class UserEventMediaController : ControllerBase
     }
 
     [Authorize]
-    [HttpPost]
+    [HttpPost("{eventId}")]
     [DisableRequestSizeLimit]
     [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = 2147483648)] // 2GB limit for form data
     public async Task<IActionResult> SubmitMedia(
-        [FromForm(Name = "eventId")] long eventId, 
-        [FromForm(Name = "file")] IFormFile file, 
-        [FromForm(Name = "comment")] string? comment, 
+        [FromRoute] long eventId, 
+        IFormFile file, 
+        [FromForm] string? comment, 
         CancellationToken cancellationToken)
     {
         var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);

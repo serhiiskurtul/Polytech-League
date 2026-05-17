@@ -47,13 +47,12 @@ export const markAsMainPhoto = async (eventId: number | string, photoId: number 
  */
 export const submitUserEventMedia = async (eventId: number | string, file: File, comment?: string): Promise<{ message: string, id: number }> => {
     const formData = new FormData();
-    formData.append('eventId', eventId.toString());
     formData.append('file', file);
     if (comment) {
         formData.append('comment', comment);
     }
 
-    const response = await api.post<{ message: string, id: number }>(`/user-event-media`, formData);
+    const response = await api.post<{ message: string, id: number }>(`/user-event-media/${eventId}`, formData);
     return response.data;
 };
 
