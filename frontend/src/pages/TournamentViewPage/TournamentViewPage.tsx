@@ -1151,9 +1151,9 @@ const TournamentViewPage = () => {
           console.error('Failed to fetch detailed event info:', eventErr);
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to fetch tournament:', err);
-      setError('Не вдалося завантажити інформацію про змагання.');
+      setError(`Не вдалося завантажити інформацію про змагання. (ID: ${id}) Деталі: ${err.message || 'Невідома помилка'}`);
     } finally {
       setIsLoading(false);
     }
