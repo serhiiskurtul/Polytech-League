@@ -3288,7 +3288,7 @@ const TournamentViewPage = () => {
               {pendingUserMedia && pendingUserMedia.length > 0 ? (
                 <div className={styles.photoGrid}>
                   {pendingUserMedia.map((media: any) => (
-                    <div key={media.id} className={styles.galleryItem} style={{ height: 'auto', background: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
+                    <div key={media.id} style={{ background: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
                       <div style={{ height: '200px', overflow: 'hidden', position: 'relative' }}>
                         {media.type === 'video' ? (
                           <video src={getImageUrl(media.url)} controls style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
