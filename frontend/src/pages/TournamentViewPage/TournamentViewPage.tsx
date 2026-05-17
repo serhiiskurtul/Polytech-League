@@ -16,6 +16,10 @@ import {
   uploadEventMedia,
   deleteEventMedia,
   setMainPhoto,
+  submitUserEventMedia,
+  getApprovedUserEventMedia,
+  getPendingUserEventMedia,
+  updateUserEventMediaStatus,
   searchUsers,
   getAllPlayers,
   createPlayer,
@@ -86,7 +90,7 @@ import {
   removeBadmintonParticipant
 } from '@/shared/api';
 import { PlayerDto, Gender } from '@/shared/types/player.types';
-import { RegistrationStatus } from '@/shared/types/tournament.types';
+import { RegistrationStatus, ModerationStatus } from '@/shared/types/tournament.types';
 import {
   getTableTennisEventById,
   updateTableTennisEvent,
@@ -142,6 +146,34 @@ const TournamentViewPage = () => {
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
   const [seasons, setSeasons] = useState<any[]>([]);
   
+  const [userMedia, setUserMedia] = useState<any[]>([]);
+  const [isUploadingUserMedia, setIsUploadingUserMedia] = useState(false);
+  const [userMediaComment, setUserMediaComment] = useState('');
+  const [userMediaFile, setUserMediaFile] = useState<File | null>(null);
+  const [pendingUserMedia, setPendingUserMedia] = useState<any[]>([]);
+
+  const fetchUserMedia = async () => {
+    if (!id) return;
+    try {
+      const data = await getApprovedUserEventMedia(id);
+      setUserMedia(data);
+    } catch (err) {
+      console.error('Failed to fetch user media:', err);
+    }
+  };
+
+  const fetchPendingUserMedia = async () => {
+    const isUserAdmin = user?.role === 1 || user?.role === '1' || user?.role === 'Admin';
+    if (!isUserAdmin) return;
+    try {
+      const data = await getPendingUserEventMedia();
+      const filtered = data.filter((m: any) => m.eventId === Number(id));
+      setPendingUserMedia(filtered);
+    } catch (err) {
+      console.error('Failed to fetch pending media:', err);
+    }
+  };
+  
   const [voteStats, setVoteStats] = useState<any>(null);
   const [isVoting, setIsVoting] = useState(false);
 
@@ -181,6 +213,8 @@ const TournamentViewPage = () => {
   useEffect(() => {
     if (id) {
       fetchVoteStats();
+      fetchUserMedia();
+      fetchPendingUserMedia();
     }
   }, [id]);
 
@@ -3123,6 +3157,185 @@ const TournamentViewPage = () => {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* User Media Section */}
+          <div className={styles.gallerySection} style={{ marginTop: '40px' }}>
+            <div className={styles.galleryHeader}>
+              <i className="fas fa-camera-retro"></i>
+              <h2>Галерея від учасників та вболівальників</h2>
+            </div>
+
+            {/* Upload Form (only for logged in users) */}
+            {user ? (
+              <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', marginBottom: '24px', border: '1px solid #e2e8f0' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '12px', color: '#1e293b' }}>Поділіться своїми фото чи відео</h3>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
+                  <input
+                    type="file"
+                    accept="image/*,video/*"
+                    onChange={(e) => setUserMediaFile(e.target.files?.[0] || null)}
+                    style={{ padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#fff' }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Ваш коментар (опціонально)"
+                    value={userMediaComment}
+                    onChange={(e) => setUserMediaComment(e.target.value)}
+                    style={{ flex: 1, minWidth: '200px', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+                  />
+                  <button
+                    onClick={async () => {
+                      if (!userMediaFile) {
+                        toast.error("Будь ласка, оберіть файл");
+                        return;
+                      }
+                      try {
+                        setIsUploadingUserMedia(true);
+                        await submitUserEventMedia(id!, userMediaFile, userMediaComment);
+                        toast.success("Медіа надіслано на модерацію!");
+                        setUserMediaFile(null);
+                        setUserMediaComment('');
+                        // Reset file input
+                        const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+                        if (input) input.value = '';
+                      } catch (err: any) {
+                        console.error(err);
+                        toast.error(err.response?.data?.message || "Помилка при відправці");
+                      } finally {
+                        setIsUploadingUserMedia(false);
+                      }
+                    }}
+                    disabled={isUploadingUserMedia || !userMediaFile}
+                    style={{
+                      padding: '10px 20px',
+                      background: '#2563eb',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontWeight: 'bold',
+                      opacity: (isUploadingUserMedia || !userMediaFile) ? 0.5 : 1
+                    }}
+                  >
+                    {isUploadingUserMedia ? "Відправка..." : "Надіслати"}
+                  </button>
+                </div>
+                <p style={{ fontSize: '12px', color: '#64748b', marginTop: '8px' }}>
+                  * Всі медіа проходять модерацію адміністратором перед публікацією.
+                </p>
+              </div>
+            ) : (
+              <div style={{ background: '#f8fafc', padding: '15px', borderRadius: '12px', marginBottom: '24px', textAlign: 'center', color: '#64748b' }}>
+                <i className="fas fa-info-circle" style={{ marginRight: '8px' }}></i>
+                Будь ласка, <Link to="/login" style={{ color: '#2563eb', textDecoration: 'underline' }}>авторизуйтесь</Link>, щоб додати свої фото чи відео.
+              </div>
+            )}
+
+            {/* Display Grid */}
+            {userMedia && userMedia.length > 0 ? (
+              <div className={styles.photoGrid}>
+                {userMedia.map((media: any) => (
+                  <div key={media.id} className={styles.galleryItem} style={{ height: 'auto', background: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
+                    <div style={{ height: '200px', overflow: 'hidden', position: 'relative' }}>
+                      {media.type === 'video' ? (
+                        <video src={getImageUrl(media.url)} controls style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        <img src={getImageUrl(media.url)} alt="User media" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      )}
+                    </div>
+                    <div style={{ padding: '12px' }}>
+                      <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#1e293b', marginBottom: '4px' }}>
+                        <i className="fas fa-user" style={{ marginRight: '6px', color: '#64748b' }}></i>
+                        {media.authorName || 'Анонім'}
+                      </div>
+                      {media.comment && (
+                        <div style={{ fontSize: '13px', color: '#475569', fontStyle: 'italic' }}>
+                          "{media.comment}"
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center', color: '#64748b', padding: '40px 0' }}>
+                <i className="fas fa-camera" style={{ fontSize: '40px', marginBottom: '12px', color: '#cbd5e1' }}></i>
+                <p>Ще немає медіа від учасників. Будьте першим!</p>
+              </div>
+            )}
+          </div>
+
+          {/* Admin Moderation Section */}
+          {isAdmin && (
+            <div className={styles.gallerySection} style={{ marginTop: '40px' }}>
+              <div className={styles.galleryHeader}>
+                <i className="fas fa-tasks"></i>
+                <h2>Модерація медіа від користувачів</h2>
+              </div>
+              
+              {pendingUserMedia && pendingUserMedia.length > 0 ? (
+                <div className={styles.photoGrid}>
+                  {pendingUserMedia.map((media: any) => (
+                    <div key={media.id} className={styles.galleryItem} style={{ height: 'auto', background: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
+                      <div style={{ height: '200px', overflow: 'hidden', position: 'relative' }}>
+                        {media.type === 'video' ? (
+                          <video src={getImageUrl(media.url)} controls style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                          <img src={getImageUrl(media.url)} alt="User media" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        )}
+                      </div>
+                      <div style={{ padding: '12px' }}>
+                        <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#1e293b', marginBottom: '4px' }}>
+                          <i className="fas fa-user" style={{ marginRight: '6px', color: '#64748b' }}></i>
+                          {media.authorName || 'Анонім'}
+                        </div>
+                        {media.comment && (
+                          <div style={{ fontSize: '13px', color: '#475569', fontStyle: 'italic', marginBottom: '8px' }}>
+                            "{media.comment}"
+                          </div>
+                        )}
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            onClick={async () => {
+                              try {
+                                await updateUserEventMediaStatus(media.id, ModerationStatus.Approved);
+                                toast.success("Схвалено!");
+                                fetchUserMedia();
+                                fetchPendingUserMedia();
+                              } catch (err) {
+                                toast.error("Помилка");
+                              }
+                            }}
+                            style={{ flex: 1, padding: '6px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                          >
+                            Схвалити
+                          </button>
+                          <button
+                            onClick={async () => {
+                              try {
+                                await updateUserEventMediaStatus(media.id, ModerationStatus.Rejected);
+                                toast.success("Відхилено!");
+                                fetchPendingUserMedia();
+                              } catch (err) {
+                                toast.error("Помилка");
+                              }
+                            }}
+                            style={{ flex: 1, padding: '6px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                          >
+                            Відхилити
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div style={{ textAlign: 'center', color: '#64748b', padding: '20px 0' }}>
+                  <p>Немає медіафайлів, що потребують модерації.</p>
+                </div>
+              )}
             </div>
           )}
 

@@ -7,6 +7,7 @@ public abstract class Event
     public required DateTime Date { get; set; }
     public required string Location { get; set; }
     public ICollection<EventPhotos>? Photos { get; set; }
+    public ICollection<UserEventMedia>? UserMedia { get; set; }
     public required ICollection<long> RefereeIds { get; set; }
     public required CompetitionLevel Level { get; set; }
     public EventCategory Category { get; set; } = EventCategory.Mixed;

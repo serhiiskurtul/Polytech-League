@@ -49,6 +49,12 @@ export enum RegistrationStatus {
   Rejected = 'Rejected'
 }
 
+export enum ModerationStatus {
+  Pending = 'Pending',
+  Approved = 'Approved',
+  Rejected = 'Rejected'
+}
+
 export type TournamentCategory = 'Men' | 'Women' | 'Mixed';
 
 export interface Champion {

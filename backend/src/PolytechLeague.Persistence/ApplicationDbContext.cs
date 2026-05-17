@@ -55,6 +55,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<ExternalAchievement> ExternalAchievements { get; set; }
     public DbSet<ExternalAchievementMedia> ExternalAchievementMedias { get; set; }
     public DbSet<EventVote> EventVotes { get; set; }
+    public DbSet<UserEventMedia> UserEventMedias { get; set; }
 
 
     
@@ -143,7 +144,8 @@ public class ApplicationDbContext : DbContext
             .HasPostgresEnum<BeachVolleyballTournamentType>()
             .HasPostgresEnum<BadmintonTournamentType>()
             .HasPostgresEnum<NotificationType>()
-            .HasPostgresEnum<RegistrationStatus>();
+            .HasPostgresEnum<RegistrationStatus>()
+            .HasPostgresEnum<ModerationStatus>();
 
         modelBuilder.Entity<Person>().UseTptMappingStrategy();
         modelBuilder.Entity<Event>().UseTptMappingStrategy();
@@ -155,6 +157,7 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new PlayerConfiguration()); // Unified Player config
         modelBuilder.ApplyConfiguration(new EventConfiguration());
         modelBuilder.ApplyConfiguration(new EventPhotosConfiguration());
+        modelBuilder.ApplyConfiguration(new UserEventMediaConfiguration());
         modelBuilder.ApplyConfiguration(new NotificationConfiguration());
         modelBuilder.ApplyConfiguration(new ConversationConfiguration());
         modelBuilder.ApplyConfiguration(new MessageConfiguration());
