@@ -78,3 +78,10 @@ export const getPendingUserEventMedia = async (): Promise<any[]> => {
 export const updateUserEventMediaStatus = async (id: number | string, status: ModerationStatus): Promise<void> => {
     await api.put(`/user-event-media/${id}/status`, { status });
 };
+
+/**
+ * Delete a user event media (Admin only)
+ */
+export const deleteUserEventMedia = async (id: number | string): Promise<void> => {
+    await api.delete(`/user-event-media/${id}`);
+};

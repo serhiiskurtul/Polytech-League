@@ -20,6 +20,7 @@ import {
   getApprovedUserEventMedia,
   getPendingUserEventMedia,
   updateUserEventMediaStatus,
+  deleteUserEventMedia,
   searchUsers,
   getAllPlayers,
   createPlayer,
@@ -579,6 +580,22 @@ const TournamentViewPage = () => {
         console.error('Помилка при видаленні змагання:', error);
         toast.error('Помилка при видаленні змагань. Деталі в консолі.');
       }
+    }
+  };
+
+  const handleDeleteUserMedia = async (mediaId: number) => {
+    if (!window.confirm('Ви впевнені, що хочете видалити це медіа? Цю дію неможливо скасувати.')) return;
+    try {
+      await deleteUserEventMedia(mediaId);
+      toast.success('Медіа видалено');
+      fetchUserMedia();
+      fetchPendingUserMedia();
+      if (selectedUserPhotoIndex !== null) {
+        setSelectedUserPhotoIndex(null);
+      }
+    } catch (err: any) {
+      toast.error('Помилка при видаленні медіа');
+      console.error(err);
     }
   };
 
@@ -3255,6 +3272,33 @@ const TournamentViewPage = () => {
                       ) : (
                         <img src={getImageUrl(media.url)} alt="User media" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       )}
+                      
+                      {isAdmin && (
+                        <div style={{ position: 'absolute', top: '8px', right: '8px' }}>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteUserMedia(media.id);
+                            }}
+                            style={{
+                              background: 'rgba(239, 68, 68, 0.9)',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '50%',
+                              width: '32px',
+                              height: '32px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                            }}
+                            title="Видалити"
+                          >
+                            <i className="fas fa-trash-alt"></i>
+                          </button>
+                        </div>
+                      )}
                     </div>
                     <div style={{ padding: '12px' }}>
                       <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#1e293b', marginBottom: '4px' }}>
@@ -3427,6 +3471,21 @@ const TournamentViewPage = () => {
                 <button className={styles.lightboxClose} onClick={() => setSelectedUserPhotoIndex(null)}>
                   <i className="fas fa-times"></i>
                 </button>
+
+                {isAdmin && (
+                  <button
+                    className={styles.lightboxDeleteBtn}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (userMedia[selectedUserPhotoIndex]) {
+                        handleDeleteUserMedia(userMedia[selectedUserPhotoIndex].id);
+                      }
+                    }}
+                    title="Видалити медіафайл"
+                  >
+                    <i className="fas fa-trash-alt"></i> Видалити
+                  </button>
+                )}
 
                 {userMedia[selectedUserPhotoIndex].type === 'video' ? (
                   <video

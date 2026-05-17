@@ -138,6 +138,25 @@ public class UserEventMediaController : ControllerBase
 
         return NoContent();
     }
+
+    [Authorize(Policy = "Admin")]
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteMedia(long id, CancellationToken cancellationToken)
+    {
+        var media = await _dbContext.UserEventMedias.FindAsync(new object[] { id }, cancellationToken);
+        if (media == null) return NotFound();
+
+        try
+        {
+            _fileService.DeleteFile(media.Url);
+        }
+        catch { /* ignore if file not found */ }
+
+        _dbContext.UserEventMedias.Remove(media);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return NoContent();
+    }
 }
 
 public class UpdateMediaStatusDto
