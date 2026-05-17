@@ -3191,6 +3191,13 @@ const TournamentViewPage = () => {
                         toast.error("Будь ласка, оберіть файл");
                         return;
                       }
+                      
+                      const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500 MB
+                      if (userMediaFile.size > MAX_FILE_SIZE) {
+                        toast.error("Файл занадто великий. Максимум 500 МБ.");
+                        return;
+                      }
+
                       try {
                         setIsUploadingUserMedia(true);
                         await submitUserEventMedia(id!, userMediaFile, userMediaComment);
@@ -3202,7 +3209,10 @@ const TournamentViewPage = () => {
                         if (input) input.value = '';
                       } catch (err: any) {
                         console.error(err);
-                        toast.error(err.response?.data?.message || "Помилка при відправці");
+                        const errorMsg = typeof err.response?.data === 'string' 
+                          ? err.response.data 
+                          : (err.response?.data?.message || "Помилка при відправці");
+                        toast.error(errorMsg);
                       } finally {
                         setIsUploadingUserMedia(false);
                       }
