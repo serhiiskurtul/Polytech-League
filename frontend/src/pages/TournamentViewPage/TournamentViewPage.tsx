@@ -147,11 +147,8 @@ const TournamentViewPage = () => {
 
   const fetchVoteStats = async () => {
     try {
-      const response = await fetch(`/api/tournaments/${id}/votes`);
-      if (response.ok) {
-        const data = await response.json();
-        setVoteStats(data);
-      }
+      const response = await api.get(`/tournaments/${id}/votes`);
+      setVoteStats(response.data);
     } catch (err) {
       console.error('Failed to fetch vote stats:', err);
     }
@@ -160,25 +157,22 @@ const TournamentViewPage = () => {
   const handleVote = async (teamId?: number, playerId?: number) => {
     setIsVoting(true);
     try {
-      let url = `/api/tournaments/${id}/vote`;
+      let url = `/tournaments/${id}/vote`;
       const params = new URLSearchParams();
       if (teamId) params.append('teamId', teamId.toString());
       if (playerId) params.append('playerId', playerId.toString());
       if (params.toString()) url += `?${params.toString()}`;
 
-      const response = await fetch(url, { method: 'POST' });
-      if (response.ok) {
-        toast.success('Ваш голос враховано!');
-        fetchVoteStats();
-      } else if (response.status === 401) {
+      await api.post(url);
+      toast.success('Ваш голос враховано!');
+      fetchVoteStats();
+    } catch (err: any) {
+      console.error('Failed to vote:', err);
+      if (err.response?.status === 401) {
         toast.error('Будь ласка, авторизуйтесь, щоб проголосувати.');
       } else {
-        const error = await response.text();
-        toast.error(error || 'Помилка при голосуванні');
+        toast.error(err.response?.data || 'Помилка при голосуванні');
       }
-    } catch (err) {
-      console.error('Failed to vote:', err);
-      toast.error('Помилка при голосуванні');
     } finally {
       setIsVoting(false);
     }

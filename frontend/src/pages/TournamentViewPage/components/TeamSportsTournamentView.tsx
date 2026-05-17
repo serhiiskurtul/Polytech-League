@@ -76,6 +76,7 @@ import TournamentPodium from './TournamentPodium';
 import FootballBracket from './FootballBracket';
 import styles from '../TournamentViewPage.module.css';
 import { Link } from 'react-router-dom';
+import api from '@/shared/api/axiosInstance';
 
 type Sport = 'volleyball' | 'волейбол' | 'beach_volleyball' | 'beach-volleyball' | 'пляжний_волейбол' | 'football' | 'футбол' | 'basketball_3x3' | 'basketball3x3' | 'basketball-3x3' | 'баскетбол_3х3' | 'badminton' | 'бадмінтон' | 'chess' | 'шахи' | 'checkers' | 'шашки' | 'tabletennis' | 'table_tennis' | 'table-tennis' | 'настільний_теніс';
 
@@ -228,11 +229,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
   const fetchVoteStats = async () => {
     try {
-      const response = await fetch(`/api/tournaments/${details.id}/votes`);
-      if (response.ok) {
-        const data = await response.json();
-        setVoteStats(data);
-      }
+      const response = await api.get(`/tournaments/${details.id}/votes`);
+      setVoteStats(response.data);
     } catch (err) {
       console.error('Failed to fetch vote stats:', err);
     }
@@ -241,25 +239,22 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const handleVote = async (teamId?: number, playerId?: number) => {
     setIsVoting(true);
     try {
-      let url = `/api/tournaments/${details.id}/vote`;
+      let url = `/tournaments/${details.id}/vote`;
       const params = new URLSearchParams();
       if (teamId) params.append('teamId', teamId.toString());
       if (playerId) params.append('playerId', playerId.toString());
       if (params.toString()) url += `?${params.toString()}`;
 
-      const response = await fetch(url, { method: 'POST' });
-      if (response.ok) {
-        alert('Ваш голос враховано!');
-        fetchVoteStats();
-      } else if (response.status === 401) {
+      await api.post(url);
+      alert('Ваш голос враховано!');
+      fetchVoteStats();
+    } catch (err: any) {
+      console.error('Failed to vote:', err);
+      if (err.response?.status === 401) {
         alert('Будь ласка, авторизуйтесь, щоб проголосувати.');
       } else {
-        const error = await response.text();
-        alert(error || 'Помилка при голосуванні');
+        alert(err.response?.data || 'Помилка при голосуванні');
       }
-    } catch (err) {
-      console.error('Failed to vote:', err);
-      alert('Помилка при голосуванні');
     } finally {
       setIsVoting(false);
     }
