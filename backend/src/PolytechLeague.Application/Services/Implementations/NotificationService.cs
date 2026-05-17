@@ -59,8 +59,6 @@ public class NotificationService(
             .Where(u => !u.IsDeleted && u.Role == UserRole.Admin)
             .ToListAsync();
 
-        var pushTasks = new List<Task>();
-
         foreach (var admin in admins)
         {
             var notification = new Notification
@@ -73,13 +71,18 @@ public class NotificationService(
                 CreatedAt = DateTime.UtcNow
             };
             _context.Notifications.Add(notification);
-            
-            pushTasks.Add(_pushNotificationService.SendPushNotificationAsync(admin.Id, title, message, link, tag));
-            pushTasks.Add(NotifyUserViaSignalR(admin.Id));
         }
 
+        // 1. Save all database changes first
         await _context.SaveChangesAsync();
-        await Task.WhenAll(pushTasks);
+
+        // 2. Await push notifications sequentially to avoid DbContext threading issues
+        // (Since _pushNotificationService.SendPushNotificationAsync queries the DB)
+        foreach (var admin in admins)
+        {
+            await _pushNotificationService.SendPushNotificationAsync(admin.Id, title, message, link, tag);
+            await NotifyUserViaSignalR(admin.Id);
+        }
     }
 
     public async Task SendNotificationToUserAsync(long userId, string title, string message, NotificationType type, string? link = null, string? tag = null)
