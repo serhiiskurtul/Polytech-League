@@ -219,11 +219,21 @@ public class ChessEventService :
 
     protected override async Task OnCreatedAsync(ChessEvent entity, CancellationToken cancellationToken)
     {
+        var actualId = entity.Id;
+        if (actualId == 0)
+        {
+            actualId = await _dbcontext.Set<ChessEvent>()
+                .Where(e => e.Name == entity.Name && e.Date == entity.Date)
+                .OrderByDescending(e => e.Id)
+                .Select(e => e.Id)
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+
         await _notificationService!.SendNotificationToAllAsync(
             "Нове змагання!",
             $"Створено нове змагання з шахів: {entity.Name}",
             NotificationType.Tournament,
-            $"/tournaments/{entity.Id}",
+            $"/tournaments/{actualId}",
             true
         );
     }

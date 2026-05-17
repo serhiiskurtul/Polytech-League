@@ -101,11 +101,21 @@ public class FootballEventService :
 
     protected override async Task OnCreatedAsync(FootballEvent entity, CancellationToken cancellationToken)
     {
+        var actualId = entity.Id;
+        if (actualId == 0)
+        {
+            actualId = await _dbcontext.Set<FootballEvent>()
+                .Where(e => e.Name == entity.Name && e.Date == entity.Date)
+                .OrderByDescending(e => e.Id)
+                .Select(e => e.Id)
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+
         await _notificationService!.SendNotificationToAllAsync(
             "Нове змагання!",
             $"Створено нове змагання з Футболу: {entity.Name}",
             NotificationType.Tournament,
-            $"/tournaments/{entity.Id}",
+            $"/tournaments/{actualId}",
             true
         );
     }
