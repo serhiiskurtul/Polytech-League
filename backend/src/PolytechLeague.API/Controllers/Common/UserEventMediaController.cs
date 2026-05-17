@@ -26,7 +26,7 @@ public class UserEventMediaController : ControllerBase
     [Authorize]
     [HttpPost("{eventId}")]
     [DisableRequestSizeLimit]
-    public async Task<IActionResult> SubmitMedia(long eventId, [FromForm] IFormFile file, [FromForm] string? comment, CancellationToken cancellationToken)
+    public async Task<IActionResult> SubmitMedia(long eventId, [FromForm] SubmitMediaDto dto, CancellationToken cancellationToken)
     {
         var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!long.TryParse(userIdStr, out long userId)) return Unauthorized();
@@ -34,19 +34,19 @@ public class UserEventMediaController : ControllerBase
         var @event = await _dbContext.Events.FindAsync(new object[] { eventId }, cancellationToken);
         if (@event == null) return NotFound("Event not found");
 
-        if (file == null || file.Length == 0) return BadRequest("File is required");
+        if (dto.File == null || dto.File.Length == 0) return BadRequest("File is required");
 
         // Determine folder based on file type
-        string type = file.ContentType.StartsWith("video/") ? "video" : "photo";
+        string type = dto.File.ContentType.StartsWith("video/") ? "video" : "photo";
         string folder = type == "video" ? "events/user-videos" : "events/user-photos";
         
-        var url = await _fileService.SaveFileAsync(file, folder, cancellationToken);
+        var url = await _fileService.SaveFileAsync(dto.File, folder, cancellationToken);
         
         var media = new UserEventMedia
         {
             Url = url,
             Type = type,
-            Comment = comment,
+            Comment = dto.Comment,
             UserId = userId,
             EventId = eventId,
             Status = ModerationStatus.Pending
@@ -138,4 +138,10 @@ public class UserEventMediaController : ControllerBase
 public class UpdateMediaStatusDto
 {
     public ModerationStatus Status { get; set; }
+}
+
+public class SubmitMediaDto
+{
+    public IFormFile File { get; set; } = null!;
+    public string? Comment { get; set; }
 }
