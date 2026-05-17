@@ -1166,7 +1166,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         <h3 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '10px', color: '#1e293b', display: 'flex', alignItems: 'center' }}>
           <i className="fas fa-poll" style={{ marginRight: '8px', color: '#3b82f6' }}></i>
           Голосування за переможця (Всього голосів: {voteStats?.totalVotes || 0})
-          <i className="fas fa-info-circle" title="Це голосування ніяк не впливає на результат змагань, а є лише по фану" style={{ marginLeft: '6px', color: '#64748b', cursor: 'help', fontSize: '14px' }}></i>
+          <i className="fas fa-info-circle" title="Голосування має суто розважальний характер і не впливає на офіційні результати змагань" style={{ marginLeft: '6px', color: '#64748b', cursor: 'help', fontSize: '14px' }}></i>
         </h3>
         
         {voteStats?.hasVoted && (
