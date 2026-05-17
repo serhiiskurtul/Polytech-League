@@ -14,11 +14,13 @@ public class UserEventMediaController : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly IFileService _fileService;
+    private readonly INotificationService _notificationService;
 
-    public UserEventMediaController(ApplicationDbContext dbContext, IFileService fileService)
+    public UserEventMediaController(ApplicationDbContext dbContext, IFileService fileService, INotificationService notificationService)
     {
         _dbContext = dbContext;
         _fileService = fileService;
+        _notificationService = notificationService;
     }
 
     [Authorize]
@@ -52,6 +54,13 @@ public class UserEventMediaController : ControllerBase
 
         _dbContext.UserEventMedias.Add(media);
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        await _notificationService.SendNotificationToAdminsAsync(
+            "Новий медіа матеріал на модерацію",
+            $"Користувач завантажив медіа до змагання {@event.Name}",
+            NotificationType.Tournament,
+            $"/tournaments/{eventId}"
+        );
 
         return Ok(new { message = "Медіа матеріал відправлено на модерацію", id = media.Id });
     }
@@ -109,6 +118,18 @@ public class UserEventMediaController : ControllerBase
 
         media.Status = dto.Status;
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        var @event = await _dbContext.Events.FindAsync(new object[] { media.EventId }, cancellationToken);
+        var eventName = @event?.Name ?? "змагання";
+        var statusStr = dto.Status == ModerationStatus.Approved ? "схвалено" : "відхилено";
+
+        await _notificationService.SendNotificationToUserAsync(
+            media.UserId,
+            "Статус модерації медіа",
+            $"Ваш медіа матеріал для {eventName} було {statusStr}",
+            NotificationType.Tournament,
+            $"/tournaments/{media.EventId}"
+        );
 
         return NoContent();
     }

@@ -3269,10 +3269,17 @@ const TournamentViewPage = () => {
 
           {/* Admin Moderation Section */}
           {isAdmin && (
-            <div className={styles.gallerySection} style={{ marginTop: '40px' }}>
+            <div className={styles.gallerySection} style={{ marginTop: '40px', background: '#fffbeb', padding: '20px', borderRadius: '12px', border: '1px solid #fef3c7' }}>
               <div className={styles.galleryHeader}>
-                <i className="fas fa-tasks"></i>
-                <h2>Модерація медіа від користувачів</h2>
+                <i className="fas fa-tasks" style={{ color: '#f59e0b' }}></i>
+                <h2 style={{ color: '#b45309' }}>
+                  Модерація медіа від користувачів
+                  {pendingUserMedia.length > 0 && (
+                    <span style={{ marginLeft: '8px', background: '#ef4444', color: '#fff', padding: '2px 8px', borderRadius: '12px', fontSize: '14px' }}>
+                      {pendingUserMedia.length}
+                    </span>
+                  )}
+                </h2>
               </div>
               
               {pendingUserMedia && pendingUserMedia.length > 0 ? (
