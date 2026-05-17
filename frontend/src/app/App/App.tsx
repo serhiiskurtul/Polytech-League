@@ -18,6 +18,7 @@ import { TournamentCreatePage } from '@/pages/TournamentCreatePage';
 import { PlayerViewPage } from '@/pages/PlayerViewPage';
 import { PlayerComparePage } from '@/pages/PlayerComparePage/index'; // Player comparison page
 import NotFoundPage from '@/pages/NotFoundPage/NotFoundPage';
+import { useNotifications } from '@/app/providers/NotificationProvider';
 import InternalServerErrorPage from '@/pages/InternalServerErrorPage/InternalServerErrorPage';
 import { RatingsPage } from '@/pages/RatingsPage';
 import { AdminMergesPage } from '@/pages/AdminMergesPage/AdminMergesPage';
@@ -40,17 +41,29 @@ import { NotificationBanner } from '@/features/notifications/NotificationBanner'
 export default function App() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { notifications, markAsRead } = useNotifications();
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data && event.data.type === 'NAVIGATE') {
-        navigate(event.data.url);
+        const url = event.data.url;
+        navigate(url);
+        
+        try {
+          const urlPath = new URL(url).pathname;
+          const matchingNotif = notifications.find(n => !n.isRead && n.link === urlPath);
+          if (matchingNotif) {
+            markAsRead(matchingNotif.id).catch(console.error);
+          }
+        } catch (e) {
+          console.error('Failed to parse URL in message listener:', e);
+        }
       }
     };
 
     navigator.serviceWorker?.addEventListener('message', handleMessage);
     return () => navigator.serviceWorker?.removeEventListener('message', handleMessage);
-  }, [navigate]);
+  }, [navigate, notifications, markAsRead]);
 
   const hideLayout = location.pathname === "/login" ||
     location.pathname === "/signup" ||
