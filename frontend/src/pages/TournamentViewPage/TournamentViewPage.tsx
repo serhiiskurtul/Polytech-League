@@ -164,13 +164,10 @@ const TournamentViewPage = () => {
 
   const fetchPendingUserMedia = async () => {
     const isUserAdmin = user?.role === 1 || user?.role === '1' || user?.role === 'Admin';
-    console.log('[Debug] fetchPendingUserMedia: isUserAdmin =', isUserAdmin);
     if (!isUserAdmin) return;
     try {
       const data = await getPendingUserEventMedia();
-      console.log('[Debug] fetchPendingUserMedia: all pending =', data);
       const filtered = data.filter((m: any) => m.eventId === Number(id));
-      console.log('[Debug] fetchPendingUserMedia: filtered (event ' + id + ') =', filtered);
       setPendingUserMedia(filtered);
     } catch (err) {
       console.error('Failed to fetch pending media:', err);

@@ -26,7 +26,7 @@ public class UserEventMediaController : ControllerBase
     [Authorize]
     [HttpPost("{eventId}")]
     [DisableRequestSizeLimit]
-    public async Task<IActionResult> SubmitMedia(long eventId, IFormFile file, [FromForm] string? comment, CancellationToken cancellationToken)
+    public async Task<IActionResult> SubmitMedia(long eventId, [FromForm] IFormFile file, [FromForm] string? comment, CancellationToken cancellationToken)
     {
         var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!long.TryParse(userIdStr, out long userId)) return Unauthorized();
