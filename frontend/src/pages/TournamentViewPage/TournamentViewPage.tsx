@@ -2245,45 +2245,48 @@ const TournamentViewPage = () => {
               return (
                 <>
                   {/* Voting Section */}
-                  {voteStats && (
-                    <div className={styles.votingSection} style={{ marginBottom: '20px', background: '#fff', padding: '15px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-                      <h3 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '10px', color: '#1e293b' }}>
-                        <i className="fas fa-poll" style={{ marginRight: '8px', color: '#3b82f6' }}></i>
-                        Голосування за переможця (Всього голосів: {voteStats.totalVotes})
-                      </h3>
-                      
-                      {voteStats.hasVoted && (
-                        <p style={{ color: '#10b981', fontSize: '14px', marginBottom: '10px' }}>
-                          <i className="fas fa-check-circle" style={{ marginRight: '4px' }}></i>
-                          Ви вже проголосували!
-                        </p>
-                      )}
+                  <div className={styles.votingSection} style={{ marginBottom: '20px', background: '#fff', padding: '15px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '10px', color: '#1e293b' }}>
+                      <i className="fas fa-poll" style={{ marginRight: '8px', color: '#3b82f6' }}></i>
+                      Голосування за переможця (Всього голосів: {voteStats?.totalVotes || 0})
+                    </h3>
+                    
+                    {voteStats?.hasVoted && (
+                      <p style={{ color: '#10b981', fontSize: '14px', marginBottom: '10px' }}>
+                        <i className="fas fa-check-circle" style={{ marginRight: '4px' }}></i>
+                        Ви вже проголосували!
+                      </p>
+                    )}
 
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        {voteStats.optionStats?.map((option: any) => (
-                          <div key={option.id} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {(sortedPlayers || []).map((player: any) => {
+                        const stats = voteStats?.optionStats?.find((s: any) => s.id === player.playerId);
+                        const votes = stats?.votes || 0;
+                        const percentage = stats?.percentage || 0;
+                        return (
+                          <div key={player.playerId} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                             <div style={{ width: '150px', fontSize: '14px', fontWeight: 500, color: '#334155' }}>
-                              {option.name}
+                              {player.playerName}
                             </div>
                             <div style={{ flex: 1, height: '8px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
-                              <div style={{ width: `${option.percentage}%`, height: '100%', background: '#3b82f6' }}></div>
+                              <div style={{ width: `${percentage}%`, height: '100%', background: '#3b82f6' }}></div>
                             </div>
                             <div style={{ width: '100px', fontSize: '12px', color: '#64748b', textAlign: 'right' }}>
-                              {option.votes} ({option.percentage}%)
+                              {votes} ({percentage}%)
                             </div>
-                            {!voteStats.hasVoted && !isVoting && new Date(tournament?.rawDate || tournament?.date || '') > new Date() && (
+                            {!voteStats?.hasVoted && !isVoting && new Date(tournament?.rawDate || tournament?.date || '') > new Date() && (
                               <button 
-                                onClick={() => handleVote(undefined, option.id)}
+                                onClick={() => handleVote(undefined, player.playerId)}
                                 style={{ padding: '2px 8px', fontSize: '12px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
                               >
                                 Голосувати
                               </button>
                             )}
                           </div>
-                        ))}
-                      </div>
+                        );
+                      })}
                     </div>
-                  )}
+                  </div>
 
                   <div className={styles.tabsContainer}>
                     <div className={styles.tabsHeader}>
