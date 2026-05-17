@@ -77,6 +77,7 @@ import FootballBracket from './FootballBracket';
 import styles from '../TournamentViewPage.module.css';
 import { Link } from 'react-router-dom';
 import api from '@/shared/api/axiosInstance';
+import toast from 'react-hot-toast';
 
 type Sport = 'volleyball' | 'волейбол' | 'beach_volleyball' | 'beach-volleyball' | 'пляжний_волейбол' | 'football' | 'футбол' | 'basketball_3x3' | 'basketball3x3' | 'basketball-3x3' | 'баскетбол_3х3' | 'badminton' | 'бадмінтон' | 'chess' | 'шахи' | 'checkers' | 'шашки' | 'tabletennis' | 'table_tennis' | 'table-tennis' | 'настільний_теніс';
 
@@ -246,14 +247,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       if (params.toString()) url += `?${params.toString()}`;
 
       await api.post(url);
-      alert('Ваш голос враховано!');
+      toast.success('Ваш голос враховано!');
       fetchVoteStats();
     } catch (err: any) {
       console.error('Failed to vote:', err);
       if (err.response?.status === 401) {
-        alert('Будь ласка, авторизуйтесь, щоб проголосувати.');
+        toast.error('Будь ласка, авторизуйтесь, щоб проголосувати.');
       } else {
-        alert(err.response?.data || 'Помилка при голосуванні');
+        toast.error(err.response?.data || 'Помилка при голосуванні');
       }
     } finally {
       setIsVoting(false);
