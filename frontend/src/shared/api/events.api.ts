@@ -52,11 +52,7 @@ export const submitUserEventMedia = async (eventId: number | string, file: File,
         formData.append('comment', comment);
     }
 
-    const response = await api.post<{ message: string, id: number }>(`/user-event-media/${eventId}`, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
-    });
+    const response = await api.post<{ message: string, id: number }>(`/user-event-media/${eventId}`, formData);
     return response.data;
 };
 
