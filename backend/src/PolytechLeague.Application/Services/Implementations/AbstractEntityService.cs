@@ -86,6 +86,21 @@ public abstract class AbstractEntityService<TEntity>(
         // Ensure the ID is populated (sometimes EF Core doesn't update it immediately in memory for TPT)
         await _dbcontext.Entry(entity).ReloadAsync(cancellationToken);
 
+        // Fallback if ID is still 0 and it's an Event
+        if (entity is Event ev && ev.Id == 0)
+        {
+            var id = await _dbcontext.Set<Event>()
+                .Where(e => e.Name == ev.Name && e.Date == ev.Date)
+                .OrderByDescending(e => e.Id)
+                .Select(e => e.Id)
+                .FirstOrDefaultAsync(cancellationToken);
+            
+            if (id != 0)
+            {
+                ev.Id = id;
+            }
+        }
+
         await OnCreatedAsync(entity, cancellationToken);
 
         _logger.LogInformation("Entity of type {EntityType} successfully created", typeof(TEntity).Name);
