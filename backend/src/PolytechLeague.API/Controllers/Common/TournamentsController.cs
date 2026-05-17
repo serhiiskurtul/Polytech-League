@@ -75,4 +75,34 @@ public class TournamentsController : ControllerBase
         var champions = await _tournamentService.GetChampionsAsync(sport, gender, weightClass);
         return Ok(champions);
     }
+
+    [HttpPost("{id}/vote")]
+    [Microsoft.AspNetCore.Authorization.Authorize]
+    public async Task<ActionResult> Vote(long id, [FromQuery] long? teamId, [FromQuery] long? playerId)
+    {
+        var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdStr) || !long.TryParse(userIdStr, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var result = await _tournamentService.VoteAsync(id, userId, teamId, playerId);
+        if (!result) return BadRequest("Не вдалося проголосувати. Можливо, ви вже голосували або змагання вже розпочалися.");
+
+        return Ok();
+    }
+
+    [HttpGet("{id}/votes")]
+    public async Task<ActionResult<VoteStatsDto>> GetVotes(long id)
+    {
+        var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        long? userId = null;
+        if (!string.IsNullOrEmpty(userIdStr) && long.TryParse(userIdStr, out var parsedUserId))
+        {
+            userId = parsedUserId;
+        }
+
+        var stats = await _tournamentService.GetVoteStatsAsync(id, userId);
+        return Ok(stats);
+    }
 }

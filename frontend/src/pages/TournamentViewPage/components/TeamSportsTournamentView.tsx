@@ -95,6 +95,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const [activeTab, setActiveTab] = useState<'standings' | 'matches' | 'teams' | 'info' | 'bracket' | 'participants' | 'stats'>((sport === 'football' || sport === 'футбол') ? 'bracket' : 'matches');
   const [allPlayers, setAllPlayers] = useState<PlayerDto[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [voteStats, setVoteStats] = useState<any>(null);
+  const [isVoting, setIsVoting] = useState(false);
   const isRegionalOrNational = details?.level === 'Regional' || details?.level === 'National';
   
   // Create Match State
@@ -217,6 +219,51 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       loadAllPlayers();
     }
   }, [isAdmin]);
+
+  useEffect(() => {
+    if (details?.id) {
+      fetchVoteStats();
+    }
+  }, [details?.id]);
+
+  const fetchVoteStats = async () => {
+    try {
+      const response = await fetch(`/api/tournaments/${details.id}/votes`);
+      if (response.ok) {
+        const data = await response.json();
+        setVoteStats(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch vote stats:', err);
+    }
+  };
+
+  const handleVote = async (teamId?: number, playerId?: number) => {
+    setIsVoting(true);
+    try {
+      let url = `/api/tournaments/${details.id}/vote`;
+      const params = new URLSearchParams();
+      if (teamId) params.append('teamId', teamId.toString());
+      if (playerId) params.append('playerId', playerId.toString());
+      if (params.toString()) url += `?${params.toString()}`;
+
+      const response = await fetch(url, { method: 'POST' });
+      if (response.ok) {
+        alert('Ваш голос враховано!');
+        fetchVoteStats();
+      } else if (response.status === 401) {
+        alert('Будь ласка, авторизуйтесь, щоб проголосувати.');
+      } else {
+        const error = await response.text();
+        alert(error || 'Помилка при голосуванні');
+      }
+    } catch (err) {
+      console.error('Failed to vote:', err);
+      alert('Помилка при голосуванні');
+    } finally {
+      setIsVoting(false);
+    }
+  };
 
   const loadAllPlayers = async () => {
     try {
@@ -1111,6 +1158,76 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
              onViewRoster={(teamId) => { setEditingTeamId(teamId); setIsTeamRosterModalOpen(true); }}
            />
 
+        </div>
+      )}
+
+      {/* Voting Section */}
+      {voteStats && (
+        <div className={styles.votingSection} style={{ marginBottom: '20px', background: '#fff', padding: '15px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+          <h3 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '10px', color: '#1e293b' }}>
+            <i className="fas fa-poll" style={{ marginRight: '8px', color: '#3b82f6' }}></i>
+            Голосування за переможця (Всього голосів: {voteStats.totalVotes})
+          </h3>
+          
+          {voteStats.hasVoted && (
+            <p style={{ color: '#10b981', fontSize: '14px', marginBottom: '10px' }}>
+              <i className="fas fa-check-circle" style={{ marginRight: '4px' }}></i>
+              Ви вже проголосували!
+            </p>
+          )}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {voteStats.optionStats?.map((option: any) => (
+              <div key={option.id} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '150px', fontSize: '14px', fontWeight: 500, color: '#334155' }}>
+                  {option.name}
+                </div>
+                <div style={{ flex: 1, height: '8px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
+                  <div style={{ width: `${option.percentage}%`, height: '100%', background: '#3b82f6' }}></div>
+                </div>
+                <div style={{ width: '100px', fontSize: '12px', color: '#64748b', textAlign: 'right' }}>
+                  {option.votes} ({option.percentage}%)
+                </div>
+                {!voteStats.hasVoted && !isVoting && new Date(details.rawDate || details.date) > new Date() && (
+                  <button 
+                    onClick={() => handleVote(details.isTeam ? option.id : undefined, !details.isTeam ? option.id : undefined)}
+                    style={{ padding: '2px 8px', fontSize: '12px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                  >
+                    Голосувати
+                  </button>
+                )}
+              </div>
+            ))}
+            
+            {voteStats.totalVotes === 0 && !voteStats.hasVoted && new Date(details.rawDate || details.date) > new Date() && (
+              <div style={{ fontSize: '14px', color: '#64748b' }}>
+                Голосів ще немає. Будьте першим!
+                <div style={{ display: 'flex', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
+                  {details.isTeam ? (
+                    details.teams?.map((team: any) => (
+                      <button 
+                        key={team.id}
+                        onClick={() => handleVote(team.id, undefined)}
+                        style={{ padding: '4px 12px', background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', borderRadius: '6px', cursor: 'pointer' }}
+                      >
+                        {team.name}
+                      </button>
+                    ))
+                  ) : (
+                    details.participants?.map((p: any) => (
+                      <button 
+                        key={p.playerId}
+                        onClick={() => handleVote(undefined, p.playerId)}
+                        style={{ padding: '4px 12px', background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', borderRadius: '6px', cursor: 'pointer' }}
+                      >
+                        {p.playerName}
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

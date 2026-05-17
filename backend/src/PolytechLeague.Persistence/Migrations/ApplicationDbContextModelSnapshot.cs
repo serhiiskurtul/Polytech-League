@@ -1162,6 +1162,41 @@ namespace PolytechLeague.Persistence.Migrations
                     b.ToTable("event_photos", (string)null);
                 });
 
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.EventVote", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("EventId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("VotedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("VotedForPlayerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("VotedForTeamId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("VotedForPlayerId");
+
+                    b.HasIndex("EventId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("EventVotes");
+                });
+
             modelBuilder.Entity("PolytechLeague.Domain.Entities.ExternalAchievement", b =>
                 {
                     b.Property<long>("Id")
@@ -3421,6 +3456,31 @@ namespace PolytechLeague.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.EventVote", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", "VotedForPlayer")
+                        .WithMany()
+                        .HasForeignKey("VotedForPlayerId");
+
+                    b.Navigation("Event");
+
+                    b.Navigation("User");
+
+                    b.Navigation("VotedForPlayer");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.ExternalAchievementMedia", b =>

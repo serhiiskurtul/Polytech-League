@@ -54,6 +54,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<PushSubscription> PushSubscriptions { get; set; }
     public DbSet<ExternalAchievement> ExternalAchievements { get; set; }
     public DbSet<ExternalAchievementMedia> ExternalAchievementMedias { get; set; }
+    public DbSet<EventVote> EventVotes { get; set; }
 
 
     
@@ -158,6 +159,10 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new ConversationConfiguration());
         modelBuilder.ApplyConfiguration(new MessageConfiguration());
         modelBuilder.ApplyConfiguration(new SeasonConfiguration());
+
+        modelBuilder.Entity<EventVote>()
+            .HasIndex(v => new { v.EventId, v.UserId })
+            .IsUnique();
 
 
         // Chess configurations

@@ -10,4 +10,6 @@ public interface ITournamentService
     Task<GeneralStatsDto> GetGeneralStatsAsync();
     Task<IEnumerable<RecentMatchDto>> GetRecentMatchesAsync(int count, string? sport = null);
     Task<IEnumerable<PolytechLeague.Application.Dto.General.ChampionDto>> GetChampionsAsync(string? sportType = null, PolytechLeague.Domain.Entities.Enums.Gender? gender = null, string? weightClass = null);
+    Task<bool> VoteAsync(long eventId, long userId, long? teamId, long? playerId);
+    Task<VoteStatsDto> GetVoteStatsAsync(long eventId, long? userId = null);
 }

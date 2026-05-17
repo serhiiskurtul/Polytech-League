@@ -773,4 +773,111 @@ public class TournamentService : ITournamentService
 
         return dtos;
     }
+
+    public async Task<bool> VoteAsync(long eventId, long userId, long? teamId, long? playerId)
+    {
+        var e = await _context.Set<Event>().FindAsync(eventId);
+        if (e == null) return false;
+
+        if (DateTime.UtcNow >= e.Date) return false;
+
+        var existingVote = await _context.EventVotes
+            .FirstOrDefaultAsync(v => v.EventId == eventId && v.UserId == userId);
+        if (existingVote != null) return false;
+
+        var vote = new EventVote
+        {
+            EventId = eventId,
+            UserId = userId,
+            VotedForTeamId = teamId,
+            VotedForPlayerId = playerId,
+            VotedAt = DateTime.UtcNow
+        };
+
+        _context.EventVotes.Add(vote);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<VoteStatsDto> GetVoteStatsAsync(long eventId, long? userId = null)
+    {
+        var votes = await _context.EventVotes
+            .Where(v => v.EventId == eventId)
+            .ToListAsync();
+
+        var totalVotes = votes.Count;
+        var stats = new VoteStatsDto { TotalVotes = totalVotes };
+
+        if (userId.HasValue)
+        {
+            stats.HasVoted = votes.Any(v => v.UserId == userId.Value);
+        }
+
+        if (totalVotes == 0) return stats;
+
+        var teamVotes = votes.Where(v => v.VotedForTeamId.HasValue)
+            .GroupBy(v => v.VotedForTeamId!.Value)
+            .Select(g => new { Id = g.Key, Count = g.Count() })
+            .ToList();
+
+        var playerVotes = votes.Where(v => v.VotedForPlayerId.HasValue)
+            .GroupBy(v => v.VotedForPlayerId!.Value)
+            .Select(g => new { Id = g.Key, Count = g.Count() })
+            .ToList();
+
+        var e = await _context.Set<Event>().FindAsync(eventId);
+        if (e == null) return stats;
+
+        var sport = GetSportName(e);
+
+        foreach (var tv in teamVotes)
+        {
+            string name = "Команда";
+            switch (sport)
+            {
+                case "football":
+                    var ft = await _context.FootballTeams.FindAsync(tv.Id);
+                    if (ft != null) name = ft.Name;
+                    break;
+                case "volleyball":
+                    var vt = await _context.VolleyballTeams.FindAsync(tv.Id);
+                    if (vt != null) name = vt.Name;
+                    break;
+                case "basketball-3x3":
+                    var bt = await _context.BasketballTeams.FindAsync(tv.Id);
+                    if (bt != null) name = bt.Name;
+                    break;
+                case "beach-volleyball":
+                    var bvt = await _context.BeachVolleyballTeams.FindAsync(tv.Id);
+                    if (bvt != null) name = bvt.Name;
+                    break;
+            }
+
+            stats.OptionStats.Add(new VoteOptionStatDto
+            {
+                Id = tv.Id,
+                Name = name,
+                Votes = tv.Count,
+                Percentage = Math.Round((double)tv.Count / totalVotes * 100, 2)
+            });
+        }
+
+        foreach (var pv in playerVotes)
+        {
+            var player = await _context.Players.FindAsync(pv.Id);
+            string name = player != null ? $"{player.FirstName} {player.LastName}" : "Гравець";
+
+            stats.OptionStats.Add(new VoteOptionStatDto
+            {
+                Id = pv.Id,
+                Name = name,
+                Votes = pv.Count,
+                Percentage = Math.Round((double)pv.Count / totalVotes * 100, 2)
+            });
+        }
+
+        stats.OptionStats = stats.OptionStats.OrderByDescending(o => o.Votes).ToList();
+
+        return stats;
+    }
 }
