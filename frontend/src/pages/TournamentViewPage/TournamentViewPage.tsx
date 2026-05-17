@@ -265,8 +265,8 @@ const TournamentViewPage = () => {
         headRefereeName: editTournamentData.headRefereeName || (details as any).headRefereeName || '',
         referees: editTournamentData.referees || (details as any).referees || '',
         schedule: editTournamentData.schedule || (details as any).schedule || '',
-        registrationStart: editTournamentData.level === 'CollegeGroup' ? formatToISO(editTournamentData.registrationStart) : (details as any).registrationStart || null,
-        registrationEnd: editTournamentData.level === 'CollegeGroup' ? formatToISO(editTournamentData.registrationEnd) : (details as any).registrationEnd || null,
+        registrationStart: formatToISO(editTournamentData.registrationStart) || (details as any).registrationStart || null,
+        registrationEnd: formatToISO(editTournamentData.registrationEnd) || (details as any).registrationEnd || null,
         endDate: formatToISO(editTournamentData.endDate) || (details as any).endDate || null,
         isModerated: editTournamentData.level === 'CollegeGroup' ? !!editTournamentData.isModerated : !!(details as any).isModerated,
         isPublic: editTournamentData.isPublic !== undefined ? !!editTournamentData.isPublic : ((details as any).isPublic !== undefined ? !!(details as any).isPublic : true),
@@ -538,7 +538,7 @@ const TournamentViewPage = () => {
     if (details) {
       setEditTournamentData({
         name: tournament?.title || details.name,
-        date: formatDateForInput(details.date),
+        date: formatDateForInput(details.rawDate || details.date),
         location: tournament?.location || details.location,
         refereeIds: details.refereeIds || [],
         level: details.level || 'CollegeGroup',
@@ -668,8 +668,8 @@ const TournamentViewPage = () => {
         referees: editTournamentData.referees || (details as any).referees || '',
         schedule: editTournamentData.schedule || (details as any).schedule || '',
         isTeam: editTournamentData.isTeam !== undefined ? !!editTournamentData.isTeam : !!(details as any).isTeam,
-        registrationStart: editTournamentData.level === 'CollegeGroup' ? formatToISO(editTournamentData.registrationStart) : (details as any).registrationStart || null,
-        registrationEnd: editTournamentData.level === 'CollegeGroup' ? formatToISO(editTournamentData.registrationEnd) : (details as any).registrationEnd || null,
+        registrationStart: formatToISO(editTournamentData.registrationStart) || (details as any).registrationStart || null,
+        registrationEnd: formatToISO(editTournamentData.registrationEnd) || (details as any).registrationEnd || null,
         endDate: formatToISO(editTournamentData.endDate) || (details as any).endDate || null,
         isModerated: editTournamentData.level === 'CollegeGroup' ? !!editTournamentData.isModerated : !!(details as any).isModerated,
         isPublic: editTournamentData.isPublic !== undefined ? !!editTournamentData.isPublic : ((details as any).isPublic !== undefined ? !!(details as any).isPublic : true),
@@ -1118,7 +1118,7 @@ const TournamentViewPage = () => {
             // Initialize editTournamentData to prevent 400 errors when saving winners
             setEditTournamentData({
               name: data.title || d.name || '',
-              date: formatDateForInput(d.date),
+              date: formatDateForInput(data.rawDate || d.date),
               location: data.location || d.location || '',
               refereeIds: d.refereeIds || [],
               level: d.level || 'CollegeGroup',
