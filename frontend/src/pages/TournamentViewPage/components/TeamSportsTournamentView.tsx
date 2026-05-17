@@ -1186,53 +1186,26 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   {team.name}
                 </div>
                 <div style={{ flex: 1, height: '8px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
-                  <div style={{ width: `${option.percentage}%`, height: '100%', background: '#3b82f6' }}></div>
+                  <div style={{ width: `${percentage}%`, height: '100%', background: '#3b82f6' }}></div>
                 </div>
                 <div style={{ width: '100px', fontSize: '12px', color: '#64748b', textAlign: 'right' }}>
-                  {option.votes} ({option.percentage}%)
+                  {votes} ({percentage}%)
                 </div>
-                {!voteStats.hasVoted && !isVoting && new Date(details.rawDate || details.date) > new Date() && (
+                {!voteStats?.hasVoted && !isVoting && new Date(details.rawDate || details.date) > new Date() && (
                   <button 
-                    onClick={() => handleVote(details.isTeam ? option.id : undefined, !details.isTeam ? option.id : undefined)}
+                    onClick={() => handleVote(details.isTeam ? team.id : undefined, !details.isTeam ? team.id : undefined)}
                     style={{ padding: '2px 8px', fontSize: '12px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
                   >
                     Голосувати
                   </button>
                 )}
               </div>
-            ))}
+            );
+          })}
             
-            {voteStats.totalVotes === 0 && !voteStats.hasVoted && new Date(details.rawDate || details.date) > new Date() && (
-              <div style={{ fontSize: '14px', color: '#64748b' }}>
-                Голосів ще немає. Будьте першим!
-                <div style={{ display: 'flex', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
-                  {details.isTeam ? (
-                    details.teams?.map((team: any) => (
-                      <button 
-                        key={team.id}
-                        onClick={() => handleVote(team.id, undefined)}
-                        style={{ padding: '4px 12px', background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', borderRadius: '6px', cursor: 'pointer' }}
-                      >
-                        {team.name}
-                      </button>
-                    ))
-                  ) : (
-                    details.participants?.map((p: any) => (
-                      <button 
-                        key={p.playerId}
-                        onClick={() => handleVote(undefined, p.playerId)}
-                        style={{ padding: '4px 12px', background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', borderRadius: '6px', cursor: 'pointer' }}
-                      >
-                        {p.playerName}
-                      </button>
-                    ))
-                  )}
-                </div>
-              </div>
-            )}
+
           </div>
         </div>
-      )}
 
       {/* Main Content Areas */}
       <div className={styles.tabContent}>
