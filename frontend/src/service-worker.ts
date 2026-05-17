@@ -70,9 +70,7 @@ self.addEventListener('notificationclick', (event) => {
       // Also try to find any client if we just want to navigate it
       if (windowClients.length > 0) {
         const client = windowClients[0];
-        if ('navigate' in client) {
-            client.navigate(urlToOpen);
-        }
+        client.postMessage({ type: 'NAVIGATE', url: urlToOpen });
         if ('focus' in client) {
             return client.focus();
         }

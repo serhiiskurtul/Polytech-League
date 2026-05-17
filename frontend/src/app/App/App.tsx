@@ -1,8 +1,9 @@
 import './App.css'
+import { useEffect } from 'react';
 import { Header } from '@/widgets/header';
 import { Footer } from '@/widgets/footer';
 import { LoginPage } from '@/pages/LoginPage';
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import { SignupPage } from '@/pages/SignupPage';
 import { CalendarPage } from '@/pages/CalendarPage';
 import { TournamentsPage } from '@/pages/TournamentsPage';
@@ -38,6 +39,19 @@ import { NotificationBanner } from '@/features/notifications/NotificationBanner'
 
 export default function App() {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data && event.data.type === 'NAVIGATE') {
+        navigate(event.data.url);
+      }
+    };
+
+    navigator.serviceWorker?.addEventListener('message', handleMessage);
+    return () => navigator.serviceWorker?.removeEventListener('message', handleMessage);
+  }, [navigate]);
+
   const hideLayout = location.pathname === "/login" ||
     location.pathname === "/signup" ||
     location.pathname === "/email-verification";
