@@ -85,6 +85,7 @@ public class CheckersEventsController(ICheckersEventService checkersEventService
         await redisService.RemoveGroupAsync("checkers_events_all");
         await redisService.RemoveDataAsync($"checkers_event_{id}");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
 
         return NoContent();
     }

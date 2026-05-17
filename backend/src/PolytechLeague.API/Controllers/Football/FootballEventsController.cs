@@ -57,6 +57,8 @@ public class FootballEventsController(
         await FootballEventService.UpdateAsync(id, entity, cancellationToken);
 
         await redisService.RemoveGroupAsync("Football_events_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
+        await redisService.RemoveGroupAsync("tournaments_group");
 
         return NoContent();
     }
