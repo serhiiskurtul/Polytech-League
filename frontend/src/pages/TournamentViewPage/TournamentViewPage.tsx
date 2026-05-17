@@ -3151,7 +3151,7 @@ const TournamentViewPage = () => {
                   >
                     {isVideo(photo.url) ? (
                       <div className={styles.videoThumbnail}>
-                        <video src={getImageUrl(photo.url)} muted />
+                        <video src={getImageUrl(photo.url)} preload="metadata" muted playsInline />
                         <div className={styles.videoPlayIcon}><i className="fas fa-play"></i></div>
                       </div>
                     ) : (
@@ -3268,9 +3268,12 @@ const TournamentViewPage = () => {
                   <div key={media.id} className={styles.galleryItem} onClick={() => setSelectedUserPhotoIndex(index)} style={{ cursor: 'pointer', height: 'auto', background: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
                     <div style={{ height: '200px', overflow: 'hidden', position: 'relative' }}>
                       {media.type === 'video' ? (
-                        <video src={getImageUrl(media.url)} controls style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <>
+                          <video src={getImageUrl(media.url)} preload="metadata" muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <div className={styles.videoPlayIcon}><i className="fas fa-play"></i></div>
+                        </>
                       ) : (
-                        <img src={getImageUrl(media.url)} alt="User media" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img src={getImageUrl(media.url)} alt="User media" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       )}
                       
                       {isAdmin && (
@@ -3343,9 +3346,9 @@ const TournamentViewPage = () => {
                     <div key={media.id} style={{ background: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
                       <div style={{ height: '200px', overflow: 'hidden', position: 'relative' }}>
                         {media.type === 'video' ? (
-                          <video src={getImageUrl(media.url)} controls style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <video src={getImageUrl(media.url)} preload="metadata" controls playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
-                          <img src={getImageUrl(media.url)} alt="User media" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <img src={getImageUrl(media.url)} alt="User media" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         )}
                       </div>
                       <div style={{ padding: '12px' }}>
@@ -3430,6 +3433,8 @@ const TournamentViewPage = () => {
                     src={getImageUrl(details.photos[selectedPhotoIndex].url)}
                     controls
                     autoPlay
+                    preload="metadata"
+                    playsInline
                     className={styles.lightboxVideo}
                   />
                 ) : (
@@ -3492,6 +3497,8 @@ const TournamentViewPage = () => {
                     src={getImageUrl(userMedia[selectedUserPhotoIndex].url)}
                     controls
                     autoPlay
+                    preload="metadata"
+                    playsInline
                     className={styles.lightboxVideo}
                   />
                 ) : (
