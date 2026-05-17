@@ -59,7 +59,7 @@ public class UserEventMediaController : ControllerBase
             "Новий медіа матеріал на модерацію",
             $"Користувач завантажив медіа до змагання {@event.Name}",
             NotificationType.Tournament,
-            $"/tournaments/{eventId}"
+            $"/tournaments/{dto.EventId}"
         );
 
         return Ok(new { message = "Медіа матеріал відправлено на модерацію", id = media.Id });
