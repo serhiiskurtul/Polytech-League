@@ -83,6 +83,9 @@ public abstract class AbstractEntityService<TEntity>(
         _dbcontext.Set<TEntity>().Add(entity);
         await _dbcontext.SaveChangesAsync(cancellationToken);
 
+        // Ensure the ID is populated (sometimes EF Core doesn't update it immediately in memory for TPT)
+        await _dbcontext.Entry(entity).ReloadAsync(cancellationToken);
+
         await OnCreatedAsync(entity, cancellationToken);
 
         _logger.LogInformation("Entity of type {EntityType} successfully created", typeof(TEntity).Name);
