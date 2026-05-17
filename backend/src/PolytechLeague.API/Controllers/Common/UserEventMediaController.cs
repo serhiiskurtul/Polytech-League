@@ -26,29 +26,34 @@ public class UserEventMediaController : ControllerBase
     [Authorize]
     [HttpPost]
     [DisableRequestSizeLimit]
-    public async Task<IActionResult> SubmitMedia([FromForm] SubmitMediaDto dto, CancellationToken cancellationToken)
+    [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = 2147483648)] // 2GB limit for form data
+    public async Task<IActionResult> SubmitMedia(
+        [FromForm(Name = "eventId")] long eventId, 
+        [FromForm(Name = "file")] IFormFile file, 
+        [FromForm(Name = "comment")] string? comment, 
+        CancellationToken cancellationToken)
     {
         var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!long.TryParse(userIdStr, out long userId)) return Unauthorized();
 
-        var @event = await _dbContext.Events.FindAsync(new object[] { dto.EventId }, cancellationToken);
+        var @event = await _dbContext.Events.FindAsync(new object[] { eventId }, cancellationToken);
         if (@event == null) return NotFound("Event not found");
 
-        if (dto.File == null || dto.File.Length == 0) return BadRequest("File is required");
+        if (file == null || file.Length == 0) return BadRequest("File is required");
 
         // Determine folder based on file type
-        string type = dto.File.ContentType.StartsWith("video/") ? "video" : "photo";
+        string type = file.ContentType.StartsWith("video/") ? "video" : "photo";
         string folder = type == "video" ? "events/user-videos" : "events/user-photos";
         
-        var url = await _fileService.SaveFileAsync(dto.File, folder, cancellationToken);
+        var url = await _fileService.SaveFileAsync(file, folder, cancellationToken);
         
         var media = new UserEventMedia
         {
             Url = url,
             Type = type,
-            Comment = dto.Comment,
+            Comment = comment,
             UserId = userId,
-            EventId = dto.EventId,
+            EventId = eventId,
             Status = ModerationStatus.Pending
         };
 
@@ -59,7 +64,7 @@ public class UserEventMediaController : ControllerBase
             "Новий медіа матеріал на модерацію",
             $"Користувач завантажив медіа до змагання {@event.Name}",
             NotificationType.Tournament,
-            $"/tournaments/{dto.EventId}"
+            $"/tournaments/{eventId}"
         );
 
         return Ok(new { message = "Медіа матеріал відправлено на модерацію", id = media.Id });
