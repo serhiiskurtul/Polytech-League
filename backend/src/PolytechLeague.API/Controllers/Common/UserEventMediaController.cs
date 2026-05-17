@@ -24,14 +24,14 @@ public class UserEventMediaController : ControllerBase
     }
 
     [Authorize]
-    [HttpPost("{eventId}")]
+    [HttpPost]
     [DisableRequestSizeLimit]
-    public async Task<IActionResult> SubmitMedia(long eventId, [FromForm] SubmitMediaDto dto, CancellationToken cancellationToken)
+    public async Task<IActionResult> SubmitMedia([FromForm] SubmitMediaDto dto, CancellationToken cancellationToken)
     {
         var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!long.TryParse(userIdStr, out long userId)) return Unauthorized();
 
-        var @event = await _dbContext.Events.FindAsync(new object[] { eventId }, cancellationToken);
+        var @event = await _dbContext.Events.FindAsync(new object[] { dto.EventId }, cancellationToken);
         if (@event == null) return NotFound("Event not found");
 
         if (dto.File == null || dto.File.Length == 0) return BadRequest("File is required");
@@ -48,7 +48,7 @@ public class UserEventMediaController : ControllerBase
             Type = type,
             Comment = dto.Comment,
             UserId = userId,
-            EventId = eventId,
+            EventId = dto.EventId,
             Status = ModerationStatus.Pending
         };
 
@@ -142,6 +142,7 @@ public class UpdateMediaStatusDto
 
 public class SubmitMediaDto
 {
+    public long EventId { get; set; }
     public IFormFile File { get; set; } = null!;
     public string? Comment { get; set; }
 }
