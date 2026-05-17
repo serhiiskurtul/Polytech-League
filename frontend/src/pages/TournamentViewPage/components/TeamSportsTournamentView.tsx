@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { PlayerDto, Gender } from '@/shared/types/player.types';
 import { ChessEventResponse, ChessEventParticipantDto, ChessGameDto, ChessEventRequest, GameResult } from '@/shared/types/chess.types';
 import { getAllPlayers } from '@/shared/api';
@@ -92,7 +92,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   isAdmin,
   onRefresh
 }) => {
-  const [activeTab, setActiveTab] = useState<'standings' | 'matches' | 'teams' | 'info' | 'bracket' | 'participants'>((sport === 'football' || sport === 'футбол') ? 'bracket' : 'matches');
+  const [activeTab, setActiveTab] = useState<'standings' | 'matches' | 'teams' | 'info' | 'bracket' | 'participants' | 'stats'>((sport === 'football' || sport === 'футбол') ? 'bracket' : 'matches');
   const [allPlayers, setAllPlayers] = useState<PlayerDto[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const isRegionalOrNational = details?.level === 'Regional' || details?.level === 'National';
@@ -138,6 +138,78 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const [stageType, setStageType] = useState('Груповий етап');
   const [useStrictFiltering, setUseStrictFiltering] = useState(true);
   const [selectedMatchForInfo, setSelectedMatchForInfo] = useState<any>(null);
+
+  const footballStats = useMemo(() => {
+    if (sport !== 'football' && sport !== 'футбол') return null;
+
+    const matches = details.matches || details.games || [];
+    const playerGoals: Record<number, { player: any; goals: number }> = {};
+    const teamGoals: Record<number, { name: string; goals: number }> = {};
+    const teamYellowCards: Record<number, { name: string; cards: number }> = {};
+
+    details.teams?.forEach((team: any) => {
+      teamGoals[team.id] = { name: team.name, goals: 0 };
+      teamYellowCards[team.id] = { name: team.name, cards: 0 };
+    });
+
+    matches.forEach((match: any) => {
+      const homeTeamId = match.homeTeamId;
+      const awayTeamId = match.awayTeamId;
+
+      if (homeTeamId && teamGoals[homeTeamId]) {
+        teamGoals[homeTeamId].goals += (match.homeTeamScore ?? 0);
+      }
+      if (awayTeamId && teamGoals[awayTeamId]) {
+        teamGoals[awayTeamId].goals += (match.awayTeamScore ?? 0);
+      }
+
+      match.goals?.forEach((goal: any) => {
+        const playerId = goal.playerId;
+        if (playerId) {
+          if (!playerGoals[playerId]) {
+            playerGoals[playerId] = { player: goal.player, goals: 0 };
+          }
+          playerGoals[playerId].goals += (goal.goalsCount ?? 0);
+        }
+      });
+
+      match.yellowCards?.forEach((card: any) => {
+        const playerId = card.playerId;
+        let teamId = null;
+        if (match.homeRoster?.some((p: any) => p.id === playerId)) {
+          teamId = homeTeamId;
+        } else if (match.awayRoster?.some((p: any) => p.id === playerId)) {
+          teamId = awayTeamId;
+        } else {
+          const team = details.teams?.find((t: any) => t.players?.some((p: any) => p.id === playerId));
+          if (team) teamId = team.id;
+        }
+
+        if (teamId && teamYellowCards[teamId]) {
+          teamYellowCards[teamId].cards += 1;
+        }
+      });
+    });
+
+    const topPlayers = Object.values(playerGoals)
+      .sort((a, b) => b.goals - a.goals)
+      .slice(0, 3);
+
+    const topTeamsByGoals = Object.values(teamGoals)
+      .sort((a, b) => b.goals - a.goals)
+      .slice(0, 3);
+
+    const topTeamsByCards = Object.values(teamYellowCards)
+      .sort((a, b) => b.cards - a.cards);
+    
+    const teamMostCards = topTeamsByCards[0] || { name: '—', cards: 0 };
+
+    return {
+      topPlayers,
+      topTeamsByGoals,
+      teamMostCards
+    };
+  }, [details, sport]);
   const [isMatchInfoModalOpen, setIsMatchInfoModalOpen] = useState(false);
 
   useEffect(() => {
@@ -992,6 +1064,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
             <button className={activeTab === 'bracket' ? styles.activeTab : ''} onClick={() => setActiveTab('bracket')}>Сітка</button>
           )}
           <button className={activeTab === 'teams' ? styles.activeTab : ''} onClick={() => setActiveTab('teams')}>Команди</button>
+          {(sport === 'football' || sport === 'футбол') && (
+            <button className={activeTab === 'stats' ? styles.activeTab : ''} onClick={() => setActiveTab('stats')}>Статистика</button>
+          )}
           {isAdmin && !isRegionalOrNational && (
             <button className={activeTab === 'participants' ? styles.activeTab : ''} onClick={() => setActiveTab('participants')}>
               Учасники {details.participants?.filter((p: any) => p.status === RegistrationStatus.Pending)?.length > 0 && (
@@ -1634,6 +1709,78 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   )}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'stats' && (sport === 'football' || sport === 'футбол') && (
+          <div className={styles.statsSection}>
+            <div className={styles.statsGrid}>
+              
+              {/* Top Scorers */}
+              <div className={styles.statsCard}>
+                <div className={styles.statsCardHeader}>
+                  <i className="fas fa-futbol"></i>
+                  <h4>Топ 3 бомбардири</h4>
+                </div>
+                <div className={styles.statsCardBody}>
+                  {(footballStats?.topPlayers?.length ?? 0) > 0 ? (
+                    footballStats?.topPlayers.map((item: any, idx: number) => (
+                      <div key={idx} className={styles.statsItem}>
+                        <span className={styles.statsRank}>{idx + 1}</span>
+                        <span className={styles.statsName}>
+                          {item.player?.footballShirtNumber ? `№${item.player.footballShirtNumber} ` : ''}
+                          {item.player?.lastName} {item.player?.firstName}
+                        </span>
+                        <span className={styles.statsValue}>{item.goals} голів</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className={styles.noData}>Немає даних</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Top Teams by Goals */}
+              <div className={styles.statsCard}>
+                <div className={styles.statsCardHeader}>
+                  <i className="fas fa-bullseye"></i>
+                  <h4>Топ 3 команди по голам</h4>
+                </div>
+                <div className={styles.statsCardBody}>
+                  {(footballStats?.topTeamsByGoals?.length ?? 0) > 0 ? (
+                    footballStats?.topTeamsByGoals.map((item: any, idx: number) => (
+                      <div key={idx} className={styles.statsItem}>
+                        <span className={styles.statsRank}>{idx + 1}</span>
+                        <span className={styles.statsName}>{item.name}</span>
+                        <span className={styles.statsValue}>{item.goals} голів</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className={styles.noData}>Немає даних</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Most Yellow Cards */}
+              <div className={styles.statsCard}>
+                <div className={styles.statsCardHeader}>
+                  <i className="fas fa-square" style={{ color: '#f59e0b' }}></i>
+                  <h4>Найбільше жовтих карток</h4>
+                </div>
+                <div className={styles.statsCardBody}>
+                  {(footballStats?.teamMostCards?.cards ?? 0) > 0 ? (
+                    <div className={styles.statsItem}>
+                      <span className={styles.statsRank}><i className="fas fa-exclamation-triangle" style={{ color: '#f59e0b' }}></i></span>
+                      <span className={styles.statsName}>{footballStats?.teamMostCards.name}</span>
+                      <span className={styles.statsValue}>{footballStats?.teamMostCards.cards} карток</span>
+                    </div>
+                  ) : (
+                    <p className={styles.noData}>Немає даних (або 0 карток)</p>
+                  )}
+                </div>
+              </div>
+
             </div>
           </div>
         )}
