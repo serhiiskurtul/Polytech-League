@@ -5,7 +5,7 @@
 namespace PolytechLeague.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class AddFeedBackEnum : Migration
+    public partial class ChangeFeedbackTypeToEnum : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

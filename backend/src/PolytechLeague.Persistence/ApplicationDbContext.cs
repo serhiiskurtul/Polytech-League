@@ -164,6 +164,10 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new MessageConfiguration());
         modelBuilder.ApplyConfiguration(new SeasonConfiguration());
 
+        modelBuilder.Entity<Feedback>()
+            .Property(f => f.Type)
+            .HasConversion<string>();
+
         modelBuilder.Entity<EventVote>()
             .HasIndex(v => new { v.EventId, v.UserId })
             .IsUnique();
