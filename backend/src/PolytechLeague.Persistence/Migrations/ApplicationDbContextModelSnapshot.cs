@@ -1261,6 +1261,38 @@ namespace PolytechLeague.Persistence.Migrations
                     b.ToTable("ExternalAchievementMedias");
                 });
 
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Feedback", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long?>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Feedbacks");
+                });
+
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Football.FootballCard", b =>
                 {
                     b.Property<long>("Id")
@@ -3543,6 +3575,15 @@ namespace PolytechLeague.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("ExternalAchievement");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.Feedback", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Football.FootballCard", b =>

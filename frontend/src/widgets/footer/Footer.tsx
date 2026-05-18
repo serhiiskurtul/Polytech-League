@@ -22,7 +22,8 @@ const Footer = () => {
     { name: 'Рейтинг гравців', path: '/ratings' },
     { name: 'Список змагань', path: '/tournaments' },
     { name: 'Студенти поза коледжем', path: '/student-news' },
-    { name: 'Про проєкт', path: '/about' }
+    { name: 'Про проєкт', path: '/about' },
+    { name: 'Пропозиції та скарги', path: '/feedback' }
   ];
 
   const socialLinks = [

@@ -56,6 +56,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<ExternalAchievementMedia> ExternalAchievementMedias { get; set; }
     public DbSet<EventVote> EventVotes { get; set; }
     public DbSet<UserEventMedia> UserEventMedias { get; set; }
+    public DbSet<Feedback> Feedbacks { get; set; }
 
 
     

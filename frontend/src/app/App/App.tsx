@@ -30,6 +30,7 @@ import { CollegesPage } from '@/pages/CollegesPage';
 import ChampionsPage from '@/pages/ChampionsPage/ChampionsPage';
 import { AboutPage } from '@/pages/AboutPage';
 import StudentNewsPage from '@/pages/StudentNewsPage/StudentNewsPage';
+import { FeedbackPage } from '@/pages/FeedbackPage';
 
 import ProtectedRoute from '../providers/ProtectedRoute';
 import ScrollToTop from '../providers/ScrollToTop';
@@ -242,6 +243,17 @@ export default function App() {
             <ProtectedRoute requireAuth={false}>
               <div className="page-wrapper">
                 <AboutPage />
+              </div>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/feedback"
+          element={
+            <ProtectedRoute requireAuth={false}>
+              <div className="page-wrapper">
+                <FeedbackPage />
               </div>
             </ProtectedRoute>
           }
