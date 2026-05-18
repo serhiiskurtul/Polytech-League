@@ -252,7 +252,7 @@ export default function App() {
         <Route
           path="/feedback"
           element={
-            <ProtectedRoute requireAuth={false}>
+            <ProtectedRoute requireAuth={true}>
               <div className="page-wrapper">
                 <FeedbackPage />
               </div>

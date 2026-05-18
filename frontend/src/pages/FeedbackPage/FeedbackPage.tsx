@@ -8,7 +8,6 @@ const FeedbackPage: React.FC = () => {
   const { user } = useAuth();
   const [content, setContent] = useState('');
   const [type, setType] = useState('Suggestion');
-  const [isAnonymous, setIsAnonymous] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -22,13 +21,11 @@ const FeedbackPage: React.FC = () => {
       setIsSubmitting(true);
       await api.post('/feedback', {
         content,
-        type,
-        isAnonymous: !user ? true : isAnonymous
+        type
       });
       toast.success('Дякуємо за ваш відгук!');
       setContent('');
       setType('Suggestion');
-      setIsAnonymous(false);
     } catch (error) {
       toast.error('Помилка при відправці відгуку');
       console.error(error);
@@ -73,23 +70,7 @@ const FeedbackPage: React.FC = () => {
             />
           </div>
 
-          {user && (
-            <div className={styles.checkboxGroup}>
-              <input
-                type="checkbox"
-                id="isAnonymous"
-                checked={isAnonymous}
-                onChange={(e) => setIsAnonymous(e.target.checked)}
-              />
-              <label htmlFor="isAnonymous">Надіслати анонімно</label>
-            </div>
-          )}
 
-          {!user && (
-            <p className={styles.anonymousNote}>
-              * Ви не авторизовані, тому повідомлення буде надіслано анонімно.
-            </p>
-          )}
 
           <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
             {isSubmitting ? 'Відправка...' : 'Надіслати'}

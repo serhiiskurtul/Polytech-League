@@ -18,21 +18,18 @@ public class FeedbackController : ControllerBase
         _dbContext = dbContext;
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> SubmitFeedback([FromBody] FeedbackSubmissionDto dto, CancellationToken cancellationToken)
     {
         var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        long? userId = null;
-        if (long.TryParse(userIdStr, out long parsedId))
-        {
-            userId = parsedId;
-        }
+        if (!long.TryParse(userIdStr, out long userId)) return Unauthorized();
 
         var feedback = new Feedback
         {
             Content = dto.Content,
             Type = dto.Type,
-            UserId = dto.IsAnonymous ? null : userId,
+            UserId = userId,
             CreatedAt = DateTime.UtcNow,
             IsRead = false
         };
