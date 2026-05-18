@@ -8,6 +8,7 @@ const FeedbackPage: React.FC = () => {
   const { user } = useAuth();
   const [content, setContent] = useState('');
   const [type, setType] = useState('Suggestion');
+  const [file, setFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -19,13 +20,26 @@ const FeedbackPage: React.FC = () => {
 
     try {
       setIsSubmitting(true);
-      await api.post('/feedback', {
-        content,
-        type
+      const formData = new FormData();
+      formData.append('content', content);
+      formData.append('type', type);
+      if (file) {
+        formData.append('file', file);
+      }
+
+      await api.post('/feedback', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       });
       toast.success('Дякуємо за ваш відгук!');
       setContent('');
       setType('Suggestion');
+      setFile(null);
+      
+      // Reset file input
+      const fileInput = document.getElementById('file') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
     } catch (error) {
       toast.error('Помилка при відправці відгуку');
       console.error(error);
@@ -70,7 +84,16 @@ const FeedbackPage: React.FC = () => {
             />
           </div>
 
-
+          <div className={styles.formGroup}>
+            <label htmlFor="file">Прикріпити фото</label>
+            <input
+              type="file"
+              id="file"
+              accept="image/*"
+              onChange={(e) => setFile(e.target.files?.[0] || null)}
+              className={styles.fileInput}
+            />
+          </div>
 
           <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
             {isSubmitting ? 'Відправка...' : 'Надіслати'}

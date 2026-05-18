@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '@/shared/api/axiosInstance';
 import styles from './AdminFeedbackPage.module.css';
 import toast from 'react-hot-toast';
+import { getPhotoUrl } from '@/shared/utils/photo.utils';
 
 interface FeedbackResponse {
   id: number;
@@ -11,6 +12,7 @@ interface FeedbackResponse {
   isRead: boolean;
   userId: number | null;
   authorName: string;
+  photoUrl?: string;
 }
 
 export const AdminFeedbackPage = () => {
@@ -146,7 +148,14 @@ export const AdminFeedbackPage = () => {
                     </td>
                     <td>
                       <div className={styles.contentCell}>
-                        {feedback.content}
+                        <p>{feedback.content}</p>
+                        {feedback.photoUrl && (
+                          <div className={styles.photoWrapper}>
+                            <a href={getPhotoUrl(feedback.photoUrl)!} target="_blank" rel="noopener noreferrer">
+                              <img src={getPhotoUrl(feedback.photoUrl)!} alt="Feedback" className={styles.feedbackPhoto} />
+                            </a>
+                          </div>
+                        )}
                       </div>
                     </td>
                     <td>

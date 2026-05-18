@@ -4,6 +4,7 @@ using PolytechLeague.Domain.Entities;
 using PolytechLeague.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using PolytechLeague.Application.Services.Interfaces;
 
 namespace PolytechLeague.API.Controllers.Common;
 
@@ -12,18 +13,28 @@ namespace PolytechLeague.API.Controllers.Common;
 public class FeedbackController : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext;
+    private readonly IFileService _fileService;
 
-    public FeedbackController(ApplicationDbContext dbContext)
+    public FeedbackController(ApplicationDbContext dbContext, IFileService fileService)
     {
         _dbContext = dbContext;
+        _fileService = fileService;
     }
 
     [Authorize]
     [HttpPost]
-    public async Task<IActionResult> SubmitFeedback([FromBody] FeedbackSubmissionDto dto, CancellationToken cancellationToken)
+    [DisableRequestSizeLimit]
+    [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = 2147483648)]
+    public async Task<IActionResult> SubmitFeedback([FromForm] FeedbackSubmissionFormDto dto, CancellationToken cancellationToken)
     {
         var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!long.TryParse(userIdStr, out long userId)) return Unauthorized();
+
+        string? photoUrl = null;
+        if (dto.File != null && dto.File.Length > 0)
+        {
+            photoUrl = await _fileService.SaveFileAsync(dto.File, "feedback", cancellationToken);
+        }
 
         var feedback = new Feedback
         {
@@ -31,7 +42,8 @@ public class FeedbackController : ControllerBase
             Type = dto.Type,
             UserId = userId,
             CreatedAt = DateTime.UtcNow,
-            IsRead = false
+            IsRead = false,
+            PhotoUrl = photoUrl
         };
 
         _dbContext.Feedbacks.Add(feedback);
@@ -51,10 +63,11 @@ public class FeedbackController : ControllerBase
             {
                 f.Id,
                 f.Content,
-                f.Type,
+                Type = f.Type.ToString(),
                 f.CreatedAt,
                 f.IsRead,
                 f.UserId,
+                f.PhotoUrl,
                 AuthorName = f.User != null ? $"{f.User.FirstName} {f.User.LastName}" : "Анонімно"
             })
             .ToListAsync(cancellationToken);
@@ -76,9 +89,9 @@ public class FeedbackController : ControllerBase
     }
 }
 
-public class FeedbackSubmissionDto
+public class FeedbackSubmissionFormDto
 {
     public required string Content { get; set; }
-    public string Type { get; set; } = "Suggestion"; // Suggestion, Complaint, Other
-    public bool IsAnonymous { get; set; } = false;
+    public FeedbackType Type { get; set; } = FeedbackType.Suggestion;
+    public IFormFile? File { get; set; }
 }

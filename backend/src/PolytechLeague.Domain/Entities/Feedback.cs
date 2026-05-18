@@ -9,6 +9,14 @@ public class Feedback
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public long? UserId { get; set; }
     public virtual User? User { get; set; }
-    public string Type { get; set; } = "Suggestion"; // Suggestion, Complaint, Other
+    public FeedbackType Type { get; set; } = FeedbackType.Suggestion;
     public bool IsRead { get; set; } = false;
+    public string? PhotoUrl { get; set; }
+}
+
+public enum FeedbackType
+{
+    Suggestion,
+    Complaint,
+    Other
 }

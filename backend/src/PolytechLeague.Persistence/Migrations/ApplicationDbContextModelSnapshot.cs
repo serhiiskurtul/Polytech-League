@@ -1279,9 +1279,11 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<bool>("IsRead")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
+                    b.Property<string>("PhotoUrl")
                         .HasColumnType("text");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
 
                     b.Property<long?>("UserId")
                         .HasColumnType("bigint");
