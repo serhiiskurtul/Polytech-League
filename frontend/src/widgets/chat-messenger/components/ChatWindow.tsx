@@ -7,7 +7,7 @@ interface ChatWindowProps {
     onBack?: () => void;
 }
 
-import { formatMessageDate } from '@/shared/utils/date.utils';
+import { formatMessageDate, formatDateGroup } from '@/shared/utils/date.utils';
 
 export const ChatWindow: React.FC<ChatWindowProps> = ({ onBack }) => {
     const { user } = useAuth();
@@ -66,15 +66,27 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ onBack }) => {
             
             <div className={styles.messageList} ref={messageListRef}>
                 {messages.length > 0 ? (
-                    messages.map((msg) => (
-                        <div 
-                            key={msg.id} 
-                            className={`${styles.messageBubble} ${msg.senderId === user?.id ? styles.msgSent : styles.msgReceived}`}
-                        >
-                            <div className={styles.msgContent}>{msg.content}</div>
-                            <span className={styles.msgTime}>{formatMessageDate(msg.sentAt)}</span>
-                        </div>
-                    ))
+                    messages.map((msg, index) => {
+                        const currentDateGroup = formatDateGroup(msg.sentAt);
+                        const prevDateGroup = index > 0 ? formatDateGroup(messages[index - 1].sentAt) : null;
+                        const showDateGroup = currentDateGroup !== prevDateGroup;
+
+                        return (
+                            <React.Fragment key={msg.id}>
+                                {showDateGroup && (
+                                    <div className={styles.dateSeparator}>
+                                        <span className={styles.dateSeparatorText}>{currentDateGroup}</span>
+                                    </div>
+                                )}
+                                <div 
+                                    className={`${styles.messageBubble} ${msg.senderId === user?.id ? styles.msgSent : styles.msgReceived}`}
+                                >
+                                    <div className={styles.msgContent}>{msg.content}</div>
+                                    <span className={styles.msgTime}>{formatMessageDate(msg.sentAt)}</span>
+                                </div>
+                            </React.Fragment>
+                        );
+                    })
                 ) : (
                     <div className={styles.noMessages}>
                         <p>Почніть розмову...</p>

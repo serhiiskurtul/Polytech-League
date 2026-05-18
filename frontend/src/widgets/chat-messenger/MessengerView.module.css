@@ -278,6 +278,22 @@
     font-style: italic;
 }
 
+.dateSeparator {
+    display: flex;
+    justify-content: center;
+    margin: 16px 0 8px;
+}
+
+.dateSeparatorText {
+    background: var(--bg);
+    color: var(--muted);
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+}
+
 @media (max-width: 600px) {
     .messengerView {
         height: 600px;

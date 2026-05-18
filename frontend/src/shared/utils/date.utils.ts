@@ -47,3 +47,19 @@ export const formatConversationDate = (dateStr: string | Date) => {
     
     return date.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
 };
+
+export const formatDateGroup = (dateStr: string | Date) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    
+    const isToday = date.toDateString() === now.toDateString();
+    
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const isYesterday = date.toDateString() === yesterday.toDateString();
+    
+    if (isToday) return 'Сьогодні';
+    if (isYesterday) return 'Вчора';
+    
+    return date.toLocaleDateString('uk-UA', { day: '2-digit', month: 'long', year: 'numeric' });
+};
