@@ -206,9 +206,11 @@ const StudentNewsPage: React.FC = () => {
                       style={{ cursor: 'pointer' }}
                     >
                       {media.type === 'photo' ? (
-                        <img src={getPhotoUrl(media.url)!} alt={item.title} className={styles.photo} />
+                        <img src={getPhotoUrl(media.url)!} alt={item.title} className={styles.photo} loading="lazy" decoding="async" />
                       ) : (
-                        <video src={getPhotoUrl(media.url)!} className={styles.video} />
+                        <div className={styles.video} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#1e293b' }}>
+                          <i className="fas fa-video" style={{ fontSize: '3rem', color: '#475569' }}></i>
+                        </div>
                       )}
                     </div>
                   ))}
@@ -268,7 +270,7 @@ const StudentNewsPage: React.FC = () => {
             {fullscreenMedia.type === 'photo' ? (
               <img src={getPhotoUrl(fullscreenMedia.url)!} alt="Fullscreen" className={styles.fullscreenImage} />
             ) : (
-              <video src={getPhotoUrl(fullscreenMedia.url)!} controls autoPlay className={styles.fullscreenVideo} />
+              <video src={getPhotoUrl(fullscreenMedia.url)!} controls preload="none" className={styles.fullscreenVideo} />
             )}
           </div>
         </div>

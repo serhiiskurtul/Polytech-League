@@ -3150,8 +3150,8 @@ const TournamentViewPage = () => {
                     onClick={() => setSelectedPhotoIndex(index)}
                   >
                     {isVideo(photo.url) ? (
-                      <div className={styles.videoThumbnail}>
-                        <video src={getImageUrl(photo.url)} preload="none" muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', backgroundColor: '#000' }} />
+                      <div className={styles.videoThumbnail} style={{ backgroundColor: '#1e293b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <i className="fas fa-video" style={{ fontSize: '3rem', color: '#475569' }}></i>
                         <div className={styles.videoPlayIcon}><i className="fas fa-play"></i></div>
                       </div>
                     ) : (
@@ -3268,10 +3268,10 @@ const TournamentViewPage = () => {
                   <div key={media.id} className={styles.galleryItem} onClick={() => setSelectedUserPhotoIndex(index)} style={{ cursor: 'pointer', height: 'auto', background: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
                     <div style={{ height: '200px', overflow: 'hidden', position: 'relative' }}>
                       {media.type === 'video' ? (
-                        <>
-                          <video src={getImageUrl(media.url)} preload="none" muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', backgroundColor: '#000' }} />
+                        <div style={{ width: '100%', height: '100%', backgroundColor: '#1e293b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <i className="fas fa-video" style={{ fontSize: '3rem', color: '#475569' }}></i>
                           <div className={styles.videoPlayIcon}><i className="fas fa-play"></i></div>
-                        </>
+                        </div>
                       ) : (
                         <img src={getImageUrl(media.url)} alt="User media" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       )}
@@ -3346,7 +3346,10 @@ const TournamentViewPage = () => {
                     <div key={media.id} style={{ background: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
                       <div style={{ height: '200px', overflow: 'hidden', position: 'relative' }}>
                         {media.type === 'video' ? (
-                          <video src={getImageUrl(media.url)} preload="none" controls playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', backgroundColor: '#000' }} />
+                          <div style={{ width: '100%', height: '100%', backgroundColor: '#1e293b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <i className="fas fa-video" style={{ fontSize: '3rem', color: '#475569' }}></i>
+                            <div className={styles.videoPlayIcon}><i className="fas fa-play"></i></div>
+                          </div>
                         ) : (
                           <img src={getImageUrl(media.url)} alt="User media" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         )}
@@ -3432,8 +3435,7 @@ const TournamentViewPage = () => {
                   <video
                     src={getImageUrl(details.photos[selectedPhotoIndex].url)}
                     controls
-                    autoPlay
-                    preload="metadata"
+                    preload="none"
                     playsInline
                     className={styles.lightboxVideo}
                   />
@@ -3496,8 +3498,7 @@ const TournamentViewPage = () => {
                   <video
                     src={getImageUrl(userMedia[selectedUserPhotoIndex].url)}
                     controls
-                    autoPlay
-                    preload="metadata"
+                    preload="none"
                     playsInline
                     className={styles.lightboxVideo}
                   />
@@ -3822,7 +3823,9 @@ const TournamentViewPage = () => {
                           {details.photos.map((photo: any) => (
                             <div key={photo.id} className={styles.photoPreviewCard}>
                               {isVideo(photo.url) ? (
-                                <video src={getImageUrl(photo.url)} muted />
+                                <div style={{ width: '100%', height: '100%', backgroundColor: '#1e293b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                  <i className="fas fa-video" style={{ fontSize: '2rem', color: '#475569' }}></i>
+                                </div>
                               ) : (
                                 <img src={getImageUrl(photo.url)} alt="Tournament" />
                               )}
