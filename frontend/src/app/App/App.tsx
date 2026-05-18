@@ -31,6 +31,7 @@ import ChampionsPage from '@/pages/ChampionsPage/ChampionsPage';
 import { AboutPage } from '@/pages/AboutPage';
 import StudentNewsPage from '@/pages/StudentNewsPage/StudentNewsPage';
 import { FeedbackPage } from '@/pages/FeedbackPage';
+import { AdminFeedbackPage } from '@/pages/AdminFeedbackPage';
 
 import ProtectedRoute from '../providers/ProtectedRoute';
 import ScrollToTop from '../providers/ScrollToTop';
@@ -319,6 +320,17 @@ export default function App() {
             <ProtectedRoute requireAuth={true} adminOnly={true}>
               <div className="page-wrapper">
                 <AdminCollegesPage />
+              </div>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/feedback"
+          element={
+            <ProtectedRoute requireAuth={true} adminOnly={true}>
+              <div className="page-wrapper">
+                <AdminFeedbackPage />
               </div>
             </ProtectedRoute>
           }

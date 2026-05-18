@@ -110,6 +110,12 @@ export default function Header() {
                     <span>Користувачі</span>
                   </Link>
                 </li>
+                <li>
+                  <Link to="/admin/feedback" className={`${styles.navLink} ${styles.adminLink}`} onClick={closeMenu}>
+                    <i className={`fas fa-comment-alt ${styles.navIcon}`}></i>
+                    <span>Відгуки</span>
+                  </Link>
+                </li>
               </>
             )}
           </ul>
