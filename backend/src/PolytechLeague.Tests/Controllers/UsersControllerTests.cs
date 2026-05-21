@@ -21,6 +21,11 @@ public class UsersControllerTests : IntegrationTestBase
 
         // Act
         var response = await httpClient.GetAsync("/users");
+        if (response.StatusCode != HttpStatusCode.Unauthorized)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Expected Unauthorized, got {response.StatusCode}. Content: {content}");
+        }
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -71,6 +76,11 @@ public class UsersControllerTests : IntegrationTestBase
 
         // Act
         var response = await httpClient.PostAsJsonAsync("/users", request);
+        if (response.StatusCode != HttpStatusCode.Created)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Expected Created, got {response.StatusCode}. Content: {content}");
+        }
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
