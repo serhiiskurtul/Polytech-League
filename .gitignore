@@ -407,6 +407,7 @@ src/WebServer.API/appsettings.json
 /src/WebServer.API/wwwroot
 *.yml
 !.gitlab-ci.yml
+!.github/workflows/*.yml
 docker/.env
 /src/.vscode
 /backend/src/PolytechLeague.API/.idea
