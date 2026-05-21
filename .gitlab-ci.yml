@@ -32,7 +32,7 @@ frontend-lint:
 # ---------------------------------------------
 backend-build:
   stage: build
-  image: mcr.microsoft.com/dotnet/sdk:8.0
+  image: mcr.microsoft.com/dotnet/sdk:9.0
   script:
     - dotnet restore backend/src/PolytechLeague.API/PolytechLeague.sln --packages $NUGET_PACKAGES
     - dotnet build backend/src/PolytechLeague.API/PolytechLeague.sln --no-restore -c Release
@@ -55,7 +55,7 @@ frontend-build:
 # ---------------------------------------------
 backend-test:
   stage: test
-  image: mcr.microsoft.com/dotnet/sdk:8.0
+  image: mcr.microsoft.com/dotnet/sdk:9.0
   # Services required for Integration Tests using Testcontainers (Docker)
   services:
     - name: docker:dind
