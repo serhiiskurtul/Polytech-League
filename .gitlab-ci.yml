@@ -1,0 +1,70 @@
+stages:
+  - lint
+  - build
+  - test
+
+variables:
+  # Opt out of dotnet telemetry and logo messages to clean up logs
+  DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+  DOTNET_NOLOGO: "true"
+  # Path for caching NuGet packages
+  NUGET_PACKAGES: "$CI_PROJECT_DIR/.nuget-cache"
+
+# Global cache configuration for NuGet and npm
+cache:
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - .nuget-cache/
+    - frontend/node_modules/
+
+# ---------------------------------------------
+# LINT STAGE
+# ---------------------------------------------
+frontend-lint:
+  stage: lint
+  image: node:20-alpine
+  script:
+    - cd frontend
+    - npm ci
+    - npm run lint
+
+# ---------------------------------------------
+# BUILD STAGE
+# ---------------------------------------------
+backend-build:
+  stage: build
+  image: mcr.microsoft.com/dotnet/sdk:8.0
+  script:
+    - dotnet restore backend/src/PolytechLeague.API/PolytechLeague.sln --packages $NUGET_PACKAGES
+    - dotnet build backend/src/PolytechLeague.API/PolytechLeague.sln --no-restore -c Release
+
+frontend-build:
+  stage: build
+  image: node:20-alpine
+  script:
+    - cd frontend
+    - npm ci
+    - npm run build
+  artifacts:
+    name: "frontend-build-artifacts-$CI_COMMIT_REF_SLUG"
+    paths:
+      - frontend/dist/
+    expire_in: 1 week
+
+# ---------------------------------------------
+# TEST STAGE
+# ---------------------------------------------
+backend-test:
+  stage: test
+  image: mcr.microsoft.com/dotnet/sdk:8.0
+  # Services required for Integration Tests using Testcontainers (Docker)
+  services:
+    - name: docker:dind
+      alias: docker
+  variables:
+    # Point the dotnet test runner / Testcontainers to the Docker daemon service
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  script:
+    - dotnet restore backend/src/PolytechLeague.API/PolytechLeague.sln --packages $NUGET_PACKAGES
+    - dotnet test backend/src/PolytechLeague.API/PolytechLeague.sln --no-restore -c Release
