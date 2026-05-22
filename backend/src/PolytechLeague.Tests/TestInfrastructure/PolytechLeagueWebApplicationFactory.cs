@@ -29,6 +29,10 @@ public class PolytechLeagueWebApplicationFactory :
 
     public PolytechLeagueWebApplicationFactory()
     {
+        Environment.SetEnvironmentVariable("JwtOptions__SecretKey", "super-secret-key-for-testing-purposes-only-which-is-at-least-256-bits-long");
+        Environment.SetEnvironmentVariable("JwtOptions__Issuer", "polytechleague");
+        Environment.SetEnvironmentVariable("JwtOptions__Audience", "polytechleague");
+
         _dbContainer = new PostgreSqlBuilder()
             .WithImage("postgres:16.4")
             .WithDatabase("PolytechLeague_db")
@@ -67,16 +71,6 @@ public class PolytechLeagueWebApplicationFactory :
     
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.ConfigureAppConfiguration((context, conf) =>
-        {
-            conf.AddInMemoryCollection(new Dictionary<string, string?>
-            {
-                { "JwtOptions:SecretKey", "super-secret-key-for-testing-purposes-only-which-is-at-least-256-bits-long" },
-                { "JwtOptions:Issuer", "polytechleague" },
-                { "JwtOptions:Audience", "polytechleague" }
-            });
-        });
-
         builder.ConfigureTestServices(services =>
         {
             services.RemoveAll(typeof(DbContextOptions<ApplicationDbContext>));
