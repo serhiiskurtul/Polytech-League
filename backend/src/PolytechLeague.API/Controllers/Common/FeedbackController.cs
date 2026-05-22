@@ -14,11 +14,13 @@ public class FeedbackController : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly IFileService _fileService;
+    private readonly INotificationService _notificationService;
 
-    public FeedbackController(ApplicationDbContext dbContext, IFileService fileService)
+    public FeedbackController(ApplicationDbContext dbContext, IFileService fileService, INotificationService notificationService)
     {
         _dbContext = dbContext;
         _fileService = fileService;
+        _notificationService = notificationService;
     }
 
     [Authorize]
@@ -48,6 +50,29 @@ public class FeedbackController : ControllerBase
 
         _dbContext.Feedbacks.Add(feedback);
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        var user = await _dbContext.Users.FindAsync(new object[] { userId }, cancellationToken);
+        var senderName = user != null ? $"{user.FirstName} {user.LastName}" : "Користувач";
+
+        string title = dto.Type switch
+        {
+            FeedbackType.Complaint => "Нова скарга",
+            FeedbackType.Suggestion => "Нова пропозиція",
+            _ => "Новий відгук"
+        };
+
+        string contentPreview = dto.Content.Length > 60
+            ? dto.Content[..60] + "..."
+            : dto.Content;
+
+        string message = $"Від: {senderName}. Текст: {contentPreview}";
+
+        await _notificationService.SendNotificationToAdminsAsync(
+            title,
+            message,
+            NotificationType.System,
+            "/admin/feedback"
+        );
 
         return Ok(new { message = "Дякуємо за ваш відгук!" });
     }
@@ -83,6 +108,28 @@ public class FeedbackController : ControllerBase
         if (feedback == null) return NotFound();
 
         feedback.IsRead = true;
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return NoContent();
+    }
+
+    [Authorize(Policy = "Admin")]
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteFeedback(long id, CancellationToken cancellationToken)
+    {
+        var feedback = await _dbContext.Feedbacks.FindAsync(new object[] { id }, cancellationToken);
+        if (feedback == null) return NotFound();
+
+        if (!string.IsNullOrEmpty(feedback.PhotoUrl))
+        {
+            try
+            {
+                _fileService.DeleteFile(feedback.PhotoUrl);
+            }
+            catch { /* ignore if file not found */ }
+        }
+
+        _dbContext.Feedbacks.Remove(feedback);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return NoContent();

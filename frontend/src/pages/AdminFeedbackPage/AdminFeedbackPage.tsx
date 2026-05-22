@@ -47,6 +47,19 @@ export const AdminFeedbackPage = () => {
     }
   };
 
+  const handleDeleteFeedback = async (id: number) => {
+    if (!window.confirm('Ви впевнені, що хочете видалити це повідомлення?')) {
+      return;
+    }
+    try {
+      await api.delete(`/feedback/${id}`);
+      toast.success('Повідомлення видалено');
+      setFeedbacks(feedbacks.filter(f => f.id !== id));
+    } catch (error) {
+      toast.error('Не вдалося видалити повідомлення');
+    }
+  };
+
   const filteredFeedbacks = feedbacks.filter(f => {
     if (filter === 'unread') return !f.isRead;
     if (filter === 'read') return f.isRead;
@@ -183,6 +196,13 @@ export const AdminFeedbackPage = () => {
                             <i className="fas fa-check"></i>
                           </button>
                         )}
+                        <button 
+                          className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                          onClick={() => handleDeleteFeedback(feedback.id)}
+                          title="Видалити"
+                        >
+                          <i className="fas fa-trash-alt"></i>
+                        </button>
                       </div>
                     </td>
                   </tr>
