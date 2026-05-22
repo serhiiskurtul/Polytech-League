@@ -38,7 +38,7 @@ export default function Login() {
   const onSubmit = async (data: LoginFormInputs) => {
     try {
       const response = await loginApi({ email: data.email, password: data.password });
-      
+
       // Save tokens to localStorage
       localStorage.setItem('token', response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
@@ -52,7 +52,7 @@ export default function Login() {
     } catch (error: any) {
       console.error("Login error:", error);
       const detail = error.response?.data?.detail;
-      
+
       if (detail && detail.toLowerCase().includes("blocked")) {
         setError("root", { message: "Ваш акаунт заблокований адміністратором" });
       } else if (error.response?.status === 401) {
@@ -70,14 +70,14 @@ export default function Login() {
           <Logo />
         </div>
 
-        <h1>Вітаємо назад!</h1>
+        <h1>З поверненням!</h1>
         <div className={styles.subtitle}>
           Увійдіть до свого акаунту
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           {errors.root && <div className={styles.errorMessage}>{errors.root.message}</div>}
-          
+
           <InputSign
             labelInput="Email"
             type="email"

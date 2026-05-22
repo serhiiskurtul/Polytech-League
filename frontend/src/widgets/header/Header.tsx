@@ -98,23 +98,32 @@ export default function Header() {
             {isAdmin && (
               <>
                 <li className={styles.adminDivider}></li>
-                <li>
-                  <Link to="/admin/merges" className={`${styles.navLink} ${styles.adminLink}`} onClick={closeMenu}>
-                    <i className={`fas fa-code-merge ${styles.navIcon}`}></i>
-                    <span>Запити</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/admin/users" className={`${styles.navLink} ${styles.adminLink}`} onClick={closeMenu}>
-                    <i className={`fas fa-user-shield ${styles.navIcon}`}></i>
-                    <span>Користувачі</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/admin/feedback" className={`${styles.navLink} ${styles.adminLink}`} onClick={closeMenu}>
-                    <i className={`fas fa-comment-alt ${styles.navIcon}`}></i>
-                    <span>Відгуки</span>
-                  </Link>
+                <li className={`${styles.dropdown} ${styles.adminDropdown}`}>
+                  <button className={`${styles.navLink} ${styles.adminLink}`} onClick={(e) => e.preventDefault()}>
+                    <i className={`fas fa-user-cog ${styles.navIcon}`}></i>
+                    <span>Панель адміна</span>
+                    <i className={`fas fa-chevron-down ${styles.dropdownIcon}`}></i>
+                  </button>
+                  <ul className={styles.dropdownMenu}>
+                    <li>
+                      <Link to="/admin/merges" className={styles.adminDropdownLink} onClick={closeMenu}>
+                        <i className="fas fa-code-merge"></i>
+                        <span>Запити</span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/admin/users" className={styles.adminDropdownLink} onClick={closeMenu}>
+                        <i className="fas fa-user-shield"></i>
+                        <span>Користувачі</span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/admin/feedback" className={styles.adminDropdownLink} onClick={closeMenu}>
+                        <i className="fas fa-comment-alt"></i>
+                        <span>Відгуки</span>
+                      </Link>
+                    </li>
+                  </ul>
                 </li>
               </>
             )}

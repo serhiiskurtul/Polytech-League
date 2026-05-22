@@ -509,3 +509,27 @@
     margin: 10px 0;
   }
 }
+
+.adminDropdownLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: #f43f5e !important;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.adminDropdownLink i {
+  color: #f43f5e !important;
+  width: 20px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.adminDropdownLink:hover {
+  background: rgba(244, 63, 94, 0.08) !important;
+}
