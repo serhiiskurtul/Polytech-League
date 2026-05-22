@@ -20,7 +20,7 @@ public class UsersControllerTests : IntegrationTestBase
         RecreateClient();
 
         // Act
-        var response = await httpClient.GetAsync("/users");
+        var response = await httpClient.GetAsync("/api/users");
         if (response.StatusCode != HttpStatusCode.Unauthorized)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -39,7 +39,7 @@ public class UsersControllerTests : IntegrationTestBase
         RecreateClient();
 
         // Act
-        var response = await httpClient.GetAsync("/users/1");
+        var response = await httpClient.GetAsync("/api/users/1");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -53,7 +53,7 @@ public class UsersControllerTests : IntegrationTestBase
         RecreateClient();
 
         // Act
-        var response = await httpClient.GetAsync("/users/with-deleted");
+        var response = await httpClient.GetAsync("/api/users/with-deleted");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -75,7 +75,7 @@ public class UsersControllerTests : IntegrationTestBase
         };
 
         // Act
-        var response = await httpClient.PostAsJsonAsync("/users", request);
+        var response = await httpClient.PostAsJsonAsync("/api/users", request);
         if (response.StatusCode != HttpStatusCode.Created)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -102,7 +102,7 @@ public class UsersControllerTests : IntegrationTestBase
         };
 
         // Act
-        var response = await httpClient.PostAsJsonAsync("/users", request);
+        var response = await httpClient.PostAsJsonAsync("/api/users", request);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -116,7 +116,7 @@ public class UsersControllerTests : IntegrationTestBase
         RecreateClient();
 
         // Act
-        var response = await httpClient.DeleteAsync("/users/hard-delete/1");
+        var response = await httpClient.DeleteAsync("/api/users/hard-delete/1");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
