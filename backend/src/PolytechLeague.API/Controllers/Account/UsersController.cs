@@ -73,7 +73,7 @@ public class UsersController(IUserService userService, IPlayerService playerServ
     {
         var user = userRequest.FromRequest();
         await userService.CreateAsync(user, cancellationToken);
-        return Created();
+        return StatusCode(201);
     }
 
     [Authorize(Policy = "User")]

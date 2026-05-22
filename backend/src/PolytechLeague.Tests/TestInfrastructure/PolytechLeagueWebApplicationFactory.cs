@@ -64,7 +64,7 @@ public class PolytechLeagueWebApplicationFactory :
         await dbContext.Database.EnsureCreatedAsync();
     }
 
-    public async Task DisposeAsync()
+    public new async Task DisposeAsync()
     {
         await _dbContainer.StopAsync();
     }

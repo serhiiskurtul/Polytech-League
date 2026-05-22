@@ -63,14 +63,17 @@ public class UserService : AbstractEntityService<User>, IUserService
 
         user.Password = _passwordEncoder.Encode(user.Password);
 
-        var findUser = await _dbcontext.Set<User>().FirstOrDefaultAsync(
-            u => u.Email.ToLower() == user.Email.ToLower() &&
-            !u.IsDeleted, cancellationToken);
-
-        if (findUser != null)
+        if (user.Email != null)
         {
-            _logger.LogError("Attempt to create user with existing email {Email}", user.Email);
-            throw new AuthenticationException("User with this email already exist");
+            var findUser = await _dbcontext.Set<User>().FirstOrDefaultAsync(
+                u => u.Email != null && u.Email.ToLower() == user.Email.ToLower() &&
+                !u.IsDeleted, cancellationToken);
+
+            if (findUser != null)
+            {
+                _logger.LogError("Attempt to create user with existing email {Email}", user.Email);
+                throw new AuthenticationException("User with this email already exist");
+            }
         }
 
         await _dbcontext.AddAsync(user);
