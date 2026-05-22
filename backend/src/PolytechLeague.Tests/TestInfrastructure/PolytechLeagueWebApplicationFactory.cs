@@ -15,6 +15,7 @@ using PolytechLeague.Infrastructure.Redis;
 using PolytechLeague.Application.Services.Interfaces;
 using PolytechLeague.Application.Dto;
 using PolytechLeague.Tests.TestInfrastructure.Authentication;
+using Microsoft.Extensions.Configuration;
 
 namespace PolytechLeague.Tests.IntegrationTests;
 
@@ -66,6 +67,16 @@ public class PolytechLeagueWebApplicationFactory :
     
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.ConfigureAppConfiguration((context, conf) =>
+        {
+            conf.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                { "JwtOptions:SecretKey", "super-secret-key-for-testing-purposes-only-which-is-at-least-256-bits-long" },
+                { "JwtOptions:Issuer", "polytechleague" },
+                { "JwtOptions:Audience", "polytechleague" }
+            });
+        });
+
         builder.ConfigureTestServices(services =>
         {
             services.RemoveAll(typeof(DbContextOptions<ApplicationDbContext>));
