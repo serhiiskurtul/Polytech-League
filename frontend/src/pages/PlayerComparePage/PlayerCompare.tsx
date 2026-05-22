@@ -80,6 +80,9 @@ export const PlayerComparePage = () => {
               matchesPlayed: rankingInfo.matchesPlayed,
               winsCount: rankingInfo.winsCount,
               goalsCount: rankingInfo.goalsCount,
+              footballCollegeGroupGoals: rankingInfo.footballCollegeGroupGoals,
+              footballRegionalGoals: rankingInfo.footballRegionalGoals,
+              footballNationalGoals: rankingInfo.footballNationalGoals,
               hatTricksCount: rankingInfo.hatTricksCount,
               finalGoalsCount: rankingInfo.finalGoalsCount,
               semifinalGoalsCount: rankingInfo.semifinalGoalsCount,
@@ -91,7 +94,6 @@ export const PlayerComparePage = () => {
               competitionsCount: rankingInfo.competitionsCount,
               globalRank: rankingInfo.globalRank,
               sportStats: rankingInfo.sportStats
-
             };
           }
           return {
@@ -100,6 +102,9 @@ export const PlayerComparePage = () => {
             matchesPlayed: 0,
             winsCount: 0,
             goalsCount: 0,
+            footballCollegeGroupGoals: 0,
+            footballRegionalGoals: 0,
+            footballNationalGoals: 0,
             hatTricksCount: 0,
             finalGoalsCount: 0,
             semifinalGoalsCount: 0,
@@ -111,7 +116,6 @@ export const PlayerComparePage = () => {
             competitionsCount: 0,
             globalRank: undefined,
             sportStats: []
-
           };
         };
 
@@ -323,6 +327,21 @@ export const PlayerComparePage = () => {
                       label="Забито голів" 
                       val1={player1.goalsCount} 
                       val2={player2?.goalsCount}
+                    />
+                    <StatRow 
+                      label="Голи у міжгрупових змаганнях" 
+                      val1={player1.footballCollegeGroupGoals} 
+                      val2={player2?.footballCollegeGroupGoals}
+                    />
+                    <StatRow 
+                      label="Голи в обласних змаганнях" 
+                      val1={player1.footballRegionalGoals} 
+                      val2={player2?.footballRegionalGoals}
+                    />
+                    <StatRow 
+                      label="Голи у всеукраїнських змаганнях" 
+                      val1={player1.footballNationalGoals} 
+                      val2={player2?.footballNationalGoals}
                     />
                     {((player1.sportStats?.some(s => s.sportType === 'football') || (player1.goalsCount || 0) > 0) &&
                       (player2?.sportStats?.some(s => s.sportType === 'football') || (player2?.goalsCount || 0) > 0)) && (

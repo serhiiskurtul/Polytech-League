@@ -359,16 +359,19 @@ public class PlayerService : IPlayerService
             var bad1S = await _dbContext.BadmintonMatches.AsNoTracking().Where(g => eligibleEventIdsList.Contains(g.EventId) && g.Player1Id != null && eligiblePlayerIdsList.Contains(g.Player1Id.Value)).GroupBy(g => g.Player1Id).Select(g => new { Id = g.Key!.Value, Count = g.Count(), Wins = g.Count(x => x.WinnerPlayerId == g.Key) }).ToListAsync(cancellationToken);
             var bad2S = await _dbContext.BadmintonMatches.AsNoTracking().Where(g => eligibleEventIdsList.Contains(g.EventId) && g.Player2Id != null && eligiblePlayerIdsList.Contains(g.Player2Id.Value)).GroupBy(g => g.Player2Id).Select(g => new { Id = g.Key!.Value, Count = g.Count(), Wins = g.Count(x => x.WinnerPlayerId == g.Key) }).ToListAsync(cancellationToken);
 
-            var goalsSQuery = _dbContext.FootballGoals.AsNoTracking();
+            var goalsSDetailQuery = _dbContext.FootballGoals.AsNoTracking();
             if (seasonId != null)
             {
-                goalsSQuery = goalsSQuery.Where(g => g.Match != null && eligibleEventIdsList.Contains(g.Match.EventId));
+                goalsSDetailQuery = goalsSDetailQuery.Where(g => g.Match != null && eligibleEventIdsList.Contains(g.Match.EventId));
             }
 
-            var goalsS = await goalsSQuery
+            var goalsSDetail = await goalsSDetailQuery
                 .Where(g => eligiblePlayerIdsList.Contains(g.PlayerId))
-                .GroupBy(g => g.PlayerId)
-                .Select(g => new { Id = g.Key, Goals = g.Sum(x => x.GoalsCount) })
+                .Select(g => new {
+                    g.PlayerId,
+                    g.GoalsCount,
+                    Level = g.Match != null && g.Match.Event != null ? (CompetitionLevel?)g.Match.Event.Level : null
+                })
                 .ToListAsync(cancellationToken);
             
             var cardsSQuery = _dbContext.FootballCards.AsNoTracking();
@@ -447,7 +450,17 @@ public class PlayerService : IPlayerService
             var bvH = beachHomeStats.GroupBy(x => x.Id).ToDictionary(g => g.Key, g => g.First()); 
             var bvA = beachAwayStats.GroupBy(x => x.Id).ToDictionary(g => g.Key, g => g.First());
 
-            var goalsLookup = goalsS.GroupBy(x => x.Id).ToDictionary(g => g.Key, g => g.First().Goals);
+            var goalsDetailLookup = goalsSDetail
+                .GroupBy(x => x.PlayerId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => new {
+                        Total = g.Sum(x => x.GoalsCount),
+                        College = g.Where(x => x.Level == CompetitionLevel.CollegeGroup).Sum(x => x.GoalsCount),
+                        Regional = g.Where(x => x.Level == CompetitionLevel.Regional).Sum(x => x.GoalsCount),
+                        National = g.Where(x => x.Level == CompetitionLevel.National).Sum(x => x.GoalsCount)
+                    }
+                );
             var cardsLookup = cardsS.ToLookup(x => x.PlayerId);
 
             var playerDtos = new List<PlayerDto>();
@@ -644,11 +657,14 @@ public class PlayerService : IPlayerService
                     pointsBreakdown.Add(new PointEntryDto { Description = $"Участь (Футбол): {fPlayed} ігор", Points = playPts, Category = "Participation", SportType = "football" });
                     if (fWins > 0) pointsBreakdown.Add(new PointEntryDto { Description = $"Перемоги (Футбол): {fWins}", Points = winPts, Category = "Wins", SportType = "football" });
                 }
-                if (goalsLookup.TryGetValue(playerId, out var pGoals)) {
-                    var s = sportStatsMap["football"]; s.GoalsCount += pGoals;
-                    int goalPts = pGoals * 5; s.PerformanceScore += goalPts; totalScore += goalPts;
-                    pointsBreakdown.Add(new PointEntryDto { Description = $"Голи (Футбол): {pGoals}", Points = goalPts, Category = "Goals", SportType = "football" });
-                    dto.GoalsCount = pGoals;
+                if (goalsDetailLookup.TryGetValue(playerId, out var pGoalsInfo)) {
+                    var s = sportStatsMap["football"]; s.GoalsCount += pGoalsInfo.Total;
+                    int goalPts = pGoalsInfo.Total * 5; s.PerformanceScore += goalPts; totalScore += goalPts;
+                    pointsBreakdown.Add(new PointEntryDto { Description = $"Голи (Футбол): {pGoalsInfo.Total}", Points = goalPts, Category = "Goals", SportType = "football" });
+                    dto.GoalsCount = pGoalsInfo.Total;
+                    dto.FootballCollegeGroupGoals = pGoalsInfo.College;
+                    dto.FootballRegionalGoals = pGoalsInfo.Regional;
+                    dto.FootballNationalGoals = pGoalsInfo.National;
                 }
                 var pCards = cardsLookup[playerId].ToList();
                 int yellow = pCards.Count(x => x.Type == FootballCardType.Yellow);
@@ -1883,6 +1899,18 @@ public class PlayerService : IPlayerService
                 GoalsScored = g.GoalsCount,
                 Date = g.Match?.Event?.Date ?? DateTime.MinValue
             }).OrderByDescending(x => x.Date).ToList();
+
+            dto.FootballCollegeGroupGoals = goalDetails
+                .Where(g => g.Match?.Event?.Level == CompetitionLevel.CollegeGroup)
+                .Sum(g => g.GoalsCount);
+
+            dto.FootballRegionalGoals = goalDetails
+                .Where(g => g.Match?.Event?.Level == CompetitionLevel.Regional)
+                .Sum(g => g.GoalsCount);
+
+            dto.FootballNationalGoals = goalDetails
+                .Where(g => g.Match?.Event?.Level == CompetitionLevel.National)
+                .Sum(g => g.GoalsCount);
 
             dto.HatTricksCount = goalDetails
                 .GroupBy(g => g.MatchId)
