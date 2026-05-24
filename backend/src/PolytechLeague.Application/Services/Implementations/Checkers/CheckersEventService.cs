@@ -452,4 +452,40 @@ public class CheckersEventService :
             $"/tournaments/{eventId}"
         );
     }
+
+    public override async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
+    {
+        // 0. Clear player references to avoid FK constraint violation
+        await _dbcontext.Database.ExecuteSqlRawAsync(
+            $"UPDATE players SET \"CheckersTeamId\" = NULL WHERE \"CheckersTeamId\" IN (SELECT \"Id\" FROM checkers_teams WHERE \"EventId\" = {id})", 
+            cancellationToken);
+
+        // 1. Fetch event
+        var entity = await _dbcontext.Set<CheckersEvent>()
+            .Include(e => e.Games)
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+
+        if (entity == null) throw new EntityNotFoundException(nameof(CheckersEvent), id);
+
+        // 2. Clear winners to break circular references
+        entity.FirstPlaceId = null;
+        entity.SecondPlaceId = null;
+        entity.ThirdPlaceId = null;
+        entity.FirstPlaceTeamId = null;
+        entity.SecondPlaceTeamId = null;
+        entity.ThirdPlaceTeamId = null;
+        await _dbcontext.SaveChangesAsync(cancellationToken);
+
+        // 3. Delete games
+        if (entity.Games != null && entity.Games.Any())
+        {
+            _dbcontext.Set<CheckersGame>().RemoveRange(entity.Games);
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+        }
+
+        // 4. Delete event
+        _dbcontext.Set<CheckersEvent>().Remove(entity);
+        await _dbcontext.SaveChangesAsync(cancellationToken);
+    }
 }
+

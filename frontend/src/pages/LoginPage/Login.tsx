@@ -103,7 +103,6 @@ export default function Login() {
 
         <div className={styles.links}>
           <Link to="/signup">Немає акаунту? Зареєструватись</Link>
-          <a href="#">Забули пароль?</a>
         </div>
       </div>
     </main>
