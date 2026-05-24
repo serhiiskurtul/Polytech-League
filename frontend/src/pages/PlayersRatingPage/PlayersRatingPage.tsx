@@ -181,16 +181,16 @@ const PlayersRatingPage = () => {
 
   const getSportInfo = (sportKey: string) => {
     switch (sportKey.toLowerCase()) {
-      case 'chess': return { icon: '♟️', color: '#8b4513' };
-      case 'checkers': return { icon: '🏁', color: '#555' };
-      case 'football': return { icon: '⚽', color: '#2c3e50' };
-      case 'basketball_3x3': return { icon: '🏀', color: '#e67e22' };
-      case 'volleyball': return { icon: '🏐', color: '#f1c40f' };
-      case 'table_tennis': return { icon: '🏓', color: '#e74c3c' };
-      case 'badminton': return { icon: '🏸', color: '#1abc9c' };
-      case 'armwrestling': return { icon: '💪', color: '#7f8c8d' };
-      case 'beach_volleyball': return { icon: '🏖️', color: '#3498db' };
-      default: return { icon: '🏅', color: '#9b59b6' };
+      case 'chess': return { icon: '♟️', color: '#8b4513', name: 'Шахи' };
+      case 'checkers': return { icon: '🏁', color: '#555', name: 'Шашки' };
+      case 'football': return { icon: '⚽', color: '#2c3e50', name: 'Футбол' };
+      case 'basketball_3x3': return { icon: '🏀', color: '#e67e22', name: 'Баскетбол' };
+      case 'volleyball': return { icon: '🏐', color: '#f1c40f', name: 'Волейбол' };
+      case 'table_tennis': return { icon: '🏓', color: '#e74c3c', name: 'Настільний теніс' };
+      case 'badminton': return { icon: '🏸', color: '#1abc9c', name: 'Бадмінтон' };
+      case 'armwrestling': return { icon: '💪', color: '#7f8c8d', name: 'Армрестлинг' };
+      case 'beach_volleyball': return { icon: '🏖️', color: '#3498db', name: 'Пляжний волейбол' };
+      default: return { icon: '🏅', color: '#9b59b6', name: sportKey };
     }
   };
 
@@ -383,7 +383,7 @@ const PlayersRatingPage = () => {
                               .map(s => {
                                 const info = getSportInfo(s);
                                 return (
-                                  <div key={s} className={styles.sportBadgeSmall} title={s} style={{ backgroundColor: info.color + '22', color: info.color }}>
+                                  <div key={s} className={styles.sportBadgeSmall} title={info.name} style={{ backgroundColor: info.color + '22', color: info.color }}>
                                     {info.icon}
                                   </div>
                                 );
