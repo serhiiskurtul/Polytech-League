@@ -154,7 +154,10 @@ if (app.Environment.IsDevelopment())
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseHttpsRedirection();
+    app.UseWhen(context => !context.Request.Path.StartsWithSegments("/health"), builder =>
+    {
+        builder.UseHttpsRedirection();
+    });
 }
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
