@@ -5,8 +5,12 @@ import { getSeasons, getSeasonRating, createSeason, updateSeason, deleteSeason }
 import { Season, SeasonRatingResponse } from '@/shared/types/seasonRating.types';
 import toast from 'react-hot-toast';
 import * as XLSX from 'xlsx';
+import { useAuth } from '@/app/providers/AuthContext';
 
 const RatingsPage: React.FC = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 1 || user?.role === '1' || user?.role === 'Admin';
+
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [selectedSeasonId, setSelectedSeasonId] = useState<number | null>(null);
   const [ratingData, setRatingData] = useState<SeasonRatingResponse | null>(null);
@@ -160,9 +164,11 @@ const RatingsPage: React.FC = () => {
             </select>
           )}
 
-          <button className={styles.manageBtn} onClick={() => { setEditingSeason(null); setShowSeasonModal(true); }}>
-            <i className="fas fa-calendar-plus"></i> Керування сезонами
-          </button>
+          {isAdmin && (
+            <button className={styles.manageBtn} onClick={() => { setEditingSeason(null); setShowSeasonModal(true); }}>
+              <i className="fas fa-calendar-plus"></i> Керування сезонами
+            </button>
+          )}
 
           {ratingData && ratingData.rows.length > 0 && (
             <>
@@ -186,10 +192,16 @@ const RatingsPage: React.FC = () => {
         <div className={styles.emptyState}>
           <i className="fas fa-calendar-times"></i>
           <h3>Сезонів не знайдено</h3>
-          <p>Будь ласка, створіть перший сезон, щоб почати відстежувати рейтинги груп.</p>
-          <button className={styles.createBtn} onClick={() => setShowSeasonModal(true)}>
-            Створити сезон
-          </button>
+          {isAdmin ? (
+            <>
+              <p>Будь ласка, створіть перший сезон, щоб почати відстежувати рейтинги груп.</p>
+              <button className={styles.createBtn} onClick={() => setShowSeasonModal(true)}>
+                Створити сезон
+              </button>
+            </>
+          ) : (
+            <p>Наразі немає активних або минулих сезонів.</p>
+          )}
         </div>
       ) : ratingData && ratingData.rows.length > 0 ? (
         <div className={styles.tableContainer}>
@@ -238,7 +250,7 @@ const RatingsPage: React.FC = () => {
         </div>
       )}
 
-      {showSeasonModal && (
+      {showSeasonModal && isAdmin && (
         <div className={styles.modalOverlay}>
           <div className={styles.modal}>
             <div className={styles.modalHeader}>
