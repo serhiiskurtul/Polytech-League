@@ -1352,15 +1352,15 @@
 }
 
 .refereesBoard {
-  background: var(--bg);
-  padding: 16px;
-  border-radius: 12px;
+  background: transparent;
+  padding: 0;
 }
 
 .headReferee {
   font-size: 0.95rem;
   color: var(--text);
   margin-bottom: 8px;
+  white-space: pre-line;
 }
 
 .refereeNote {
