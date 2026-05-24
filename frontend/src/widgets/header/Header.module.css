@@ -372,7 +372,7 @@
 
 @media (max-width: 850px) {
   .header {
-    position: relative;
+    position: relative !important;
   }
 
   .burgerBtn {
