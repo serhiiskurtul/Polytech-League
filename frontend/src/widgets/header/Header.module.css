@@ -371,6 +371,10 @@
 }
 
 @media (max-width: 850px) {
+  .header {
+    position: relative;
+  }
+
   .burgerBtn {
     display: flex;
   }
