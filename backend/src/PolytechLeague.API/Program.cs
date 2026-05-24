@@ -64,6 +64,7 @@ builder.WebHost.ConfigureKestrel(options =>
     options.Limits.MaxRequestBodySize = 2147483648; // 2GB
 });
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHealthChecks();
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -140,6 +141,8 @@ builder.Services.AddRateLimiter(options =>
 });
 
 var app = builder.Build();
+
+app.MapHealthChecks("/health");
 
 app.UseCors("AllowReactApp");
 
