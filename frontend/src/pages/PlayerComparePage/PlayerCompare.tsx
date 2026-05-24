@@ -189,10 +189,12 @@ export const PlayerComparePage = () => {
     
     const selectedSeason = seasons.find(s => s.id === selectedSeasonId);
     if (selectedSeason) {
-      const yearStr = selectedSeason.name.match(/\d{4}/)?.[0];
-      if (yearStr) {
-        filtered = filtered.filter(a => a.date.includes(yearStr));
-      }
+      const start = new Date(selectedSeason.startDate);
+      const end = new Date(selectedSeason.endDate);
+      filtered = filtered.filter(a => {
+        const aDate = new Date(a.date);
+        return aDate >= start && aDate <= end;
+      });
     }
     
     const uniqueTournaments = new Set(
