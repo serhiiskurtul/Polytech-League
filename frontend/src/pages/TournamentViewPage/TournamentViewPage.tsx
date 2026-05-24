@@ -1896,7 +1896,7 @@ const TournamentViewPage = () => {
                   <i className="fas fa-users"></i>
                   <span>{actualParticipants} {participantLabel}</span>
                 </div>
-                {details?.timeControl && (
+                {details?.timeControl && tournament?.sport?.toLowerCase() !== 'armwrestling' && (
                   <div className={styles.metaItem}>
                     <i className="fas fa-clock"></i>
                     <span>Контроль часу: {details.timeControl}</span>
