@@ -194,7 +194,7 @@ const PlayersRatingPage = () => {
     }
   };
 
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://polytech-league-api-lbnoc.ondigitalocean.app';
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://polytech-league-production.up.railway.app';
 
   return (
     <div className={styles.page}>
