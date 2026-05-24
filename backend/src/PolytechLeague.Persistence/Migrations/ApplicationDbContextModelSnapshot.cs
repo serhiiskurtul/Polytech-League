@@ -1646,10 +1646,6 @@ namespace PolytechLeague.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<DateOnly>("BirthDate")
-                        .HasColumnType("date")
-                        .HasColumnName("birthday");
-
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("text")

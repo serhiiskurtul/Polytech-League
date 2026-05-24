@@ -237,7 +237,6 @@ const TournamentViewPage = () => {
     studyYears?: string | null;
     city?: string;
     rating?: number;
-    birthDate?: string | null;
   };
 
   // Centralized sport checks
@@ -280,7 +279,6 @@ const TournamentViewPage = () => {
     group: '',
     studentId: '',
     studyYears: '',
-    birthDate: '',
     city: 'Чернівці',
     ratingELO: 1500,
     fideId: '',
@@ -1288,7 +1286,6 @@ const TournamentViewPage = () => {
               group: p.group || null,
               studentId: p.studentId || '',
               studyYears: p.studyYears || '',
-              birthDate: p.birthDate || '',
               rating: tournament?.sport === 'checkers' ? (p.checkersRating || 0) : (p.chessRating || 0)
             } as SearchResult));
 
@@ -1331,7 +1328,6 @@ const TournamentViewPage = () => {
         group: result.group || '',
         studentId: result.studentId || '',
         studyYears: result.studyYears || '',
-        birthDate: result.birthDate || '',
         ratingELO: result.rating || 1500,
         userId: result.userId || null,
         existingPlayerId: result.id
@@ -1372,7 +1368,6 @@ const TournamentViewPage = () => {
           firstName: newPlayer.firstName,
           patronymic: newPlayer.patronymic || null,
           lastName: newPlayer.lastName,
-          birthDate: newPlayer.birthDate || null,
           group: newPlayer.group,
           studentId: newPlayer.studentId || null,
           studyYears: newPlayer.studyYears || null,
@@ -1459,7 +1454,7 @@ const TournamentViewPage = () => {
           });
       }
       toast.success("Учасник успішно доданий до змагань!");
-      setNewPlayer({ firstName: '', patronymic: '', lastName: '', group: '', studentId: '', studyYears: '', birthDate: '', city: 'Чернівці', ratingELO: 1500, fideId: '', title: '', userId: null, existingPlayerId: null, weight: 0, gender: 'None' });
+      setNewPlayer({ firstName: '', patronymic: '', lastName: '', group: '', studentId: '', studyYears: '', city: 'Чернівці', ratingELO: 1500, fideId: '', title: '', userId: null, existingPlayerId: null, weight: 0, gender: 'None' });
       fetchTournament(true); // Refresh
     } catch (err) {
       console.error(err);
@@ -2943,12 +2938,6 @@ const TournamentViewPage = () => {
                                   <label style={{ marginBottom: '4px', fontSize: '12px' }}>Прізвище</label>
                                   <input type="text" placeholder="Прізвище" value={newPlayer.lastName} onChange={(e) => setNewPlayer({ ...newPlayer, lastName: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
                                 </div>
-                                {tournament?.sport !== 'chess' && (
-                                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                    <label style={{ marginBottom: '4px', fontSize: '12px' }}>Дата народження</label>
-                                    <input type="date" value={newPlayer.birthDate} onChange={(e) => setNewPlayer({ ...newPlayer, birthDate: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />
-                                  </div>
-                                )}
                                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                                   <label style={{ marginBottom: '4px', fontSize: '12px' }}>Група (напр. 211)</label>
                                   <input type="text" placeholder="Група (напр. 211)" value={newPlayer.group} onChange={(e) => setNewPlayer({ ...newPlayer, group: e.target.value })} style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }} />

@@ -17,7 +17,6 @@ public class PlayerDto
     public string? LastName { get; set; }
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public Gender Gender { get; set; }
-    public DateOnly? BirthDate { get; set; }
     public string? Group { get; set; }
     public int EnrollmentYear { get; set; }
     public int SpecialtyCode { get; set; }
@@ -152,7 +151,6 @@ public static class PlayerDtoExtensions
             FirstName = player.FirstName,
             Patronymic = player.Patronymic,
             LastName = player.LastName,
-            BirthDate = player.BirthDate,
             Group = player.Group,
             EnrollmentYear = player.EnrollmentYear,
             SpecialtyCode = player.SpecialtyCode,
@@ -221,7 +219,6 @@ public static class PlayerDtoExtensions
             FirstName = dto.FirstName ?? string.Empty,
             Patronymic = dto.Patronymic,
             LastName = dto.LastName ?? string.Empty,
-            BirthDate = dto.BirthDate ?? DateOnly.MinValue,
             Group = dto.Group ?? string.Empty,
             EnrollmentYear = dto.EnrollmentYear,
             SpecialtyCode = dto.SpecialtyCode,
