@@ -147,7 +147,7 @@ const TournamentViewPage = () => {
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
   const [isMainPhotoLightboxOpen, setIsMainPhotoLightboxOpen] = useState(false);
   const [seasons, setSeasons] = useState<any[]>([]);
-  
+
   const [userMedia, setUserMedia] = useState<any[]>([]);
   const [isUploadingUserMedia, setIsUploadingUserMedia] = useState(false);
   const [userMediaComment, setUserMediaComment] = useState('');
@@ -176,7 +176,7 @@ const TournamentViewPage = () => {
       console.error('Failed to fetch pending media:', err);
     }
   };
-  
+
   const [voteStats, setVoteStats] = useState<any>(null);
   const [isVoting, setIsVoting] = useState(false);
 
@@ -400,7 +400,7 @@ const TournamentViewPage = () => {
             if (update.playerId && update.playerId !== 0) {
               const participant = (details as any).participants?.find((p: any) => Number(p.playerId || p.id) === Number(update.playerId));
               const player = allTeamPlayers.find((p: any) => Number(p.id) === Number(update.playerId));
-              
+
 
               if (participant) {
                 const pPayload = { ...participant, boardRank: update.rank };
@@ -664,7 +664,7 @@ const TournamentViewPage = () => {
         thirdPlaceTeamId: details.thirdPlaceTeam?.id || null,
         mvpId: details.mvpId || null
       } as any);
-      
+
       const board1_participants = (details as any).participants?.filter((p: any) => p.boardRank === 1) || [];
       const board2_participants = (details as any).participants?.filter((p: any) => p.boardRank === 2) || [];
       const board3_participants = (details as any).participants?.filter((p: any) => p.boardRank === 3) || [];
@@ -1187,10 +1187,10 @@ const TournamentViewPage = () => {
 
             const board1_1st = d.participants?.find((p: any) => p.boardRank === 1 && findBoardForPlayer(p.playerId) === 1);
             const board2_1st = d.participants?.find((p: any) => p.boardRank === 1 && findBoardForPlayer(p.playerId) === 2);
-            
+
             const board1_2nd = d.participants?.find((p: any) => p.boardRank === 2 && findBoardForPlayer(p.playerId) === 1);
             const board2_2nd = d.participants?.find((p: any) => p.boardRank === 2 && findBoardForPlayer(p.playerId) === 2);
-            
+
             const board1_3rd = d.participants?.find((p: any) => p.boardRank === 3 && findBoardForPlayer(p.playerId) === 1);
             const board2_3rd = d.participants?.find((p: any) => p.boardRank === 3 && findBoardForPlayer(p.playerId) === 2);
 
@@ -1652,16 +1652,16 @@ const TournamentViewPage = () => {
               </button>
             )}
             {isAdmin && (
-              <button 
-                onClick={handleEditTournament} 
+              <button
+                onClick={handleEditTournament}
                 className={`${styles.adminBtn} ${styles.editBtn}`}
               >
                 <i className="fas fa-edit"></i> <span>Редагувати змагання</span>
               </button>
             )}
             {isAdmin && (
-              <button 
-                onClick={handleDeleteTournament} 
+              <button
+                onClick={handleDeleteTournament}
                 className={`${styles.adminBtn} ${styles.deleteBtn}`}
               >
                 <i className="fas fa-trash"></i> <span>Видалити</span>
@@ -1741,110 +1741,110 @@ const TournamentViewPage = () => {
                 </div>
               </div> {/* CLOSE GRID HERE */}
 
-                {!['chess', 'checkers', 'athletics', 'table_tennis', 'tabletennis', 'badminton', 'beach_volleyball', 'beachvolleyball', 'armwrestling'].includes(tournament?.sport?.toLowerCase() || '') && (
+              {!['chess', 'checkers', 'athletics', 'table_tennis', 'tabletennis', 'badminton', 'beach_volleyball', 'beachvolleyball', 'armwrestling'].includes(tournament?.sport?.toLowerCase() || '') && (
+                <div style={{ marginTop: '16px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
+                    <i className="fas fa-star" style={{ color: '#f59e0b' }}></i> Найкращий гравець (MVP)
+                  </label>
+                  <select
+                    value={winners.mvpId}
+                    onChange={(e) => setWinners({ ...winners, mvpId: Number(e.target.value) })}
+                    style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                  >
+                    <option key="default-mvp" value="0">-- Оберіть MVP --</option>
+                    {isTeamSport ? (
+                      details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
+                        <option key={`mvp-p-${p.id}`} value={p.id}>
+                          {p.firstName} {p.lastName} ({p.teamName})
+                        </option>
+                      ))
+                    ) : (
+                      sortedPlayers?.map((p: any) => (
+                        <option key={`mvp-p-${p.playerId}`} value={p.playerId}>{p.playerName}</option>
+                      ))
+                    )}
+                  </select>
+                </div>
+              )}
+
+              {['chess', 'checkers'].includes(tournament?.sport?.toLowerCase() || '') && details?.level !== 'CollegeGroup' && (
+                <>
+                  <div style={{ marginTop: '24px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
+                      <i className="fas fa-medal" style={{ color: '#f59e0b' }}></i> Кращі на 1 дошці
+                    </label>
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                      <select
+                        value={winners.board1_1st || 0}
+                        onChange={(e) => setWinners({ ...winners, board1_1st: Number(e.target.value) })}
+                        style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                      >
+                        <option value="0">1 місце (Дошка 1)</option>
+                        {details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
+                          <option key={`b1-1-${p.id}`} value={p.id}>{p.firstName} {p.lastName} ({p.teamName})</option>
+                        ))}
+                      </select>
+                      <select
+                        value={winners.board1_2nd || 0}
+                        onChange={(e) => setWinners({ ...winners, board1_2nd: Number(e.target.value) })}
+                        style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                      >
+                        <option value="0">2 місце (Дошка 1)</option>
+                        {details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
+                          <option key={`b1-2-${p.id}`} value={p.id}>{p.firstName} {p.lastName} ({p.teamName})</option>
+                        ))}
+                      </select>
+                      <select
+                        value={winners.board1_3rd || 0}
+                        onChange={(e) => setWinners({ ...winners, board1_3rd: Number(e.target.value) })}
+                        style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                      >
+                        <option value="0">3 місце (Дошка 1)</option>
+                        {details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
+                          <option key={`b1-3-${p.id}`} value={p.id}>{p.firstName} {p.lastName} ({p.teamName})</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
                   <div style={{ marginTop: '16px' }}>
                     <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
-                      <i className="fas fa-star" style={{ color: '#f59e0b' }}></i> Найкращий гравець (MVP)
+                      <i className="fas fa-medal" style={{ color: '#f59e0b' }}></i> Кращі на 2 дошці
                     </label>
-                    <select
-                      value={winners.mvpId}
-                      onChange={(e) => setWinners({ ...winners, mvpId: Number(e.target.value) })}
-                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
-                    >
-                      <option key="default-mvp" value="0">-- Оберіть MVP --</option>
-                      {isTeamSport ? (
-                        details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
-                          <option key={`mvp-p-${p.id}`} value={p.id}>
-                            {p.firstName} {p.lastName} ({p.teamName})
-                          </option>
-                        ))
-                      ) : (
-                        sortedPlayers?.map((p: any) => (
-                          <option key={`mvp-p-${p.playerId}`} value={p.playerId}>{p.playerName}</option>
-                        ))
-                      )}
-                    </select>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <select
+                        value={winners.board2_1st || 0}
+                        onChange={(e) => setWinners({ ...winners, board2_1st: Number(e.target.value) })}
+                        style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                      >
+                        <option value="0">1 місце (Дошка 2)</option>
+                        {details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
+                          <option key={`b2-1-${p.id}`} value={p.id}>{p.firstName} {p.lastName} ({p.teamName})</option>
+                        ))}
+                      </select>
+                      <select
+                        value={winners.board2_2nd || 0}
+                        onChange={(e) => setWinners({ ...winners, board2_2nd: Number(e.target.value) })}
+                        style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                      >
+                        <option value="0">2 місце (Дошка 2)</option>
+                        {details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
+                          <option key={`b2-2-${p.id}`} value={p.id}>{p.firstName} {p.lastName} ({p.teamName})</option>
+                        ))}
+                      </select>
+                      <select
+                        value={winners.board2_3rd || 0}
+                        onChange={(e) => setWinners({ ...winners, board2_3rd: Number(e.target.value) })}
+                        style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                      >
+                        <option value="0">3 місце (Дошка 2)</option>
+                        {details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
+                          <option key={`b2-3-${p.id}`} value={p.id}>{p.firstName} {p.lastName} ({p.teamName})</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
-                )}
-
-                {['chess', 'checkers'].includes(tournament?.sport?.toLowerCase() || '') && details?.level !== 'CollegeGroup' && (
-                  <>
-                    <div style={{ marginTop: '24px' }}>
-                      <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
-                        <i className="fas fa-medal" style={{ color: '#f59e0b' }}></i> Кращі на 1 дошці
-                      </label>
-                      <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-                        <select
-                          value={winners.board1_1st || 0}
-                          onChange={(e) => setWinners({ ...winners, board1_1st: Number(e.target.value) })}
-                          style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
-                        >
-                          <option value="0">1 місце (Дошка 1)</option>
-                          {details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
-                            <option key={`b1-1-${p.id}`} value={p.id}>{p.firstName} {p.lastName} ({p.teamName})</option>
-                          ))}
-                        </select>
-                        <select
-                          value={winners.board1_2nd || 0}
-                          onChange={(e) => setWinners({ ...winners, board1_2nd: Number(e.target.value) })}
-                          style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
-                        >
-                          <option value="0">2 місце (Дошка 1)</option>
-                          {details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
-                            <option key={`b1-2-${p.id}`} value={p.id}>{p.firstName} {p.lastName} ({p.teamName})</option>
-                          ))}
-                        </select>
-                        <select
-                          value={winners.board1_3rd || 0}
-                          onChange={(e) => setWinners({ ...winners, board1_3rd: Number(e.target.value) })}
-                          style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
-                        >
-                          <option value="0">3 місце (Дошка 1)</option>
-                          {details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
-                            <option key={`b1-3-${p.id}`} value={p.id}>{p.firstName} {p.lastName} ({p.teamName})</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    <div style={{ marginTop: '16px' }}>
-                      <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
-                        <i className="fas fa-medal" style={{ color: '#f59e0b' }}></i> Кращі на 2 дошці
-                      </label>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <select
-                          value={winners.board2_1st || 0}
-                          onChange={(e) => setWinners({ ...winners, board2_1st: Number(e.target.value) })}
-                          style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
-                        >
-                          <option value="0">1 місце (Дошка 2)</option>
-                          {details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
-                            <option key={`b2-1-${p.id}`} value={p.id}>{p.firstName} {p.lastName} ({p.teamName})</option>
-                          ))}
-                        </select>
-                        <select
-                          value={winners.board2_2nd || 0}
-                          onChange={(e) => setWinners({ ...winners, board2_2nd: Number(e.target.value) })}
-                          style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
-                        >
-                          <option value="0">2 місце (Дошка 2)</option>
-                          {details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
-                            <option key={`b2-2-${p.id}`} value={p.id}>{p.firstName} {p.lastName} ({p.teamName})</option>
-                          ))}
-                        </select>
-                        <select
-                          value={winners.board2_3rd || 0}
-                          onChange={(e) => setWinners({ ...winners, board2_3rd: Number(e.target.value) })}
-                          style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
-                        >
-                          <option value="0">3 місце (Дошка 2)</option>
-                          {details?.teams?.flatMap((t: any) => (t.players || []).map((p: any) => ({ ...p, teamName: t.name }))).map((p: any) => (
-                            <option key={`b2-3-${p.id}`} value={p.id}>{p.firstName} {p.lastName} ({p.teamName})</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  </>)}
+                </>)}
 
 
               <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
@@ -1943,7 +1943,7 @@ const TournamentViewPage = () => {
                 )}
               </div>
             </div>
-            <div 
+            <div
               className={styles.tournamentImage}
               onClick={() => {
                 if (details?.mainPhotoUrl || (details?.photos && details.photos.length > 0)) {
@@ -2016,7 +2016,7 @@ const TournamentViewPage = () => {
                 <h3 style={{ fontSize: '16px', marginBottom: '12px', color: '#374151', display: 'flex', alignItems: 'center' }}>
                   <i className="fas fa-chess" style={{ marginRight: '8px', color: '#4b5563' }}></i> Призери по дошках
                 </h3>
-                
+
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                   {/* Board 1 */}
                   <div>
@@ -2027,7 +2027,7 @@ const TournamentViewPage = () => {
                       {b1_3rd && <li style={{ fontSize: '14px', marginBottom: '4px' }}>🥉 3. {b1_3rd.playerName}</li>}
                     </ul>
                   </div>
-                  
+
                   {/* Board 2 */}
                   <div>
                     <h4 style={{ fontSize: '14px', marginBottom: '8px', color: '#6b7280' }}>Дошка 2</h4>
@@ -2358,7 +2358,7 @@ const TournamentViewPage = () => {
                             Голосування за переможця (Всього голосів: {voteStats?.totalVotes || 0})
                             <i className="fas fa-info-circle" title="Голосування має суто розважальний характер і не впливає на офіційні результати змагань" style={{ marginLeft: '6px', color: '#64748b', cursor: 'help', fontSize: '14px' }}></i>
                           </h3>
-                          
+
                           {voteStats?.hasVoted && (
                             <p style={{ color: '#10b981', fontSize: '14px', marginBottom: '10px' }}>
                               <i className="fas fa-check-circle" style={{ marginRight: '4px' }}></i>
@@ -2383,7 +2383,7 @@ const TournamentViewPage = () => {
                                     {votes} ({percentage}%)
                                   </div>
                                   {!voteStats?.hasVoted && !isVoting && new Date(tournament?.rawDate || tournament?.date || '') > new Date() && (
-                                    <button 
+                                    <button
                                       onClick={() => handleVote(undefined, player.playerId)}
                                       style={{ padding: '2px 8px', fontSize: '12px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
                                     >
@@ -2455,12 +2455,12 @@ const TournamentViewPage = () => {
                                           </div>
                                         ) : (
                                           (p.playerId && !p.isGuest) ? (
-                                             <Link to={`/players/${p.playerId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
-                                               {p.playerName}
-                                             </Link>
-                                           ) : (
-                                             <span style={{ fontWeight: 'bold' }}>{p.playerName}</span>
-                                           )
+                                            <Link to={`/players/${p.playerId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
+                                              {p.playerName}
+                                            </Link>
+                                          ) : (
+                                            <span style={{ fontWeight: 'bold' }}>{p.playerName}</span>
+                                          )
                                         )}
                                       </td>
                                       <td>
@@ -2765,21 +2765,21 @@ const TournamentViewPage = () => {
                                         {tournament?.sport !== 'checkers' && <td>{(game as any).board || idx + 1}</td>}
                                         <td>
                                           {game.whitePlayerId ? (
-                                             <Link to={`/players/${game.whitePlayerId}`} style={{ color: '#3b82f6', textDecoration: 'none' }}>
-                                               {game.whitePlayerName}
-                                             </Link>
-                                           ) : (
-                                             game.whitePlayerName || '—'
-                                           )}
+                                            <Link to={`/players/${game.whitePlayerId}`} style={{ color: '#3b82f6', textDecoration: 'none' }}>
+                                              {game.whitePlayerName}
+                                            </Link>
+                                          ) : (
+                                            game.whitePlayerName || '—'
+                                          )}
                                         </td>
                                         <td>
                                           {game.blackPlayerId ? (
-                                             <Link to={`/players/${game.blackPlayerId}`} style={{ color: '#3b82f6', textDecoration: 'none' }}>
-                                               {game.blackPlayerName}
-                                             </Link>
-                                           ) : (
-                                             game.blackPlayerName || '—'
-                                           )}
+                                            <Link to={`/players/${game.blackPlayerId}`} style={{ color: '#3b82f6', textDecoration: 'none' }}>
+                                              {game.blackPlayerName}
+                                            </Link>
+                                          ) : (
+                                            game.blackPlayerName || '—'
+                                          )}
                                         </td>
                                         <td>
                                           {game.result === 'WhiteWin' ? (
@@ -2999,7 +2999,7 @@ const TournamentViewPage = () => {
                               </div>
                               <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                                 <button type="button" onClick={handleAddPlayer} style={{ padding: '10px 24px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
-                                  {newPlayer.existingPlayerId ? 'Додати існуючого гравця' : newPlayer.userId ? 'Створити профіль гравця та додати' : 'Створити гостя та додати'}
+                                  {newPlayer.existingPlayerId ? 'Додати існуючого гравця' : newPlayer.userId ? 'Створити профіль гравця та додати' : 'Створити гравця та додати'}
                                 </button>
                                 {(newPlayer.userId || newPlayer.existingPlayerId) && (
                                   <button
@@ -3215,7 +3215,7 @@ const TournamentViewPage = () => {
                           toast.error("Будь ласка, оберіть файл");
                           return;
                         }
-                        
+
                         const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500 MB
                         if (userMediaFile.size > MAX_FILE_SIZE) {
                           toast.error("Файл занадто великий. Максимум 500 МБ.");
@@ -3233,8 +3233,8 @@ const TournamentViewPage = () => {
                           if (input) input.value = '';
                         } catch (err: any) {
                           console.error(err);
-                          const errorMsg = typeof err.response?.data === 'string' 
-                            ? err.response.data 
+                          const errorMsg = typeof err.response?.data === 'string'
+                            ? err.response.data
                             : (err.response?.data?.message || "Помилка при відправці");
                           toast.error(errorMsg);
                         } finally {
@@ -3282,7 +3282,7 @@ const TournamentViewPage = () => {
                       ) : (
                         <img src={getImageUrl(media.url)} alt="User media" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       )}
-                      
+
                       {isAdmin && (
                         <div style={{ position: 'absolute', top: '8px', right: '8px' }}>
                           <button
@@ -3346,7 +3346,7 @@ const TournamentViewPage = () => {
                   )}
                 </h2>
               </div>
-              
+
               {pendingUserMedia && pendingUserMedia.length > 0 ? (
                 <div className={styles.photoGrid}>
                   {pendingUserMedia.map((media: any) => (
