@@ -347,7 +347,7 @@ public class CheckersEventService :
 
         if (string.IsNullOrWhiteSpace(player.StudentId))
         {
-            throw new InvalidOperationException("Для реєстрації на змагання необхідно вказати серію та номер студентського квитка в профілі (наприклад: PH13856483).");
+            throw new InvalidOperationException("Для реєстрації на змагання необхідно вказати серію та номер студентського квитка в профілі (наприклад: PH12345678).");
         }
 
         if (player.Gender == Gender.None)
