@@ -115,13 +115,13 @@ const ProfileHeader = ({ userData, isAdmin, onEdit, onAvatarUpload, onLogout, on
               ))}
             </div>
             </div>
-            <div className={styles.socialLinks}>
-              {userData.instagramUrl && (
+            {userData.instagramUrl && (
+              <div className={styles.socialLinks}>
                 <a href={userData.instagramUrl} target="_blank" rel="noopener noreferrer" className={styles.socialIcon} title="Instagram">
                   <i className="fab fa-instagram"></i>
                 </a>
-              )}
-            </div>
+              </div>
+            )}
             <div className={styles.profileActions}>
               {onEdit && (
                 <button className={styles.editProfileBtn} onClick={onEdit}>

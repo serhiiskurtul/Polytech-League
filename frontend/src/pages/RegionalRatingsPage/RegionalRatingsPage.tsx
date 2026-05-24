@@ -9,8 +9,8 @@ import toast from 'react-hot-toast';
 import * as XLSX from 'xlsx';
 
 const ALL_SPORTS = [
-  "Шахи", "Шашки", "Футбол", "Армрестлінг", 
-  "Настільний теніс", "Бадмінтон", "Волейбол", 
+  "Шахи", "Шашки", "Футбол", "Армрестлінг",
+  "Настільний теніс", "Бадмінтон", "Волейбол",
   "Баскетбол", "Пляжний волейбол", "Легка атлетика"
 ];
 
@@ -22,7 +22,7 @@ const normalizeSportName = (name: string) => {
 const RegionalRatingsPage: React.FC = () => {
   const { user } = useAuth();
   const isAdmin = user?.role === 1 || user?.role === '1' || user?.role === 'Admin';
-  
+
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [colleges, setColleges] = useState<College[]>([]);
   const [selectedSeasonId, setSelectedSeasonId] = useState<number | null>(null);
@@ -78,10 +78,10 @@ const RegionalRatingsPage: React.FC = () => {
 
   const startEditing = () => {
     if (!ratingData) return;
-    
+
     const initialEditData = colleges.map(college => {
       const row = ratingData.rows.find(r => r.collegeId === college.id);
-      
+
       const sportResults: Record<string, string> = {};
       if (row?.sportResults) {
         Object.keys(row.sportResults).forEach(sport => {
@@ -99,7 +99,7 @@ const RegionalRatingsPage: React.FC = () => {
         sportResults: sportResults
       };
     });
-    
+
     const sortedEditData = initialEditData.sort((a, b) => {
       if (a.participated && !b.participated) return -1;
       if (!a.participated && b.participated) return 1;
@@ -124,7 +124,7 @@ const RegionalRatingsPage: React.FC = () => {
   };
 
   const handleEditChange = (collegeId: number, field: string, value: any) => {
-    setEditData(prev => prev.map(item => 
+    setEditData(prev => prev.map(item =>
       item.collegeId === collegeId ? { ...item, [field]: value } : item
     ));
   };
@@ -184,7 +184,7 @@ const RegionalRatingsPage: React.FC = () => {
       <header className={styles.header}>
         <div className={styles.titleSection}>
           <h1>
-            Обласний залік 
+            Обласний залік
             <span className={styles.regionalBadge}>Regional</span>
           </h1>
           {ratingData && (
@@ -194,7 +194,7 @@ const RegionalRatingsPage: React.FC = () => {
               </div>
               <div className={styles.nameToggleWrapper}>
                 <span className={`${styles.toggleText} ${!showFullName ? styles.activeText : ''}`}>Скорочена</span>
-                <button 
+                <button
                   className={`${styles.toggleBtn} ${showFullName ? styles.toggleActive : ''}`}
                   onClick={() => setShowFullName(!showFullName)}
                   title={showFullName ? "Показати скорочені назви" : "Показати повні назви"}
@@ -209,9 +209,9 @@ const RegionalRatingsPage: React.FC = () => {
 
         <div className={styles.controls}>
           <Link to="/colleges" className={styles.collegesBtn}>
-            <i className="fas fa-university"></i> Коледжі
+            <i className="fas fa-university"></i> Список коледжів
           </Link>
-          
+
           {isAdmin && (
             <>
               {isEditing ? (
@@ -258,8 +258,8 @@ const RegionalRatingsPage: React.FC = () => {
           <div className={styles.sportCheckboxes}>
             {ALL_SPORTS.map(sport => (
               <label key={sport} className={styles.sportCheckboxLabel}>
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={activeSports.includes(sport)}
                   onChange={(e) => {
                     if (e.target.checked) {
@@ -317,9 +317,9 @@ const RegionalRatingsPage: React.FC = () => {
                         })()}
                       </td>
                       <td className={styles.editCell}>
-                        <input 
-                          type="checkbox" 
-                          checked={item.participated} 
+                        <input
+                          type="checkbox"
+                          checked={item.participated}
                           onChange={(e) => handleEditChange(item.collegeId, 'participated', e.target.checked)}
                           className={styles.participationCheckbox}
                         />
@@ -328,9 +328,9 @@ const RegionalRatingsPage: React.FC = () => {
                       {ratingData?.sports.map(sport => (
                         <td key={sport} className={styles.editCell}>
                           {isCHPFK ? (
-                            <input 
-                              type="text" 
-                              value={item.sportResults?.[sport] || '-'} 
+                            <input
+                              type="text"
+                              value={item.sportResults?.[sport] || '-'}
                               onChange={(e) => {
                                 const newSportResults = { ...(item.sportResults || {}) };
                                 newSportResults[sport] = e.target.value;
@@ -345,18 +345,18 @@ const RegionalRatingsPage: React.FC = () => {
                         </td>
                       ))}
                       <td className={styles.editCell}>
-                        <input 
-                          type="number" 
-                          value={item.points} 
+                        <input
+                          type="number"
+                          value={item.points}
                           onChange={(e) => handleEditChange(item.collegeId, 'points', e.target.value)}
                           className={styles.editInput}
                           disabled={!item.participated}
                         />
                       </td>
                       <td className={styles.editCell}>
-                        <input 
-                          type="text" 
-                          value={item.rank} 
+                        <input
+                          type="text"
+                          value={item.rank}
                           onChange={(e) => handleEditChange(item.collegeId, 'rank', e.target.value)}
                           className={styles.editInput}
                           disabled={!item.participated}
@@ -369,14 +369,14 @@ const RegionalRatingsPage: React.FC = () => {
                 ratingData!.rows.map((row) => {
                   const college = colleges.find(c => c.id === row.collegeId);
                   const isCHPFK = college?.shortName === 'ЧПФК' || college?.name?.includes('Чернівецький політехнічний');
-                  
+
                   return (
                     <tr key={row.collegeId || row.groupName} className={styles.row}>
                       <td className={styles.collegeCell}>
                         <div className={styles.collegeInfo}>
-                            <div className={styles.collegeName}>
-                              {showFullName ? (college?.name || row.groupName) : (college?.shortName || row.groupName)}
-                            </div>
+                          <div className={styles.collegeName}>
+                            {showFullName ? (college?.name || row.groupName) : (college?.shortName || row.groupName)}
+                          </div>
                         </div>
                       </td>
                       <td className={styles.regionCell}>
