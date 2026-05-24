@@ -83,9 +83,36 @@ public class UserService : AbstractEntityService<User>, IUserService
         return user;
     }
 
+    public override async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Hard deleting user with id {Id} and all associated person profiles", id);
+
+        var user = await _dbcontext.Set<User>().FindAsync(new object[] { id }, cancellationToken);
+        if (user is null)
+        {
+            _logger.LogWarning("User {Id} not found for hard delete", id);
+            throw new EntityNotFoundException(nameof(User), id);
+        }
+
+        var persons = await _dbcontext.Set<Person>()
+            .Where(p => p.UserId == id)
+            .ToListAsync(cancellationToken);
+
+        if (persons.Any())
+        {
+            _logger.LogInformation("Deleting {Count} associated person profiles for hard deleted user {UserId}", persons.Count, id);
+            _dbcontext.Set<Person>().RemoveRange(persons);
+        }
+
+        _dbcontext.Set<User>().Remove(user);
+        await _dbcontext.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("User {Id} and associated person profiles successfully deleted", id);
+    }
+
     public async Task SoftDeleteAsync(long id, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Soft deleting user with id {Id}", id);
+        _logger.LogInformation("Soft deleting user with id {Id} and all associated person profiles", id);
 
         var user = await _dbcontext.Set<User>()
             .FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted, cancellationToken);
@@ -94,6 +121,16 @@ public class UserService : AbstractEntityService<User>, IUserService
         {
             _logger.LogWarning("User {Id} not found or already deleted", id);
             throw new EntityNotFoundException(nameof(User), id);
+        }
+
+        var persons = await _dbcontext.Set<Person>()
+            .Where(p => p.UserId == id)
+            .ToListAsync(cancellationToken);
+
+        if (persons.Any())
+        {
+            _logger.LogInformation("Deleting {Count} associated person profiles for soft deleted user {UserId}", persons.Count, id);
+            _dbcontext.Set<Person>().RemoveRange(persons);
         }
 
         user.IsDeleted = true;
