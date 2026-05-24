@@ -177,7 +177,7 @@ app.UseWebSockets();
 app.MapControllers();
 app.MapHub<ChatHub>("/hubs/chat");
 
-//Автоматичне застосування міграцій при старті (корисно для Railway)
+//Автоматичне застосування міграцій при старті
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

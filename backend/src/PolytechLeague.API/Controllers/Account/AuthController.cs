@@ -73,7 +73,7 @@ public class AuthController(IAuthService authService) : Controller
 
     private void SetAuthCookies(AuthResponse tokens)
     {
-        var isProd = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT"));
+        var isProd = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production";
 
         Response.Cookies.Append("access_token", tokens.AccessToken, new CookieOptions
         {
