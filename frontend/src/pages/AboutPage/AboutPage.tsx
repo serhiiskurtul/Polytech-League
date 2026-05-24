@@ -65,7 +65,7 @@ const AboutPage: React.FC = () => {
       <section className={styles.metaSection}>
         <div className={styles.metaGrid}>
           <div className={styles.metaItem}>
-            <div className={styles.metaLabel}>Створено</div>
+            <div className={styles.metaLabel}>Дата запуску</div>
             <div className={styles.metaValue}>Травень 2026</div>
           </div>
 
