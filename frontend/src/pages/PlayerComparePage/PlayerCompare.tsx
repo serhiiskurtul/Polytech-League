@@ -175,6 +175,33 @@ export const PlayerComparePage = () => {
     return Math.round((wins / matches) * 100);
   };
 
+  const getCompetitionsCount = (player: PlayerDto | null, selectedSeasonId: number | null) => {
+    if (!player) return 0;
+    if (selectedSport === 'all') {
+      return player.competitionsCount || 0;
+    }
+    
+    if (!player.achievements) return 0;
+    
+    let filtered = player.achievements.filter(
+      a => a.sportType.toLowerCase() === selectedSport.toLowerCase()
+    );
+    
+    const selectedSeason = seasons.find(s => s.id === selectedSeasonId);
+    if (selectedSeason) {
+      const yearStr = selectedSeason.name.match(/\d{4}/)?.[0];
+      if (yearStr) {
+        filtered = filtered.filter(a => a.date.includes(yearStr));
+      }
+    }
+    
+    const uniqueTournaments = new Set(
+      filtered.map(a => a.tournamentId || a.tournamentName)
+    );
+    
+    return uniqueTournaments.size;
+  };
+
   const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://polytech-league-api-lbnoc.ondigitalocean.app';
 
   if (loading) {
@@ -393,9 +420,9 @@ export const PlayerComparePage = () => {
 
                <StatRow 
                  label="Участь у змаганнях" 
-                 val1={player1.competitionsCount} 
-                 val2={player2?.competitionsCount}
-                 suffix=" турнірів"
+                 val1={getCompetitionsCount(player1, selectedSeasonId1)} 
+                 val2={getCompetitionsCount(player2, selectedSeasonId2)}
+                 suffix=" змагань"
                />
             </div>
           </div>
