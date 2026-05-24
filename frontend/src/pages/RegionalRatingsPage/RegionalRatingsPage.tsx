@@ -224,7 +224,7 @@ const RegionalRatingsPage: React.FC = () => {
                 </button>
               )}
               <Link to="/admin/colleges" className={styles.manageBtn}>
-                <i className="fas fa-cog"></i> Керування
+                <i className="fas fa-cog"></i> Керування коледжами
               </Link>
             </>
           )}

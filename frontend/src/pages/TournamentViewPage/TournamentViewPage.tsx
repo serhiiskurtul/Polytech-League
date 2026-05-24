@@ -3176,73 +3176,75 @@ const TournamentViewPage = () => {
 
             {/* Upload Form (only for logged in users) */}
             {user ? (
-              <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', marginBottom: '24px', border: '1px solid #e2e8f0' }}>
-                <h3 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '12px', color: '#1e293b' }}>Поділіться своїми фото чи відео</h3>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
-                  <input
-                    type="file"
-                    accept="image/*,video/*"
-                    onChange={(e) => setUserMediaFile(e.target.files?.[0] || null)}
-                    style={{ padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#fff' }}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Ваш коментар (опціонально)"
-                    value={userMediaComment}
-                    onChange={(e) => setUserMediaComment(e.target.value)}
-                    style={{ flex: 1, minWidth: '200px', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
-                  />
-                  <button
-                    onClick={async () => {
-                      if (!userMediaFile) {
-                        toast.error("Будь ласка, оберіть файл");
-                        return;
-                      }
-                      
-                      const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500 MB
-                      if (userMediaFile.size > MAX_FILE_SIZE) {
-                        toast.error("Файл занадто великий. Максимум 500 МБ.");
-                        return;
-                      }
+              !isAdmin && (
+                <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', marginBottom: '24px', border: '1px solid #e2e8f0' }}>
+                  <h3 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '12px', color: '#1e293b' }}>Поділіться своїми фото чи відео</h3>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
+                    <input
+                      type="file"
+                      accept="image/*,video/*"
+                      onChange={(e) => setUserMediaFile(e.target.files?.[0] || null)}
+                      style={{ padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#fff' }}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Ваш коментар (опціонально)"
+                      value={userMediaComment}
+                      onChange={(e) => setUserMediaComment(e.target.value)}
+                      style={{ flex: 1, minWidth: '200px', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+                    />
+                    <button
+                      onClick={async () => {
+                        if (!userMediaFile) {
+                          toast.error("Будь ласка, оберіть файл");
+                          return;
+                        }
+                        
+                        const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500 MB
+                        if (userMediaFile.size > MAX_FILE_SIZE) {
+                          toast.error("Файл занадто великий. Максимум 500 МБ.");
+                          return;
+                        }
 
-                      try {
-                        setIsUploadingUserMedia(true);
-                        await submitUserEventMedia(id!, userMediaFile, userMediaComment);
-                        toast.success("Медіа надіслано на модерацію!");
-                        setUserMediaFile(null);
-                        setUserMediaComment('');
-                        // Reset file input
-                        const input = document.querySelector('input[type="file"]') as HTMLInputElement;
-                        if (input) input.value = '';
-                      } catch (err: any) {
-                        console.error(err);
-                        const errorMsg = typeof err.response?.data === 'string' 
-                          ? err.response.data 
-                          : (err.response?.data?.message || "Помилка при відправці");
-                        toast.error(errorMsg);
-                      } finally {
-                        setIsUploadingUserMedia(false);
-                      }
-                    }}
-                    disabled={isUploadingUserMedia || !userMediaFile}
-                    style={{
-                      padding: '10px 20px',
-                      background: '#2563eb',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      fontWeight: 'bold',
-                      opacity: (isUploadingUserMedia || !userMediaFile) ? 0.5 : 1
-                    }}
-                  >
-                    {isUploadingUserMedia ? "Відправка..." : "Надіслати"}
-                  </button>
+                        try {
+                          setIsUploadingUserMedia(true);
+                          await submitUserEventMedia(id!, userMediaFile, userMediaComment);
+                          toast.success("Медіа надіслано на модерацію!");
+                          setUserMediaFile(null);
+                          setUserMediaComment('');
+                          // Reset file input
+                          const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+                          if (input) input.value = '';
+                        } catch (err: any) {
+                          console.error(err);
+                          const errorMsg = typeof err.response?.data === 'string' 
+                            ? err.response.data 
+                            : (err.response?.data?.message || "Помилка при відправці");
+                          toast.error(errorMsg);
+                        } finally {
+                          setIsUploadingUserMedia(false);
+                        }
+                      }}
+                      disabled={isUploadingUserMedia || !userMediaFile}
+                      style={{
+                        padding: '10px 20px',
+                        background: '#2563eb',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontWeight: 'bold',
+                        opacity: (isUploadingUserMedia || !userMediaFile) ? 0.5 : 1
+                      }}
+                    >
+                      {isUploadingUserMedia ? "Відправка..." : "Надіслати"}
+                    </button>
+                  </div>
+                  <p style={{ fontSize: '12px', color: '#64748b', marginTop: '8px' }}>
+                    * Всі медіа проходять модерацію адміністратором перед публікацією.
+                  </p>
                 </div>
-                <p style={{ fontSize: '12px', color: '#64748b', marginTop: '8px' }}>
-                  * Всі медіа проходять модерацію адміністратором перед публікацією.
-                </p>
-              </div>
+              )
             ) : (
               <div style={{ background: '#f8fafc', padding: '15px', borderRadius: '12px', marginBottom: '24px', textAlign: 'center', color: '#64748b' }}>
                 <i className="fas fa-info-circle" style={{ marginRight: '8px' }}></i>
