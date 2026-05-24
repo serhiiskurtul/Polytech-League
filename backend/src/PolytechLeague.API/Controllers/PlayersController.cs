@@ -3,6 +3,7 @@ using PolytechLeague.Application.Dto.GeneralDto;
 using PolytechLeague.Application.Services.Interfaces;
 using PolytechLeague.Application.Extensions;
 using Microsoft.AspNetCore.Authorization;
+using PolytechLeague.Infrastructure.Redis;
 
 namespace PolytechLeague.API.Controllers;
 
@@ -13,12 +14,14 @@ public class PlayersController : ControllerBase
     private readonly IPlayerService _playerService;
     private readonly IUserService _userService;
     private readonly IFileService _fileService;
+    private readonly IRedisService _redisService;
 
-    public PlayersController(IPlayerService playerService, IUserService userService, IFileService fileService)
+    public PlayersController(IPlayerService playerService, IUserService userService, IFileService fileService, IRedisService redisService)
     {
         _playerService = playerService;
         _userService = userService;
         _fileService = fileService;
+        _redisService = redisService;
     }
 
     [Authorize]
@@ -26,6 +29,11 @@ public class PlayersController : ControllerBase
     public async Task<ActionResult<PlayerDto>> GetProfile(CancellationToken cancellationToken)
     {
         var userId = User.GetUserId();
+        var cacheKey = $"player_profile_{userId}";
+        
+        var cached = await _redisService.GetDataAsync<PlayerDto>(cacheKey);
+        if (cached != null) return Ok(cached);
+
         var user = await _userService.GetByIdAsync(userId, cancellationToken);
         var player = await _playerService.GetByUserIdAsync(userId, cancellationToken);
 
@@ -49,6 +57,7 @@ public class PlayersController : ControllerBase
             await _playerService.UpdateAsync(player.Id ?? 0, player, cancellationToken);
         }
 
+        await _redisService.SetDataAsync(cacheKey, player, TimeSpan.FromMinutes(30), "player_profiles_group");
         return Ok(player);
     }
 
@@ -83,6 +92,9 @@ public class PlayersController : ControllerBase
             await _playerService.UpdateAsync(player.Id ?? 0, player, cancellationToken);
         }
 
+        var cacheKey = $"player_profile_{userId}";
+        await _redisService.RemoveDataAsync(cacheKey);
+
         return Ok(new { photoUrl });
     }
 
@@ -99,6 +111,10 @@ public class PlayersController : ControllerBase
         
         // Fetch again to get the most up-to-date data
         var updated = await _playerService.GetByUserIdAsync(userId, cancellationToken);
+        
+        var cacheKey = $"player_profile_{userId}";
+        await _redisService.SetDataAsync(cacheKey, updated, TimeSpan.FromMinutes(30), "player_profiles_group");
+
         return Ok(updated);
     }
 
@@ -130,6 +146,13 @@ public class PlayersController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(long id, PlayerDto dto, CancellationToken cancellationToken)
     {
+        var player = await _playerService.GetByIdAsync(id, cancellationToken);
+        if (player != null && player.UserId.HasValue)
+        {
+            var cacheKey = $"player_profile_{player.UserId.Value}";
+            await _redisService.RemoveDataAsync(cacheKey);
+        }
+
         await _playerService.UpdateAsync(id, dto, cancellationToken);
         return NoContent();
     }
@@ -138,6 +161,13 @@ public class PlayersController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(long id, CancellationToken cancellationToken)
     {
+        var player = await _playerService.GetByIdAsync(id, cancellationToken);
+        if (player != null && player.UserId.HasValue)
+        {
+            var cacheKey = $"player_profile_{player.UserId.Value}";
+            await _redisService.RemoveDataAsync(cacheKey);
+        }
+
         await _playerService.DeleteAsync(id, cancellationToken);
         return NoContent();
     }
@@ -191,6 +221,14 @@ public class PlayersController : ControllerBase
     [HttpPost("merge-requests/{id}/approve")]
     public async Task<IActionResult> ApproveMergeRequest(long id, CancellationToken cancellationToken)
     {
+        var requests = await _playerService.GetAllMergeRequestsAsync(cancellationToken);
+        var req = requests.FirstOrDefault(r => r.Id == id);
+        if (req != null)
+        {
+            var cacheKey = $"player_profile_{req.UserId}";
+            await _redisService.RemoveDataAsync(cacheKey);
+        }
+
         await _playerService.ApproveMergeRequestAsync(id, cancellationToken);
         return Ok();
     }
