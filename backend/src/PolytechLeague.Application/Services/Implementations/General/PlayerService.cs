@@ -1910,8 +1910,8 @@ public class PlayerService : IPlayerService
             var playedMatches = await _dbContext.FootballMatches
                 .Include(m => m.HomeRoster)
                 .Include(m => m.AwayRoster)
-                .Where(m => (m.HomeRoster != null && m.HomeRoster.Any(p => p.Id == playerId)) ||
-                            (m.AwayRoster != null && m.AwayRoster.Any(p => p.Id == playerId)))
+                .Where(m => m.HomeRoster.Any(p => p.Id == playerId) ||
+                            m.AwayRoster.Any(p => p.Id == playerId))
                 .ToListAsync(cancellationToken);
 
             dto.FinalMatchesCount = playedMatches
