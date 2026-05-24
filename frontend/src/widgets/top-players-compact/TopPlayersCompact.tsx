@@ -132,7 +132,12 @@ const TopPlayersCompact = () => {
                 style={{ cursor: 'pointer' }}
               >
                 <div className={styles.playerRank}>
-                  <div className={`${styles.rankNumber} ${index < 3 ? styles.topRank : ''}`}>
+                  <div className={`
+                    ${styles.rankNumber}
+                    ${index === 0 ? styles.rankGold : ''}
+                    ${index === 1 ? styles.rankSilver : ''}
+                    ${index === 2 ? styles.rankBronze : ''}
+                  `}>
                     {index + 1}
                   </div>
                 </div>
