@@ -246,4 +246,35 @@ public class ApplicationDbContext : DbContext
     {
         optionsBuilder.UseExceptionProcessor();
     }
+
+    public static event System.Action? OnChangesSaved;
+
+    public override int SaveChanges()
+    {
+        var result = base.SaveChanges();
+        OnChangesSaved?.Invoke();
+        return result;
+    }
+
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        var result = base.SaveChanges(acceptAllChangesOnSuccess);
+        OnChangesSaved?.Invoke();
+        return result;
+    }
+
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var result = await base.SaveChangesAsync(cancellationToken);
+        OnChangesSaved?.Invoke();
+        return result;
+    }
+
+    public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    {
+        var result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        OnChangesSaved?.Invoke();
+        return result;
+    }
 }
+

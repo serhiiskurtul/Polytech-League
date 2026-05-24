@@ -24,5 +24,7 @@ public interface IPlayerService
     Task IgnoreMergeRequestAsync(long userId, long targetPlayerId, CancellationToken cancellationToken = default);
 
     Task<HeadToHeadDto> GetHeadToHeadAsync(long player1Id, long player2Id, CancellationToken cancellationToken = default);
+    void ClearRankingsCache();
 }
+
 

@@ -30,6 +30,24 @@ public class PlayerService : IPlayerService
     private static readonly object _cacheLock = new object();
     private static readonly TimeSpan _cacheDuration = TimeSpan.FromMinutes(10);
 
+    static PlayerService()
+    {
+        ApplicationDbContext.OnChangesSaved += ClearRankingsCache;
+    }
+
+    public static void ClearRankingsCache()
+    {
+        lock (_cacheLock)
+        {
+            _rankingsCache.Clear();
+        }
+    }
+
+    void IPlayerService.ClearRankingsCache()
+    {
+        ClearRankingsCache();
+    }
+
 
     public PlayerService(ApplicationDbContext dbContext, ILogger<PlayerService> logger, INotificationService notificationService)
     {
@@ -37,6 +55,7 @@ public class PlayerService : IPlayerService
         _logger = logger;
         _notificationService = notificationService;
     }
+
 
     public async Task<IEnumerable<PlayerDto>> GetAllAsync(CancellationToken cancellationToken = default)
     {
