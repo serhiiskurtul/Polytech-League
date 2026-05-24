@@ -55,6 +55,10 @@
   transition: border-color 0.2s;
 }
 
+.textarea {
+  resize: none;
+}
+
 .select:focus, .textarea:focus {
   outline: none;
   border-color: #2563eb;
