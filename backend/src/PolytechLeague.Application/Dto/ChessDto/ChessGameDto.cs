@@ -34,18 +34,48 @@ public class ChessGameDto
 
 public static class ChessGameDtoExtensions
 {
-    public static ChessGameDto ToDto(this ChessGame game)
+    public static ChessGameDto ToDto(this ChessGame game, IEnumerable<ChessEventParticipant>? participants = null)
     {
+        string? whiteName = null;
+        string? blackName = null;
+
+        if (participants != null)
+        {
+            var whiteP = participants.FirstOrDefault(p => p.PlayerId == game.WhitePlayerId);
+            if (whiteP != null)
+            {
+                whiteName = (whiteP.PlayerFirstName != null || whiteP.PlayerLastName != null)
+                    ? $"{whiteP.PlayerFirstName} {whiteP.PlayerLastName}".Trim()
+                    : (game.WhitePlayer != null ? $"{game.WhitePlayer.FirstName} {game.WhitePlayer.LastName}".Trim() : null);
+            }
+            var blackP = participants.FirstOrDefault(p => p.PlayerId == game.BlackPlayerId);
+            if (blackP != null)
+            {
+                blackName = (blackP.PlayerFirstName != null || blackP.PlayerLastName != null)
+                    ? $"{blackP.PlayerFirstName} {blackP.PlayerLastName}".Trim()
+                    : (game.BlackPlayer != null ? $"{game.BlackPlayer.FirstName} {game.BlackPlayer.LastName}".Trim() : null);
+            }
+        }
+
+        if (whiteName == null)
+        {
+            whiteName = game.WhitePlayer != null ? $"{game.WhitePlayer.FirstName} {game.WhitePlayer.LastName}".Trim() : null;
+        }
+        if (blackName == null)
+        {
+            blackName = game.BlackPlayer != null ? $"{game.BlackPlayer.FirstName} {game.BlackPlayer.LastName}".Trim() : null;
+        }
+
         return new ChessGameDto
         {
             Id = game.Id,
             TournamentId = game.TournamentId,
             WhitePlayerId = game.WhitePlayerId,
             WhiteUserId = game.WhitePlayer?.UserId,
-            WhitePlayerName = game.WhitePlayer != null ? $"{game.WhitePlayer.FirstName} {game.WhitePlayer.LastName}".Trim() : null,
+            WhitePlayerName = whiteName,
             BlackPlayerId = game.BlackPlayerId,
             BlackUserId = game.BlackPlayer?.UserId,
-            BlackPlayerName = game.BlackPlayer != null ? $"{game.BlackPlayer.FirstName} {game.BlackPlayer.LastName}".Trim() : null,
+            BlackPlayerName = blackName,
             WhiteTeamId = game.WhiteTeamId,
             WhiteTeam = game.WhiteTeam?.ToResponse(),
             BlackTeamId = game.BlackTeamId,

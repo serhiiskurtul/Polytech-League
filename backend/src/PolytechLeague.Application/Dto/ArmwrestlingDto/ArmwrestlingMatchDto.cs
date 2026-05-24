@@ -1,3 +1,4 @@
+using PolytechLeague.Domain.Entities;
 using PolytechLeague.Application.Dto.GeneralDto;
 using PolytechLeague.Domain.Entities.Armwrestling;
 
@@ -40,16 +41,34 @@ public static class ArmwrestlingMatchDtoExtensions
         };
     }
 
-    public static ArmwrestlingMatchResponse ToResponse(this ArmwrestlingMatch entity)
+    private static PlayerDto? ToPlayerDto(Player? player, long? playerId, IEnumerable<ArmwrestlingEventParticipant>? participants)
+    {
+        if (playerId == null) return null;
+        var participant = participants?.FirstOrDefault(p => p.PlayerId == playerId);
+        if (participant != null)
+        {
+            return new PlayerDto
+            {
+                Id = participant.PlayerId,
+                FirstName = participant.PlayerFirstName ?? participant.Player?.FirstName ?? "Unknown",
+                LastName = participant.PlayerLastName ?? participant.Player?.LastName ?? "",
+                Group = participant.GroupName ?? participant.Player?.Group ?? "Unknown",
+                PhotoUrl = participant.Player?.PhotoUrl
+            };
+        }
+        return player?.ToDto();
+    }
+
+    public static ArmwrestlingMatchResponse ToResponse(this ArmwrestlingMatch entity, IEnumerable<ArmwrestlingEventParticipant>? participants = null)
     {
         return new ArmwrestlingMatchResponse
         {
             Id = entity.Id,
             EventId = entity.EventId,
             Player1Id = entity.Player1Id,
-            Player1 = entity.Player1?.ToDto(),
+            Player1 = ToPlayerDto(entity.Player1, entity.Player1Id, participants),
             Player2Id = entity.Player2Id,
-            Player2 = entity.Player2?.ToDto(),
+            Player2 = ToPlayerDto(entity.Player2, entity.Player2Id, participants),
             WinnerId = entity.WinnerId,
             Stage = entity.Stage
         };

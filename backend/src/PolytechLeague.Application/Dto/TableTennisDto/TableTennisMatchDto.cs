@@ -1,3 +1,4 @@
+using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Entities.TableTennis;
 using PolytechLeague.Application.Dto.GeneralDto;
 
@@ -71,16 +72,34 @@ public static class TableTennisMatchDtoExtensions
         };
     }
 
-    public static TableTennisMatchResponse ToResponse(this TableTennisMatch entity)
+    private static PlayerDto? ToPlayerDto(Player? player, long? playerId, IEnumerable<TableTennisEventParticipant>? participants)
+    {
+        if (playerId == null) return null;
+        var participant = participants?.FirstOrDefault(p => p.PlayerId == playerId);
+        if (participant != null)
+        {
+            return new PlayerDto
+            {
+                Id = participant.PlayerId,
+                FirstName = participant.PlayerFirstName ?? participant.Player?.FirstName ?? "Unknown",
+                LastName = participant.PlayerLastName ?? participant.Player?.LastName ?? "",
+                Group = participant.GroupName ?? participant.Player?.Group ?? "Unknown",
+                PhotoUrl = participant.Player?.PhotoUrl
+            };
+        }
+        return player?.ToDto();
+    }
+
+    public static TableTennisMatchResponse ToResponse(this TableTennisMatch entity, IEnumerable<TableTennisEventParticipant>? participants = null)
     {
         return new TableTennisMatchResponse
         {
             Id = entity.Id,
             TournamentId = entity.TournamentId,
             Player1Id = entity.Player1Id,
-            Player1 = entity.Player1?.ToDto(),
+            Player1 = ToPlayerDto(entity.Player1, entity.Player1Id, participants),
             Player2Id = entity.Player2Id,
-            Player2 = entity.Player2?.ToDto(),
+            Player2 = ToPlayerDto(entity.Player2, entity.Player2Id, participants),
             HomeTeamId = entity.HomeTeamId,
             HomeTeam = entity.HomeTeam?.ToResponse(),
             AwayTeamId = entity.AwayTeamId,

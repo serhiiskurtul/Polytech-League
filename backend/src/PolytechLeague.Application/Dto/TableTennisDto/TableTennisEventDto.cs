@@ -161,7 +161,7 @@ public static class TableTennisEventDtoExtensions
             FirstPlaceTeam = entity.FirstPlaceTeam?.ToResponse(),
             SecondPlaceTeam = entity.SecondPlaceTeam?.ToResponse(),
             ThirdPlaceTeam = entity.ThirdPlaceTeam?.ToResponse(),
-            Matches = entity.Matches?.Select(m => m.ToResponse()).ToList(),
+            Matches = entity.Matches?.Select(m => m.ToResponse(entity.Participants)).ToList(),
             ParticipantsCount = entity.Participants?.Count ?? 0,
             Participants = entity.Participants?.Select(p => p.ToDto()).ToList(),
             Teams = entity.Teams?.Select(t => t.ToResponse()).ToList(),

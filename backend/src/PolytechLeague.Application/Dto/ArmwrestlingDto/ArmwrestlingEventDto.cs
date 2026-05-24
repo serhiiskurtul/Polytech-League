@@ -164,7 +164,7 @@ public static class ArmwrestlingEventDtoExtensions
             Hand = entity.Hand,
             WeightClass = entity.WeightClass,
             Category = entity.Category,
-            Matches = entity.Matches?.Select(m => m.ToResponse()).ToList(),
+            Matches = entity.Matches?.Select(m => m.ToResponse(entity.Players)).ToList(),
             Rules = entity.Rules,
             Prizes = entity.Prizes,
             HeadRefereeName = entity.HeadRefereeName,

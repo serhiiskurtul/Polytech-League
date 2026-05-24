@@ -239,7 +239,7 @@ public static class BadmintonDtoExtensions
             SecondPlaceTeam = entity.SecondPlaceTeam?.ToDto(),
             ThirdPlaceTeam = entity.ThirdPlaceTeam?.ToDto(),
             Teams = entity.Teams?.Select(t => t.ToDto()).ToList(),
-            Matches = entity.Matches?.Select(m => m.ToResponse()).ToList(),
+            Matches = entity.Matches?.Select(m => m.ToResponse(entity.Participants)).ToList(),
             Participants = entity.Participants?.Select(p => p.ToDto()).ToList(),
             MvpId = entity.MvpId,
             MvpName = entity.Mvp != null ? $"{entity.Mvp.FirstName} {entity.Mvp.LastName}" : null,
@@ -247,6 +247,24 @@ public static class BadmintonDtoExtensions
             Category = entity.Category
 
         };
+    }
+
+    private static PlayerDto? ToPlayerDto(Player? player, long? playerId, IEnumerable<BadmintonEventParticipant>? participants)
+    {
+        if (playerId == null) return null;
+        var participant = participants?.FirstOrDefault(p => p.PlayerId == playerId);
+        if (participant != null)
+        {
+            return new PlayerDto
+            {
+                Id = participant.PlayerId,
+                FirstName = participant.PlayerFirstName ?? participant.Player?.FirstName ?? "Unknown",
+                LastName = participant.PlayerLastName ?? participant.Player?.LastName ?? "",
+                Group = participant.GroupName ?? participant.Player?.Group ?? "Unknown",
+                PhotoUrl = participant.Player?.PhotoUrl
+            };
+        }
+        return player?.ToDto();
     }
 
     public static BadmintonMatch FromRequest(this BadmintonMatchRequest request)
@@ -270,21 +288,21 @@ public static class BadmintonDtoExtensions
         };
     }
 
-    public static BadmintonMatchResponse ToResponse(this BadmintonMatch entity)
+    public static BadmintonMatchResponse ToResponse(this BadmintonMatch entity, IEnumerable<BadmintonEventParticipant>? participants = null)
     {
         return new BadmintonMatchResponse
         {
             Id = entity.Id,
             Player1Id = entity.Player1Id,
-            Player1 = entity.Player1?.ToDto(),
+            Player1 = ToPlayerDto(entity.Player1, entity.Player1Id, participants),
             Player2Id = entity.Player2Id,
-            Player2 = entity.Player2?.ToDto(),
+            Player2 = ToPlayerDto(entity.Player2, entity.Player2Id, participants),
             HomeTeamId = entity.HomeTeamId,
             AwayTeamId = entity.AwayTeamId,
             HomeScore = entity.HomeScore,
             AwayScore = entity.AwayScore,
             WinnerPlayerId = entity.WinnerPlayerId,
-            WinnerPlayer = entity.WinnerPlayer?.ToDto(),
+            WinnerPlayer = ToPlayerDto(entity.WinnerPlayer, entity.WinnerPlayerId, participants),
             WinnerTeamId = entity.WinnerTeamId,
             WinnerTeam = entity.WinnerTeam?.ToDto(),
             Stage = entity.Stage,

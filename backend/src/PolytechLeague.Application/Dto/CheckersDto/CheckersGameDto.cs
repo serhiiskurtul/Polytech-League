@@ -38,15 +38,31 @@ public static class CheckersGameDtoExtensions
 {
     public static CheckersGameDto ToDto(this CheckersGame game)
     {
+        string? whiteName = null;
+        if (game.WhitePlayer != null)
+        {
+            whiteName = (game.WhitePlayer.PlayerFirstName != null || game.WhitePlayer.PlayerLastName != null)
+                ? $"{game.WhitePlayer.PlayerFirstName} {game.WhitePlayer.PlayerLastName}".Trim()
+                : (game.WhitePlayer.Player != null ? $"{game.WhitePlayer.Player.FirstName} {game.WhitePlayer.Player.LastName}".Trim() : null);
+        }
+
+        string? blackName = null;
+        if (game.BlackPlayer != null)
+        {
+            blackName = (game.BlackPlayer.PlayerFirstName != null || game.BlackPlayer.PlayerLastName != null)
+                ? $"{game.BlackPlayer.PlayerFirstName} {game.BlackPlayer.PlayerLastName}".Trim()
+                : (game.BlackPlayer.Player != null ? $"{game.BlackPlayer.Player.FirstName} {game.BlackPlayer.Player.LastName}".Trim() : null);
+        }
+
         return new CheckersGameDto
         {
             Id = game.Id,
             TournamentId = game.TournamentId,
             WhitePlayerId = game.WhitePlayerId,
-            WhitePlayerName = game.WhitePlayer?.Player != null ? $"{game.WhitePlayer.Player.FirstName} {game.WhitePlayer.Player.LastName}" : null,
+            WhitePlayerName = whiteName,
             WhiteUserId = game.WhitePlayer?.Player?.UserId,
             BlackPlayerId = game.BlackPlayerId,
-            BlackPlayerName = game.BlackPlayer?.Player != null ? $"{game.BlackPlayer.Player.FirstName} {game.BlackPlayer.Player.LastName}" : null,
+            BlackPlayerName = blackName,
             BlackUserId = game.BlackPlayer?.Player?.UserId,
             WhiteTeamId = game.WhiteTeamId,
             WhiteTeam = game.WhiteTeam?.ToResponse(),

@@ -159,7 +159,7 @@ public static class ChessEventDtoExtension
             RegistrationEnd = chessEvent.RegistrationEnd,
             EndDate = chessEvent.EndDate,
             System = chessEvent.System,
-            Games = chessEvent.Games?.Select(g => g.ToDto()).ToList() ?? [],
+            Games = chessEvent.Games?.Select(g => g.ToDto(chessEvent.Players)).ToList() ?? [],
             Participants = chessEvent.Players?.Select(p => p.ToDto()).ToList() ?? [],
             Teams = chessEvent.Teams?.Select(t => t.ToResponse()).ToList(),
             Rules = chessEvent.Rules,

@@ -149,20 +149,33 @@ public static class AthleticsDtoExtensions
             SeasonId = entity.SeasonId,
             MvpId = entity.MvpId,
             MvpName = entity.Mvp != null ? $"{entity.Mvp.FirstName} {entity.Mvp.LastName}" : null,
-            Results = entity.Results?.Select(r => r.ToDto()).ToList() ?? [],
+            Results = entity.Results?.Select(r => r.ToDto(entity.Participants)).ToList() ?? [],
 
             Participants = entity.Participants?.Select(p => p.ToDto()).ToList() ?? []
         };
     }
 
-    public static AthleticsResultDto ToDto(this AthleticsResult result)
+    public static AthleticsResultDto ToDto(this AthleticsResult result, IEnumerable<AthleticsEventParticipant>? participants = null)
     {
+        var participant = participants?.FirstOrDefault(p => p.PlayerId == result.PlayerId);
+        string? name = null;
+        if (participant != null)
+        {
+            name = (participant.PlayerFirstName != null || participant.PlayerLastName != null)
+                ? $"{participant.PlayerFirstName} {participant.PlayerLastName}".Trim()
+                : (result.Player != null ? $"{result.Player.FirstName} {result.Player.LastName}".Trim() : null);
+        }
+        else if (result.Player != null)
+        {
+            name = $"{result.Player.FirstName} {result.Player.LastName}".Trim();
+        }
+
         return new AthleticsResultDto
         {
             Id = result.Id,
             DisciplineName = result.DisciplineName,
             PlayerId = result.PlayerId,
-            PlayerName = result.Player != null ? $"{result.Player.FirstName} {result.Player.LastName}" : null,
+            PlayerName = name,
             TeamName = result.TeamName,
             Score = result.Score,
             Rank = result.Rank
