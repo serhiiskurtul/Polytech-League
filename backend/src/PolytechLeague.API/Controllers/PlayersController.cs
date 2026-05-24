@@ -58,6 +58,11 @@ public class PlayersController : ControllerBase
         }
 
         await _redisService.SetDataAsync(cacheKey, player, TimeSpan.FromMinutes(30), "player_profiles_group");
+        if (player.Id.HasValue)
+        {
+            var playerCacheKey = $"player_profile_id_{player.Id.Value}";
+            await _redisService.SetDataAsync(playerCacheKey, player, TimeSpan.FromMinutes(30), "player_profiles_group");
+        }
         return Ok(player);
     }
 
@@ -95,6 +100,15 @@ public class PlayersController : ControllerBase
         var cacheKey = $"player_profile_{userId}";
         await _redisService.RemoveDataAsync(cacheKey);
 
+        if (player != null && player.Id.HasValue)
+        {
+            var playerCacheKey = $"player_profile_id_{player.Id.Value}";
+            await _redisService.RemoveDataAsync(playerCacheKey);
+        }
+
+        var userCacheKey = $"user_account_{userId}";
+        await _redisService.RemoveDataAsync(userCacheKey);
+
         return Ok(new { photoUrl });
     }
 
@@ -115,6 +129,15 @@ public class PlayersController : ControllerBase
         var cacheKey = $"player_profile_{userId}";
         await _redisService.SetDataAsync(cacheKey, updated, TimeSpan.FromMinutes(30), "player_profiles_group");
 
+        if (updated != null && updated.Id.HasValue)
+        {
+            var playerCacheKey = $"player_profile_id_{updated.Id.Value}";
+            await _redisService.SetDataAsync(playerCacheKey, updated, TimeSpan.FromMinutes(30), "player_profiles_group");
+        }
+
+        var userCacheKey = $"user_account_{userId}";
+        await _redisService.RemoveDataAsync(userCacheKey);
+
         return Ok(updated);
     }
 
@@ -129,8 +152,20 @@ public class PlayersController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<PlayerDto>> GetById(long id, CancellationToken cancellationToken)
     {
+        var cacheKey = $"player_profile_id_{id}";
+        var cached = await _redisService.GetDataAsync<PlayerDto>(cacheKey);
+        if (cached != null) return Ok(cached);
+
         var player = await _playerService.GetByIdAsync(id, cancellationToken);
         if (player == null) return NotFound();
+
+        await _redisService.SetDataAsync(cacheKey, player, TimeSpan.FromMinutes(30), "player_profiles_group");
+        if (player.UserId.HasValue)
+        {
+            var userCacheKey = $"player_profile_{player.UserId.Value}";
+            await _redisService.SetDataAsync(userCacheKey, player, TimeSpan.FromMinutes(30), "player_profiles_group");
+        }
+
         return Ok(player);
     }
 
@@ -147,10 +182,19 @@ public class PlayersController : ControllerBase
     public async Task<IActionResult> Update(long id, PlayerDto dto, CancellationToken cancellationToken)
     {
         var player = await _playerService.GetByIdAsync(id, cancellationToken);
-        if (player != null && player.UserId.HasValue)
+        if (player != null)
         {
-            var cacheKey = $"player_profile_{player.UserId.Value}";
-            await _redisService.RemoveDataAsync(cacheKey);
+            var playerCacheKey = $"player_profile_id_{id}";
+            await _redisService.RemoveDataAsync(playerCacheKey);
+
+            if (player.UserId.HasValue)
+            {
+                var cacheKey = $"player_profile_{player.UserId.Value}";
+                await _redisService.RemoveDataAsync(cacheKey);
+
+                var userCacheKey = $"user_account_{player.UserId.Value}";
+                await _redisService.RemoveDataAsync(userCacheKey);
+            }
         }
 
         await _playerService.UpdateAsync(id, dto, cancellationToken);
@@ -162,10 +206,19 @@ public class PlayersController : ControllerBase
     public async Task<IActionResult> Delete(long id, CancellationToken cancellationToken)
     {
         var player = await _playerService.GetByIdAsync(id, cancellationToken);
-        if (player != null && player.UserId.HasValue)
+        if (player != null)
         {
-            var cacheKey = $"player_profile_{player.UserId.Value}";
-            await _redisService.RemoveDataAsync(cacheKey);
+            var playerCacheKey = $"player_profile_id_{id}";
+            await _redisService.RemoveDataAsync(playerCacheKey);
+
+            if (player.UserId.HasValue)
+            {
+                var cacheKey = $"player_profile_{player.UserId.Value}";
+                await _redisService.RemoveDataAsync(cacheKey);
+
+                var userCacheKey = $"user_account_{player.UserId.Value}";
+                await _redisService.RemoveDataAsync(userCacheKey);
+            }
         }
 
         await _playerService.DeleteAsync(id, cancellationToken);
@@ -227,6 +280,32 @@ public class PlayersController : ControllerBase
         {
             var cacheKey = $"player_profile_{req.UserId}";
             await _redisService.RemoveDataAsync(cacheKey);
+
+            var userCacheKey = $"user_account_{req.UserId}";
+            await _redisService.RemoveDataAsync(userCacheKey);
+
+            var targetPlayer = await _playerService.GetByIdAsync(req.TargetPlayerId, cancellationToken);
+            if (targetPlayer != null)
+            {
+                var targetPlayerCacheKey = $"player_profile_id_{req.TargetPlayerId}";
+                await _redisService.RemoveDataAsync(targetPlayerCacheKey);
+
+                if (targetPlayer.UserId.HasValue)
+                {
+                    var targetUserCacheKey = $"player_profile_{targetPlayer.UserId.Value}";
+                    await _redisService.RemoveDataAsync(targetUserCacheKey);
+
+                    var targetUserAccountCacheKey = $"user_account_{targetPlayer.UserId.Value}";
+                    await _redisService.RemoveDataAsync(targetUserAccountCacheKey);
+                }
+            }
+
+            var requestingPlayer = await _playerService.GetByUserIdAsync(req.UserId, cancellationToken);
+            if (requestingPlayer != null && requestingPlayer.Id.HasValue)
+            {
+                var requestingPlayerCacheKey = $"player_profile_id_{requestingPlayer.Id.Value}";
+                await _redisService.RemoveDataAsync(requestingPlayerCacheKey);
+            }
         }
 
         await _playerService.ApproveMergeRequestAsync(id, cancellationToken);

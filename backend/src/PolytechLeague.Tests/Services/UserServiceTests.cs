@@ -8,6 +8,8 @@ using PolytechLeague.Domain.Entities;
 using PolytechLeague.Domain.Exceptions;
 using System.Security.Authentication;
 using PolytechLeague.Persistence.Database;
+using PolytechLeague.Application.Dto.GeneralDto;
+using System.Text.Json;
 
 namespace PolytechLeague.Tests.Services
 {
@@ -29,6 +31,49 @@ namespace PolytechLeague.Tests.Services
             _mockPasswordEncoder = new Mock<IPasswordEncoder>();
 
             _service = new UserService(_dbContext, _mockPasswordEncoder.Object, mockLogger.Object);
+        }
+
+        [Fact]
+        public void PlayerDtoSerialization_ShouldWork()
+        {
+            var dto = new PlayerDto
+            {
+                Id = 1,
+                UserId = 2,
+                FirstName = "Test",
+                LastName = "Player",
+                Gender = PolytechLeague.Domain.Entities.Enums.Gender.Male,
+                Group = "TestGroup",
+                EnrollmentYear = 2023,
+                SpecialtyCode = 121,
+                GroupNumber = 1,
+                StudentId = "12345",
+                City = "Chernivtsi",
+                PhotoUrl = "photo.jpg",
+                StudyYears = "2023-2027",
+                Bio = "Bio",
+                InstagramUrl = "insta",
+                PreviousNames = "",
+                IsFounder = false,
+                AutomaticBadges = new List<AutomaticBadgeDto>
+                {
+                    new AutomaticBadgeDto { Type = "TopScorer", Label = "Top Scorer" }
+                },
+                HasPendingMergeRequest = false,
+                SportStats = new List<SportStatsDto>
+                {
+                    new SportStatsDto { SportType = "chess", PerformanceScore = 100 }
+                }
+            };
+
+            var json = JsonSerializer.Serialize(dto);
+            var deserialized = JsonSerializer.Deserialize<PlayerDto>(json);
+
+            Assert.NotNull(deserialized);
+            Assert.Equal(dto.FirstName, deserialized.FirstName);
+            Assert.Equal(dto.LastName, deserialized.LastName);
+            Assert.Equal(dto.AutomaticBadges.Count, deserialized.AutomaticBadges.Count);
+            Assert.Equal(dto.AutomaticBadges[0].Type, deserialized.AutomaticBadges[0].Type);
         }
 
         [Fact]

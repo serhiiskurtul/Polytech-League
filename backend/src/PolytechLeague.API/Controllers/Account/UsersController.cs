@@ -5,12 +5,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using PolytechLeague.Application.Extensions;
+using PolytechLeague.Infrastructure.Redis;
 
 namespace PolytechLeague.API.Controllers.Account;
 
 [ApiController]
 [Route("api/users")]
-public class UsersController(IUserService userService, IPlayerService playerService) : Controller
+public class UsersController(IUserService userService, IPlayerService playerService, IRedisService redisService) : Controller
 {
     [Authorize(Policy = "Admin")]
     [HttpGet]
@@ -56,11 +57,18 @@ public class UsersController(IUserService userService, IPlayerService playerServ
             return Ok(null);
 
         var userId = User.GetUserId();
+        var cacheKey = $"user_account_{userId}";
+
+        var cached = await redisService.GetDataAsync<UserResponse>(cacheKey);
+        if (cached != null) return Ok(cached);
+
         var user = await userService.GetByIdAsync(userId, cancellationToken);
         var response = user.ToResponse();
 
         // Get photo from player profile if exists (lightweight check)
         response.PhotoUrl = await playerService.GetPhotoUrlByUserIdAsync(userId, cancellationToken);
+
+        await redisService.SetDataAsync(cacheKey, response, TimeSpan.FromMinutes(30), "user_accounts_group");
 
         return Ok(response);
     }
@@ -83,6 +91,10 @@ public class UsersController(IUserService userService, IPlayerService playerServ
     {
         var user = userRequest.FromRequest();
         await userService.UpdateAsync(id, user, cancellationToken);
+
+        var cacheKey = $"user_account_{id}";
+        await redisService.RemoveDataAsync(cacheKey);
+
         return NoContent();
     }
 
@@ -92,6 +104,10 @@ public class UsersController(IUserService userService, IPlayerService playerServ
         [FromRoute] long id, CancellationToken cancellationToken)
     {
         await userService.SoftDeleteAsync(id, cancellationToken);
+
+        var cacheKey = $"user_account_{id}";
+        await redisService.RemoveDataAsync(cacheKey);
+
         return NoContent();
     }
 
@@ -101,6 +117,10 @@ public class UsersController(IUserService userService, IPlayerService playerServ
         [FromRoute] long id, CancellationToken cancellationToken)
     {
         await userService.DeleteAsync(id, cancellationToken);
+
+        var cacheKey = $"user_account_{id}";
+        await redisService.RemoveDataAsync(cacheKey);
+
         return NoContent();
     }
 
@@ -110,6 +130,10 @@ public class UsersController(IUserService userService, IPlayerService playerServ
         [FromRoute] long id, CancellationToken cancellationToken)
     {
         await userService.BlockAsync(id, cancellationToken);
+
+        var cacheKey = $"user_account_{id}";
+        await redisService.RemoveDataAsync(cacheKey);
+
         return NoContent();
     }
 
@@ -119,6 +143,10 @@ public class UsersController(IUserService userService, IPlayerService playerServ
         [FromRoute] long id, CancellationToken cancellationToken)
     {
         await userService.UnblockAsync(id, cancellationToken);
+
+        var cacheKey = $"user_account_{id}";
+        await redisService.RemoveDataAsync(cacheKey);
+
         return NoContent();
     }
 }
