@@ -177,4 +177,30 @@ public class UserService : AbstractEntityService<User>, IUserService
         oldEntity.PhotoUrl = newEntity.PhotoUrl;
         oldEntity.IsBlocked = newEntity.IsBlocked;
     }
+
+    protected override async Task OnUpdatedAsync(User oldEntity, User newEntity, CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Syncing updated name/photo from user {UserId} to persons", oldEntity.Id);
+
+        var persons = await _dbcontext.Set<Person>()
+            .Where(p => p.UserId == oldEntity.Id)
+            .ToListAsync(cancellationToken);
+
+        if (persons.Any())
+        {
+            foreach (var person in persons)
+            {
+                person.FirstName = oldEntity.FirstName;
+                person.LastName = oldEntity.LastName;
+                if (!string.IsNullOrEmpty(oldEntity.PhotoUrl))
+                {
+                    person.PhotoUrl = oldEntity.PhotoUrl;
+                }
+            }
+
+            _dbcontext.Set<Person>().UpdateRange(persons);
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation("Successfully synced user {UserId} changes to {Count} persons", oldEntity.Id, persons.Count);
+        }
+    }
 }
