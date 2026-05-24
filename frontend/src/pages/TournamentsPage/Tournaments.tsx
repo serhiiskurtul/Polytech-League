@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthContext';
 import TournamentCard from './TournamentCard';
 import TournamentFilters from './TournamentFilters';
@@ -19,6 +19,7 @@ interface TournamentUI extends Tournament {
 }
 
 const Tournaments = () => {
+  const location = useLocation();
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -136,10 +137,21 @@ const Tournaments = () => {
 
   useEffect(() => {
     fetchTournamentsData(pagination.page);
-    if (containerRef.current) {
-      containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
   }, [pagination.page, activeStatus, activeSport, activeLevel]);
+
+  const prevPageRef = useRef(pagination.page);
+  useEffect(() => {
+    if (prevPageRef.current !== pagination.page) {
+      if (containerRef.current) {
+        containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      prevPageRef.current = pagination.page;
+    }
+  }, [pagination.page]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [location.pathname, location.search]);
 
 
   const handleResetFilters = () => {
