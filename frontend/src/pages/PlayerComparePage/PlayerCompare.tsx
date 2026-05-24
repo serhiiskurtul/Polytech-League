@@ -175,7 +175,7 @@ export const PlayerComparePage = () => {
     return Math.round((wins / matches) * 100);
   };
 
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://polytech-league-production.up.railway.app';
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://polytech-league-api-lbnoc.ondigitalocean.app';
 
   if (loading) {
     return (

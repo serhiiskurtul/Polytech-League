@@ -417,3 +417,8 @@ docker/.env
 backend/src/PolytechLeague.API/appsettings.Development.json
 frontend/.env.development
 /backend/src/PolytechLeague.Tests/coveragereport
+
+# Local environment variables and secrets
+.env
+*.env
+.env.*

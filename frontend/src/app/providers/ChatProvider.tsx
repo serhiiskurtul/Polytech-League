@@ -94,7 +94,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return;
         }
 
-        const baseUrl = (import.meta.env.VITE_API_URL || 'https://polytech-league-production.up.railway.app/api').replace('/api', '');
+        const baseUrl = (import.meta.env.VITE_API_URL || 'https://polytech-league-api-lbnoc.ondigitalocean.app/api').replace('/api', '');
         const newConnection = new HubConnectionBuilder()
             .withUrl(`${baseUrl}/hubs/chat`, {
                 accessTokenFactory: () => localStorage.getItem('token') || ''

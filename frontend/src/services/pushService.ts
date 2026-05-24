@@ -59,7 +59,7 @@ export async function subscribeUserToPush() {
 
 async function sendSubscriptionToBackend(subscription: PushSubscription) {
   // Use VITE_API_BASE_URL or fallback to production URL
-  const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://polytech-league-production.up.railway.app';
+  const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://polytech-league-api-lbnoc.ondigitalocean.app';
   // Ensure we use HTTPS for production to avoid Mixed Content issues
   const secureApiUrl = apiUrl.replace('http://', 'https://');
   const url = `${secureApiUrl.endsWith('/') ? secureApiUrl.slice(0, -1) : secureApiUrl}/api/notifications/subscribe`;
