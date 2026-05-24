@@ -2,7 +2,8 @@ import { Link } from "react-router-dom";
 import styles from './Header.module.css';
 import { Logo } from "@/shared/ui";
 import { useAuth } from "@/app/providers/AuthContext";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+
 import { useNotifications } from "@/app/providers/NotificationProvider";
 import { useChat } from "@/app/providers/ChatProvider";
 import { getPhotoUrl } from "@/shared/utils/photo.utils";
@@ -32,7 +33,33 @@ export default function Header() {
     document.body.style.overflow = 'unset';
   };
 
+  const menuRef = useRef<HTMLElement>(null);
+  const burgerRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        burgerRef.current &&
+        !burgerRef.current.contains(event.target as Node)
+      ) {
+        closeMenu();
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("touchstart", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+    };
+  }, [isMenuOpen]);
+
   return (
+
     <header className={`${styles.header} ${isMenuOpen ? styles.menuOpen : ''}`}>
       <div className={styles.container}>
         <div className={styles.logoContainer}>
@@ -42,7 +69,7 @@ export default function Header() {
           </Link>
         </div>
 
-        <nav className={`${styles.navPrimary} ${isMenuOpen ? styles.navActive : ''}`}>
+        <nav ref={menuRef} className={`${styles.navPrimary} ${isMenuOpen ? styles.navActive : ''}`}>
           <ul className={styles.navList}>
             <li>
               <Link to="/calendar" className={styles.navLink} onClick={closeMenu}>
@@ -163,6 +190,7 @@ export default function Header() {
           )}
 
           <button 
+            ref={burgerRef}
             className={`${styles.burgerBtn} ${isMenuOpen ? styles.burgerActive : ''}`} 
             onClick={toggleMenu}
             aria-label="Toggle menu"
