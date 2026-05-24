@@ -26,28 +26,7 @@ public class PlayerService : IPlayerService
     private readonly ILogger<PlayerService> _logger;
     private readonly INotificationService _notificationService;
 
-    private static readonly Dictionary<long, (DateTime ExpiredAt, IEnumerable<PlayerDto> Data)> _rankingsCache = new();
-    private static readonly object _cacheLock = new object();
-    private static readonly System.Threading.SemaphoreSlim _cacheSemaphore = new(1, 1);
-    private static readonly TimeSpan _cacheDuration = TimeSpan.FromMinutes(10);
 
-    static PlayerService()
-    {
-        ApplicationDbContext.OnChangesSaved += ClearRankingsCache;
-    }
-
-    public static void ClearRankingsCache()
-    {
-        lock (_cacheLock)
-        {
-            _rankingsCache.Clear();
-        }
-    }
-
-    void IPlayerService.ClearRankingsCache()
-    {
-        ClearRankingsCache();
-    }
 
 
     public PlayerService(ApplicationDbContext dbContext, ILogger<PlayerService> logger, INotificationService notificationService)
@@ -287,39 +266,7 @@ public class PlayerService : IPlayerService
 
     public async Task<IEnumerable<PlayerDto>> GetAllWithRankingsAsync(long? seasonId = null, CancellationToken cancellationToken = default)
     {
-        long cacheKey = seasonId ?? 0;
-        lock (_cacheLock)
-        {
-            if (_rankingsCache.TryGetValue(cacheKey, out var entry) && entry.ExpiredAt > DateTime.Now)
-            {
-                return entry.Data;
-            }
-        }
-
-        await _cacheSemaphore.WaitAsync(cancellationToken);
-        try
-        {
-            lock (_cacheLock)
-            {
-                if (_rankingsCache.TryGetValue(cacheKey, out var entry) && entry.ExpiredAt > DateTime.Now)
-                {
-                    return entry.Data;
-                }
-            }
-
-            var data = await GetAllWithRankingsInternalAsync(seasonId, cancellationToken);
-
-            lock (_cacheLock)
-            {
-                _rankingsCache[cacheKey] = (DateTime.Now.Add(_cacheDuration), data);
-            }
-
-            return data;
-        }
-        finally
-        {
-            _cacheSemaphore.Release();
-        }
+        return await GetAllWithRankingsInternalAsync(seasonId, cancellationToken);
     }
 
     private async Task<IEnumerable<PlayerDto>> GetAllWithRankingsInternalAsync(long? seasonId = null, CancellationToken cancellationToken = default)
