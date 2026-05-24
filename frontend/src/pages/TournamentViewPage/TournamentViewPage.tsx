@@ -145,6 +145,7 @@ const TournamentViewPage = () => {
   const [currentUserPlayer, setCurrentUserPlayer] = useState<PlayerDto | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
+  const [isMainPhotoLightboxOpen, setIsMainPhotoLightboxOpen] = useState(false);
   const [seasons, setSeasons] = useState<any[]>([]);
   
   const [userMedia, setUserMedia] = useState<any[]>([]);
@@ -1942,7 +1943,16 @@ const TournamentViewPage = () => {
                 )}
               </div>
             </div>
-            <div className={styles.tournamentImage}>
+            <div 
+              className={styles.tournamentImage}
+              onClick={() => {
+                if (details?.mainPhotoUrl || (details?.photos && details.photos.length > 0)) {
+                  setIsMainPhotoLightboxOpen(true);
+                }
+              }}
+              style={{ cursor: (details?.mainPhotoUrl || (details?.photos && details.photos.length > 0)) ? 'pointer' : 'default' }}
+              title={(details?.mainPhotoUrl || (details?.photos && details.photos.length > 0)) ? "Натисніть, щоб збільшити" : ""}
+            >
               {details?.mainPhotoUrl ? (
                 <img src={getImageUrl(details.mainPhotoUrl)} alt={tournament?.title} />
               ) : details?.photos && details.photos.length > 0 ? (
@@ -1958,6 +1968,12 @@ const TournamentViewPage = () => {
                               tournament?.sport === 'table_tennis' || tournament?.sport === 'table-tennis' || tournament?.sport === 'tabletennis' ? "fas fa-table-tennis" :
                                 "fas fa-chess-queen"
                 }></i>
+              )}
+
+              {(details?.mainPhotoUrl || (details?.photos && details.photos.length > 0)) && (
+                <div className={styles.zoomIndicator}>
+                  <i className="fas fa-search-plus"></i>
+                </div>
               )}
             </div>
           </div>
@@ -3395,6 +3411,22 @@ const TournamentViewPage = () => {
                   <p>Немає медіафайлів, що потребують модерації.</p>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Main Photo Lightbox */}
+          {isMainPhotoLightboxOpen && (details?.mainPhotoUrl || (details?.photos && details.photos.length > 0)) && (
+            <div className={styles.lightboxOverlay} onClick={() => setIsMainPhotoLightboxOpen(false)}>
+              <div className={styles.lightboxContent} onClick={(e) => e.stopPropagation()}>
+                <button className={styles.lightboxClose} onClick={() => setIsMainPhotoLightboxOpen(false)}>
+                  <i className="fas fa-times"></i>
+                </button>
+                <img
+                  src={getImageUrl(details?.mainPhotoUrl || details?.photos[0].url)}
+                  alt="Tournament Main Photo Fullscreen"
+                  className={styles.lightboxImage}
+                />
+              </div>
             </div>
           )}
 

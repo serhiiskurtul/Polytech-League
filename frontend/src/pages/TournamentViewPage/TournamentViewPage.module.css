@@ -164,12 +164,38 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .tournamentImage img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.zoomIndicator {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(15, 23, 42, 0.75);
+  color: white;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  opacity: 0.8;
+  backdrop-filter: blur(4px);
+  z-index: 5;
+}
+
+.tournamentImage:hover .zoomIndicator {
+  opacity: 1;
+  transform: scale(1.1);
+  background: var(--primary);
 }
 
 .tournamentImage i {
@@ -180,7 +206,9 @@
 @media (max-width: 768px) {
   .tournamentImage {
       width: 100%;
-      height: 200px;
+      height: auto;
+      aspect-ratio: 16 / 9;
+      max-height: 280px;
   }
 }
 
@@ -524,7 +552,9 @@
 
   .tournamentImage {
       width: 100%;
-      height: 180px;
+      height: auto;
+      aspect-ratio: 16 / 9;
+      max-height: 240px;
   }
   
   .infoCard {
