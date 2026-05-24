@@ -1139,10 +1139,16 @@ const TournamentViewPage = () => {
     if (!id) return;
     if (!quiet) setIsLoading(true);
     try {
+      let profilePromise = Promise.resolve<any>(null);
       if (user && !currentUserPlayer) {
-        getProfile().then(setCurrentUserPlayer).catch(() => { });
+        profilePromise = getProfile().catch(() => null);
       }
       const data = await getTournamentById(id);
+      
+      const profileData = await profilePromise;
+      if (profileData) {
+        setCurrentUserPlayer(profileData);
+      }
       setTournament(data);
 
       const sportKey = data.sport.toLowerCase().replace(/-/g, '_').replace(/\s/g, '');
