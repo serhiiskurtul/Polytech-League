@@ -2163,7 +2163,7 @@ const TournamentViewPage = () => {
                     </div>
                   )}
                   {(details as any)?.referees && (
-                    <div style={{ color: '#4b5563', fontSize: '0.95rem', whiteSpace: 'pre-line', padding: '8px 12px', background: '#fff', borderRadius: '10px', border: '1px solid #e5e7eb' }}>
+                    <div style={{ color: '#4b5563', fontSize: '0.95rem', whiteSpace: 'pre-line', padding: '4px 0' }}>
                       {(details as any).referees}
                     </div>
                   )}
