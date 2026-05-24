@@ -57,11 +57,11 @@ public class PlayersController : ControllerBase
             await _playerService.UpdateAsync(player.Id ?? 0, player, cancellationToken);
         }
 
-        await _redisService.SetDataAsync(cacheKey, player, TimeSpan.FromMinutes(30), "player_profiles_group");
+        await _redisService.SetDataAsync(cacheKey, player, TimeSpan.FromHours(24), "player_profiles_group");
         if (player.Id.HasValue)
         {
             var playerCacheKey = $"player_profile_id_{player.Id.Value}";
-            await _redisService.SetDataAsync(playerCacheKey, player, TimeSpan.FromMinutes(30), "player_profiles_group");
+            await _redisService.SetDataAsync(playerCacheKey, player, TimeSpan.FromHours(24), "player_profiles_group");
         }
         return Ok(player);
     }
@@ -127,12 +127,12 @@ public class PlayersController : ControllerBase
         var updated = await _playerService.GetByUserIdAsync(userId, cancellationToken);
         
         var cacheKey = $"player_profile_{userId}";
-        await _redisService.SetDataAsync(cacheKey, updated, TimeSpan.FromMinutes(30), "player_profiles_group");
+        await _redisService.SetDataAsync(cacheKey, updated, TimeSpan.FromHours(24), "player_profiles_group");
 
         if (updated != null && updated.Id.HasValue)
         {
             var playerCacheKey = $"player_profile_id_{updated.Id.Value}";
-            await _redisService.SetDataAsync(playerCacheKey, updated, TimeSpan.FromMinutes(30), "player_profiles_group");
+            await _redisService.SetDataAsync(playerCacheKey, updated, TimeSpan.FromHours(24), "player_profiles_group");
         }
 
         var userCacheKey = $"user_account_{userId}";
@@ -159,11 +159,11 @@ public class PlayersController : ControllerBase
         var player = await _playerService.GetByIdAsync(id, cancellationToken);
         if (player == null) return NotFound();
 
-        await _redisService.SetDataAsync(cacheKey, player, TimeSpan.FromMinutes(30), "player_profiles_group");
+        await _redisService.SetDataAsync(cacheKey, player, TimeSpan.FromHours(24), "player_profiles_group");
         if (player.UserId.HasValue)
         {
             var userCacheKey = $"player_profile_{player.UserId.Value}";
-            await _redisService.SetDataAsync(userCacheKey, player, TimeSpan.FromMinutes(30), "player_profiles_group");
+            await _redisService.SetDataAsync(userCacheKey, player, TimeSpan.FromHours(24), "player_profiles_group");
         }
 
         return Ok(player);

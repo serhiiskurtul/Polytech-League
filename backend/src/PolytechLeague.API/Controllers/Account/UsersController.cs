@@ -68,7 +68,7 @@ public class UsersController(IUserService userService, IPlayerService playerServ
         // Get photo from player profile if exists (lightweight check)
         response.PhotoUrl = await playerService.GetPhotoUrlByUserIdAsync(userId, cancellationToken);
 
-        await redisService.SetDataAsync(cacheKey, response, TimeSpan.FromMinutes(30), "user_accounts_group");
+        await redisService.SetDataAsync(cacheKey, response, TimeSpan.FromHours(24), "user_accounts_group");
 
         return Ok(response);
     }
