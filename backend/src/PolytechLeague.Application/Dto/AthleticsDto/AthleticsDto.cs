@@ -174,7 +174,7 @@ public static class AthleticsDtoExtensions
         return new AthleticsEventParticipantDto
         {
             PlayerId = participant.PlayerId,
-            PlayerName = participant.PlayerFirstName != null ? $"{participant.PlayerFirstName} {participant.PlayerLastName}" : (participant.Player != null ? $"{participant.Player.FirstName} {participant.Player.LastName}" : "Unknown"),
+            PlayerName = participant.Player != null ? $"{participant.Player.FirstName} {participant.Player.LastName}" : (participant.PlayerFirstName != null ? $"{participant.PlayerFirstName} {participant.PlayerLastName}" : "Unknown"),
             GroupName = participant.GroupName ?? participant.Player?.Group
         };
     }
