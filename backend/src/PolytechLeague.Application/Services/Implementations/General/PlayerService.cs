@@ -28,6 +28,7 @@ public class PlayerService : IPlayerService
 
     private static readonly Dictionary<long, (DateTime ExpiredAt, IEnumerable<PlayerDto> Data)> _rankingsCache = new();
     private static readonly object _cacheLock = new object();
+    private static readonly System.Threading.SemaphoreSlim _cacheSemaphore = new(1, 1);
     private static readonly TimeSpan _cacheDuration = TimeSpan.FromMinutes(10);
 
     static PlayerService()
@@ -295,14 +296,30 @@ public class PlayerService : IPlayerService
             }
         }
 
-        var data = await GetAllWithRankingsInternalAsync(seasonId, cancellationToken);
-
-        lock (_cacheLock)
+        await _cacheSemaphore.WaitAsync(cancellationToken);
+        try
         {
-            _rankingsCache[cacheKey] = (DateTime.Now.Add(_cacheDuration), data);
-        }
+            lock (_cacheLock)
+            {
+                if (_rankingsCache.TryGetValue(cacheKey, out var entry) && entry.ExpiredAt > DateTime.Now)
+                {
+                    return entry.Data;
+                }
+            }
 
-        return data;
+            var data = await GetAllWithRankingsInternalAsync(seasonId, cancellationToken);
+
+            lock (_cacheLock)
+            {
+                _rankingsCache[cacheKey] = (DateTime.Now.Add(_cacheDuration), data);
+            }
+
+            return data;
+        }
+        finally
+        {
+            _cacheSemaphore.Release();
+        }
     }
 
     private async Task<IEnumerable<PlayerDto>> GetAllWithRankingsInternalAsync(long? seasonId = null, CancellationToken cancellationToken = default)

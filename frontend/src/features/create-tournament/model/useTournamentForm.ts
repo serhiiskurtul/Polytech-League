@@ -87,7 +87,7 @@ export const useTournamentForm = () => {
     // Шахові / шашкові специфічні поля
     date: '',
     timeControl: '10+5',
-    system: '',
+    system: 'Swiss',
     variant: 'International', // Для шашок
     participantsCount: 32,
     refereeIds: [],
