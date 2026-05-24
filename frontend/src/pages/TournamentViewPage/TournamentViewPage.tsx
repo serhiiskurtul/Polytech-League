@@ -2438,13 +2438,13 @@ const TournamentViewPage = () => {
                                             />
                                           </div>
                                         ) : (
-                                          p.userId ? (
-                                            <Link to={`/profile/${p.userId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
-                                              {p.playerName}
-                                            </Link>
-                                          ) : (
-                                            <span style={{ fontWeight: 'bold' }}>{p.playerName}</span>
-                                          )
+                                          (p.playerId && !p.isGuest) ? (
+                                             <Link to={`/players/${p.playerId}`} style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 'bold' }}>
+                                               {p.playerName}
+                                             </Link>
+                                           ) : (
+                                             <span style={{ fontWeight: 'bold' }}>{p.playerName}</span>
+                                           )
                                         )}
                                       </td>
                                       <td>
@@ -2748,22 +2748,22 @@ const TournamentViewPage = () => {
                                         <td>{(game as any).round || (game as any).roundNumber}</td>
                                         {tournament?.sport !== 'checkers' && <td>{(game as any).board || idx + 1}</td>}
                                         <td>
-                                          {game.whiteUserId ? (
-                                            <Link to={`/profile/${game.whiteUserId}`} style={{ color: '#3b82f6', textDecoration: 'none' }}>
-                                              {game.whitePlayerName}
-                                            </Link>
-                                          ) : (
-                                            game.whitePlayerName || '—'
-                                          )}
+                                          {game.whitePlayerId ? (
+                                             <Link to={`/players/${game.whitePlayerId}`} style={{ color: '#3b82f6', textDecoration: 'none' }}>
+                                               {game.whitePlayerName}
+                                             </Link>
+                                           ) : (
+                                             game.whitePlayerName || '—'
+                                           )}
                                         </td>
                                         <td>
-                                          {game.blackUserId ? (
-                                            <Link to={`/profile/${game.blackUserId}`} style={{ color: '#3b82f6', textDecoration: 'none' }}>
-                                              {game.blackPlayerName}
-                                            </Link>
-                                          ) : (
-                                            game.blackPlayerName || '—'
-                                          )}
+                                          {game.blackPlayerId ? (
+                                             <Link to={`/players/${game.blackPlayerId}`} style={{ color: '#3b82f6', textDecoration: 'none' }}>
+                                               {game.blackPlayerName}
+                                             </Link>
+                                           ) : (
+                                             game.blackPlayerName || '—'
+                                           )}
                                         </td>
                                         <td>
                                           {game.result === 'WhiteWin' ? (
