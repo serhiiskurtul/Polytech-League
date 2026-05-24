@@ -27,8 +27,8 @@ public static class CheckersEventParticipantDtoExtensions
 {
     public static CheckersEventParticipantDto ToDto(this CheckersEventParticipant participant)
     {
-        string? firstName = participant.Player?.FirstName ?? participant.PlayerFirstName;
-        string? lastName = participant.Player?.LastName ?? participant.PlayerLastName;
+        string? firstName = participant.PlayerFirstName ?? participant.Player?.FirstName;
+        string? lastName = participant.PlayerLastName ?? participant.Player?.LastName;
         string? fullName = (firstName != null || lastName != null) 
             ? $"{firstName} {lastName}".Trim() 
             : null;

@@ -32,8 +32,8 @@ public static class ChessEventParticipantDtoExtensions
 {
     public static ChessEventParticipantDto ToDto(this ChessEventParticipant participant)
     {
-        string? firstName = participant.Player?.FirstName ?? participant.PlayerFirstName;
-        string? lastName = participant.Player?.LastName ?? participant.PlayerLastName;
+        string? firstName = participant.PlayerFirstName ?? participant.Player?.FirstName;
+        string? lastName = participant.PlayerLastName ?? participant.Player?.LastName;
         string? fullName = (firstName != null || lastName != null) 
             ? $"{firstName} {lastName}".Trim() 
             : null;
