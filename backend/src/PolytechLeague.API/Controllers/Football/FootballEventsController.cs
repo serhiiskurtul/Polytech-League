@@ -42,6 +42,7 @@ public class FootballEventsController(
         await FootballEventService.CreateAsync(entity, cancellationToken);
 
         await redisService.RemoveGroupAsync("Football_events_group");
+        await redisService.RemoveGroupAsync("tournaments_group");
 
         return Created();
     }
@@ -70,6 +71,8 @@ public class FootballEventsController(
         await FootballEventService.DeleteAsync(id, cancellationToken);
 
         await redisService.RemoveGroupAsync("Football_events_group");
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
 
         return NoContent();
     }
@@ -80,6 +83,8 @@ public class FootballEventsController(
     {
         await FootballEventService.RegisterPlayerAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("Football_events_group");
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
 
@@ -89,6 +94,8 @@ public class FootballEventsController(
     {
         await FootballEventService.ApproveParticipantAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("Football_events_group");
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
 
@@ -98,6 +105,8 @@ public class FootballEventsController(
     {
         await FootballEventService.RejectParticipantAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("Football_events_group");
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
 
@@ -107,6 +116,8 @@ public class FootballEventsController(
     {
         await FootballEventService.RemoveParticipantAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("Football_events_group");
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
         return NoContent();
     }
 }

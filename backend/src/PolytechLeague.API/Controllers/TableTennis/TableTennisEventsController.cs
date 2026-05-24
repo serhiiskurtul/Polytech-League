@@ -66,6 +66,7 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
         await ttEventService.CreateAsync(entity, cancellationToken);
 
         await redisService.RemoveGroupAsync("tt_events_all");
+        await redisService.RemoveGroupAsync("tournaments_group");
 
         return Created();
     }
@@ -82,6 +83,8 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
 
         await redisService.RemoveGroupAsync("tt_events_all");
         await redisService.RemoveDataAsync($"tt_event_v2_{id}");
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
 
         return NoContent();
     }
@@ -94,6 +97,8 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
 
         await redisService.RemoveGroupAsync("tt_events_all");
         await redisService.RemoveDataAsync($"tt_event_v2_{id}");
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
 
         return NoContent();
     }
@@ -104,6 +109,8 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
         await ttEventService.AddParticipantAsync(id, dto, cancellationToken);
         await redisService.RemoveGroupAsync("tt_events_all");
         await redisService.RemoveDataAsync($"tt_event_v2_{id}");
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
 
@@ -114,6 +121,8 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
         await ttEventService.UpdateParticipantAsync(id, playerId, dto, cancellationToken);
         await redisService.RemoveGroupAsync("tt_events_all");
         await redisService.RemoveDataAsync($"tt_event_v2_{id}");
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
 
@@ -124,6 +133,8 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
         await ttEventService.RemoveParticipantAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("tt_events_all");
         await redisService.RemoveDataAsync($"tt_event_v2_{id}");
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
 
@@ -134,6 +145,8 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
         await ttEventService.RegisterPlayerAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("tt_events_all");
         await redisService.RemoveDataAsync($"tt_event_v2_{id}");
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
 
@@ -144,6 +157,8 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
         await ttEventService.ApproveParticipantAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("tt_events_all");
         await redisService.RemoveDataAsync($"tt_event_v2_{id}");
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
 
@@ -154,6 +169,8 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
         await ttEventService.RejectParticipantAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("tt_events_all");
         await redisService.RemoveDataAsync($"tt_event_v2_{id}");
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
 }

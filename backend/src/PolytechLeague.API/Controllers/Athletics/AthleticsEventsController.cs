@@ -4,11 +4,15 @@ using PolytechLeague.Domain.Params;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using PolytechLeague.Infrastructure.Redis;
+
 namespace PolytechLeague.API.Controllers.Athletics;
 
 [ApiController]
 [Route("api/athletics-events")]
-public class AthleticsEventsController(IAthleticsEventService athleticsEventService) : ControllerBase
+public class AthleticsEventsController(
+    IAthleticsEventService athleticsEventService,
+    IRedisService redisService) : ControllerBase
 {
     [AllowAnonymous]
     [HttpGet]
@@ -41,6 +45,7 @@ public class AthleticsEventsController(IAthleticsEventService athleticsEventServ
     {
         var entity = request.FromRequest();
         await athleticsEventService.CreateAsync(entity, cancellationToken);
+        await redisService.RemoveGroupAsync("tournaments_group");
         return Created();
     }
 
@@ -53,6 +58,8 @@ public class AthleticsEventsController(IAthleticsEventService athleticsEventServ
     {
         var entity = request.FromRequest();
         await athleticsEventService.UpdateAsync(id, entity, cancellationToken);
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
         return NoContent();
     }
 
@@ -61,6 +68,8 @@ public class AthleticsEventsController(IAthleticsEventService athleticsEventServ
     public async Task<IActionResult> Delete([FromRoute] long id, CancellationToken cancellationToken)
     {
         await athleticsEventService.DeleteAsync(id, cancellationToken);
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
         return NoContent();
     }
 
@@ -69,6 +78,8 @@ public class AthleticsEventsController(IAthleticsEventService athleticsEventServ
     public async Task<IActionResult> AddResult([FromRoute] long id, [FromBody] AthleticsResultDto dto, CancellationToken cancellationToken)
     {
         await athleticsEventService.AddResultAsync(id, dto, cancellationToken);
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Created();
     }
 
@@ -77,6 +88,8 @@ public class AthleticsEventsController(IAthleticsEventService athleticsEventServ
     public async Task<IActionResult> UpdateResult([FromRoute] long id, [FromRoute] long resultId, [FromBody] AthleticsResultDto dto, CancellationToken cancellationToken)
     {
         await athleticsEventService.UpdateResultAsync(id, resultId, dto, cancellationToken);
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
         return NoContent();
     }
 
@@ -85,6 +98,8 @@ public class AthleticsEventsController(IAthleticsEventService athleticsEventServ
     public async Task<IActionResult> DeleteResult([FromRoute] long id, [FromRoute] long resultId, CancellationToken cancellationToken)
     {
         await athleticsEventService.RemoveResultAsync(id, resultId, cancellationToken);
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
         return NoContent();
     }
 
@@ -93,6 +108,8 @@ public class AthleticsEventsController(IAthleticsEventService athleticsEventServ
     public async Task<IActionResult> AddParticipant([FromRoute] long id, [FromBody] AthleticsEventParticipantDto dto, CancellationToken cancellationToken)
     {
         await athleticsEventService.AddParticipantAsync(id, dto, cancellationToken);
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Created();
     }
 
@@ -101,6 +118,8 @@ public class AthleticsEventsController(IAthleticsEventService athleticsEventServ
     public async Task<IActionResult> RemoveParticipant([FromRoute] long id, [FromRoute] long playerId, CancellationToken cancellationToken)
     {
         await athleticsEventService.RemoveParticipantAsync(id, playerId, cancellationToken);
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
         return NoContent();
     }
 }

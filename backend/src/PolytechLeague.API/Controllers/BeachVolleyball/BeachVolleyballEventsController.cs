@@ -42,6 +42,7 @@ public class BeachVolleyballEventsController(
         await beachVolleyballEventService.CreateAsync(entity, cancellationToken);
 
         await redisService.RemoveGroupAsync("beachvolleyball_events_group");
+        await redisService.RemoveGroupAsync("tournaments_group");
 
         return Created();
     }
@@ -57,6 +58,8 @@ public class BeachVolleyballEventsController(
         await beachVolleyballEventService.UpdateAsync(id, entity, cancellationToken);
 
         await redisService.RemoveGroupAsync("beachvolleyball_events_group");
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
 
         return NoContent();
     }
@@ -68,6 +71,8 @@ public class BeachVolleyballEventsController(
         await beachVolleyballEventService.DeleteAsync(id, cancellationToken);
 
         await redisService.RemoveGroupAsync("beachvolleyball_events_group");
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
 
         return NoContent();
     }
@@ -78,6 +83,8 @@ public class BeachVolleyballEventsController(
     {
         await beachVolleyballEventService.RegisterPlayerAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("beachvolleyball_events_group");
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
 
@@ -87,6 +94,8 @@ public class BeachVolleyballEventsController(
     {
         await beachVolleyballEventService.ApproveParticipantAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("beachvolleyball_events_group");
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
 
@@ -96,6 +105,8 @@ public class BeachVolleyballEventsController(
     {
         await beachVolleyballEventService.RejectParticipantAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("beachvolleyball_events_group");
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
 
@@ -105,6 +116,8 @@ public class BeachVolleyballEventsController(
     {
         await beachVolleyballEventService.RemoveParticipantAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("beachvolleyball_events_group");
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
         return NoContent();
     }
 }
