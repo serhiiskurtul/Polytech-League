@@ -471,7 +471,11 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
           <i className="fas fa-dumbbell"></i> {details.category === 'Men' ? 'Чоловіки' : 'Жінки'} • {details.hand === 'Left' ? 'Ліва рука' : 'Права рука'} • {details.weightClass?.replace('Under', '-').replace('Plus', '+')}
         </div>
         <div className={styles.categoryInfo}>
-          <span className={styles.badge}>{details.level}</span>
+          <span className={styles.badge}>
+            {details.level === 'CollegeGroup' ? 'Міжгруповий рівень' :
+             details.level === 'Regional' ? 'Регіональний рівень' :
+             details.level === 'National' ? 'Національний рівень' : details.level}
+          </span>
           {isAdmin && (
             <button
               type="button"
