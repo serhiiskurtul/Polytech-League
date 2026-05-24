@@ -7,7 +7,7 @@ using PolytechLeague.Infrastructure.Redis;
 namespace PolytechLeague.API.Controllers.Football;
 
 [ApiController]
-[Route("api/Football-matches")]
+[Route("api/football-matches")]
 public class FootballMatchesController(
     IFootballMatchService FootballMatchService,
     IRedisService redisService) : ControllerBase
