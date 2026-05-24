@@ -39,6 +39,17 @@ interface ProfileHeaderProps {
 }
 
 const ProfileHeader = ({ userData, isAdmin, onEdit, onAvatarUpload, onLogout, onCompare, onMessage }: ProfileHeaderProps) => {
+  const getInstagramUrl = (url?: string | null) => {
+    if (!url || url.trim() === '') return null;
+    const trimmed = url.trim();
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      return trimmed;
+    }
+    return `https://instagram.com/${trimmed.replace('@', '').trim()}`;
+  };
+
+  const instagramUrl = getInstagramUrl(userData.instagramUrl);
+
   return (
     <div className={styles.profileHeader}>
       <div className={styles.profileHeaderCard}>
@@ -115,9 +126,9 @@ const ProfileHeader = ({ userData, isAdmin, onEdit, onAvatarUpload, onLogout, on
               ))}
             </div>
             </div>
-            {userData.instagramUrl && (
+            {instagramUrl && (
               <div className={styles.socialLinks}>
-                <a href={userData.instagramUrl} target="_blank" rel="noopener noreferrer" className={styles.socialIcon} title="Instagram">
+                <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className={styles.socialIcon} title="Instagram">
                   <i className="fab fa-instagram"></i>
                 </a>
               </div>
