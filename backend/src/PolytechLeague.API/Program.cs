@@ -142,8 +142,6 @@ builder.Services.AddRateLimiter(options =>
 
 var app = builder.Build();
 
-app.MapHealthChecks("/health");
-
 app.UseCors("AllowReactApp");
 
 app.UseResponseCompression();
@@ -178,6 +176,7 @@ app.UseAuthorization();
 app.UseWebSockets();
 
 app.MapControllers();
+app.MapHealthChecks("/health");
 app.MapHub<ChatHub>("/hubs/chat");
 
 //Автоматичне застосування міграцій при старті
