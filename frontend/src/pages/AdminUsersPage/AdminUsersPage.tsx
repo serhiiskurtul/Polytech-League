@@ -144,7 +144,10 @@ export const AdminUsersPage = () => {
       fetchPlayers();
     } catch (error: any) {
       console.error(error);
-      const errMsg = error.response?.data || 'Не вдалося об\'єднати гравців';
+      const data = error.response?.data;
+      const errMsg = typeof data === 'string'
+        ? data
+        : (data?.detail || data?.title || 'Не вдалося об\'єднати гравців');
       toast.error(errMsg);
     }
   };
