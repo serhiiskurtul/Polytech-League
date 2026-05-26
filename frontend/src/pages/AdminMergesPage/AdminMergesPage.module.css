@@ -194,3 +194,22 @@
         justify-content: center;
     }
 }
+
+.manualMergeBtn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s;
+    font-size: 14px;
+}
+
+.manualMergeBtn:hover {
+    background: #2563eb;
+}
