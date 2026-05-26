@@ -1329,6 +1329,54 @@ public class PlayerService : IPlayerService
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task MergePlayersManuallyAsync(long sourcePlayerId, long targetPlayerId, CancellationToken cancellationToken = default)
+    {
+        var sourcePlayer = await _dbContext.Players.FindAsync(new object[] { sourcePlayerId }, cancellationToken);
+        var targetPlayer = await _dbContext.Players.FindAsync(new object[] { targetPlayerId }, cancellationToken);
+
+        if (sourcePlayer == null || targetPlayer == null)
+        {
+            throw new KeyNotFoundException("Гравця не знайдено");
+        }
+
+        if (sourcePlayer.Id == targetPlayer.Id)
+        {
+            throw new InvalidOperationException("Неможливо об'єднати гравця з самим собою");
+        }
+
+        // Move UserId if source has it and target does not
+        if (sourcePlayer.UserId.HasValue)
+        {
+            if (!targetPlayer.UserId.HasValue)
+            {
+                targetPlayer.UserId = sourcePlayer.UserId;
+            }
+            else if (targetPlayer.UserId != sourcePlayer.UserId)
+            {
+                throw new InvalidOperationException("Обидва профілі прив'язані до різних акаунтів. Спочатку відв'яжіть один з них.");
+            }
+        }
+
+        // Merge all data from source to target
+        await MergePlayersDataAsync(sourcePlayer.Id, targetPlayer.Id, cancellationToken);
+
+        // Clean up any profile merge requests associated with these players
+        var mergeRequests = await _dbContext.ProfileMergeRequests
+            .Where(r => (r.UserId == sourcePlayer.UserId || r.UserId == targetPlayer.UserId) && 
+                        (r.TargetPlayerId == sourcePlayer.Id || r.TargetPlayerId == targetPlayer.Id))
+            .ToListAsync(cancellationToken);
+            
+        foreach (var req in mergeRequests)
+        {
+            req.Status = RegistrationStatus.Approved;
+        }
+
+        // Delete the source player
+        _dbContext.Players.Remove(sourcePlayer);
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
     private async Task MergePlayersDataAsync(long sourceId, long targetId, CancellationToken cancellationToken)
     {
         // Update all related tables - Reassigning everything from the "new" profile back to the "archival" one

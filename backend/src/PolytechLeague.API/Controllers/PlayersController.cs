@@ -328,6 +328,47 @@ public class PlayersController : ControllerBase
         return Ok(requests);
     }
 
+    [Authorize(Policy = "Admin")]
+    [HttpPost("merge-manual")]
+    public async Task<IActionResult> MergeManual([FromQuery] long sourcePlayerId, [FromQuery] long targetPlayerId, CancellationToken cancellationToken)
+    {
+        var sourcePlayer = await _playerService.GetByIdAsync(sourcePlayerId, cancellationToken);
+        var targetPlayer = await _playerService.GetByIdAsync(targetPlayerId, cancellationToken);
+        
+        if (sourcePlayer != null)
+        {
+            var sourcePlayerCacheKey = $"player_profile_id_{sourcePlayerId}";
+            await _redisService.RemoveDataAsync(sourcePlayerCacheKey);
+
+            if (sourcePlayer.UserId.HasValue)
+            {
+                var cacheKey = $"player_profile_{sourcePlayer.UserId.Value}";
+                await _redisService.RemoveDataAsync(cacheKey);
+
+                var userCacheKey = $"user_account_{sourcePlayer.UserId.Value}";
+                await _redisService.RemoveDataAsync(userCacheKey);
+            }
+        }
+
+        if (targetPlayer != null)
+        {
+            var targetPlayerCacheKey = $"player_profile_id_{targetPlayerId}";
+            await _redisService.RemoveDataAsync(targetPlayerCacheKey);
+
+            if (targetPlayer.UserId.HasValue)
+            {
+                var cacheKey = $"player_profile_{targetPlayer.UserId.Value}";
+                await _redisService.RemoveDataAsync(cacheKey);
+
+                var userCacheKey = $"user_account_{targetPlayer.UserId.Value}";
+                await _redisService.RemoveDataAsync(userCacheKey);
+            }
+        }
+
+        await _playerService.MergePlayersManuallyAsync(sourcePlayerId, targetPlayerId, cancellationToken);
+        return Ok();
+    }
+
     [Authorize]
     [HttpPost("merge-requests/ignore")]
     public async Task<IActionResult> IgnoreMergeRequest([FromQuery] long targetPlayerId, CancellationToken cancellationToken)
