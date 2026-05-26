@@ -1382,94 +1382,155 @@ public class PlayerService : IPlayerService
         // 1. Participant tables with composite primary key: prevent duplicate tracking errors and SQL primary key violations.
 
         // Chess
-        var chessPart = await _dbContext.ChessEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        var chessPart = await _dbContext.ChessEventParticipants.AsNoTracking().Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
         var targetChessTournaments = await _dbContext.ChessEventParticipants.Where(p => p.PlayerId == targetId).Select(p => p.TournamentId).ToListAsync(cancellationToken);
+        if (chessPart.Any()) await _dbContext.ChessEventParticipants.Where(p => p.PlayerId == sourceId).ExecuteDeleteAsync(cancellationToken);
+        var newChessParts = new List<PolytechLeague.Domain.Entities.Chess.ChessEventParticipant>();
         foreach (var p in chessPart)
         {
-            if (targetChessTournaments.Contains(p.TournamentId)) _dbContext.ChessEventParticipants.Remove(p);
-            else p.PlayerId = targetId;
+            if (!targetChessTournaments.Contains(p.TournamentId))
+            {
+                p.PlayerId = targetId;
+                newChessParts.Add(p);
+            }
         }
+        if (newChessParts.Any()) _dbContext.ChessEventParticipants.AddRange(newChessParts);
 
         // Checkers
-        var checkersPart = await _dbContext.CheckersEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        var checkersPart = await _dbContext.CheckersEventParticipants.AsNoTracking().Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
         var targetCheckersTournaments = await _dbContext.CheckersEventParticipants.Where(p => p.PlayerId == targetId).Select(p => p.TournamentId).ToListAsync(cancellationToken);
+        if (checkersPart.Any()) await _dbContext.CheckersEventParticipants.Where(p => p.PlayerId == sourceId).ExecuteDeleteAsync(cancellationToken);
+        var newCheckersParts = new List<PolytechLeague.Domain.Entities.Checkers.CheckersEventParticipant>();
         foreach (var p in checkersPart)
         {
-            if (targetCheckersTournaments.Contains(p.TournamentId)) _dbContext.CheckersEventParticipants.Remove(p);
-            else p.PlayerId = targetId;
+            if (!targetCheckersTournaments.Contains(p.TournamentId))
+            {
+                p.Id = 0; // Prevent identity insert exception
+                p.PlayerId = targetId;
+                newCheckersParts.Add(p);
+            }
         }
+        if (newCheckersParts.Any()) _dbContext.CheckersEventParticipants.AddRange(newCheckersParts);
 
         // Table Tennis
-        var ttPart = await _dbContext.TableTennisEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        var ttPart = await _dbContext.TableTennisEventParticipants.AsNoTracking().Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
         var targetTtTournaments = await _dbContext.TableTennisEventParticipants.Where(p => p.PlayerId == targetId).Select(p => p.TournamentId).ToListAsync(cancellationToken);
+        if (ttPart.Any()) await _dbContext.TableTennisEventParticipants.Where(p => p.PlayerId == sourceId).ExecuteDeleteAsync(cancellationToken);
+        var newTtParts = new List<PolytechLeague.Domain.Entities.TableTennis.TableTennisEventParticipant>();
         foreach (var p in ttPart)
         {
-            if (targetTtTournaments.Contains(p.TournamentId)) _dbContext.TableTennisEventParticipants.Remove(p);
-            else p.PlayerId = targetId;
+            if (!targetTtTournaments.Contains(p.TournamentId))
+            {
+                p.PlayerId = targetId;
+                newTtParts.Add(p);
+            }
         }
+        if (newTtParts.Any()) _dbContext.TableTennisEventParticipants.AddRange(newTtParts);
 
         // Armwrestling
-        var armPart = await _dbContext.ArmwrestlingEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        var armPart = await _dbContext.ArmwrestlingEventParticipants.AsNoTracking().Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
         var targetArmTournaments = await _dbContext.ArmwrestlingEventParticipants.Where(p => p.PlayerId == targetId).Select(p => p.TournamentId).ToListAsync(cancellationToken);
+        if (armPart.Any()) await _dbContext.ArmwrestlingEventParticipants.Where(p => p.PlayerId == sourceId).ExecuteDeleteAsync(cancellationToken);
+        var newArmParts = new List<PolytechLeague.Domain.Entities.Armwrestling.ArmwrestlingEventParticipant>();
         foreach (var p in armPart)
         {
-            if (targetArmTournaments.Contains(p.TournamentId)) _dbContext.ArmwrestlingEventParticipants.Remove(p);
-            else p.PlayerId = targetId;
+            if (!targetArmTournaments.Contains(p.TournamentId))
+            {
+                p.PlayerId = targetId;
+                newArmParts.Add(p);
+            }
         }
+        if (newArmParts.Any()) _dbContext.ArmwrestlingEventParticipants.AddRange(newArmParts);
 
         // Badminton
-        var badPart = await _dbContext.BadmintonEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        var badPart = await _dbContext.BadmintonEventParticipants.AsNoTracking().Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
         var targetBadEvents = await _dbContext.BadmintonEventParticipants.Where(p => p.PlayerId == targetId).Select(p => p.EventId).ToListAsync(cancellationToken);
+        if (badPart.Any()) await _dbContext.BadmintonEventParticipants.Where(p => p.PlayerId == sourceId).ExecuteDeleteAsync(cancellationToken);
+        var newBadParts = new List<PolytechLeague.Domain.Entities.Badminton.BadmintonEventParticipant>();
         foreach (var p in badPart)
         {
-            if (targetBadEvents.Contains(p.EventId)) _dbContext.BadmintonEventParticipants.Remove(p);
-            else p.PlayerId = targetId;
+            if (!targetBadEvents.Contains(p.EventId))
+            {
+                p.PlayerId = targetId;
+                newBadParts.Add(p);
+            }
         }
+        if (newBadParts.Any()) _dbContext.BadmintonEventParticipants.AddRange(newBadParts);
 
         // Football Event Participants
-        var footballParts = await _dbContext.FootballEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        var footballParts = await _dbContext.FootballEventParticipants.AsNoTracking().Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
         var targetFootballEvents = await _dbContext.FootballEventParticipants.Where(p => p.PlayerId == targetId).Select(p => p.EventId).ToListAsync(cancellationToken);
+        if (footballParts.Any()) await _dbContext.FootballEventParticipants.Where(p => p.PlayerId == sourceId).ExecuteDeleteAsync(cancellationToken);
+        var newFootballParts = new List<PolytechLeague.Domain.Entities.Football.FootballEventParticipant>();
         foreach (var p in footballParts)
         {
-            if (targetFootballEvents.Contains(p.EventId)) _dbContext.FootballEventParticipants.Remove(p);
-            else p.PlayerId = targetId;
+            if (!targetFootballEvents.Contains(p.EventId))
+            {
+                p.PlayerId = targetId;
+                newFootballParts.Add(p);
+            }
         }
+        if (newFootballParts.Any()) _dbContext.FootballEventParticipants.AddRange(newFootballParts);
 
         // Volleyball Event Participants
-        var volleyParts = await _dbContext.VolleyballEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        var volleyParts = await _dbContext.VolleyballEventParticipants.AsNoTracking().Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
         var targetVolleyEvents = await _dbContext.VolleyballEventParticipants.Where(p => p.PlayerId == targetId).Select(p => p.EventId).ToListAsync(cancellationToken);
+        if (volleyParts.Any()) await _dbContext.VolleyballEventParticipants.Where(p => p.PlayerId == sourceId).ExecuteDeleteAsync(cancellationToken);
+        var newVolleyParts = new List<PolytechLeague.Domain.Entities.Volleyball.VolleyballEventParticipant>();
         foreach (var p in volleyParts)
         {
-            if (targetVolleyEvents.Contains(p.EventId)) _dbContext.VolleyballEventParticipants.Remove(p);
-            else p.PlayerId = targetId;
+            if (!targetVolleyEvents.Contains(p.EventId))
+            {
+                p.PlayerId = targetId;
+                newVolleyParts.Add(p);
+            }
         }
+        if (newVolleyParts.Any()) _dbContext.VolleyballEventParticipants.AddRange(newVolleyParts);
 
         // Basketball Event Participants
-        var bballParts = await _dbContext.BasketballEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        var bballParts = await _dbContext.BasketballEventParticipants.AsNoTracking().Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
         var targetBballEvents = await _dbContext.BasketballEventParticipants.Where(p => p.PlayerId == targetId).Select(p => p.EventId).ToListAsync(cancellationToken);
+        if (bballParts.Any()) await _dbContext.BasketballEventParticipants.Where(p => p.PlayerId == sourceId).ExecuteDeleteAsync(cancellationToken);
+        var newBballParts = new List<PolytechLeague.Domain.Entities.Basketball.BasketballEventParticipant>();
         foreach (var p in bballParts)
         {
-            if (targetBballEvents.Contains(p.EventId)) _dbContext.BasketballEventParticipants.Remove(p);
-            else p.PlayerId = targetId;
+            if (!targetBballEvents.Contains(p.EventId))
+            {
+                p.PlayerId = targetId;
+                newBballParts.Add(p);
+            }
         }
+        if (newBballParts.Any()) _dbContext.BasketballEventParticipants.AddRange(newBballParts);
 
         // Beach Volleyball Event Participants
-        var beachVParts = await _dbContext.BeachVolleyballEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        var beachVParts = await _dbContext.BeachVolleyballEventParticipants.AsNoTracking().Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
         var targetBeachVEvents = await _dbContext.BeachVolleyballEventParticipants.Where(p => p.PlayerId == targetId).Select(p => p.EventId).ToListAsync(cancellationToken);
+        if (beachVParts.Any()) await _dbContext.BeachVolleyballEventParticipants.Where(p => p.PlayerId == sourceId).ExecuteDeleteAsync(cancellationToken);
+        var newBeachVParts = new List<PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballEventParticipant>();
         foreach (var p in beachVParts)
         {
-            if (targetBeachVEvents.Contains(p.EventId)) _dbContext.BeachVolleyballEventParticipants.Remove(p);
-            else p.PlayerId = targetId;
+            if (!targetBeachVEvents.Contains(p.EventId))
+            {
+                p.PlayerId = targetId;
+                newBeachVParts.Add(p);
+            }
         }
+        if (newBeachVParts.Any()) _dbContext.BeachVolleyballEventParticipants.AddRange(newBeachVParts);
 
         // Athletics Event Participants
-        var athleticsParts = await _dbContext.Set<PolytechLeague.Domain.Entities.Athletics.AthleticsEventParticipant>().Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        var athleticsParts = await _dbContext.Set<PolytechLeague.Domain.Entities.Athletics.AthleticsEventParticipant>().AsNoTracking().Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
         var targetAthleticsEvents = await _dbContext.Set<PolytechLeague.Domain.Entities.Athletics.AthleticsEventParticipant>().Where(p => p.PlayerId == targetId).Select(p => p.AthleticsEventId).ToListAsync(cancellationToken);
+        if (athleticsParts.Any()) await _dbContext.Set<PolytechLeague.Domain.Entities.Athletics.AthleticsEventParticipant>().Where(p => p.PlayerId == sourceId).ExecuteDeleteAsync(cancellationToken);
+        var newAthleticsParts = new List<PolytechLeague.Domain.Entities.Athletics.AthleticsEventParticipant>();
         foreach (var p in athleticsParts)
         {
-            if (targetAthleticsEvents.Contains(p.AthleticsEventId)) _dbContext.Set<PolytechLeague.Domain.Entities.Athletics.AthleticsEventParticipant>().Remove(p);
-            else p.PlayerId = targetId;
+            if (!targetAthleticsEvents.Contains(p.AthleticsEventId))
+            {
+                p.PlayerId = targetId;
+                newAthleticsParts.Add(p);
+            }
         }
+        if (newAthleticsParts.Any()) _dbContext.Set<PolytechLeague.Domain.Entities.Athletics.AthleticsEventParticipant>().AddRange(newAthleticsParts);
 
         // 2. Reassign other tables without composite/unique keys on PlayerId
 
@@ -1544,87 +1605,80 @@ public class PlayerService : IPlayerService
         var footballMatchesAGk = await _dbContext.FootballMatches.Where(m => m.AwayGoalkeeperId == sourceId).ToListAsync(cancellationToken);
         foreach (var m in footballMatchesAGk) m.AwayGoalkeeperId = targetId;
 
-        // 4. Update many-to-many match rosters (direct DB queries bypass EF Core model dictionaries)
+        // 4. Update many-to-many match rosters using EF Core navigations
+        
+        var targetPlayer = await _dbContext.Players.FindAsync(new object[] { targetId }, cancellationToken);
+        if (targetPlayer == null) return;
 
-        // Football Home Roster
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            "UPDATE \"Football_match_home_roster\" SET \"PlayerId\" = {0} WHERE \"PlayerId\" = {1} AND \"FootballMatchId\" NOT IN (SELECT \"FootballMatchId\" FROM \"Football_match_home_roster\" WHERE \"PlayerId\" = {0})",
-            targetId, sourceId);
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            "DELETE FROM \"Football_match_home_roster\" WHERE \"PlayerId\" = {0}",
-            sourceId);
+        // Football
+        var fbHomeMatches = await _dbContext.FootballMatches.Include(m => m.HomeRoster).Where(m => m.HomeRoster!.Any(p => p.Id == sourceId)).ToListAsync(cancellationToken);
+        foreach (var m in fbHomeMatches)
+        {
+            m.HomeRoster!.Remove(m.HomeRoster.First(p => p.Id == sourceId));
+            if (!m.HomeRoster.Any(p => p.Id == targetId)) m.HomeRoster.Add(targetPlayer);
+        }
+        var fbAwayMatches = await _dbContext.FootballMatches.Include(m => m.AwayRoster).Where(m => m.AwayRoster!.Any(p => p.Id == sourceId)).ToListAsync(cancellationToken);
+        foreach (var m in fbAwayMatches)
+        {
+            m.AwayRoster!.Remove(m.AwayRoster.First(p => p.Id == sourceId));
+            if (!m.AwayRoster.Any(p => p.Id == targetId)) m.AwayRoster.Add(targetPlayer);
+        }
 
-        // Football Away Roster
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            "UPDATE \"Football_match_away_roster\" SET \"PlayerId\" = {0} WHERE \"PlayerId\" = {1} AND \"FootballMatchId\" NOT IN (SELECT \"FootballMatchId\" FROM \"Football_match_away_roster\" WHERE \"PlayerId\" = {0})",
-            targetId, sourceId);
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            "DELETE FROM \"Football_match_away_roster\" WHERE \"PlayerId\" = {0}",
-            sourceId);
+        // Volleyball
+        var vbHomeMatches = await _dbContext.VolleyballMatches.Include(m => m.HomeRoster).Where(m => m.HomeRoster!.Any(p => p.Id == sourceId)).ToListAsync(cancellationToken);
+        foreach (var m in vbHomeMatches)
+        {
+            m.HomeRoster!.Remove(m.HomeRoster.First(p => p.Id == sourceId));
+            if (!m.HomeRoster.Any(p => p.Id == targetId)) m.HomeRoster.Add(targetPlayer);
+        }
+        var vbAwayMatches = await _dbContext.VolleyballMatches.Include(m => m.AwayRoster).Where(m => m.AwayRoster!.Any(p => p.Id == sourceId)).ToListAsync(cancellationToken);
+        foreach (var m in vbAwayMatches)
+        {
+            m.AwayRoster!.Remove(m.AwayRoster.First(p => p.Id == sourceId));
+            if (!m.AwayRoster.Any(p => p.Id == targetId)) m.AwayRoster.Add(targetPlayer);
+        }
 
-        // Volleyball Home Roster
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            "UPDATE \"volleyball_match_home_roster\" SET \"PlayerId\" = {0} WHERE \"PlayerId\" = {1} AND \"VolleyballMatchId\" NOT IN (SELECT \"VolleyballMatchId\" FROM \"volleyball_match_home_roster\" WHERE \"PlayerId\" = {0})",
-            targetId, sourceId);
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            "DELETE FROM \"volleyball_match_home_roster\" WHERE \"PlayerId\" = {0}",
-            sourceId);
+        // Basketball
+        var bbHomeMatches = await _dbContext.BasketballMatches.Include(m => m.HomeRoster).Where(m => m.HomeRoster!.Any(p => p.Id == sourceId)).ToListAsync(cancellationToken);
+        foreach (var m in bbHomeMatches)
+        {
+            m.HomeRoster!.Remove(m.HomeRoster.First(p => p.Id == sourceId));
+            if (!m.HomeRoster.Any(p => p.Id == targetId)) m.HomeRoster.Add(targetPlayer);
+        }
+        var bbAwayMatches = await _dbContext.BasketballMatches.Include(m => m.AwayRoster).Where(m => m.AwayRoster!.Any(p => p.Id == sourceId)).ToListAsync(cancellationToken);
+        foreach (var m in bbAwayMatches)
+        {
+            m.AwayRoster!.Remove(m.AwayRoster.First(p => p.Id == sourceId));
+            if (!m.AwayRoster.Any(p => p.Id == targetId)) m.AwayRoster.Add(targetPlayer);
+        }
 
-        // Volleyball Away Roster
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            "UPDATE \"volleyball_match_away_roster\" SET \"PlayerId\" = {0} WHERE \"PlayerId\" = {1} AND \"VolleyballMatchId\" NOT IN (SELECT \"VolleyballMatchId\" FROM \"volleyball_match_away_roster\" WHERE \"PlayerId\" = {0})",
-            targetId, sourceId);
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            "DELETE FROM \"volleyball_match_away_roster\" WHERE \"PlayerId\" = {0}",
-            sourceId);
+        // Beach Volleyball
+        var bvbHomeMatches = await _dbContext.BeachVolleyballMatches.Include(m => m.HomeRoster).Where(m => m.HomeRoster!.Any(p => p.Id == sourceId)).ToListAsync(cancellationToken);
+        foreach (var m in bvbHomeMatches)
+        {
+            m.HomeRoster!.Remove(m.HomeRoster.First(p => p.Id == sourceId));
+            if (!m.HomeRoster.Any(p => p.Id == targetId)) m.HomeRoster.Add(targetPlayer);
+        }
+        var bvbAwayMatches = await _dbContext.BeachVolleyballMatches.Include(m => m.AwayRoster).Where(m => m.AwayRoster!.Any(p => p.Id == sourceId)).ToListAsync(cancellationToken);
+        foreach (var m in bvbAwayMatches)
+        {
+            m.AwayRoster!.Remove(m.AwayRoster.First(p => p.Id == sourceId));
+            if (!m.AwayRoster.Any(p => p.Id == targetId)) m.AwayRoster.Add(targetPlayer);
+        }
 
-        // Basketball Home Roster
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            "UPDATE \"basketball3x3_match_home_roster\" SET \"PlayerId\" = {0} WHERE \"PlayerId\" = {1} AND \"BasketballMatchId\" NOT IN (SELECT \"BasketballMatchId\" FROM \"basketball3x3_match_home_roster\" WHERE \"PlayerId\" = {0})",
-            targetId, sourceId);
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            "DELETE FROM \"basketball3x3_match_home_roster\" WHERE \"PlayerId\" = {0}",
-            sourceId);
-
-        // Basketball Away Roster
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            "UPDATE \"basketball3x3_match_away_roster\" SET \"PlayerId\" = {0} WHERE \"PlayerId\" = {1} AND \"BasketballMatchId\" NOT IN (SELECT \"BasketballMatchId\" FROM \"basketball3x3_match_away_roster\" WHERE \"PlayerId\" = {0})",
-            targetId, sourceId);
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            "DELETE FROM \"basketball3x3_match_away_roster\" WHERE \"PlayerId\" = {0}",
-            sourceId);
-
-        // Beach Volleyball Home Roster
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            "UPDATE \"beach_volleyball_match_home_roster\" SET \"PlayerId\" = {0} WHERE \"PlayerId\" = {1} AND \"BeachVolleyballMatchId\" NOT IN (SELECT \"BeachVolleyballMatchId\" FROM \"beach_volleyball_match_home_roster\" WHERE \"PlayerId\" = {0})",
-            targetId, sourceId);
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            "DELETE FROM \"beach_volleyball_match_home_roster\" WHERE \"PlayerId\" = {0}",
-            sourceId);
-
-        // Beach Volleyball Away Roster
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            "UPDATE \"beach_volleyball_match_away_roster\" SET \"PlayerId\" = {0} WHERE \"PlayerId\" = {1} AND \"BeachVolleyballMatchId\" NOT IN (SELECT \"BeachVolleyballMatchId\" FROM \"beach_volleyball_match_away_roster\" WHERE \"PlayerId\" = {0})",
-            targetId, sourceId);
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            "DELETE FROM \"beach_volleyball_match_away_roster\" WHERE \"PlayerId\" = {0}",
-            sourceId);
-
-        // Badminton Home Roster
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            "UPDATE \"badminton_match_home_roster\" SET \"PlayerId\" = {0} WHERE \"PlayerId\" = {1} AND \"BadmintonMatchId\" NOT IN (SELECT \"BadmintonMatchId\" FROM \"badminton_match_home_roster\" WHERE \"PlayerId\" = {0})",
-            targetId, sourceId);
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            "DELETE FROM \"badminton_match_home_roster\" WHERE \"PlayerId\" = {0}",
-            sourceId);
-
-        // Badminton Away Roster
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            "UPDATE \"badminton_match_away_roster\" SET \"PlayerId\" = {0} WHERE \"PlayerId\" = {1} AND \"BadmintonMatchId\" NOT IN (SELECT \"BadmintonMatchId\" FROM \"badminton_match_away_roster\" WHERE \"PlayerId\" = {0})",
-            targetId, sourceId);
-        await _dbContext.Database.ExecuteSqlRawAsync(
-            "DELETE FROM \"badminton_match_away_roster\" WHERE \"PlayerId\" = {0}",
-            sourceId);
+        // Badminton
+        var badHomeMatches = await _dbContext.BadmintonMatches.Include(m => m.HomeRoster).Where(m => m.HomeRoster!.Any(p => p.Id == sourceId)).ToListAsync(cancellationToken);
+        foreach (var m in badHomeMatches)
+        {
+            m.HomeRoster!.Remove(m.HomeRoster.First(p => p.Id == sourceId));
+            if (!m.HomeRoster.Any(p => p.Id == targetId)) m.HomeRoster.Add(targetPlayer);
+        }
+        var badAwayMatches = await _dbContext.BadmintonMatches.Include(m => m.AwayRoster).Where(m => m.AwayRoster!.Any(p => p.Id == sourceId)).ToListAsync(cancellationToken);
+        foreach (var m in badAwayMatches)
+        {
+            m.AwayRoster!.Remove(m.AwayRoster.First(p => p.Id == sourceId));
+            if (!m.AwayRoster.Any(p => p.Id == targetId)) m.AwayRoster.Add(targetPlayer);
+        }
     }
 
     private async Task PopulateAutomaticBadgesAsync(PlayerDto dto, CancellationToken cancellationToken)
