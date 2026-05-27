@@ -1466,20 +1466,31 @@ public class PlayerService : IPlayerService
         if (newChessParts.Any()) _dbContext.ChessEventParticipants.AddRange(newChessParts);
 
         // Checkers
-        var checkersPart = await _dbContext.CheckersEventParticipants.AsNoTracking().Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
-        var targetCheckersTournaments = await _dbContext.CheckersEventParticipants.Where(p => p.PlayerId == targetId).Select(p => p.TournamentId).ToListAsync(cancellationToken);
-        if (checkersPart.Any()) await _dbContext.CheckersEventParticipants.Where(p => p.PlayerId == sourceId).ExecuteDeleteAsync(cancellationToken);
-        var newCheckersParts = new List<PolytechLeague.Domain.Entities.Checkers.CheckersEventParticipant>();
+        var checkersPart = await _dbContext.CheckersEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        var targetCheckersParts = await _dbContext.CheckersEventParticipants.Where(p => p.PlayerId == targetId).ToListAsync(cancellationToken);
+        
         foreach (var p in checkersPart)
         {
-            if (!targetCheckersTournaments.Contains(p.TournamentId))
+            var targetP = targetCheckersParts.FirstOrDefault(t => t.TournamentId == p.TournamentId);
+            if (targetP != null)
             {
-                p.Id = 0; // Prevent identity insert exception
+                // Target already has a participant in this tournament.
+                // Reassign all games from 'p' to 'targetP'
+                var gamesW = await _dbContext.CheckersGames.Where(g => g.WhitePlayerId == p.Id).ToListAsync(cancellationToken);
+                foreach (var g in gamesW) g.WhitePlayerId = targetP.Id;
+                
+                var gamesB = await _dbContext.CheckersGames.Where(g => g.BlackPlayerId == p.Id).ToListAsync(cancellationToken);
+                foreach (var g in gamesB) g.BlackPlayerId = targetP.Id;
+                
+                // Now safe to delete the duplicate participant 'p'
+                _dbContext.CheckersEventParticipants.Remove(p);
+            }
+            else
+            {
+                // Target doesn't have a participant, just update PlayerId
                 p.PlayerId = targetId;
-                newCheckersParts.Add(p);
             }
         }
-        if (newCheckersParts.Any()) _dbContext.CheckersEventParticipants.AddRange(newCheckersParts);
 
         // Table Tennis
         var ttPart = await _dbContext.TableTennisEventParticipants.AsNoTracking().Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
@@ -1609,11 +1620,6 @@ public class PlayerService : IPlayerService
         var chessGamesB = await _dbContext.ChessGames.Where(g => g.BlackPlayerId == sourceId).ToListAsync(cancellationToken);
         foreach (var g in chessGamesB) g.BlackPlayerId = targetId;
 
-        // Checkers games
-        var checkersGamesW = await _dbContext.CheckersGames.Where(g => g.WhitePlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var g in checkersGamesW) g.WhitePlayerId = targetId;
-        var checkersGamesB = await _dbContext.CheckersGames.Where(g => g.BlackPlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var g in checkersGamesB) g.BlackPlayerId = targetId;
 
         // Table Tennis matches
         var ttMatches1 = await _dbContext.TableTennisMatches.Where(m => m.Player1Id == sourceId).ToListAsync(cancellationToken);
