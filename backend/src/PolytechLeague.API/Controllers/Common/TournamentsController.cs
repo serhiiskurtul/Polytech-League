@@ -50,7 +50,7 @@ public class TournamentsController : ControllerBase
         var tournament = await _tournamentService.GetTournamentByIdAsync(id);
         if (tournament == null) return NotFound();
 
-        await _redisService.SetDataAsync(cacheKey, tournament, TimeSpan.FromMinutes(60), "tournaments_byid_group");
+        await _redisService.SetDataAsync(cacheKey, tournament, TimeSpan.FromHours(24), "tournaments_byid_group");
         return Ok(tournament);
     }
 

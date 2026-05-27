@@ -34,7 +34,7 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
             result.Data.Select(e => e.ToResponse()).ToList(),
             result.TotalCount);
 
-        await redisService.SetDataAsync(cacheKey, response, TimeSpan.FromMinutes(60), "tt_events_all");
+        await redisService.SetDataAsync(cacheKey, response, TimeSpan.FromHours(24), "tt_events_all");
 
         return Ok(response);
     }
@@ -51,7 +51,7 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
         var entity = await ttEventService.GetByIdAsync(id, cancellationToken);
         var response = entity.ToResponse();
 
-        await redisService.SetDataAsync(cacheKey, response, TimeSpan.FromMinutes(60), "tt_events_byid");
+        await redisService.SetDataAsync(cacheKey, response, TimeSpan.FromHours(24), "tt_events_byid");
 
         return Ok(response);
     }
