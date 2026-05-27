@@ -1255,6 +1255,8 @@ public class PlayerService : IPlayerService
         {
             // MOVE ALL DATA FROM currentPlayer TO targetPlayer
             await MergePlayersDataAsync(currentPlayer.Id, targetPlayer.Id, cancellationToken);
+            CopyPlayerProperties(currentPlayer, targetPlayer);
+            currentPlayer.UserId = null;
             // Delete the temporary current player
             _dbContext.Players.Remove(currentPlayer);
         }
@@ -1350,12 +1352,16 @@ public class PlayerService : IPlayerService
             if (!targetPlayer.UserId.HasValue)
             {
                 targetPlayer.UserId = sourcePlayer.UserId;
+                sourcePlayer.UserId = null; // Clear to prevent unique constraint conflict
             }
             else if (targetPlayer.UserId != sourcePlayer.UserId)
             {
                 throw new InvalidOperationException("Обидва профілі прив'язані до різних акаунтів. Спочатку відв'яжіть один з них.");
             }
         }
+
+        // Copy profile fields if target does not have them
+        CopyPlayerProperties(sourcePlayer, targetPlayer);
 
         // Merge all data from source to target
         await MergePlayersDataAsync(sourcePlayer.Id, targetPlayer.Id, cancellationToken);
@@ -1375,6 +1381,69 @@ public class PlayerService : IPlayerService
         _dbContext.Players.Remove(sourcePlayer);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private void CopyPlayerProperties(Player source, Player target)
+    {
+        if (target.ChessRating == null || target.ChessRating == 0) target.ChessRating = source.ChessRating;
+        if (string.IsNullOrEmpty(target.ChessFideId)) target.ChessFideId = source.ChessFideId;
+        if (string.IsNullOrEmpty(target.ChessTitle)) target.ChessTitle = source.ChessTitle;
+        if (target.CheckersRating == null || target.CheckersRating == 0) target.CheckersRating = source.CheckersRating;
+        if (target.TableTennisRating == null || target.TableTennisRating == 0) target.TableTennisRating = source.TableTennisRating;
+        if (target.TableTennisHand == null) target.TableTennisHand = source.TableTennisHand;
+        if (target.ArmwrestlingWeight == null || target.ArmwrestlingWeight == 0) target.ArmwrestlingWeight = source.ArmwrestlingWeight;
+        if (target.ArmwrestlingPreferredWeightClass == null) target.ArmwrestlingPreferredWeightClass = source.ArmwrestlingPreferredWeightClass;
+        if (string.IsNullOrEmpty(target.Bio)) target.Bio = source.Bio;
+        if (string.IsNullOrEmpty(target.InstagramUrl)) target.InstagramUrl = source.InstagramUrl;
+        if (string.IsNullOrEmpty(target.PreviousNames)) target.PreviousNames = source.PreviousNames;
+        if (!target.IsFounder) target.IsFounder = source.IsFounder;
+        if (target.CollegeId == null) target.CollegeId = source.CollegeId;
+        if (target.Gender == Gender.None) target.Gender = source.Gender;
+
+        if (target.FootballTeamId == null)
+        {
+            target.FootballTeamId = source.FootballTeamId;
+            target.FootballPosition = source.FootballPosition;
+            target.FootballShirtNumber = source.FootballShirtNumber;
+        }
+        if (target.VolleyballTeamId == null)
+        {
+            target.VolleyballTeamId = source.VolleyballTeamId;
+            target.VolleyballPosition = source.VolleyballPosition;
+            target.VolleyballShirtNumber = source.VolleyballShirtNumber;
+        }
+        if (target.BasketballTeamId == null)
+        {
+            target.BasketballTeamId = source.BasketballTeamId;
+            target.BasketballShirtNumber = source.BasketballShirtNumber;
+        }
+        if (target.BeachVolleyballTeamId == null)
+        {
+            target.BeachVolleyballTeamId = source.BeachVolleyballTeamId;
+            target.BeachVolleyballShirtNumber = source.BeachVolleyballShirtNumber;
+        }
+
+        var sourceChessTeamId = _dbContext.Entry(source).Property<long?>("ChessTeamId").CurrentValue;
+        if (sourceChessTeamId.HasValue)
+        {
+            var targetChessTeamId = _dbContext.Entry(target).Property<long?>("ChessTeamId").CurrentValue;
+            if (!targetChessTeamId.HasValue)
+            {
+                _dbContext.Entry(target).Property<long?>("ChessTeamId").CurrentValue = sourceChessTeamId;
+            }
+        }
+        var sourceCheckersTeamId = _dbContext.Entry(source).Property<long?>("CheckersTeamId").CurrentValue;
+        if (sourceCheckersTeamId.HasValue)
+        {
+            var targetCheckersTeamId = _dbContext.Entry(target).Property<long?>("CheckersTeamId").CurrentValue;
+            if (!targetCheckersTeamId.HasValue)
+            {
+                _dbContext.Entry(target).Property<long?>("CheckersTeamId").CurrentValue = sourceCheckersTeamId;
+            }
+        }
+
+        _dbContext.Entry(source).Property<long?>("ChessTeamId").CurrentValue = null;
+        _dbContext.Entry(source).Property<long?>("CheckersTeamId").CurrentValue = null;
     }
 
     private async Task MergePlayersDataAsync(long sourceId, long targetId, CancellationToken cancellationToken)
@@ -1567,6 +1636,8 @@ public class PlayerService : IPlayerService
         foreach (var m in badMatches1) m.Player1Id = targetId;
         var badMatches2 = await _dbContext.BadmintonMatches.Where(m => m.Player2Id == sourceId).ToListAsync(cancellationToken);
         foreach (var m in badMatches2) m.Player2Id = targetId;
+        var badWinner = await _dbContext.BadmintonMatches.Where(m => m.WinnerPlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var m in badWinner) m.WinnerPlayerId = targetId;
 
         // Football Goals
         var goals = await _dbContext.FootballGoals.Where(g => g.PlayerId == sourceId).ToListAsync(cancellationToken);
@@ -1587,6 +1658,21 @@ public class PlayerService : IPlayerService
         foreach (var e in events2) e.SecondPlaceId = targetId;
         var events3 = await _dbContext.Set<Event>().Where(e => e.ThirdPlaceId == sourceId).ToListAsync(cancellationToken);
         foreach (var e in events3) e.ThirdPlaceId = targetId;
+        var eventsMvp = await _dbContext.Set<Event>().Where(e => e.MvpId == sourceId).ToListAsync(cancellationToken);
+        foreach (var e in eventsMvp) e.MvpId = targetId;
+
+        // Event Votes
+        var votes = await _dbContext.EventVotes.Where(v => v.VotedForPlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var v in votes) v.VotedForPlayerId = targetId;
+
+        // Profile Merge Requests
+        var otherMergeRequests = await _dbContext.ProfileMergeRequests
+            .Where(r => r.TargetPlayerId == sourceId)
+            .ToListAsync(cancellationToken);
+        foreach (var r in otherMergeRequests)
+        {
+            r.TargetPlayerId = targetId;
+        }
 
         // 3. Reassign Team roles (Captain, Goalkeeper, Match captains/goalkeepers) to prevent Restrict constraint violations
 
@@ -1678,6 +1764,23 @@ public class PlayerService : IPlayerService
         {
             m.AwayRoster!.Remove(m.AwayRoster.First(p => p.Id == sourceId));
             if (!m.AwayRoster.Any(p => p.Id == targetId)) m.AwayRoster.Add(targetPlayer);
+        }
+
+        // Badminton Teams (reassign players)
+        var badTeams1 = await _dbContext.Set<PolytechLeague.Domain.Entities.Badminton.BadmintonTeam>().Where(t => t.Player1Id == sourceId).ToListAsync(cancellationToken);
+        foreach (var t in badTeams1) t.Player1Id = targetId;
+        var badTeams2 = await _dbContext.Set<PolytechLeague.Domain.Entities.Badminton.BadmintonTeam>().Where(t => t.Player2Id == sourceId).ToListAsync(cancellationToken);
+        foreach (var t in badTeams2) t.Player2Id = targetId;
+
+        // Table Tennis Teams (many-to-many players)
+        var ttTeams = await _dbContext.Set<PolytechLeague.Domain.Entities.TableTennis.TableTennisTeam>()
+            .Include(t => t.Players)
+            .Where(t => t.Players!.Any(p => p.Id == sourceId))
+            .ToListAsync(cancellationToken);
+        foreach (var t in ttTeams)
+        {
+            t.Players!.Remove(t.Players.First(p => p.Id == sourceId));
+            if (!t.Players.Any(p => p.Id == targetId)) t.Players.Add(targetPlayer);
         }
     }
 

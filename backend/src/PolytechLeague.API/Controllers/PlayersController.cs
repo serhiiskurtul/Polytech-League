@@ -309,6 +309,7 @@ public class PlayersController : ControllerBase
         }
 
         await _playerService.ApproveMergeRequestAsync(id, cancellationToken);
+        await _redisService.RemoveGroupAsync("player_profiles_group");
         return Ok();
     }
 
@@ -366,6 +367,7 @@ public class PlayersController : ControllerBase
         }
 
         await _playerService.MergePlayersManuallyAsync(sourcePlayerId, targetPlayerId, cancellationToken);
+        await _redisService.RemoveGroupAsync("player_profiles_group");
         return Ok();
     }
 
