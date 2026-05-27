@@ -139,16 +139,23 @@ export const AdminUsersPage = () => {
       return;
     }
     try {
-      await mergePlayersManually(sourceId, targetId);
-      toast.success('Гравців успішно об\'єднано');
+      await toast.promise(
+        mergePlayersManually(sourceId, targetId),
+        {
+          loading: 'Об\'єднання гравців... Будь ласка, зачекайте, це може зайняти деякий час.',
+          success: 'Гравців успішно об\'єднано!',
+          error: (error: any) => {
+            console.error(error);
+            const data = error.response?.data;
+            return typeof data === 'string'
+              ? data
+              : (data?.detail || data?.title || 'Не вдалося об\'єднати гравців');
+          }
+        }
+      );
       fetchPlayers();
     } catch (error: any) {
-      console.error(error);
-      const data = error.response?.data;
-      const errMsg = typeof data === 'string'
-        ? data
-        : (data?.detail || data?.title || 'Не вдалося об\'єднати гравців');
-      toast.error(errMsg);
+      // Error is handled by toast.promise
     }
   };
 
