@@ -60,7 +60,7 @@ public class PlayersController : ControllerBase
         await _redisService.SetDataAsync(cacheKey, player, TimeSpan.FromHours(24), "player_profiles_group");
         if (player.Id.HasValue)
         {
-            var playerCacheKey = $"player_profile_id_{player.Id.Value}";
+            var playerCacheKey = $"player_profile_{player.Id.Value}";
             await _redisService.SetDataAsync(playerCacheKey, player, TimeSpan.FromHours(24), "player_profiles_group");
         }
         return Ok(player);
@@ -102,7 +102,7 @@ public class PlayersController : ControllerBase
 
         if (player != null && player.Id.HasValue)
         {
-            var playerCacheKey = $"player_profile_id_{player.Id.Value}";
+            var playerCacheKey = $"player_profile_{player.Id.Value}";
             await _redisService.RemoveDataAsync(playerCacheKey);
         }
 
@@ -131,7 +131,7 @@ public class PlayersController : ControllerBase
 
         if (updated != null && updated.Id.HasValue)
         {
-            var playerCacheKey = $"player_profile_id_{updated.Id.Value}";
+            var playerCacheKey = $"player_profile_{updated.Id.Value}";
             await _redisService.SetDataAsync(playerCacheKey, updated, TimeSpan.FromHours(24), "player_profiles_group");
         }
 
@@ -152,7 +152,7 @@ public class PlayersController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<PlayerDto>> GetById(long id, CancellationToken cancellationToken)
     {
-        var cacheKey = $"player_profile_id_{id}";
+        var cacheKey = $"player_profile_{id}";
         var cached = await _redisService.GetDataAsync<PlayerDto>(cacheKey);
         if (cached != null) return Ok(cached);
 
@@ -184,7 +184,7 @@ public class PlayersController : ControllerBase
         var player = await _playerService.GetByIdAsync(id, cancellationToken);
         if (player != null)
         {
-            var playerCacheKey = $"player_profile_id_{id}";
+            var playerCacheKey = $"player_profile_{id}";
             await _redisService.RemoveDataAsync(playerCacheKey);
 
             if (player.UserId.HasValue)
@@ -208,7 +208,7 @@ public class PlayersController : ControllerBase
         var player = await _playerService.GetByIdAsync(id, cancellationToken);
         if (player != null)
         {
-            var playerCacheKey = $"player_profile_id_{id}";
+            var playerCacheKey = $"player_profile_{id}";
             await _redisService.RemoveDataAsync(playerCacheKey);
 
             if (player.UserId.HasValue)
@@ -287,7 +287,7 @@ public class PlayersController : ControllerBase
             var targetPlayer = await _playerService.GetByIdAsync(req.TargetPlayerId, cancellationToken);
             if (targetPlayer != null)
             {
-                var targetPlayerCacheKey = $"player_profile_id_{req.TargetPlayerId}";
+                var targetPlayerCacheKey = $"player_profile_{req.TargetPlayerId}";
                 await _redisService.RemoveDataAsync(targetPlayerCacheKey);
 
                 if (targetPlayer.UserId.HasValue)
@@ -303,7 +303,7 @@ public class PlayersController : ControllerBase
             var requestingPlayer = await _playerService.GetByUserIdAsync(req.UserId, cancellationToken);
             if (requestingPlayer != null && requestingPlayer.Id.HasValue)
             {
-                var requestingPlayerCacheKey = $"player_profile_id_{requestingPlayer.Id.Value}";
+                var requestingPlayerCacheKey = $"player_profile_{requestingPlayer.Id.Value}";
                 await _redisService.RemoveDataAsync(requestingPlayerCacheKey);
             }
         }
@@ -338,7 +338,7 @@ public class PlayersController : ControllerBase
         
         if (sourcePlayer != null)
         {
-            var sourcePlayerCacheKey = $"player_profile_id_{sourcePlayerId}";
+            var sourcePlayerCacheKey = $"player_profile_{sourcePlayerId}";
             await _redisService.RemoveDataAsync(sourcePlayerCacheKey);
 
             if (sourcePlayer.UserId.HasValue)
@@ -353,7 +353,7 @@ public class PlayersController : ControllerBase
 
         if (targetPlayer != null)
         {
-            var targetPlayerCacheKey = $"player_profile_id_{targetPlayerId}";
+            var targetPlayerCacheKey = $"player_profile_{targetPlayerId}";
             await _redisService.RemoveDataAsync(targetPlayerCacheKey);
 
             if (targetPlayer.UserId.HasValue)
