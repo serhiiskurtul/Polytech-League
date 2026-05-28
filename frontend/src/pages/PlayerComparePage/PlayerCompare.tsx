@@ -204,7 +204,7 @@ export const PlayerComparePage = () => {
     return uniqueTournaments.size;
   };
 
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://polytech-league-production.up.railway.app';
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'https://polytech-league-testing.up.railway.app' : 'https://polytech-league-production.up.railway.app');
 
   if (loading) {
     return (
