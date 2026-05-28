@@ -20,9 +20,9 @@ export interface PagedResponse<T> {
 export const getUsers = async (page = 1, pageSize = 10, search = ''): Promise<PagedResponse<UserResponse>> => {
   const response = await api.get<PagedResponse<UserResponse>>('/users', {
     params: {
-      'page.PageNumber': page,
-      'page.PageSize': pageSize,
-      'filter.FirstName': search || undefined,
+      Page: page,
+      PageSize: pageSize,
+      Name: search || undefined,
     }
   });
   return response.data;
@@ -31,7 +31,7 @@ export const getUsers = async (page = 1, pageSize = 10, search = ''): Promise<Pa
 export const searchUsers = async (query: string): Promise<UserResponse[]> => {
   const response = await api.get<PagedResponse<UserResponse>>('/users', {
     params: {
-      'filter.FirstName': query,
+      Name: query,
     }
   });
   return response.data.data;
