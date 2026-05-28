@@ -6,8 +6,12 @@ import { getPlayersRankings } from '../../shared/api/players.api';
 import { getSeasons } from '../../shared/api/seasonRating.api';
 import { PlayerDto } from '../../shared/types/player.types';
 import { Season } from '../../shared/types/seasonRating.types';
+import { useAuth } from '../../app/providers/AuthContext';
 
 const PlayersRatingPage = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 1 || user?.role === '1' || user?.role === 'Admin';
+
   const [searchParams] = useSearchParams();
   const p1Id = searchParams.get('p1');
   const [players, setPlayers] = useState<PlayerDto[]>([]);
@@ -371,6 +375,21 @@ const PlayersRatingPage = () => {
                               </div>
                               <div className={styles.playerSubInfo}>
                                 <span className={styles.groupText}>{player.group || '—'}</span>
+                                {isAdmin && (
+                                  <>
+                                    <span className={styles.adminDivider}>•</span>
+                                    <span className={styles.idText} title="ID гравця">ID: {player.id}</span>
+                                    {player.userEmail && (
+                                      <>
+                                        <span className={styles.adminDivider}>•</span>
+                                        <span className={styles.emailText} title="Електронна пошта">
+                                          <i className="fa-regular fa-envelope" style={{ marginRight: '4px' }}></i>
+                                          {player.userEmail}
+                                        </span>
+                                      </>
+                                    )}
+                                  </>
+                                )}
                               </div>
                             </div>
                           </Link>

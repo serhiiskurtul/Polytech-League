@@ -992,3 +992,18 @@
   font-weight: 600;
   color: #1e293b;
 }
+
+.adminDivider {
+  margin: 0 6px;
+  color: #cbd5e1;
+}
+
+.idText {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.emailText {
+  color: #2563eb;
+  font-weight: 500;
+}
