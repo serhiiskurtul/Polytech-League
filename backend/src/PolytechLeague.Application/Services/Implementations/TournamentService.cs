@@ -68,18 +68,18 @@ public class TournamentService : ITournamentService
         // Server-side filtering by status (based on date logic)
         if (!string.IsNullOrEmpty(status) && status != "all")
         {
-            var today = DateTime.UtcNow.Date;
+            var now = DateTime.UtcNow;
             if (status == "upcoming")
             {
-                query = query.Where(e => e.Date > today);
+                query = query.Where(e => e.Date > now);
             }
             else if (status == "ongoing")
             {
-                query = query.Where(e => e.Date == today);
+                query = query.Where(e => e.Date <= now && (e.EndDate.HasValue ? e.EndDate.Value >= now : e.Date >= now.AddDays(-1)));
             }
             else if (status == "completed")
             {
-                query = query.Where(e => e.Date < today);
+                query = query.Where(e => (e.EndDate.HasValue && e.EndDate.Value < now) || (!e.EndDate.HasValue && e.Date < now.AddDays(-1)));
             }
         }
 
@@ -109,7 +109,7 @@ public class TournamentService : ITournamentService
             RegistrationStart = e.RegistrationStart?.ToString("yyyy-MM-ddTHH:mm:ssZ"),
             RegistrationEnd = e.RegistrationEnd?.ToString("yyyy-MM-ddTHH:mm:ssZ") ?? e.Date.AddDays(-5).ToString("yyyy-MM-ddTHH:mm:ssZ"),
             EndDate = e.EndDate?.ToString("yyyy-MM-ddTHH:mm:ssZ"),
-            CurrentRound = GetStatus(e) == "ongoing" ? "В процесі" : "Реєстрація",
+            CurrentRound = GetCurrentRoundLabel(GetStatus(e)),
             Registered = false,
             Featured = false,
             IsTeam = e.IsTeam,
@@ -161,7 +161,7 @@ public class TournamentService : ITournamentService
             RegistrationStart = e.RegistrationStart?.ToString("yyyy-MM-ddTHH:mm:ssZ"),
             RegistrationEnd = e.RegistrationEnd?.ToString("yyyy-MM-ddTHH:mm:ssZ") ?? e.Date.AddDays(-5).ToString("yyyy-MM-ddTHH:mm:ssZ"),
             EndDate = e.EndDate?.ToString("yyyy-MM-ddTHH:mm:ssZ"),
-            CurrentRound = GetStatus(e) == "ongoing" ? "В процесі" : "Реєстрація",
+            CurrentRound = GetCurrentRoundLabel(GetStatus(e)),
             Registered = false,
             Featured = false,
             IsTeam = e.IsTeam,
@@ -290,6 +290,18 @@ public class TournamentService : ITournamentService
         if (e.Date > now) return "upcoming";
 
         return "completed";
+    }
+
+    private string GetCurrentRoundLabel(string status)
+    {
+        return status switch
+        {
+            "ongoing" => "В процесі",
+            "completed" => "Завершено",
+            "registration" => "Реєстрація",
+            "upcoming" => "Заплановано",
+            _ => "Реєстрація"
+        };
     }
 
     public async Task<GeneralStatsDto> GetGeneralStatsAsync()
