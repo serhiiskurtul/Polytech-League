@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getUsers, blockUser, unblockUser, deleteUser, UserResponse } from '@/shared/api/users.api';
-import { getAllPlayers, deletePlayer, searchPlayers, getPlayersRankings } from '@/shared/api/players.api';
+import { getAllPlayers, deletePlayer, searchPlayers, getPlayersRankings, mergePlayersManually } from '@/shared/api/players.api';
 import { PlayerDto } from '@/shared/types/player.types';
 import { getPhotoUrl } from '@/shared/utils/photo.utils';
 import { Link } from 'react-router-dom';
@@ -118,6 +118,44 @@ export const AdminUsersPage = () => {
       fetchPlayers();
     } catch (error) {
       toast.error('Помилка при видаленні гравця');
+    }
+  };
+
+  const handleMergePlayers = async (sourceId: number) => {
+    const targetIdStr = prompt(
+      `Об'єднання гравців.\nВи дійсно хочете ПЕРЕНЕСТИ всі дані з цього гравця (ID: ${sourceId})?\nВведіть ID цільового гравця (який залишиться і отримає всі досягнення та прив'язку до акаунту):`
+    );
+    if (!targetIdStr) return;
+    const targetId = parseInt(targetIdStr.trim(), 10);
+    if (isNaN(targetId)) {
+      toast.error('Некоректний ID цільового гравця');
+      return;
+    }
+    if (sourceId === targetId) {
+      toast.error('Не можна об\'єднати гравця з самим собою');
+      return;
+    }
+    if (!window.confirm(`Ви дійсно хочете перенести всі дані гравця з ID ${sourceId} в гравця з ID ${targetId}?\nГравець ${sourceId} буде видалений.`)) {
+      return;
+    }
+    try {
+      await toast.promise(
+        mergePlayersManually(sourceId, targetId),
+        {
+          loading: 'Об\'єднання гравців... Будь ласка, зачекайте, це може зайняти деякий час.',
+          success: 'Гравців успішно об\'єднано!',
+          error: (error: any) => {
+            console.error(error);
+            const data = error.response?.data;
+            return typeof data === 'string'
+              ? data
+              : (data?.detail || data?.title || 'Не вдалося об\'єднати гравців');
+          }
+        }
+      );
+      fetchPlayers();
+    } catch (error: any) {
+      // Error is handled by toast.promise
     }
   };
 
@@ -300,6 +338,14 @@ export const AdminUsersPage = () => {
                         <td>{player.performanceScore}</td>
                         <td>
                           <div className={styles.actions}>
+                            <button 
+                              className={styles.actionBtn}
+                              onClick={() => player.id && handleMergePlayers(player.id)}
+                              title="Об'єднати з іншим гравцем"
+                              style={{ color: '#3b82f6' }}
+                            >
+                              <i className="fas fa-compress-alt"></i>
+                            </button>
                             <Link 
                               to={`/players/${player.id}`} 
                               className={styles.actionBtn}

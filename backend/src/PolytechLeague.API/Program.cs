@@ -37,6 +37,7 @@ builder.Services.AddCors(options =>
                                 "http://localhost:3000", 
                                 "http://localhost:5174",
                                 "https://polytech-league.vercel.app",
+                                "https://polytech-league-develop.vercel.app",
                                 "https://polytech-league.com",
                                 "https://www.polytech-league.com")
                   .AllowAnyHeader()

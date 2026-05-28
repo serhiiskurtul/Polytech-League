@@ -95,3 +95,7 @@ export const getHeadToHead = async (p1: number | string, p2: number | string): P
     return response.data;
 };
 
+export const mergePlayersManually = async (sourcePlayerId: number, targetPlayerId: number): Promise<void> => {
+    await api.post(`/players/merge-manual?sourcePlayerId=${sourcePlayerId}&targetPlayerId=${targetPlayerId}`);
+};
+

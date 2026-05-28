@@ -21,15 +21,22 @@ public class BeachVolleyballEventsController(
         var entities = await beachVolleyballEventService.GetAllAsync(cancellationToken: cancellationToken);
         var response = entities.Select(e => e.ToResponse()).ToList();
 
-        await redisService.SetDataAsync("beachvolleyball_events_all", response, TimeSpan.FromMinutes(60), "beachvolleyball_events_group");
+        await redisService.SetDataAsync("beachvolleyball_events_all", response, TimeSpan.FromHours(24), "beachvolleyball_events_group");
         return Ok(response);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(long id, CancellationToken cancellationToken)
     {
+        var cacheKey = $"beachvolleyball_event_{id}";
+        var cached = await redisService.GetDataAsync<BeachVolleyballEventResponse>(cacheKey);
+        if (cached != null) return Ok(cached);
+
         var entity = await beachVolleyballEventService.GetByIdAsync(id, cancellationToken);
-        return Ok(entity.ToResponse());
+        var response = entity.ToResponse();
+
+        await redisService.SetDataAsync(cacheKey, response, TimeSpan.FromHours(24), "beachvolleyball_events_group");
+        return Ok(response);
     }
 
     [Authorize(Policy = "Admin")]

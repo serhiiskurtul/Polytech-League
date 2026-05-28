@@ -1255,6 +1255,8 @@ public class PlayerService : IPlayerService
         {
             // MOVE ALL DATA FROM currentPlayer TO targetPlayer
             await MergePlayersDataAsync(currentPlayer.Id, targetPlayer.Id, cancellationToken);
+            CopyPlayerProperties(currentPlayer, targetPlayer);
+            currentPlayer.UserId = null;
             // Delete the temporary current player
             _dbContext.Players.Remove(currentPlayer);
         }
@@ -1329,48 +1331,320 @@ public class PlayerService : IPlayerService
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task MergePlayersManuallyAsync(long sourcePlayerId, long targetPlayerId, CancellationToken cancellationToken = default)
+    {
+        var sourcePlayer = await _dbContext.Players.FindAsync(new object[] { sourcePlayerId }, cancellationToken);
+        var targetPlayer = await _dbContext.Players.FindAsync(new object[] { targetPlayerId }, cancellationToken);
+
+        if (sourcePlayer == null || targetPlayer == null)
+        {
+            throw new KeyNotFoundException("Гравця не знайдено");
+        }
+
+        if (sourcePlayer.Id == targetPlayer.Id)
+        {
+            throw new InvalidOperationException("Неможливо об'єднати гравця з самим собою");
+        }
+
+        // Move UserId if source has it and target does not
+        if (sourcePlayer.UserId.HasValue)
+        {
+            if (!targetPlayer.UserId.HasValue)
+            {
+                targetPlayer.UserId = sourcePlayer.UserId;
+                sourcePlayer.UserId = null; // Clear to prevent unique constraint conflict
+            }
+            else if (targetPlayer.UserId != sourcePlayer.UserId)
+            {
+                throw new InvalidOperationException("Обидва профілі прив'язані до різних акаунтів. Спочатку відв'яжіть один з них.");
+            }
+        }
+
+        // Copy profile fields if target does not have them
+        CopyPlayerProperties(sourcePlayer, targetPlayer);
+
+        // Merge all data from source to target
+        await MergePlayersDataAsync(sourcePlayer.Id, targetPlayer.Id, cancellationToken);
+
+        // Clean up any profile merge requests associated with these players
+        var mergeRequests = await _dbContext.ProfileMergeRequests
+            .Where(r => (r.UserId == sourcePlayer.UserId || r.UserId == targetPlayer.UserId) && 
+                        (r.TargetPlayerId == sourcePlayer.Id || r.TargetPlayerId == targetPlayer.Id))
+            .ToListAsync(cancellationToken);
+            
+        foreach (var req in mergeRequests)
+        {
+            req.Status = RegistrationStatus.Approved;
+        }
+
+        // Delete the source player
+        _dbContext.Players.Remove(sourcePlayer);
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private void CopyPlayerProperties(Player source, Player target)
+    {
+        if (target.ChessRating == null || target.ChessRating == 0) target.ChessRating = source.ChessRating;
+        if (string.IsNullOrEmpty(target.ChessFideId)) target.ChessFideId = source.ChessFideId;
+        if (string.IsNullOrEmpty(target.ChessTitle)) target.ChessTitle = source.ChessTitle;
+        if (target.CheckersRating == null || target.CheckersRating == 0) target.CheckersRating = source.CheckersRating;
+        if (target.TableTennisRating == null || target.TableTennisRating == 0) target.TableTennisRating = source.TableTennisRating;
+        if (target.TableTennisHand == null) target.TableTennisHand = source.TableTennisHand;
+        if (target.ArmwrestlingWeight == null || target.ArmwrestlingWeight == 0) target.ArmwrestlingWeight = source.ArmwrestlingWeight;
+        if (target.ArmwrestlingPreferredWeightClass == null) target.ArmwrestlingPreferredWeightClass = source.ArmwrestlingPreferredWeightClass;
+        if (string.IsNullOrEmpty(target.Bio)) target.Bio = source.Bio;
+        if (string.IsNullOrEmpty(target.InstagramUrl)) target.InstagramUrl = source.InstagramUrl;
+        if (string.IsNullOrEmpty(target.PreviousNames)) target.PreviousNames = source.PreviousNames;
+        if (!target.IsFounder) target.IsFounder = source.IsFounder;
+        if (target.CollegeId == null) target.CollegeId = source.CollegeId;
+        if (target.Gender == Gender.None) target.Gender = source.Gender;
+
+        if (target.FootballTeamId == null)
+        {
+            target.FootballTeamId = source.FootballTeamId;
+            target.FootballPosition = source.FootballPosition;
+            target.FootballShirtNumber = source.FootballShirtNumber;
+        }
+        if (target.VolleyballTeamId == null)
+        {
+            target.VolleyballTeamId = source.VolleyballTeamId;
+            target.VolleyballPosition = source.VolleyballPosition;
+            target.VolleyballShirtNumber = source.VolleyballShirtNumber;
+        }
+        if (target.BasketballTeamId == null)
+        {
+            target.BasketballTeamId = source.BasketballTeamId;
+            target.BasketballShirtNumber = source.BasketballShirtNumber;
+        }
+        if (target.BeachVolleyballTeamId == null)
+        {
+            target.BeachVolleyballTeamId = source.BeachVolleyballTeamId;
+            target.BeachVolleyballShirtNumber = source.BeachVolleyballShirtNumber;
+        }
+
+        var sourceChessTeamId = _dbContext.Entry(source).Property<long?>("ChessTeamId").CurrentValue;
+        if (sourceChessTeamId.HasValue)
+        {
+            var targetChessTeamId = _dbContext.Entry(target).Property<long?>("ChessTeamId").CurrentValue;
+            if (!targetChessTeamId.HasValue)
+            {
+                _dbContext.Entry(target).Property<long?>("ChessTeamId").CurrentValue = sourceChessTeamId;
+            }
+        }
+        var sourceCheckersTeamId = _dbContext.Entry(source).Property<long?>("CheckersTeamId").CurrentValue;
+        if (sourceCheckersTeamId.HasValue)
+        {
+            var targetCheckersTeamId = _dbContext.Entry(target).Property<long?>("CheckersTeamId").CurrentValue;
+            if (!targetCheckersTeamId.HasValue)
+            {
+                _dbContext.Entry(target).Property<long?>("CheckersTeamId").CurrentValue = sourceCheckersTeamId;
+            }
+        }
+
+        _dbContext.Entry(source).Property<long?>("ChessTeamId").CurrentValue = null;
+        _dbContext.Entry(source).Property<long?>("CheckersTeamId").CurrentValue = null;
+    }
+
     private async Task MergePlayersDataAsync(long sourceId, long targetId, CancellationToken cancellationToken)
     {
-        // Update all related tables - Reassigning everything from the "new" profile back to the "archival" one
+        // 1. Participant tables with composite primary key: prevent duplicate tracking errors and SQL primary key violations.
+
         // Chess
-        var chessPart = await _dbContext.ChessEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var p in chessPart) p.PlayerId = targetId;
+        var chessPart = await _dbContext.ChessEventParticipants.AsNoTracking().Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        var targetChessTournaments = await _dbContext.ChessEventParticipants.Where(p => p.PlayerId == targetId).Select(p => p.TournamentId).ToListAsync(cancellationToken);
+        if (chessPart.Any()) await _dbContext.ChessEventParticipants.Where(p => p.PlayerId == sourceId).ExecuteDeleteAsync(cancellationToken);
+        var newChessParts = new List<PolytechLeague.Domain.Entities.Chess.ChessEventParticipant>();
+        foreach (var p in chessPart)
+        {
+            if (!targetChessTournaments.Contains(p.TournamentId))
+            {
+                p.PlayerId = targetId;
+                newChessParts.Add(p);
+            }
+        }
+        if (newChessParts.Any()) _dbContext.ChessEventParticipants.AddRange(newChessParts);
+
+        // Checkers
+        var checkersPart = await _dbContext.CheckersEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        var targetCheckersParts = await _dbContext.CheckersEventParticipants.Where(p => p.PlayerId == targetId).ToListAsync(cancellationToken);
+        
+        foreach (var p in checkersPart)
+        {
+            var targetP = targetCheckersParts.FirstOrDefault(t => t.TournamentId == p.TournamentId);
+            if (targetP != null)
+            {
+                // Target already has a participant in this tournament.
+                // Reassign all games from 'p' to 'targetP'
+                var gamesW = await _dbContext.CheckersGames.Where(g => g.WhitePlayerId == p.Id).ToListAsync(cancellationToken);
+                foreach (var g in gamesW) g.WhitePlayerId = targetP.Id;
+                
+                var gamesB = await _dbContext.CheckersGames.Where(g => g.BlackPlayerId == p.Id).ToListAsync(cancellationToken);
+                foreach (var g in gamesB) g.BlackPlayerId = targetP.Id;
+                
+                // Now safe to delete the duplicate participant 'p'
+                _dbContext.CheckersEventParticipants.Remove(p);
+            }
+            else
+            {
+                // Target doesn't have a participant, just update PlayerId
+                p.PlayerId = targetId;
+            }
+        }
+
+        // Table Tennis
+        var ttPart = await _dbContext.TableTennisEventParticipants.AsNoTracking().Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        var targetTtTournaments = await _dbContext.TableTennisEventParticipants.Where(p => p.PlayerId == targetId).Select(p => p.TournamentId).ToListAsync(cancellationToken);
+        if (ttPart.Any()) await _dbContext.TableTennisEventParticipants.Where(p => p.PlayerId == sourceId).ExecuteDeleteAsync(cancellationToken);
+        var newTtParts = new List<PolytechLeague.Domain.Entities.TableTennis.TableTennisEventParticipant>();
+        foreach (var p in ttPart)
+        {
+            if (!targetTtTournaments.Contains(p.TournamentId))
+            {
+                p.PlayerId = targetId;
+                newTtParts.Add(p);
+            }
+        }
+        if (newTtParts.Any()) _dbContext.TableTennisEventParticipants.AddRange(newTtParts);
+
+        // Armwrestling
+        var armPart = await _dbContext.ArmwrestlingEventParticipants.AsNoTracking().Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        var targetArmTournaments = await _dbContext.ArmwrestlingEventParticipants.Where(p => p.PlayerId == targetId).Select(p => p.TournamentId).ToListAsync(cancellationToken);
+        if (armPart.Any()) await _dbContext.ArmwrestlingEventParticipants.Where(p => p.PlayerId == sourceId).ExecuteDeleteAsync(cancellationToken);
+        var newArmParts = new List<PolytechLeague.Domain.Entities.Armwrestling.ArmwrestlingEventParticipant>();
+        foreach (var p in armPart)
+        {
+            if (!targetArmTournaments.Contains(p.TournamentId))
+            {
+                p.PlayerId = targetId;
+                newArmParts.Add(p);
+            }
+        }
+        if (newArmParts.Any()) _dbContext.ArmwrestlingEventParticipants.AddRange(newArmParts);
+
+        // Badminton
+        var badPart = await _dbContext.BadmintonEventParticipants.AsNoTracking().Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        var targetBadEvents = await _dbContext.BadmintonEventParticipants.Where(p => p.PlayerId == targetId).Select(p => p.EventId).ToListAsync(cancellationToken);
+        if (badPart.Any()) await _dbContext.BadmintonEventParticipants.Where(p => p.PlayerId == sourceId).ExecuteDeleteAsync(cancellationToken);
+        var newBadParts = new List<PolytechLeague.Domain.Entities.Badminton.BadmintonEventParticipant>();
+        foreach (var p in badPart)
+        {
+            if (!targetBadEvents.Contains(p.EventId))
+            {
+                p.PlayerId = targetId;
+                newBadParts.Add(p);
+            }
+        }
+        if (newBadParts.Any()) _dbContext.BadmintonEventParticipants.AddRange(newBadParts);
+
+        // Football Event Participants
+        var footballParts = await _dbContext.FootballEventParticipants.AsNoTracking().Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        var targetFootballEvents = await _dbContext.FootballEventParticipants.Where(p => p.PlayerId == targetId).Select(p => p.EventId).ToListAsync(cancellationToken);
+        if (footballParts.Any()) await _dbContext.FootballEventParticipants.Where(p => p.PlayerId == sourceId).ExecuteDeleteAsync(cancellationToken);
+        var newFootballParts = new List<PolytechLeague.Domain.Entities.Football.FootballEventParticipant>();
+        foreach (var p in footballParts)
+        {
+            if (!targetFootballEvents.Contains(p.EventId))
+            {
+                p.PlayerId = targetId;
+                newFootballParts.Add(p);
+            }
+        }
+        if (newFootballParts.Any()) _dbContext.FootballEventParticipants.AddRange(newFootballParts);
+
+        // Volleyball Event Participants
+        var volleyParts = await _dbContext.VolleyballEventParticipants.AsNoTracking().Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        var targetVolleyEvents = await _dbContext.VolleyballEventParticipants.Where(p => p.PlayerId == targetId).Select(p => p.EventId).ToListAsync(cancellationToken);
+        if (volleyParts.Any()) await _dbContext.VolleyballEventParticipants.Where(p => p.PlayerId == sourceId).ExecuteDeleteAsync(cancellationToken);
+        var newVolleyParts = new List<PolytechLeague.Domain.Entities.Volleyball.VolleyballEventParticipant>();
+        foreach (var p in volleyParts)
+        {
+            if (!targetVolleyEvents.Contains(p.EventId))
+            {
+                p.PlayerId = targetId;
+                newVolleyParts.Add(p);
+            }
+        }
+        if (newVolleyParts.Any()) _dbContext.VolleyballEventParticipants.AddRange(newVolleyParts);
+
+        // Basketball Event Participants
+        var bballParts = await _dbContext.BasketballEventParticipants.AsNoTracking().Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        var targetBballEvents = await _dbContext.BasketballEventParticipants.Where(p => p.PlayerId == targetId).Select(p => p.EventId).ToListAsync(cancellationToken);
+        if (bballParts.Any()) await _dbContext.BasketballEventParticipants.Where(p => p.PlayerId == sourceId).ExecuteDeleteAsync(cancellationToken);
+        var newBballParts = new List<PolytechLeague.Domain.Entities.Basketball.BasketballEventParticipant>();
+        foreach (var p in bballParts)
+        {
+            if (!targetBballEvents.Contains(p.EventId))
+            {
+                p.PlayerId = targetId;
+                newBballParts.Add(p);
+            }
+        }
+        if (newBballParts.Any()) _dbContext.BasketballEventParticipants.AddRange(newBballParts);
+
+        // Beach Volleyball Event Participants
+        var beachVParts = await _dbContext.BeachVolleyballEventParticipants.AsNoTracking().Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        var targetBeachVEvents = await _dbContext.BeachVolleyballEventParticipants.Where(p => p.PlayerId == targetId).Select(p => p.EventId).ToListAsync(cancellationToken);
+        if (beachVParts.Any()) await _dbContext.BeachVolleyballEventParticipants.Where(p => p.PlayerId == sourceId).ExecuteDeleteAsync(cancellationToken);
+        var newBeachVParts = new List<PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballEventParticipant>();
+        foreach (var p in beachVParts)
+        {
+            if (!targetBeachVEvents.Contains(p.EventId))
+            {
+                p.PlayerId = targetId;
+                newBeachVParts.Add(p);
+            }
+        }
+        if (newBeachVParts.Any()) _dbContext.BeachVolleyballEventParticipants.AddRange(newBeachVParts);
+
+        // Athletics Event Participants
+        var athleticsParts = await _dbContext.Set<PolytechLeague.Domain.Entities.Athletics.AthleticsEventParticipant>().AsNoTracking().Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
+        var targetAthleticsEvents = await _dbContext.Set<PolytechLeague.Domain.Entities.Athletics.AthleticsEventParticipant>().Where(p => p.PlayerId == targetId).Select(p => p.AthleticsEventId).ToListAsync(cancellationToken);
+        if (athleticsParts.Any()) await _dbContext.Set<PolytechLeague.Domain.Entities.Athletics.AthleticsEventParticipant>().Where(p => p.PlayerId == sourceId).ExecuteDeleteAsync(cancellationToken);
+        var newAthleticsParts = new List<PolytechLeague.Domain.Entities.Athletics.AthleticsEventParticipant>();
+        foreach (var p in athleticsParts)
+        {
+            if (!targetAthleticsEvents.Contains(p.AthleticsEventId))
+            {
+                p.PlayerId = targetId;
+                newAthleticsParts.Add(p);
+            }
+        }
+        if (newAthleticsParts.Any()) _dbContext.Set<PolytechLeague.Domain.Entities.Athletics.AthleticsEventParticipant>().AddRange(newAthleticsParts);
+
+        // 2. Reassign other tables without composite/unique keys on PlayerId
+
+        // Chess games
         var chessGamesW = await _dbContext.ChessGames.Where(g => g.WhitePlayerId == sourceId).ToListAsync(cancellationToken);
         foreach (var g in chessGamesW) g.WhitePlayerId = targetId;
         var chessGamesB = await _dbContext.ChessGames.Where(g => g.BlackPlayerId == sourceId).ToListAsync(cancellationToken);
         foreach (var g in chessGamesB) g.BlackPlayerId = targetId;
-        // Checkers
-        var checkersPart = await _dbContext.CheckersEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var p in checkersPart) p.PlayerId = targetId;
-        var checkersGamesW = await _dbContext.CheckersGames.Where(g => g.WhitePlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var g in checkersGamesW) g.WhitePlayerId = targetId;
-        var checkersGamesB = await _dbContext.CheckersGames.Where(g => g.BlackPlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var g in checkersGamesB) g.BlackPlayerId = targetId;
-        // Table Tennis
-        var ttPart = await _dbContext.TableTennisEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var p in ttPart) p.PlayerId = targetId;
+
+
+        // Table Tennis matches
         var ttMatches1 = await _dbContext.TableTennisMatches.Where(m => m.Player1Id == sourceId).ToListAsync(cancellationToken);
         foreach (var m in ttMatches1) m.Player1Id = targetId;
         var ttMatches2 = await _dbContext.TableTennisMatches.Where(m => m.Player2Id == sourceId).ToListAsync(cancellationToken);
         foreach (var m in ttMatches2) m.Player2Id = targetId;
         var ttWinner = await _dbContext.TableTennisMatches.Where(m => m.WinnerId == sourceId).ToListAsync(cancellationToken);
         foreach (var m in ttWinner) m.WinnerId = targetId;
-        // Armwrestling
-        var armPart = await _dbContext.ArmwrestlingEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var p in armPart) p.PlayerId = targetId;
+
+        // Armwrestling matches
         var armMatches1 = await _dbContext.ArmwrestlingMatches.Where(m => m.Player1Id == sourceId).ToListAsync(cancellationToken);
         foreach (var m in armMatches1) m.Player1Id = targetId;
         var armMatches2 = await _dbContext.ArmwrestlingMatches.Where(m => m.Player2Id == sourceId).ToListAsync(cancellationToken);
         foreach (var m in armMatches2) m.Player2Id = targetId;
         var armWinner = await _dbContext.ArmwrestlingMatches.Where(m => m.WinnerId == sourceId).ToListAsync(cancellationToken);
         foreach (var m in armWinner) m.WinnerId = targetId;
-        // Badminton
-        var badPart = await _dbContext.BadmintonEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var p in badPart) p.PlayerId = targetId;
+
+        // Badminton matches
         var badMatches1 = await _dbContext.BadmintonMatches.Where(m => m.Player1Id == sourceId).ToListAsync(cancellationToken);
         foreach (var m in badMatches1) m.Player1Id = targetId;
         var badMatches2 = await _dbContext.BadmintonMatches.Where(m => m.Player2Id == sourceId).ToListAsync(cancellationToken);
         foreach (var m in badMatches2) m.Player2Id = targetId;
+        var badWinner = await _dbContext.BadmintonMatches.Where(m => m.WinnerPlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var m in badWinner) m.WinnerPlayerId = targetId;
+
         // Football Goals
         var goals = await _dbContext.FootballGoals.Where(g => g.PlayerId == sourceId).ToListAsync(cancellationToken);
         foreach (var g in goals) g.PlayerId = targetId;
@@ -1379,29 +1653,9 @@ public class PlayerService : IPlayerService
         var cards = await _dbContext.FootballCards.Where(c => c.PlayerId == sourceId).ToListAsync(cancellationToken);
         foreach (var c in cards) c.PlayerId = targetId;
 
-        // Football Event Participants
-        var footballParts = await _dbContext.FootballEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var p in footballParts) p.PlayerId = targetId;
-
         // Athletics Results
         var athleticsResults = await _dbContext.AthleticsResults.Where(r => r.PlayerId == sourceId).ToListAsync(cancellationToken);
         foreach (var r in athleticsResults) r.PlayerId = targetId;
-
-        // Volleyball Event Participants
-        var volleyParts = await _dbContext.VolleyballEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var p in volleyParts) p.PlayerId = targetId;
-
-        // Basketball Event Participants
-        var bballParts = await _dbContext.BasketballEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var p in bballParts) p.PlayerId = targetId;
-
-        // Beach Volleyball Event Participants
-        var beachVParts = await _dbContext.BeachVolleyballEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var p in beachVParts) p.PlayerId = targetId;
-
-        // Badminton Event Participants
-        var badParts = await _dbContext.BadmintonEventParticipants.Where(p => p.PlayerId == sourceId).ToListAsync(cancellationToken);
-        foreach (var p in badParts) p.PlayerId = targetId;
 
         // General Event Winners
         var events1 = await _dbContext.Set<Event>().Where(e => e.FirstPlaceId == sourceId).ToListAsync(cancellationToken);
@@ -1410,6 +1664,130 @@ public class PlayerService : IPlayerService
         foreach (var e in events2) e.SecondPlaceId = targetId;
         var events3 = await _dbContext.Set<Event>().Where(e => e.ThirdPlaceId == sourceId).ToListAsync(cancellationToken);
         foreach (var e in events3) e.ThirdPlaceId = targetId;
+        var eventsMvp = await _dbContext.Set<Event>().Where(e => e.MvpId == sourceId).ToListAsync(cancellationToken);
+        foreach (var e in eventsMvp) e.MvpId = targetId;
+
+        // Event Votes
+        var votes = await _dbContext.EventVotes.Where(v => v.VotedForPlayerId == sourceId).ToListAsync(cancellationToken);
+        foreach (var v in votes) v.VotedForPlayerId = targetId;
+
+        // Profile Merge Requests
+        var otherMergeRequests = await _dbContext.ProfileMergeRequests
+            .Where(r => r.TargetPlayerId == sourceId)
+            .ToListAsync(cancellationToken);
+        foreach (var r in otherMergeRequests)
+        {
+            r.TargetPlayerId = targetId;
+        }
+
+        // 3. Reassign Team roles (Captain, Goalkeeper, Match captains/goalkeepers) to prevent Restrict constraint violations
+
+        var footballTeamsCap = await _dbContext.FootballTeams.Where(t => t.CaptainId == sourceId).ToListAsync(cancellationToken);
+        foreach (var t in footballTeamsCap) t.CaptainId = targetId;
+        var footballTeamsGk = await _dbContext.FootballTeams.Where(t => t.GoalkeeperId == sourceId).ToListAsync(cancellationToken);
+        foreach (var t in footballTeamsGk) t.GoalkeeperId = targetId;
+
+        var footballMatchesHCap = await _dbContext.FootballMatches.Where(m => m.HomeCaptainId == sourceId).ToListAsync(cancellationToken);
+        foreach (var m in footballMatchesHCap) m.HomeCaptainId = targetId;
+        var footballMatchesACap = await _dbContext.FootballMatches.Where(m => m.AwayCaptainId == sourceId).ToListAsync(cancellationToken);
+        foreach (var m in footballMatchesACap) m.AwayCaptainId = targetId;
+
+        var footballMatchesHGk = await _dbContext.FootballMatches.Where(m => m.HomeGoalkeeperId == sourceId).ToListAsync(cancellationToken);
+        foreach (var m in footballMatchesHGk) m.HomeGoalkeeperId = targetId;
+        var footballMatchesAGk = await _dbContext.FootballMatches.Where(m => m.AwayGoalkeeperId == sourceId).ToListAsync(cancellationToken);
+        foreach (var m in footballMatchesAGk) m.AwayGoalkeeperId = targetId;
+
+        // 4. Update many-to-many match rosters using EF Core navigations
+        
+        var targetPlayer = await _dbContext.Players.FindAsync(new object[] { targetId }, cancellationToken);
+        if (targetPlayer == null) return;
+
+        // Football
+        var fbHomeMatches = await _dbContext.FootballMatches.Include(m => m.HomeRoster).Where(m => m.HomeRoster!.Any(p => p.Id == sourceId)).ToListAsync(cancellationToken);
+        foreach (var m in fbHomeMatches)
+        {
+            m.HomeRoster!.Remove(m.HomeRoster.First(p => p.Id == sourceId));
+            if (!m.HomeRoster.Any(p => p.Id == targetId)) m.HomeRoster.Add(targetPlayer);
+        }
+        var fbAwayMatches = await _dbContext.FootballMatches.Include(m => m.AwayRoster).Where(m => m.AwayRoster!.Any(p => p.Id == sourceId)).ToListAsync(cancellationToken);
+        foreach (var m in fbAwayMatches)
+        {
+            m.AwayRoster!.Remove(m.AwayRoster.First(p => p.Id == sourceId));
+            if (!m.AwayRoster.Any(p => p.Id == targetId)) m.AwayRoster.Add(targetPlayer);
+        }
+
+        // Volleyball
+        var vbHomeMatches = await _dbContext.VolleyballMatches.Include(m => m.HomeRoster).Where(m => m.HomeRoster!.Any(p => p.Id == sourceId)).ToListAsync(cancellationToken);
+        foreach (var m in vbHomeMatches)
+        {
+            m.HomeRoster!.Remove(m.HomeRoster.First(p => p.Id == sourceId));
+            if (!m.HomeRoster.Any(p => p.Id == targetId)) m.HomeRoster.Add(targetPlayer);
+        }
+        var vbAwayMatches = await _dbContext.VolleyballMatches.Include(m => m.AwayRoster).Where(m => m.AwayRoster!.Any(p => p.Id == sourceId)).ToListAsync(cancellationToken);
+        foreach (var m in vbAwayMatches)
+        {
+            m.AwayRoster!.Remove(m.AwayRoster.First(p => p.Id == sourceId));
+            if (!m.AwayRoster.Any(p => p.Id == targetId)) m.AwayRoster.Add(targetPlayer);
+        }
+
+        // Basketball
+        var bbHomeMatches = await _dbContext.BasketballMatches.Include(m => m.HomeRoster).Where(m => m.HomeRoster!.Any(p => p.Id == sourceId)).ToListAsync(cancellationToken);
+        foreach (var m in bbHomeMatches)
+        {
+            m.HomeRoster!.Remove(m.HomeRoster.First(p => p.Id == sourceId));
+            if (!m.HomeRoster.Any(p => p.Id == targetId)) m.HomeRoster.Add(targetPlayer);
+        }
+        var bbAwayMatches = await _dbContext.BasketballMatches.Include(m => m.AwayRoster).Where(m => m.AwayRoster!.Any(p => p.Id == sourceId)).ToListAsync(cancellationToken);
+        foreach (var m in bbAwayMatches)
+        {
+            m.AwayRoster!.Remove(m.AwayRoster.First(p => p.Id == sourceId));
+            if (!m.AwayRoster.Any(p => p.Id == targetId)) m.AwayRoster.Add(targetPlayer);
+        }
+
+        // Beach Volleyball
+        var bvbHomeMatches = await _dbContext.BeachVolleyballMatches.Include(m => m.HomeRoster).Where(m => m.HomeRoster!.Any(p => p.Id == sourceId)).ToListAsync(cancellationToken);
+        foreach (var m in bvbHomeMatches)
+        {
+            m.HomeRoster!.Remove(m.HomeRoster.First(p => p.Id == sourceId));
+            if (!m.HomeRoster.Any(p => p.Id == targetId)) m.HomeRoster.Add(targetPlayer);
+        }
+        var bvbAwayMatches = await _dbContext.BeachVolleyballMatches.Include(m => m.AwayRoster).Where(m => m.AwayRoster!.Any(p => p.Id == sourceId)).ToListAsync(cancellationToken);
+        foreach (var m in bvbAwayMatches)
+        {
+            m.AwayRoster!.Remove(m.AwayRoster.First(p => p.Id == sourceId));
+            if (!m.AwayRoster.Any(p => p.Id == targetId)) m.AwayRoster.Add(targetPlayer);
+        }
+
+        // Badminton
+        var badHomeMatches = await _dbContext.BadmintonMatches.Include(m => m.HomeRoster).Where(m => m.HomeRoster!.Any(p => p.Id == sourceId)).ToListAsync(cancellationToken);
+        foreach (var m in badHomeMatches)
+        {
+            m.HomeRoster!.Remove(m.HomeRoster.First(p => p.Id == sourceId));
+            if (!m.HomeRoster.Any(p => p.Id == targetId)) m.HomeRoster.Add(targetPlayer);
+        }
+        var badAwayMatches = await _dbContext.BadmintonMatches.Include(m => m.AwayRoster).Where(m => m.AwayRoster!.Any(p => p.Id == sourceId)).ToListAsync(cancellationToken);
+        foreach (var m in badAwayMatches)
+        {
+            m.AwayRoster!.Remove(m.AwayRoster.First(p => p.Id == sourceId));
+            if (!m.AwayRoster.Any(p => p.Id == targetId)) m.AwayRoster.Add(targetPlayer);
+        }
+
+        // Badminton Teams (reassign players)
+        var badTeams1 = await _dbContext.Set<PolytechLeague.Domain.Entities.Badminton.BadmintonTeam>().Where(t => t.Player1Id == sourceId).ToListAsync(cancellationToken);
+        foreach (var t in badTeams1) t.Player1Id = targetId;
+        var badTeams2 = await _dbContext.Set<PolytechLeague.Domain.Entities.Badminton.BadmintonTeam>().Where(t => t.Player2Id == sourceId).ToListAsync(cancellationToken);
+        foreach (var t in badTeams2) t.Player2Id = targetId;
+
+        // Table Tennis Teams (many-to-many players)
+        var ttTeams = await _dbContext.Set<PolytechLeague.Domain.Entities.TableTennis.TableTennisTeam>()
+            .Include(t => t.Players)
+            .Where(t => t.Players!.Any(p => p.Id == sourceId))
+            .ToListAsync(cancellationToken);
+        foreach (var t in ttTeams)
+        {
+            t.Players!.Remove(t.Players.First(p => p.Id == sourceId));
+            if (!t.Players.Any(p => p.Id == targetId)) t.Players.Add(targetPlayer);
+        }
     }
 
     private async Task PopulateAutomaticBadgesAsync(PlayerDto dto, CancellationToken cancellationToken)

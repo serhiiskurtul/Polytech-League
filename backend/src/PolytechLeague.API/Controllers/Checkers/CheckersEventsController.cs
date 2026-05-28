@@ -35,7 +35,7 @@ public class CheckersEventsController(ICheckersEventService checkersEventService
             result.Data.Select(e => e.ToResponse()).ToList(),
             result.TotalCount);
 
-        await redisService.SetDataAsync(cacheKey, response, TimeSpan.FromMinutes(60), "checkers_events_all");
+        await redisService.SetDataAsync(cacheKey, response, TimeSpan.FromHours(24), "checkers_events_all");
 
         return Ok(response);
     }
@@ -52,7 +52,7 @@ public class CheckersEventsController(ICheckersEventService checkersEventService
         var entity = await checkersEventService.GetByIdAsync(id, cancellationToken);
         var response = entity.ToResponse();
 
-        await redisService.SetDataAsync(cacheKey, response, TimeSpan.FromMinutes(60), "checkers_events_byid");
+        await redisService.SetDataAsync(cacheKey, response, TimeSpan.FromHours(24), "checkers_events_byid");
 
         return Ok(response);
     }

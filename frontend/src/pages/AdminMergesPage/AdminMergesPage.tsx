@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getPendingMergeRequests, approveMergeRequest, rejectMergeRequest, getAllMergeRequests } from '@/shared/api/players.api';
+import { getPendingMergeRequests, approveMergeRequest, rejectMergeRequest, getAllMergeRequests, mergePlayersManually } from '@/shared/api/players.api';
 import { toast } from 'react-hot-toast';
 import styles from './AdminMergesPage.module.css';
 
@@ -46,6 +46,53 @@ export const AdminMergesPage = () => {
         }
     };
 
+    const handleManualMerge = async () => {
+        const sourceIdStr = prompt("Введіть ID вихідного гравця (який буде видалений, а його дані перенесені):");
+        if (!sourceIdStr) return;
+        const sourceId = parseInt(sourceIdStr.trim(), 10);
+        if (isNaN(sourceId)) {
+            toast.error("Некоректний ID вихідного гравця");
+            return;
+        }
+
+        const targetIdStr = prompt("Введіть ID цільового гравця (який залишиться і отримає всі досягнення та прив'язку до акаунту):");
+        if (!targetIdStr) return;
+        const targetId = parseInt(targetIdStr.trim(), 10);
+        if (isNaN(targetId)) {
+            toast.error("Некоректний ID цільового гравця");
+            return;
+        }
+
+        if (sourceId === targetId) {
+            toast.error("Неможливо об'єднати гравця з самим собою");
+            return;
+        }
+
+        if (!window.confirm(`Ви впевнені, що хочете об'єднати гравця ${sourceId} з гравцем ${targetId}?\nВсі дані з ${sourceId} перейдуть до ${targetId}, а профіль ${sourceId} буде видалено.`)) {
+            return;
+        }
+
+        try {
+            await toast.promise(
+                mergePlayersManually(sourceId, targetId),
+                {
+                    loading: 'Об\'єднання гравців... Будь ласка, зачекайте, це може зайняти деякий час.',
+                    success: 'Гравців успішно об\'єднано!',
+                    error: (error: any) => {
+                        console.error(error);
+                        const data = error.response?.data;
+                        return typeof data === 'string'
+                            ? data
+                            : (data?.detail || data?.title || "Не вдалося об'єднати гравців");
+                    }
+                }
+            );
+            fetchRequests();
+        } catch (error: any) {
+            // Error is handled by toast.promise
+        }
+    };
+
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'Approved': return <span className={styles.statusApproved}>Схвалено</span>;
@@ -63,19 +110,24 @@ export const AdminMergesPage = () => {
                         <i className="fas fa-users-cog" style={{ marginRight: '15px', color: '#3b82f6' }}></i>
                         Запити на об'єднання профілів
                     </h1>
-                    <div className={styles.viewToggle}>
-                        <button 
-                            className={!showHistory ? styles.activeTab : ''} 
-                            onClick={() => setShowHistory(false)}
-                        >
-                            Активні
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                        <button className={styles.manualMergeBtn} onClick={handleManualMerge}>
+                            <i className="fas fa-compress-alt"></i> Об'єднати вручну
                         </button>
-                        <button 
-                            className={showHistory ? styles.activeTab : ''} 
-                            onClick={() => setShowHistory(true)}
-                        >
-                            Історія
-                        </button>
+                        <div className={styles.viewToggle}>
+                            <button 
+                                className={!showHistory ? styles.activeTab : ''} 
+                                onClick={() => setShowHistory(false)}
+                            >
+                                Активні
+                            </button>
+                            <button 
+                                className={showHistory ? styles.activeTab : ''} 
+                                onClick={() => setShowHistory(true)}
+                            >
+                                Історія
+                            </button>
+                        </div>
                     </div>
                 </div>
 

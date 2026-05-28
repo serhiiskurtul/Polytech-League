@@ -38,7 +38,7 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
             result.Data.Select(e => e.ToResponse()).ToList(),
             result.TotalCount);
 
-        await redisService.SetDataAsync(cacheKey, response, TimeSpan.FromMinutes(60), "chess_events_all");
+        await redisService.SetDataAsync(cacheKey, response, TimeSpan.FromHours(24), "chess_events_all");
 
         return Ok(response);
     }
@@ -55,7 +55,7 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
         var entity = await chessEventService.GetByIdAsync(id, cancellationToken);
         var response = entity.ToResponse();
 
-        await redisService.SetDataAsync(cacheKey, response, TimeSpan.FromMinutes(60), "chess_events_byid");
+        await redisService.SetDataAsync(cacheKey, response, TimeSpan.FromHours(24), "chess_events_byid");
 
         return Ok(response);
     }
