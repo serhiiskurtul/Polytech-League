@@ -115,6 +115,8 @@ const ProfileHeader = ({ userData, isAdmin, onEdit, onAvatarUpload, onLogout, on
                     badge.type === 'RankLeader' ? styles.badgeRankLeader :
                     badge.type === 'ChessTotalWins4' ? styles.badgeChessWins :
                     badge.type === 'BestAthlete' ? styles.badgeBestAthlete :
+                    badge.type === 'BestAthlete2' ? styles.badgeBestAthlete2 :
+                    badge.type === 'BestAthlete3' ? styles.badgeBestAthlete3 :
                     badge.type === 'BestAthleteSport' ? styles.badgeBestAthleteSport :
                     styles.badgeSeasonTopScorer
                   }

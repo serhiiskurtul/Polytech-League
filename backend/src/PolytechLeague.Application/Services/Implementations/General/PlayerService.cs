@@ -1900,6 +1900,26 @@ public class PlayerService : IPlayerService
                             Icon = "crown"
                         });
                     }
+                    else if (meInSeason.GlobalRank == 2 && meInSeason.PerformanceScore > 0)
+                    {
+                        badges.Add(new AutomaticBadgeDto
+                        {
+                            Type = "BestAthlete2",
+                            Label = "2 місце в загальному рейтингу",
+                            SeasonName = season.Name,
+                            Icon = "medal"
+                        });
+                    }
+                    else if (meInSeason.GlobalRank == 3 && meInSeason.PerformanceScore > 0)
+                    {
+                        badges.Add(new AutomaticBadgeDto
+                        {
+                            Type = "BestAthlete3",
+                            Label = "3 місце в загальному рейтингу",
+                            SeasonName = season.Name,
+                            Icon = "medal"
+                        });
+                    }
 
                     foreach (var sport in meInSeason.SportStats)
                     {
