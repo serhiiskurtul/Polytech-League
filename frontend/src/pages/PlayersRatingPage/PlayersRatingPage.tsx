@@ -370,16 +370,18 @@ const PlayersRatingPage = () => {
                       return { score: sport?.performanceScore || 0, activity: (sport?.matchesPlayed || 0) + (sport?.winsCount || 0) };
                     };
 
+                    const topPlayerStats = filteredPlayers.length > 0 ? getStats(filteredPlayers[0]) : null;
                     const currentStats = getStats(player);
+                    
                     let isTied = false;
-                    if (currentStats.score > 0) {
-                      if (prevPlayer) {
-                        const prevStats = getStats(prevPlayer);
-                        if (prevStats.score === currentStats.score && prevStats.activity === currentStats.activity) isTied = true;
-                      }
-                      if (!isTied && nextPlayer) {
-                        const nextStats = getStats(nextPlayer);
-                        if (nextStats.score === currentStats.score && nextStats.activity === currentStats.activity) isTied = true;
+                    if (topPlayerStats && currentStats.score > 0 && currentStats.score === topPlayerStats.score && currentStats.activity === topPlayerStats.activity) {
+                      const tiedCount = filteredPlayers.filter(p => {
+                        const s = getStats(p);
+                        return s.score === topPlayerStats.score && s.activity === topPlayerStats.activity;
+                      }).length;
+                      
+                      if (tiedCount > 1) {
+                        isTied = true;
                       }
                     }
 

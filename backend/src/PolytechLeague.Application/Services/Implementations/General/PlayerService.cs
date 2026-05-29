@@ -666,12 +666,52 @@ public class PlayerService : IPlayerService
                     playerDtos.Add(dto);
                 }
             }
-            var allRanked = playerDtos.OrderByDescending(p => p.PerformanceScore).ToList();
-            for (int i = 0; i < allRanked.Count; i++) allRanked[i].GlobalRank = i + 1;
+            var allRanked = playerDtos.OrderByDescending(p => p.PerformanceScore)
+                                      .ThenByDescending(p => p.MatchesPlayed + p.WinsCount)
+                                      .ToList();
+            if (allRanked.Count > 0)
+            {
+                allRanked[0].GlobalRank = 1;
+                for (int i = 1; i < allRanked.Count; i++)
+                {
+                    if (allRanked[i].PerformanceScore == allRanked[i - 1].PerformanceScore && 
+                        (allRanked[i].MatchesPlayed + allRanked[i].WinsCount) == (allRanked[i - 1].MatchesPlayed + allRanked[i - 1].WinsCount))
+                    {
+                        allRanked[i].GlobalRank = allRanked[i - 1].GlobalRank;
+                    }
+                    else
+                    {
+                        allRanked[i].GlobalRank = i + 1;
+                    }
+                }
+            }
+
             var allSportTypes = playerDtos.SelectMany(p => p.SportStats.Select(s => s.SportType)).Distinct().ToList();
             foreach (var sport in allSportTypes) {
-                var rankedForSport = playerDtos.Where(p => p.SportStats.Any(s => s.SportType == sport)).OrderByDescending(p => p.SportStats.First(s => s.SportType == sport).PerformanceScore).ToList();
-                for (int i = 0; i < rankedForSport.Count; i++) rankedForSport[i].SportStats.First(s => s.SportType == sport).Rank = i + 1;
+                var rankedForSport = playerDtos
+                    .Where(p => p.SportStats.Any(s => s.SportType == sport))
+                    .OrderByDescending(p => p.SportStats.First(s => s.SportType == sport).PerformanceScore)
+                    .ThenByDescending(p => p.SportStats.First(s => s.SportType == sport).MatchesPlayed + p.SportStats.First(s => s.SportType == sport).WinsCount)
+                    .ToList();
+                
+                if (rankedForSport.Count > 0)
+                {
+                    rankedForSport[0].SportStats.First(s => s.SportType == sport).Rank = 1;
+                    for (int i = 1; i < rankedForSport.Count; i++)
+                    {
+                        var currStat = rankedForSport[i].SportStats.First(s => s.SportType == sport);
+                        var prevStat = rankedForSport[i - 1].SportStats.First(s => s.SportType == sport);
+                        if (currStat.PerformanceScore == prevStat.PerformanceScore && 
+                            (currStat.MatchesPlayed + currStat.WinsCount) == (prevStat.MatchesPlayed + prevStat.WinsCount))
+                        {
+                            currStat.Rank = prevStat.Rank;
+                        }
+                        else
+                        {
+                            currStat.Rank = i + 1;
+                        }
+                    }
+                }
             }
             return allRanked;
         } catch (Exception ex) {
