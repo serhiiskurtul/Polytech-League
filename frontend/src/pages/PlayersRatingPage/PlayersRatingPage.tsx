@@ -198,7 +198,7 @@ const PlayersRatingPage = () => {
     }
   };
 
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://polytech-league-production.up.railway.app';
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
   return (
     <div className={styles.page}>

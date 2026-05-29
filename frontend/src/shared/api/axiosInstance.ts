@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios';
 
-export const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://polytech-league-production.up.railway.app';
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 export const API_URL = `${BASE_URL}/api`;
 
 const api = axios.create({
