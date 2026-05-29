@@ -330,7 +330,16 @@ export const AdminUsersPage = () => {
                               <Link to={`/players/${player.id}`} className={styles.playerLink}>
                                 <span className={styles.userName}>{player.firstName} {player.lastName}</span>
                               </Link>
-                              <span className={styles.userEmail}>ID: {player.id}</span>
+                              <span className={styles.userEmail}>
+                                ID: {player.id}
+                                {player.userEmail && (
+                                  <>
+                                    <span style={{ margin: '0 6px', opacity: 0.5 }}>•</span>
+                                    <i className="fa-regular fa-envelope" style={{ marginRight: '4px', opacity: 0.7 }}></i>
+                                    {player.userEmail}
+                                  </>
+                                )}
+                              </span>
                             </div>
                           </div>
                         </td>

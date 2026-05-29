@@ -31,6 +31,7 @@ public class PlayerDto
     public bool IsFounder { get; set; }
     public List<AutomaticBadgeDto> AutomaticBadges { get; set; } = new();
     public bool HasPendingMergeRequest { get; set; }
+    public string? UserEmail { get; set; }
 
     // Chess
     public int? ChessRating { get; set; }
@@ -163,6 +164,7 @@ public static class PlayerDtoExtensions
             InstagramUrl = player.InstagramUrl,
             PreviousNames = player.PreviousNames,
             IsFounder = player.IsFounder,
+            UserEmail = player.User?.Email,
             ChessRating = player.ChessRating,
             ChessFideId = player.ChessFideId,
             ChessTitle = player.ChessTitle,

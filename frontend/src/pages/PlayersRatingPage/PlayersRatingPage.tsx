@@ -6,8 +6,12 @@ import { getPlayersRankings } from '../../shared/api/players.api';
 import { getSeasons } from '../../shared/api/seasonRating.api';
 import { PlayerDto } from '../../shared/types/player.types';
 import { Season } from '../../shared/types/seasonRating.types';
+import { useAuth } from '../../app/providers/AuthContext';
 
 const PlayersRatingPage = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 1 || user?.role === '1' || user?.role === 'Admin';
+
   const [searchParams] = useSearchParams();
   const p1Id = searchParams.get('p1');
   const [players, setPlayers] = useState<PlayerDto[]>([]);
@@ -19,7 +23,7 @@ const PlayersRatingPage = () => {
   const [sortBy, setSortBy] = useState<'performance' | 'goals'>('performance');
   const [selectedPlayers, setSelectedPlayers] = useState<PlayerDto[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  
+
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [selectedSeasonId, setSelectedSeasonId] = useState<string>('all');
   const [selectedGender, setSelectedGender] = useState<'all' | 'male' | 'female'>('all');
@@ -128,7 +132,7 @@ const PlayersRatingPage = () => {
         const patr = p.patronymic.trim().toLowerCase();
         const isFemale = patr.endsWith('івна') || patr.endsWith('ївна');
         const isMale = patr.endsWith('вич');
-        
+
         if (selectedGender === 'female') return isFemale;
         if (selectedGender === 'male') return isMale;
         return true;
@@ -138,11 +142,11 @@ const PlayersRatingPage = () => {
     // Filter by tab
     if (activeTab !== 'Загальний') {
       result = result.filter(p => p.sports?.includes(activeTab) || p.sports?.some(s => s.toLowerCase() === activeTab.toLowerCase()));
-      
+
       // Filter by weight class for armwrestling
       if (activeTab.toLowerCase() === 'armwrestling' && selectedWeightClass !== 'all') {
-        result = result.filter(p => 
-          p.armwrestlingPreferredWeightClass === selectedWeightClass || 
+        result = result.filter(p =>
+          p.armwrestlingPreferredWeightClass === selectedWeightClass ||
           p.armwrestlingWeightClasses?.includes(selectedWeightClass)
         );
       }
@@ -163,7 +167,7 @@ const PlayersRatingPage = () => {
       if (activeTab.toLowerCase() === 'football' && sortBy === 'goals') {
         return (b.goalsCount || 0) - (a.goalsCount || 0);
       }
-      
+
       if (activeTab !== 'Загальний') {
         const aSport = a.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase());
         const bSport = b.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase());
@@ -194,7 +198,7 @@ const PlayersRatingPage = () => {
     }
   };
 
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://polytech-league-production.up.railway.app';
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
   return (
     <div className={styles.page}>
@@ -237,12 +241,12 @@ const PlayersRatingPage = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            
+
             {activeTab.toLowerCase() === 'armwrestling' && (
               <div className={styles.weightFilter}>
                 <i className="fa-solid fa-weight-hanging"></i>
-                <select 
-                  value={selectedWeightClass} 
+                <select
+                  value={selectedWeightClass}
                   onChange={(e) => setSelectedWeightClass(e.target.value)}
                   className={styles.weightSelect}
                 >
@@ -256,8 +260,8 @@ const PlayersRatingPage = () => {
             {activeTab.toLowerCase() === 'football' && (
               <div className={styles.weightFilter}>
                 <i className="fa-solid fa-sort"></i>
-                <select 
-                  value={sortBy} 
+                <select
+                  value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
                   className={styles.weightSelect}
                 >
@@ -269,8 +273,8 @@ const PlayersRatingPage = () => {
 
             <div className={styles.weightFilter}>
               <i className="fa-solid fa-calendar-days"></i>
-              <select 
-                value={selectedSeasonId} 
+              <select
+                value={selectedSeasonId}
                 onChange={(e) => setSelectedSeasonId(e.target.value)}
                 className={styles.weightSelect}
               >
@@ -283,19 +287,19 @@ const PlayersRatingPage = () => {
 
             {(activeTab.toLowerCase() === 'chess' || activeTab.toLowerCase() === 'checkers') && (
               <div className={styles.genderTabs}>
-                <button 
+                <button
                   className={`${styles.genderTab} ${selectedGender === 'all' ? styles.activeGenderTab : ''}`}
                   onClick={() => setSelectedGender('all')}
                 >
                   Всі
                 </button>
-                <button 
+                <button
                   className={`${styles.genderTab} ${selectedGender === 'male' ? styles.activeGenderTab : ''}`}
                   onClick={() => setSelectedGender('male')}
                 >
                   Чоловіки
                 </button>
-                <button 
+                <button
                   className={`${styles.genderTab} ${selectedGender === 'female' ? styles.activeGenderTab : ''}`}
                   onClick={() => setSelectedGender('female')}
                 >
@@ -353,10 +357,10 @@ const PlayersRatingPage = () => {
                             {photoSrc ? (
                               <img src={photoSrc} alt="" className={styles.playerAvatarImg} />
                             ) : (
-                              <img 
-                                src="https://cdn-icons-png.flaticon.com/512/149/149071.png" 
-                                alt="Placeholder" 
-                                className={styles.playerAvatarImg} 
+                              <img
+                                src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                                alt="Placeholder"
+                                className={styles.playerAvatarImg}
                                 style={{ opacity: 0.6, background: '#f1f5f9' }}
                               />
                             )}
@@ -371,6 +375,21 @@ const PlayersRatingPage = () => {
                               </div>
                               <div className={styles.playerSubInfo}>
                                 <span className={styles.groupText}>{player.group || '—'}</span>
+                                {isAdmin && (
+                                  <>
+                                    <span className={styles.adminDivider}>•</span>
+                                    <span className={styles.idText} title="ID гравця">ID: {player.id}</span>
+                                    {player.userEmail && (
+                                      <>
+                                        <span className={styles.adminDivider}>•</span>
+                                        <span className={styles.emailText} title="Електронна пошта">
+                                          <i className="fa-regular fa-envelope" style={{ marginRight: '4px' }}></i>
+                                          {player.userEmail}
+                                        </span>
+                                      </>
+                                    )}
+                                  </>
+                                )}
                               </div>
                             </div>
                           </Link>
@@ -395,12 +414,12 @@ const PlayersRatingPage = () => {
                         <div className={styles.cell}>
                           <div className={styles.ratingBox}>
                             <div className={styles.ratingLarge}>
-                              {activeTab === 'Загальний' 
-                                ? player.performanceScore 
+                              {activeTab === 'Загальний'
+                                ? player.performanceScore
                                 : player.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase())?.performanceScore || 0}
                             </div>
                             <div className={styles.pointsLabel}>очок</div>
-                            
+
                             {player.pointsBreakdown && player.pointsBreakdown.length > 0 && (
                               <div className={styles.breakdownTrigger}>
                                 <i className="fa-solid fa-circle-info"></i>
@@ -410,15 +429,15 @@ const PlayersRatingPage = () => {
                                     {player.pointsBreakdown
                                       .filter(entry => activeTab === 'Загальний' || entry.sportType?.toLowerCase() === activeTab.toLowerCase())
                                       .map((entry, i) => (
-                                      <div key={i} className={styles.breakdownItem}>
-                                        <span className={styles.breakdownDesc}>{entry.description}</span>
-                                        <span className={styles.breakdownPoints}>+{entry.points}</span>
-                                      </div>
-                                    ))}
+                                        <div key={i} className={styles.breakdownItem}>
+                                          <span className={styles.breakdownDesc}>{entry.description}</span>
+                                          <span className={styles.breakdownPoints}>+{entry.points}</span>
+                                        </div>
+                                      ))}
                                   </div>
                                   <div className={styles.breakdownTotal}>
-                                    Разом: {activeTab === 'Загальний' 
-                                      ? player.performanceScore 
+                                    Разом: {activeTab === 'Загальний'
+                                      ? player.performanceScore
                                       : player.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase())?.performanceScore || 0} очок
                                   </div>
                                 </div>
@@ -431,8 +450,8 @@ const PlayersRatingPage = () => {
                           <div className={styles.statsMini}>
                             <div className={styles.statMiniItem}>
                               <span className={styles.statMiniVal}>
-                                {activeTab === 'Загальний' 
-                                  ? player.matchesPlayed 
+                                {activeTab === 'Загальний'
+                                  ? player.matchesPlayed
                                   : player.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase())?.matchesPlayed || 0}
                               </span> ігор
                             </div>
@@ -443,20 +462,20 @@ const PlayersRatingPage = () => {
                             )}
                             <div className={styles.statMiniItem}>
                               <span className={styles.statMiniVal}>
-                                {activeTab === 'Загальний' 
-                                  ? player.winsCount 
+                                {activeTab === 'Загальний'
+                                  ? player.winsCount
                                   : player.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase())?.winsCount || 0}
                               </span> перемог
                             </div>
                           </div>
                         </div>
 
-                         <div className={`${styles.cell} ${styles.centered}`}>
+                        <div className={`${styles.cell} ${styles.centered}`}>
                           <div className={styles.actionsGroup}>
                             <Link to={`/players/${player.id}`} className={styles.actionBtn} title="Профіль">
                               <i className="fa-regular fa-user"></i>
                             </Link>
-                            <button 
+                            <button
                               className={`${styles.actionBtn} ${selectedPlayers.find(p => p.id === player.id) ? styles.activeAction : ''}`}
                               onClick={() => togglePlayerSelection(player)}
                               title="Порівняти"
@@ -477,19 +496,19 @@ const PlayersRatingPage = () => {
                 {/* Pagination */}
                 {filteredPlayers.length > itemsPerPage && (
                   <div className={styles.pagination}>
-                    <button 
+                    <button
                       onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                       disabled={currentPage === 1}
                       className={styles.pageBtn}
                     >
                       <i className="fa-solid fa-chevron-left"></i>
                     </button>
-                    
+
                     <span className={styles.pageInfo}>
                       Сторінка {currentPage} з {Math.ceil(filteredPlayers.length / itemsPerPage)}
                     </span>
-                    
-                    <button 
+
+                    <button
                       onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(filteredPlayers.length / itemsPerPage)))}
                       disabled={currentPage === Math.ceil(filteredPlayers.length / itemsPerPage)}
                       className={styles.pageBtn}
@@ -585,7 +604,7 @@ const PlayersRatingPage = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Comparison Floating Bar */}
       {selectedPlayers.length > 0 && (
         <div className={styles.comparisonBar}>
@@ -598,7 +617,7 @@ const PlayersRatingPage = () => {
               {selectedPlayers.map(p => (
                 <div key={p.id} className={styles.selectedPlayerBadge}>
                   {p.firstName} {p.lastName[0]}.
-                   <button onClick={() => togglePlayerSelection(p)} className={styles.removeBtn}>
+                  <button onClick={() => togglePlayerSelection(p)} className={styles.removeBtn}>
                     <i className="fa-solid fa-xmark"></i>
                   </button>
                 </div>
@@ -608,7 +627,7 @@ const PlayersRatingPage = () => {
               <button onClick={() => setSelectedPlayers([])} className={styles.clearBtn}>
                 Очистити
               </button>
-              <Link 
+              <Link
                 to={`/compare?p1=${selectedPlayers[0]?.id}${selectedPlayers[1] ? `&p2=${selectedPlayers[1].id}` : ''}`}
                 className={`${styles.compareBtn} ${selectedPlayers.length < 2 ? styles.disabled : ''}`}
               >

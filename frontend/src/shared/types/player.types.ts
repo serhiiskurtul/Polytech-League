@@ -96,6 +96,7 @@ export interface PlayerDto {
     mvpCount?: number;
     isExternal?: boolean;
     hasPendingMergeRequest?: boolean;
+    userEmail?: string | null;
 }
 
 
