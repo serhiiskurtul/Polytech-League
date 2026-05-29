@@ -504,3 +504,33 @@
   box-shadow: 0 2px 8px rgba(225, 29, 72, 0.1);
   white-space: nowrap;
 }
+
+.badgeBestAthleteTied {
+  background: #f5f3ff;
+  color: #6d28d9;
+  border: 1px dashed #c4b5fd;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(109, 40, 217, 0.1);
+  white-space: nowrap;
+}
+
+.badgeBestAthleteSportTied {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.1);
+  white-space: nowrap;
+}

@@ -1892,13 +1892,27 @@ public class PlayerService : IPlayerService
 
                     if (meInSeason.GlobalRank == 1 && meInSeason.PerformanceScore > 0)
                     {
-                        badges.Add(new AutomaticBadgeDto
+                        var topRankedCount = rankings.Count(p => p.GlobalRank == 1 && p.PerformanceScore > 0);
+                        if (topRankedCount > 1)
                         {
-                            Type = "BestAthlete",
-                            Label = "Найкращий спортсмен",
-                            SeasonName = season.Name,
-                            Icon = "crown"
-                        });
+                            badges.Add(new AutomaticBadgeDto
+                            {
+                                Type = "BestAthleteTied",
+                                Label = "Рівність (Загальний рейтинг)",
+                                SeasonName = season.Name,
+                                Icon = "handshake"
+                            });
+                        }
+                        else
+                        {
+                            badges.Add(new AutomaticBadgeDto
+                            {
+                                Type = "BestAthlete",
+                                Label = "Найкращий спортсмен",
+                                SeasonName = season.Name,
+                                Icon = "crown"
+                            });
+                        }
                     }
                     else if (meInSeason.GlobalRank == 2 && meInSeason.PerformanceScore > 0)
                     {
@@ -1925,13 +1939,29 @@ public class PlayerService : IPlayerService
                     {
                         if (sport.Rank == 1 && sport.PerformanceScore > 0)
                         {
-                            badges.Add(new AutomaticBadgeDto
+                            var tiedInSport = rankings
+                                .Where(p => p.SportStats.Any(s => s.SportType == sport.SportType && s.Rank == 1 && s.PerformanceScore > 0))
+                                .Count();
+                            if (tiedInSport > 1)
                             {
-                                Type = "BestAthleteSport",
-                                Label = $"Найкращий гравець ({GetSportNameUa(sport.SportType)})",
-                                SeasonName = season.Name,
-                                Icon = "star"
-                            });
+                                badges.Add(new AutomaticBadgeDto
+                                {
+                                    Type = "BestAthleteSportTied",
+                                    Label = $"Рівність ({GetSportNameUa(sport.SportType)})",
+                                    SeasonName = season.Name,
+                                    Icon = "handshake"
+                                });
+                            }
+                            else
+                            {
+                                badges.Add(new AutomaticBadgeDto
+                                {
+                                    Type = "BestAthleteSport",
+                                    Label = $"Найкращий гравець ({GetSportNameUa(sport.SportType)})",
+                                    SeasonName = season.Name,
+                                    Icon = "star"
+                                });
+                            }
                         }
                     }
                 } catch (Exception ex) {
