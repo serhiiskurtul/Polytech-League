@@ -739,8 +739,10 @@ public class PlayerService : IPlayerService
                     else if (p.Tournament.SecondPlaceId == playerId) rank = 2;
                     else if (p.Tournament.ThirdPlaceId == playerId) rank = 3;
                     else {
+                        var tId = p.TournamentId;
+                        var pts = p.Points;
                         rank = await _dbContext.ChessEventParticipants
-                            .Where(other => other.TournamentId == p.TournamentId && other.Points > p.Points)
+                            .Where(other => other.TournamentId == tId && other.Points > pts)
                             .CountAsync(cancellationToken) + 1;
                     }
                 }
@@ -784,8 +786,10 @@ public class PlayerService : IPlayerService
                     else if (p.Event.SecondPlaceId == playerId) rank = 2;
                     else if (p.Event.ThirdPlaceId == playerId) rank = 3;
                     else {
+                        var tId = p.TournamentId;
+                        var pts = p.Points;
                         rank = await _dbContext.CheckersEventParticipants
-                            .Where(other => other.TournamentId == p.TournamentId && other.Points > p.Points)
+                            .Where(other => other.TournamentId == tId && other.Points > pts)
                             .CountAsync(cancellationToken) + 1;
                     }
                 }
@@ -829,8 +833,10 @@ public class PlayerService : IPlayerService
                     else if (p.Tournament.SecondPlaceId == playerId) rank = 2;
                     else if (p.Tournament.ThirdPlaceId == playerId) rank = 3;
                     else {
+                        var tId = p.TournamentId;
+                        var pts = p.Points;
                         rank = await _dbContext.TableTennisEventParticipants
-                            .Where(other => other.TournamentId == p.TournamentId && other.Points > p.Points)
+                            .Where(other => other.TournamentId == tId && other.Points > pts)
                             .CountAsync(cancellationToken) + 1;
                     }
                 }
@@ -860,8 +866,10 @@ public class PlayerService : IPlayerService
                     else if (p.Event.SecondPlaceId == playerId) rank = 2;
                     else if (p.Event.ThirdPlaceId == playerId) rank = 3;
                     else {
+                        var eId = p.EventId;
+                        var pts = p.Points;
                         rank = await _dbContext.BadmintonEventParticipants
-                            .Where(other => other.EventId == p.EventId && other.Points > p.Points)
+                            .Where(other => other.EventId == eId && other.Points > pts)
                             .CountAsync(cancellationToken) + 1;
                     }
                 }
@@ -925,8 +933,10 @@ public class PlayerService : IPlayerService
                 if (team.Event == null) continue;
                 int rank = GetTeamRank(team.Event, team.Id);
                 if (rank == 0 && team.Points > 0) {
+                    var eId = team.EventId;
+                    var pts = team.Points;
                     rank = await _dbContext.FootballTeams
-                        .Where(others => others.EventId == team.EventId && others.Points > team.Points)
+                        .Where(others => others.EventId == eId && others.Points > pts)
                         .CountAsync(cancellationToken) + 1;
                 }
                 achievements.Add(new AchievementDto {
