@@ -4,6 +4,7 @@ import styles from './PlayerComparePage.module.css';
 import { getPlayerById, getPlayersRankings, getHeadToHead } from '../../shared/api/players.api';
 import { getSeasons } from '../../shared/api/seasonRating.api';
 import { PlayerDto } from '../../shared/types/player.types';
+import { BASE_URL } from '../../shared/api/axiosInstance';
 import { Season } from '../../shared/types/seasonRating.types';
 import { getPhotoUrl } from '../../shared/utils/photo.utils';
 import { 
@@ -204,7 +205,7 @@ export const PlayerComparePage = () => {
     return uniqueTournaments.size;
   };
 
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+  const baseUrl = BASE_URL;
 
   if (loading) {
     return (

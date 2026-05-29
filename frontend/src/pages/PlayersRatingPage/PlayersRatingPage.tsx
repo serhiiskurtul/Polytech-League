@@ -5,6 +5,7 @@ import { getPhotoUrl } from '../../shared/utils/photo.utils';
 import { getPlayersRankings } from '../../shared/api/players.api';
 import { getSeasons } from '../../shared/api/seasonRating.api';
 import { PlayerDto } from '../../shared/types/player.types';
+import { BASE_URL } from '../../shared/api/axiosInstance';
 import { Season } from '../../shared/types/seasonRating.types';
 import { useAuth } from '../../app/providers/AuthContext';
 
@@ -198,7 +199,7 @@ const PlayersRatingPage = () => {
     }
   };
 
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+  const baseUrl = BASE_URL;
 
   return (
     <div className={styles.page}>

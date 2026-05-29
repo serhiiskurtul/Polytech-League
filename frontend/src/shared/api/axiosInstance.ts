@@ -1,7 +1,24 @@
 import axios, { AxiosError } from 'axios';
 
-export const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
-export const API_URL = `${BASE_URL}/api`;
+const getApiUrl = (): string => {
+  let url = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '';
+  if (!url) {
+    return '';
+  }
+  if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('//') && !url.startsWith('/')) {
+    url = `https://${url}`;
+  }
+  if (url.endsWith('/')) {
+    url = url.slice(0, -1);
+  }
+  if (!url.endsWith('/api')) {
+    url = `${url}/api`;
+  }
+  return url;
+};
+
+export const API_URL = getApiUrl();
+export const BASE_URL = API_URL.endsWith('/api') ? API_URL.slice(0, -4) : API_URL;
 
 const api = axios.create({
   baseURL: API_URL,

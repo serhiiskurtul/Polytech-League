@@ -1,6 +1,7 @@
 /**
  * Utility to handle PWA Push Notifications subscription
  */
+import { BASE_URL } from '../shared/api/axiosInstance';
 
 const PUBLIC_VAPID_KEY = 'BB47cRWxaTwglHKmdQMGkRTn1bMJvD2GGG7a8wr5eEpdCi-KMABJXIUdjG0URYBEcb8PWOcQudBEs9FlsCrsYi0';
 
@@ -58,11 +59,7 @@ export async function subscribeUserToPush() {
 }
 
 async function sendSubscriptionToBackend(subscription: PushSubscription) {
-  // Use VITE_API_BASE_URL or fallback to production URL
-  const apiUrl = import.meta.env.VITE_API_BASE_URL || '';
-  // Ensure we use HTTPS for production to avoid Mixed Content issues
-  const secureApiUrl = apiUrl.replace('http://', 'https://');
-  const url = `${secureApiUrl.endsWith('/') ? secureApiUrl.slice(0, -1) : secureApiUrl}/api/notifications/subscribe`;
+  const url = `${BASE_URL}/api/notifications/subscribe`;
 
   console.log('Sending subscription to:', url);
 
