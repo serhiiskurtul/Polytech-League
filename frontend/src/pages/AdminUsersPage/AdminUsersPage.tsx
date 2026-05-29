@@ -70,6 +70,7 @@ export const AdminUsersPage = () => {
 
   useEffect(() => {
     setPage(1);
+    setShowDuplicatesOnly(false);
   }, [activeTab]);
 
   useEffect(() => {
@@ -191,15 +192,13 @@ export const AdminUsersPage = () => {
             </button>
           </div>
 
-          {activeTab === 'players' && (
-            <button 
-              className={`${styles.duplicateBtn} ${showDuplicatesOnly ? styles.duplicateBtnActive : ''}`}
-              onClick={() => setShowDuplicatesOnly(!showDuplicatesOnly)}
-              title="Показати гравців з однаковими іменами"
-            >
-              <i className="fas fa-copy"></i> {showDuplicatesOnly ? 'Всі гравці' : 'Знайти дублікати'}
-            </button>
-          )}
+          <button 
+            className={`${styles.duplicateBtn} ${showDuplicatesOnly ? styles.duplicateBtnActive : ''}`}
+            onClick={() => setShowDuplicatesOnly(!showDuplicatesOnly)}
+            title={activeTab === 'users' ? "Показати користувачів з однаковими іменами" : "Показати гравців з однаковими іменами"}
+          >
+            <i className="fas fa-copy"></i> {showDuplicatesOnly ? (activeTab === 'users' ? 'Всі користувачі' : 'Всі гравці') : 'Знайти дублікати'}
+          </button>
         </div>
 
         <div className={styles.controls}>
@@ -231,57 +230,76 @@ export const AdminUsersPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user) => (
-                  <tr key={user.id}>
-                    <td>
-                      <div className={styles.userCell}>
-                        <div className={styles.avatar}>
-                          {user.firstName[0]}{user.lastName[0]}
+                {(() => {
+                  let displayUsers = [...users];
+                  if (showDuplicatesOnly) {
+                    const nameCounts = new Map<string, number>();
+                    displayUsers.forEach(u => {
+                      const key = `${u.firstName.trim().toLowerCase()}_${u.lastName.trim().toLowerCase()}`;
+                      nameCounts.set(key, (nameCounts.get(key) || 0) + 1);
+                    });
+                    displayUsers = displayUsers.filter(u => {
+                      const key = `${u.firstName.trim().toLowerCase()}_${u.lastName.trim().toLowerCase()}`;
+                      return (nameCounts.get(key) || 0) > 1;
+                    }).sort((a, b) => {
+                      const keyA = `${a.firstName.trim().toLowerCase()}_${a.lastName.trim().toLowerCase()}`;
+                      const keyB = `${b.firstName.trim().toLowerCase()}_${b.lastName.trim().toLowerCase()}`;
+                      return keyA.localeCompare(keyB);
+                    });
+                  }
+
+                  return displayUsers.map((user) => (
+                    <tr key={user.id} className={showDuplicatesOnly ? styles.duplicateRow : ''}>
+                      <td>
+                        <div className={styles.userCell}>
+                          <div className={styles.avatar}>
+                            {user.firstName[0]}{user.lastName[0]}
+                          </div>
+                          <div>
+                            <span className={styles.userName}>{user.firstName} {user.lastName}</span>
+                            <span className={styles.userEmail}>{user.email}</span>
+                          </div>
                         </div>
-                        <div>
-                          <span className={styles.userName}>{user.firstName} {user.lastName}</span>
-                          <span className={styles.userEmail}>{user.email}</span>
+                      </td>
+                      <td>
+                        <span className={`${styles.statusBadge} ${user.isEmailConfirmed ? styles.verifiedStatus : styles.unverifiedStatus}`}>
+                          {user.isEmailConfirmed ? 'Підтверджена' : 'Не підтверджена'}
+                        </span>
+                      </td>
+                      <td>
+                        <span className={`${styles.roleBadge} ${user.role === 1 || user.role === 'Admin' ? styles.adminRole : styles.userRole}`}>
+                          {user.role === 1 || user.role === 'Admin' ? 'Адмін' : 'Користувач'}
+                        </span>
+                      </td>
+                      <td>
+                        <span className={`${styles.statusBadge} ${user.isBlocked ? styles.blockedStatus : styles.activeStatus}`}>
+                          {user.isBlocked ? 'Заблокований' : 'Активний'}
+                        </span>
+                      </td>
+                      <td>
+                        {user.createdAt ? new Intl.DateTimeFormat('uk-UA', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(user.createdAt)) : '-'}
+                      </td>
+                      <td>
+                        <div className={styles.actions}>
+                          <button 
+                            className={`${styles.actionBtn} ${user.isBlocked ? styles.unblockBtn : styles.blockBtn}`}
+                            onClick={() => handleBlock(user.id, user.isBlocked)}
+                            title={user.isBlocked ? "Розблокувати" : "Заблокувати"}
+                          >
+                            <i className={`fas ${user.isBlocked ? 'fa-unlock' : 'fa-ban'}`}></i>
+                          </button>
+                          <button 
+                            className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                            onClick={() => handleDelete(user.id)}
+                            title="Видалити назавжди"
+                          >
+                            <i className="fas fa-trash-alt"></i>
+                          </button>
                         </div>
-                      </div>
-                    </td>
-                    <td>
-                      <span className={`${styles.statusBadge} ${user.isEmailConfirmed ? styles.verifiedStatus : styles.unverifiedStatus}`}>
-                        {user.isEmailConfirmed ? 'Підтверджена' : 'Не підтверджена'}
-                      </span>
-                    </td>
-                    <td>
-                      <span className={`${styles.roleBadge} ${user.role === 1 || user.role === 'Admin' ? styles.adminRole : styles.userRole}`}>
-                        {user.role === 1 || user.role === 'Admin' ? 'Адмін' : 'Користувач'}
-                      </span>
-                    </td>
-                    <td>
-                      <span className={`${styles.statusBadge} ${user.isBlocked ? styles.blockedStatus : styles.activeStatus}`}>
-                        {user.isBlocked ? 'Заблокований' : 'Активний'}
-                      </span>
-                    </td>
-                    <td>
-                      {user.createdAt ? new Intl.DateTimeFormat('uk-UA', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(user.createdAt)) : '-'}
-                    </td>
-                    <td>
-                      <div className={styles.actions}>
-                        <button 
-                          className={`${styles.actionBtn} ${user.isBlocked ? styles.unblockBtn : styles.blockBtn}`}
-                          onClick={() => handleBlock(user.id, user.isBlocked)}
-                          title={user.isBlocked ? "Розблокувати" : "Заблокувати"}
-                        >
-                          <i className={`fas ${user.isBlocked ? 'fa-unlock' : 'fa-ban'}`}></i>
-                        </button>
-                        <button 
-                          className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                          onClick={() => handleDelete(user.id)}
-                          title="Видалити назавжди"
-                        >
-                          <i className="fas fa-trash-alt"></i>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                    </tr>
+                  ));
+                })()}
               </tbody>
             </table>
           ) : (
