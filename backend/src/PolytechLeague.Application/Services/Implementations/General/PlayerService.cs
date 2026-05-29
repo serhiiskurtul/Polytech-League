@@ -1877,7 +1877,62 @@ public class PlayerService : IPlayerService
                 });
             }
 
-            // 3. Overall Season Winners
+            // 3. Overall All-time General Rating (No Seasons)
+            try {
+                var overallRankings = await GetAllWithRankingsAsync(null, cancellationToken);
+                var meOverall = overallRankings.FirstOrDefault(p => p.Id == playerId);
+                if (meOverall != null)
+                {
+                    if (meOverall.GlobalRank == 1 && meOverall.PerformanceScore > 0)
+                    {
+                        var topRankedCount = overallRankings.Count(p => p.GlobalRank == 1 && p.PerformanceScore > 0);
+                        if (topRankedCount > 1)
+                        {
+                            badges.Add(new AutomaticBadgeDto
+                            {
+                                Type = "BestAthleteTied",
+                                Label = "Найкращий спортсмен",
+                                SeasonName = null,
+                                Icon = "handshake"
+                            });
+                        }
+                        else
+                        {
+                            badges.Add(new AutomaticBadgeDto
+                            {
+                                Type = "BestAthlete",
+                                Label = "Найкращий спортсмен",
+                                SeasonName = null,
+                                Icon = "crown"
+                            });
+                        }
+                    }
+                    else if (meOverall.GlobalRank == 2 && meOverall.PerformanceScore > 0)
+                    {
+                        badges.Add(new AutomaticBadgeDto
+                        {
+                            Type = "BestAthlete2",
+                            Label = "2 місце в загальному рейтингу",
+                            SeasonName = null,
+                            Icon = "medal"
+                        });
+                    }
+                    else if (meOverall.GlobalRank == 3 && meOverall.PerformanceScore > 0)
+                    {
+                        badges.Add(new AutomaticBadgeDto
+                        {
+                            Type = "BestAthlete3",
+                            Label = "3 місце в загальному рейтингу",
+                            SeasonName = null,
+                            Icon = "medal"
+                        });
+                    }
+                }
+            } catch (Exception ex) {
+                _logger.LogWarning(ex, "Error getting overall all-time rankings in badges population");
+            }
+
+            // 4. Sport-Specific Season Winners (With Seasons)
             var allSeasons = await _dbContext.Seasons
                 .OrderByDescending(s => s.StartDate)
                 .Take(5) // Limit to last 5 seasons for performance
@@ -1889,51 +1944,6 @@ public class PlayerService : IPlayerService
                     var rankings = await GetAllWithRankingsAsync(season.Id, cancellationToken);
                     var meInSeason = rankings.FirstOrDefault(p => p.Id == playerId);
                     if (meInSeason == null) continue;
-
-                    if (meInSeason.GlobalRank == 1 && meInSeason.PerformanceScore > 0)
-                    {
-                        var topRankedCount = rankings.Count(p => p.GlobalRank == 1 && p.PerformanceScore > 0);
-                        if (topRankedCount > 1)
-                        {
-                            badges.Add(new AutomaticBadgeDto
-                            {
-                                Type = "BestAthleteTied",
-                                Label = "Рівність (Загальний рейтинг)",
-                                SeasonName = season.Name,
-                                Icon = "handshake"
-                            });
-                        }
-                        else
-                        {
-                            badges.Add(new AutomaticBadgeDto
-                            {
-                                Type = "BestAthlete",
-                                Label = "Найкращий спортсмен",
-                                SeasonName = season.Name,
-                                Icon = "crown"
-                            });
-                        }
-                    }
-                    else if (meInSeason.GlobalRank == 2 && meInSeason.PerformanceScore > 0)
-                    {
-                        badges.Add(new AutomaticBadgeDto
-                        {
-                            Type = "BestAthlete2",
-                            Label = "2 місце в загальному рейтингу",
-                            SeasonName = season.Name,
-                            Icon = "medal"
-                        });
-                    }
-                    else if (meInSeason.GlobalRank == 3 && meInSeason.PerformanceScore > 0)
-                    {
-                        badges.Add(new AutomaticBadgeDto
-                        {
-                            Type = "BestAthlete3",
-                            Label = "3 місце в загальному рейтингу",
-                            SeasonName = season.Name,
-                            Icon = "medal"
-                        });
-                    }
 
                     foreach (var sport in meInSeason.SportStats)
                     {
@@ -1947,7 +1957,7 @@ public class PlayerService : IPlayerService
                                 badges.Add(new AutomaticBadgeDto
                                 {
                                     Type = "BestAthleteSportTied",
-                                    Label = $"Рівність ({GetSportNameUa(sport.SportType)})",
+                                    Label = $"Найкращий гравець ({GetSportNameUa(sport.SportType)})",
                                     SeasonName = season.Name,
                                     Icon = "handshake"
                                 });
