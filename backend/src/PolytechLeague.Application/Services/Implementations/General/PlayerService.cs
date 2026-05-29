@@ -666,12 +666,52 @@ public class PlayerService : IPlayerService
                     playerDtos.Add(dto);
                 }
             }
-            var allRanked = playerDtos.OrderByDescending(p => p.PerformanceScore).ToList();
-            for (int i = 0; i < allRanked.Count; i++) allRanked[i].GlobalRank = i + 1;
+            var allRanked = playerDtos.OrderByDescending(p => p.PerformanceScore)
+                                      .ThenByDescending(p => p.MatchesPlayed + p.WinsCount)
+                                      .ToList();
+            if (allRanked.Count > 0)
+            {
+                allRanked[0].GlobalRank = 1;
+                for (int i = 1; i < allRanked.Count; i++)
+                {
+                    if (allRanked[i].PerformanceScore == allRanked[i - 1].PerformanceScore && 
+                        (allRanked[i].MatchesPlayed + allRanked[i].WinsCount) == (allRanked[i - 1].MatchesPlayed + allRanked[i - 1].WinsCount))
+                    {
+                        allRanked[i].GlobalRank = allRanked[i - 1].GlobalRank;
+                    }
+                    else
+                    {
+                        allRanked[i].GlobalRank = i + 1;
+                    }
+                }
+            }
+
             var allSportTypes = playerDtos.SelectMany(p => p.SportStats.Select(s => s.SportType)).Distinct().ToList();
             foreach (var sport in allSportTypes) {
-                var rankedForSport = playerDtos.Where(p => p.SportStats.Any(s => s.SportType == sport)).OrderByDescending(p => p.SportStats.First(s => s.SportType == sport).PerformanceScore).ToList();
-                for (int i = 0; i < rankedForSport.Count; i++) rankedForSport[i].SportStats.First(s => s.SportType == sport).Rank = i + 1;
+                var rankedForSport = playerDtos
+                    .Where(p => p.SportStats.Any(s => s.SportType == sport))
+                    .OrderByDescending(p => p.SportStats.First(s => s.SportType == sport).PerformanceScore)
+                    .ThenByDescending(p => p.SportStats.First(s => s.SportType == sport).MatchesPlayed + p.SportStats.First(s => s.SportType == sport).WinsCount)
+                    .ToList();
+                
+                if (rankedForSport.Count > 0)
+                {
+                    rankedForSport[0].SportStats.First(s => s.SportType == sport).Rank = 1;
+                    for (int i = 1; i < rankedForSport.Count; i++)
+                    {
+                        var currStat = rankedForSport[i].SportStats.First(s => s.SportType == sport);
+                        var prevStat = rankedForSport[i - 1].SportStats.First(s => s.SportType == sport);
+                        if (currStat.PerformanceScore == prevStat.PerformanceScore && 
+                            (currStat.MatchesPlayed + currStat.WinsCount) == (prevStat.MatchesPlayed + prevStat.WinsCount))
+                        {
+                            currStat.Rank = prevStat.Rank;
+                        }
+                        else
+                        {
+                            currStat.Rank = i + 1;
+                        }
+                    }
+                }
             }
             return allRanked;
         } catch (Exception ex) {
@@ -1837,7 +1877,62 @@ public class PlayerService : IPlayerService
                 });
             }
 
-            // 3. Overall Season Winners
+            // 3. Overall All-time General Rating (No Seasons)
+            try {
+                var overallRankings = await GetAllWithRankingsAsync(null, cancellationToken);
+                var meOverall = overallRankings.FirstOrDefault(p => p.Id == playerId);
+                if (meOverall != null)
+                {
+                    if (meOverall.GlobalRank == 1 && meOverall.PerformanceScore > 0)
+                    {
+                        var topRankedCount = overallRankings.Count(p => p.GlobalRank == 1 && p.PerformanceScore > 0);
+                        if (topRankedCount > 1)
+                        {
+                            badges.Add(new AutomaticBadgeDto
+                            {
+                                Type = "BestAthleteTied",
+                                Label = "Найкращий спортсмен",
+                                SeasonName = null,
+                                Icon = "handshake"
+                            });
+                        }
+                        else
+                        {
+                            badges.Add(new AutomaticBadgeDto
+                            {
+                                Type = "BestAthlete",
+                                Label = "Найкращий спортсмен",
+                                SeasonName = null,
+                                Icon = "crown"
+                            });
+                        }
+                    }
+                    else if (meOverall.GlobalRank == 2 && meOverall.PerformanceScore > 0)
+                    {
+                        badges.Add(new AutomaticBadgeDto
+                        {
+                            Type = "BestAthlete2",
+                            Label = "2 місце в загальному рейтингу",
+                            SeasonName = null,
+                            Icon = "medal"
+                        });
+                    }
+                    else if (meOverall.GlobalRank == 3 && meOverall.PerformanceScore > 0)
+                    {
+                        badges.Add(new AutomaticBadgeDto
+                        {
+                            Type = "BestAthlete3",
+                            Label = "3 місце в загальному рейтингу",
+                            SeasonName = null,
+                            Icon = "medal"
+                        });
+                    }
+                }
+            } catch (Exception ex) {
+                _logger.LogWarning(ex, "Error getting overall all-time rankings in badges population");
+            }
+
+            // 4. Sport-Specific Season Winners (With Seasons)
             var allSeasons = await _dbContext.Seasons
                 .OrderByDescending(s => s.StartDate)
                 .Take(5) // Limit to last 5 seasons for performance
@@ -1850,28 +1945,33 @@ public class PlayerService : IPlayerService
                     var meInSeason = rankings.FirstOrDefault(p => p.Id == playerId);
                     if (meInSeason == null) continue;
 
-                    if (meInSeason.GlobalRank == 1 && meInSeason.PerformanceScore > 0)
-                    {
-                        badges.Add(new AutomaticBadgeDto
-                        {
-                            Type = "BestAthlete",
-                            Label = "Найкращий спортсмен",
-                            SeasonName = season.Name,
-                            Icon = "crown"
-                        });
-                    }
-
                     foreach (var sport in meInSeason.SportStats)
                     {
                         if (sport.Rank == 1 && sport.PerformanceScore > 0)
                         {
-                            badges.Add(new AutomaticBadgeDto
+                            var tiedInSport = rankings
+                                .Where(p => p.SportStats.Any(s => s.SportType == sport.SportType && s.Rank == 1 && s.PerformanceScore > 0))
+                                .Count();
+                            if (tiedInSport > 1)
                             {
-                                Type = "BestAthleteSport",
-                                Label = $"Найкращий гравець ({GetSportNameUa(sport.SportType)})",
-                                SeasonName = season.Name,
-                                Icon = "star"
-                            });
+                                badges.Add(new AutomaticBadgeDto
+                                {
+                                    Type = "BestAthleteSportTied",
+                                    Label = $"Найкращий гравець ({GetSportNameUa(sport.SportType)})",
+                                    SeasonName = season.Name,
+                                    Icon = "handshake"
+                                });
+                            }
+                            else
+                            {
+                                badges.Add(new AutomaticBadgeDto
+                                {
+                                    Type = "BestAthleteSport",
+                                    Label = $"Найкращий гравець ({GetSportNameUa(sport.SportType)})",
+                                    SeasonName = season.Name,
+                                    Icon = "star"
+                                });
+                            }
                         }
                     }
                 } catch (Exception ex) {

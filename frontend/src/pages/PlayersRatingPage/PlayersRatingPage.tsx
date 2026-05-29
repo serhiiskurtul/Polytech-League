@@ -169,12 +169,27 @@ const PlayersRatingPage = () => {
         return (b.goalsCount || 0) - (a.goalsCount || 0);
       }
 
+      let scoreA = 0, scoreB = 0, activityA = 0, activityB = 0;
+
       if (activeTab !== 'Загальний') {
         const aSport = a.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase());
         const bSport = b.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase());
-        return (bSport?.performanceScore || 0) - (aSport?.performanceScore || 0);
+        scoreA = aSport?.performanceScore || 0;
+        scoreB = bSport?.performanceScore || 0;
+        activityA = (aSport?.matchesPlayed || 0) + (aSport?.winsCount || 0);
+        activityB = (bSport?.matchesPlayed || 0) + (bSport?.winsCount || 0);
+      } else {
+        scoreA = a.performanceScore || 0;
+        scoreB = b.performanceScore || 0;
+        activityA = (a.matchesPlayed || 0) + (a.winsCount || 0);
+        activityB = (b.matchesPlayed || 0) + (b.winsCount || 0);
       }
-      return (b.performanceScore || 0) - (a.performanceScore || 0);
+
+      if (scoreB !== scoreA) {
+        return scoreB - scoreA;
+      }
+      
+      return activityB - activityA;
     });
   }, [players, activeTab, searchQuery, selectedWeightClass, sortBy, selectedGender]);
 
@@ -345,6 +360,32 @@ const PlayersRatingPage = () => {
                     const photoSrc = getPhotoUrl(player.photoUrl);
                     const actualIndex = (currentPage - 1) * itemsPerPage + index;
 
+                    const prevPlayer = actualIndex > 0 ? filteredPlayers[actualIndex - 1] : null;
+                    const nextPlayer = actualIndex < filteredPlayers.length - 1 ? filteredPlayers[actualIndex + 1] : null;
+
+                    const getStats = (p: PlayerDto) => {
+                      if (activeTab === 'Загальний') {
+                        return { score: p.performanceScore || 0, activity: (p.matchesPlayed || 0) + (p.winsCount || 0) };
+                      }
+                      const sport = p.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase());
+                      return { score: sport?.performanceScore || 0, activity: (sport?.matchesPlayed || 0) + (sport?.winsCount || 0) };
+                    };
+
+                    const topPlayerStats = filteredPlayers.length > 0 ? getStats(filteredPlayers[0]) : null;
+                    const currentStats = getStats(player);
+                    
+                    let isTied = false;
+                    if (topPlayerStats && currentStats.score > 0 && currentStats.score === topPlayerStats.score && currentStats.activity === topPlayerStats.activity) {
+                      const tiedCount = filteredPlayers.filter(p => {
+                        const s = getStats(p);
+                        return s.score === topPlayerStats.score && s.activity === topPlayerStats.activity;
+                      }).length;
+                      
+                      if (tiedCount > 1) {
+                        isTied = true;
+                      }
+                    }
+
                     return (
                       <div key={player.id} className={styles.tableRow}>
                         <div className={styles.cell}>
@@ -371,6 +412,11 @@ const PlayersRatingPage = () => {
                                 {player.previousNames && (
                                   <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 'normal', marginLeft: '4px' }}>
                                     ({player.previousNames})
+                                  </span>
+                                )}
+                                {isTied && (
+                                  <span className={styles.tieBadge} title="Абсолютна рівність показників (бали, ігри, перемоги)">
+                                    <i className="fa-solid fa-handshake"></i> Рівність
                                   </span>
                                 )}
                               </div>
@@ -600,6 +646,14 @@ const PlayersRatingPage = () => {
                 <ul>
                   <li><span>Кожен турнір:</span> +10 балів</li>
                 </ul>
+              </div>
+
+              <div className={styles.formulaCard}>
+                <div className={styles.formulaIcon} style={{ background: '#f1f5f9', color: '#64748b' }}>
+                  <i className="fa-solid fa-scale-balanced"></i>
+                </div>
+                <h3>Рівність балів</h3>
+                <p>Якщо гравці мають однакову кількість балів, перевага надається тому, у кого більша сума ігор та перемог (Ігри + Перемоги). У разі абсолютної рівності обидва гравці отримують бейдж <span className={styles.tieBadge} style={{marginLeft: 0}}><i className="fa-solid fa-handshake"></i> Рівність</span>.</p>
               </div>
             </div>
           </div>

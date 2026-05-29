@@ -367,6 +367,21 @@
   margin-bottom: 2px;
 }
 
+.tieBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #fdf5ff;
+  color: #c026d3;
+  border: 1px solid #fae8ff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
 .playerSubInfo {
   font-size: 12px;
   color: #94a3b8;
