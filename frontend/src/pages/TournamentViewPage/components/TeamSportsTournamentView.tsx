@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { PlayerDto, Gender } from '@/shared/types/player.types';
 import { ChessEventResponse, ChessEventParticipantDto, ChessGameDto, ChessEventRequest, GameResult } from '@/shared/types/chess.types';
-import { getAllPlayers } from '@/shared/api';
+import { searchPlayers } from '@/shared/api';
 import { 
   updateVolleyballMatch, 
   updateBeachVolleyballMatch, 
@@ -95,8 +95,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   onRefresh
 }) => {
   const [activeTab, setActiveTab] = useState<'standings' | 'matches' | 'teams' | 'info' | 'bracket' | 'participants' | 'stats' | 'voting'>((sport === 'football' || sport === 'футбол') ? 'bracket' : 'matches');
-  const [allPlayers, setAllPlayers] = useState<PlayerDto[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filteredPlayers, setFilteredPlayers] = useState<PlayerDto[]>([]);
+  const [isSearchingPlayers, setIsSearchingPlayers] = useState(false);
   const [voteStats, setVoteStats] = useState<any>(null);
   const [isVoting, setIsVoting] = useState(false);
   const isRegionalOrNational = details?.level === 'Regional' || details?.level === 'National';
@@ -217,10 +218,30 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const [isMatchInfoModalOpen, setIsMatchInfoModalOpen] = useState(false);
 
   useEffect(() => {
-    if (isAdmin) {
-      loadAllPlayers();
-    }
+    // Kept empty, just for logic preservation
   }, [isAdmin]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    
+    const delayDebounceFn = setTimeout(async () => {
+      if (searchQuery.length >= 2) {
+        setIsSearchingPlayers(true);
+        try {
+          const players = await searchPlayers(searchQuery);
+          setFilteredPlayers(players);
+        } catch (e) {
+          console.error(e);
+        } finally {
+          setIsSearchingPlayers(false);
+        }
+      } else {
+        setFilteredPlayers([]);
+      }
+    }, 400);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery, isAdmin]);
 
   useEffect(() => {
     if (details?.id) {
@@ -261,14 +282,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     }
   };
 
-  const loadAllPlayers = async () => {
-    try {
-      const players = await getAllPlayers();
-      setAllPlayers(players);
-    } catch (err) {
-      console.error('Failed to load players:', err);
-    }
-  };
+  // Removed loadAllPlayers
 
   const getMatchUpdateApi = () => {
     switch (sport) {
@@ -975,8 +989,6 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       await handleTogglePlayerInTeam(editingTeamId!, newPlayer.id!);
       
       // Refresh players list
-      await loadAllPlayers();
-      
       // Reset form
       setQuickAddForm({ firstName: '', lastName: '', patronymic: '', group: '', gender: 'None' });
       setIsQuickAddMode(false);
@@ -1086,10 +1098,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     }
   };
 
-  const filteredPlayers = allPlayers.filter(p => 
-    (p.firstName + ' ' + p.lastName).toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.group?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+
 
   return (
     <div className={styles.teamSportsView}>

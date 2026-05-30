@@ -139,6 +139,7 @@ public class TournamentService : ITournamentService
     {
         var e = await _context.Set<PolytechLeague.Domain.Entities.Event>()
             .Include(e => e.Photos)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(e => e.Id == id);
 
         if (e == null) return null;

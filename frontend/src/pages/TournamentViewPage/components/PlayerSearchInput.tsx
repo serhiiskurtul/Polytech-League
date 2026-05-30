@@ -5,6 +5,7 @@ import styles from './PlayerSearchInput.module.css';
 
 interface PlayerSearchInputProps {
   label: string;
+  players?: PlayerDto[];
   selectedId: number;
   onSelect: (playerId: number) => void;
   onQuickAdd: (name: string) => void;
@@ -14,6 +15,7 @@ interface PlayerSearchInputProps {
 
 const PlayerSearchInput: React.FC<PlayerSearchInputProps> = ({
   label,
+  players,
   selectedId,
   onSelect,
   onQuickAdd,
@@ -29,10 +31,15 @@ const PlayerSearchInput: React.FC<PlayerSearchInputProps> = ({
   useEffect(() => {
     if (selectedId && initialPlayerName) {
       setSearchTerm(initialPlayerName);
+    } else if (selectedId && players && players.length > 0) {
+      const player = players.find(p => p.id === selectedId);
+      if (player) {
+        setSearchTerm(`${player.firstName} ${player.lastName}`);
+      }
     } else if (!selectedId) {
         setSearchTerm('');
     }
-  }, [selectedId, initialPlayerName]);
+  }, [selectedId, initialPlayerName, players]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -46,6 +53,24 @@ const PlayerSearchInput: React.FC<PlayerSearchInputProps> = ({
   }, []);
 
   useEffect(() => {
+    if (players && players.length > 0) {
+      // Local filtering mode
+      if (searchTerm.length > 0) {
+        const results = players.filter(p => {
+          const fullName = `${p.firstName} ${p.patronymic || ''} ${p.lastName}`.toLowerCase();
+          const search = searchTerm.toLowerCase();
+          return fullName.includes(search) || 
+                 p.group?.toLowerCase().includes(search) ||
+                 p.studentId?.toLowerCase().includes(search);
+        });
+        setFilteredPlayers(results.slice(0, 8));
+      } else {
+        setFilteredPlayers(players.slice(0, 8)); // show all eligible if no search term
+      }
+      return;
+    }
+
+    // Remote filtering mode
     const delayDebounceFn = setTimeout(async () => {
       if (searchTerm.length >= 2) {
         try {
@@ -60,7 +85,7 @@ const PlayerSearchInput: React.FC<PlayerSearchInputProps> = ({
     }, 300);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm]);
+  }, [searchTerm, players]);
 
   const exactMatch = filteredPlayers.find(p => 
     `${p.firstName} ${p.lastName}`.toLowerCase() === searchTerm.toLowerCase()
