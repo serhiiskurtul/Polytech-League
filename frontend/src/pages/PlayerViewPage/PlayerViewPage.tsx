@@ -7,7 +7,7 @@ import {
 } from '@/widgets/profile-widgets';
 import styles from './PlayerViewPage.module.css';
 import { PlayerDto } from '@/shared/types/player.types';
-import { getPlayerById, updatePlayer } from '@/shared/api/players.api';
+import { getPlayerById, getPlayerRank, updatePlayer } from '@/shared/api/players.api';
 import EditProfileModal from '@/widgets/profile-widgets/edit-profile-modal/EditProfileModal';
 import { toast } from 'react-hot-toast';
 import { useChat } from '@/app/providers/ChatProvider';
@@ -35,6 +35,17 @@ const PlayerViewPage = () => {
       setLoading(true);
       try {
         const data = await getPlayerById(id);
+        
+        try {
+          const rankData = await getPlayerRank(id);
+          data.globalRank = rankData.globalRank;
+          data.performanceScore = rankData.performanceScore;
+          data.sportStats = rankData.sportStats;
+        } catch (rankErr) {
+          console.error("Failed to fetch player rank:", rankErr);
+          // Non-fatal, profile still loads
+        }
+        
         setPlayerProfile(data);
         setError(null);
       } catch (err: any) {

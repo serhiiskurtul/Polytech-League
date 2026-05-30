@@ -49,24 +49,22 @@ public class PlayerService : IPlayerService
 
     public async Task<PlayerDto?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
     {
-        var allWithRankings = await GetAllWithRankingsAsync(null, cancellationToken);
-        var ranked = allWithRankings.FirstOrDefault(p => p.Id == id);
-        if (ranked != null) { 
-            await PopulateAchievementsAsync(ranked, cancellationToken);
-            await PopulateAutomaticBadgesAsync(ranked, cancellationToken); 
-            await PopulateChessSpecialStatsAsync(ranked, cancellationToken); 
-            await PopulateFootballStatsAsync(ranked, cancellationToken);
-            return ranked; 
-        }
-        // Fallback for players not in rankings (Admins, External)
+        // O(1) Fast profile loading (without global rankings calculation)
         var player = await _dbContext.Players
             .Include(p => p.User)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+            
         if (player == null) return null;
+        
         var dto = player.ToDto();
         dto.HasPendingMergeRequest = await _dbContext.ProfileMergeRequests
             .AnyAsync(r => r.UserId == (player.UserId ?? 0) && r.Status == RegistrationStatus.Pending, cancellationToken);
-        await PopulateAchievementsAsync(dto, cancellationToken); await PopulateAutomaticBadgesAsync(dto, cancellationToken); await PopulateChessSpecialStatsAsync(dto, cancellationToken);
+            
+        await PopulateAchievementsAsync(dto, cancellationToken); 
+        await PopulateAutomaticBadgesAsync(dto, cancellationToken); 
+        await PopulateChessSpecialStatsAsync(dto, cancellationToken);
+        await PopulateFootballStatsAsync(dto, cancellationToken);
+        
         return dto;
     }
 
@@ -80,27 +78,22 @@ public class PlayerService : IPlayerService
 
     public async Task<PlayerDto?> GetByUserIdAsync(long userId, CancellationToken cancellationToken = default)
     {
-        var allWithRankings = await GetAllWithRankingsAsync(null, cancellationToken);
-        var ranked = allWithRankings.FirstOrDefault(p => p.UserId == userId);
-        if (ranked != null) { 
-            await PopulateAchievementsAsync(ranked, cancellationToken);
-            await PopulateAutomaticBadgesAsync(ranked, cancellationToken); 
-            await PopulateChessSpecialStatsAsync(ranked, cancellationToken); 
-            await PopulateFootballStatsAsync(ranked, cancellationToken);
-            return ranked; 
-        }
-        // Fallback for players not in rankings (Admins, External)
+        // O(1) Fast profile loading (without global rankings calculation)
         var player = await _dbContext.Players
             .Include(p => p.User)
             .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
+            
         if (player == null) return null;
+        
         var dto = player.ToDto();
         dto.HasPendingMergeRequest = await _dbContext.ProfileMergeRequests
             .AnyAsync(r => r.UserId == userId && r.Status == RegistrationStatus.Pending, cancellationToken);
+            
         await PopulateAchievementsAsync(dto, cancellationToken); 
         await PopulateAutomaticBadgesAsync(dto, cancellationToken); 
         await PopulateChessSpecialStatsAsync(dto, cancellationToken);
         await PopulateFootballStatsAsync(dto, cancellationToken);
+        
         return dto;
     }
 
