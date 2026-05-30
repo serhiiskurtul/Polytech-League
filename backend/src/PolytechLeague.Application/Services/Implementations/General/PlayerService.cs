@@ -1383,6 +1383,8 @@ public class PlayerService : IPlayerService
 
     public async Task MergePlayersManuallyAsync(long sourcePlayerId, long targetPlayerId, CancellationToken cancellationToken = default)
     {
+        _dbContext.ChangeTracker.Clear();
+
         var sourcePlayer = await _dbContext.Players.FindAsync(new object[] { sourcePlayerId }, cancellationToken);
         var targetPlayer = await _dbContext.Players.FindAsync(new object[] { targetPlayerId }, cancellationToken);
 

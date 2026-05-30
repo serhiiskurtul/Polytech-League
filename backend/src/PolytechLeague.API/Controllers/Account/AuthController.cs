@@ -80,7 +80,7 @@ public class AuthController(IAuthService authService) : Controller
             HttpOnly = true,
             Secure = isProd,
             SameSite = isProd ? SameSiteMode.None : SameSiteMode.Lax,
-            Expires = DateTimeOffset.UtcNow.AddHours(24),
+            Expires = DateTimeOffset.UtcNow.AddMinutes(15),
             Path = "/"
         });
 
@@ -92,7 +92,7 @@ public class AuthController(IAuthService authService) : Controller
                 HttpOnly = true,
                 Secure = isProd,
                 SameSite = isProd ? SameSiteMode.None : SameSiteMode.Lax,
-                Expires = DateTimeOffset.UtcNow.AddDays(7),
+                Expires = DateTimeOffset.UtcNow.AddDays(30),
                 Path = "/"
             });
     }

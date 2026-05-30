@@ -59,6 +59,16 @@ public class AuthService(
         var oldRefreshToken = await refreshTokenService.GetByRefreshTokenAsync(
             refreshTokenRequest.RefreshToken, cancellationToken);
 
+        if (oldRefreshToken.IsExpired)
+        {
+            throw new AuthenticationException("Refresh token is expired.");
+        }
+
+        if (oldRefreshToken.IsRevoked)
+        {
+            throw new AuthenticationException("Refresh token is revoked.");
+        }
+
         oldRefreshToken.IsRevoked = true;
         await refreshTokenService.UpdateAsync(
             oldRefreshToken.Id, oldRefreshToken, cancellationToken);

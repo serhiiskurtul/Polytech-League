@@ -21,7 +21,7 @@ public class JwtService: IJwtService
         if (string.IsNullOrWhiteSpace(_options.SecretKey)) throw new ArgumentException("JWT SecretKey is null or empty.", nameof(_options.SecretKey));
         if (string.IsNullOrWhiteSpace(_options.Issuer)) throw new ArgumentException("JWT Issuer is null or empty.", nameof(_options.Issuer));
         if (string.IsNullOrWhiteSpace(_options.Audience)) throw new ArgumentException("JWT Audience is null or empty.", nameof(_options.Audience));
-        if (_options.ExpiresHours <= 0) throw new ArgumentOutOfRangeException(nameof(_options.ExpiresHours), "JWT ExpiresHours must be greater than zero.");
+        if (_options.ExpiresMinutes <= 0) throw new ArgumentOutOfRangeException(nameof(_options.ExpiresMinutes), "JWT ExpiresMinutes must be greater than zero.");
     }
 
     public string GenerateAccessToken(User user)
@@ -38,7 +38,7 @@ public class JwtService: IJwtService
                 new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
                 new Claim("name", $"{user.FirstName} {user.LastName}".Trim())
             }),
-            Expires = DateTime.UtcNow.AddHours(_options.ExpiresHours),
+            Expires = DateTime.UtcNow.AddMinutes(_options.ExpiresMinutes),
             Issuer = _options.Issuer,
             Audience = _options.Audience,
             SigningCredentials = new SigningCredentials(
@@ -50,7 +50,7 @@ public class JwtService: IJwtService
         return tokenHandler.WriteToken(token);
     }
     
-    public RefreshToken GenerateRefreshToken(long userId, int expireDays = 7)
+    public RefreshToken GenerateRefreshToken(long userId, int expireDays = 30)
     {
         var token = new RefreshToken
         {
