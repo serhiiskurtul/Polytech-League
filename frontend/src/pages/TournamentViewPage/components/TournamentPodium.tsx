@@ -51,7 +51,7 @@ const TournamentPodium: React.FC<TournamentPodiumProps> = ({
           style={{ cursor: (isTeam && onViewRoster) ? 'pointer' : 'default' }}
         >
           {photoSrc ? (
-            <img 
+            <img loading="lazy" 
               src={photoSrc} 
               alt={displayName} 
               className={styles.podiumPhoto}

@@ -842,50 +842,60 @@ public class TournamentService : ITournamentService
 
         var sport = GetSportName(e);
 
-        foreach (var tv in teamVotes)
+        if (teamVotes.Any())
         {
-            string name = "Команда";
+            var teamIds = teamVotes.Select(tv => tv.Id).ToList();
+            Dictionary<long, string> teamNames = new();
+
             switch (sport)
             {
                 case "football":
-                    var ft = await _context.FootballTeams.FindAsync(tv.Id);
-                    if (ft != null) name = ft.Name;
+                    teamNames = await _context.FootballTeams.Where(t => teamIds.Contains(t.Id) && t.Name != null).ToDictionaryAsync(t => t.Id, t => t.Name!);
                     break;
                 case "volleyball":
-                    var vt = await _context.VolleyballTeams.FindAsync(tv.Id);
-                    if (vt != null) name = vt.Name;
+                    teamNames = await _context.VolleyballTeams.Where(t => teamIds.Contains(t.Id) && t.Name != null).ToDictionaryAsync(t => t.Id, t => t.Name!);
                     break;
                 case "basketball-3x3":
-                    var bt = await _context.BasketballTeams.FindAsync(tv.Id);
-                    if (bt != null) name = bt.Name;
+                    teamNames = await _context.BasketballTeams.Where(t => teamIds.Contains(t.Id) && t.Name != null).ToDictionaryAsync(t => t.Id, t => t.Name!);
                     break;
                 case "beach-volleyball":
-                    var bvt = await _context.BeachVolleyballTeams.FindAsync(tv.Id);
-                    if (bvt != null) name = bvt.Name;
+                    teamNames = await _context.BeachVolleyballTeams.Where(t => teamIds.Contains(t.Id) && t.Name != null).ToDictionaryAsync(t => t.Id, t => t.Name!);
                     break;
             }
 
-            stats.OptionStats.Add(new VoteOptionStatDto
+            foreach (var tv in teamVotes)
             {
-                Id = tv.Id,
-                Name = name,
-                Votes = tv.Count,
-                Percentage = Math.Round((double)tv.Count / totalVotes * 100, 2)
-            });
+                string name = teamNames.ContainsKey(tv.Id) ? teamNames[tv.Id] : "Команда";
+                stats.OptionStats.Add(new VoteOptionStatDto
+                {
+                    Id = tv.Id,
+                    Name = name,
+                    Votes = tv.Count,
+                    Percentage = Math.Round((double)tv.Count / totalVotes * 100, 2)
+                });
+            }
         }
 
-        foreach (var pv in playerVotes)
+        if (playerVotes.Any())
         {
-            var player = await _context.Players.FindAsync(pv.Id);
-            string name = player != null ? $"{player.FirstName} {player.LastName}" : "Гравець";
+            var playerIds = playerVotes.Select(pv => pv.Id).ToList();
+            var players = await _context.Players
+                .Where(p => playerIds.Contains(p.Id))
+                .Select(p => new { p.Id, p.FirstName, p.LastName })
+                .ToDictionaryAsync(p => p.Id, p => $"{p.FirstName} {p.LastName}");
 
-            stats.OptionStats.Add(new VoteOptionStatDto
+            foreach (var pv in playerVotes)
             {
-                Id = pv.Id,
-                Name = name,
-                Votes = pv.Count,
-                Percentage = Math.Round((double)pv.Count / totalVotes * 100, 2)
-            });
+                string name = players.ContainsKey(pv.Id) ? players[pv.Id] : "Гравець";
+
+                stats.OptionStats.Add(new VoteOptionStatDto
+                {
+                    Id = pv.Id,
+                    Name = name,
+                    Votes = pv.Count,
+                    Percentage = Math.Round((double)pv.Count / totalVotes * 100, 2)
+                });
+            }
         }
 
         stats.OptionStats = stats.OptionStats.OrderByDescending(o => o.Votes).ToList();

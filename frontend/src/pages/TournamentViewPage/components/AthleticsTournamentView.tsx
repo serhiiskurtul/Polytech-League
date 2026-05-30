@@ -9,7 +9,7 @@ import styles from '../TournamentViewPage.module.css';
 import PlayerSearchInput from './PlayerSearchInput';
 import { RegistrationStatus } from '@/shared/types/tournament.types';
 import { PlayerDto, Gender } from '@/shared/types/player.types';
-import { createPlayer, searchUsers, getAllPlayers } from '@/shared/api';
+import { createPlayer, searchUsers, searchPlayers } from '@/shared/api';
 
 type SearchResult = {
   type: 'player' | 'user';
@@ -24,14 +24,12 @@ type SearchResult = {
 
 interface AthleticsTournamentViewProps {
   details: AthleticsEventResponse;
-  allPlayers: any[];
   isAdmin: boolean;
   onRefresh: () => void;
 }
 
 const AthleticsTournamentView: React.FC<AthleticsTournamentViewProps> = ({
   details,
-  allPlayers,
   isAdmin,
   onRefresh
 }) => {
@@ -106,12 +104,9 @@ const AthleticsTournamentView: React.FC<AthleticsTournamentViewProps> = ({
     setIsSearching(true);
     try {
       const q = query.toLowerCase();
-      // 1. Search in existing Players
-      const playerResults: SearchResult[] = allPlayers
-        .filter(p =>
-          (p.firstName + ' ' + p.lastName).toLowerCase().includes(q) ||
-          p.group?.toLowerCase().includes(q)
-        )
+      // 1. Search in existing Players via API
+      const players = await searchPlayers(query);
+      const playerResults: SearchResult[] = players
         .map(p => ({
           type: 'player',
           id: p.id!,
@@ -262,7 +257,6 @@ const AthleticsTournamentView: React.FC<AthleticsTournamentViewProps> = ({
               <div className={styles.formGroup}>
                 <PlayerSearchInput 
                   label="Гравець (якщо індивідуально)"
-                  players={allPlayers}
                   selectedId={newResult.playerId || 0}
                   onSelect={(id) => setNewResult({...newResult, playerId: id, teamName: ''})}
                   onQuickAdd={() => {}}

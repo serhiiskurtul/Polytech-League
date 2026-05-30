@@ -22,7 +22,7 @@ import {
   updateUserEventMediaStatus,
   deleteUserEventMedia,
   searchUsers,
-  getAllPlayers,
+  searchPlayers,
   createPlayer,
   registerForChessEvent,
   approveChessParticipant,
@@ -138,7 +138,6 @@ const TournamentViewPage = () => {
   const { user } = useAuth();
   const [tournament, setTournament] = useState<Tournament | null>(null);
   const [details, setDetails] = useState<any | null>(null);
-  const [allPlayers, setAllPlayers] = useState<PlayerDto[]>([]);
   const [activeTab, setActiveTab] = useState<'standings' | 'games' | 'participants' | 'schedule' | 'voting'>('standings');
   const [isLoading, setIsLoading] = useState(true);
   const [isRegistering, setIsRegistering] = useState(false);
@@ -1156,7 +1155,6 @@ const TournamentViewPage = () => {
 
       if (['chess', 'checkers', 'armwrestling', 'volleyball', 'beach_volleyball', 'football', 'basketball_3x3', 'basketball_3x3', 'basketball3x3', 'badminton', 'table_tennis', 'tabletennis', 'athletics'].includes(sportKey)) {
         try {
-          const playersGetter = getAllPlayers;
           let detailsPromise;
 
           switch (sportKey) {
@@ -1174,12 +1172,8 @@ const TournamentViewPage = () => {
             default: detailsPromise = getChessEventById(id);
           }
 
-          const [detailsData, playersData] = await Promise.all([
-            detailsPromise,
-            playersGetter()
-          ]);
+          const detailsData = await detailsPromise;
           setDetails(detailsData);
-          setAllPlayers(playersData);
 
           // Initialize winners state
           if (detailsData) {
@@ -1277,12 +1271,9 @@ const TournamentViewPage = () => {
       if (searchQuery.length >= 2) {
         setIsSearching(true);
         try {
-          // 1. Search in existing Players (local search for now, as we have allPlayers)
-          const playerResults: SearchResult[] = allPlayers
-            .filter(p =>
-              (p.firstName + ' ' + p.lastName).toLowerCase().includes(searchQuery.toLowerCase()) ||
-              p.group?.toLowerCase().includes(searchQuery.toLowerCase())
-            )
+          // 1. Search in existing Players via API
+          const players = await searchPlayers(searchQuery);
+          const playerResults: SearchResult[] = players
             .map(p => ({
               type: 'player',
               id: p.id!,
@@ -1323,7 +1314,7 @@ const TournamentViewPage = () => {
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery, allPlayers, tournament?.sport]);
+  }, [searchQuery, tournament?.sport]);
 
   const handleSelectResult = (result: SearchResult) => {
     if (result.type === 'player') {
@@ -1960,9 +1951,9 @@ const TournamentViewPage = () => {
               title={(details?.mainPhotoUrl || (details?.photos && details.photos.length > 0)) ? "Натисніть, щоб збільшити" : ""}
             >
               {details?.mainPhotoUrl ? (
-                <img src={getImageUrl(details.mainPhotoUrl)} alt={tournament?.title} />
+                <img src={getImageUrl(details.mainPhotoUrl)} alt={tournament?.title} loading="lazy" />
               ) : details?.photos && details.photos.length > 0 ? (
-                <img src={getImageUrl(details.photos[0].url)} alt={tournament?.title} />
+                <img src={getImageUrl(details.photos[0].url)} alt={tournament?.title} loading="lazy" />
               ) : (
                 <i className={
                   tournament?.sport === 'checkers' ? "fas fa-braille" :
@@ -2297,7 +2288,6 @@ const TournamentViewPage = () => {
               return (
                 <AthleticsTournamentView
                   details={details as any}
-                  allPlayers={allPlayers}
                   isAdmin={isAdmin}
                   onRefresh={() => fetchTournament(true)}
                 />
@@ -3751,7 +3741,7 @@ const TournamentViewPage = () => {
                       <div className={styles.mainPhotoContainer}>
                         {details?.mainPhotoUrl ? (
                           <div className={styles.mainPhotoPreview}>
-                            <img src={getImageUrl(details.mainPhotoUrl)} alt="Main" />
+                            <img src={getImageUrl(details.mainPhotoUrl)} alt="Main" loading="lazy" />
                             <div className={styles.mainPhotoActions}>
                               <button
                                 className={styles.changeMainPhotoBtn}
@@ -3856,7 +3846,7 @@ const TournamentViewPage = () => {
                                   <i className="fas fa-video" style={{ fontSize: '2rem', color: '#475569' }}></i>
                                 </div>
                               ) : (
-                                <img src={getImageUrl(photo.url)} alt="Tournament" />
+                                <img src={getImageUrl(photo.url)} alt="Tournament" loading="lazy" />
                               )}
                               <div className={styles.adminPhotoActions}>
                                 <button onClick={() => handleDeletePhoto(photo.id)} className={styles.deletePhotoBtn}>
