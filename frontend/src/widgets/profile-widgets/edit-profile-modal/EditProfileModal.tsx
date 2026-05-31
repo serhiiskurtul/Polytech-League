@@ -31,7 +31,9 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
     volleyballShirtNumber: initialData.volleyballShirtNumber !== null && initialData.volleyballShirtNumber !== undefined ? initialData.volleyballShirtNumber : '',
     basketballShirtNumber: initialData.basketballShirtNumber !== null && initialData.basketballShirtNumber !== undefined ? initialData.basketballShirtNumber : '',
     previousNames: initialData.previousNames || '',
-    gender: initialData.gender || 'None'
+    gender: initialData.gender || 'None',
+    startYear: initialData.studyYears?.split('-')[0]?.trim() || '',
+    endYear: initialData.studyYears?.split('-')[1]?.trim() || ''
   });
 
   const [loading, setLoading] = React.useState(false);
@@ -53,7 +55,9 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
         volleyballShirtNumber: initialData.volleyballShirtNumber !== null && initialData.volleyballShirtNumber !== undefined ? initialData.volleyballShirtNumber : '',
         basketballShirtNumber: initialData.basketballShirtNumber !== null && initialData.basketballShirtNumber !== undefined ? initialData.basketballShirtNumber : '',
         previousNames: initialData.previousNames || '',
-        gender: initialData.gender || 'None'
+        gender: initialData.gender || 'None',
+        startYear: initialData.studyYears?.split('-')[0]?.trim() || '',
+        endYear: initialData.studyYears?.split('-')[1]?.trim() || ''
       });
     }
   }, [isOpen, initialData]);
@@ -87,8 +91,10 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
       return;
     }
 
+    const { startYear, endYear, studyYears, ...restData } = formData;
     const sanitizedData = {
-      ...formData,
+      ...restData,
+      studyYears: (startYear && endYear) ? `${startYear}-${endYear}` : (startYear || endYear || ''),
       studentId: formData.studentId.toUpperCase(),
       footballShirtNumber: (formData.footballShirtNumber === '' || formData.footballShirtNumber === null) ? null : parseInt(formData.footballShirtNumber.toString()),
       volleyballShirtNumber: (formData.volleyballShirtNumber === '' || formData.volleyballShirtNumber === null) ? null : parseInt(formData.volleyballShirtNumber.toString()),
@@ -208,15 +214,30 @@ const EditProfileModal = ({ isOpen, onClose, onSave, initialData, isAdmin }: Edi
                 </div>
                 
                 <div className={styles.formGroup}>
-                  <label htmlFor="studyYears">Роки навчання</label>
-                  <input
-                    type="text"
-                    id="studyYears"
-                    name="studyYears"
-                    value={formData.studyYears}
-                    onChange={handleChange}
-                    placeholder="Наприклад: 2021-2025"
-                  />
+                  <label>Роки навчання</label>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <select
+                      value={formData.startYear}
+                      onChange={(e) => setFormData(prev => ({ ...prev, startYear: e.target.value }))}
+                      className={styles.selectInput}
+                    >
+                      <option value="">Початок</option>
+                      {Array.from({length: 15}, (_, i) => (2015 + i).toString()).map(year => (
+                        <option key={year} value={year}>{year}</option>
+                      ))}
+                    </select>
+                    <span style={{ alignSelf: 'center', color: 'var(--muted)' }}>-</span>
+                    <select
+                      value={formData.endYear}
+                      onChange={(e) => setFormData(prev => ({ ...prev, endYear: e.target.value }))}
+                      className={styles.selectInput}
+                    >
+                      <option value="">Кінець</option>
+                      {Array.from({length: 15}, (_, i) => (2015 + i).toString()).map(year => (
+                        <option key={year} value={year}>{year}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
                 
                 <div className={styles.formGroup}>
