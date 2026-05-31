@@ -85,7 +85,7 @@ public class UserService : AbstractEntityService<User>, IUserService
 
     public override async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Hard deleting user with id {Id} and all associated person profiles", id);
+        _logger.LogInformation("Hard deleting user with id {Id} and all associated records", id);
 
         var user = await _dbcontext.Set<User>().FindAsync(new object[] { id }, cancellationToken);
         if (user is null)
@@ -104,10 +104,60 @@ public class UserService : AbstractEntityService<User>, IUserService
             _dbcontext.Set<Person>().RemoveRange(persons);
         }
 
+        var conversations = await _dbcontext.Set<Conversation>()
+            .Where(c => c.User1Id == id || c.User2Id == id)
+            .ToListAsync(cancellationToken);
+        if (conversations.Any())
+        {
+            var conversationIds = conversations.Select(c => c.Id).ToList();
+            var messages = await _dbcontext.Set<Message>()
+                .Where(m => conversationIds.Contains(m.ConversationId) || m.SenderId == id)
+                .ToListAsync(cancellationToken);
+            if (messages.Any())
+                _dbcontext.Set<Message>().RemoveRange(messages);
+            _dbcontext.Set<Conversation>().RemoveRange(conversations);
+        }
+
+        var notifications = await _dbcontext.Set<Notification>()
+            .Where(n => n.UserId == id)
+            .ToListAsync(cancellationToken);
+        if (notifications.Any())
+            _dbcontext.Set<Notification>().RemoveRange(notifications);
+
+        var pushSubs = await _dbcontext.Set<PushSubscription>()
+            .Where(p => p.UserId == id)
+            .ToListAsync(cancellationToken);
+        if (pushSubs.Any())
+            _dbcontext.Set<PushSubscription>().RemoveRange(pushSubs);
+
+        var mergeReqs = await _dbcontext.Set<ProfileMergeRequest>()
+            .Where(r => r.UserId == id)
+            .ToListAsync(cancellationToken);
+        if (mergeReqs.Any())
+            _dbcontext.Set<ProfileMergeRequest>().RemoveRange(mergeReqs);
+
+        var eventVotes = await _dbcontext.Set<EventVote>()
+            .Where(e => e.UserId == id)
+            .ToListAsync(cancellationToken);
+        if (eventVotes.Any())
+            _dbcontext.Set<EventVote>().RemoveRange(eventVotes);
+
+        var feedbacks = await _dbcontext.Set<Feedback>()
+            .Where(f => f.UserId == id)
+            .ToListAsync(cancellationToken);
+        if (feedbacks.Any())
+            _dbcontext.Set<Feedback>().RemoveRange(feedbacks);
+
+        var media = await _dbcontext.Set<UserEventMedia>()
+            .Where(m => m.UserId == id)
+            .ToListAsync(cancellationToken);
+        if (media.Any())
+            _dbcontext.Set<UserEventMedia>().RemoveRange(media);
+
         _dbcontext.Set<User>().Remove(user);
         await _dbcontext.SaveChangesAsync(cancellationToken);
 
-        _logger.LogInformation("User {Id} and associated person profiles successfully deleted", id);
+        _logger.LogInformation("User {Id} and all associated records successfully deleted", id);
     }
 
     public async Task SoftDeleteAsync(long id, CancellationToken cancellationToken = default)
