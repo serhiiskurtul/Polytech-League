@@ -881,6 +881,11 @@ public class PlayerService : IPlayerService
             foreach (var p in armwPerformances) {
                 if (p.Tournament == null) continue;
                 int rank = p.Rank;
+                if (rank <= 0) {
+                    if (p.Tournament.FirstPlaceId == playerId) rank = 1;
+                    else if (p.Tournament.SecondPlaceId == playerId) rank = 2;
+                    else if (p.Tournament.ThirdPlaceId == playerId) rank = 3;
+                }
                 achievements.Add(new AchievementDto {
                     TournamentName = p.Tournament.Name,
                     SportType = "armwrestling",
