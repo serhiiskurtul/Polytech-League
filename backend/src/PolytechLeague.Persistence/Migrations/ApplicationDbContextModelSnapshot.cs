@@ -1853,6 +1853,30 @@ namespace PolytechLeague.Persistence.Migrations
                     b.ToTable("seasons", (string)null);
                 });
 
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.SiteVisit", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("GuestId")
+                        .HasColumnType("text");
+
+                    b.Property<long?>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("VisitDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SiteVisits");
+                });
+
             modelBuilder.Entity("PolytechLeague.Domain.Entities.TableTennis.TableTennisEventParticipant", b =>
                 {
                     b.Property<long>("TournamentId")
@@ -2094,6 +2118,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("last_name");
+
+                    b.Property<DateTime?>("LastVisitAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -3842,6 +3869,15 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Navigation("College");
 
                     b.Navigation("Season");
+                });
+
+            modelBuilder.Entity("PolytechLeague.Domain.Entities.SiteVisit", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.TableTennis.TableTennisEventParticipant", b =>

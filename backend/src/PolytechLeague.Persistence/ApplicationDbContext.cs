@@ -57,6 +57,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<EventVote> EventVotes { get; set; }
     public DbSet<UserEventMedia> UserEventMedias { get; set; }
     public DbSet<Feedback> Feedbacks { get; set; }
+    public DbSet<SiteVisit> SiteVisits { get; set; }
 
 
     

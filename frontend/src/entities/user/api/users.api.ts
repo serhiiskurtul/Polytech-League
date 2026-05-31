@@ -10,6 +10,7 @@ export interface UserResponse {
   isDeleted: boolean;
   createdAt: string;
   isEmailConfirmed: boolean;
+  lastVisitAt?: string;
 }
 
 export interface PagedResponse<T> {

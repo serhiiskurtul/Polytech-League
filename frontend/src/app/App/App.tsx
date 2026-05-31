@@ -23,6 +23,7 @@ import InternalServerErrorPage from '@/pages/internal-server-error/InternalServe
 import { RatingsPage } from '@/pages/ratings';
 import { AdminMergesPage } from '@/pages/admin-merges/AdminMergesPage';
 import { AdminUsersPage } from '@/pages/admin-users';
+import { AdminAnalyticsPage } from '@/pages/admin-analytics/AdminAnalyticsPage';
 import { NationalRatingsPage } from '@/pages/national-ratings';
 import { AdminCollegesPage } from '@/pages/admin-colleges';
 import { RegionalRatingsPage } from '@/pages/regional-ratings';
@@ -37,6 +38,7 @@ import ProtectedRoute from '../providers/ProtectedRoute';
 import ScrollToTop from '../providers/ScrollToTop';
 import { Toaster } from 'react-hot-toast';
 import { NotificationBanner } from '@/features/notifications/NotificationBanner';
+import api from '@/shared/api/axiosInstance';
 
 
 
@@ -44,6 +46,22 @@ export default function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const { notifications, markAsRead } = useNotifications();
+
+  useEffect(() => {
+    const recordVisit = async () => {
+      try {
+        let guestId = localStorage.getItem('guestId');
+        if (!guestId) {
+          guestId = crypto.randomUUID();
+          localStorage.setItem('guestId', guestId);
+        }
+        await api.post('/SiteVisits', { guestId });
+      } catch (e) {
+        console.error('Failed to record visit:', e);
+      }
+    };
+    recordVisit();
+  }, []);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -309,6 +327,17 @@ export default function App() {
             <ProtectedRoute requireAuth={true} adminOnly={true}>
               <div className="page-wrapper">
                 <AdminUsersPage />
+              </div>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/analytics"
+          element={
+            <ProtectedRoute requireAuth={true} adminOnly={true}>
+              <div className="page-wrapper">
+                <AdminAnalyticsPage />
               </div>
             </ProtectedRoute>
           }
