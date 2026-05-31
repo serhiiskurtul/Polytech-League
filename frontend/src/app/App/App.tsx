@@ -37,6 +37,7 @@ import ProtectedRoute from '../providers/ProtectedRoute';
 import ScrollToTop from '../providers/ScrollToTop';
 import { Toaster } from 'react-hot-toast';
 import { NotificationBanner } from '@/features/notifications/NotificationBanner';
+import api from '@/shared/api/axiosInstance';
 
 
 
@@ -44,6 +45,22 @@ export default function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const { notifications, markAsRead } = useNotifications();
+
+  useEffect(() => {
+    const recordVisit = async () => {
+      try {
+        let guestId = localStorage.getItem('guestId');
+        if (!guestId) {
+          guestId = crypto.randomUUID();
+          localStorage.setItem('guestId', guestId);
+        }
+        await api.post('/SiteVisits', { guestId });
+      } catch (e) {
+        console.error('Failed to record visit:', e);
+      }
+    };
+    recordVisit();
+  }, []);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {

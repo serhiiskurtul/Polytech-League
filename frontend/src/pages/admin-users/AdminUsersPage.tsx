@@ -18,7 +18,25 @@ export const AdminUsersPage = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [userSortBy, setUserSortBy] = useState<string | undefined>(undefined);
   const [userSortDirection, setUserSortDirection] = useState<'Asc' | 'Desc' | undefined>(undefined);
+  const [stats, setStats] = useState<{ totalVisits: number, uniqueRegisteredUsers: number, uniqueUnregisteredUsers: number } | null>(null);
   const pageSize = 100;
+
+  const fetchStats = async () => {
+    try {
+      // Need to import api at the top if it's not imported.
+      // Wait, let's use the local 'import api from '@/shared/api/axiosInstance';' if we need.
+      // We will add the import at the top of the file.
+      const { default: api } = await import('@/shared/api/axiosInstance');
+      const response = await api.get('/SiteVisits/stats');
+      setStats(response.data);
+    } catch (e) {
+      console.error('Failed to fetch site stats', e);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -194,9 +212,27 @@ export const AdminUsersPage = () => {
           <div className={styles.titleSection}>
             <h1>Керування користувачами</h1>
             <p>Перегляд, блокування та видалення облікових записів</p>
-            <div className={styles.statsBadge}>
-              {activeTab === 'users' ? 'Всього акаунтів: ' : 'Всього гравців: '}
-              <span>{totalCount}</span>
+            <div style={{ display: 'flex', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
+              <div className={styles.statsBadge}>
+                {activeTab === 'users' ? 'Всього акаунтів: ' : 'Всього гравців: '}
+                <span>{totalCount}</span>
+              </div>
+              {stats && (
+                <>
+                  <div className={styles.statsBadge} style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.2)' }}>
+                    <i className="fas fa-eye" style={{ marginRight: '6px' }}></i>
+                    Усіх візитів: <span>{stats.totalVisits}</span>
+                  </div>
+                  <div className={styles.statsBadge} style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                    <i className="fas fa-user-check" style={{ marginRight: '6px' }}></i>
+                    Зареєстрованих відвідувачів: <span>{stats.uniqueRegisteredUsers}</span>
+                  </div>
+                  <div className={styles.statsBadge} style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
+                    <i className="fas fa-user-secret" style={{ marginRight: '6px' }}></i>
+                    Гостей: <span>{stats.uniqueUnregisteredUsers}</span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </header>
