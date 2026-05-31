@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { subscribeUserToPush } from '@/services/pushService';
+import { subscribeUserToPush } from '@/shared/lib/push/pushService';
 import { useAuth } from '@/entities/session';
 
 export const NotificationBanner: React.FC = () => {

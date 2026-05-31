@@ -1,8 +1,8 @@
 import React from 'react';
 import { footballMatchResponse } from '@/shared/types/football.types';
-import UniversalBracket, { BracketRound, BracketMatch } from '@/components/Tournament/UniversalBracket/UniversalBracket';
+import { UniversalBracket, BracketRound, BracketMatch } from '@/widgets/tournament-bracket';
 import styles from '../TournamentViewPage.module.css';
-import bracketStyles from '@/components/Tournament/UniversalBracket/UniversalBracket.module.css';
+import bracketStyles from '@/widgets/tournament-bracket/UniversalBracket.module.css';
 
 interface FootballBracketProps {
   matches: footballMatchResponse[];
