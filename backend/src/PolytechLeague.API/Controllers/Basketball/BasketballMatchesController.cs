@@ -15,13 +15,13 @@ public class BasketballMatchesController(
     [HttpGet]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
-        var cached = await redisService.GetDataAsync<IEnumerable<BasketballMatchResponse>>("basketball3x3_matches_all");
+        var cached = await redisService.GetDataAsync<IEnumerable<BasketballMatchResponse>>("basketball_matches_all");
         if (cached != null) return Ok(cached);
 
         var entities = await basketball3x3MatchService.GetAllAsync(cancellationToken: cancellationToken);
         var response = entities.Select(e => e.ToResponse()).ToList();
 
-        await redisService.SetDataAsync("basketball3x3_matches_all", response, TimeSpan.FromMinutes(60), "basketball3x3_matches_group");
+        await redisService.SetDataAsync("basketball_matches_all", response, TimeSpan.FromMinutes(60), "basketball_matches_group");
         return Ok(response);
     }
 
@@ -41,8 +41,8 @@ public class BasketballMatchesController(
         var entity = request.FromRequest();
         await basketball3x3MatchService.CreateAsync(entity, cancellationToken);
 
-        await redisService.RemoveGroupAsync("basketball3x3_matches_group");
-        await redisService.RemoveGroupAsync("basketball3x3_events_group");
+        await redisService.RemoveGroupAsync("basketball_matches_group");
+        await redisService.RemoveGroupAsync("basketball_events_group");
 
         return Created();
     }
@@ -57,8 +57,8 @@ public class BasketballMatchesController(
         var entity = request.FromRequest();
         await basketball3x3MatchService.UpdateAsync(id, entity, cancellationToken);
 
-        await redisService.RemoveGroupAsync("basketball3x3_matches_group");
-        await redisService.RemoveGroupAsync("basketball3x3_events_group");
+        await redisService.RemoveGroupAsync("basketball_matches_group");
+        await redisService.RemoveGroupAsync("basketball_events_group");
 
         return NoContent();
     }
@@ -69,8 +69,8 @@ public class BasketballMatchesController(
     {
         await basketball3x3MatchService.DeleteAsync(id, cancellationToken);
 
-        await redisService.RemoveGroupAsync("basketball3x3_matches_group");
-        await redisService.RemoveGroupAsync("basketball3x3_events_group");
+        await redisService.RemoveGroupAsync("basketball_matches_group");
+        await redisService.RemoveGroupAsync("basketball_events_group");
 
         return NoContent();
     }
