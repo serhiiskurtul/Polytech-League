@@ -42,6 +42,7 @@ public class FootballMatchesController(
         await FootballMatchService.CreateAsync(entity, cancellationToken);
 
         await redisService.RemoveGroupAsync("Football_matches_group");
+        await redisService.RemoveGroupAsync("Football_events_group");
 
         return Created();
     }
@@ -62,6 +63,7 @@ public class FootballMatchesController(
         await FootballMatchService.UpdateAsync(id, entity, cancellationToken);
 
         await redisService.RemoveGroupAsync("Football_matches_group");
+        await redisService.RemoveGroupAsync("Football_events_group");
 
         return NoContent();
     }
@@ -73,6 +75,7 @@ public class FootballMatchesController(
         await FootballMatchService.DeleteAsync(id, cancellationToken);
 
         await redisService.RemoveGroupAsync("Football_matches_group");
+        await redisService.RemoveGroupAsync("Football_events_group");
 
         return NoContent();
     }

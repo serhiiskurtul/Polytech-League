@@ -63,6 +63,7 @@ public class BadmintonMatchesController(
     public async Task<IActionResult> Delete(long id, CancellationToken cancellationToken)
     {
         await badmintonMatchService.DeleteAsync(id, cancellationToken);
+        await redisService.RemoveGroupAsync("badminton_events_group");
         return NoContent();
     }
 }
