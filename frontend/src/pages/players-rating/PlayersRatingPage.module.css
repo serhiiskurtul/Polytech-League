@@ -454,8 +454,10 @@
   pointer-events: none;
 }
 
+.tooltipLockedWrapper .breakdownTooltip,
 .breakdownTrigger:hover .breakdownTooltip {
-  display: block;
+  display: flex;
+  flex-direction: column;
   opacity: 1;
   transform: translateY(-8px);
 }
@@ -467,8 +469,17 @@
   margin-bottom: 0 !important;
 }
 
+.tooltipLockedWrapper .tooltipDown,
 .breakdownTrigger:hover .tooltipDown {
   transform: translateY(8px) !important;
+}
+
+.tooltipLockedWrapper {
+  color: #3b82f6;
+}
+
+.tooltipLockedWrapper .breakdownTooltip {
+  pointer-events: auto;
 }
 
 .breakdownHeader {
@@ -486,6 +497,18 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.breakdownList::-webkit-scrollbar {
+  width: 4px;
+}
+
+.breakdownList::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
 }
 
 .breakdownItem {
