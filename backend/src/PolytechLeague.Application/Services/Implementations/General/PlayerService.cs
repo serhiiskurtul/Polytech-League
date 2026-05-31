@@ -213,7 +213,6 @@ public class PlayerService : IPlayerService
         try
         {
             await _dbContext.SaveChangesAsync(cancellationToken);
-            _rankingsCache.Clear();
         }
         catch (Exception ex)
         {
@@ -273,9 +272,20 @@ public class PlayerService : IPlayerService
     private async Task<IEnumerable<PlayerDto>> GetAllWithRankingsInternalAsync(long? seasonId = null, CancellationToken cancellationToken = default)
     {
         var cacheKey = $"rankings_{seasonId ?? 0}";
-        if (_rankingsCache.TryGetValue(cacheKey, out var cacheEntry) && (DateTime.UtcNow - cacheEntry.CreatedAt) < CacheDuration)
+        if (_rankingsCache.TryGetValue(cacheKey, out var cacheEntry))
         {
-            return cacheEntry.Data;
+            var isCurrent = true;
+            if (seasonId.HasValue)
+            {
+                var season = await _dbContext.Seasons.AsNoTracking().FirstOrDefaultAsync(s => s.Id == seasonId.Value, cancellationToken);
+                isCurrent = season?.IsCurrent ?? false;
+            }
+            
+            var duration = isCurrent ? CacheDuration : TimeSpan.FromHours(24);
+            if ((DateTime.UtcNow - cacheEntry.CreatedAt) < duration)
+            {
+                return cacheEntry.Data;
+            }
         }
 
         try
