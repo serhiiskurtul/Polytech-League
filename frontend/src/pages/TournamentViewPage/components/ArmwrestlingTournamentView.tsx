@@ -7,7 +7,7 @@ import {
 } from '@/shared/types/armwrestling.types';
 import { RegistrationStatus } from '@/shared/types/tournament.types';
 import { PlayerDto, Gender } from '@/shared/types/player.types';
-import { getAllPlayers, createPlayer, searchUsers } from '@/shared/api';
+import { createPlayer, searchUsers, searchPlayers } from '@/shared/api';
 import {
   createArmwrestlingMatch,
   updateArmwrestlingMatch,
@@ -46,7 +46,6 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
   isAdmin,
   onRefresh
 }) => {
-  const [allPlayers, setAllPlayers] = useState<PlayerDto[]>([]);
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [showSetWinners, setShowSetWinners] = useState(false);
 
@@ -81,9 +80,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
   const [stageType, setStageType] = useState('Раунд');
 
   useEffect(() => {
-    if (isAdmin) {
-      loadPlayers();
-    }
+    // Kept empty, just for logic preservation
   }, [isAdmin]);
 
   // Sync winners state with props when details change
@@ -101,11 +98,8 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
         setIsSearching(true);
         try {
           // 1. Search in existing Players
-          const playerResults: SearchResult[] = allPlayers
-            .filter(p =>
-              (p.firstName + ' ' + p.lastName).toLowerCase().includes(searchQuery.toLowerCase()) ||
-              p.group?.toLowerCase().includes(searchQuery.toLowerCase())
-            )
+          const players = await searchPlayers(searchQuery);
+          const playerResults: SearchResult[] = players
             .map(p => ({
               type: 'player',
               id: p.id!,
@@ -143,7 +137,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
     }, 500);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery, allPlayers]);
+  }, [searchQuery]);
 
   const handleSelectResult = (result: SearchResult) => {
     setNewParticipant({
@@ -159,14 +153,8 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
   };
 
   const loadPlayers = async (selectId?: { p1?: number, p2?: number }) => {
-    try {
-      const players = await getAllPlayers();
-      setAllPlayers(players);
       if (selectId?.p1) setNewMatch(prev => ({ ...prev, player1Id: selectId.p1! }));
       if (selectId?.p2) setNewMatch(prev => ({ ...prev, player2Id: selectId.p2! }));
-    } catch (err) {
-      console.error('Failed to load players:', err);
-    }
   };
 
   const handleQuickAddPlayer = async (fullName: string, playerNum: 1 | 2) => {
@@ -185,7 +173,8 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
     }
 
     // 1. Check if ANY player with this name already exists in DB
-    const existing = allPlayers.find(p =>
+    const searchResults = await searchPlayers(fullName);
+    const existing = searchResults.find(p =>
       p.firstName.toLowerCase() === firstName.toLowerCase() &&
       p.lastName.toLowerCase() === lastName.toLowerCase()
     );
@@ -278,12 +267,9 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
     }
   };
 
-  // derived participants state
   const currentParticipants = (details.participants || []).map(p => {
-    const fullInfo = allPlayers.find(ap => ap.id === p.playerId);
-    const groupToShow = p.groupName || fullInfo?.group || 'Учасник';
+    const groupToShow = p.groupName || 'Учасник';
     
-    if (fullInfo) return { ...fullInfo, group: groupToShow };
     return {
       id: p.playerId,
       userId: p.userId,

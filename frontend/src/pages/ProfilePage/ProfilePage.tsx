@@ -8,7 +8,7 @@ import EditProfileModal from '@/widgets/profile-widgets/edit-profile-modal/EditP
 import styles from './ProfilePage.module.css';
 import { useAuth } from '@/app/providers/AuthContext';
 import { PlayerDto } from '@/shared/types/player.types';
-import { getProfile, updateProfile, uploadAvatar, checkArchivalMatches, createMergeRequest, ignoreMergeRequest } from '@/shared/api/players.api';
+import { getProfile, updateProfile, uploadAvatar, checkArchivalMatches, createMergeRequest, ignoreMergeRequest, getPlayerRank } from '@/shared/api/players.api';
 
 import { toast } from 'react-hot-toast';
 
@@ -55,6 +55,18 @@ const ProfilePage = () => {
     const fetchProfile = async () => {
       try {
         const data = await getProfile();
+        
+        try {
+          if (data.id) {
+            const rankData = await getPlayerRank(data.id);
+            data.globalRank = rankData.globalRank;
+            data.performanceScore = rankData.performanceScore;
+            data.sportStats = rankData.sportStats;
+          }
+        } catch (e) {
+          console.error("Failed to fetch profile rank:", e);
+        }
+        
         setPlayerProfile(data);
         if (data.hasPendingMergeRequest) {
           setIsMergeRequestSent(true);

@@ -101,6 +101,12 @@ builder.Services
     .AddServices(builder.Configuration)
     .AddAuth(builder.Configuration);
 
+builder.Services.AddMiniProfiler(options =>
+{
+    options.RouteBasePath = "/profiler";
+    options.SqlFormatter = new StackExchange.Profiling.SqlFormatters.InlineFormatter();
+}).AddEntityFramework();
+
 
 var redisConnectionString = builder.Configuration["RedisSettings:Redis"];
 if (string.IsNullOrEmpty(redisConnectionString))
@@ -169,6 +175,8 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 app.UseSerilogRequestLogging();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.UseMiniProfiler();
 
 app.UseStaticFiles();
 

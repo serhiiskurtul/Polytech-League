@@ -1,14 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { PlayerDto } from '@/shared/types/player.types';
+import { searchPlayers } from '@/shared/api';
 import styles from './PlayerSearchInput.module.css';
 
 interface PlayerSearchInputProps {
   label: string;
-  players: PlayerDto[];
+  players?: PlayerDto[];
   selectedId: number;
   onSelect: (playerId: number) => void;
   onQuickAdd: (name: string) => void;
   placeholder?: string;
+  initialPlayerName?: string;
 }
 
 const PlayerSearchInput: React.FC<PlayerSearchInputProps> = ({
@@ -17,23 +19,27 @@ const PlayerSearchInput: React.FC<PlayerSearchInputProps> = ({
   selectedId,
   onSelect,
   onQuickAdd,
-  placeholder = "Введіть ім'я..."
+  placeholder = "Введіть ім'я...",
+  initialPlayerName
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const [filteredPlayers, setFilteredPlayers] = useState<PlayerDto[]>([]);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   // Set initial search term if a player is already selected
   useEffect(() => {
-    if (selectedId) {
+    if (selectedId && initialPlayerName) {
+      setSearchTerm(initialPlayerName);
+    } else if (selectedId && players && players.length > 0) {
       const player = players.find(p => p.id === selectedId);
       if (player) {
         setSearchTerm(`${player.firstName} ${player.lastName}`);
       }
-    } else {
+    } else if (!selectedId) {
         setSearchTerm('');
     }
-  }, [selectedId, players]);
+  }, [selectedId, initialPlayerName, players]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -46,15 +52,42 @@ const PlayerSearchInput: React.FC<PlayerSearchInputProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const filteredPlayers = players.filter(p => {
-    const fullName = `${p.firstName} ${p.patronymic || ''} ${p.lastName}`.toLowerCase();
-    const search = searchTerm.toLowerCase();
-    return fullName.includes(search) || 
-           p.group?.toLowerCase().includes(search) ||
-           p.studentId?.toLowerCase().includes(search);
-  }).slice(0, 8);
+  useEffect(() => {
+    if (players && players.length > 0) {
+      // Local filtering mode
+      if (searchTerm.length > 0) {
+        const results = players.filter(p => {
+          const fullName = `${p.firstName} ${p.patronymic || ''} ${p.lastName}`.toLowerCase();
+          const search = searchTerm.toLowerCase();
+          return fullName.includes(search) || 
+                 p.group?.toLowerCase().includes(search) ||
+                 p.studentId?.toLowerCase().includes(search);
+        });
+        setFilteredPlayers(results.slice(0, 8));
+      } else {
+        setFilteredPlayers(players.slice(0, 8)); // show all eligible if no search term
+      }
+      return;
+    }
 
-  const exactMatch = players.find(p => 
+    // Remote filtering mode
+    const delayDebounceFn = setTimeout(async () => {
+      if (searchTerm.length >= 2) {
+        try {
+          const results = await searchPlayers(searchTerm);
+          setFilteredPlayers(results.slice(0, 8));
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        setFilteredPlayers([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm, players]);
+
+  const exactMatch = filteredPlayers.find(p => 
     `${p.firstName} ${p.lastName}`.toLowerCase() === searchTerm.toLowerCase()
   );
 

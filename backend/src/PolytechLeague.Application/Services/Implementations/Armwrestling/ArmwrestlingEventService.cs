@@ -43,6 +43,7 @@ public class ArmwrestlingEventService :
             .Include(e => e.Mvp)
             .Include(e => e.Players!)
                 .ThenInclude(p => p.Player)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 
 

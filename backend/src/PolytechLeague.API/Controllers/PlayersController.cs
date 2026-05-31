@@ -168,6 +168,27 @@ public class PlayersController : ControllerBase
 
         return Ok(player);
     }
+    [HttpGet("{id}/rank")]
+    public async Task<ActionResult<PlayerRankResponse>> GetPlayerRank(long id, CancellationToken cancellationToken)
+    {
+        var cacheKey = "global_rankings_all";
+        var allWithRankings = await _redisService.GetDataAsync<IEnumerable<PlayerDto>>(cacheKey);
+        
+        if (allWithRankings == null)
+        {
+            allWithRankings = await _playerService.GetAllWithRankingsAsync(null, cancellationToken);
+            await _redisService.SetDataAsync(cacheKey, allWithRankings, TimeSpan.FromMinutes(30), "rankings_group");
+        }
+        
+        var ranked = allWithRankings.FirstOrDefault(p => p.Id == id);
+        if (ranked == null) return NotFound();
+        
+        return Ok(new PlayerRankResponse {
+            GlobalRank = ranked.GlobalRank,
+            PerformanceScore = ranked.PerformanceScore,
+            SportStats = ranked.SportStats
+        });
+    }
 
     [Authorize(Policy = "Admin")]
     [HttpPost]
