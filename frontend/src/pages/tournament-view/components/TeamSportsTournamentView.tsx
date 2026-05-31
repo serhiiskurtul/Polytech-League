@@ -93,7 +93,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   isAdmin,
   onRefresh
 }) => {
-  const [activeTab, setActiveTab] = useState<'standings' | 'matches' | 'teams' | 'info' | 'bracket' | 'participants' | 'stats' | 'voting'>((sport === 'football' || sport === 'футбол') ? 'bracket' : 'matches');
+  const hasBracket = (sport === 'football' || sport === 'футбол') && details?.tournamentType !== 'RoundRobin';
+  const [activeTab, setActiveTab] = useState<'standings' | 'matches' | 'teams' | 'info' | 'bracket' | 'participants' | 'stats' | 'voting'>(hasBracket ? 'bracket' : 'matches');
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredPlayers, setFilteredPlayers] = useState<PlayerDto[]>([]);
   const [isSearchingPlayers, setIsSearchingPlayers] = useState(false);
@@ -1107,11 +1108,11 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           <i className="fas fa-trophy"></i> {getSportLabel()}
         </div>
         <div className={styles.tabsNav}>
-          {!(sport === 'football' || sport === 'футбол') && (
+          {!hasBracket && (
             <button className={activeTab === 'matches' ? styles.activeTab : ''} onClick={() => setActiveTab('matches')}>Матчі</button>
           )}
           <button className={activeTab === 'standings' ? styles.activeTab : ''} onClick={() => setActiveTab('standings')}>Таблиця</button>
-          {(sport === 'football' || sport === 'футбол') && (
+          {hasBracket && (
             <button className={activeTab === 'bracket' ? styles.activeTab : ''} onClick={() => setActiveTab('bracket')}>Сітка</button>
           )}
           <button className={activeTab === 'teams' ? styles.activeTab : ''} onClick={() => setActiveTab('teams')}>Команди</button>
@@ -1201,7 +1202,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           </div>
         )}
         {/* football Admin Panel (Horizontal) */}
-        {isAdmin && activeTab === 'bracket' && (sport === 'football' || sport === 'футбол') && (
+        {isAdmin && activeTab === 'bracket' && hasBracket && (
             <div className={styles.footballAdminPanel}>
                 <div className={styles.panelHeader}>
                     <i className="fas fa-plus-circle"></i> Додати новий поєдинок
@@ -1654,7 +1655,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           </div>
         )}
 
-        {activeTab === 'bracket' && (sport === 'football' || sport === 'футбол') && (
+        {activeTab === 'bracket' && hasBracket && (
           <FootballBracket 
             matches={details.matches || details.games || []}
             isAdmin={isAdmin}

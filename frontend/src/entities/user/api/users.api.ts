@@ -17,12 +17,20 @@ export interface PagedResponse<T> {
   totalCount: number;
 }
 
-export const getUsers = async (page = 1, pageSize = 10, search = ''): Promise<PagedResponse<UserResponse>> => {
+export const getUsers = async (
+  page = 1, 
+  pageSize = 10, 
+  search = '', 
+  orderBy?: string, 
+  sortDirection?: 'Asc' | 'Desc'
+): Promise<PagedResponse<UserResponse>> => {
   const response = await api.get<PagedResponse<UserResponse>>('/users', {
     params: {
       Page: page,
       PageSize: pageSize,
       Name: search || undefined,
+      OrderBy: orderBy,
+      SortDirection: sortDirection,
     }
   });
   return response.data;

@@ -16,6 +16,8 @@ export const AdminUsersPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [userSortBy, setUserSortBy] = useState<string | undefined>(undefined);
+  const [userSortDirection, setUserSortDirection] = useState<'Asc' | 'Desc' | undefined>(undefined);
   const pageSize = 100;
 
   const fetchUsers = async () => {
@@ -23,7 +25,7 @@ export const AdminUsersPage = () => {
     try {
       const currentPageSize = showDuplicatesOnly ? 10000 : pageSize;
       const currentPage = showDuplicatesOnly ? 1 : page;
-      const response = await getUsers(currentPage, currentPageSize, searchTerm);
+      const response = await getUsers(currentPage, currentPageSize, searchTerm, userSortBy, userSortDirection);
       setUsers(response.data);
       setTotalCount(response.totalCount);
     } catch (error) {
@@ -84,7 +86,28 @@ export const AdminUsersPage = () => {
       }
     }, 500);
     return () => clearTimeout(timer);
-  }, [page, searchTerm, activeTab, showDuplicatesOnly]);
+  }, [page, searchTerm, activeTab, showDuplicatesOnly, userSortBy, userSortDirection]);
+
+  const handleSort = (field: string) => {
+    if (userSortBy === field) {
+      if (userSortDirection === 'Asc') {
+        setUserSortDirection('Desc');
+      } else if (userSortDirection === 'Desc') {
+        setUserSortBy(undefined);
+        setUserSortDirection(undefined);
+      }
+    } else {
+      setUserSortBy(field);
+      setUserSortDirection('Asc');
+    }
+  };
+
+  const getSortIcon = (field: string) => {
+    if (userSortBy !== field) return <i className="fas fa-sort" style={{ opacity: 0.3, marginLeft: '5px' }}></i>;
+    return userSortDirection === 'Asc' 
+      ? <i className="fas fa-sort-up" style={{ marginLeft: '5px' }}></i>
+      : <i className="fas fa-sort-down" style={{ marginLeft: '5px' }}></i>;
+  };
 
   const handleBlock = async (id: number, isBlocked: boolean) => {
     try {
@@ -223,11 +246,15 @@ export const AdminUsersPage = () => {
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>Користувач</th>
+                  <th onClick={() => handleSort('FirstName')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                    Користувач {getSortIcon('FirstName')}
+                  </th>
                   <th>Пошта підтверджена</th>
                   <th>Роль</th>
                   <th>Статус</th>
-                  <th>Дата реєстрації</th>
+                  <th onClick={() => handleSort('CreatedAt')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                    Дата реєстрації {getSortIcon('CreatedAt')}
+                  </th>
                   <th>Дії</th>
                 </tr>
               </thead>

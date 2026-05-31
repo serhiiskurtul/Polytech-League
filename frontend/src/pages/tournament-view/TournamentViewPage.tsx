@@ -639,6 +639,7 @@ const TournamentViewPage = () => {
         timeControl: details.timeControl || '',
         participantsCount: details.participantsCount || 0,
         system: (details as any).system || 'Swiss',
+        tournamentType: (details as any).tournamentType || 'RoundRobin',
         rules: details.rules || '',
         prizes: details.prizes || '',
         headRefereeName: details.headRefereeName || '',
@@ -794,13 +795,13 @@ const TournamentViewPage = () => {
         await updateFn(id!, { ...payload, setsToWin: (details as any).setsToWin || 2 });
       } else if (sportKey === 'football' || sportKey === 'badminton') {
         const updateFn = sportKey === 'football' ? updateFootballEvent : updateBadmintonEvent;
-        await updateFn(id!, { ...payload, tournamentType: (details as any).tournamentType || 'RoundRobin' });
+        await updateFn(id!, { ...payload, tournamentType: (editTournamentData as any).tournamentType || (details as any).tournamentType || 'RoundRobin' });
       } else if (sportKey === 'basketball_3x3' || sportKey === 'basketball3x3') {
-        await updateBasketball3x3Event(id!, { ...payload, tournamentType: (details as any).tournamentType || 'RoundRobin' });
+        await updateBasketball3x3Event(id!, { ...payload, tournamentType: (editTournamentData as any).tournamentType || (details as any).tournamentType || 'RoundRobin' });
       } else if (sportKey === 'tabletennis' || sportKey === 'table_tennis') {
         await updateTableTennisEvent(id!, {
           ...payload,
-          tournamentType: (details as any).tournamentType || 'RoundRobin'
+          tournamentType: (editTournamentData as any).tournamentType || (details as any).tournamentType || 'RoundRobin'
         });
       } else {
         // Chess
@@ -3642,6 +3643,17 @@ const TournamentViewPage = () => {
                           <input type="text" placeholder="напр. 10хв + 5с" value={editTournamentData.timeControl} onChange={(e) => setEditTournamentData({ ...editTournamentData, timeControl: e.target.value })} />
                         </div>
                       </>
+                    )}
+                    {['football', 'badminton', 'basketball_3x3', 'basketball3x3', 'table_tennis', 'tabletennis'].includes(sportKey) && (
+                        <div className={styles.formGroup}>
+                          <label>Система проведення</label>
+                          <select value={(editTournamentData as any).tournamentType || 'RoundRobin'} onChange={(e) => setEditTournamentData({ ...editTournamentData, tournamentType: e.target.value } as any)}>
+                            <option value="RoundRobin">Кругова система</option>
+                            <option value="SingleElimination">Олімпійська система</option>
+                            <option value="DoubleElimination">Двоєступінчаста система</option>
+                            <option value="GroupsPlayoff">Груповий етап + плей-офф</option>
+                          </select>
+                        </div>
                     )}
                     {editTournamentData.level === 'CollegeGroup' && (
                       <div className={styles.formGroup} style={{ gridColumn: '1 / -1', display: 'flex', gap: '20px' }}>

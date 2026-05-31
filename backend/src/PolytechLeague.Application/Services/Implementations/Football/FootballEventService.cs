@@ -32,6 +32,7 @@ public class FootballEventService :
         oldEntity.RegistrationEnd = newEntity.RegistrationEnd;
         oldEntity.EndDate = newEntity.EndDate;
         oldEntity.Level = newEntity.Level;
+        oldEntity.TournamentType = newEntity.TournamentType;
         oldEntity.Rules = newEntity.Rules;
         oldEntity.Prizes = newEntity.Prizes;
         oldEntity.HeadRefereeName = newEntity.HeadRefereeName;

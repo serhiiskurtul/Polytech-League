@@ -26,6 +26,9 @@ public class PlayerService : IPlayerService
     private readonly ILogger<PlayerService> _logger;
     private readonly INotificationService _notificationService;
 
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, (DateTime CreatedAt, IEnumerable<PlayerDto> Data)> _rankingsCache = new();
+    private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
+
 
 
 
@@ -136,6 +139,7 @@ public class PlayerService : IPlayerService
         }
         await _dbContext.Players.AddAsync(player, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
+        _rankingsCache.Clear();
         return player.ToDto();
     }
 
@@ -224,6 +228,7 @@ public class PlayerService : IPlayerService
         {
             _dbContext.Players.Remove(player);
             await _dbContext.SaveChangesAsync(cancellationToken);
+            _rankingsCache.Clear();
         }
     }
 
@@ -266,6 +271,23 @@ public class PlayerService : IPlayerService
 
     private async Task<IEnumerable<PlayerDto>> GetAllWithRankingsInternalAsync(long? seasonId = null, CancellationToken cancellationToken = default)
     {
+        var cacheKey = $"rankings_{seasonId ?? 0}";
+        if (_rankingsCache.TryGetValue(cacheKey, out var cacheEntry))
+        {
+            var isCurrent = true;
+            if (seasonId.HasValue)
+            {
+                var season = await _dbContext.Seasons.AsNoTracking().FirstOrDefaultAsync(s => s.Id == seasonId.Value, cancellationToken);
+                isCurrent = season?.IsCurrent ?? false;
+            }
+            
+            var duration = isCurrent ? CacheDuration : TimeSpan.FromHours(24);
+            if ((DateTime.UtcNow - cacheEntry.CreatedAt) < duration)
+            {
+                return cacheEntry.Data;
+            }
+        }
+
         try
         {
             var players = await _dbContext.Players
@@ -708,6 +730,7 @@ public class PlayerService : IPlayerService
                     }
                 }
             }
+            _rankingsCache[cacheKey] = (DateTime.UtcNow, allRanked);
             return allRanked;
         } catch (Exception ex) {
             _logger.LogError(ex, "Error in GetAllWithRankingsAsync: {Message}", ex.Message);
@@ -1462,6 +1485,7 @@ public class PlayerService : IPlayerService
         _dbContext.Players.Remove(sourcePlayer);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
+        _rankingsCache.Clear();
     }
 
     private void CopyPlayerProperties(Player source, Player target)
