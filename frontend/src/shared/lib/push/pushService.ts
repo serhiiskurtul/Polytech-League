@@ -3,6 +3,7 @@
  */
 import { BASE_URL } from '../shared/api/axiosInstance';
 
+
 const PUBLIC_VAPID_KEY = 'BB47cRWxaTwglHKmdQMGkRTn1bMJvD2GGG7a8wr5eEpdCi-KMABJXIUdjG0URYBEcb8PWOcQudBEs9FlsCrsYi0';
 
 export async function requestNotificationPermission() {
