@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getPendingMergeRequests, approveMergeRequest, rejectMergeRequest, getAllMergeRequests, mergePlayersManually } from '@/shared/api/players.api';
+import { getPendingMergeRequests, approveMergeRequest, rejectMergeRequest, getAllMergeRequests, mergePlayersManually } from '@/entities/player/api/players.api';
 import { toast } from 'react-hot-toast';
 import styles from './AdminMergesPage.module.css';
 

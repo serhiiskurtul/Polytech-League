@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './NotificationsPage.module.css';
-import { Notification } from '@/shared/types/notification.types';
+import { Notification } from '@/entities/notification/model/notification.types';
 import toast from 'react-hot-toast';
 import { MessengerView } from '@/widgets/chat-messenger/MessengerView';
 import { useChat } from '@/entities/chat';

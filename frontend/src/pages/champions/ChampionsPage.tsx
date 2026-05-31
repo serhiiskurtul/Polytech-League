@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { getChampions, createHallOfFameEntry, deleteHallOfFameEntry } from '@/shared/api/tournaments.api';
-import { Champion } from '@/shared/types/tournament.types';
+import { getChampions, createHallOfFameEntry, deleteHallOfFameEntry } from '@/entities/tournament/api/tournaments.api';
+import { Champion } from '@/entities/tournament/model/tournament.types';
 import styles from './ChampionsPage.module.css';
 import { useAuth } from '@/entities/session';
 import { toast } from 'react-hot-toast';

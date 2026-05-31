@@ -90,8 +90,8 @@ import {
   rejectBadmintonParticipant,
   removeBadmintonParticipant
 } from '@/shared/api';
-import { PlayerDto, Gender } from '@/shared/types/player.types';
-import { RegistrationStatus, ModerationStatus } from '@/shared/types/tournament.types';
+import { PlayerDto, Gender } from '@/entities/player/model/player.types';
+import { RegistrationStatus, ModerationStatus } from '@/entities/tournament/model/tournament.types';
 import {
   getTableTennisEventById,
   updateTableTennisEvent,
@@ -101,13 +101,13 @@ import {
   registerForTableTennisEvent,
   approveTableTennisParticipant,
   rejectTableTennisParticipant
-} from '@/shared/api/tabletennis.api';
+} from '@/entities/sport/api/tabletennis.api';
 import ArmwrestlingTournamentView from './components/ArmwrestlingTournamentView';
 import TeamSportsTournamentView from './components/TeamSportsTournamentView';
 import TournamentPodium from './components/TournamentPodium';
 import ChessGameViewerModal from './components/ChessGameViewerModal';
 import AthleticsTournamentView from './components/AthleticsTournamentView';
-import { Tournament } from '@/shared/types/tournament.types';
+import { Tournament } from '@/entities/tournament/model/tournament.types';
 import {
   ChessEventResponse,
   ChessGameDto,
@@ -118,19 +118,19 @@ import {
   ChessEventRequest,
   CompetitionLevel,
   ChessSystem
-} from '@/shared/types/chess.types';
+} from '@/entities/sport/model/chess.types';
 import {
   CheckersEventResponse,
   CheckersEventRequest,
   CheckersGameDto,
   CheckersEventParticipantDto
-} from '@/shared/types/checkers.types';
+} from '@/entities/sport/model/checkers.types';
 import api, { BASE_URL } from '@/shared/api/axiosInstance';
 import styles from './TournamentViewPage.module.css';
 
 import {
   ArmwrestlingEventResponse
-} from '@/shared/types/armwrestling.types';
+} from '@/entities/sport/model/armwrestling.types';
 
 const TournamentViewPage = () => {
   const { id } = useParams<{ id: string }>();

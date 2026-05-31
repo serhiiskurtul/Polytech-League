@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styles from './RegionalRatingsPage.module.css';
-import { getSeasons, getRegionalRating, updateRegionalRating } from '@/shared/api/seasonRating.api';
-import { getColleges, College } from '@/shared/api/colleges.api';
-import { Season, SeasonRatingResponse } from '@/shared/types/seasonRating.types';
+import { getSeasons, getRegionalRating, updateRegionalRating } from '@/entities/rating/api/seasonRating.api';
+import { getColleges, College } from '@/entities/college/api/colleges.api';
+import { Season, SeasonRatingResponse } from '@/entities/rating/model/seasonRating.types';
 import { useAuth } from '@/entities/session';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';

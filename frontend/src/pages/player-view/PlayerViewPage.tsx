@@ -6,12 +6,12 @@ import {
   UserAchievements 
 } from '@/widgets/profile-widgets';
 import styles from './PlayerViewPage.module.css';
-import { PlayerDto } from '@/shared/types/player.types';
-import { getPlayerById, getPlayerRank, updatePlayer } from '@/shared/api/players.api';
+import { PlayerDto } from '@/entities/player/model/player.types';
+import { getPlayerById, getPlayerRank, updatePlayer } from '@/entities/player/api/players.api';
 import EditProfileModal from '@/widgets/profile-widgets/edit-profile-modal/EditProfileModal';
 import { toast } from 'react-hot-toast';
 import { useChat } from '@/entities/chat';
-import { chatApi } from '@/shared/api/chat.api';
+import { chatApi } from '@/entities/chat/api/chat.api';
 import { useAuth } from '@/entities/session';
 
 

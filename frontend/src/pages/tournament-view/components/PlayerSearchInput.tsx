@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { PlayerDto } from '@/shared/types/player.types';
-import { searchPlayers } from '@/shared/api';
+import { PlayerDto } from '@/entities/player/model/player.types';
+import { searchPlayers } from '@/entities/player/api/players.api';
 import styles from './PlayerSearchInput.module.css';
 
 interface PlayerSearchInputProps {

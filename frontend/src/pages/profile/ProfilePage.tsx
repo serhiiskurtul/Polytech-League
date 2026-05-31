@@ -7,8 +7,8 @@ import {
 import EditProfileModal from '@/widgets/profile-widgets/edit-profile-modal/EditProfileModal';
 import styles from './ProfilePage.module.css';
 import { useAuth } from '@/entities/session';
-import { PlayerDto } from '@/shared/types/player.types';
-import { getProfile, updateProfile, uploadAvatar, checkArchivalMatches, createMergeRequest, ignoreMergeRequest, getPlayerRank } from '@/shared/api/players.api';
+import { PlayerDto } from '@/entities/player/model/player.types';
+import { getProfile, updateProfile, uploadAvatar, checkArchivalMatches, createMergeRequest, ignoreMergeRequest, getPlayerRank } from '@/entities/player/api/players.api';
 
 import { toast } from 'react-hot-toast';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArmwrestlingMatchResponse, ArmwrestlingTournamentType } from '@/shared/types/armwrestling.types';
+import { ArmwrestlingMatchResponse, ArmwrestlingTournamentType } from '@/entities/sport/model/armwrestling.types';
 import styles from '../TournamentViewPage.module.css';
 
 interface ArmwrestlingBracketProps {

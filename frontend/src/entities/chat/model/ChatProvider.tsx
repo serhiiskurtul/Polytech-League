@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { HubConnection, HubConnectionBuilder, LogLevel, HubConnectionState } from '@microsoft/signalr';
 import { useAuth } from '@/entities/session';
-import { chatApi, ConversationDto, MessageDto } from '@/shared/api/chat.api';
+import { chatApi, ConversationDto, MessageDto } from '@/entities/chat/api/chat.api';
 
 interface ChatContextType {
     conversations: ConversationDto[];

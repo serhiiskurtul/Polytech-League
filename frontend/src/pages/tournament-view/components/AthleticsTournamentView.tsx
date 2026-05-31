@@ -3,13 +3,14 @@ import toast from 'react-hot-toast';
 import { 
   AthleticsEventResponse, 
   AthleticsResultResponse 
-} from '@/shared/types/athletics.types';
+} from '@/entities/sport/model/athletics.types';
 import api from '@/shared/api/axiosInstance';
 import styles from '../TournamentViewPage.module.css';
 import PlayerSearchInput from './PlayerSearchInput';
-import { RegistrationStatus } from '@/shared/types/tournament.types';
-import { PlayerDto, Gender } from '@/shared/types/player.types';
-import { createPlayer, searchUsers, searchPlayers } from '@/shared/api';
+import { RegistrationStatus } from '@/entities/tournament/model/tournament.types';
+import { PlayerDto, Gender } from '@/entities/player/model/player.types';
+import { createPlayer, searchPlayers } from '@/entities/player/api/players.api';
+import { searchUsers } from '@/entities/user/api/users.api';
 
 type SearchResult = {
   type: 'player' | 'user';

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import styles from './PlayerComparePage.module.css';
-import { getPlayerById, getPlayersRankings, getHeadToHead } from '../../shared/api/players.api';
-import { getSeasons } from '../../shared/api/seasonRating.api';
-import { PlayerDto } from '../../shared/types/player.types';
-import { Season } from '../../shared/types/seasonRating.types';
+import { getPlayerById, getPlayersRankings, getHeadToHead } from '@/entities/player/api/players.api';
+import { getSeasons } from '@/entities/rating/api/seasonRating.api';
+import { PlayerDto } from '@/entities/player/model/player.types';
+import { Season } from '@/entities/rating/model/seasonRating.types';
 import { getPhotoUrl } from '../../shared/utils/photo.utils';
 import { 
   PieChart, 

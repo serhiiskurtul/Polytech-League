@@ -2,10 +2,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import styles from './PlayersRatingPage.module.css';
 import { getPhotoUrl } from '../../shared/utils/photo.utils';
-import { getPlayersRankings } from '../../shared/api/players.api';
-import { getSeasons } from '../../shared/api/seasonRating.api';
-import { PlayerDto } from '../../shared/types/player.types';
-import { Season } from '../../shared/types/seasonRating.types';
+import { getPlayersRankings } from '@/entities/player/api/players.api';
+import { getSeasons } from '@/entities/rating/api/seasonRating.api';
+import { PlayerDto } from '@/entities/player/model/player.types';
+import { Season } from '@/entities/rating/model/seasonRating.types';
 import { useAuth } from '@/entities/session';
 
 const PlayersRatingPage = () => {

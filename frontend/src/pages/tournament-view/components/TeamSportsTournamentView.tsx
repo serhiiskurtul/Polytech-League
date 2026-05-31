@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { PlayerDto, Gender } from '@/shared/types/player.types';
-import { ChessEventResponse, ChessEventParticipantDto, ChessGameDto, ChessEventRequest, GameResult } from '@/shared/types/chess.types';
+import { PlayerDto, Gender } from '@/entities/player/model/player.types';
+import { ChessEventResponse, ChessEventParticipantDto, ChessGameDto, ChessEventRequest, GameResult } from '@/entities/sport/model/chess.types';
 import { searchPlayers } from '@/shared/api';
 import { 
   updateVolleyballMatch, 
@@ -71,7 +71,7 @@ import {
   rejectTableTennisParticipant,
   removeTableTennisParticipant
 } from '@/shared/api';
-import { RegistrationStatus } from '@/shared/types/tournament.types';
+import { RegistrationStatus } from '@/entities/tournament/model/tournament.types';
 import FootballBracket from './FootballBracket';
 import styles from '../TournamentViewPage.module.css';
 import { Link } from 'react-router-dom';

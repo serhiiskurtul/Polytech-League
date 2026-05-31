@@ -4,10 +4,11 @@ import toast from 'react-hot-toast';
 import {
   ArmwrestlingEventResponse,
   ArmwrestlingMatchResponse
-} from '@/shared/types/armwrestling.types';
-import { RegistrationStatus } from '@/shared/types/tournament.types';
-import { PlayerDto, Gender } from '@/shared/types/player.types';
-import { createPlayer, searchUsers, searchPlayers } from '@/shared/api';
+} from '@/entities/sport/model/armwrestling.types';
+import { RegistrationStatus } from '@/entities/tournament/model/tournament.types';
+import { PlayerDto, Gender } from '@/entities/player/model/player.types';
+import { createPlayer, searchPlayers } from '@/entities/player/api/players.api';
+import { searchUsers } from '@/entities/user/api/users.api';
 import {
   createArmwrestlingMatch,
   updateArmwrestlingMatch,
@@ -17,7 +18,7 @@ import {
   deleteArmwrestlingMatch,
   approveArmwrestlingParticipant,
   rejectArmwrestlingParticipant
-} from '@/shared/api/armwrestling.api';
+} from '@/entities/sport/api/armwrestling.api';
 import ArmwrestlingBracket from './ArmwrestlingBracket';
 import PlayerSearchInput from './PlayerSearchInput';
 import styles from '../TournamentViewPage.module.css';

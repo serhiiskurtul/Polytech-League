@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { login as loginApi, axiosInstance as api } from "@/shared/api";
+import { login as loginApi } from "@/entities/session/api/auth.api";
+import api from "@/shared/api/axiosInstance";
 import { InputSign, ButtonSign, Logo } from "@/shared/ui";
 import { useAuth } from '@/entities/session';
 

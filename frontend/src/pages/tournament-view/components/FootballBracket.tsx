@@ -1,5 +1,5 @@
 import React from 'react';
-import { footballMatchResponse } from '@/shared/types/football.types';
+import { footballMatchResponse } from '@/entities/sport/model/football.types';
 import { UniversalBracket, BracketRound, BracketMatch } from '@/widgets/tournament-bracket';
 import styles from '../TournamentViewPage.module.css';
 import bracketStyles from '@/widgets/tournament-bracket/UniversalBracket.module.css';

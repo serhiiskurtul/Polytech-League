@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './CollegesPage.module.css';
-import { getColleges, College } from '@/shared/api/colleges.api';
+import { getColleges, College } from '@/entities/college/api/colleges.api';
 import toast from 'react-hot-toast';
 
 const CollegesPage: React.FC = () => {

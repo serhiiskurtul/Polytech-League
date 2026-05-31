@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styles from './RatingsPage.module.css';
-import { getSeasons, getSeasonRating, createSeason, updateSeason, deleteSeason } from '@/shared/api/seasonRating.api';
+import { getSeasons, getSeasonRating, createSeason, updateSeason, deleteSeason } from '@/entities/rating/api/seasonRating.api';
 
-import { Season, SeasonRatingResponse } from '@/shared/types/seasonRating.types';
+import { Season, SeasonRatingResponse } from '@/entities/rating/model/seasonRating.types';
 import toast from 'react-hot-toast';
 import * as XLSX from 'xlsx';
 import { useAuth } from '@/entities/session';

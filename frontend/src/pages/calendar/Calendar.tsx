@@ -4,7 +4,7 @@ import CalendarSidebar from './CalendarSidebar';
 import CalendarStats from './CalendarStats';
 import CalendarControls from './CalendarControls';
 import CalendarFilters from './CalendarFilters';
-import { getTournaments } from '@/shared/api/tournaments.api';
+import { getTournaments } from '@/entities/tournament/api/tournaments.api';
 import './Calendar.css';
 
 export interface CalendarEventData {

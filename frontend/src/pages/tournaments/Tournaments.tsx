@@ -4,9 +4,9 @@ import { useAuth } from '@/entities/session';
 import TournamentCard from './TournamentCard';
 import TournamentFilters from './TournamentFilters';
 import TournamentStats from './TournamentStats';
-import { getTournaments } from '@/shared/api';
+import { getTournaments } from '@/entities/tournament/api/tournaments.api';
 import './Tournaments.css';
-import { Tournament } from '@/shared/types/tournament.types';
+import { Tournament } from '@/entities/tournament/model/tournament.types';
 
 // Extend the base Tournament type with UI-specific fields if needed, 
 // or use the base type if it's sufficient.

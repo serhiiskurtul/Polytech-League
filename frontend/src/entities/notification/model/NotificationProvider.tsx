@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/entities/session';
 import { useChat } from '@/entities/chat';
-import { getMyNotifications, markAsRead as apiMarkAsRead, markAllAsRead as apiMarkAllAsRead, deleteNotification as apiDeleteNotification, clearReadNotifications as apiClearReadNotifications } from '@/shared/api/notifications.api';
-import { Notification } from '@/shared/types/notification.types';
+import { getMyNotifications, markAsRead as apiMarkAsRead, markAllAsRead as apiMarkAllAsRead, deleteNotification as apiDeleteNotification, clearReadNotifications as apiClearReadNotifications } from '@/entities/notification/api/notifications.api';
+import { Notification } from '@/entities/notification/model/notification.types';
 
 interface NotificationContextType {
   notifications: Notification[];

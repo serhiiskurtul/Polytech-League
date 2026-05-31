@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getExternalAchievements, createExternalAchievement, updateExternalAchievement, deleteExternalAchievement, ExternalAchievement, ExternalAchievementMedia } from '@/shared/api/externalAchievements.api';
+import { getExternalAchievements, createExternalAchievement, updateExternalAchievement, deleteExternalAchievement, ExternalAchievement, ExternalAchievementMedia } from '@/entities/achievement/api/externalAchievements.api';
 import styles from './StudentNewsPage.module.css';
 import { useAuth } from '@/entities/session';
 import { toast } from 'react-hot-toast';

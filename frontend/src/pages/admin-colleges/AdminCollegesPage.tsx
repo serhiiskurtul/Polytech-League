@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './AdminCollegesPage.module.css';
-import { getColleges, createCollege, updateCollege, deleteCollege, College } from '@/shared/api/colleges.api';
+import { getColleges, createCollege, updateCollege, deleteCollege, College } from '@/entities/college/api/colleges.api';
 import { getPhotoUrl } from '@/shared/utils/photo.utils';
 import toast from 'react-hot-toast';
 

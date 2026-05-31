@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { getUsers, blockUser, unblockUser, deleteUser, UserResponse } from '@/shared/api/users.api';
-import { getAllPlayers, deletePlayer, searchPlayers, getPlayersRankings, mergePlayersManually } from '@/shared/api/players.api';
-import { PlayerDto } from '@/shared/types/player.types';
+import { getUsers, blockUser, unblockUser, deleteUser, UserResponse } from '@/entities/user/api/users.api';
+import { getAllPlayers, deletePlayer, searchPlayers, getPlayersRankings, mergePlayersManually } from '@/entities/player/api/players.api';
+import { PlayerDto } from '@/entities/player/model/player.types';
 import { getPhotoUrl } from '@/shared/utils/photo.utils';
 import { Link } from 'react-router-dom';
 import styles from './AdminUsersPage.module.css';

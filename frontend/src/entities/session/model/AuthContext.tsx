@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import api from "@/shared/api/axiosInstance";
-import { AuthResponse } from "@/shared/types/auth.types";
+import { AuthResponse } from '@/entities/session/model/auth.types';
 import { subscribeUserToPush } from '@/shared/lib/push/pushService';
 
 type User = AuthResponse['user'];
