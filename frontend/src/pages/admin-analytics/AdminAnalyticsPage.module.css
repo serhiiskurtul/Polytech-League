@@ -1,0 +1,72 @@
+.adminAnalyticsPage {
+  min-height: calc(100vh - 80px);
+  padding: 40px 20px;
+  background-color: var(--background-color, #f9fafb);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.titleSection h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary, #111827);
+  margin-bottom: 8px;
+}
+
+.titleSection p {
+  color: var(--text-secondary, #6b7280);
+  font-size: 16px;
+}
+
+.tableContainer {
+  background: var(--surface-color, #ffffff);
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table th {
+  background-color: var(--surface-secondary, #f3f4f6);
+  padding: 16px 24px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.table td {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  color: var(--text-primary, #111827);
+  font-size: 14px;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr:hover {
+  background-color: var(--surface-hover, #f9fafb);
+}
+
+.loading {
+  text-align: center;
+  padding: 48px;
+  color: var(--text-secondary, #6b7280);
+  font-size: 16px;
+}

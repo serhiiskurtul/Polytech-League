@@ -2119,6 +2119,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("last_name");
 
+                    b.Property<DateTime?>("LastVisitAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("text")

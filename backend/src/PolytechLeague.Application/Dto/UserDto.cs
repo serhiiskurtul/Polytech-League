@@ -24,6 +24,7 @@ public class UserResponse
     [JsonPropertyName("createdAt")]
     public DateTime CreatedAt { get; set; }
     public bool IsEmailConfirmed { get; set; }
+    public DateTime? LastVisitAt { get; set; }
 }
 
 public class UserWithDeletedResponse
@@ -64,7 +65,8 @@ public static class UserDtoExtension
             PhotoUrl = user.PhotoUrl,
             IsBlocked = user.IsBlocked,
             CreatedAt = user.CreatedAt,
-            IsEmailConfirmed = user.isEmailConfirmed
+            IsEmailConfirmed = user.isEmailConfirmed,
+            LastVisitAt = user.LastVisitAt
         };
     }
 

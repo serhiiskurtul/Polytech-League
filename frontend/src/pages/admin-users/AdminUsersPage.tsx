@@ -251,6 +251,9 @@ export const AdminUsersPage = () => {
             >
               Гравці (Рейтинг)
             </button>
+            <Link to="/admin/analytics" className={styles.tab} style={{ textDecoration: 'none', color: 'inherit' }}>
+              Аналітика відвідувань
+            </Link>
           </div>
 
           <button 
@@ -291,6 +294,7 @@ export const AdminUsersPage = () => {
                   <th onClick={() => handleSort('CreatedAt')} style={{ cursor: 'pointer', userSelect: 'none' }}>
                     Дата реєстрації {getSortIcon('CreatedAt')}
                   </th>
+                  <th>Останній візит</th>
                   <th>Дії</th>
                 </tr>
               </thead>
@@ -343,6 +347,9 @@ export const AdminUsersPage = () => {
                       </td>
                       <td>
                         {user.createdAt ? new Intl.DateTimeFormat('uk-UA', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(user.createdAt)) : '-'}
+                      </td>
+                      <td>
+                        {user.lastVisitAt ? new Intl.DateTimeFormat('uk-UA', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(user.lastVisitAt)) : '-'}
                       </td>
                       <td>
                         <div className={styles.actions}>

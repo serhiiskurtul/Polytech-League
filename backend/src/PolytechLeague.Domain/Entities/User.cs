@@ -13,6 +13,7 @@ public class User
     public bool IsDeleted { get; set; } = false;
     public bool IsBlocked { get; set; } = false;
     public string? PhotoUrl { get; set; }
+    public DateTime? LastVisitAt { get; set; }
 
     public ICollection<Notification>? Notifications { get; set; }
 }

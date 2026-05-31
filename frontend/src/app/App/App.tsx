@@ -23,6 +23,7 @@ import InternalServerErrorPage from '@/pages/internal-server-error/InternalServe
 import { RatingsPage } from '@/pages/ratings';
 import { AdminMergesPage } from '@/pages/admin-merges/AdminMergesPage';
 import { AdminUsersPage } from '@/pages/admin-users';
+import { AdminAnalyticsPage } from '@/pages/admin-analytics/AdminAnalyticsPage';
 import { NationalRatingsPage } from '@/pages/national-ratings';
 import { AdminCollegesPage } from '@/pages/admin-colleges';
 import { RegionalRatingsPage } from '@/pages/regional-ratings';
@@ -326,6 +327,17 @@ export default function App() {
             <ProtectedRoute requireAuth={true} adminOnly={true}>
               <div className="page-wrapper">
                 <AdminUsersPage />
+              </div>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/analytics"
+          element={
+            <ProtectedRoute requireAuth={true} adminOnly={true}>
+              <div className="page-wrapper">
+                <AdminAnalyticsPage />
               </div>
             </ProtectedRoute>
           }

@@ -51,8 +51,18 @@ namespace PolytechLeague.Api.Controllers.Common
                 };
 
                 _dbContext.SiteVisits.Add(visit);
-                await _dbContext.SaveChangesAsync();
             }
+
+            if (userId.HasValue)
+            {
+                var userEntity = await _dbContext.Users.FindAsync(userId.Value);
+                if (userEntity != null)
+                {
+                    userEntity.LastVisitAt = DateTime.UtcNow;
+                }
+            }
+
+            await _dbContext.SaveChangesAsync();
 
             return Ok();
         }
@@ -82,6 +92,26 @@ namespace PolytechLeague.Api.Controllers.Common
                 UniqueUnregisteredUsers = uniqueUnregisteredUsers
             });
         }
+
+        [HttpGet("daily-stats")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<List<DailyVisitStats>>> GetDailyStats()
+        {
+            var dailyStats = await _dbContext.SiteVisits
+                .GroupBy(v => v.VisitDate.Date)
+                .Select(g => new DailyVisitStats
+                {
+                    Date = g.Key,
+                    TotalVisits = g.Count(),
+                    RegisteredVisits = g.Count(v => v.UserId != null),
+                    GuestVisits = g.Count(v => v.UserId == null)
+                })
+                .OrderByDescending(s => s.Date)
+                .Take(30)
+                .ToListAsync();
+
+            return Ok(dailyStats);
+        }
     }
 
     public class SiteVisitRequest
@@ -94,5 +124,13 @@ namespace PolytechLeague.Api.Controllers.Common
         public long TotalVisits { get; set; }
         public long UniqueRegisteredUsers { get; set; }
         public long UniqueUnregisteredUsers { get; set; }
+    }
+
+    public class DailyVisitStats
+    {
+        public DateTime Date { get; set; }
+        public long TotalVisits { get; set; }
+        public long RegisteredVisits { get; set; }
+        public long GuestVisits { get; set; }
     }
 }
