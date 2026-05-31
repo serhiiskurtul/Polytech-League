@@ -105,30 +105,30 @@ public class ArmwrestlingEventService :
         // Update ranks for participants based on winners
         var eventWithParticipants = await _dbcontext.ArmwrestlingEvents
             .Include(e => e.Players)
-            .FirstOrDefaultAsync(e => e.Id == newEntity.Id, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == oldEntity.Id, cancellationToken);
 
         if (eventWithParticipants != null && eventWithParticipants.Players != null)
         {
             foreach (var participant in eventWithParticipants.Players)
             {
-                if (participant.PlayerId == newEntity.FirstPlaceId) participant.Rank = 1;
-                else if (participant.PlayerId == newEntity.SecondPlaceId) participant.Rank = 2;
-                else if (participant.PlayerId == newEntity.ThirdPlaceId) participant.Rank = 3;
+                if (participant.PlayerId == oldEntity.FirstPlaceId) participant.Rank = 1;
+                else if (participant.PlayerId == oldEntity.SecondPlaceId) participant.Rank = 2;
+                else if (participant.PlayerId == oldEntity.ThirdPlaceId) participant.Rank = 3;
                 else participant.Rank = 0;
             }
             await _dbcontext.SaveChangesAsync(cancellationToken);
         }
 
         // Перевірка чи були визначені призери (перехід від null до значення)
-        bool winnersSet = newEntity.FirstPlaceId != null && newEntity.SecondPlaceId != null && newEntity.ThirdPlaceId != null;
+        bool winnersSet = oldEntity.FirstPlaceId != null && oldEntity.SecondPlaceId != null && oldEntity.ThirdPlaceId != null;
         
         if (winnersSet)
         {
             await _notificationService.SendNotificationToAllAsync(
                 "Змагання завершено!",
-                $"Визначено переможців у змаганні з армрестлінгу: {newEntity.Name}",
+                $"Визначено переможців у змаганні з армрестлінгу: {oldEntity.Name}",
                 NotificationType.Tournament,
-                $"/tournaments/{newEntity.Id}",
+                $"/tournaments/{oldEntity.Id}",
                 true
             );
         }

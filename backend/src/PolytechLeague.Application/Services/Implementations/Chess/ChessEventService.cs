@@ -243,30 +243,30 @@ public class ChessEventService :
         // Update ranks for participants based on winners
         var eventWithParticipants = await _dbcontext.Set<ChessEvent>()
             .Include(e => e.Players)
-            .FirstOrDefaultAsync(e => e.Id == newEntity.Id, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == oldEntity.Id, cancellationToken);
 
         if (eventWithParticipants != null && eventWithParticipants.Players != null)
         {
             foreach (var participant in eventWithParticipants.Players)
             {
-                if (participant.PlayerId == newEntity.FirstPlaceId) participant.Rank = 1;
-                else if (participant.PlayerId == newEntity.SecondPlaceId) participant.Rank = 2;
-                else if (participant.PlayerId == newEntity.ThirdPlaceId) participant.Rank = 3;
+                if (participant.PlayerId == oldEntity.FirstPlaceId) participant.Rank = 1;
+                else if (participant.PlayerId == oldEntity.SecondPlaceId) participant.Rank = 2;
+                else if (participant.PlayerId == oldEntity.ThirdPlaceId) participant.Rank = 3;
                 else participant.Rank = 0;
             }
             await _dbcontext.SaveChangesAsync(cancellationToken);
         }
 
-        bool individualWinnersSet = newEntity.FirstPlaceId != null && newEntity.SecondPlaceId != null && newEntity.ThirdPlaceId != null;
-        bool teamWinnersSet = newEntity.FirstPlaceTeamId != null && newEntity.SecondPlaceTeamId != null && newEntity.ThirdPlaceTeamId != null;
+        bool individualWinnersSet = oldEntity.FirstPlaceId != null && oldEntity.SecondPlaceId != null && oldEntity.ThirdPlaceId != null;
+        bool teamWinnersSet = oldEntity.FirstPlaceTeamId != null && oldEntity.SecondPlaceTeamId != null && oldEntity.ThirdPlaceTeamId != null;
         
         if (individualWinnersSet || teamWinnersSet)
         {
             await _notificationService!.SendNotificationToAllAsync(
                 "Змагання завершено!",
-                $"Визначено переможців у змаганні з шахів: {newEntity.Name}",
+                $"Визначено переможців у змаганні з шахів: {oldEntity.Name}",
                 NotificationType.Tournament,
-                $"/tournaments/{newEntity.Id}",
+                $"/tournaments/{oldEntity.Id}",
                 true
             );
         }

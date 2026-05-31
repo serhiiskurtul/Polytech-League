@@ -91,31 +91,31 @@ public class TableTennisEventService(
         // Update ranks for teams based on winners
         var eventWithTeams = await _dbcontext.TableTennisEvents
             .Include(e => e.Teams)
-            .FirstOrDefaultAsync(e => e.Id == newEntity.Id, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == oldEntity.Id, cancellationToken);
 
         if (eventWithTeams != null && eventWithTeams.Teams != null)
         {
             foreach (var team in eventWithTeams.Teams)
             {
-                if (team.Id == newEntity.FirstPlaceTeamId) team.Rank = 1;
-                else if (team.Id == newEntity.SecondPlaceTeamId) team.Rank = 2;
-                else if (team.Id == newEntity.ThirdPlaceTeamId) team.Rank = 3;
-                else if (newEntity.FirstPlaceTeamId != null) team.Rank = 4;
+                if (team.Id == oldEntity.FirstPlaceTeamId) team.Rank = 1;
+                else if (team.Id == oldEntity.SecondPlaceTeamId) team.Rank = 2;
+                else if (team.Id == oldEntity.ThirdPlaceTeamId) team.Rank = 3;
+                else if (oldEntity.FirstPlaceTeamId != null) team.Rank = 4;
                 else team.Rank = 0;
             }
             await _dbcontext.SaveChangesAsync(cancellationToken);
         }
 
-        bool individualWinnersSet = newEntity.FirstPlaceId != null && newEntity.SecondPlaceId != null && newEntity.ThirdPlaceId != null;
-        bool teamWinnersSet = newEntity.FirstPlaceTeamId != null && newEntity.SecondPlaceTeamId != null && newEntity.ThirdPlaceTeamId != null;
+        bool individualWinnersSet = oldEntity.FirstPlaceId != null && oldEntity.SecondPlaceId != null && oldEntity.ThirdPlaceId != null;
+        bool teamWinnersSet = oldEntity.FirstPlaceTeamId != null && oldEntity.SecondPlaceTeamId != null && oldEntity.ThirdPlaceTeamId != null;
         
         if (individualWinnersSet || teamWinnersSet)
         {
             await _notificationService.SendNotificationToAllAsync(
                 "Змагання завершено!",
-                $"Визначено переможців у змаганні з настільного тенісу: {newEntity.Name}",
+                $"Визначено переможців у змаганні з настільного тенісу: {oldEntity.Name}",
                 NotificationType.Tournament,
-                $"/tournaments/{newEntity.Id}",
+                $"/tournaments/{oldEntity.Id}",
                 true
             );
         }
