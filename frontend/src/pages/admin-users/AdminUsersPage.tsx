@@ -21,7 +21,9 @@ export const AdminUsersPage = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await getUsers(page, pageSize, searchTerm);
+      const currentPageSize = showDuplicatesOnly ? 10000 : pageSize;
+      const currentPage = showDuplicatesOnly ? 1 : page;
+      const response = await getUsers(currentPage, currentPageSize, searchTerm);
       setUsers(response.data);
       setTotalCount(response.totalCount);
     } catch (error) {
@@ -82,7 +84,7 @@ export const AdminUsersPage = () => {
       }
     }, 500);
     return () => clearTimeout(timer);
-  }, [page, searchTerm, activeTab]);
+  }, [page, searchTerm, activeTab, showDuplicatesOnly]);
 
   const handleBlock = async (id: number, isBlocked: boolean) => {
     try {
@@ -248,7 +250,7 @@ export const AdminUsersPage = () => {
                     });
                   }
 
-                  return displayUsers.map((user) => (
+                  return displayUsers.slice(showDuplicatesOnly ? 0 : 0, showDuplicatesOnly ? displayUsers.length : displayUsers.length).map((user) => (
                     <tr key={user.id} className={showDuplicatesOnly ? styles.duplicateRow : ''}>
                       <td>
                         <div className={styles.userCell}>
