@@ -461,9 +461,9 @@ public class PlayerService : IPlayerService
                         College = g.Where(x => x.Level == CompetitionLevel.CollegeGroup).Sum(x => x.GoalsCount),
                         Regional = g.Where(x => x.Level == CompetitionLevel.Regional).Sum(x => x.GoalsCount),
                         National = g.Where(x => x.Level == CompetitionLevel.National).Sum(x => x.GoalsCount),
-                        HatTricks = g.GroupBy(x => x.MatchId).Count(m => m.Sum(x => x.GoalsCount) >= 3),
-                        Pokers = g.GroupBy(x => x.MatchId).Count(m => m.Sum(x => x.GoalsCount) >= 4),
-                        Pentatricks = g.GroupBy(x => x.MatchId).Count(m => m.Sum(x => x.GoalsCount) >= 5),
+                        HatTricks = g.GroupBy(x => x.MatchId).Count(m => m.Sum(x => x.GoalsCount) == 3),
+                        Pokers = g.GroupBy(x => x.MatchId).Count(m => m.Sum(x => x.GoalsCount) == 4),
+                        Pentatricks = g.GroupBy(x => x.MatchId).Count(m => m.Sum(x => x.GoalsCount) == 5),
                         FinalGoals = g.Where(x => x.Stage != null && x.Stage.ToLower().Contains("фінал") && !x.Stage.ToLower().Contains("півфінал")).Sum(x => x.GoalsCount),
                         SemifinalGoals = g.Where(x => x.Stage != null && x.Stage.ToLower().Contains("півфінал")).Sum(x => x.GoalsCount)
                     }
@@ -2518,15 +2518,15 @@ public class PlayerService : IPlayerService
 
             dto.HatTricksCount = goalDetails
                 .GroupBy(g => g.MatchId)
-                .Count(g => g.Sum(x => x.GoalsCount) >= 3);
+                .Count(g => g.Sum(x => x.GoalsCount) == 3);
 
             dto.PokersCount = goalDetails
                 .GroupBy(g => g.MatchId)
-                .Count(g => g.Sum(x => x.GoalsCount) >= 4);
+                .Count(g => g.Sum(x => x.GoalsCount) == 4);
 
             dto.PentatricksCount = goalDetails
                 .GroupBy(g => g.MatchId)
-                .Count(g => g.Sum(x => x.GoalsCount) >= 5);
+                .Count(g => g.Sum(x => x.GoalsCount) == 5);
 
             dto.FinalGoalsCount = goalDetails
                 .Where(g => g.Match?.Stage?.ToLower().Contains("фінал") == true && !g.Match.Stage.ToLower().Contains("півфінал"))
