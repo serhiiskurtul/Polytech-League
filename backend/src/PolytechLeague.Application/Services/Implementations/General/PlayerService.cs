@@ -2432,6 +2432,14 @@ public class PlayerService : IPlayerService
                 .GroupBy(g => g.MatchId)
                 .Count(g => g.Sum(x => x.GoalsCount) >= 3);
 
+            dto.PokersCount = goalDetails
+                .GroupBy(g => g.MatchId)
+                .Count(g => g.Sum(x => x.GoalsCount) >= 4);
+
+            dto.PentatricksCount = goalDetails
+                .GroupBy(g => g.MatchId)
+                .Count(g => g.Sum(x => x.GoalsCount) >= 5);
+
             dto.FinalGoalsCount = goalDetails
                 .Where(g => g.Match?.Stage?.ToLower().Contains("фінал") == true && !g.Match.Stage.ToLower().Contains("півфінал"))
                 .Sum(g => g.GoalsCount);

@@ -85,6 +85,8 @@ public class PlayerDto
     public int FootballRegionalGoals { get; set; }
     public int FootballNationalGoals { get; set; }
     public int HatTricksCount { get; set; }
+    public int PokersCount { get; set; }
+    public int PentatricksCount { get; set; }
     public int FinalGoalsCount { get; set; }
     public int SemifinalGoalsCount { get; set; }
     public int FinalMatchesCount { get; set; }
@@ -198,6 +200,8 @@ public static class PlayerDtoExtensions
             FootballRegionalGoals = 0,
             FootballNationalGoals = 0,
             HatTricksCount = 0,
+            PokersCount = 0,
+            PentatricksCount = 0,
             FinalGoalsCount = 0,
             SemifinalGoalsCount = 0,
             FinalMatchesCount = 0,

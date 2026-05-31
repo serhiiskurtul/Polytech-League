@@ -71,6 +71,8 @@ export interface PlayerDto {
     footballRegionalGoals?: number;
     footballNationalGoals?: number;
     hatTricksCount?: number;
+    pokersCount?: number;
+    pentatricksCount?: number;
     finalGoalsCount?: number;
     semifinalGoalsCount?: number;
     finalMatchesCount?: number;

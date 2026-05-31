@@ -19,6 +19,8 @@ interface Stats {
   redCardsCount?: number;
   globalRank?: number;
   hatTricksCount?: number;
+  pokersCount?: number;
+  pentatricksCount?: number;
   sportStats?: SportStat[];
   chessTotalPoints?: number | null;
   chessTotalPossiblePoints?: number | null;
@@ -114,6 +116,18 @@ const ProfileStats = ({ stats }: ProfileStatsProps) => {
           <div className={styles.statCard} title="Кількість забитих хет-триків у футбольних матчах (3+ голи за матч)">
             <div className={styles.statValue}>{stats.hatTricksCount || 0}</div>
             <div className={styles.statLabel}>Хет-триків</div>
+          </div>
+        )}
+        {(isFootballer || (stats.pokersCount !== undefined && stats.pokersCount > 0)) && (
+          <div className={styles.statCard} title="Кількість забитих покерів у футбольних матчах (4+ голи за матч)">
+            <div className={styles.statValue}>{stats.pokersCount || 0}</div>
+            <div className={styles.statLabel}>Покерів</div>
+          </div>
+        )}
+        {(isFootballer || (stats.pentatricksCount !== undefined && stats.pentatricksCount > 0)) && (
+          <div className={styles.statCard} title="Кількість забитих пентатриків у футбольних матчах (5+ голів за матч)">
+            <div className={styles.statValue}>{stats.pentatricksCount || 0}</div>
+            <div className={styles.statLabel}>Пентатриків</div>
           </div>
         )}
         {(isFootballer || (stats.yellowCardsCount !== undefined && stats.yellowCardsCount > 0)) && (
