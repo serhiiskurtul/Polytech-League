@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getExternalAchievements, createExternalAchievement, updateExternalAchievement, deleteExternalAchievement, ExternalAchievement, ExternalAchievementMedia } from '@/shared/api/externalAchievements.api';
 import styles from './StudentNewsPage.module.css';
-import { useAuth } from '@/app/providers/AuthContext';
+import { useAuth } from '@/entities/session';
 import { toast } from 'react-hot-toast';
 import { getPhotoUrl } from '@/shared/utils/photo.utils';
 

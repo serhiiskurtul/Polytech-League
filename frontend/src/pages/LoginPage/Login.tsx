@@ -5,7 +5,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { login as loginApi, axiosInstance as api } from "@/shared/api";
 import { InputSign, ButtonSign, Logo } from "@/shared/ui";
-import { useAuth } from "@/app/providers/AuthContext";
+import { useAuth } from '@/entities/session';
 
 // Yup schema
 const loginSchema = yup.object({

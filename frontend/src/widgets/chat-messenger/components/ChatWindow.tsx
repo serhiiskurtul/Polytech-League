@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styles from '../MessengerView.module.css';
-import { useChat } from '@/app/providers/ChatProvider';
-import { useAuth } from '@/app/providers/AuthContext';
+import { useChat } from '@/entities/chat';
+import { useAuth } from '@/entities/session';
 
 interface ChatWindowProps {
     onBack?: () => void;

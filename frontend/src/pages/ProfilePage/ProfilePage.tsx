@@ -6,7 +6,7 @@ import {
 } from '@/widgets/profile-widgets';
 import EditProfileModal from '@/widgets/profile-widgets/edit-profile-modal/EditProfileModal';
 import styles from './ProfilePage.module.css';
-import { useAuth } from '@/app/providers/AuthContext';
+import { useAuth } from '@/entities/session';
 import { PlayerDto } from '@/shared/types/player.types';
 import { getProfile, updateProfile, uploadAvatar, checkArchivalMatches, createMergeRequest, ignoreMergeRequest, getPlayerRank } from '@/shared/api/players.api';
 

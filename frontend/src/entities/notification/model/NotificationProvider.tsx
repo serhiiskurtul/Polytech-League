@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { useAuth } from './AuthContext';
-import { useChat } from './ChatProvider';
+import { useAuth } from '@/entities/session';
+import { useChat } from '@/entities/chat';
 import { getMyNotifications, markAsRead as apiMarkAsRead, markAllAsRead as apiMarkAllAsRead, deleteNotification as apiDeleteNotification, clearReadNotifications as apiClearReadNotifications } from '@/shared/api/notifications.api';
 import { Notification } from '@/shared/types/notification.types';
 

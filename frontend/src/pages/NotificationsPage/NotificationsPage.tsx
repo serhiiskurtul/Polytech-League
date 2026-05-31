@@ -4,8 +4,8 @@ import styles from './NotificationsPage.module.css';
 import { Notification } from '@/shared/types/notification.types';
 import toast from 'react-hot-toast';
 import { MessengerView } from '@/widgets/chat-messenger/MessengerView';
-import { useChat } from '@/app/providers/ChatProvider';
-import { useNotifications } from '@/app/providers/NotificationProvider';
+import { useChat } from '@/entities/chat';
+import { useNotifications } from '@/entities/notification';
 
 const NotificationsPage = () => {
   const navigate = useNavigate();

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styles from './ChatWidget.module.css';
-import { useChat } from '@/app/providers/ChatProvider';
-import { useAuth } from '@/app/providers/AuthContext';
+import { useChat } from '@/entities/chat';
+import { useAuth } from '@/entities/session';
 
 export const ChatWidget: React.FC = () => {
     const { isAuthenticated, user } = useAuth();
@@ -12,10 +12,10 @@ export const ChatWidget: React.FC = () => {
         setActiveConversationId,
         messages,
         sendMessage,
-        markAsRead,
-        isChatOpen,
-        setIsChatOpen
+        markAsRead
     } = useChat();
+
+    const [isChatOpen, setIsChatOpen] = useState(false);
 
     const [inputValue, setInputValue] = useState('');
     const messageListRef = useRef<HTMLDivElement>(null);

@@ -10,9 +10,9 @@ import { PlayerDto } from '@/shared/types/player.types';
 import { getPlayerById, getPlayerRank, updatePlayer } from '@/shared/api/players.api';
 import EditProfileModal from '@/widgets/profile-widgets/edit-profile-modal/EditProfileModal';
 import { toast } from 'react-hot-toast';
-import { useChat } from '@/app/providers/ChatProvider';
+import { useChat } from '@/entities/chat';
 import { chatApi } from '@/shared/api/chat.api';
-import { useAuth } from '@/app/providers/AuthContext';
+import { useAuth } from '@/entities/session';
 
 
 const PlayerViewPage = () => {

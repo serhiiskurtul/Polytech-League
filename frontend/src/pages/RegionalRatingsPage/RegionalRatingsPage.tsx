@@ -3,7 +3,7 @@ import styles from './RegionalRatingsPage.module.css';
 import { getSeasons, getRegionalRating, updateRegionalRating } from '@/shared/api/seasonRating.api';
 import { getColleges, College } from '@/shared/api/colleges.api';
 import { Season, SeasonRatingResponse } from '@/shared/types/seasonRating.types';
-import { useAuth } from '@/app/providers/AuthContext';
+import { useAuth } from '@/entities/session';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import * as XLSX from 'xlsx';

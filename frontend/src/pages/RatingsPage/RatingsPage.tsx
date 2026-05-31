@@ -5,7 +5,7 @@ import { getSeasons, getSeasonRating, createSeason, updateSeason, deleteSeason }
 import { Season, SeasonRatingResponse } from '@/shared/types/seasonRating.types';
 import toast from 'react-hot-toast';
 import * as XLSX from 'xlsx';
-import { useAuth } from '@/app/providers/AuthContext';
+import { useAuth } from '@/entities/session';
 
 const RatingsPage: React.FC = () => {
   const { user } = useAuth();

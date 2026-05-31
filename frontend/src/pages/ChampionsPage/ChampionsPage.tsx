@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { getChampions, createHallOfFameEntry, deleteHallOfFameEntry } from '@/shared/api/tournaments.api';
 import { Champion } from '@/shared/types/tournament.types';
 import styles from './ChampionsPage.module.css';
-import { useAuth } from '@/app/providers/AuthContext';
+import { useAuth } from '@/entities/session';
 import { toast } from 'react-hot-toast';
 
 const ChampionsPage: React.FC = () => {

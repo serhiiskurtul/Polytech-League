@@ -6,7 +6,7 @@ import { getPlayersRankings } from '../../shared/api/players.api';
 import { getSeasons } from '../../shared/api/seasonRating.api';
 import { PlayerDto } from '../../shared/types/player.types';
 import { Season } from '../../shared/types/seasonRating.types';
-import { useAuth } from '../../app/providers/AuthContext';
+import { useAuth } from '@/entities/session';
 
 const PlayersRatingPage = () => {
   const { user } = useAuth();

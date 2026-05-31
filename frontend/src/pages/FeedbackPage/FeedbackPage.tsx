@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styles from './FeedbackPage.module.css';
-import { useAuth } from '@/app/providers/AuthContext';
+import { useAuth } from '@/entities/session';
 import { toast } from 'react-hot-toast';
 import api from '@/shared/api/axiosInstance';
 

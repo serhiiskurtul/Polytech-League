@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
-import { useAuth } from '@/app/providers/AuthContext';
+import { useAuth } from '@/entities/session';
 import TournamentCard from './TournamentCard';
 import TournamentFilters from './TournamentFilters';
 import TournamentStats from './TournamentStats';

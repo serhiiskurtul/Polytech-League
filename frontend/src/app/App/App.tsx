@@ -18,7 +18,7 @@ import { TournamentCreatePage } from '@/pages/TournamentCreatePage';
 import { PlayerViewPage } from '@/pages/PlayerViewPage';
 import { PlayerComparePage } from '@/pages/PlayerComparePage/index'; // Player comparison page
 import NotFoundPage from '@/pages/NotFoundPage/NotFoundPage';
-import { useNotifications } from '@/app/providers/NotificationProvider';
+import { useNotifications } from '@/entities/notification';
 import InternalServerErrorPage from '@/pages/InternalServerErrorPage/InternalServerErrorPage';
 import { RatingsPage } from '@/pages/RatingsPage';
 import { AdminMergesPage } from '@/pages/AdminMergesPage/AdminMergesPage';
