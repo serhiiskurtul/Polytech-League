@@ -370,7 +370,9 @@ public class PlayerService : IPlayerService
                 .Select(g => new {
                     g.PlayerId,
                     g.GoalsCount,
-                    Level = g.Match != null && g.Match.Event != null ? (CompetitionLevel?)g.Match.Event.Level : null
+                    g.MatchId,
+                    Level = g.Match != null && g.Match.Event != null ? (CompetitionLevel?)g.Match.Event.Level : null,
+                    Stage = g.Match != null ? g.Match.Stage : null
                 })
                 .ToListAsync(cancellationToken);
             
@@ -458,7 +460,12 @@ public class PlayerService : IPlayerService
                         Total = g.Sum(x => x.GoalsCount),
                         College = g.Where(x => x.Level == CompetitionLevel.CollegeGroup).Sum(x => x.GoalsCount),
                         Regional = g.Where(x => x.Level == CompetitionLevel.Regional).Sum(x => x.GoalsCount),
-                        National = g.Where(x => x.Level == CompetitionLevel.National).Sum(x => x.GoalsCount)
+                        National = g.Where(x => x.Level == CompetitionLevel.National).Sum(x => x.GoalsCount),
+                        HatTricks = g.GroupBy(x => x.MatchId).Count(m => m.Sum(x => x.GoalsCount) >= 3),
+                        Pokers = g.GroupBy(x => x.MatchId).Count(m => m.Sum(x => x.GoalsCount) >= 4),
+                        Pentatricks = g.GroupBy(x => x.MatchId).Count(m => m.Sum(x => x.GoalsCount) >= 5),
+                        FinalGoals = g.Where(x => x.Stage != null && x.Stage.ToLower().Contains("фінал") && !x.Stage.ToLower().Contains("півфінал")).Sum(x => x.GoalsCount),
+                        SemifinalGoals = g.Where(x => x.Stage != null && x.Stage.ToLower().Contains("півфінал")).Sum(x => x.GoalsCount)
                     }
                 );
             var cardsLookup = cardsS.ToLookup(x => x.PlayerId);
@@ -665,6 +672,11 @@ public class PlayerService : IPlayerService
                     dto.FootballCollegeGroupGoals = pGoalsInfo.College;
                     dto.FootballRegionalGoals = pGoalsInfo.Regional;
                     dto.FootballNationalGoals = pGoalsInfo.National;
+                    dto.HatTricksCount = pGoalsInfo.HatTricks;
+                    dto.PokersCount = pGoalsInfo.Pokers;
+                    dto.PentatricksCount = pGoalsInfo.Pentatricks;
+                    dto.FinalGoalsCount = pGoalsInfo.FinalGoals;
+                    dto.SemifinalGoalsCount = pGoalsInfo.SemifinalGoals;
                 }
                 var pCards = cardsLookup[playerId].ToList();
                 int yellow = pCards.Count(x => x.Type == FootballCardType.Yellow);
