@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from '../MessengerView.module.css';
-import { ConversationDto } from '@/shared/api/chat.api';
+import { ConversationDto } from '@/entities/chat/api/chat.api';
 import { formatConversationDate } from '@/shared/utils/date.utils';
 
 interface ConversationListProps {

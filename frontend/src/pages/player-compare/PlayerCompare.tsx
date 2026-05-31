@@ -1,0 +1,826 @@
+import React, { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import styles from './PlayerComparePage.module.css';
+import { getPlayerById, getPlayersRankings, getHeadToHead } from '@/entities/player/api/players.api';
+import { getSeasons } from '@/entities/rating/api/seasonRating.api';
+import { PlayerDto } from '@/entities/player/model/player.types';
+import { Season } from '@/entities/rating/model/seasonRating.types';
+import { getPhotoUrl } from '../../shared/utils/photo.utils';
+import { 
+  PieChart, 
+  Pie, 
+  Cell, 
+  ResponsiveContainer, 
+  Tooltip, 
+  Legend 
+} from 'recharts';
+
+export const PlayerComparePage = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const p1Id = searchParams.get('p1');
+  const p2Id = searchParams.get('p2');
+
+  const [player1, setPlayer1] = useState<PlayerDto | null>(null);
+  const [player2, setPlayer2] = useState<PlayerDto | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  const [seasons, setSeasons] = useState<Season[]>([]);
+  const [selectedSeasonId1, setSelectedSeasonId1] = useState<number | null>(null);
+  const [selectedSeasonId2, setSelectedSeasonId2] = useState<number | null>(null);
+  const [loadingSeasons, setLoadingSeasons] = useState(true);
+  
+  const [headToHead, setHeadToHead] = useState<any>(null);
+  const [loadingH2H, setLoadingH2H] = useState(false);
+  const [selectedSport, setSelectedSport] = useState<string>('all');
+
+  // Initial fetch of seasons
+  useEffect(() => {
+    const fetchSeasons = async () => {
+      try {
+        const data = await getSeasons();
+        setSeasons(data);
+        const current = data.find(s => s.isCurrent);
+        if (current) {
+          setSelectedSeasonId1(current.id);
+          setSelectedSeasonId2(current.id);
+        } else if (data.length > 0) {
+          setSelectedSeasonId1(data[0].id);
+          setSelectedSeasonId2(data[0].id);
+        }
+      } catch (err) {
+        console.error('Failed to fetch seasons:', err);
+      } finally {
+        setLoadingSeasons(false);
+      }
+    };
+    fetchSeasons();
+  }, []);
+
+  useEffect(() => {
+    const fetchPlayers = async () => {
+      if (!p1Id) {
+        setError('Необхідно вибрати хоча б одного гравця для порівняння.');
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const findAndEnrich = async (id: string, seasonId: number | null) => {
+          const rankings = await getPlayersRankings(seasonId || undefined);
+          const detail = await getPlayerById(id);
+          const rankingInfo = rankings.find(p => p.id === Number(id));
+          
+          if (rankingInfo) {
+            return {
+              ...detail,
+              performanceScore: rankingInfo.performanceScore,
+              matchesPlayed: rankingInfo.matchesPlayed,
+              winsCount: rankingInfo.winsCount,
+              goalsCount: rankingInfo.goalsCount,
+              footballCollegeGroupGoals: rankingInfo.footballCollegeGroupGoals,
+              footballRegionalGoals: rankingInfo.footballRegionalGoals,
+              footballNationalGoals: rankingInfo.footballNationalGoals,
+              hatTricksCount: rankingInfo.hatTricksCount,
+              finalGoalsCount: rankingInfo.finalGoalsCount,
+              semifinalGoalsCount: rankingInfo.semifinalGoalsCount,
+              finalMatchesCount: rankingInfo.finalMatchesCount,
+              semifinalMatchesCount: rankingInfo.semifinalMatchesCount,
+              yellowCardsCount: rankingInfo.yellowCardsCount,
+              redCardsCount: rankingInfo.redCardsCount,
+              mvpCount: rankingInfo.mvpCount,
+              competitionsCount: rankingInfo.competitionsCount,
+              globalRank: rankingInfo.globalRank,
+              sportStats: rankingInfo.sportStats
+            };
+          }
+          return {
+            ...detail,
+            performanceScore: 0,
+            matchesPlayed: 0,
+            winsCount: 0,
+            goalsCount: 0,
+            footballCollegeGroupGoals: 0,
+            footballRegionalGoals: 0,
+            footballNationalGoals: 0,
+            hatTricksCount: 0,
+            finalGoalsCount: 0,
+            semifinalGoalsCount: 0,
+            finalMatchesCount: 0,
+            semifinalMatchesCount: 0,
+            yellowCardsCount: 0,
+            redCardsCount: 0,
+            mvpCount: 0,
+            competitionsCount: 0,
+            globalRank: undefined,
+            sportStats: []
+          };
+        };
+
+        const data1 = await findAndEnrich(p1Id, selectedSeasonId1);
+        setPlayer1(data1);
+        
+        if (p2Id) {
+          const data2 = await findAndEnrich(p2Id, selectedSeasonId2);
+          setPlayer2(data2);
+        }
+      } catch (err) {
+        console.error('Error fetching players for comparison:', err);
+        setError('Не вдалося завантажити дані гравців.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (!loadingSeasons) {
+      fetchPlayers();
+    }
+  }, [p1Id, p2Id, selectedSeasonId1, selectedSeasonId2, loadingSeasons]);
+
+  // Fetch Head-to-Head
+  useEffect(() => {
+    const fetchH2H = async () => {
+      if (!p1Id || !p2Id) return;
+      setLoadingH2H(true);
+      try {
+        const data = await getHeadToHead(p1Id, p2Id);
+        setHeadToHead(data);
+      } catch (err) {
+        console.error('Failed to fetch head-to-head:', err);
+      } finally {
+        setLoadingH2H(false);
+      }
+    };
+
+    fetchH2H();
+  }, [p1Id, p2Id]);
+
+
+  const getSportVal = (player: PlayerDto | null, field: string) => {
+    if (!player) return undefined;
+    if (selectedSport === 'all') {
+      return (player as any)[field];
+    }
+    const sport = player.sportStats?.find(s => s.sportType === selectedSport);
+    return sport ? (sport as any)[field] : 0;
+  };
+
+  const calculateWinRate = (player: PlayerDto | null) => {
+    if (!player) return 0;
+    const matches = getSportVal(player, 'matchesPlayed') || 0;
+    const wins = getSportVal(player, 'winsCount') || 0;
+    if (!matches) return 0;
+    return Math.round((wins / matches) * 100);
+  };
+
+  const getCompetitionsCount = (player: PlayerDto | null, selectedSeasonId: number | null) => {
+    if (!player) return 0;
+    if (selectedSport === 'all') {
+      return player.competitionsCount || 0;
+    }
+    
+    if (!player.achievements) return 0;
+    
+    let filtered = player.achievements.filter(
+      a => a.sportType.toLowerCase() === selectedSport.toLowerCase()
+    );
+    
+    const selectedSeason = seasons.find(s => s.id === selectedSeasonId);
+    if (selectedSeason) {
+      const start = new Date(selectedSeason.startDate);
+      const end = new Date(selectedSeason.endDate);
+      filtered = filtered.filter(a => {
+        const aDate = new Date(a.date);
+        return aDate >= start && aDate <= end;
+      });
+    }
+    
+    const uniqueTournaments = new Set(
+      filtered.map(a => a.tournamentId || a.tournamentName)
+    );
+    
+    return uniqueTournaments.size;
+  };
+
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+
+  if (loading) {
+    return (
+      <div className={styles.loadingContainer}>
+        <div className={styles.spinner}></div>
+        <p>Підготовка порівняння...</p>
+      </div>
+    );
+  }
+
+  if (error || !player1) {
+    return (
+      <div className={styles.errorContainer}>
+        <i className="fa-solid fa-triangle-exclamation"></i>
+        <h2>Помилка</h2>
+        <p>{error}</p>
+        <button onClick={() => navigate('/ratings')} className={styles.backBtn}>
+          До рейтингів
+        </button>
+      </div>
+    );
+  }
+
+
+  return (
+    <div className={styles.page}>
+      <div className={styles.container}>
+        <header className={styles.header}>
+          <button onClick={() => navigate(-1)} className={styles.backBtnSmall}>
+            <i className="fa-solid fa-arrow-left"></i> Назад
+          </button>
+          <h1 className={styles.title}>Порівняння гравців</h1>
+          <div style={{ width: '100px' }}></div> {/* Spacer for symmetry */}
+        </header>
+
+        <div className={styles.comparisonGrid}>
+          {/* Player Cards */}
+          <div className={styles.playersRow}>
+            <div className={styles.playerColumn}>
+              <SeasonSelector 
+                seasons={seasons} 
+                player={player1}
+                selectedId={selectedSeasonId1} 
+                onChange={setSelectedSeasonId1} 
+              />
+              <PlayerCard 
+                player={player1} 
+                color="#3b82f6" 
+                selectedSeason={seasons.find(s => s.id === selectedSeasonId1)} 
+              />
+            </div>
+
+            <div className={styles.vsCircle}>VS</div>
+
+            <div className={styles.playerColumn}>
+              {player2 ? (
+                <>
+                  <SeasonSelector 
+                    seasons={seasons} 
+                    player={player2}
+                    selectedId={selectedSeasonId2} 
+                    onChange={setSelectedSeasonId2} 
+                  />
+                  <PlayerCard 
+                    player={player2} 
+                    color="#ef4444" 
+                    selectedSeason={seasons.find(s => s.id === selectedSeasonId2)} 
+                  />
+                </>
+              ) : (
+                <div className={styles.emptyPlayerSlot}>
+                  <p>Виберіть другого гравця в рейтингах</p>
+                  <button onClick={() => navigate(`/ratings?p1=${p1Id}`)} className={styles.addPlayerBtn}>
+                    Додати гравця
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+
+          {/* Metrics Table */}
+          <div className={styles.statsSection}>
+            <div className={styles.sectionHeader}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <i className="fa-solid fa-table-list"></i>
+                <h2>Порівняльні метрики</h2>
+              </div>
+              
+              <div className={styles.sportSelector}>
+                <label htmlFor="sport-filter">Вид спорту:</label>
+                <select 
+                  id="sport-filter"
+                  value={selectedSport} 
+                  onChange={(e) => setSelectedSport(e.target.value)}
+                >
+                  <option value="all">Всі види</option>
+                  {Array.from(new Set([
+                    ...(player1?.sportStats?.map(s => s.sportType) || []),
+                    ...(player2?.sportStats?.map(s => s.sportType) || [])
+                  ])).map(sport => (
+                    <option key={sport} value={sport}>{translateSport(sport)}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className={styles.statsTable}>
+              <StatRow 
+                label={selectedSport === 'all' ? "Загальний рейтинг" : "Очки в спорті"} 
+                val1={getSportVal(player1, 'performanceScore')} 
+                val2={getSportVal(player2, 'performanceScore')}
+                suffix=" очок"
+              />
+              <StatRow 
+                label="Зіграно матчів" 
+                val1={getSportVal(player1, 'matchesPlayed')} 
+                val2={getSportVal(player2, 'matchesPlayed')}
+                suffix=" ігор"
+              />
+              <StatRow 
+                label="Кількість перемог" 
+                val1={getSportVal(player1, 'winsCount')} 
+                val2={getSportVal(player2, 'winsCount')}
+                suffix=" перемог"
+              />
+              <StatRow 
+                label="Відсоток перемог" 
+                val1={calculateWinRate(player1)} 
+                val2={calculateWinRate(player2)}
+                suffix="%"
+                isBetterHigh={true}
+              />
+              <StatRow 
+                label="Звання MVP" 
+                val1={player1.mvpCount} 
+                val2={player2?.mvpCount}
+                suffix=" разів"
+              />
+
+               {/* Only show goals if both played football and sport is all or football */}
+               {(selectedSport === 'all' || selectedSport === 'football') && 
+                (player1.sportStats?.some(s => s.sportType === 'football') || 
+                 player2?.sportStats?.some(s => s.sportType === 'football') ||
+                (player1.goalsCount || 0) > 0 || (player2?.goalsCount || 0) > 0 ||
+                 (player1.yellowCardsCount || 0) > 0 || (player2?.yellowCardsCount || 0) > 0 ||
+                 (player1.redCardsCount || 0) > 0 || (player2?.redCardsCount || 0) > 0) && (
+                  <>
+                    <StatRow 
+                      label="Забито голів" 
+                      val1={player1.goalsCount} 
+                      val2={player2?.goalsCount}
+                    />
+                    <StatRow 
+                      label="Голи у міжгрупових змаганнях" 
+                      val1={player1.footballCollegeGroupGoals} 
+                      val2={player2?.footballCollegeGroupGoals}
+                    />
+                    <StatRow 
+                      label="Голи в обласних змаганнях" 
+                      val1={player1.footballRegionalGoals} 
+                      val2={player2?.footballRegionalGoals}
+                    />
+                    <StatRow 
+                      label="Голи у всеукраїнських змаганнях" 
+                      val1={player1.footballNationalGoals} 
+                      val2={player2?.footballNationalGoals}
+                    />
+                    {((player1.sportStats?.some(s => s.sportType === 'football') || (player1.goalsCount || 0) > 0) &&
+                      (player2?.sportStats?.some(s => s.sportType === 'football') || (player2?.goalsCount || 0) > 0)) && (
+                      <>
+                        <StatRow 
+                          label="Хет-трики" 
+                          val1={player1.hatTricksCount} 
+                          val2={player2?.hatTricksCount}
+                          suffix=" хет-триків"
+                        />
+                        <StatRow 
+                          label="Голи у фіналах" 
+                          val1={player1.finalGoalsCount} 
+                          val2={player2?.finalGoalsCount}
+                        />
+                        <StatRow 
+                          label="Голи у півфіналах" 
+                          val1={player1.semifinalGoalsCount} 
+                          val2={player2?.semifinalGoalsCount}
+                        />
+                        <StatRow 
+                          label="Участь у фіналах" 
+                          val1={player1.finalMatchesCount} 
+                          val2={player2?.finalMatchesCount}
+                          suffix=" матчів"
+                        />
+                        <StatRow 
+                          label="Участь у півфіналах" 
+                          val1={player1.semifinalMatchesCount} 
+                          val2={player2?.semifinalMatchesCount}
+                          suffix=" матчів"
+                        />
+                      </>
+                    )}
+                    <StatRow 
+                      label="Жовті картки" 
+                      val1={player1.yellowCardsCount} 
+                      val2={player2?.yellowCardsCount}
+                      isBetterHigh={false}
+                    />
+                    <StatRow 
+                      label="Червоні картки" 
+                      val1={player1.redCardsCount} 
+                      val2={player2?.redCardsCount}
+                      isBetterHigh={false}
+                    />
+                  </>
+                )}
+
+               <StatRow 
+                 label="Участь у змаганнях" 
+                 val1={getCompetitionsCount(player1, selectedSeasonId1)} 
+                 val2={getCompetitionsCount(player2, selectedSeasonId2)}
+                 suffix=" змагань"
+               />
+            </div>
+          </div>
+
+          {/* New Sections: Distribution & Head-to-Head */}
+          <div className={styles.extraStatsRow}>
+            {/* Points Distribution */}
+            <div className={styles.statsSection}>
+              <div className={styles.sectionHeader}>
+                <i className="fa-solid fa-chart-pie"></i>
+                <h2>Розподіл очок</h2>
+              </div>
+              <div className={styles.distributionContainer}>
+                <div className={styles.distributionChart}>
+                  <p className={styles.chartLabel}>{player1.firstName}</p>
+                  <PointsDistributionChart player={player1} />
+                </div>
+                {player2 && (
+                  <div className={styles.distributionChart}>
+                    <p className={styles.chartLabel}>{player2.firstName}</p>
+                    <PointsDistributionChart player={player2} />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Head to Head */}
+            <div className={styles.statsSection}>
+              <div className={styles.sectionHeader}>
+                <i className="fa-solid fa-handshake"></i>
+                <h2>Особисті зустрічі</h2>
+              </div>
+              <HeadToHeadSection 
+                data={headToHead} 
+                loading={loadingH2H} 
+                p1Name={player1.firstName} 
+                p2Name={player2?.firstName || 'Гравець 2'} 
+              />
+            </div>
+          </div>
+
+          {/* Chess Comparison (if applicable and BOTH played) */}
+          {(selectedSport === 'all' || selectedSport === 'chess') && 
+           player1.sportStats?.some(s => s.sportType === 'chess') && 
+           player2?.sportStats?.some(s => s.sportType === 'chess') && (
+            <div className={styles.statsSection}>
+              <div className={styles.sectionHeader}>
+                <i className="fa-solid fa-chess"></i>
+                <h2>Шахова аналітика</h2>
+              </div>
+              <div className={styles.statsTable}>
+                <StatRow 
+                  label="ELO Рейтинг" 
+                  val1={player1.chessRating || 0} 
+                  val2={player2?.chessRating || 0}
+                  isBetterHigh={true}
+                />
+                <StatRow 
+                  label="Титул" 
+                  val1={player1.chessTitle ? 1 : 0} 
+                  val2={player2?.chessTitle ? 1 : 0}
+                  isBetterHigh={true}
+                  customVal1={player1.chessTitle || '—'}
+                  customVal2={player2?.chessTitle || '—'}
+                />
+                <StatRow 
+                  label="Набрано очок (міжгр.)" 
+                  val1={player1.chessTotalPoints || 0} 
+                  val2={player2?.chessTotalPoints || 0}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const SeasonSelector = ({ seasons, player, selectedId, onChange }: { 
+  seasons: Season[], 
+  player: PlayerDto | null,
+  selectedId: number | null, 
+  onChange: (id: number | null) => void 
+}) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Filter seasons where the player had at least one achievement
+  const filteredSeasons = seasons.filter(s => {
+    if (!player || !player.achievements) return true;
+    
+    const start = new Date(s.startDate);
+    const end = new Date(s.endDate);
+    
+    return player.achievements.some(a => {
+      const achDate = new Date(a.date);
+      return achDate >= start && achDate <= end;
+    });
+  });
+
+  const selectedSeason = seasons.find(s => s.id === selectedId);
+
+  return (
+    <div className={styles.seasonSelector} ref={dropdownRef}>
+      <label>Сезон</label>
+      <div className={styles.customSelect} onClick={() => setIsOpen(!isOpen)}>
+        <span className={styles.currentValue}>
+          {selectedSeason ? selectedSeason.name : 'За весь час'}
+        </span>
+        <i className={`fa-solid fa-chevron-down ${isOpen ? styles.iconOpen : ''}`}></i>
+        
+        {isOpen && (
+          <div className={styles.dropdownList}>
+            <div 
+              className={`${styles.dropdownOption} ${!selectedId ? styles.selectedOption : ''}`}
+              onClick={() => { onChange(null); setIsOpen(false); }}
+            >
+              За весь час
+            </div>
+            {filteredSeasons.map(s => (
+              <div 
+                key={s.id} 
+                className={`${styles.dropdownOption} ${selectedId === s.id ? styles.selectedOption : ''}`}
+                onClick={() => { onChange(s.id); setIsOpen(false); }}
+              >
+                {s.name}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const PlayerCard = ({ player, color, selectedSeason }: { 
+  player: PlayerDto, 
+  color: string,
+  selectedSeason?: Season 
+}) => {
+  const photoSrc = getPhotoUrl(player.photoUrl);
+  
+  // Logic to determine status relative to selected season
+  const getStatus = () => {
+    if (!selectedSeason || !player.enrollmentYear) return null;
+    
+    // Extract year from season name (e.g., "2025-2026" -> 2025)
+    const seasonStartYear = parseInt(selectedSeason.name.split('-')[0]);
+    
+    if (seasonStartYear < player.enrollmentYear) {
+      return { text: 'Ще не вступив', type: 'future' };
+    }
+    
+    // Assume 4 years of Bachelor degree
+    if (seasonStartYear > player.enrollmentYear + 4) {
+      return { text: 'Випускник', type: 'past' };
+    }
+    
+    return null;
+  };
+
+  const status = getStatus();
+
+  const getMedalCounts = () => {
+    if (!player.achievements) return { gold: 0, silver: 0, bronze: 0 };
+    
+    // Filter achievements by season if selected
+    let filtered = player.achievements.filter(a => a.result !== 'Спеціальне досягнення');
+    
+    if (selectedSeason) {
+      const yearStr = selectedSeason.name.match(/\d{4}/)?.[0];
+      if (yearStr) {
+        filtered = filtered.filter(a => a.date.includes(yearStr));
+      }
+    }
+
+    return {
+      gold: filtered.filter(a => a.rank === 1).length,
+      silver: filtered.filter(a => a.rank === 2).length,
+      bronze: filtered.filter(a => a.rank === 3).length
+    };
+  };
+
+  const medals = getMedalCounts();
+
+  return (
+    <div className={`${styles.playerCard} ${status ? styles.inactiveCard : ''}`} style={{ '--accent-color': color } as React.CSSProperties}>
+      <div className={styles.avatarWrapper}>
+        {photoSrc ? (
+          <img src={photoSrc} alt="" className={styles.avatarImg} />
+        ) : (
+          <div className={styles.avatarPlaceholder}>
+            {player.firstName[0]}{player.lastName[0]}
+          </div>
+        )}
+        {status && <div className={styles.statusBadge}>{status.text}</div>}
+      </div>
+      <div className={styles.cardInfo}>
+        <h3 className={styles.cardName}>{player.firstName} {player.lastName}</h3>
+        <p className={styles.cardGroup}>{player.group}</p>
+        
+        <div className={styles.medalsRow}>
+          {medals.gold > 0 && <span className={styles.medalItem} title="Золото"><i className="fa-solid fa-medal" style={{color: '#ffd700'}}></i> {medals.gold}</span>}
+          {medals.silver > 0 && <span className={styles.medalItem} title="Срібло"><i className="fa-solid fa-medal" style={{color: '#c0c0c0'}}></i> {medals.silver}</span>}
+          {medals.bronze > 0 && <span className={styles.medalItem} title="Бронза"><i className="fa-solid fa-medal" style={{color: '#cd7f32'}}></i> {medals.bronze}</span>}
+        </div>
+
+        {player.studyYears && (
+          <div className={styles.cardRank}>
+            <i className="fa-solid fa-calendar-alt"></i> {player.studyYears}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const PointsDistributionChart = ({ player }: { player: PlayerDto }) => {
+  const data = React.useMemo(() => {
+    if (!player.sportStats || player.sportStats.length === 0) return [];
+    return player.sportStats.map(s => ({
+      name: translateSport(s.sportType),
+      value: s.performanceScore
+    })).filter(s => s.value > 0);
+  }, [player]);
+
+  const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+
+  if (data.length === 0) {
+    return <div className={styles.noDataChart}>Немає балів</div>;
+  }
+
+  return (
+    <div style={{ width: '100%', height: 260 }}>
+      <ResponsiveContainer>
+        <PieChart>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            innerRadius={40}
+            outerRadius={70}
+            paddingAngle={5}
+            dataKey="value"
+          >
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Pie>
+          <Tooltip 
+            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+            formatter={(value: any) => [`${value} очок`, 'Бали']}
+          />
+          <Legend iconType="circle" />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
+
+const translateSport = (sport: string) => {
+  const translations: Record<string, string> = {
+    chess: 'Шахи',
+    checkers: 'Шашки',
+    football: 'Футбол',
+    volleyball: 'Волейбол',
+    basketball_3x3: 'Баскетбол',
+    table_tennis: 'Настільний теніс',
+    armwrestling: 'Армрестлінг',
+    badminton: 'Бадмінтон',
+    beach_volleyball: 'Пляжний волейбол'
+  };
+  return translations[sport] || sport;
+};
+
+const HeadToHeadSection = ({ data, loading, p1Name, p2Name }: { data: any, loading: boolean, p1Name: string, p2Name: string }) => {
+  const navigate = useNavigate();
+  if (loading) return <div className={styles.h2hLoading}><div className={styles.spinnerSmall}></div> Пошук матчів...</div>;
+  if (!data || !data.matches || data.matches.length === 0) {
+    return <div className={styles.noH2H}>Гравці ще не зустрічалися в офіційних матчах</div>;
+  }
+
+  const getTournamentUrl = (id: number) => {
+    return `/tournaments/${id}`;
+  };
+
+  const translateResult = (res: string) => {
+    if (!res) return '—';
+    const lowRes = res.toLowerCase();
+    
+    // Most aggressive check for winner names
+    if (lowRes.includes('p1') || lowRes === 'whitewin' || lowRes === 'white') return p1Name;
+    if (lowRes.includes('p2') || lowRes === 'blackwin' || lowRes === 'black') return p2Name;
+    
+    // Specific check for strings like "BlackWin" or "blackwins"
+    if (lowRes.includes('black')) return p2Name;
+    if (lowRes.includes('white')) return p1Name;
+    
+    if (lowRes === 'draw' || lowRes.includes('draw')) return 'Нічия';
+    return res;
+  };
+
+  return (
+    <div className={styles.h2hContainer}>
+      <div className={styles.h2hSummary}>
+        <div className={styles.h2hScoreBlock}>
+          <span className={styles.h2hPlayerName}>{p1Name}</span>
+          <span className={styles.h2hScore}>{data.player1Wins}</span>
+        </div>
+        <div className={styles.h2hDivider}>
+          <span className={styles.h2hDraws}>{data.draws} нічиїх</span>
+        </div>
+        <div className={styles.h2hScoreBlock}>
+          <span className={styles.h2hPlayerName}>{p2Name}</span>
+          <span className={styles.h2hScore}>{data.player2Wins}</span>
+        </div>
+      </div>
+
+      <div className={styles.h2hMatchesList}>
+        {data.matches.map((m: any, idx: number) => (
+          <div 
+            key={idx} 
+            className={styles.h2hMatchItem}
+            onClick={() => navigate(getTournamentUrl(m.tournamentId))}
+            title="Перейти до турніру"
+            style={{ cursor: 'pointer' }}
+          >
+            <div className={styles.h2hMatchSport}>
+              <i className={`fa-solid ${getSportIcon(m.sportType)}`}></i>
+            </div>
+            <div className={styles.h2hMatchInfo}>
+              <div className={styles.h2hMatchName}>{m.tournamentName}</div>
+              <div className={styles.h2hMatchDate}>{new Date(m.date).toLocaleDateString()}</div>
+            </div>
+            <div className={`${styles.h2hMatchResult} ${m.result === 'P1 Won' ? styles.resP1 : m.result === 'P2 Won' ? styles.resP2 : ''}`}>
+              {translateResult(m.result)}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const getSportIcon = (sport: string) => {
+  const icons: Record<string, string> = {
+    chess: 'fa-chess',
+    checkers: 'fa-chess-board',
+    football: 'fa-soccer-ball',
+    volleyball: 'fa-volleyball',
+    basketball_3x3: 'fa-basketball',
+    table_tennis: 'fa-table-tennis-paddle-ball',
+    armwrestling: 'fa-handshake',
+    badminton: 'fa-shuttlecock',
+    beach_volleyball: 'fa-umbrella-beach'
+  };
+  return icons[sport] || 'fa-trophy';
+};
+
+const StatRow = ({ label, val1, val2, suffix = '', isBetterHigh = true, customVal1, customVal2 }: { 
+  label: string, 
+  val1: number | undefined, 
+  val2: number | undefined,
+  suffix?: string,
+  isBetterHigh?: boolean,
+  customVal1?: string,
+  customVal2?: string
+}) => {
+  const v1 = val1 || 0;
+  const v2 = val2 || 0;
+  
+  const is1Better = isBetterHigh ? v1 > v2 : v1 < v2;
+  const is2Better = isBetterHigh ? v2 > v1 : v2 < v1;
+
+  return (
+    <div className={styles.statRow}>
+      <div className={`${styles.statValue} ${is1Better ? styles.betterValue : ''}`}>
+        {customVal1 || (v1 + suffix)}
+      </div>
+      <div className={styles.statLabel}>{label}</div>
+      <div className={`${styles.statValue} ${is2Better ? styles.betterValue : ''}`}>
+        {customVal2 || (v2 !== undefined ? `${v2}${suffix}` : '—')}
+      </div>
+    </div>
+  );
+};
+

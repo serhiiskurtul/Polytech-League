@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import styles from './SeasonStats.module.css';
-import { getTournamentsStats } from '@/shared/api/tournaments.api';
+import { getTournamentsStats } from '@/entities/tournament/api/tournaments.api';
 
 interface Stats {
   totalMatches: number;

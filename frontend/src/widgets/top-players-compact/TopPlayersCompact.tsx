@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import styles from './TopPlayersCompact.module.css';
-import { getPlayersRankings } from '@/shared/api/players.api';
-import { getCurrentSeason } from '@/shared/api/seasonRating.api';
-import { PlayerDto } from '@/shared/types/player.types';
+import { getPlayersRankings } from '@/entities/player/api/players.api';
+import { getCurrentSeason } from '@/entities/rating/api/seasonRating.api';
+import { PlayerDto } from '@/entities/player/model/player.types';
 import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '@/shared/api/axiosInstance';
 import { getPhotoUrl } from '@/shared/utils/photo.utils';

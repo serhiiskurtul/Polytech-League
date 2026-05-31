@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import styles from './MessengerView.module.css';
-import { useChat } from '@/app/providers/ChatProvider';
+import { useChat } from '@/entities/chat';
 import { ConversationList } from './components/ConversationList';
 import { ChatWindow } from './components/ChatWindow';
 

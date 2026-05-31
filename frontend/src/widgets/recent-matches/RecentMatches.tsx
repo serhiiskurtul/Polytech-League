@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './RecentMatches.module.css';
-import { getRecentResults } from '@/shared/api/tournaments.api';
-import { RecentMatch } from '@/shared/types/tournament.types';
+import { getRecentResults } from '@/entities/tournament/api/tournaments.api';
+import { RecentMatch } from '@/entities/tournament/model/tournament.types';
 
 const RecentMatches = () => {
   const navigate = useNavigate();

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './TournamentCalendar.module.css';
-import { getTournaments } from '@/shared/api/tournaments.api';
-import { Tournament } from '@/shared/types/tournament.types';
+import { getTournaments } from '@/entities/tournament/api/tournaments.api';
+import { Tournament } from '@/entities/tournament/model/tournament.types';
 
 const SPORT_CONFIG: Record<string, { label: string; icon: string; color: string }> = {
   'football': { label: 'Футбол', icon: 'fa-futbol', color: 'var(--accent)' },

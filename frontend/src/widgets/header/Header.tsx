@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import styles from './Header.module.css';
 import { Logo } from "@/shared/ui";
-import { useAuth } from "@/app/providers/AuthContext";
+import { useAuth } from '@/entities/session';
 import { useState, useEffect, useRef } from "react";
 
-import { useNotifications } from "@/app/providers/NotificationProvider";
-import { useChat } from "@/app/providers/ChatProvider";
+import { useNotifications } from '@/entities/notification';
+import { useChat } from '@/entities/chat';
 import { getPhotoUrl } from "@/shared/utils/photo.utils";
 
 export default function Header() {

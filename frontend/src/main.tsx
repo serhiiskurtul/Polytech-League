@@ -4,9 +4,9 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './app/App/App'
 import './app/styles/globals.css';
-import { AuthProvider } from './app/providers/AuthContext';
-import { NotificationProvider } from './app/providers/NotificationProvider';
-import { ChatProvider } from './app/providers/ChatProvider';
+import { AuthProvider } from '@/entities/session';
+import { NotificationProvider } from '@/entities/notification';
+import { ChatProvider } from '@/entities/chat';
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 

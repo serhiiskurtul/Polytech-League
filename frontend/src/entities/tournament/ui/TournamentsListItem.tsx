@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import styles from './TournamentsListItem.module.css';
-import SimpleButton from '../../shared/ui/SimpleButton/SimpleButton';
+import SimpleButton from '@/shared/ui/SimpleButton/SimpleButton';
 
 export type TournamentStatus = 'ongoing' | 'upcoming' | 'finished';
 

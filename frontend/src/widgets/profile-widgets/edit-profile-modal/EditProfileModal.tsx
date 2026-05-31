@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PlayerDto } from '@/shared/types/player.types';
+import { PlayerDto } from '@/entities/player/model/player.types';
 import styles from './EditProfileModal.module.css';
 
 interface EditProfileModalProps {
