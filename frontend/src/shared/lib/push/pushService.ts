@@ -2,7 +2,6 @@
  * Utility to handle PWA Push Notifications subscription
  */
 
-import { BASE_URL } from '@/shared/api/axiosInstance';
 
 const PUBLIC_VAPID_KEY = 'BB47cRWxaTwglHKmdQMGkRTn1bMJvD2GGG7a8wr5eEpdCi-KMABJXIUdjG0URYBEcb8PWOcQudBEs9FlsCrsYi0';
 
