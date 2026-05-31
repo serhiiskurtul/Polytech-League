@@ -84,6 +84,8 @@ export const PlayerComparePage = () => {
               footballRegionalGoals: rankingInfo.footballRegionalGoals,
               footballNationalGoals: rankingInfo.footballNationalGoals,
               hatTricksCount: rankingInfo.hatTricksCount,
+              pokersCount: rankingInfo.pokersCount,
+              pentatricksCount: rankingInfo.pentatricksCount,
               finalGoalsCount: rankingInfo.finalGoalsCount,
               semifinalGoalsCount: rankingInfo.semifinalGoalsCount,
               finalMatchesCount: rankingInfo.finalMatchesCount,
@@ -106,6 +108,8 @@ export const PlayerComparePage = () => {
             footballRegionalGoals: 0,
             footballNationalGoals: 0,
             hatTricksCount: 0,
+            pokersCount: 0,
+            pentatricksCount: 0,
             finalGoalsCount: 0,
             semifinalGoalsCount: 0,
             finalMatchesCount: 0,
@@ -380,6 +384,18 @@ export const PlayerComparePage = () => {
                           val1={player1.hatTricksCount} 
                           val2={player2?.hatTricksCount}
                           suffix=" хет-триків"
+                        />
+                        <StatRow 
+                          label="Покери" 
+                          val1={player1.pokersCount} 
+                          val2={player2?.pokersCount}
+                          suffix=" покерів"
+                        />
+                        <StatRow 
+                          label="Пентатрики" 
+                          val1={player1.pentatricksCount} 
+                          val2={player2?.pentatricksCount}
+                          suffix=" пентатриків"
                         />
                         <StatRow 
                           label="Голи у фіналах" 
