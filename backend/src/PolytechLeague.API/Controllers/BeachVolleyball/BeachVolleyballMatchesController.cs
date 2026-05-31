@@ -42,6 +42,7 @@ public class BeachVolleyballMatchesController(
         await beachVolleyballMatchService.CreateAsync(entity, cancellationToken);
 
         await redisService.RemoveGroupAsync("beach_volleyball_matches_group");
+        await redisService.RemoveGroupAsync("beachvolleyball_events_group");
 
         return Created();
     }
@@ -57,6 +58,7 @@ public class BeachVolleyballMatchesController(
         await beachVolleyballMatchService.UpdateAsync(id, entity, cancellationToken);
 
         await redisService.RemoveGroupAsync("beach_volleyball_matches_group");
+        await redisService.RemoveGroupAsync("beachvolleyball_events_group");
 
         return NoContent();
     }
@@ -68,6 +70,7 @@ public class BeachVolleyballMatchesController(
         await beachVolleyballMatchService.DeleteAsync(id, cancellationToken);
 
         await redisService.RemoveGroupAsync("beach_volleyball_matches_group");
+        await redisService.RemoveGroupAsync("beachvolleyball_events_group");
 
         return NoContent();
     }

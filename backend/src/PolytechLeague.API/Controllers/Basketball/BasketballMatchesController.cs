@@ -42,6 +42,7 @@ public class BasketballMatchesController(
         await basketball3x3MatchService.CreateAsync(entity, cancellationToken);
 
         await redisService.RemoveGroupAsync("basketball3x3_matches_group");
+        await redisService.RemoveGroupAsync("basketball3x3_events_group");
 
         return Created();
     }
@@ -57,6 +58,7 @@ public class BasketballMatchesController(
         await basketball3x3MatchService.UpdateAsync(id, entity, cancellationToken);
 
         await redisService.RemoveGroupAsync("basketball3x3_matches_group");
+        await redisService.RemoveGroupAsync("basketball3x3_events_group");
 
         return NoContent();
     }
@@ -68,6 +70,7 @@ public class BasketballMatchesController(
         await basketball3x3MatchService.DeleteAsync(id, cancellationToken);
 
         await redisService.RemoveGroupAsync("basketball3x3_matches_group");
+        await redisService.RemoveGroupAsync("basketball3x3_events_group");
 
         return NoContent();
     }
