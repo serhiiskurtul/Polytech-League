@@ -41,8 +41,10 @@ const PlayerViewPage = () => {
           data.globalRank = rankData.globalRank;
           data.performanceScore = rankData.performanceScore;
           data.sportStats = rankData.sportStats;
-        } catch (rankErr) {
-          console.error("Failed to fetch player rank:", rankErr);
+        } catch (rankErr: any) {
+          if (rankErr?.response?.status !== 404) {
+            console.error("Failed to fetch player rank:", rankErr);
+          }
           // Non-fatal, profile still loads
         }
         

@@ -63,8 +63,10 @@ const ProfilePage = () => {
             data.performanceScore = rankData.performanceScore;
             data.sportStats = rankData.sportStats;
           }
-        } catch (e) {
-          console.error("Failed to fetch profile rank:", e);
+        } catch (e: any) {
+          if (e?.response?.status !== 404) {
+            console.error("Failed to fetch profile rank:", e);
+          }
         }
         
         setPlayerProfile(data);
