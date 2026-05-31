@@ -72,7 +72,6 @@ import {
   removeTableTennisParticipant
 } from '@/shared/api';
 import { RegistrationStatus } from '@/shared/types/tournament.types';
-import TournamentPodium from './TournamentPodium';
 import FootballBracket from './FootballBracket';
 import styles from '../TournamentViewPage.module.css';
 import { Link } from 'react-router-dom';
@@ -1151,21 +1150,6 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         </div>
       </div>
 
-      {/* Podium */}
-      {(details.firstPlaceTeam || details.secondPlaceTeam || details.thirdPlaceTeam || details.mvpId) && (
-        <div className={styles.podiumSection}>
-           <TournamentPodium 
-             firstPlace={details.firstPlaceTeam}
-             secondPlace={details.secondPlaceTeam}
-             thirdPlace={details.thirdPlaceTeam}
-             mvpId={details.mvpId}
-             mvpName={details.mvpName}
-             isTeam={true}
-             onViewRoster={(teamId) => { setEditingTeamId(teamId); setIsTeamRosterModalOpen(true); }}
-           />
-
-        </div>
-      )}
 
 
 

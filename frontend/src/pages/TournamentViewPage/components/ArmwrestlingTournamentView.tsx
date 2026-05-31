@@ -19,7 +19,6 @@ import {
   rejectArmwrestlingParticipant
 } from '@/shared/api/armwrestling.api';
 import ArmwrestlingBracket from './ArmwrestlingBracket';
-import TournamentPodium from './TournamentPodium';
 import PlayerSearchInput from './PlayerSearchInput';
 import styles from '../TournamentViewPage.module.css';
 
@@ -474,14 +473,6 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
         </div>
       </div>
 
-      {/* Podium Display */}
-      {(details.firstPlace || details.secondPlace || details.thirdPlace) && !showSetWinners && (
-        <TournamentPodium
-          firstPlace={details.firstPlace}
-          secondPlace={details.secondPlace}
-          thirdPlace={details.thirdPlace}
-        />
-      )}
 
       {/* Admin Panel for Winners */}
       {isAdmin && showSetWinners && (

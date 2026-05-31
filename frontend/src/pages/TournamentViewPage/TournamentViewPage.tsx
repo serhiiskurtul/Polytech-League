@@ -138,6 +138,7 @@ const TournamentViewPage = () => {
   const { user } = useAuth();
   const [tournament, setTournament] = useState<Tournament | null>(null);
   const [details, setDetails] = useState<any | null>(null);
+  const [viewingRosterTeamId, setViewingRosterTeamId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'standings' | 'games' | 'participants' | 'schedule' | 'voting'>('standings');
   const [isLoading, setIsLoading] = useState(true);
   const [isRegistering, setIsRegistering] = useState(false);
@@ -1975,20 +1976,17 @@ const TournamentViewPage = () => {
             </div>
           </div>
 
-          {(tournament?.sport === 'chess' ||
-            tournament?.sport === 'checkers' ||
-            tournament?.sport === 'badminton' ||
-            tournament?.sport === 'table_tennis' ||
-            tournament?.sport === 'table-tennis') && details && (
-              <TournamentPodium
-                firstPlace={details.firstPlace}
-                secondPlace={details.secondPlace}
-                thirdPlace={details.thirdPlace}
-                mvpId={['chess', 'checkers', 'athletics', 'table_tennis', 'tabletennis', 'badminton', 'beach_volleyball', 'beachvolleyball', 'armwrestling'].includes(tournament?.sport?.toLowerCase() || '') ? null : details.mvpId}
-                mvpName={['chess', 'checkers', 'athletics', 'table_tennis', 'tabletennis', 'badminton', 'beach_volleyball', 'beachvolleyball', 'armwrestling'].includes(tournament?.sport?.toLowerCase() || '') ? null : details.mvpName}
-              />
-
-            )}
+          {details && (details.firstPlace || details.secondPlace || details.thirdPlace || details.firstPlaceTeam || details.secondPlaceTeam || details.thirdPlaceTeam || details.mvpId) && (
+            <TournamentPodium
+              firstPlace={isTeamSport ? details.firstPlaceTeam : details.firstPlace}
+              secondPlace={isTeamSport ? details.secondPlaceTeam : details.secondPlace}
+              thirdPlace={isTeamSport ? details.thirdPlaceTeam : details.thirdPlace}
+              mvpId={['chess', 'checkers', 'athletics', 'table_tennis', 'tabletennis', 'badminton', 'beach_volleyball', 'beachvolleyball', 'armwrestling'].includes(tournament?.sport?.toLowerCase() || '') ? null : details.mvpId}
+              mvpName={['chess', 'checkers', 'athletics', 'table_tennis', 'tabletennis', 'badminton', 'beach_volleyball', 'beachvolleyball', 'armwrestling'].includes(tournament?.sport?.toLowerCase() || '') ? null : details.mvpName}
+              isTeam={isTeamSport}
+              onViewRoster={(teamId) => setViewingRosterTeamId(teamId)}
+            />
+          )}
 
           {['chess', 'checkers'].includes(tournament?.sport?.toLowerCase() || '') && details && (() => {
             const findBoardForPlayer = (playerId: number) => {
@@ -3869,6 +3867,33 @@ const TournamentViewPage = () => {
           )}
         </>
       </div>
+
+      {viewingRosterTeamId !== null && (
+        <div className={styles.rosterModalOverlay} onClick={() => setViewingRosterTeamId(null)}>
+          <div className={styles.rosterModal} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3>Склад команди: {details?.teams?.find((t: any) => t.id === viewingRosterTeamId)?.name}</h3>
+              <button className={styles.closeButton} onClick={() => setViewingRosterTeamId(null)}>&times;</button>
+            </div>
+            <div className={styles.modalBody} style={{ maxHeight: '400px', overflowY: 'auto', padding: '20px' }}>
+              <div className={styles.playersList}>
+                {details?.teams?.find((t: any) => t.id === viewingRosterTeamId)?.players?.map((player: any) => (
+                  <div key={player.id} className={styles.playerPickItem} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 16px', background: '#f8fafc', borderRadius: '10px', marginBottom: '8px', border: '1px solid #e2e8f0', cursor: 'default' }}>
+                    <span style={{ fontWeight: 600, color: '#1e293b' }}>
+                      {player.footballShirtNumber ? `№${player.footballShirtNumber} ` : ''}
+                      {player.lastName} {player.firstName}
+                    </span>
+                    <span style={{ color: '#64748b' }}>{player.group}</span>
+                  </div>
+                ))}
+                {(!details?.teams?.find((t: any) => t.id === viewingRosterTeamId)?.players || details?.teams?.find((t: any) => t.id === viewingRosterTeamId)?.players.length === 0) && (
+                  <p style={{ textAlign: 'center', color: '#64748b' }}>У цій команді ще немає гравців</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

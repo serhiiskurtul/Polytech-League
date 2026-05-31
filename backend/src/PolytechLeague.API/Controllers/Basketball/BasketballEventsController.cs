@@ -15,27 +15,27 @@ public class BasketballEventsController(
     [HttpGet]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
-        var cached = await redisService.GetDataAsync<IEnumerable<BasketballEventResponse>>("basketball3x3_events_all");
+        var cached = await redisService.GetDataAsync<IEnumerable<BasketballEventResponse>>("basketball_events_all");
         if (cached != null) return Ok(cached);
 
         var entities = await basketball3x3EventService.GetAllAsync(cancellationToken: cancellationToken);
         var response = entities.Select(e => e.ToResponse()).ToList();
 
-        await redisService.SetDataAsync("basketball3x3_events_all", response, TimeSpan.FromHours(24), "basketball3x3_events_group");
+        await redisService.SetDataAsync("basketball_events_all", response, TimeSpan.FromHours(24), "basketball_events_group");
         return Ok(response);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(long id, CancellationToken cancellationToken)
     {
-        var cacheKey = $"basketball3x3_event_{id}";
+        var cacheKey = $"basketball_event_{id}";
         var cached = await redisService.GetDataAsync<BasketballEventResponse>(cacheKey);
         if (cached != null) return Ok(cached);
 
         var entity = await basketball3x3EventService.GetByIdAsync(id, cancellationToken);
         var response = entity.ToResponse();
 
-        await redisService.SetDataAsync(cacheKey, response, TimeSpan.FromHours(24), "basketball3x3_events_group");
+        await redisService.SetDataAsync(cacheKey, response, TimeSpan.FromHours(24), "basketball_events_group");
         return Ok(response);
     }
 
@@ -48,7 +48,7 @@ public class BasketballEventsController(
         var entity = request.FromRequest();
         await basketball3x3EventService.CreateAsync(entity, cancellationToken);
 
-        await redisService.RemoveGroupAsync("basketball3x3_events_group");
+        await redisService.RemoveGroupAsync("basketball_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
 
         return Created();
@@ -64,7 +64,7 @@ public class BasketballEventsController(
         var entity = request.FromRequest();
         await basketball3x3EventService.UpdateAsync(id, entity, cancellationToken);
 
-        await redisService.RemoveGroupAsync("basketball3x3_events_group");
+        await redisService.RemoveGroupAsync("basketball_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
         await redisService.RemoveGroupAsync("tournaments_byid_group");
 
@@ -77,7 +77,7 @@ public class BasketballEventsController(
     {
         await basketball3x3EventService.DeleteAsync(id, cancellationToken);
 
-        await redisService.RemoveGroupAsync("basketball3x3_events_group");
+        await redisService.RemoveGroupAsync("basketball_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
         await redisService.RemoveGroupAsync("tournaments_byid_group");
 
@@ -89,7 +89,7 @@ public class BasketballEventsController(
     public async Task<IActionResult> Register(long id, [FromQuery] long playerId, CancellationToken cancellationToken)
     {
         await basketball3x3EventService.RegisterPlayerAsync(id, playerId, cancellationToken);
-        await redisService.RemoveGroupAsync("basketball3x3_events_group");
+        await redisService.RemoveGroupAsync("basketball_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
@@ -100,7 +100,7 @@ public class BasketballEventsController(
     public async Task<IActionResult> ApproveParticipant(long id, long playerId, CancellationToken cancellationToken)
     {
         await basketball3x3EventService.ApproveParticipantAsync(id, playerId, cancellationToken);
-        await redisService.RemoveGroupAsync("basketball3x3_events_group");
+        await redisService.RemoveGroupAsync("basketball_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
@@ -111,7 +111,7 @@ public class BasketballEventsController(
     public async Task<IActionResult> RejectParticipant(long id, long playerId, CancellationToken cancellationToken)
     {
         await basketball3x3EventService.RejectParticipantAsync(id, playerId, cancellationToken);
-        await redisService.RemoveGroupAsync("basketball3x3_events_group");
+        await redisService.RemoveGroupAsync("basketball_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
@@ -122,7 +122,7 @@ public class BasketballEventsController(
     public async Task<IActionResult> RemoveParticipant(long id, long playerId, CancellationToken cancellationToken)
     {
         await basketball3x3EventService.RemoveParticipantAsync(id, playerId, cancellationToken);
-        await redisService.RemoveGroupAsync("basketball3x3_events_group");
+        await redisService.RemoveGroupAsync("basketball_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return NoContent();

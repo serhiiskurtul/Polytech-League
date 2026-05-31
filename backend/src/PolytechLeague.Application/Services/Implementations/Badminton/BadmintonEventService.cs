@@ -97,16 +97,16 @@ public class BadmintonEventService(
 
     protected override async Task OnUpdatedAsync(BadmintonEvent oldEntity, BadmintonEvent newEntity, CancellationToken cancellationToken)
     {
-        bool individualWinnersSet = newEntity.FirstPlaceId != null && newEntity.SecondPlaceId != null && newEntity.ThirdPlaceId != null;
-        bool teamWinnersSet = newEntity.FirstPlaceTeamId != null && newEntity.SecondPlaceTeamId != null && newEntity.ThirdPlaceTeamId != null;
+        bool individualWinnersSet = oldEntity.FirstPlaceId != null && oldEntity.SecondPlaceId != null && oldEntity.ThirdPlaceId != null;
+        bool teamWinnersSet = oldEntity.FirstPlaceTeamId != null && oldEntity.SecondPlaceTeamId != null && oldEntity.ThirdPlaceTeamId != null;
         
         if (individualWinnersSet || teamWinnersSet)
         {
             await _notificationService.SendNotificationToAllAsync(
                 "Змагання завершено!",
-                $"Визначено переможців у змаганні з бадмінтону: {newEntity.Name}",
+                $"Визначено переможців у змаганні з бадмінтону: {oldEntity.Name}",
                 NotificationType.Tournament,
-                $"/tournaments/{newEntity.Id}",
+                $"/tournaments/{oldEntity.Id}",
                 true
             );
         }
