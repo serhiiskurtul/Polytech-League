@@ -27,6 +27,18 @@ const PlayersRatingPage = () => {
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [selectedSeasonId, setSelectedSeasonId] = useState<string>('all');
   const [selectedGender, setSelectedGender] = useState<'all' | 'male' | 'female'>('all');
+  const [lockedTooltipId, setLockedTooltipId] = useState<number | null>(null);
+
+  // Close tooltip on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (!(e.target as Element).closest(`.${styles.breakdownTrigger}`)) {
+        setLockedTooltipId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (players.length > 0 && p1Id && selectedPlayers.length === 0) {
@@ -467,7 +479,13 @@ const PlayersRatingPage = () => {
                             <div className={styles.pointsLabel}>очок</div>
 
                             {player.pointsBreakdown && player.pointsBreakdown.length > 0 && (
-                              <div className={styles.breakdownTrigger}>
+                              <div 
+                                className={`${styles.breakdownTrigger} ${lockedTooltipId === player.id ? styles.tooltipLockedWrapper : ''}`}
+                                onClick={(e) => {
+                                  if ((e.target as Element).closest(`.${styles.breakdownTooltip}`)) return;
+                                  setLockedTooltipId(prev => prev === player.id ? null : (player.id || null));
+                                }}
+                              >
                                 <i className="fa-solid fa-circle-info"></i>
                                 <div className={`${styles.breakdownTooltip} ${index < 3 ? styles.tooltipDown : ''}`}>
                                   <div className={styles.breakdownHeader}>Деталізація балів</div>
