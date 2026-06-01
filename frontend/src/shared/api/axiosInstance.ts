@@ -29,7 +29,11 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+      if (config.headers && typeof config.headers.set === 'function') {
+        config.headers.set('Authorization', `Bearer ${token}`);
+      } else {
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
     }
     return config;
   },
@@ -75,24 +79,43 @@ api.interceptors.response.use(
       (originalRequest as any)._retry = true;
       isRefreshing = true;
 
-      try {
-        const refreshToken = localStorage.getItem('refreshToken');
-        const response = await axios.post(`${API_URL}/refresh`, { refreshToken }, { withCredentials: true });
-        
-        const { accessToken, refreshToken: newRefreshToken } = response.data;
-        localStorage.setItem('token', accessToken);
-        localStorage.setItem('refreshToken', newRefreshToken);
+      const currentRefreshToken = localStorage.getItem('refreshToken');
 
-        processQueue(null, accessToken);
-        return api(originalRequest);
-      } catch (refreshError) {
-        processQueue(refreshError, null);
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
-        window.location.href = '/login';
-        return Promise.reject(refreshError);
-      } finally {
-        isRefreshing = false;
+      const performRefresh = async () => {
+        try {
+          const refreshToken = localStorage.getItem('refreshToken');
+          const response = await axios.post(`${API_URL}/refresh`, { refreshToken }, { withCredentials: true });
+          
+          const { accessToken, refreshToken: newRefreshToken } = response.data;
+          localStorage.setItem('token', accessToken);
+          localStorage.setItem('refreshToken', newRefreshToken);
+
+          processQueue(null, accessToken);
+          return api(originalRequest);
+        } catch (refreshError) {
+          processQueue(refreshError, null);
+          localStorage.removeItem('token');
+          localStorage.removeItem('refreshToken');
+          window.location.href = '/login';
+          return Promise.reject(refreshError);
+        } finally {
+          isRefreshing = false;
+        }
+      };
+
+      if (navigator.locks) {
+        return navigator.locks.request('refresh_token_lock', async () => {
+          const tokenNow = localStorage.getItem('refreshToken');
+          if (tokenNow !== currentRefreshToken) {
+            // Another tab already refreshed the token
+            isRefreshing = false;
+            processQueue(null, localStorage.getItem('token'));
+            return api(originalRequest);
+          }
+          return await performRefresh();
+        });
+      } else {
+        return await performRefresh();
       }
     }
 
