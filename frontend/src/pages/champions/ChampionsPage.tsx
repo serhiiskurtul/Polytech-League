@@ -100,7 +100,7 @@ const ChampionsPage: React.FC = () => {
     <div className={styles.pageContainer}>
       <header className={styles.header}>
         <div className={styles.headerContent}>
-          <i className="fas fa-crown" style={{ fontSize: '3.5rem', color: '#6366f1', marginBottom: '1.5rem', filter: 'drop-shadow(0 0 15px rgba(99, 102, 241, 0.4))' }}></i>
+          <i className="fas fa-crown" style={{ fontSize: '3.5rem', color: '#3b82f6', marginBottom: '1.5rem', filter: 'drop-shadow(0 0 15px rgba(59, 130, 246, 0.4))' }}></i>
           <h1 className={styles.title}>Зала слави</h1>
           <p className={styles.subtitle}>Історія чемпіонів Polytech League крізь роки</p>
         </div>

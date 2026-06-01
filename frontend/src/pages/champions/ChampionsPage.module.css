@@ -37,7 +37,7 @@
   font-weight: 900;
   margin-bottom: 1rem;
   letter-spacing: -0.02em;
-  background: linear-gradient(to right, #818cf8, #a78bfa);
+  background: linear-gradient(to right, #3b82f6, #60a5fa);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-transform: uppercase;
@@ -71,7 +71,7 @@
   bottom: 0;
   left: 50%;
   width: 2px;
-  background: linear-gradient(to bottom, transparent, #c7d2fe, #818cf8, #c7d2fe, transparent);
+  background: linear-gradient(to bottom, transparent, #bfdbfe, #3b82f6, #bfdbfe, transparent);
   transform: translateX(-50%);
   border-radius: 4px;
 }
@@ -93,13 +93,13 @@
 
 .seasonYear {
   background: white;
-  color: #4f46e5;
+  color: #2563eb;
   font-size: 1.5rem;
   font-weight: 800;
   padding: 10px 24px;
   border-radius: 30px;
-  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.15);
-  border: 2px solid #e0e7ff;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.15);
+  border: 2px solid #dbeafe;
 }
 
 .seasonCount {
@@ -147,17 +147,17 @@
   width: 14px;
   height: 14px;
   background: white;
-  border: 3px solid #6366f1;
+  border: 3px solid #3b82f6;
   border-radius: 50%;
   z-index: 5;
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
 }
 
 .timelineConnector {
   position: absolute;
   top: 50%;
   height: 2px;
-  background: #e0e7ff;
+  background: #dbeafe;
   z-index: 1;
 }
 
@@ -197,15 +197,15 @@
 
 .timelineCard:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(99, 102, 241, 0.12);
-  border-color: #c7d2fe;
+  box-shadow: 0 12px 30px rgba(59, 130, 246, 0.12);
+  border-color: #bfdbfe;
 }
 
 .sportBadge {
   position: absolute;
   top: -12px;
   left: 20px;
-  background: #4f46e5;
+  background: #2563eb;
   color: white;
   padding: 4px 12px;
   border-radius: 20px;
@@ -214,7 +214,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
   z-index: 2;
 }
 
@@ -258,7 +258,7 @@
 }
 
 .playerNameLink:hover {
-  color: #4f46e5;
+  color: #2563eb;
   text-decoration: underline;
 }
 
@@ -279,8 +279,8 @@
 
 .detailPill {
   font-size: 0.75rem;
-  color: #4f46e5;
-  background: #e0e7ff;
+  color: #2563eb;
+  background: #dbeafe;
   padding: 4px 10px;
   border-radius: 12px;
   font-weight: 600;
@@ -346,7 +346,7 @@
 }
 
 .addLegendBtn {
-  background: #4f46e5;
+  background: #2563eb;
   color: white;
   border: none;
   padding: 12px 24px;
@@ -362,7 +362,7 @@
 }
 
 .addLegendBtn:hover {
-  background: #4338ca;
+  background: #1d4ed8;
   transform: translateY(-2px);
 }
 
@@ -408,7 +408,7 @@
 
 .formInput:focus {
   outline: none;
-  border-color: #818cf8;
+  border-color: #3b82f6;
   background: white;
 }
 
@@ -448,7 +448,7 @@
   width: 50px;
   height: 50px;
   border: 4px solid #f1f5f9;
-  border-top-color: #4f46e5;
+  border-top-color: #2563eb;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
