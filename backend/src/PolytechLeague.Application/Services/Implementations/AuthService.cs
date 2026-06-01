@@ -69,10 +69,6 @@ public class AuthService(
             throw new AuthenticationException("Refresh token is revoked.");
         }
 
-        oldRefreshToken.IsRevoked = true;
-        await refreshTokenService.UpdateAsync(
-            oldRefreshToken.Id, oldRefreshToken, cancellationToken);
-
         var user = await userService.GetByIdAsync(oldRefreshToken.UserId, cancellationToken);
 
         if (user.IsBlocked)
@@ -81,14 +77,11 @@ public class AuthService(
         }
 
         var newAccessToken = jwtService.GenerateAccessToken(user);
-        var newRefreshToken = jwtService.GenerateRefreshToken(user.Id);
-
-        await refreshTokenService.CreateAsync(newRefreshToken, cancellationToken);
 
         return new AuthResponse
         {
             AccessToken = newAccessToken,
-            RefreshToken = newRefreshToken.Token
+            RefreshToken = oldRefreshToken.Token
         };
     }
 }
