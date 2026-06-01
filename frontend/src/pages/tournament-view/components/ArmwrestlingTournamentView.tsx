@@ -459,7 +459,7 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
         <div className={styles.categoryInfo}>
           <span className={styles.badge}>
             {details.level === 'CollegeGroup' ? 'Міжгруповий рівень' :
-             details.level === 'Regional' ? 'Регіональний рівень' :
+             details.level === 'Regional' ? 'Обласний рівень' :
              details.level === 'National' ? 'Національний рівень' : details.level}
           </span>
           {isAdmin && (

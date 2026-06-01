@@ -36,7 +36,7 @@ const SettingsSection = ({ formData, handleInputChange }: SettingsSectionProps) 
               required
             >
               <option value="CollegeGroup">Міжгрупові (коледж)</option>
-              <option value="Regional">Регіональні</option>
+              <option value="Regional">Обласні</option>
               <option value="National">Всеукраїнські</option>
             </select>
           </div>
