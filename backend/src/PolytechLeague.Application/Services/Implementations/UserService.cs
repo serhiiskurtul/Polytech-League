@@ -95,21 +95,21 @@ public class UserService : AbstractEntityService<User>, IUserService
         }
 
         // Delete Conversations and Messages
-        var conversations = await _dbcontext.Set<Conversation>()
+        var userConversations = await _dbcontext.Set<Conversation>()
             .Where(c => c.User1Id == id || c.User2Id == id)
             .ToListAsync(cancellationToken);
 
-        if (conversations.Any())
+        if (userConversations.Any())
         {
-            var conversationIds = conversations.Select(c => c.Id).ToList();
-            var messages = await _dbcontext.Set<Message>()
+            var conversationIds = userConversations.Select(c => c.Id).ToList();
+            var conversationMessages = await _dbcontext.Set<Message>()
                 .Where(m => conversationIds.Contains(m.ConversationId))
                 .ToListAsync(cancellationToken);
             
-            if (messages.Any())
-                _dbcontext.Set<Message>().RemoveRange(messages);
+            if (conversationMessages.Any())
+                _dbcontext.Set<Message>().RemoveRange(conversationMessages);
 
-            _dbcontext.Set<Conversation>().RemoveRange(conversations);
+            _dbcontext.Set<Conversation>().RemoveRange(userConversations);
         }
 
         // Also delete any remaining messages sent by user in other conversations
@@ -120,11 +120,11 @@ public class UserService : AbstractEntityService<User>, IUserService
             _dbcontext.Set<Message>().RemoveRange(otherMessages);
 
         // Delete ProfileMergeRequests
-        var mergeRequests = await _dbcontext.Set<ProfileMergeRequest>()
+        var userMergeRequests = await _dbcontext.Set<ProfileMergeRequest>()
             .Where(r => r.UserId == id)
             .ToListAsync(cancellationToken);
-        if (mergeRequests.Any())
-            _dbcontext.Set<ProfileMergeRequest>().RemoveRange(mergeRequests);
+        if (userMergeRequests.Any())
+            _dbcontext.Set<ProfileMergeRequest>().RemoveRange(userMergeRequests);
 
         var persons = await _dbcontext.Set<Person>()
             .Where(p => p.UserId == id)
