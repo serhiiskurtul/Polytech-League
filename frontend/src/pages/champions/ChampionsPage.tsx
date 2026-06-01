@@ -213,9 +213,6 @@ const ChampionsPage: React.FC = () => {
               <div key={season} className={styles.timelineSeason}>
                 <div className={styles.seasonMarker}>
                   <span className={styles.seasonYear}>{season}</span>
-                  <span className={styles.seasonCount}>
-                    {groupedChampions[season].length} {groupedChampions[season].length === 1 ? 'чемпіон' : groupedChampions[season].length >= 2 && groupedChampions[season].length <= 4 ? 'чемпіони' : 'чемпіонів'}
-                  </span>
                 </div>
                 
                 <div className={styles.timelineItems}>
@@ -268,6 +265,17 @@ const ChampionsPage: React.FC = () => {
                                 </div>
                               )}
                             </div>
+                            
+                            {champion.teamMembers && champion.teamMembers.length > 0 && (
+                              <div className={styles.teamMembersContainer}>
+                                <div className={styles.teamMembersTitle}>
+                                  <i className="fas fa-users"></i> Склад команди:
+                                </div>
+                                <div className={styles.teamMembersList}>
+                                  {champion.teamMembers.join(', ')}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
 

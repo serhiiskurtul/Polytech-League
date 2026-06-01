@@ -740,6 +740,8 @@ public class TournamentService : ITournamentService
             string? photoUrl = null;
             Gender champGender = Gender.None;
 
+            var teamMembers = new List<string>();
+
             if (e.FirstPlaceId != null)
             {
                 playerName = $"{e.FirstPlace!.FirstName} {e.FirstPlace.LastName}";
@@ -749,23 +751,27 @@ public class TournamentService : ITournamentService
             }
             else if (e is FootballEvent fe && fe.FirstPlaceTeamId != null)
             {
-                var team = await _context.FootballTeams.FindAsync(fe.FirstPlaceTeamId);
+                var team = await _context.FootballTeams.Include(t => t.Players).FirstOrDefaultAsync(t => t.Id == fe.FirstPlaceTeamId);
                 playerName = team?.Name ?? "Команда";
+                if (team?.Players != null) teamMembers = team.Players.Select(p => $"{p.FirstName} {p.LastName}").ToList();
             }
             else if (e is VolleyballEvent ve && ve.FirstPlaceTeamId != null)
             {
-                var team = await _context.VolleyballTeams.FindAsync(ve.FirstPlaceTeamId);
+                var team = await _context.VolleyballTeams.Include(t => t.Players).FirstOrDefaultAsync(t => t.Id == ve.FirstPlaceTeamId);
                 playerName = team?.Name ?? "Команда";
+                if (team?.Players != null) teamMembers = team.Players.Select(p => $"{p.FirstName} {p.LastName}").ToList();
             }
             else if (e is BasketballEvent be && be.FirstPlaceTeamId != null)
             {
-                var team = await _context.BasketballTeams.FindAsync(be.FirstPlaceTeamId);
+                var team = await _context.BasketballTeams.Include(t => t.Players).FirstOrDefaultAsync(t => t.Id == be.FirstPlaceTeamId);
                 playerName = team?.Name ?? "Команда";
+                if (team?.Players != null) teamMembers = team.Players.Select(p => $"{p.FirstName} {p.LastName}").ToList();
             }
             else if (e is BeachVolleyballEvent bve && bve.FirstPlaceTeamId != null)
             {
-                var team = await _context.BeachVolleyballTeams.FindAsync(bve.FirstPlaceTeamId);
+                var team = await _context.BeachVolleyballTeams.Include(t => t.Players).FirstOrDefaultAsync(t => t.Id == bve.FirstPlaceTeamId);
                 playerName = team?.Name ?? "Команда";
+                if (team?.Players != null) teamMembers = team.Players.Select(p => $"{p.FirstName} {p.LastName}").ToList();
             }
 
             dtos.Add(new PolytechLeague.Application.Dto.General.ChampionDto
@@ -780,7 +786,8 @@ public class TournamentService : ITournamentService
                 Date = e.Date,
                 Points = points,
                 Gender = champGender,
-                WeightClass = (e is ArmwrestlingEvent armEvent) ? armEvent.WeightClass.ToString() : null
+                WeightClass = (e is ArmwrestlingEvent armEvent) ? armEvent.WeightClass.ToString() : null,
+                TeamMembers = teamMembers
             });
         }
 

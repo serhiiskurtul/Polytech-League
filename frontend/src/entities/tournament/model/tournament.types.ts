@@ -69,4 +69,5 @@ export interface Champion {
   points: number;
   gender: 'Male' | 'Female' | 'None';
   weightClass?: string;
+  teamMembers?: string[];
 }

@@ -288,6 +288,31 @@
   display: inline-block;
 }
 
+.teamMembersContainer {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #e2e8f0;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.teamMembersTitle {
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.teamMembersTitle i {
+  color: #2563eb;
+}
+
+.teamMembersList {
+  line-height: 1.4;
+}
+
 .deleteBtn {
   position: absolute;
   top: 10px;
