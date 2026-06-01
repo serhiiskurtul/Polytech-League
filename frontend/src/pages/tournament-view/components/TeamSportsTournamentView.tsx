@@ -80,6 +80,18 @@ import toast from 'react-hot-toast';
 
 type Sport = 'volleyball' | 'волейбол' | 'beach_volleyball' | 'beach-volleyball' | 'пляжний_волейбол' | 'football' | 'футбол' | 'basketball_3x3' | 'basketball3x3' | 'basketball-3x3' | 'баскетбол_3х3' | 'badminton' | 'бадмінтон' | 'chess' | 'шахи' | 'checkers' | 'шашки' | 'tabletennis' | 'table_tennis' | 'table-tennis' | 'настільний_теніс';
 
+const getCanonicalSport = (s: Sport): Sport => {
+  if (['volleyball', 'волейбол'].includes(s)) return 'volleyball';
+  if (['beach_volleyball', 'beach-volleyball', 'пляжний_волейбол'].includes(s)) return 'beach_volleyball';
+  if (['football', 'футбол'].includes(s)) return 'football';
+  if (['basketball_3x3', 'basketball3x3', 'basketball-3x3', 'баскетбол_3х3'].includes(s)) return 'basketball_3x3';
+  if (['badminton', 'бадмінтон'].includes(s)) return 'badminton';
+  if (['chess', 'шахи'].includes(s)) return 'chess';
+  if (['checkers', 'шашки'].includes(s)) return 'checkers';
+  if (['tabletennis', 'table_tennis', 'table-tennis', 'настільний_теніс'].includes(s)) return 'tabletennis';
+  return s;
+};
+
 interface TeamSportsTournamentViewProps {
   sport: Sport;
   details: any;
@@ -285,7 +297,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   // Removed loadAllPlayers
 
   const getMatchUpdateApi = () => {
-    switch (sport) {
+    switch (getCanonicalSport(sport)) {
       case 'volleyball': return updateVolleyballMatch;
       case 'beach_volleyball': return updateBeachVolleyballMatch;
       case 'football': return updateFootballMatch;
@@ -515,7 +527,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
     try {
       let deleteApi;
-      switch (sport) {
+      switch (getCanonicalSport(sport)) {
         case 'volleyball': deleteApi = deleteVolleyballMatch; break;
         case 'beach_volleyball': deleteApi = deleteBeachVolleyballMatch; break;
         case 'football': deleteApi = deleteFootballMatch; break;
@@ -539,7 +551,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   };
 
   const getTeamUpdateApi = () => {
-    switch (sport) {
+    switch (getCanonicalSport(sport)) {
       case 'volleyball': return updateVolleyballTeam;
       case 'beach_volleyball': return updateBeachVolleyballTeam;
       case 'football': return updateFootballTeam;
@@ -720,7 +732,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         awayCaptainId: awayTeam?.captainId
       };
 
-      switch (sport) {
+      switch (getCanonicalSport(sport)) {
         case 'volleyball': createApi = createVolleyballMatch; break;
         case 'beach_volleyball': createApi = createBeachVolleyballMatch; break;
         case 'football': createApi = createFootballMatch; break;
@@ -793,7 +805,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       };
 
       let createApi;
-      switch (sport) {
+      switch (getCanonicalSport(sport)) {
         case 'volleyball': createApi = createVolleyballTeam; break;
         case 'beach_volleyball': createApi = createBeachVolleyballTeam; break;
         case 'football': createApi = createFootballTeam; break;
@@ -843,7 +855,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const handleApproveParticipant = async (playerId: number) => {
     try {
       let approveApi;
-      switch (sport) {
+      switch (getCanonicalSport(sport)) {
         case 'football': approveApi = approveFootballParticipant; break;
         case 'volleyball': approveApi = approveVolleyballParticipant; break;
         case 'beach_volleyball': approveApi = approveBeachVolleyballParticipant; break;
@@ -864,7 +876,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const handleRejectParticipant = async (playerId: number) => {
     try {
       let rejectApi;
-      switch (sport) {
+      switch (getCanonicalSport(sport)) {
         case 'football': rejectApi = rejectFootballParticipant; break;
         case 'volleyball': rejectApi = rejectVolleyballParticipant; break;
         case 'beach_volleyball': rejectApi = rejectBeachVolleyballParticipant; break;
@@ -886,7 +898,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     if (!window.confirm('Ви впевнені, що хочете повністю видалити цей запис про реєстрацію?')) return;
     try {
       let removeApi;
-      switch (sport) {
+      switch (getCanonicalSport(sport)) {
         case 'football': removeApi = removeFootballParticipant; break;
         case 'volleyball': removeApi = removeVolleyballParticipant; break;
         case 'beach_volleyball': removeApi = removeBeachVolleyballParticipant; break;
@@ -1006,7 +1018,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
     try {
       let deleteApi;
-      switch (sport) {
+      switch (getCanonicalSport(sport)) {
         case 'volleyball': deleteApi = deleteVolleyballTeam; break;
         case 'beach_volleyball': deleteApi = deleteBeachVolleyballTeam; break;
         case 'football': deleteApi = deleteFootballTeam; break;
@@ -1072,7 +1084,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const eligibleTeams = getEligibleTeams(newMatchForm.stage);
 
   const getSportLabel = () => {
-    switch (sport) {
+    switch (getCanonicalSport(sport)) {
       case 'volleyball':
       case 'волейбол': return 'Волейбол';
       case 'beach_volleyball':
