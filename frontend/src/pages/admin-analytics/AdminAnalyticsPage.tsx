@@ -60,6 +60,13 @@ export const AdminAnalyticsPage = () => {
     fetchStats();
   }, []);
 
+  const todayDateString = new Date().toISOString().split('T')[0];
+  const todayStats = dailyStats.find(s => s.date.startsWith(todayDateString)) || {
+    totalVisits: 0,
+    registeredVisits: 0,
+    guestVisits: 0,
+  };
+
   return (
     <div className={styles.adminAnalyticsPage}>
       <div className={styles.container}>
@@ -67,6 +74,20 @@ export const AdminAnalyticsPage = () => {
           <div className={styles.titleSection}>
             <h1>Аналітика відвідувань</h1>
             <p>Статистика візитів за останні 30 днів</p>
+            <div style={{ display: 'flex', gap: '10px', marginTop: '16px', flexWrap: 'wrap' }}>
+              <div className={styles.statsBadge} style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.2)' }}>
+                <i className="fas fa-calendar-day" style={{ marginRight: '6px' }}></i>
+                Сьогодні візитів: <span style={{ color: '#111827' }}>{todayStats.totalVisits}</span>
+              </div>
+              <div className={styles.statsBadge} style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                <i className="fas fa-user-check" style={{ marginRight: '6px' }}></i>
+                Зареєстрованих: <span style={{ color: '#111827' }}>{todayStats.registeredVisits}</span>
+              </div>
+              <div className={styles.statsBadge} style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
+                <i className="fas fa-user-secret" style={{ marginRight: '6px' }}></i>
+                Гостей: <span style={{ color: '#111827' }}>{todayStats.guestVisits}</span>
+              </div>
+            </div>
           </div>
         </header>
 
