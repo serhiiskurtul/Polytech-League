@@ -22,7 +22,12 @@ export const BASE_URL = API_URL.endsWith('/api') ? API_URL.slice(0, -4) : API_UR
 
 const api = axios.create({
   baseURL: API_URL,
-  withCredentials: true
+  withCredentials: true,
+  headers: {
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    Pragma: 'no-cache',
+    Expires: '0'
+  }
 });
 
 api.interceptors.request.use(
@@ -108,16 +113,31 @@ api.interceptors.response.use(
       };
 
       if (navigator.locks) {
-        return navigator.locks.request('refresh_token_lock', async () => {
-          const tokenNow = localStorage.getItem('refreshToken');
-          if (tokenNow !== currentRefreshToken) {
-            // Another tab already refreshed the token
-            isRefreshing = false;
-            processQueue(null, localStorage.getItem('token'));
-            return api(originalRequest);
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000);
+          
+          return await navigator.locks.request('refresh_token_lock', { signal: controller.signal }, async () => {
+            clearTimeout(timeoutId);
+            const tokenNow = localStorage.getItem('refreshToken');
+            if (tokenNow !== currentRefreshToken) {
+              // Another tab already refreshed the token
+              isRefreshing = false;
+              processQueue(null, localStorage.getItem('token'));
+              return api(originalRequest);
+            }
+            return await performRefresh();
+          });
+        } catch (lockError: any) {
+          // If the lock times out (AbortError) or Web Locks API fails (SecurityError/NotSupportedError in PWA),
+          // or if performRefresh itself throws an error, we need to handle it.
+          if (lockError.name === 'AbortError' || lockError.name === 'SecurityError' || lockError.name === 'NotSupportedError') {
+            console.warn('Web Locks API timed out or failed in PWA context. Falling back to unprotected refresh.', lockError);
+            return await performRefresh();
           }
-          return await performRefresh();
-        });
+          // Otherwise, it's a real error from performRefresh (e.g. network error, 401), so throw it up
+          throw lockError;
+        }
       } else {
         return await performRefresh();
       }
