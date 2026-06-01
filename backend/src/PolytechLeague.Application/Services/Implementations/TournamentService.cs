@@ -740,7 +740,7 @@ public class TournamentService : ITournamentService
             string? photoUrl = null;
             Gender champGender = Gender.None;
 
-            var teamMembers = new List<string>();
+            var teamMembers = new List<PolytechLeague.Application.Dto.General.TeamMemberDto>();
 
             if (e.FirstPlaceId != null)
             {
@@ -753,25 +753,25 @@ public class TournamentService : ITournamentService
             {
                 var team = await _context.FootballTeams.Include(t => t.Players).FirstOrDefaultAsync(t => t.Id == fe.FirstPlaceTeamId);
                 playerName = team?.Name ?? "Команда";
-                if (team?.Players != null) teamMembers = team.Players.Select(p => $"{p.FirstName} {p.LastName}").ToList();
+                if (team?.Players != null) teamMembers = team.Players.Select(p => new PolytechLeague.Application.Dto.General.TeamMemberDto { Id = p.Id, Name = $"{p.FirstName} {p.LastName}" }).ToList();
             }
             else if (e is VolleyballEvent ve && ve.FirstPlaceTeamId != null)
             {
                 var team = await _context.VolleyballTeams.Include(t => t.Players).FirstOrDefaultAsync(t => t.Id == ve.FirstPlaceTeamId);
                 playerName = team?.Name ?? "Команда";
-                if (team?.Players != null) teamMembers = team.Players.Select(p => $"{p.FirstName} {p.LastName}").ToList();
+                if (team?.Players != null) teamMembers = team.Players.Select(p => new PolytechLeague.Application.Dto.General.TeamMemberDto { Id = p.Id, Name = $"{p.FirstName} {p.LastName}" }).ToList();
             }
             else if (e is BasketballEvent be && be.FirstPlaceTeamId != null)
             {
                 var team = await _context.BasketballTeams.Include(t => t.Players).FirstOrDefaultAsync(t => t.Id == be.FirstPlaceTeamId);
                 playerName = team?.Name ?? "Команда";
-                if (team?.Players != null) teamMembers = team.Players.Select(p => $"{p.FirstName} {p.LastName}").ToList();
+                if (team?.Players != null) teamMembers = team.Players.Select(p => new PolytechLeague.Application.Dto.General.TeamMemberDto { Id = p.Id, Name = $"{p.FirstName} {p.LastName}" }).ToList();
             }
             else if (e is BeachVolleyballEvent bve && bve.FirstPlaceTeamId != null)
             {
                 var team = await _context.BeachVolleyballTeams.Include(t => t.Players).FirstOrDefaultAsync(t => t.Id == bve.FirstPlaceTeamId);
                 playerName = team?.Name ?? "Команда";
-                if (team?.Players != null) teamMembers = team.Players.Select(p => $"{p.FirstName} {p.LastName}").ToList();
+                if (team?.Players != null) teamMembers = team.Players.Select(p => new PolytechLeague.Application.Dto.General.TeamMemberDto { Id = p.Id, Name = $"{p.FirstName} {p.LastName}" }).ToList();
             }
 
             dtos.Add(new PolytechLeague.Application.Dto.General.ChampionDto

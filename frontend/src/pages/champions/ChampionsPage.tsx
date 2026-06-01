@@ -217,7 +217,7 @@ const ChampionsPage: React.FC = () => {
                 
                 <div className={styles.timelineItems}>
                   {groupedChampions[season].map((champion, index) => {
-                    const isManual = champion.playerId === 0;
+                    const isManual = champion.tournamentName === 'Архівні дані';
                     const isLeft = index % 2 === 0;
                     
                     const cardContent = (
@@ -239,7 +239,7 @@ const ChampionsPage: React.FC = () => {
                             />
                           </div>
                           <div className={styles.cardInfo}>
-                            {isManual ? (
+                            {isManual || champion.playerId === 0 ? (
                               <div className={styles.playerName}>{champion.playerName}</div>
                             ) : (
                               <Link
@@ -272,7 +272,18 @@ const ChampionsPage: React.FC = () => {
                                   <i className="fas fa-users"></i> Склад команди:
                                 </div>
                                 <div className={styles.teamMembersList}>
-                                  {champion.teamMembers.join(', ')}
+                                  {champion.teamMembers.map((member, i) => (
+                                    <React.Fragment key={member.id}>
+                                      <Link 
+                                        to={`/players/${member.id}`} 
+                                        className={styles.teamMemberLink}
+                                        onClick={(e) => e.stopPropagation()}
+                                      >
+                                        {member.name}
+                                      </Link>
+                                      {i < champion.teamMembers!.length - 1 && ', '}
+                                    </React.Fragment>
+                                  ))}
                                 </div>
                               </div>
                             )}
