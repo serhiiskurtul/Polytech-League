@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '@/shared/api/axiosInstance';
 import styles from './AdminAnalyticsPage.module.css';
 import toast from 'react-hot-toast';
@@ -10,9 +10,40 @@ interface DailyVisitStats {
   guestVisits: number;
 }
 
+interface VisitedUser {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email?: string;
+  role: string;
+  lastVisitAt?: string;
+}
+
 export const AdminAnalyticsPage = () => {
   const [dailyStats, setDailyStats] = useState<DailyVisitStats[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [visitedUsers, setVisitedUsers] = useState<VisitedUser[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+
+  const fetchUsersForDate = async (date: string) => {
+    if (selectedDate === date) {
+      setSelectedDate(null);
+      return;
+    }
+    setSelectedDate(date);
+    setLoadingUsers(true);
+    try {
+      const response = await api.get(`/SiteVisits/users-by-date?date=${date}`);
+      setVisitedUsers(response.data);
+    } catch (e) {
+      console.error('Failed to load users for date', e);
+      toast.error('Не вдалося завантажити користувачів');
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -52,16 +83,50 @@ export const AdminAnalyticsPage = () => {
                   <th>Усі візити</th>
                   <th>Зареєстровані</th>
                   <th>Гості</th>
+                  <th>Дії</th>
                 </tr>
               </thead>
               <tbody>
                 {dailyStats.map((stat, idx) => (
-                  <tr key={idx}>
-                    <td>{new Intl.DateTimeFormat('uk-UA', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(stat.date))}</td>
-                    <td style={{ fontWeight: 'bold' }}>{stat.totalVisits}</td>
-                    <td style={{ color: '#10b981' }}>{stat.registeredVisits}</td>
-                    <td style={{ color: '#f59e0b' }}>{stat.guestVisits}</td>
-                  </tr>
+                  <React.Fragment key={idx}>
+                    <tr onClick={() => fetchUsersForDate(stat.date)} style={{ cursor: 'pointer', backgroundColor: selectedDate === stat.date ? 'var(--surface-hover, #f9fafb)' : 'inherit' }}>
+                      <td>{new Intl.DateTimeFormat('uk-UA', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(stat.date))}</td>
+                      <td style={{ fontWeight: 'bold' }}>{stat.totalVisits}</td>
+                      <td style={{ color: '#10b981' }}>{stat.registeredVisits}</td>
+                      <td style={{ color: '#f59e0b' }}>{stat.guestVisits}</td>
+                      <td>
+                        <button className={styles.detailsBtn}>
+                          {selectedDate === stat.date ? 'Приховати' : 'Хто заходив?'}
+                        </button>
+                      </td>
+                    </tr>
+                    {selectedDate === stat.date && (
+                      <tr className={styles.expandedRow}>
+                        <td colSpan={5} style={{ padding: 0 }}>
+                          <div className={styles.expandedContent}>
+                            <h3 className={styles.expandedTitle}>Зареєстровані користувачі ({stat.registeredVisits})</h3>
+                            {loadingUsers ? (
+                              <div style={{ padding: '20px', color: '#6b7280' }}>Завантаження списку користувачів...</div>
+                            ) : visitedUsers.length === 0 ? (
+                              <div style={{ padding: '20px', color: '#6b7280' }}>Немає зареєстрованих користувачів за цей день</div>
+                            ) : (
+                              <div className={styles.userGrid}>
+                                {visitedUsers.map(u => (
+                                  <div key={u.id} className={styles.userCard}>
+                                    <div className={styles.userAvatar}>{u.firstName[0]}{u.lastName[0]}</div>
+                                    <div className={styles.userInfo}>
+                                      <div className={styles.userName}>{u.firstName} {u.lastName}</div>
+                                      <div className={styles.userEmail}>{u.email || 'Без email'} • ID: {u.id}</div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>

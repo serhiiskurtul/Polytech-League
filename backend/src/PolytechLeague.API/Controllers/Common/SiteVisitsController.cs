@@ -112,6 +112,40 @@ namespace PolytechLeague.Api.Controllers.Common
 
             return Ok(dailyStats);
         }
+
+        [HttpGet("users-by-date")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<List<VisitedUserDto>>> GetUsersByDate([FromQuery] DateTime date)
+        {
+            var targetDate = date.Date;
+            
+            var users = await _dbContext.SiteVisits
+                .Where(v => v.VisitDate.Date == targetDate && v.UserId != null)
+                .Select(v => v.User)
+                .Distinct()
+                .Select(u => new VisitedUserDto
+                {
+                    Id = u!.Id,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Email = u.Email,
+                    Role = u.Role.ToString(),
+                    LastVisitAt = u.LastVisitAt
+                })
+                .ToListAsync();
+
+            return Ok(users);
+        }
+    }
+
+    public class VisitedUserDto
+    {
+        public long Id { get; set; }
+        public required string FirstName { get; set; }
+        public required string LastName { get; set; }
+        public string? Email { get; set; }
+        public required string Role { get; set; }
+        public DateTime? LastVisitAt { get; set; }
     }
 
     public class SiteVisitRequest
