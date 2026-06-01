@@ -13,4 +13,11 @@ public class ChampionDto
     public double Points { get; set; }
     public PolytechLeague.Domain.Entities.Enums.Gender Gender { get; set; }
     public string? WeightClass { get; set; }
+    public List<TeamMemberDto> TeamMembers { get; set; } = new();
+}
+
+public class TeamMemberDto
+{
+    public long Id { get; set; }
+    public string Name { get; set; } = string.Empty;
 }

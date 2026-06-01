@@ -84,8 +84,8 @@ export default function Header() {
               </Link>
             </li>
             <li>
-              <Link to="/hall-of-fame/chess" className={styles.navLink} onClick={closeMenu}>
-                <i className={`fas fa-chess-king ${styles.navIcon}`}></i>
+              <Link to="/hall-of-fame" className={styles.navLink} onClick={closeMenu}>
+                <i className={`fas fa-crown ${styles.navIcon}`}></i>
                 <span>Зала слави</span>
               </Link>
             </li>
