@@ -294,7 +294,9 @@ export const AdminUsersPage = () => {
                   <th onClick={() => handleSort('CreatedAt')} style={{ cursor: 'pointer', userSelect: 'none' }}>
                     Дата реєстрації {getSortIcon('CreatedAt')}
                   </th>
-                  <th>Останній візит</th>
+                  <th onClick={() => handleSort('LastVisitAt')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                    Останній візит {getSortIcon('LastVisitAt')}
+                  </th>
                   <th>Дії</th>
                 </tr>
               </thead>
