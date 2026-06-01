@@ -85,7 +85,7 @@ public class UserService : AbstractEntityService<User>, IUserService
 
     public override async Task DeleteAsync(long id, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Hard deleting user with id {Id} and all associated records", id);
+        _logger.LogInformation("Hard deleting user with id {Id} and all associated data", id);
 
         var user = await _dbcontext.Set<User>().FindAsync(new object[] { id }, cancellationToken);
         if (user is null)
@@ -93,6 +93,38 @@ public class UserService : AbstractEntityService<User>, IUserService
             _logger.LogWarning("User {Id} not found for hard delete", id);
             throw new EntityNotFoundException(nameof(User), id);
         }
+
+        // Delete Conversations and Messages
+        var conversations = await _dbcontext.Set<Conversation>()
+            .Where(c => c.User1Id == id || c.User2Id == id)
+            .ToListAsync(cancellationToken);
+
+        if (conversations.Any())
+        {
+            var conversationIds = conversations.Select(c => c.Id).ToList();
+            var messages = await _dbcontext.Set<Message>()
+                .Where(m => conversationIds.Contains(m.ConversationId))
+                .ToListAsync(cancellationToken);
+            
+            if (messages.Any())
+                _dbcontext.Set<Message>().RemoveRange(messages);
+
+            _dbcontext.Set<Conversation>().RemoveRange(conversations);
+        }
+
+        // Also delete any remaining messages sent by user in other conversations
+        var otherMessages = await _dbcontext.Set<Message>()
+            .Where(m => m.SenderId == id)
+            .ToListAsync(cancellationToken);
+        if (otherMessages.Any())
+            _dbcontext.Set<Message>().RemoveRange(otherMessages);
+
+        // Delete ProfileMergeRequests
+        var mergeRequests = await _dbcontext.Set<ProfileMergeRequest>()
+            .Where(r => r.UserId == id)
+            .ToListAsync(cancellationToken);
+        if (mergeRequests.Any())
+            _dbcontext.Set<ProfileMergeRequest>().RemoveRange(mergeRequests);
 
         var persons = await _dbcontext.Set<Person>()
             .Where(p => p.UserId == id)
@@ -157,7 +189,7 @@ public class UserService : AbstractEntityService<User>, IUserService
         _dbcontext.Set<User>().Remove(user);
         await _dbcontext.SaveChangesAsync(cancellationToken);
 
-        _logger.LogInformation("User {Id} and all associated records successfully deleted", id);
+        _logger.LogInformation("User {Id} and associated data successfully deleted", id);
     }
 
     public async Task SoftDeleteAsync(long id, CancellationToken cancellationToken = default)

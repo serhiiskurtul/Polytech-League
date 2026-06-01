@@ -199,12 +199,54 @@ const PlayersRatingPage = () => {
       if (scoreB !== scoreA) {
         return scoreB - scoreA;
       }
-      
+
       return activityB - activityA;
     });
   }, [players, activeTab, searchQuery, selectedWeightClass, sortBy, selectedGender]);
 
   const itemsPerPage = 100;
+
+  const playerRanks = useMemo(() => {
+    const ranks: string[] = [];
+    let i = 0;
+    
+    const getStats = (p: PlayerDto) => {
+      if (activeTab === 'Загальний') {
+        return { score: p.performanceScore || 0, activity: (p.matchesPlayed || 0) + (p.winsCount || 0) };
+      }
+      const sport = p.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase());
+      return { score: sport?.performanceScore || 0, activity: (sport?.matchesPlayed || 0) + (sport?.winsCount || 0) };
+    };
+
+    while (i < filteredPlayers.length) {
+      let j = i;
+      const statsI = getStats(filteredPlayers[i]);
+
+      while (j < filteredPlayers.length) {
+        let isTie = false;
+        if (activeTab.toLowerCase() === 'football' && sortBy === 'goals') {
+          isTie = (filteredPlayers[i].goalsCount || 0) === (filteredPlayers[j].goalsCount || 0);
+        } else {
+          const statsJ = getStats(filteredPlayers[j]);
+          isTie = statsI.score === statsJ.score && statsI.activity === statsJ.activity;
+        }
+
+        if (isTie) {
+          j++;
+        } else {
+          break;
+        }
+      }
+
+      const rankStr = j - 1 > i ? `${i + 1}-${j}` : `${i + 1}`;
+      for (let k = i; k < j; k++) {
+        ranks[k] = rankStr;
+      }
+      i = j;
+    }
+    return ranks;
+  }, [filteredPlayers, activeTab, sortBy]);
+
   const paginatedPlayers = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return filteredPlayers.slice(startIndex, startIndex + itemsPerPage);
@@ -370,38 +412,13 @@ const PlayersRatingPage = () => {
                   {paginatedPlayers.map((player, index) => {
                     const photoSrc = getPhotoUrl(player.photoUrl);
                     const actualIndex = (currentPage - 1) * itemsPerPage + index;
-
-                    const prevPlayer = actualIndex > 0 ? filteredPlayers[actualIndex - 1] : null;
-                    const nextPlayer = actualIndex < filteredPlayers.length - 1 ? filteredPlayers[actualIndex + 1] : null;
-
-                    const getStats = (p: PlayerDto) => {
-                      if (activeTab === 'Загальний') {
-                        return { score: p.performanceScore || 0, activity: (p.matchesPlayed || 0) + (p.winsCount || 0) };
-                      }
-                      const sport = p.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase());
-                      return { score: sport?.performanceScore || 0, activity: (sport?.matchesPlayed || 0) + (sport?.winsCount || 0) };
-                    };
-
-                    const topPlayerStats = filteredPlayers.length > 0 ? getStats(filteredPlayers[0]) : null;
-                    const currentStats = getStats(player);
-                    
-                    let isTied = false;
-                    if (topPlayerStats && currentStats.score > 0 && currentStats.score === topPlayerStats.score && currentStats.activity === topPlayerStats.activity) {
-                      const tiedCount = filteredPlayers.filter(p => {
-                        const s = getStats(p);
-                        return s.score === topPlayerStats.score && s.activity === topPlayerStats.activity;
-                      }).length;
-                      
-                      if (tiedCount > 1) {
-                        isTied = true;
-                      }
-                    }
+                    const displayRank = playerRanks[actualIndex];
 
                     return (
                       <div key={player.id} className={styles.tableRow}>
                         <div className={styles.cell}>
                           <div className={`${styles.rankCircle} ${actualIndex < 3 ? styles.topRank : ''}`}>
-                            {actualIndex + 1}
+                            {displayRank}
                           </div>
                         </div>
 
@@ -423,11 +440,6 @@ const PlayersRatingPage = () => {
                                 {player.previousNames && (
                                   <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 'normal', marginLeft: '4px' }}>
                                     ({player.previousNames})
-                                  </span>
-                                )}
-                                {isTied && (
-                                  <span className={styles.tieBadge} title="Абсолютна рівність показників (бали, ігри, перемоги)">
-                                    <i className="fa-solid fa-handshake"></i> Рівність
                                   </span>
                                 )}
                               </div>
@@ -479,7 +491,7 @@ const PlayersRatingPage = () => {
                             <div className={styles.pointsLabel}>очок</div>
 
                             {player.pointsBreakdown && player.pointsBreakdown.length > 0 && (
-                              <div 
+                              <div
                                 className={`${styles.breakdownTrigger} ${lockedTooltipId === player.id ? styles.tooltipLockedWrapper : ''}`}
                                 onClick={(e) => {
                                   if ((e.target as Element).closest(`.${styles.breakdownTooltip}`)) return;
@@ -659,18 +671,18 @@ const PlayersRatingPage = () => {
                   <i className="fa-solid fa-users"></i>
                 </div>
                 <h3>Участь у змаганнях</h3>
-                <p>Бали за сам факт участі (тільки для міжгрупових змагань):</p>
+                <p>Бали за сам факт участі:</p>
                 <ul>
                   <li><span>Кожен турнір:</span> +10 балів</li>
                 </ul>
               </div>
 
-              <div className={styles.formulaCard}>
+              <div className={styles.formulaCard} style={{ display: 'none' }}>
                 <div className={styles.formulaIcon} style={{ background: '#f1f5f9', color: '#64748b' }}>
                   <i className="fa-solid fa-scale-balanced"></i>
                 </div>
                 <h3>Рівність балів</h3>
-                <p>Якщо гравці мають однакову кількість балів, перевага надається тому, у кого більша сума ігор та перемог (Ігри + Перемоги). У разі абсолютної рівності обидва гравці отримують бейдж <span className={styles.tieBadge} style={{marginLeft: 0}}><i className="fa-solid fa-handshake"></i> Рівність</span>.</p>
+                <p>Якщо гравці мають однакову кількість балів, перевага надається тому, у кого більша сума ігор та перемог (Ігри + Перемоги).</p>
               </div>
             </div>
           </div>

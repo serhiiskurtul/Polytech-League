@@ -2042,13 +2042,6 @@ public class PlayerService : IPlayerService
                         var topRankedCount = overallRankings.Count(p => p.GlobalRank == 1 && p.PerformanceScore > 0);
                         if (topRankedCount > 1)
                         {
-                            badges.Add(new AutomaticBadgeDto
-                            {
-                                Type = "BestAthleteTied",
-                                Label = "Найкращий спортсмен",
-                                SeasonName = null,
-                                Icon = "handshake"
-                            });
                         }
                         else
                         {
@@ -2108,13 +2101,6 @@ public class PlayerService : IPlayerService
                                 .Count();
                             if (tiedInSport > 1)
                             {
-                                badges.Add(new AutomaticBadgeDto
-                                {
-                                    Type = "BestAthleteSportTied",
-                                    Label = $"Найкращий гравець ({GetSportNameUa(sport.SportType)})",
-                                    SeasonName = season.Name,
-                                    Icon = "handshake"
-                                });
                             }
                             else
                             {
