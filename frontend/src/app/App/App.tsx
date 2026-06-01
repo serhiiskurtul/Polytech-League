@@ -248,7 +248,7 @@ export default function App() {
         />
 
         <Route
-          path="/hall-of-fame/:sport"
+          path="/hall-of-fame"
           element={
             <ProtectedRoute requireAuth={false}>
               <ChampionsPage />
