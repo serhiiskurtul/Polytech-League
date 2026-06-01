@@ -603,8 +603,8 @@ public class PlayerService : IPlayerService
                     if (allEvents.TryGetValue(ach.TournamentId, out var lvl)) {
                         if (levelMultipliers.TryGetValue(lvl, out var m)) mult = m;
                         levelName = lvl switch { CompetitionLevel.Regional => "Обласні", CompetitionLevel.National => "Всеукраїнські", _ => "Міжгрупові" };
-                        pts = (lvl == CompetitionLevel.CollegeGroup) ? 10 : 0;
-                    } else pts = 0;
+                        pts = 10;
+                    } else pts = 10;
                     if (ach.Rank == 1) pts += 100; else if (ach.Rank == 2) pts += 50; else if (ach.Rank == 3) pts += 30;
                     if (allEvents.TryGetValue(ach.TournamentId, out var eventLvl) && eventLvl != CompetitionLevel.CollegeGroup) {
                         if (ach.BoardRank == 1) pts += 40; else if (ach.BoardRank == 2) pts += 25; else if (ach.BoardRank == 3) pts += 15;
@@ -1113,9 +1113,10 @@ public class PlayerService : IPlayerService
             .Where(e => eventIds.Contains(e.Id))
             .Select(e => new { e.Id, e.Level })
             .ToDictionaryAsync(e => e.Id, e => e.Level, cancellationToken);
-        foreach (var ach in dto.Achievements) {
-            double basePts = (ach.Rank == 1) ? 100 : (ach.Rank == 2 ? 50 : (ach.Rank == 3 ? 30 : 0));
-            if (basePts <= 0) continue;
+        foreach (var ach in dto.Achievements.Where(a => a.Result != "MVP")) {
+            double basePts = 10;
+            if (ach.Rank == 1) basePts += 100; else if (ach.Rank == 2) basePts += 50; else if (ach.Rank == 3) basePts += 30;
+            
             double mult = 1.0;
             string levelName = "Міжгрупові";
             if (eventLevels.TryGetValue(ach.TournamentId, out var lvl)) {
@@ -1125,17 +1126,27 @@ public class PlayerService : IPlayerService
                     CompetitionLevel.National => "Всеукраїнські",
                     _ => "Міжгрупові"
                 };
+                
+                if (lvl != CompetitionLevel.CollegeGroup) {
+                    if (ach.BoardRank == 1) basePts += 40; else if (ach.BoardRank == 2) basePts += 25; else if (ach.BoardRank == 3) basePts += 15;
+                }
             }
             int finalPts = (int)Math.Round(basePts * mult);
             totalScore += finalPts;
+            
+            string desc = (ach.Rank > 0 ? $"{ach.Rank} місце: {ach.TournamentName} ({levelName})" : $"Участь: {ach.TournamentName} ({levelName})");
+            if (ach.BoardRank.HasValue && ach.BoardRank.Value > 0) {
+                desc += $", {ach.BoardRank.Value} місце на дошці";
+            }
+            
             pointsBreakdown.Add(new PointEntryDto {
-                Description = $"{ach.Rank} місце: {ach.TournamentName} ({levelName})",
+                Description = desc,
                 Points = finalPts,
                 Category = "Achievements"
             });
         }
         foreach (var ach in dto.Achievements.Where(a => a.Result == "MVP")) {
-            int mvpPts = 50;
+            int mvpPts = 15;
             totalScore += mvpPts;
             pointsBreakdown.Add(new PointEntryDto {
                 Description = $"MVP: {ach.TournamentName}",
