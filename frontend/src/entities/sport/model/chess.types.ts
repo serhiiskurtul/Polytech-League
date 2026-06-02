@@ -71,6 +71,7 @@ export interface ChessEventResponse {
   timeControl: string;
   isModerated: boolean;
   isPublic: boolean;
+  disableNotifications: boolean;
   participantsCount: number;
   system: ChessSystem;
   games: ChessGameResponse[];
@@ -102,6 +103,7 @@ export interface ChessEventRequest {
   timeControl: string;
   isModerated: boolean;
   isPublic: boolean;
+  disableNotifications: boolean;
   participantsCount: number;
   system: ChessSystem;
   rules?: string;
