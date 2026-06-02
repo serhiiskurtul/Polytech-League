@@ -430,6 +430,27 @@
   font-size: 14px;
 }
 
+.statsGridCombined {
+  display: flex;
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  margin-bottom: 32px;
+  overflow: hidden;
+}
+
+.statItemCombined {
+  flex: 1;
+  padding: 24px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+}
+
+.statItemCombined:last-child {
+  border-right: none;
+}
+
 /* Бейджи результатів */
 .resultBadge {
   display: inline-flex;
@@ -582,6 +603,19 @@
   
   .statsGrid {
       grid-template-columns: 1fr;
+  }
+  
+  .statsGridCombined {
+      flex-direction: column;
+  }
+  
+  .statItemCombined {
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+  }
+  
+  .statItemCombined:last-child {
+      border-bottom: none;
   }
   
   .dataTable th,

@@ -1,3 +1,5 @@
+import { BASE_URL } from '@/shared/api/axiosInstance';
+
 interface TournamentUI {
   id: string;
   sport: string;
@@ -15,6 +17,7 @@ interface TournamentUI {
   rawDate?: string;
   level: string;
   category: string;
+  mainPhotoUrl?: string;
 }
 
 interface TournamentCardProps {
@@ -81,6 +84,12 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
     'Mixed': 'Змішаний'
   };
 
+  const getImageUrl = (url?: string) => {
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    return `${BASE_URL}${url}`;
+  };
+
   // Форматування дати
   const formatDate = (dateString: string) => {
     if (dateString.includes(' - ')) {
@@ -103,6 +112,16 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
             <i className="fas fa-star"></i> Рекомендовано
           </div>
         )}
+
+        <div className="tournament-image-container">
+          {tournament.mainPhotoUrl ? (
+            <img src={getImageUrl(tournament.mainPhotoUrl)} alt={tournament.title} className="tournament-cover-image" loading="lazy" />
+          ) : (
+            <div className="tournament-cover-placeholder">
+              <i className={sportIcons[tournament.sport] || 'fas fa-trophy'}></i>
+            </div>
+          )}
+        </div>
 
         <div className="tournament-header">
           <div className="tournament-sport">
@@ -164,9 +183,15 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
       style={{ cursor: 'pointer' }}
     >
       <div className="list-main">
-        <div className="list-sport">
-          <i className={sportIcons[tournament.sport] || 'fas fa-trophy'}></i>
-        </div>
+        {tournament.mainPhotoUrl ? (
+          <div className="list-image">
+            <img src={getImageUrl(tournament.mainPhotoUrl)} alt={tournament.title} loading="lazy" />
+          </div>
+        ) : (
+          <div className="list-sport">
+            <i className={sportIcons[tournament.sport] || 'fas fa-trophy'}></i>
+          </div>
+        )}
         
         <div className="list-content">
           <div className="list-header">

@@ -2231,79 +2231,81 @@ const TournamentViewPage = () => {
             </div>
           </div>
 
-          <div className={styles.statsGrid}>
-            {isTeamSport ? (
-              <>
-                <div className={styles.statCard}>
-                  <div className={styles.statIcon}><i className="fas fa-users-viewfinder"></i></div>
-                  <div className={styles.statValue}>{actualParticipants}</div>
-                  <div className={styles.statLabel}>Всього команд</div>
-                </div>
-                <div className={styles.statCard}>
-                  <div className={styles.statIcon}><i className="fas fa-user-group"></i></div>
-                  <div className={styles.statValue}>{details?.teams?.reduce((acc: number, t: any) => acc + (t.players?.length || 0), 0) || 0}</div>
-                  <div className={styles.statLabel}>Всього гравців</div>
-                </div>
-                <div className={styles.statCard}>
-                  <div className={styles.statIcon}><i className="fas fa-calendar-check"></i></div>
-                  <div className={styles.statValue}>{allGamesOrMatches.length}</div>
-                  <div className={styles.statLabel}>Всього матчів</div>
-                </div>
-                <div className={styles.statCard}>
-                  <div className={styles.statIcon}><i className="fas fa-chart-line"></i></div>
-                  <div className={styles.statValue}>{playedGames}</div>
-                  <div className={styles.statLabel}>Зіграно матчів</div>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className={styles.statCard}>
-                  <div className={styles.statIcon}>
-                    <i className={
-                      tournament?.sport === 'badminton' ||
-                        tournament?.sport === 'table_tennis' ||
-                        tournament?.sport === 'tabletennis' ||
-                        tournament?.sport === 'armwrestling' ||
-                        tournament?.sport === 'athletics'
-                        ? (tournament?.sport === 'athletics' ? "fas fa-running" : "fas fa-project-diagram")
-                        : "fas fa-chess-board"
-                    }></i>
+          {details?.level === 'CollegeGroup' && (
+            <div className={styles.statsGridCombined}>
+              {isTeamSport ? (
+                <>
+                  <div className={styles.statItemCombined}>
+                    <div className={styles.statIcon}><i className="fas fa-users-viewfinder"></i></div>
+                    <div className={styles.statValue}>{actualParticipants}</div>
+                    <div className={styles.statLabel}>Всього команд</div>
                   </div>
-                  <div className={styles.statValue}>{totalRounds || '-'}</div>
-                  <div className={styles.statLabel}>Всього турів</div>
-                </div>
-                <div className={styles.statCard}>
-                  <div className={styles.statIcon}><i className="fas fa-users"></i></div>
-                  <div className={styles.statValue}>{actualParticipants}</div>
-                  <div className={styles.statLabel}>{participantLabel}</div>
-                </div>
-                <div className={styles.statCard}>
-                  <div className={styles.statIcon}>
-                    <i className={
-                      tournament?.sport === 'badminton' ? "fas fa-shuttlecock" :
-                        tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? "fas fa-table-tennis" :
-                          tournament?.sport === 'armwrestling' ? "fas fa-hand-rock" :
-                            "fas fa-venus-mars"
-                    }></i>
+                  <div className={styles.statItemCombined}>
+                    <div className={styles.statIcon}><i className="fas fa-user-group"></i></div>
+                    <div className={styles.statValue}>{details?.teams?.reduce((acc: number, t: any) => acc + (t.players?.length || 0), 0) || 0}</div>
+                    <div className={styles.statLabel}>Всього гравців</div>
                   </div>
-                  <div className={styles.statValue}>
-                    {(() => {
-                      const cat = (details as any)?.category || tournament?.category;
-                      if (cat === 'Men' || cat === 'Чоловіки') return 'Чоловіки';
-                      if (cat === 'Women' || cat === 'Жінки') return 'Жінки';
-                      return 'Змішане';
-                    })()}
+                  <div className={styles.statItemCombined}>
+                    <div className={styles.statIcon}><i className="fas fa-calendar-check"></i></div>
+                    <div className={styles.statValue}>{allGamesOrMatches.length}</div>
+                    <div className={styles.statLabel}>Всього матчів</div>
                   </div>
-                  <div className={styles.statLabel}>Категорія</div>
-                </div>
-                <div className={styles.statCard}>
-                  <div className={styles.statIcon}><i className="fas fa-chart-line"></i></div>
-                  <div className={styles.statValue}>{playedGames}</div>
-                  <div className={styles.statLabel}>Зіграно {tournament?.sport === 'armwrestling' || tournament?.sport === 'badminton' || tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? 'матчів' : 'партій'}</div>
-                </div>
-              </>
-            )}
-          </div>
+                  <div className={styles.statItemCombined}>
+                    <div className={styles.statIcon}><i className="fas fa-chart-line"></i></div>
+                    <div className={styles.statValue}>{playedGames}</div>
+                    <div className={styles.statLabel}>Зіграно матчів</div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className={styles.statItemCombined}>
+                    <div className={styles.statIcon}>
+                      <i className={
+                        tournament?.sport === 'badminton' ||
+                          tournament?.sport === 'table_tennis' ||
+                          tournament?.sport === 'tabletennis' ||
+                          tournament?.sport === 'armwrestling' ||
+                          tournament?.sport === 'athletics'
+                          ? (tournament?.sport === 'athletics' ? "fas fa-running" : "fas fa-project-diagram")
+                          : "fas fa-chess-board"
+                      }></i>
+                    </div>
+                    <div className={styles.statValue}>{totalRounds || '-'}</div>
+                    <div className={styles.statLabel}>Всього турів</div>
+                  </div>
+                  <div className={styles.statItemCombined}>
+                    <div className={styles.statIcon}><i className="fas fa-users"></i></div>
+                    <div className={styles.statValue}>{actualParticipants}</div>
+                    <div className={styles.statLabel}>{participantLabel}</div>
+                  </div>
+                  <div className={styles.statItemCombined}>
+                    <div className={styles.statIcon}>
+                      <i className={
+                        tournament?.sport === 'badminton' ? "fas fa-shuttlecock" :
+                          tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? "fas fa-table-tennis" :
+                            tournament?.sport === 'armwrestling' ? "fas fa-hand-rock" :
+                              "fas fa-venus-mars"
+                      }></i>
+                    </div>
+                    <div className={styles.statValue}>
+                      {(() => {
+                        const cat = (details as any)?.category || tournament?.category;
+                        if (cat === 'Men' || cat === 'Чоловіки') return 'Чоловіки';
+                        if (cat === 'Women' || cat === 'Жінки') return 'Жінки';
+                        return 'Змішане';
+                      })()}
+                    </div>
+                    <div className={styles.statLabel}>Категорія</div>
+                  </div>
+                  <div className={styles.statItemCombined}>
+                    <div className={styles.statIcon}><i className="fas fa-chart-line"></i></div>
+                    <div className={styles.statValue}>{playedGames}</div>
+                    <div className={styles.statLabel}>Зіграно {tournament?.sport === 'armwrestling' || tournament?.sport === 'badminton' || tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? 'матчів' : 'партій'}</div>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
 
           {(() => {
             const mandatoryTeamSports = ['volleyball', 'beach_volleyball', 'football', 'basketball_3_3', 'basketball_3x3', 'basketball3x3'];
