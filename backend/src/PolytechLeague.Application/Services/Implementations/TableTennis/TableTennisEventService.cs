@@ -19,32 +19,32 @@ public class TableTennisEventService(
     AbstractEntityService<TableTennisEvent>(_dbcontext, _logger, _notificationService),
     ITableTennisEventService
 {
-    protected override void UpdateValues(TableTennisEvent oldEntity, TableTennisEvent newEntity)
+    protected override void UpdateValues(TableTennisEvent updatedEntity, TableTennisEvent newEntity)
     {
-        oldEntity.Name = newEntity.Name;
-        oldEntity.Date = newEntity.Date;
-        oldEntity.Location = newEntity.Location;
-        oldEntity.Description = newEntity.Description;
-        oldEntity.RegistrationStart = newEntity.RegistrationStart;
-        oldEntity.RegistrationEnd = newEntity.RegistrationEnd;
-        oldEntity.EndDate = newEntity.EndDate;
-        oldEntity.Level = newEntity.Level;
-        oldEntity.TournamentType = newEntity.TournamentType;
-        oldEntity.Category = newEntity.Category;
-        oldEntity.IsModerated = newEntity.IsModerated;
-        oldEntity.IsPublic = newEntity.IsPublic;
-        oldEntity.IsTeam = newEntity.IsTeam;
-        oldEntity.FirstPlaceId = newEntity.FirstPlaceId;
-        oldEntity.SecondPlaceId = newEntity.SecondPlaceId;
-        oldEntity.ThirdPlaceId = newEntity.ThirdPlaceId;
-        oldEntity.FirstPlaceTeamId = newEntity.FirstPlaceTeamId;
-        oldEntity.SecondPlaceTeamId = newEntity.SecondPlaceTeamId;
-        oldEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
-        oldEntity.SeasonId = newEntity.SeasonId;
-        oldEntity.MvpId = newEntity.MvpId;
+        updatedEntity.Name = newEntity.Name;
+        updatedEntity.Date = newEntity.Date;
+        updatedEntity.Location = newEntity.Location;
+        updatedEntity.Description = newEntity.Description;
+        updatedEntity.RegistrationStart = newEntity.RegistrationStart;
+        updatedEntity.RegistrationEnd = newEntity.RegistrationEnd;
+        updatedEntity.EndDate = newEntity.EndDate;
+        updatedEntity.Level = newEntity.Level;
+        updatedEntity.TournamentType = newEntity.TournamentType;
+        updatedEntity.Category = newEntity.Category;
+        updatedEntity.IsModerated = newEntity.IsModerated;
+        updatedEntity.IsPublic = newEntity.IsPublic;
+        updatedEntity.IsTeam = newEntity.IsTeam;
+        updatedEntity.FirstPlaceId = newEntity.FirstPlaceId;
+        updatedEntity.SecondPlaceId = newEntity.SecondPlaceId;
+        updatedEntity.ThirdPlaceId = newEntity.ThirdPlaceId;
+        updatedEntity.FirstPlaceTeamId = newEntity.FirstPlaceTeamId;
+        updatedEntity.SecondPlaceTeamId = newEntity.SecondPlaceTeamId;
+        updatedEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
+        updatedEntity.SeasonId = newEntity.SeasonId;
+        updatedEntity.MvpId = newEntity.MvpId;
 
 
-        oldEntity.UpdatedAt = DateTime.UtcNow;
+        updatedEntity.UpdatedAt = DateTime.UtcNow;
     }
 
     public override async Task<TableTennisEvent> GetByIdAsync(long id, CancellationToken cancellationToken = default)
@@ -86,36 +86,36 @@ public class TableTennisEventService(
         );
     }
 
-    protected override async Task OnUpdatedAsync(TableTennisEvent oldEntity, TableTennisEvent newEntity, CancellationToken cancellationToken)
+    protected override async Task OnUpdatedAsync(TableTennisEvent originalEntity, TableTennisEvent updatedEntity, CancellationToken cancellationToken)
     {
         // Update ranks for teams based on winners
         var eventWithTeams = await _dbcontext.TableTennisEvents
             .Include(e => e.Teams)
-            .FirstOrDefaultAsync(e => e.Id == oldEntity.Id, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == updatedEntity.Id, cancellationToken);
 
         if (eventWithTeams != null && eventWithTeams.Teams != null)
         {
             foreach (var team in eventWithTeams.Teams)
             {
-                if (team.Id == oldEntity.FirstPlaceTeamId) team.Rank = 1;
-                else if (team.Id == oldEntity.SecondPlaceTeamId) team.Rank = 2;
-                else if (team.Id == oldEntity.ThirdPlaceTeamId) team.Rank = 3;
-                else if (oldEntity.FirstPlaceTeamId != null) team.Rank = 4;
+                if (team.Id == updatedEntity.FirstPlaceTeamId) team.Rank = 1;
+                else if (team.Id == updatedEntity.SecondPlaceTeamId) team.Rank = 2;
+                else if (team.Id == updatedEntity.ThirdPlaceTeamId) team.Rank = 3;
+                else if (updatedEntity.FirstPlaceTeamId != null) team.Rank = 4;
                 else team.Rank = 0;
             }
             await _dbcontext.SaveChangesAsync(cancellationToken);
         }
 
-        bool individualWinnersSet = oldEntity.FirstPlaceId != null && oldEntity.SecondPlaceId != null && oldEntity.ThirdPlaceId != null;
-        bool teamWinnersSet = oldEntity.FirstPlaceTeamId != null && oldEntity.SecondPlaceTeamId != null && oldEntity.ThirdPlaceTeamId != null;
+        bool individualWinnersSet = updatedEntity.FirstPlaceId != null && updatedEntity.SecondPlaceId != null && updatedEntity.ThirdPlaceId != null && (originalEntity.FirstPlaceId == null || originalEntity.SecondPlaceId == null || originalEntity.ThirdPlaceId == null);
+        bool teamWinnersSet = updatedEntity.FirstPlaceTeamId != null && updatedEntity.SecondPlaceTeamId != null && updatedEntity.ThirdPlaceTeamId != null && (originalEntity.FirstPlaceTeamId == null || originalEntity.SecondPlaceTeamId == null || originalEntity.ThirdPlaceTeamId == null);
         
         if (individualWinnersSet || teamWinnersSet)
         {
             await _notificationService.SendNotificationToAllAsync(
                 "Змагання завершено!",
-                $"Визначено переможців у змаганні з настільного тенісу: {oldEntity.Name}",
+                $"Визначено переможців у змаганні з настільного тенісу: {updatedEntity.Name}",
                 NotificationType.Tournament,
-                $"/tournaments/{oldEntity.Id}",
+                $"/tournaments/{updatedEntity.Id}",
                 true
             );
         }

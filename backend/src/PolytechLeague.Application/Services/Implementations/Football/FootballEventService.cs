@@ -22,32 +22,32 @@ public class FootballEventService :
     ) : base(dbcontext, logger, notificationService)
     {
     }
-    protected override void UpdateValues(FootballEvent oldEntity, FootballEvent newEntity)
+    protected override void UpdateValues(FootballEvent updatedEntity, FootballEvent newEntity)
     {
-        oldEntity.Name = newEntity.Name;
-        oldEntity.Date = newEntity.Date;
-        oldEntity.Location = newEntity.Location;
-        oldEntity.Description = newEntity.Description;
-        oldEntity.RegistrationStart = newEntity.RegistrationStart;
-        oldEntity.RegistrationEnd = newEntity.RegistrationEnd;
-        oldEntity.EndDate = newEntity.EndDate;
-        oldEntity.Level = newEntity.Level;
-        oldEntity.TournamentType = newEntity.TournamentType;
-        oldEntity.Rules = newEntity.Rules;
-        oldEntity.Prizes = newEntity.Prizes;
-        oldEntity.HeadRefereeName = newEntity.HeadRefereeName;
-        oldEntity.Referees = newEntity.Referees;
-        oldEntity.Schedule = newEntity.Schedule;
-        oldEntity.FirstPlaceTeamId = newEntity.FirstPlaceTeamId;
-        oldEntity.SecondPlaceTeamId = newEntity.SecondPlaceTeamId;
-        oldEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
-        oldEntity.IsModerated = newEntity.IsModerated;
+        updatedEntity.Name = newEntity.Name;
+        updatedEntity.Date = newEntity.Date;
+        updatedEntity.Location = newEntity.Location;
+        updatedEntity.Description = newEntity.Description;
+        updatedEntity.RegistrationStart = newEntity.RegistrationStart;
+        updatedEntity.RegistrationEnd = newEntity.RegistrationEnd;
+        updatedEntity.EndDate = newEntity.EndDate;
+        updatedEntity.Level = newEntity.Level;
+        updatedEntity.TournamentType = newEntity.TournamentType;
+        updatedEntity.Rules = newEntity.Rules;
+        updatedEntity.Prizes = newEntity.Prizes;
+        updatedEntity.HeadRefereeName = newEntity.HeadRefereeName;
+        updatedEntity.Referees = newEntity.Referees;
+        updatedEntity.Schedule = newEntity.Schedule;
+        updatedEntity.FirstPlaceTeamId = newEntity.FirstPlaceTeamId;
+        updatedEntity.SecondPlaceTeamId = newEntity.SecondPlaceTeamId;
+        updatedEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
+        updatedEntity.IsModerated = newEntity.IsModerated;
 
-        oldEntity.IsPublic = newEntity.IsPublic;
-        oldEntity.IsTeam = newEntity.IsTeam;
-        oldEntity.SeasonId = newEntity.SeasonId;
-        oldEntity.MvpId = newEntity.MvpId;
-        oldEntity.Category = newEntity.Category;
+        updatedEntity.IsPublic = newEntity.IsPublic;
+        updatedEntity.IsTeam = newEntity.IsTeam;
+        updatedEntity.SeasonId = newEntity.SeasonId;
+        updatedEntity.MvpId = newEntity.MvpId;
+        updatedEntity.Category = newEntity.Category;
 
     }
 
@@ -121,35 +121,35 @@ public class FootballEventService :
         );
     }
 
-    protected override async Task OnUpdatedAsync(FootballEvent oldEntity, FootballEvent newEntity, CancellationToken cancellationToken)
+    protected override async Task OnUpdatedAsync(FootballEvent originalEntity, FootballEvent updatedEntity, CancellationToken cancellationToken)
     {
         // Update ranks for teams based on winners
         var eventWithTeams = await _dbcontext.FootballEvents
             .Include(e => e.Teams)
-            .FirstOrDefaultAsync(e => e.Id == oldEntity.Id, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == updatedEntity.Id, cancellationToken);
 
         if (eventWithTeams != null && eventWithTeams.Teams != null)
         {
             foreach (var team in eventWithTeams.Teams)
             {
-                if (team.Id == oldEntity.FirstPlaceTeamId) team.Rank = 1;
-                else if (team.Id == oldEntity.SecondPlaceTeamId) team.Rank = 2;
-                else if (team.Id == oldEntity.ThirdPlaceTeamId) team.Rank = 3;
-                else if (oldEntity.FirstPlaceTeamId != null) team.Rank = 4;
+                if (team.Id == updatedEntity.FirstPlaceTeamId) team.Rank = 1;
+                else if (team.Id == updatedEntity.SecondPlaceTeamId) team.Rank = 2;
+                else if (team.Id == updatedEntity.ThirdPlaceTeamId) team.Rank = 3;
+                else if (updatedEntity.FirstPlaceTeamId != null) team.Rank = 4;
                 else team.Rank = 0;
             }
             await _dbcontext.SaveChangesAsync(cancellationToken);
         }
 
-        bool winnersSet = oldEntity.FirstPlaceTeamId != null && oldEntity.SecondPlaceTeamId != null && oldEntity.ThirdPlaceTeamId != null;
+        bool winnersSet = updatedEntity.FirstPlaceTeamId != null && updatedEntity.SecondPlaceTeamId != null && updatedEntity.ThirdPlaceTeamId != null && (originalEntity.FirstPlaceTeamId == null || originalEntity.SecondPlaceTeamId == null || originalEntity.ThirdPlaceTeamId == null);
         
         if (winnersSet)
         {
             await _notificationService!.SendNotificationToAllAsync(
                 "Змагання завершено!",
-                $"Визначено переможців у змаганні з Футболу: {oldEntity.Name}",
+                $"Визначено переможців у змаганні з Футболу: {updatedEntity.Name}",
                 NotificationType.Tournament,
-                $"/tournaments/{oldEntity.Id}",
+                $"/tournaments/{updatedEntity.Id}",
                 true
             );
         }

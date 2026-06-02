@@ -235,41 +235,41 @@ public class UserService : AbstractEntityService<User>, IUserService
         _logger.LogInformation("Email {Email} successfully confirmed for user {Id}", email, user.Id);
     }
 
-    protected override void UpdateValues(User oldEntity, User newEntity)
+    protected override void UpdateValues(User updatedEntity, User newEntity)
     {
-        _logger.LogDebug("Updating user {Id} values", oldEntity.Id);
+        _logger.LogDebug("Updating user {Id} values", updatedEntity.Id);
 
-        oldEntity.FirstName = newEntity.FirstName;
-        oldEntity.LastName = newEntity.LastName;
-        oldEntity.Role = newEntity.Role;
-        oldEntity.Email = newEntity.Email;
-        oldEntity.PhotoUrl = newEntity.PhotoUrl;
-        oldEntity.IsBlocked = newEntity.IsBlocked;
+        updatedEntity.FirstName = newEntity.FirstName;
+        updatedEntity.LastName = newEntity.LastName;
+        updatedEntity.Role = newEntity.Role;
+        updatedEntity.Email = newEntity.Email;
+        updatedEntity.PhotoUrl = newEntity.PhotoUrl;
+        updatedEntity.IsBlocked = newEntity.IsBlocked;
     }
 
-    protected override async Task OnUpdatedAsync(User oldEntity, User newEntity, CancellationToken cancellationToken)
+    protected override async Task OnUpdatedAsync(User originalEntity, User updatedEntity, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Syncing updated name/photo from user {UserId} to persons", oldEntity.Id);
+        _logger.LogInformation("Syncing updated name/photo from user {UserId} to persons", updatedEntity.Id);
 
         var persons = await _dbcontext.Set<Person>()
-            .Where(p => p.UserId == oldEntity.Id)
+            .Where(p => p.UserId == updatedEntity.Id)
             .ToListAsync(cancellationToken);
 
         if (persons.Any())
         {
             foreach (var person in persons)
             {
-                person.FirstName = oldEntity.FirstName;
-                person.LastName = oldEntity.LastName;
-                if (!string.IsNullOrEmpty(oldEntity.PhotoUrl))
+                person.FirstName = updatedEntity.FirstName;
+                person.LastName = updatedEntity.LastName;
+                if (!string.IsNullOrEmpty(updatedEntity.PhotoUrl))
                 {
-                    person.PhotoUrl = oldEntity.PhotoUrl;
+                    person.PhotoUrl = updatedEntity.PhotoUrl;
                 }
             }
 
             _dbcontext.Set<Person>().UpdateRange(persons);
             await _dbcontext.SaveChangesAsync(cancellationToken);
-            _logger.LogInformation("Successfully synced user {UserId} changes to {Count} persons", oldEntity.Id, persons.Count);
+            _logger.LogInformation("Successfully synced user {UserId} changes to {Count} persons", updatedEntity.Id, persons.Count);
         }
     }
 }

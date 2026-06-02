@@ -28,36 +28,36 @@ public class ChessEventService :
      {
          _excelImportService = excelImportService;
      }
-    protected override void UpdateValues(ChessEvent oldEntity, ChessEvent newEntity)
+    protected override void UpdateValues(ChessEvent updatedEntity, ChessEvent newEntity)
     {
-        oldEntity.Name = newEntity.Name;
-        oldEntity.Date = newEntity.Date;
-        oldEntity.Location = newEntity.Location;
-        oldEntity.Description = newEntity.Description;
-        oldEntity.RegistrationStart = newEntity.RegistrationStart;
-        oldEntity.RegistrationEnd = newEntity.RegistrationEnd;
-        oldEntity.EndDate = newEntity.EndDate;
-        oldEntity.Level = newEntity.Level;
-        oldEntity.TimeControl = newEntity.TimeControl;
-        oldEntity.System = newEntity.System;
-        oldEntity.Rules = newEntity.Rules;
-        oldEntity.Prizes = newEntity.Prizes;
-        oldEntity.HeadRefereeName = newEntity.HeadRefereeName;
-        oldEntity.Referees = newEntity.Referees;
-        oldEntity.RefereeIds = newEntity.RefereeIds;
-        oldEntity.Schedule = newEntity.Schedule;
-        oldEntity.FirstPlaceId = newEntity.FirstPlaceId;
-        oldEntity.SecondPlaceId = newEntity.SecondPlaceId;
-        oldEntity.ThirdPlaceId = newEntity.ThirdPlaceId;
-        oldEntity.FirstPlaceTeamId = newEntity.FirstPlaceTeamId;
-        oldEntity.SecondPlaceTeamId = newEntity.SecondPlaceTeamId;
-        oldEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
-        oldEntity.IsTeam = newEntity.IsTeam;
-        oldEntity.IsModerated = newEntity.IsModerated;
-        oldEntity.IsPublic = newEntity.IsPublic;
-        oldEntity.SeasonId = newEntity.SeasonId;
-        oldEntity.MvpId = newEntity.MvpId;
-        oldEntity.Category = newEntity.Category;
+        updatedEntity.Name = newEntity.Name;
+        updatedEntity.Date = newEntity.Date;
+        updatedEntity.Location = newEntity.Location;
+        updatedEntity.Description = newEntity.Description;
+        updatedEntity.RegistrationStart = newEntity.RegistrationStart;
+        updatedEntity.RegistrationEnd = newEntity.RegistrationEnd;
+        updatedEntity.EndDate = newEntity.EndDate;
+        updatedEntity.Level = newEntity.Level;
+        updatedEntity.TimeControl = newEntity.TimeControl;
+        updatedEntity.System = newEntity.System;
+        updatedEntity.Rules = newEntity.Rules;
+        updatedEntity.Prizes = newEntity.Prizes;
+        updatedEntity.HeadRefereeName = newEntity.HeadRefereeName;
+        updatedEntity.Referees = newEntity.Referees;
+        updatedEntity.RefereeIds = newEntity.RefereeIds;
+        updatedEntity.Schedule = newEntity.Schedule;
+        updatedEntity.FirstPlaceId = newEntity.FirstPlaceId;
+        updatedEntity.SecondPlaceId = newEntity.SecondPlaceId;
+        updatedEntity.ThirdPlaceId = newEntity.ThirdPlaceId;
+        updatedEntity.FirstPlaceTeamId = newEntity.FirstPlaceTeamId;
+        updatedEntity.SecondPlaceTeamId = newEntity.SecondPlaceTeamId;
+        updatedEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
+        updatedEntity.IsTeam = newEntity.IsTeam;
+        updatedEntity.IsModerated = newEntity.IsModerated;
+        updatedEntity.IsPublic = newEntity.IsPublic;
+        updatedEntity.SeasonId = newEntity.SeasonId;
+        updatedEntity.MvpId = newEntity.MvpId;
+        updatedEntity.Category = newEntity.Category;
 
     }
 
@@ -238,35 +238,35 @@ public class ChessEventService :
         );
     }
 
-    protected override async Task OnUpdatedAsync(ChessEvent oldEntity, ChessEvent newEntity, CancellationToken cancellationToken)
+    protected override async Task OnUpdatedAsync(ChessEvent originalEntity, ChessEvent updatedEntity, CancellationToken cancellationToken)
     {
         // Update ranks for participants based on winners
         var eventWithParticipants = await _dbcontext.Set<ChessEvent>()
             .Include(e => e.Players)
-            .FirstOrDefaultAsync(e => e.Id == oldEntity.Id, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == updatedEntity.Id, cancellationToken);
 
         if (eventWithParticipants != null && eventWithParticipants.Players != null)
         {
             foreach (var participant in eventWithParticipants.Players)
             {
-                if (participant.PlayerId == oldEntity.FirstPlaceId) participant.Rank = 1;
-                else if (participant.PlayerId == oldEntity.SecondPlaceId) participant.Rank = 2;
-                else if (participant.PlayerId == oldEntity.ThirdPlaceId) participant.Rank = 3;
+                if (participant.PlayerId == updatedEntity.FirstPlaceId) participant.Rank = 1;
+                else if (participant.PlayerId == updatedEntity.SecondPlaceId) participant.Rank = 2;
+                else if (participant.PlayerId == updatedEntity.ThirdPlaceId) participant.Rank = 3;
                 else participant.Rank = 0;
             }
             await _dbcontext.SaveChangesAsync(cancellationToken);
         }
 
-        bool individualWinnersSet = oldEntity.FirstPlaceId != null && oldEntity.SecondPlaceId != null && oldEntity.ThirdPlaceId != null;
-        bool teamWinnersSet = oldEntity.FirstPlaceTeamId != null && oldEntity.SecondPlaceTeamId != null && oldEntity.ThirdPlaceTeamId != null;
+        bool individualWinnersSet = updatedEntity.FirstPlaceId != null && updatedEntity.SecondPlaceId != null && updatedEntity.ThirdPlaceId != null && (originalEntity.FirstPlaceId == null || originalEntity.SecondPlaceId == null || originalEntity.ThirdPlaceId == null);
+        bool teamWinnersSet = updatedEntity.FirstPlaceTeamId != null && updatedEntity.SecondPlaceTeamId != null && updatedEntity.ThirdPlaceTeamId != null && (originalEntity.FirstPlaceTeamId == null || originalEntity.SecondPlaceTeamId == null || originalEntity.ThirdPlaceTeamId == null);
         
         if (individualWinnersSet || teamWinnersSet)
         {
             await _notificationService!.SendNotificationToAllAsync(
                 "Змагання завершено!",
-                $"Визначено переможців у змаганні з шахів: {oldEntity.Name}",
+                $"Визначено переможців у змаганні з шахів: {updatedEntity.Name}",
                 NotificationType.Tournament,
-                $"/tournaments/{oldEntity.Id}",
+                $"/tournaments/{updatedEntity.Id}",
                 true
             );
         }

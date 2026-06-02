@@ -21,7 +21,7 @@ public abstract class AbstractEntityService<TEntity>(
 
 
     protected virtual Task OnCreatedAsync(TEntity entity, CancellationToken cancellationToken) => Task.CompletedTask;
-    protected virtual Task OnUpdatedAsync(TEntity oldEntity, TEntity newEntity, CancellationToken cancellationToken) => Task.CompletedTask;
+    protected virtual Task OnUpdatedAsync(TEntity originalEntity, TEntity updatedEntity, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public virtual async Task<IEnumerable<TEntity>> GetAllAsync(
         FilterParams? filterParams = null,
@@ -112,6 +112,8 @@ public abstract class AbstractEntityService<TEntity>(
     {
         _logger.LogDebug("Updating entity of type {EntityType} with id {Id}", typeof(TEntity).Name, id);
 
+        var originalEntity = await _dbcontext.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(e => EF.Property<long>(e, "Id") == id, cancellationToken);
+        
         var oldEntity = await _dbcontext.Set<TEntity>().FindAsync(id, cancellationToken);
         if (oldEntity is null)
         {
@@ -120,11 +122,10 @@ public abstract class AbstractEntityService<TEntity>(
         }
 
         UpdateValues(oldEntity, newEntity);
-        var originalEntity = await _dbcontext.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(e => EF.Property<long>(e, "Id") == id, cancellationToken); // This is tricky, maybe better to call it before SaveChanges
 
         await _dbcontext.SaveChangesAsync(cancellationToken);
 
-        await OnUpdatedAsync(oldEntity, newEntity, cancellationToken);
+        await OnUpdatedAsync(originalEntity, oldEntity, cancellationToken);
 
         _logger.LogInformation("Entity of type {EntityType} with id {Id} successfully updated", typeof(TEntity).Name, id);
     }
