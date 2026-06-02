@@ -962,7 +962,7 @@ public class PlayerService : IPlayerService
         try {
             var teams = await _dbContext.FootballTeams
                 .Include(t => t.Event)
-                .Where(t => t.Players != null && t.Players.Any(pl => pl.Id == playerId))
+                .Where(t => t.Players.Any(pl => pl.Id == playerId))
                 .ToListAsync(cancellationToken);
             foreach (var team in teams) {
                 if (team.Event == null) continue;
@@ -992,7 +992,7 @@ public class PlayerService : IPlayerService
             // Volleyball
             var vTeams = await _dbContext.VolleyballTeams
                 .Include(t => t.Event)
-                .Where(t => t.Players != null && t.Players.Any(pl => pl.Id == playerId))
+                .Where(t => t.Players.Any(pl => pl.Id == playerId))
                 .ToListAsync(cancellationToken);
             foreach (var t in vTeams) {
                 if (t.Event == null) continue;
@@ -1002,7 +1002,7 @@ public class PlayerService : IPlayerService
             // Basketball 3x3
             var bTeams = await _dbContext.BasketballTeams
                 .Include(t => t.Event)
-                .Where(t => t.Players != null && t.Players.Any(pl => pl.Id == playerId))
+                .Where(t => t.Players.Any(pl => pl.Id == playerId))
                 .ToListAsync(cancellationToken);
             foreach (var t in bTeams) {
                 if (t.Event == null) continue;
@@ -1012,7 +1012,7 @@ public class PlayerService : IPlayerService
             // Beach Volleyball
             var bvTeams = await _dbContext.BeachVolleyballTeams
                 .Include(t => t.Event)
-                .Where(t => t.Players != null && t.Players.Any(pl => pl.Id == playerId))
+                .Where(t => t.Players.Any(pl => pl.Id == playerId))
                 .ToListAsync(cancellationToken);
             foreach (var t in bvTeams) {
                 if (t.Event == null) continue;
@@ -1074,6 +1074,7 @@ public class PlayerService : IPlayerService
                     FootballEvent => "football",
                     VolleyballEvent => "volleyball",
                     BasketballEvent => "basketball_3x3",
+                    BeachVolleyballEvent => "beach_volleyball",
                     _ => "other"
                 };
                 if (sport == "other") continue;
