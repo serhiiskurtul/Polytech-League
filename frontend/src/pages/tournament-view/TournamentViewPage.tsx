@@ -347,7 +347,7 @@ const TournamentViewPage = () => {
         endDate: formatToISO(editTournamentData.endDate) || (details as any).endDate || null,
         isModerated: editTournamentData.level === 'CollegeGroup' ? !!editTournamentData.isModerated : !!(details as any).isModerated,
         isPublic: editTournamentData.isPublic !== undefined ? !!editTournamentData.isPublic : ((details as any).isPublic !== undefined ? !!(details as any).isPublic : true),
-        disableNotifications: (editTournamentData as any).disableNotifications || false,
+        disableNotifications: (editTournamentData as any).disableNotifications !== undefined ? !!(editTournamentData as any).disableNotifications : !!(details as any).disableNotifications,
         isTeam: isTeamSport,
         seasonId: editTournamentData.seasonId || (details as any).seasonId || null,
         category: editTournamentData.category || (details as any).category || (isVolleyball ? 'Men' : 'Mixed')
@@ -1236,6 +1236,7 @@ const TournamentViewPage = () => {
               endDate: formatDateForInput(data.endDate || d.endDate),
               isModerated: !!d.isModerated,
               isPublic: d.isPublic !== undefined ? !!d.isPublic : true,
+              disableNotifications: !!d.disableNotifications,
               seasonId: d.seasonId || null,
               category: d.category || (data.category === 'Чоловіки' ? 'Men' : data.category === 'Жінки' ? 'Women' : data.category === 'Змішаний' ? 'Mixed' : data.category) || (sportKey === 'volleyball' || sportKey === 'beach_volleyball' ? 'Men' : 'Mixed'),
               firstPlaceId: d.firstPlace?.id || null,
