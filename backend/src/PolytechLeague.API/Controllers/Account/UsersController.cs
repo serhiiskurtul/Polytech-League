@@ -161,6 +161,17 @@ public class UsersController(IUserService userService, IPlayerService playerServ
     public async Task<IActionResult> ChangeRole(
         [FromRoute] long id, [FromBody] PolytechLeague.Domain.Entities.UserRole role, CancellationToken cancellationToken)
     {
+        var currentUserId = User.GetUserId();
+        if (id == currentUserId)
+        {
+            return StatusCode(403, "Ви не можете змінити власну роль.");
+        }
+
+        if (role == PolytechLeague.Domain.Entities.UserRole.Admin)
+        {
+            return StatusCode(403, "Ви не можете видавати права адміністратора іншим користувачам.");
+        }
+
         await userService.ChangeRoleAsync(id, role, cancellationToken);
 
         var cacheKey = $"user_account_{id}";

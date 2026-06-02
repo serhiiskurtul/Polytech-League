@@ -3,12 +3,14 @@ import { getUsers, blockUser, unblockUser, deleteUser, changeRole, UserResponse 
 import { getAllPlayers, deletePlayer, searchPlayers, getPlayersRankings, mergePlayersManually } from '@/entities/player/api/players.api';
 import { PlayerDto } from '@/entities/player/model/player.types';
 import { getPhotoUrl } from '@/shared/utils/photo.utils';
+import { useAuth } from '@/entities/session';
 import { Link } from 'react-router-dom';
 import styles from './AdminUsersPage.module.css';
 import toast from 'react-hot-toast';
 
 export const AdminUsersPage = () => {
   const [users, setUsers] = useState<UserResponse[]>([]);
+  const { user: currentUser } = useAuth();
   const [players, setPlayers] = useState<PlayerDto[]>([]);
   const [activeTab, setActiveTab] = useState<'users' | 'players'>('users');
   const [showDuplicatesOnly, setShowDuplicatesOnly] = useState(false);
@@ -141,8 +143,8 @@ export const AdminUsersPage = () => {
       await changeRole(id, newRole);
       toast.success('Роль змінено');
       fetchUsers();
-    } catch (error) {
-      toast.error('Помилка при зміні ролі');
+    } catch (error: any) {
+      toast.error(error.response?.data || 'Помилка при зміні ролі');
     }
   };
 
@@ -313,6 +315,8 @@ export const AdminUsersPage = () => {
                           className={styles.roleSelect}
                           value={user.role === 'Admin' ? 1 : user.role === 'Fizorg' ? 2 : user.role}
                           onChange={(e) => handleChangeRole(user.id, parseInt(e.target.value))}
+                          disabled={user.id === currentUser?.id}
+                          title={user.id === currentUser?.id ? "Ви не можете змінити власну роль" : ""}
                           style={{
                             padding: '4px 8px',
                             borderRadius: '6px',
@@ -324,7 +328,9 @@ export const AdminUsersPage = () => {
                         >
                           <option value={0}>Користувач</option>
                           <option value={2}>Фізорг</option>
-                          <option value={1}>Адмін</option>
+                          {(user.role === 'Admin' || user.role === 1) && (
+                            <option value={1}>Адмін</option>
+                          )}
                         </select>
                       </td>
                       <td>
