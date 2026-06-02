@@ -297,10 +297,36 @@
 .tournament-card.grid {
   background: var(--card);
   border-radius: var(--radius);
-  padding: 24px;
+  padding: 16px;
   border: 1px solid var(--border);
   position: relative;
   transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.tournament-image-container {
+  width: 100%;
+  height: 180px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tournament-cover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tournament-cover-placeholder i {
+  font-size: 64px;
+  color: var(--primary);
+  opacity: 0.5;
 }
 
 .tournament-card.grid:hover {
@@ -533,15 +559,30 @@
 }
 
 .list-sport {
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   border-radius: 16px;
   background: var(--primary-light);
   color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.list-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 16px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.list-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .list-content {
@@ -735,9 +776,14 @@
   }
   
   .list-sport {
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     font-size: 20px;
+  }
+  
+  .list-image {
+    width: 100%;
+    height: 140px;
   }
 }
 
