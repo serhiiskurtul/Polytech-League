@@ -159,7 +159,17 @@ public class PlayerService : IPlayerService
         if (dto.FirstName != null && !string.IsNullOrWhiteSpace(dto.FirstName)) player.FirstName = dto.FirstName;
         if (dto.Patronymic != null) player.Patronymic = dto.Patronymic;
         if (dto.LastName != null && !string.IsNullOrWhiteSpace(dto.LastName)) player.LastName = dto.LastName;
-        if (dto.Group != null) player.Group = dto.Group;
+        if (dto.Group != null) 
+        {
+            player.Group = dto.Group;
+            var parsed = PolytechLeague.Application.Utilities.GroupUtility.ParseGroup(dto.Group, DateTime.Now);
+            if (parsed.specialty > 0)
+            {
+                player.SpecialtyCode = parsed.specialty;
+                player.EnrollmentYear = parsed.enrollmentYear;
+                player.GroupNumber = parsed.groupNumber;
+            }
+        }
         // Handle StudentId: treat empty/whitespace as null to avoid unique index issues with multiple empty strings
         if (dto.StudentId != null)
         {

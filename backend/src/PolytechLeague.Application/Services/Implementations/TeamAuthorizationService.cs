@@ -17,7 +17,9 @@ public class TeamAuthorizationService(ApplicationDbContext dbContext) : ITeamAut
         var player = await dbContext.Players.FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
         if (player == null) throw new UnauthorizedAccessException("Ваш акаунт ще не прив'язано до профілю студента.");
 
-        var fizorgGroup = GroupUtility.GetCurrentGroupName(player.SpecialtyCode, player.EnrollmentYear, player.GroupNumber);
+        var fizorgGroup = player.EnrollmentYear > 0 
+            ? GroupUtility.GetCurrentGroupName(player.SpecialtyCode, player.EnrollmentYear, player.GroupNumber) 
+            : player.Group;
         
         if (!string.Equals(teamName, fizorgGroup, StringComparison.OrdinalIgnoreCase))
         {
@@ -38,10 +40,13 @@ public class TeamAuthorizationService(ApplicationDbContext dbContext) : ITeamAut
             var requestedPlayers = await dbContext.Players.Where(p => playerIdsToAdd.Contains(p.Id)).ToListAsync(cancellationToken);
             foreach (var reqPlayer in requestedPlayers)
             {
-                var reqGroup = GroupUtility.GetCurrentGroupName(reqPlayer.SpecialtyCode, reqPlayer.EnrollmentYear, reqPlayer.GroupNumber);
-                if (reqGroup != fizorgGroup)
+                var reqGroup = reqPlayer.EnrollmentYear > 0 
+                    ? GroupUtility.GetCurrentGroupName(reqPlayer.SpecialtyCode, reqPlayer.EnrollmentYear, reqPlayer.GroupNumber) 
+                    : reqPlayer.Group;
+                
+                if (!string.Equals(reqGroup, fizorgGroup, StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new UnauthorizedAccessException($"Гравець {reqPlayer.LastName} не належить до вашої групи ({fizorgGroup}).");
+                    throw new UnauthorizedAccessException($"Гравець {reqPlayer.LastName} не належить до вашої групи ({fizorgGroup}). Його поточна група: {reqGroup}");
                 }
             }
         }
