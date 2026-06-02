@@ -1898,7 +1898,17 @@ const TournamentViewPage = () => {
                 </div>
                 <div className={styles.metaItem}>
                   <i className="fas fa-users"></i>
-                  <span>{actualParticipants} {participantLabel}</span>
+                  <span>
+                    {actualParticipants} {participantLabel}
+                    {(() => {
+                      const cat = (details as any)?.category || tournament?.category;
+                      if (!cat) return '';
+                      let catLabel = 'змішане';
+                      if (cat === 'Men' || cat === 'Чоловіки') catLabel = 'чоловіче';
+                      else if (cat === 'Women' || cat === 'Жінки') catLabel = 'жіноче';
+                      return ` (${catLabel})`;
+                    })()}
+                  </span>
                 </div>
                 {details?.timeControl && tournament?.sport?.toLowerCase() !== 'armwrestling' && (
                   <div className={styles.metaItem}>
