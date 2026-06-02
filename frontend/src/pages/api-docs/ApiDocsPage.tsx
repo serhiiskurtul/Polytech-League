@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styles from './ApiDocsPage.module.css';
 import toast from 'react-hot-toast';
+import { BASE_URL } from '@/shared/api/axiosInstance';
 
 export const ApiDocsPage = () => {
   const [copied, setCopied] = useState<string | null>(null);
@@ -12,9 +13,7 @@ export const ApiDocsPage = () => {
     setTimeout(() => setCopied(null), 2000);
   };
 
-  const API_BASE_URL = window.location.origin.includes('localhost') 
-    ? 'https://localhost:7154' 
-    : 'https://polytechleague.azurewebsites.net'; // Fallback or update with actual
+  const API_BASE_URL = BASE_URL || window.location.origin;
 
   const jsExample = `const API_BASE_URL = '${API_BASE_URL}';
 
