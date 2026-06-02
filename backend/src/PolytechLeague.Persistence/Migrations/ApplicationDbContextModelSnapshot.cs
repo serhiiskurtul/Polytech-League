@@ -37,7 +37,7 @@ namespace PolytechLeague.Persistence.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "registration_status", new[] { "pending", "approved", "rejected", "ignored" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "table_tennis_hand", new[] { "left", "right", "both" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "table_tennis_tournament_type", new[] { "single_elimination", "double_elimination", "round_robin" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "user_role", new[] { "none", "user", "admin" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "user_role", new[] { "none", "user", "admin", "fizorg" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "volleyball_position", new[] { "setter", "outside_hitter", "middle_blocker", "opposite", "libero" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "volleyball_tournament_type", new[] { "single_elimination", "double_elimination", "round_robin", "swiss", "groups_playoff" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);

@@ -190,7 +190,7 @@ public class PlayersController : ControllerBase
         });
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpPost]
     public async Task<ActionResult<PlayerDto>> Create(PlayerDto dto, CancellationToken cancellationToken)
     {

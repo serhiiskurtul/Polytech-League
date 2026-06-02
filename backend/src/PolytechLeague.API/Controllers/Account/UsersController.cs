@@ -155,4 +155,17 @@ public class UsersController(IUserService userService, IPlayerService playerServ
 
         return NoContent();
     }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPut("{id}/role")]
+    public async Task<IActionResult> ChangeRole(
+        [FromRoute] long id, [FromBody] PolytechLeague.Domain.Entities.UserRole role, CancellationToken cancellationToken)
+    {
+        await userService.ChangeRoleAsync(id, role, cancellationToken);
+
+        var cacheKey = $"user_account_{id}";
+        await redisService.RemoveDataAsync(cacheKey);
+
+        return NoContent();
+    }
 }

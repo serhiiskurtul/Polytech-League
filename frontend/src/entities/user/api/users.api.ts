@@ -57,3 +57,9 @@ export const unblockUser = async (id: number): Promise<void> => {
 export const deleteUser = async (id: number): Promise<void> => {
   await api.delete(`/users/hard-delete/${id}`);
 };
+
+export const changeRole = async (id: number, role: number | string): Promise<void> => {
+  await api.put(`/users/${id}/role`, role, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+};

@@ -84,6 +84,8 @@ interface TeamSportsTournamentViewProps {
   sport: Sport;
   details: any;
   isAdmin: boolean;
+  isFizorg?: boolean;
+  userGroup?: string | null;
   onRefresh: () => void;
 }
 
@@ -91,6 +93,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   sport, 
   details, 
   isAdmin,
+  isFizorg,
+  userGroup,
   onRefresh
 }) => {
   const hasBracket = (sport === 'football' || sport === 'футбол') && details?.tournamentType !== 'RoundRobin';
@@ -231,14 +235,18 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   }, [isAdmin]);
 
   useEffect(() => {
-    if (!isAdmin) return;
+    if (!(isAdmin || isFizorg)) return;
     
     const delayDebounceFn = setTimeout(async () => {
       if (searchQuery.length >= 2) {
         setIsSearchingPlayers(true);
         try {
           const players = await searchPlayers(searchQuery);
-          setFilteredPlayers(players);
+          if (isFizorg && !isAdmin && userGroup) {
+            setFilteredPlayers(players.filter(p => p.group === userGroup));
+          } else {
+            setFilteredPlayers(players);
+          }
         } catch (e) {
           console.error(e);
         } finally {
@@ -843,9 +851,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
       await updateApi(teamId, { ...team, playerIds: newPlayerIds });
       onRefresh();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert('Помилка при зміні складу команди');
+      toast.error(err.response?.data || 'Помилка при зміні складу команди');
     }
   };
 
@@ -1002,9 +1010,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       setQuickAddForm({ firstName: '', lastName: '', patronymic: '', group: '', gender: 'None' });
       setIsQuickAddMode(false);
       setSearchQuery('');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Quick Add Error:', err);
-      alert('Помилка при швидкому додаванні гравця');
+      toast.error(err.response?.data || 'Помилка при швидкому додаванні гравця');
     }
   };
 
@@ -2041,7 +2049,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
               <button className={styles.closeButton} onClick={() => { setIsTeamRosterModalOpen(false); setEditingTeamId(null); setIsQuickAddMode(false); }}>&times;</button>
             </div>
             
-             {isAdmin && !isQuickAddMode && (
+             {(isAdmin || isFizorg) && !isQuickAddMode && (
                 <div className={styles.searchBox} style={{padding: '20px 40px 0 40px', display: 'flex', gap: '10px'}}>
                     <input 
                         type="text" 
@@ -2056,11 +2064,13 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         setIsQuickAddMode(true);
                         // Try to parse search query if it looks like Name Surname
                         const parts = searchQuery.trim().split(/\s+/);
+                        let form = { ...quickAddForm, group: (isFizorg && !isAdmin && userGroup) ? userGroup : quickAddForm.group };
                         if (parts.length >= 2) {
-                          setQuickAddForm({ ...quickAddForm, lastName: parts[0], firstName: parts[1] });
+                          form = { ...form, lastName: parts[0], firstName: parts[1] };
                         } else if (parts.length === 1) {
-                          setQuickAddForm({ ...quickAddForm, lastName: parts[0] });
+                          form = { ...form, lastName: parts[0] };
                         }
+                        setQuickAddForm(form);
                       }}
                       title="Додати нового гравця вручну"
                     >
@@ -2073,7 +2083,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                <>
                 <div className={styles.modalBody} style={{maxHeight: '400px'}}>
                     <div className={styles.playersList}>
-                        {isAdmin ? filteredPlayers.map(player => {
+                        {(isAdmin || isFizorg) ? filteredPlayers.map(player => {
                             const team = details.teams?.find((t: any) => t.id === editingTeamId);
                             const isSelected = team?.players?.some((p: any) => p.id === player.id);
                             
@@ -2145,11 +2155,13 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                               onClick={() => {
                                 setIsQuickAddMode(true);
                                 const parts = searchQuery.trim().split(/\s+/);
+                                let form = { ...quickAddForm, group: (isFizorg && !isAdmin && userGroup) ? userGroup : quickAddForm.group };
                                 if (parts.length >= 2) {
-                                  setQuickAddForm({ ...quickAddForm, lastName: parts[0], firstName: parts[1] });
+                                  form = { ...form, lastName: parts[0], firstName: parts[1] };
                                 } else if (parts.length === 1) {
-                                  setQuickAddForm({ ...quickAddForm, lastName: parts[0] });
+                                  form = { ...form, lastName: parts[0] };
                                 }
+                                setQuickAddForm(form);
                               }}
                             >
                               Додати {searchQuery} як нового гравця?
@@ -2198,6 +2210,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       value={quickAddForm.group} 
                       onChange={e => setQuickAddForm({...quickAddForm, group: e.target.value})}
                       placeholder="напр. 321 або Випускник"
+                      disabled={isFizorg && !isAdmin}
+                      style={{ opacity: (isFizorg && !isAdmin) ? 0.7 : 1 }}
                     />
                   </div>
                   <div className={styles.formGroup}>

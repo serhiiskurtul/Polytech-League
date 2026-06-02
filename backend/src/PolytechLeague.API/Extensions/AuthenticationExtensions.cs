@@ -78,6 +78,9 @@ public static class AuthenticationExtensions
 
             options.AddPolicy("AdminOrUser", p => 
                 p.RequireRole("Admin", "User"));
+
+            options.AddPolicy("AdminOrFizorg", p => 
+                p.RequireRole("Admin", "Fizorg"));
         });
 
         return services;

@@ -47,13 +47,31 @@ public class FootballTeamsController(
         return Created();
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(
         long id,
         [FromBody] FootballTeamRequest request,
+        [FromServices] PolytechLeague.Application.Services.Interfaces.ITeamAuthorizationService authService,
         CancellationToken cancellationToken)
     {
+        var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+        if (userRole == "Fizorg")
+        {
+            var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (long.TryParse(userIdStr, out long userId))
+            {
+                var team = await FootballTeamService.GetByIdAsync(id, cancellationToken);
+                try {
+                    await authService.ValidateFizorgAccessAsync(userId, team.Name, team.EventId, request.PlayerIds, cancellationToken);
+                } catch (UnauthorizedAccessException) {
+                    return Forbid();
+                } catch (ArgumentException ex) {
+                    return BadRequest(ex.Message);
+                }
+            }
+        }
+
         var entity = request.FromRequest();
         await FootballTeamService.UpdateAsync(id, entity, cancellationToken);
 

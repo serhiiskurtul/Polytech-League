@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getUsers, blockUser, unblockUser, deleteUser, UserResponse } from '@/entities/user/api/users.api';
+import { getUsers, blockUser, unblockUser, deleteUser, changeRole, UserResponse } from '@/entities/user/api/users.api';
 import { getAllPlayers, deletePlayer, searchPlayers, getPlayersRankings, mergePlayersManually } from '@/entities/player/api/players.api';
 import { PlayerDto } from '@/entities/player/model/player.types';
 import { getPhotoUrl } from '@/shared/utils/photo.utils';
@@ -151,6 +151,16 @@ export const AdminUsersPage = () => {
       fetchUsers();
     } catch (error) {
       toast.error('Помилка при видаленні аккаунту');
+    }
+  };
+
+  const handleChangeRole = async (id: number, newRole: number) => {
+    try {
+      await changeRole(id, newRole);
+      toast.success('Роль змінено');
+      fetchUsers();
+    } catch (error) {
+      toast.error('Помилка при зміні ролі');
     }
   };
 
@@ -338,9 +348,23 @@ export const AdminUsersPage = () => {
                         </span>
                       </td>
                       <td>
-                        <span className={`${styles.roleBadge} ${user.role === 1 || user.role === 'Admin' ? styles.adminRole : styles.userRole}`}>
-                          {user.role === 1 || user.role === 'Admin' ? 'Адмін' : 'Користувач'}
-                        </span>
+                        <select
+                          className={styles.roleSelect}
+                          value={user.role === 'Admin' ? 1 : user.role === 'Fizorg' ? 2 : user.role}
+                          onChange={(e) => handleChangeRole(user.id, parseInt(e.target.value))}
+                          style={{
+                            padding: '4px 8px',
+                            borderRadius: '6px',
+                            border: '1px solid var(--border)',
+                            background: 'var(--surface-light)',
+                            color: 'var(--text-primary)',
+                            fontSize: '0.875rem'
+                          }}
+                        >
+                          <option value={0}>Користувач</option>
+                          <option value={2}>Фізорг</option>
+                          <option value={1}>Адмін</option>
+                        </select>
                       </td>
                       <td>
                         <span className={`${styles.statusBadge} ${user.isBlocked ? styles.blockedStatus : styles.activeStatus}`}>

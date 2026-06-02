@@ -223,6 +223,9 @@ const TournamentViewPage = () => {
 
   // Admin access check (0 = User, 1 = Admin)
   const isAdmin = user?.role === 1 || user?.role === '1' || user?.role === 'Admin';
+  
+  // Fizorg access check (2 = Fizorg)
+  const isFizorg = user?.role === 2 || user?.role === '2' || user?.role === 'Fizorg';
 
   // Search Results type
   type SearchResult = {
@@ -2317,6 +2320,8 @@ const TournamentViewPage = () => {
                   sport={sportKey as any}
                   details={details}
                   isAdmin={isAdmin}
+                  isFizorg={isFizorg}
+                  userGroup={currentUserPlayer?.group}
                   onRefresh={() => fetchTournament(true)}
                 />
               );

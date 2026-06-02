@@ -22,5 +22,6 @@ public enum UserRole
 {
     None = -1,
     User = 0,
-    Admin = 1
+    Admin = 1,
+    Fizorg = 2
 }

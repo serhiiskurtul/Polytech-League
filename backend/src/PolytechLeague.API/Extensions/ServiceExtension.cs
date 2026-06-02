@@ -45,6 +45,7 @@ public static class ServiceExtension
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<IExcelImportService, ExcelImportService>();
+        services.AddScoped<ITeamAuthorizationService, TeamAuthorizationService>();
 
 
         services.AddScoped<IChessEventService, ChessEventService>();

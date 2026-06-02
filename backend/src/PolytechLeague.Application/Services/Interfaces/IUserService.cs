@@ -14,4 +14,5 @@ public interface IUserService : IAbstractEntityService<User>
     Task BlockAsync(long id, CancellationToken cancellationToken = default);
     Task UnblockAsync(long id, CancellationToken cancellationToken = default);
     Task ConfirmEmailAsync(string email, CancellationToken cancellationToken = default);
+    Task ChangeRoleAsync(long id, UserRole role, CancellationToken cancellationToken = default);
 }
