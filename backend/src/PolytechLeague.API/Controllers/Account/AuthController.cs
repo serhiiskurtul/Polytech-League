@@ -3,6 +3,8 @@ using PolytechLeague.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using System.Security.Authentication;
+using PolytechLeague.Domain.Exceptions;
 
 namespace PolytechLeague.API.Controllers.Account;
 
@@ -44,11 +46,16 @@ public class AuthController(IAuthService authService) : Controller
 
             return Ok(tokens);
         }
-        catch
+        catch (Exception ex) when (ex is AuthenticationException || ex is EntityNotFoundException)
         {
             Response.Cookies.Delete("access_token");
             Response.Cookies.Delete("refresh_token");
             return Unauthorized();
+        }
+        catch (Exception ex)
+        {
+            // Do not delete cookies on transient errors
+            return StatusCode(500, "An error occurred during token refresh.");
         }
     }
 
@@ -80,7 +87,7 @@ public class AuthController(IAuthService authService) : Controller
             HttpOnly = true,
             Secure = isProd,
             SameSite = isProd ? SameSiteMode.None : SameSiteMode.Lax,
-            Expires = DateTimeOffset.UtcNow.AddMinutes(15),
+            Expires = DateTimeOffset.UtcNow.AddMinutes(1),
             Path = "/"
         });
 

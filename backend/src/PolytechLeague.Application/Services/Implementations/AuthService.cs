@@ -85,6 +85,12 @@ public class AuthService(
 
         await refreshTokenService.CreateAsync(newRefreshToken, cancellationToken);
 
+        Console.WriteLine($"Token: {oldRefreshToken.Token}");
+        Console.WriteLine($"IsExpired: {oldRefreshToken.IsExpired}");
+        Console.WriteLine($"IsRevoked: {oldRefreshToken.IsRevoked}");
+        Console.WriteLine($"ExpiresAt: {oldRefreshToken.ExpiresAt}");
+        Console.WriteLine($"Now: {DateTime.UtcNow}");
+
         return new AuthResponse
         {
             AccessToken = newAccessToken,

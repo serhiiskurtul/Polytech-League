@@ -75,11 +75,16 @@ api.interceptors.response.use(
 
           processQueue(null, accessToken);
           return api(originalRequest);
-        } catch (refreshError) {
+        } catch (refreshError: any) {
           processQueue(refreshError, null);
-          localStorage.removeItem('token');
-          localStorage.removeItem('refreshToken');
-          window.location.href = '/login';
+          
+          const status = refreshError.response?.status;
+          if (status === 401 || status === 403 || status === 400 || status === 404) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('refreshToken');
+            window.location.href = '/login';
+          }
+          
           return Promise.reject(refreshError);
         } finally {
           isRefreshing = false;
