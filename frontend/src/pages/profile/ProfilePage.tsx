@@ -125,7 +125,7 @@ const ProfilePage = () => {
     badges: (() => {
       if (isAdmin) return ['Адміністратор'];
       const b = [];
-      if (user?.role === 2 || user?.role === '2' || user?.role === 'Fizorg') {
+      if (user?.role === 2 || user?.role === '2' || String(user?.role).toLowerCase() === 'fizorg') {
         b.push('Фізорг');
       }
       if (playerProfile?.group && playerProfile.group !== '-' && playerProfile.group.trim() !== '') {
