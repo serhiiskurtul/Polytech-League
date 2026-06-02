@@ -33,6 +33,7 @@ import { AboutPage } from '@/pages/about';
 import StudentNewsPage from '@/pages/student-news/StudentNewsPage';
 import { FeedbackPage } from '@/pages/feedback';
 import { AdminFeedbackPage } from '@/pages/admin-feedback';
+import { ApiDocsPage } from '@/pages/api-docs';
 
 import ProtectedRoute from '../providers/ProtectedRoute';
 import ScrollToTop from '../providers/ScrollToTop';
@@ -262,6 +263,17 @@ export default function App() {
             <ProtectedRoute requireAuth={false}>
               <div className="page-wrapper">
                 <AboutPage />
+              </div>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/api-docs"
+          element={
+            <ProtectedRoute requireAuth={false}>
+              <div className="page-wrapper">
+                <ApiDocsPage />
               </div>
             </ProtectedRoute>
           }
