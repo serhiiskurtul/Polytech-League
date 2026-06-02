@@ -54,7 +54,13 @@ public class UsersController(IUserService userService, IPlayerService playerServ
     public async Task<IActionResult> Me(CancellationToken cancellationToken)
     {
         if (!User.Identity?.IsAuthenticated ?? true)
+        {
+            if (Request.Headers.Authorization.Count > 0)
+            {
+                return Unauthorized();
+            }
             return Ok(null);
+        }
 
         var userId = User.GetUserId();
         var cacheKey = $"user_account_{userId}";
