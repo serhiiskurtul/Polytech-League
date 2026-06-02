@@ -1,3 +1,4 @@
+using PolytechLeague.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PolytechLeague.Application.Dto.FootballDto;
@@ -10,7 +11,7 @@ namespace PolytechLeague.API.Controllers.Football;
 [Route("api/football-events")]
 public class FootballEventsController(
     IFootballEventService FootballEventService,
-    IRedisService redisService) : ControllerBase
+    IRedisService redisService, IPlayerService playerService) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
@@ -50,6 +51,8 @@ public class FootballEventsController(
 
         await redisService.RemoveGroupAsync("Football_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
 
         return Created();
     }
@@ -67,6 +70,8 @@ public class FootballEventsController(
         await redisService.RemoveGroupAsync("Football_events_group");
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
 
         return NoContent();
     }
@@ -79,6 +84,8 @@ public class FootballEventsController(
 
         await redisService.RemoveGroupAsync("Football_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
 
         return NoContent();
@@ -91,6 +98,8 @@ public class FootballEventsController(
         await FootballEventService.RegisterPlayerAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("Football_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
@@ -102,6 +111,8 @@ public class FootballEventsController(
         await FootballEventService.ApproveParticipantAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("Football_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
@@ -113,6 +124,8 @@ public class FootballEventsController(
         await FootballEventService.RejectParticipantAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("Football_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
@@ -124,7 +137,11 @@ public class FootballEventsController(
         await FootballEventService.RemoveParticipantAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("Football_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return NoContent();
     }
 }
+
+

@@ -1,3 +1,4 @@
+using PolytechLeague.Application.Services.Interfaces;
 using PolytechLeague.Application.Dto.TableTennisDto;
 using PolytechLeague.Application.Services.Interfaces.TableTennis;
 using PolytechLeague.Domain.Params;
@@ -10,7 +11,7 @@ namespace PolytechLeague.API.Controllers.TableTennis;
 
 [ApiController]
 [Route("api/table-tennis-events")]
-public class TableTennisEventsController(ITableTennisEventService ttEventService, IRedisService redisService) : Controller
+public class TableTennisEventsController(ITableTennisEventService ttEventService, IRedisService redisService, IPlayerService playerService) : Controller
 {
     [AllowAnonymous]
     [HttpGet]
@@ -67,6 +68,8 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
 
         await redisService.RemoveGroupAsync("tt_events_all");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
 
         return Created();
     }
@@ -84,6 +87,8 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
         await redisService.RemoveGroupAsync("tt_events_all");
         await redisService.RemoveDataAsync($"tt_event_v2_{id}");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
 
         return NoContent();
@@ -98,6 +103,8 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
         await redisService.RemoveGroupAsync("tt_events_all");
         await redisService.RemoveDataAsync($"tt_event_v2_{id}");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
 
         return NoContent();
@@ -110,6 +117,8 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
         await redisService.RemoveGroupAsync("tt_events_all");
         await redisService.RemoveDataAsync($"tt_event_v2_{id}");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
@@ -122,6 +131,8 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
         await redisService.RemoveGroupAsync("tt_events_all");
         await redisService.RemoveDataAsync($"tt_event_v2_{id}");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
@@ -134,6 +145,8 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
         await redisService.RemoveGroupAsync("tt_events_all");
         await redisService.RemoveDataAsync($"tt_event_v2_{id}");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
@@ -146,6 +159,8 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
         await redisService.RemoveGroupAsync("tt_events_all");
         await redisService.RemoveDataAsync($"tt_event_v2_{id}");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
@@ -158,6 +173,8 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
         await redisService.RemoveGroupAsync("tt_events_all");
         await redisService.RemoveDataAsync($"tt_event_v2_{id}");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
@@ -170,7 +187,11 @@ public class TableTennisEventsController(ITableTennisEventService ttEventService
         await redisService.RemoveGroupAsync("tt_events_all");
         await redisService.RemoveDataAsync($"tt_event_v2_{id}");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
 }
+
+

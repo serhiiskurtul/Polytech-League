@@ -1,3 +1,4 @@
+using PolytechLeague.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PolytechLeague.Application.Dto.VolleyballDto;
@@ -10,7 +11,7 @@ namespace PolytechLeague.API.Controllers.Volleyball;
 [Route("api/volleyball-events")]
 public class VolleyballEventsController(
     IVolleyballEventService volleyballEventService,
-    IRedisService redisService) : ControllerBase
+    IRedisService redisService, IPlayerService playerService) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
@@ -50,6 +51,8 @@ public class VolleyballEventsController(
 
         await redisService.RemoveGroupAsync("volleyball_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
 
         return Created();
     }
@@ -66,6 +69,8 @@ public class VolleyballEventsController(
 
         await redisService.RemoveGroupAsync("volleyball_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
 
         return NoContent();
@@ -79,6 +84,8 @@ public class VolleyballEventsController(
 
         await redisService.RemoveGroupAsync("volleyball_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
 
         return NoContent();
@@ -91,6 +98,8 @@ public class VolleyballEventsController(
         await volleyballEventService.RegisterPlayerAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("volleyball_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
@@ -102,6 +111,8 @@ public class VolleyballEventsController(
         await volleyballEventService.ApproveParticipantAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("volleyball_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
@@ -113,6 +124,8 @@ public class VolleyballEventsController(
         await volleyballEventService.RejectParticipantAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("volleyball_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
@@ -124,7 +137,11 @@ public class VolleyballEventsController(
         await volleyballEventService.RemoveParticipantAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("volleyball_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return NoContent();
     }
 }
+
+

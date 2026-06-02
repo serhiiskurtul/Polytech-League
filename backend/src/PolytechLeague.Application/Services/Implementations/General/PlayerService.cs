@@ -2504,4 +2504,9 @@ public class PlayerService : IPlayerService
             _logger.LogError(ex, "Error populating football stats for player {PlayerId}", dto.Id);
         }
     }
+
+    public void ClearRankingsCache()
+    {
+        _rankingsCache.Clear();
+    }
 }

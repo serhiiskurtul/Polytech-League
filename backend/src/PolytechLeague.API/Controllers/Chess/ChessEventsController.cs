@@ -10,7 +10,7 @@ namespace PolytechLeague.API.Controllers.Chess;
 
 [ApiController]
 [Route("api/chess-events")]
-public class ChessEventsController(IChessEventService chessEventService, IRedisService redisService, IFileService fileService) : ControllerBase
+public class ChessEventsController(IChessEventService chessEventService, IRedisService redisService, IPlayerService playerService, IFileService fileService) : ControllerBase
 {
     [AllowAnonymous]
     [HttpGet("ping")]
@@ -71,6 +71,8 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
 
         await redisService.RemoveGroupAsync("chess_events_all");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
 
         return Created();
     }
@@ -88,6 +90,8 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
         await redisService.RemoveGroupAsync("chess_events_all");
         await redisService.RemoveDataAsync($"chess_event_{id}");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
 
         return NoContent();
@@ -102,6 +106,8 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
         await redisService.RemoveGroupAsync("chess_events_all");
         await redisService.RemoveDataAsync($"chess_event_{id}");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
 
         return NoContent();
     }
@@ -240,3 +246,4 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
         return Ok(result);
     }
 }
+
