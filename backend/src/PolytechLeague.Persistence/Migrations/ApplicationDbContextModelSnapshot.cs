@@ -42,6 +42,21 @@ namespace PolytechLeague.Persistence.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "volleyball_tournament_type", new[] { "single_elimination", "double_elimination", "round_robin", "swiss", "groups_playoff" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("BeachVolleyballTeamPlayer", b =>
+                {
+                    b.Property<long>("BeachVolleyballTeamsId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PlayersId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("BeachVolleyballTeamsId", "PlayersId");
+
+                    b.HasIndex("PlayersId");
+
+                    b.ToTable("beach_volleyball_team_players", (string)null);
+                });
+
             modelBuilder.Entity("Football_match_away_roster", b =>
                 {
                     b.Property<long>("FootballMatchId")
@@ -2813,10 +2828,6 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("beach_volleyball_shirt_number");
 
-                    b.Property<long?>("BeachVolleyballTeamId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("beach_volleyball_team_id");
-
                     b.Property<string>("Bio")
                         .HasColumnType("text")
                         .HasColumnName("Bio");
@@ -2925,8 +2936,6 @@ namespace PolytechLeague.Persistence.Migrations
 
                     b.HasIndex("BasketballTeamId");
 
-                    b.HasIndex("BeachVolleyballTeamId");
-
                     b.HasIndex("CheckersTeamId");
 
                     b.HasIndex("ChessTeamId");
@@ -2941,6 +2950,21 @@ namespace PolytechLeague.Persistence.Migrations
                     b.HasIndex("VolleyballTeamId");
 
                     b.ToTable("players", (string)null);
+                });
+
+            modelBuilder.Entity("BeachVolleyballTeamPlayer", b =>
+                {
+                    b.HasOne("PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballTeam", null)
+                        .WithMany()
+                        .HasForeignKey("BeachVolleyballTeamsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PolytechLeague.Domain.Entities.Player", null)
+                        .WithMany()
+                        .HasForeignKey("PlayersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Football_match_away_roster", b =>
@@ -4500,10 +4524,6 @@ namespace PolytechLeague.Persistence.Migrations
                         .WithMany("Players")
                         .HasForeignKey("BasketballTeamId");
 
-                    b.HasOne("PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballTeam", null)
-                        .WithMany("Players")
-                        .HasForeignKey("BeachVolleyballTeamId");
-
                     b.HasOne("PolytechLeague.Domain.Entities.Checkers.CheckersTeam", null)
                         .WithMany("Players")
                         .HasForeignKey("CheckersTeamId");
@@ -4547,11 +4567,6 @@ namespace PolytechLeague.Persistence.Migrations
             modelBuilder.Entity("PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballMatch", b =>
                 {
                     b.Navigation("Sets");
-                });
-
-            modelBuilder.Entity("PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballTeam", b =>
-                {
-                    b.Navigation("Players");
                 });
 
             modelBuilder.Entity("PolytechLeague.Domain.Entities.Checkers.CheckersTeam", b =>

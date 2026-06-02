@@ -188,7 +188,7 @@ public static class PlayerDtoExtensions
             BasketballShirtNumber = player.BasketballShirtNumber,
             BasketballTeamId = player.BasketballTeamId,
             BeachVolleyballShirtNumber = player.BeachVolleyballShirtNumber,
-            BeachVolleyballTeamId = player.BeachVolleyballTeamId,
+            BeachVolleyballTeamId = player.BeachVolleyballTeams?.FirstOrDefault()?.Id,
             IsExternal = player.IsExternal,
             IsGuest = player.IsGuest,
             Gender = player.Gender,
@@ -254,7 +254,6 @@ public static class PlayerDtoExtensions
             BasketballShirtNumber = dto.BasketballShirtNumber,
             BasketballTeamId = dto.BasketballTeamId,
             BeachVolleyballShirtNumber = dto.BeachVolleyballShirtNumber,
-            BeachVolleyballTeamId = dto.BeachVolleyballTeamId,
             IsExternal = dto.IsExternal,
             IsGuest = dto.IsGuest,
             Gender = dto.Gender
