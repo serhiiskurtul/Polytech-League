@@ -1566,6 +1566,28 @@ const TournamentViewPage = () => {
     return variant || 'Класичні';
   }
 
+  const getTournamentSystemLabel = () => {
+    const sport = tournament?.sport?.toLowerCase() || '';
+    if (sport === 'chess' || sport === 'checkers') {
+      const system = (details as any)?.system;
+      switch (system) {
+        case 'Swiss': return 'Швейцарська система';
+        case 'RoundRobin': return 'Кругова система';
+        case 'Knockout': return 'Олімпійська система';
+        default: return system ? getSystemLabel(system) : '';
+      }
+    } else {
+      const type = (details as any)?.tournamentType;
+      switch (type) {
+        case 'RoundRobin': return 'Кругова система';
+        case 'SingleElimination': return 'Олімпійська система (Single Elimination)';
+        case 'DoubleElimination': return 'Double Elimination (з вибуванням після двох поразок)';
+        case 'GroupsPlayoff': return 'Груповий етап + Плей-офф';
+        default: return type || '';
+      }
+    }
+  };
+
   const getImageUrl = (url: string) => {
     if (!url) return '';
     if (url.startsWith('http')) return url;
@@ -1910,6 +1932,16 @@ const TournamentViewPage = () => {
                     })()}
                   </span>
                 </div>
+                {(() => {
+                  const systemLabel = getTournamentSystemLabel();
+                  if (!systemLabel) return null;
+                  return (
+                    <div className={styles.metaItem}>
+                      <i className="fas fa-project-diagram"></i>
+                      <span>Система проведення: {systemLabel}</span>
+                    </div>
+                  );
+                })()}
                 {details?.timeControl && tournament?.sport?.toLowerCase() !== 'armwrestling' && (
                   <div className={styles.metaItem}>
                     <i className="fas fa-clock"></i>
