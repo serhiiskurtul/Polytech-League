@@ -214,6 +214,11 @@ public class PlayerService : IPlayerService
         {
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
+        catch (EntityFramework.Exceptions.Common.UniqueConstraintException ex) when (ex.ConstraintName == "IX_players_student_id")
+        {
+            _logger.LogWarning(ex, "Student ID {StudentId} is already in use by another player", player.StudentId);
+            throw new ArgumentException("Цей студентський квиток вже зареєстрований для іншого гравця.");
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error updating player {PlayerId}: {Message}", id, ex.Message);

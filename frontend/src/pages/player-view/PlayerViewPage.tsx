@@ -178,9 +178,11 @@ const PlayerViewPage = () => {
       const updatedProfile = await getPlayerById(id!);
       setPlayerProfile(updatedProfile);
       toast.success('Профіль успішно оновлено');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update profile:', error);
-      toast.error('Не вдалося оновити профіль');
+      const errorMsg = error.response?.data?.detail || 'Не вдалося оновити профіль';
+      toast.error(errorMsg);
+      throw error; // Rethrow to let EditProfileModal know it failed
     }
   };
 
