@@ -209,6 +209,35 @@ const SettingsSection = ({ formData, handleInputChange }: SettingsSectionProps) 
           </div>
         </div>
       )}
+
+      {/* Налаштування сповіщень */}
+      <div className={shared.formBlock}>
+        <h3 className={shared.blockTitle}>
+          <i className="fas fa-bell-slash"></i> Сповіщення
+        </h3>
+        <div className={shared.formGrid}>
+          <div className={shared.checkboxGroup}>
+            <label className={shared.checkboxLabel}>
+              <div className={shared.checkboxWrapper}>
+                <input
+                  type="checkbox"
+                  name="disableNotifications"
+                  checked={formData.disableNotifications}
+                  onChange={handleInputChange}
+                  className={shared.hiddenCheckbox}
+                />
+                <div className={shared.customCheckbox}>
+                  <i className="fas fa-check"></i>
+                </div>
+              </div>
+              <div className={shared.checkboxText}>
+                <span className={shared.checkboxTitle}>Вимкнути всі сповіщення</span>
+                <span className={shared.checkboxDesc}>Користувачі не отримають жодних повідомлень про створення, оновлення змагання чи визначення призерів. Зручно для імпорту старих турнірів.</span>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

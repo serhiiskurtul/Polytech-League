@@ -39,6 +39,7 @@ public class BeachVolleyballEventService(
         updatedEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
         updatedEntity.IsModerated = newEntity.IsModerated;
         updatedEntity.IsPublic = newEntity.IsPublic;
+        updatedEntity.DisableNotifications = newEntity.DisableNotifications;
         updatedEntity.IsTeam = newEntity.IsTeam;
         updatedEntity.SeasonId = newEntity.SeasonId;
         updatedEntity.MvpId = newEntity.MvpId;
@@ -81,13 +82,16 @@ public class BeachVolleyballEventService(
     {
         if (_notificationService != null)
         {
-            await _notificationService.SendNotificationToAllAsync(
+            if (!entity.DisableNotifications)
+        {
+            await _notificationService!.SendNotificationToAllAsync(
                 "Нове змагання!",
                 $"Створено нове змагання з пляжного волейболу: {entity.Name}",
                 NotificationType.Tournament,
                 $"/tournaments/{entity.Id}",
                 true
             );
+        }
         }
     }
 
@@ -112,15 +116,18 @@ public class BeachVolleyballEventService(
 
         bool winnersSet = updatedEntity.FirstPlaceTeamId != null && updatedEntity.SecondPlaceTeamId != null && updatedEntity.ThirdPlaceTeamId != null && (originalEntity.FirstPlaceTeamId == null || originalEntity.SecondPlaceTeamId == null || originalEntity.ThirdPlaceTeamId == null);
         
-        if (winnersSet)
+        if (winnersSet && !updatedEntity.DisableNotifications)
         {
-            await _notificationService.SendNotificationToAllAsync(
+            if (!updatedEntity.DisableNotifications)
+        {
+            await _notificationService!.SendNotificationToAllAsync(
                 "Змагання завершено!",
                 $"Визначено переможців у змаганні з пляжного волейболу: {updatedEntity.Name}",
                 NotificationType.Tournament,
                 $"/tournaments/{updatedEntity.Id}",
                 true
             );
+        }
         }
     }
 

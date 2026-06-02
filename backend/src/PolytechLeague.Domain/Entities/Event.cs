@@ -25,6 +25,7 @@ public abstract class Event
     public bool IsTeam { get; set; }
     public bool IsModerated { get; set; } = false;
     public bool IsPublic { get; set; } = true;
+    public bool DisableNotifications { get; set; } = false;
     public long? SeasonId { get; set; }
     public Season? Season { get; set; }
 

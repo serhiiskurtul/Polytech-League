@@ -87,7 +87,7 @@ public class AuthController(IAuthService authService) : Controller
             HttpOnly = true,
             Secure = isProd,
             SameSite = isProd ? SameSiteMode.None : SameSiteMode.Lax,
-            Expires = DateTimeOffset.UtcNow.AddMinutes(1),
+            Expires = DateTimeOffset.UtcNow.AddMinutes(60),
             Path = "/"
         });
 

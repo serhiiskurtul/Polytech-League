@@ -55,6 +55,7 @@ public class ChessEventService :
         updatedEntity.IsTeam = newEntity.IsTeam;
         updatedEntity.IsModerated = newEntity.IsModerated;
         updatedEntity.IsPublic = newEntity.IsPublic;
+        updatedEntity.DisableNotifications = newEntity.DisableNotifications;
         updatedEntity.SeasonId = newEntity.SeasonId;
         updatedEntity.MvpId = newEntity.MvpId;
         updatedEntity.Category = newEntity.Category;
@@ -229,13 +230,16 @@ public class ChessEventService :
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
-        await _notificationService!.SendNotificationToAllAsync(
+        if (!entity.DisableNotifications)
+        {
+            await _notificationService!.SendNotificationToAllAsync(
             "Нове змагання!",
             $"Створено нове змагання з шахів: {entity.Name}",
             NotificationType.Tournament,
             $"/tournaments/{actualId}",
             true
         );
+        }
     }
 
     protected override async Task OnUpdatedAsync(ChessEvent originalEntity, ChessEvent updatedEntity, CancellationToken cancellationToken)
@@ -260,7 +264,9 @@ public class ChessEventService :
         bool individualWinnersSet = updatedEntity.FirstPlaceId != null && updatedEntity.SecondPlaceId != null && updatedEntity.ThirdPlaceId != null && (originalEntity.FirstPlaceId == null || originalEntity.SecondPlaceId == null || originalEntity.ThirdPlaceId == null);
         bool teamWinnersSet = updatedEntity.FirstPlaceTeamId != null && updatedEntity.SecondPlaceTeamId != null && updatedEntity.ThirdPlaceTeamId != null && (originalEntity.FirstPlaceTeamId == null || originalEntity.SecondPlaceTeamId == null || originalEntity.ThirdPlaceTeamId == null);
         
-        if (individualWinnersSet || teamWinnersSet)
+        if ((individualWinnersSet || teamWinnersSet) && !updatedEntity.DisableNotifications)
+        {
+            if (!updatedEntity.DisableNotifications)
         {
             await _notificationService!.SendNotificationToAllAsync(
                 "Змагання завершено!",
@@ -269,6 +275,7 @@ public class ChessEventService :
                 $"/tournaments/{updatedEntity.Id}",
                 true
             );
+        }
         }
     }
 

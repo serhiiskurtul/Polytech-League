@@ -35,6 +35,7 @@ public class FootballEventRequest
     public string? Schedule { get; set; }
     public bool IsModerated { get; set; }
     public bool IsPublic { get; set; }
+    public bool DisableNotifications { get; set; }
     public bool IsTeam { get; set; }
 
     public long? FirstPlaceTeamId { get; set; }
@@ -84,6 +85,7 @@ public class FootballEventResponse
     public long? SeasonId { get; set; }
     public bool IsModerated { get; set; }
     public bool IsPublic { get; set; }
+    public bool DisableNotifications { get; set; }
     public bool IsTeam { get; set; }
     public long? MvpId { get; set; }
     public string? MvpName { get; set; }
@@ -123,6 +125,7 @@ public static class FootballEventDtoExtensions
             Schedule = request.Schedule,
             IsModerated = request.IsModerated,
             IsPublic = request.IsPublic,
+            DisableNotifications = request.DisableNotifications,
             IsTeam = request.IsTeam,
             FirstPlaceTeamId = request.FirstPlaceTeamId,
             SecondPlaceTeamId = request.SecondPlaceTeamId,
@@ -172,6 +175,7 @@ public static class FootballEventDtoExtensions
             Category = entity.Category,
             IsModerated = entity.IsModerated,
             IsPublic = entity.IsPublic,
+            DisableNotifications = entity.DisableNotifications,
             IsTeam = entity.IsTeam,
             MvpId = entity.MvpId,
             MvpName = entity.Mvp != null ? $"{entity.Mvp.FirstName} {entity.Mvp.LastName}" : null

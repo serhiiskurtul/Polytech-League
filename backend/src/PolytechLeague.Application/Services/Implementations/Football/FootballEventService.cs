@@ -44,6 +44,7 @@ public class FootballEventService :
         updatedEntity.IsModerated = newEntity.IsModerated;
 
         updatedEntity.IsPublic = newEntity.IsPublic;
+        updatedEntity.DisableNotifications = newEntity.DisableNotifications;
         updatedEntity.IsTeam = newEntity.IsTeam;
         updatedEntity.SeasonId = newEntity.SeasonId;
         updatedEntity.MvpId = newEntity.MvpId;
@@ -112,13 +113,16 @@ public class FootballEventService :
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
-        await _notificationService!.SendNotificationToAllAsync(
+        if (!entity.DisableNotifications)
+        {
+            await _notificationService!.SendNotificationToAllAsync(
             "Нове змагання!",
             $"Створено нове змагання з Футболу: {entity.Name}",
             NotificationType.Tournament,
             $"/tournaments/{actualId}",
             true
         );
+        }
     }
 
     protected override async Task OnUpdatedAsync(FootballEvent originalEntity, FootballEvent updatedEntity, CancellationToken cancellationToken)
@@ -143,7 +147,9 @@ public class FootballEventService :
 
         bool winnersSet = updatedEntity.FirstPlaceTeamId != null && updatedEntity.SecondPlaceTeamId != null && updatedEntity.ThirdPlaceTeamId != null && (originalEntity.FirstPlaceTeamId == null || originalEntity.SecondPlaceTeamId == null || originalEntity.ThirdPlaceTeamId == null);
         
-        if (winnersSet)
+        if (winnersSet && !updatedEntity.DisableNotifications)
+        {
+            if (!updatedEntity.DisableNotifications)
         {
             await _notificationService!.SendNotificationToAllAsync(
                 "Змагання завершено!",
@@ -152,6 +158,7 @@ public class FootballEventService :
                 $"/tournaments/{updatedEntity.Id}",
                 true
             );
+        }
         }
     }
 

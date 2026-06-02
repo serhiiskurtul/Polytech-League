@@ -39,6 +39,7 @@ public class VolleyballEventService(
         updatedEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
         updatedEntity.IsModerated = newEntity.IsModerated;
         updatedEntity.IsPublic = newEntity.IsPublic;
+        updatedEntity.DisableNotifications = newEntity.DisableNotifications;
         updatedEntity.IsTeam = newEntity.IsTeam;
         updatedEntity.SeasonId = newEntity.SeasonId;
         updatedEntity.MvpId = newEntity.MvpId;
@@ -81,13 +82,16 @@ public class VolleyballEventService(
     {
         if (_notificationService != null)
         {
-            await _notificationService.SendNotificationToAllAsync(
+            if (!entity.DisableNotifications)
+        {
+            await _notificationService!.SendNotificationToAllAsync(
                 "Нове змагання!",
                 $"Створено нове змагання з волейболу: {entity.Name}",
                 NotificationType.Tournament,
                 $"/tournaments/{entity.Id}",
                 true
             );
+        }
         }
     }
 
@@ -113,17 +117,20 @@ public class VolleyballEventService(
 
         bool winnersSet = updatedEntity.FirstPlaceTeamId != null && updatedEntity.SecondPlaceTeamId != null && updatedEntity.ThirdPlaceTeamId != null && (originalEntity.FirstPlaceTeamId == null || originalEntity.SecondPlaceTeamId == null || originalEntity.ThirdPlaceTeamId == null);
         
-        if (winnersSet)
+        if (winnersSet && !updatedEntity.DisableNotifications)
         {
             if (_notificationService != null)
             {
-                await _notificationService.SendNotificationToAllAsync(
+                if (!updatedEntity.DisableNotifications)
+        {
+            await _notificationService!.SendNotificationToAllAsync(
                     "Турнір завершено!",
                     $"Змагання з волейболу \"{updatedEntity.Name}\" завершено. Перегляньте результати!",
                     NotificationType.Tournament,
                     $"/tournaments/{updatedEntity.Id}",
                     true
                 );
+        }
             }
         }
     }

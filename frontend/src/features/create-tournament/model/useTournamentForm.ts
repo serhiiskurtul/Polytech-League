@@ -39,6 +39,7 @@ export interface TournamentFormData {
   schedule: string;
   isPublic: boolean;
   requireApproval: boolean;
+  disableNotifications: boolean;
   categories: string[];
   // Шахові / шашкові специфічні поля
   date: string;
@@ -83,6 +84,7 @@ export const useTournamentForm = () => {
     schedule: '',
     isPublic: true,
     requireApproval: false,
+    disableNotifications: false,
     categories: [],
     // Шахові / шашкові специфічні поля
     date: '',
@@ -226,6 +228,7 @@ export const useTournamentForm = () => {
         isTeam: formData.isTeam,
         isPublic: formData.level === 'CollegeGroup' ? formData.isPublic : false,
         isModerated: formData.level === 'CollegeGroup' ? formData.requireApproval : false,
+        disableNotifications: formData.disableNotifications,
         registrationStart: formData.level === 'CollegeGroup' && formData.registrationStartDate ? combineDateTime(formData.registrationStartDate, formData.registrationStartTime) : null,
         registrationEnd: formData.level === 'CollegeGroup' && formData.registrationDeadline ? combineDateTime(formData.registrationDeadline, formData.registrationDeadlineTime) : null,
         endDate: formData.endDate ? combineDateTime(formData.endDate, formData.endTime) : null,

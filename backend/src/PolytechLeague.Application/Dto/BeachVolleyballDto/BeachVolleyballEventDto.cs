@@ -35,6 +35,7 @@ public class BeachVolleyballEventRequest
     public string? Schedule { get; set; }
     public bool IsModerated { get; set; }
     public bool IsPublic { get; set; }
+    public bool DisableNotifications { get; set; }
     public bool IsTeam { get; set; }
 
     public long? FirstPlaceTeamId { get; set; }
@@ -80,6 +81,7 @@ public class BeachVolleyballEventResponse
     public long? SeasonId { get; set; }
     public bool IsModerated { get; set; }
     public bool IsPublic { get; set; }
+    public bool DisableNotifications { get; set; }
     public bool IsTeam { get; set; }
 }
 
@@ -116,6 +118,7 @@ public static class BeachVolleyballEventDtoExtensions
             Schedule = request.Schedule,
             IsModerated = request.IsModerated,
             IsPublic = request.IsPublic,
+            DisableNotifications = request.DisableNotifications,
             IsTeam = request.IsTeam,
             FirstPlaceTeamId = request.FirstPlaceTeamId,
             SecondPlaceTeamId = request.SecondPlaceTeamId,
@@ -160,6 +163,7 @@ public static class BeachVolleyballEventDtoExtensions
             Category = entity.Category,
             IsModerated = entity.IsModerated,
             IsPublic = entity.IsPublic,
+            DisableNotifications = entity.DisableNotifications,
             IsTeam = entity.IsTeam
         };
     }

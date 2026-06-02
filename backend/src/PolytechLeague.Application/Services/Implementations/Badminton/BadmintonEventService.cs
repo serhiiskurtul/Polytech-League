@@ -46,6 +46,7 @@ public class BadmintonEventService(
         updatedEntity.IsTeam = newEntity.IsTeam;
         updatedEntity.IsModerated = newEntity.IsModerated;
         updatedEntity.IsPublic = newEntity.IsPublic;
+        updatedEntity.DisableNotifications = newEntity.DisableNotifications;
         updatedEntity.SeasonId = newEntity.SeasonId;
         updatedEntity.MvpId = newEntity.MvpId;
         updatedEntity.Category = newEntity.Category;
@@ -86,13 +87,16 @@ public class BadmintonEventService(
 
     protected override async Task OnCreatedAsync(BadmintonEvent entity, CancellationToken cancellationToken)
     {
-        await _notificationService.SendNotificationToAllAsync(
+        if (!entity.DisableNotifications)
+        {
+            await _notificationService!.SendNotificationToAllAsync(
             "Нове змагання!",
             $"Створено нове змагання з бадмінтону: {entity.Name}",
             NotificationType.Tournament,
             $"/tournaments/{entity.Id}",
             true
         );
+        }
     }
 
     protected override async Task OnUpdatedAsync(BadmintonEvent originalEntity, BadmintonEvent updatedEntity, CancellationToken cancellationToken)
@@ -100,15 +104,18 @@ public class BadmintonEventService(
         bool individualWinnersSet = updatedEntity.FirstPlaceId != null && updatedEntity.SecondPlaceId != null && updatedEntity.ThirdPlaceId != null && (originalEntity.FirstPlaceId == null || originalEntity.SecondPlaceId == null || originalEntity.ThirdPlaceId == null);
         bool teamWinnersSet = updatedEntity.FirstPlaceTeamId != null && updatedEntity.SecondPlaceTeamId != null && updatedEntity.ThirdPlaceTeamId != null && (originalEntity.FirstPlaceTeamId == null || originalEntity.SecondPlaceTeamId == null || originalEntity.ThirdPlaceTeamId == null);
         
-        if (individualWinnersSet || teamWinnersSet)
+        if ((individualWinnersSet || teamWinnersSet) && !updatedEntity.DisableNotifications)
         {
-            await _notificationService.SendNotificationToAllAsync(
+            if (!updatedEntity.DisableNotifications)
+        {
+            await _notificationService!.SendNotificationToAllAsync(
                 "Змагання завершено!",
                 $"Визначено переможців у змаганні з бадмінтону: {updatedEntity.Name}",
                 NotificationType.Tournament,
                 $"/tournaments/{updatedEntity.Id}",
                 true
             );
+        }
         }
     }
 

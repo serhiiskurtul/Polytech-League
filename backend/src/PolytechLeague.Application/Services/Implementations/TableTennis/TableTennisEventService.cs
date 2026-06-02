@@ -33,6 +33,7 @@ public class TableTennisEventService(
         updatedEntity.Category = newEntity.Category;
         updatedEntity.IsModerated = newEntity.IsModerated;
         updatedEntity.IsPublic = newEntity.IsPublic;
+        updatedEntity.DisableNotifications = newEntity.DisableNotifications;
         updatedEntity.IsTeam = newEntity.IsTeam;
         updatedEntity.FirstPlaceId = newEntity.FirstPlaceId;
         updatedEntity.SecondPlaceId = newEntity.SecondPlaceId;
@@ -77,13 +78,16 @@ public class TableTennisEventService(
 
     protected override async Task OnCreatedAsync(TableTennisEvent entity, CancellationToken cancellationToken)
     {
-        await _notificationService.SendNotificationToAllAsync(
+        if (!entity.DisableNotifications)
+        {
+            await _notificationService!.SendNotificationToAllAsync(
             "Нове змагання!",
             $"Створено нове змагання з настільного тенісу: {entity.Name}",
             NotificationType.Tournament,
             $"/tournaments/{entity.Id}",
             true
         );
+        }
     }
 
     protected override async Task OnUpdatedAsync(TableTennisEvent originalEntity, TableTennisEvent updatedEntity, CancellationToken cancellationToken)
@@ -109,15 +113,18 @@ public class TableTennisEventService(
         bool individualWinnersSet = updatedEntity.FirstPlaceId != null && updatedEntity.SecondPlaceId != null && updatedEntity.ThirdPlaceId != null && (originalEntity.FirstPlaceId == null || originalEntity.SecondPlaceId == null || originalEntity.ThirdPlaceId == null);
         bool teamWinnersSet = updatedEntity.FirstPlaceTeamId != null && updatedEntity.SecondPlaceTeamId != null && updatedEntity.ThirdPlaceTeamId != null && (originalEntity.FirstPlaceTeamId == null || originalEntity.SecondPlaceTeamId == null || originalEntity.ThirdPlaceTeamId == null);
         
-        if (individualWinnersSet || teamWinnersSet)
+        if ((individualWinnersSet || teamWinnersSet) && !updatedEntity.DisableNotifications)
         {
-            await _notificationService.SendNotificationToAllAsync(
+            if (!updatedEntity.DisableNotifications)
+        {
+            await _notificationService!.SendNotificationToAllAsync(
                 "Змагання завершено!",
                 $"Визначено переможців у змаганні з настільного тенісу: {updatedEntity.Name}",
                 NotificationType.Tournament,
                 $"/tournaments/{updatedEntity.Id}",
                 true
             );
+        }
         }
     }
 

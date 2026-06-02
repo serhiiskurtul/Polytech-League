@@ -79,13 +79,16 @@ public class AthleticsEventService(
     {
         if (_notificationService != null)
         {
-            await _notificationService.SendNotificationToAllAsync(
+            if (!entity.DisableNotifications)
+        {
+            await _notificationService!.SendNotificationToAllAsync(
                 "Нове змагання!",
                 $"Створено нове змагання з легкої атлетики: {entity.Name}",
                 NotificationType.Tournament,
                 $"/tournaments/{entity.Id}",
                 true
             );
+        }
         }
     }
 

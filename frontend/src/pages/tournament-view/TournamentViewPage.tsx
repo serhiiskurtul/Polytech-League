@@ -347,6 +347,7 @@ const TournamentViewPage = () => {
         endDate: formatToISO(editTournamentData.endDate) || (details as any).endDate || null,
         isModerated: editTournamentData.level === 'CollegeGroup' ? !!editTournamentData.isModerated : !!(details as any).isModerated,
         isPublic: editTournamentData.isPublic !== undefined ? !!editTournamentData.isPublic : ((details as any).isPublic !== undefined ? !!(details as any).isPublic : true),
+        disableNotifications: (editTournamentData as any).disableNotifications || false,
         isTeam: isTeamSport,
         seasonId: editTournamentData.seasonId || (details as any).seasonId || null,
         category: editTournamentData.category || (details as any).category || (isVolleyball ? 'Men' : 'Mixed')
@@ -504,6 +505,7 @@ const TournamentViewPage = () => {
     endDate: '',
     isModerated: false,
     isPublic: true,
+    disableNotifications: false,
     seasonId: null,
     category: 'Mixed',
     firstPlaceId: null,
@@ -651,6 +653,7 @@ const TournamentViewPage = () => {
         endDate: formatDateForInput(tournament?.endDate || details.endDate),
         isModerated: !!details.isModerated,
         isPublic: details.isPublic !== undefined ? !!details.isPublic : true,
+        disableNotifications: (details as any).disableNotifications || false,
         seasonId: details.seasonId || null,
         category: (details as any).category ||
           (tournament?.category === 'Чоловіки' ? 'Men' :
@@ -767,6 +770,7 @@ const TournamentViewPage = () => {
         endDate: formatToISO(editTournamentData.endDate) || (details as any).endDate || null,
         isModerated: editTournamentData.level === 'CollegeGroup' ? !!editTournamentData.isModerated : !!(details as any).isModerated,
         isPublic: editTournamentData.isPublic !== undefined ? !!editTournamentData.isPublic : ((details as any).isPublic !== undefined ? !!(details as any).isPublic : true),
+        disableNotifications: (editTournamentData as any).disableNotifications || false,
         seasonId: editTournamentData.seasonId || (details as any).seasonId || null,
         category: editTournamentData.category || (details as any).category || (isVolleyball ? 'Men' : 'Mixed'),
         firstPlaceId: (editTournamentData as any).firstPlaceId || (details as any).firstPlace?.id || null,

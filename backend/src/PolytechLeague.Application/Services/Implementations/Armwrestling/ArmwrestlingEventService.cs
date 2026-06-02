@@ -78,6 +78,7 @@ public class ArmwrestlingEventService :
         updatedEntity.ParticipantsCount = newEntity.ParticipantsCount;
         updatedEntity.IsModerated = newEntity.IsModerated;
         updatedEntity.IsPublic = newEntity.IsPublic;
+        updatedEntity.DisableNotifications = newEntity.DisableNotifications;
         updatedEntity.IsTeam = newEntity.IsTeam;
         
         updatedEntity.FirstPlaceId = newEntity.FirstPlaceId;
@@ -91,13 +92,16 @@ public class ArmwrestlingEventService :
 
     protected override async Task OnCreatedAsync(ArmwrestlingEvent entity, CancellationToken cancellationToken)
     {
-        await _notificationService.SendNotificationToAllAsync(
+        if (!entity.DisableNotifications)
+        {
+            await _notificationService!.SendNotificationToAllAsync(
             "Нове змагання!",
             $"Створено нове змагання з армрестлінгу: {entity.Name}",
             NotificationType.Tournament,
             $"/tournaments/{entity.Id}",
             true
         );
+        }
     }
 
     protected override async Task OnUpdatedAsync(ArmwrestlingEvent originalEntity, ArmwrestlingEvent updatedEntity, CancellationToken cancellationToken)
@@ -122,15 +126,18 @@ public class ArmwrestlingEventService :
         // Перевірка чи були визначені призери (перехід від null до значення)
         bool winnersSet = updatedEntity.FirstPlaceId != null && updatedEntity.SecondPlaceId != null && updatedEntity.ThirdPlaceId != null && (originalEntity.FirstPlaceId == null || originalEntity.SecondPlaceId == null || originalEntity.ThirdPlaceId == null);
         
-        if (winnersSet)
+        if (winnersSet && !updatedEntity.DisableNotifications)
         {
-            await _notificationService.SendNotificationToAllAsync(
+            if (!updatedEntity.DisableNotifications)
+        {
+            await _notificationService!.SendNotificationToAllAsync(
                 "Змагання завершено!",
                 $"Визначено переможців у змаганні з армрестлінгу: {updatedEntity.Name}",
                 NotificationType.Tournament,
                 $"/tournaments/{updatedEntity.Id}",
                 true
             );
+        }
         }
     }
 
