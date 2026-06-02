@@ -37,6 +37,7 @@ public class TableTennisEventRequest
     public bool IsTeam { get; set; }
     public bool IsModerated { get; set; }
     public bool IsPublic { get; set; }
+    public bool DisableNotifications { get; set; }
     public long? SeasonId { get; set; }
 
     public long? FirstPlaceId { get; set; }
@@ -131,6 +132,7 @@ public static class TableTennisEventDtoExtensions
             IsTeam = request.IsTeam,
             IsModerated = request.IsModerated,
             IsPublic = request.IsPublic,
+            DisableNotifications = request.DisableNotifications,
             SeasonId = request.SeasonId,
             FirstPlaceId = request.FirstPlaceId,
             SecondPlaceId = request.SecondPlaceId,

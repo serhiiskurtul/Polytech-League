@@ -36,6 +36,7 @@ public class BadmintonEventRequest
     public bool IsTeam { get; set; }
     public bool IsModerated { get; set; }
     public bool IsPublic { get; set; }
+    public bool DisableNotifications { get; set; }
 
     public long? FirstPlaceTeamId { get; set; }
     public long? SecondPlaceTeamId { get; set; }
@@ -201,6 +202,7 @@ public static class BadmintonDtoExtensions
             IsTeam = request.IsTeam,
             IsModerated = request.IsModerated,
             IsPublic = request.IsPublic,
+            DisableNotifications = request.DisableNotifications,
             SeasonId = request.SeasonId,
             MvpId = request.MvpId,
             Category = request.Category

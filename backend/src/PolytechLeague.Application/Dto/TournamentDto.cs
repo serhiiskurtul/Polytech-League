@@ -27,6 +27,7 @@ public class TournamentDto
     public string? Time { get; set; }
     public bool IsModerated { get; set; }
     public bool IsPublic { get; set; }
+    public bool DisableNotifications { get; set; }
     public long? SeasonId { get; set; }
     public string? MainPhotoUrl { get; set; }
     public DateTime RawDate { get; set; }

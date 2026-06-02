@@ -49,6 +49,7 @@ public class ArmwrestlingEventRequest
 
     public bool IsModerated { get; set; }
     public bool IsPublic { get; set; }
+    public bool DisableNotifications { get; set; }
     public long? MvpId { get; set; }
     public long? SeasonId { get; set; }
 }
@@ -100,6 +101,7 @@ public class ArmwrestlingEventResponse
 
     public bool IsModerated { get; set; }
     public bool IsPublic { get; set; }
+    public bool DisableNotifications { get; set; }
 
     public ICollection<ArmwrestlingEventParticipantDto> Participants { get; set; } = new List<ArmwrestlingEventParticipantDto>();
     public long? MvpId { get; set; }
@@ -139,6 +141,7 @@ public static class ArmwrestlingEventDtoExtensions
             TournamentType = request.TournamentType,
             IsModerated = request.IsModerated,
             IsPublic = request.IsPublic,
+            DisableNotifications = request.DisableNotifications,
             MvpId = request.MvpId,
             SeasonId = request.SeasonId
 
@@ -175,6 +178,7 @@ public static class ArmwrestlingEventDtoExtensions
             TournamentType = entity.TournamentType,
             IsModerated = entity.IsModerated,
             IsPublic = entity.IsPublic,
+            DisableNotifications = entity.DisableNotifications,
             MvpId = entity.MvpId,
             MvpName = entity.Mvp != null ? $"{entity.Mvp.FirstName} {entity.Mvp.LastName}" : null,
             SeasonId = entity.SeasonId

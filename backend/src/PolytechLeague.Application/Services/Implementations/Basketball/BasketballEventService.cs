@@ -19,31 +19,32 @@ public class BasketballEventService(
     AbstractEntityService<BasketballEvent>(_dbcontext, _logger, _notificationService),
     IBasketballEventService
 {
-    protected override void UpdateValues(BasketballEvent oldEntity, BasketballEvent newEntity)
+    protected override void UpdateValues(BasketballEvent updatedEntity, BasketballEvent newEntity)
     {
-        oldEntity.Name = newEntity.Name;
-        oldEntity.Date = newEntity.Date;
-        oldEntity.Location = newEntity.Location;
-        oldEntity.Description = newEntity.Description;
-        oldEntity.RegistrationStart = newEntity.RegistrationStart;
-        oldEntity.RegistrationEnd = newEntity.RegistrationEnd;
-        oldEntity.EndDate = newEntity.EndDate;
-        oldEntity.Level = newEntity.Level;
-        oldEntity.TournamentType = newEntity.TournamentType;
-        oldEntity.Rules = newEntity.Rules;
-        oldEntity.Prizes = newEntity.Prizes;
-        oldEntity.HeadRefereeName = newEntity.HeadRefereeName;
-        oldEntity.Referees = newEntity.Referees;
-        oldEntity.Schedule = newEntity.Schedule;
-        oldEntity.FirstPlaceTeamId = newEntity.FirstPlaceTeamId;
-        oldEntity.SecondPlaceTeamId = newEntity.SecondPlaceTeamId;
-        oldEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
-        oldEntity.IsModerated = newEntity.IsModerated;
-        oldEntity.IsPublic = newEntity.IsPublic;
-        oldEntity.IsTeam = newEntity.IsTeam;
-        oldEntity.SeasonId = newEntity.SeasonId;
-        oldEntity.MvpId = newEntity.MvpId;
-        oldEntity.Category = newEntity.Category;
+        updatedEntity.Name = newEntity.Name;
+        updatedEntity.Date = newEntity.Date;
+        updatedEntity.Location = newEntity.Location;
+        updatedEntity.Description = newEntity.Description;
+        updatedEntity.RegistrationStart = newEntity.RegistrationStart;
+        updatedEntity.RegistrationEnd = newEntity.RegistrationEnd;
+        updatedEntity.EndDate = newEntity.EndDate;
+        updatedEntity.Level = newEntity.Level;
+        updatedEntity.TournamentType = newEntity.TournamentType;
+        updatedEntity.Rules = newEntity.Rules;
+        updatedEntity.Prizes = newEntity.Prizes;
+        updatedEntity.HeadRefereeName = newEntity.HeadRefereeName;
+        updatedEntity.Referees = newEntity.Referees;
+        updatedEntity.Schedule = newEntity.Schedule;
+        updatedEntity.FirstPlaceTeamId = newEntity.FirstPlaceTeamId;
+        updatedEntity.SecondPlaceTeamId = newEntity.SecondPlaceTeamId;
+        updatedEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
+        updatedEntity.IsModerated = newEntity.IsModerated;
+        updatedEntity.IsPublic = newEntity.IsPublic;
+        updatedEntity.DisableNotifications = newEntity.DisableNotifications;
+        updatedEntity.IsTeam = newEntity.IsTeam;
+        updatedEntity.SeasonId = newEntity.SeasonId;
+        updatedEntity.MvpId = newEntity.MvpId;
+        updatedEntity.Category = newEntity.Category;
 
     }
 
@@ -82,7 +83,9 @@ public class BasketballEventService(
     {
         if (_notificationService != null)
         {
-            await _notificationService.SendNotificationToAllAsync(
+            if (!entity.DisableNotifications)
+        {
+            await _notificationService!.SendNotificationToAllAsync(
                 "Нове змагання!",
                 $"Створено нове змагання з баскетболу 3х3: {entity.Name}",
                 NotificationType.Tournament,
@@ -90,39 +93,43 @@ public class BasketballEventService(
                 true
             );
         }
+        }
     }
 
-    protected override async Task OnUpdatedAsync(BasketballEvent oldEntity, BasketballEvent newEntity, CancellationToken cancellationToken)
+    protected override async Task OnUpdatedAsync(BasketballEvent originalEntity, BasketballEvent updatedEntity, CancellationToken cancellationToken)
     {
         // Update ranks for teams based on winners
         var eventWithTeams = await _dbcontext.BasketballEvents
             .Include(e => e.Teams)
-            .FirstOrDefaultAsync(e => e.Id == oldEntity.Id, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == updatedEntity.Id, cancellationToken);
 
         if (eventWithTeams != null && eventWithTeams.Teams != null)
         {
             foreach (var team in eventWithTeams.Teams)
             {
-                if (team.Id == oldEntity.FirstPlaceTeamId) team.Rank = 1;
-                else if (team.Id == oldEntity.SecondPlaceTeamId) team.Rank = 2;
-                else if (team.Id == oldEntity.ThirdPlaceTeamId) team.Rank = 3;
-                else if (oldEntity.FirstPlaceTeamId != null) team.Rank = 4; // Participation rank
+                if (team.Id == updatedEntity.FirstPlaceTeamId) team.Rank = 1;
+                else if (team.Id == updatedEntity.SecondPlaceTeamId) team.Rank = 2;
+                else if (team.Id == updatedEntity.ThirdPlaceTeamId) team.Rank = 3;
+                else if (updatedEntity.FirstPlaceTeamId != null) team.Rank = 4; // Participation rank
                 else team.Rank = 0;
             }
             await _dbcontext.SaveChangesAsync(cancellationToken);
         }
 
-        bool winnersSet = oldEntity.FirstPlaceTeamId != null && oldEntity.SecondPlaceTeamId != null && oldEntity.ThirdPlaceTeamId != null;
+        bool winnersSet = updatedEntity.FirstPlaceTeamId != null && updatedEntity.SecondPlaceTeamId != null && updatedEntity.ThirdPlaceTeamId != null && (originalEntity.FirstPlaceTeamId == null || originalEntity.SecondPlaceTeamId == null || originalEntity.ThirdPlaceTeamId == null);
         
-        if (winnersSet && _notificationService != null)
+        if (winnersSet && !updatedEntity.DisableNotifications && _notificationService != null)
         {
-            await _notificationService.SendNotificationToAllAsync(
+            if (!updatedEntity.DisableNotifications)
+        {
+            await _notificationService!.SendNotificationToAllAsync(
                 "Турнір завершено!",
-                $"Змагання з баскетболу 3х3 \"{oldEntity.Name}\" завершено. Перегляньте результати!",
+                $"Змагання з баскетболу 3х3 \"{updatedEntity.Name}\" завершено. Перегляньте результати!",
                 NotificationType.Tournament,
-                $"/tournaments/{oldEntity.Id}",
+                $"/tournaments/{updatedEntity.Id}",
                 true
             );
+        }
         }
     }
 

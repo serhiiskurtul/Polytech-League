@@ -41,6 +41,7 @@ public class CheckersEventRequest
     public bool IsTeam { get; set; }
     public bool IsModerated { get; set; }
     public bool IsPublic { get; set; }
+    public bool DisableNotifications { get; set; }
 
     public long? FirstPlaceId { get; set; }
     public long? SecondPlaceId { get; set; }
@@ -95,6 +96,7 @@ public class CheckersEventResponse
     public bool IsTeam { get; set; }
     public bool IsModerated { get; set; }
     public bool IsPublic { get; set; }
+    public bool DisableNotifications { get; set; }
 
     public PlayerDto? FirstPlace { get; set; }
     public PlayerDto? SecondPlace { get; set; }

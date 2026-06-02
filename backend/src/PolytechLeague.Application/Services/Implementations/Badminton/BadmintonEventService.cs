@@ -21,34 +21,35 @@ public class BadmintonEventService(
     AbstractEntityService<BadmintonEvent>(_dbcontext, _logger, _notificationService),
     IBadmintonEventService
 {
-    protected override void UpdateValues(BadmintonEvent oldEntity, BadmintonEvent newEntity)
+    protected override void UpdateValues(BadmintonEvent updatedEntity, BadmintonEvent newEntity)
     {
-        oldEntity.Name = newEntity.Name;
-        oldEntity.Date = newEntity.Date;
-        oldEntity.Location = newEntity.Location;
-        oldEntity.Description = newEntity.Description;
-        oldEntity.RegistrationStart = newEntity.RegistrationStart;
-        oldEntity.RegistrationEnd = newEntity.RegistrationEnd;
-        oldEntity.EndDate = newEntity.EndDate;
-        oldEntity.Level = newEntity.Level;
-        oldEntity.TournamentType = newEntity.TournamentType;
-        oldEntity.Rules = newEntity.Rules;
-        oldEntity.Prizes = newEntity.Prizes;
-        oldEntity.HeadRefereeName = newEntity.HeadRefereeName;
-        oldEntity.Referees = newEntity.Referees;
-        oldEntity.Schedule = newEntity.Schedule;
-        oldEntity.FirstPlaceId = newEntity.FirstPlaceId;
-        oldEntity.SecondPlaceId = newEntity.SecondPlaceId;
-        oldEntity.ThirdPlaceId = newEntity.ThirdPlaceId;
-        oldEntity.FirstPlaceTeamId = newEntity.FirstPlaceTeamId;
-        oldEntity.SecondPlaceTeamId = newEntity.SecondPlaceTeamId;
-        oldEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
-        oldEntity.IsTeam = newEntity.IsTeam;
-        oldEntity.IsModerated = newEntity.IsModerated;
-        oldEntity.IsPublic = newEntity.IsPublic;
-        oldEntity.SeasonId = newEntity.SeasonId;
-        oldEntity.MvpId = newEntity.MvpId;
-        oldEntity.Category = newEntity.Category;
+        updatedEntity.Name = newEntity.Name;
+        updatedEntity.Date = newEntity.Date;
+        updatedEntity.Location = newEntity.Location;
+        updatedEntity.Description = newEntity.Description;
+        updatedEntity.RegistrationStart = newEntity.RegistrationStart;
+        updatedEntity.RegistrationEnd = newEntity.RegistrationEnd;
+        updatedEntity.EndDate = newEntity.EndDate;
+        updatedEntity.Level = newEntity.Level;
+        updatedEntity.TournamentType = newEntity.TournamentType;
+        updatedEntity.Rules = newEntity.Rules;
+        updatedEntity.Prizes = newEntity.Prizes;
+        updatedEntity.HeadRefereeName = newEntity.HeadRefereeName;
+        updatedEntity.Referees = newEntity.Referees;
+        updatedEntity.Schedule = newEntity.Schedule;
+        updatedEntity.FirstPlaceId = newEntity.FirstPlaceId;
+        updatedEntity.SecondPlaceId = newEntity.SecondPlaceId;
+        updatedEntity.ThirdPlaceId = newEntity.ThirdPlaceId;
+        updatedEntity.FirstPlaceTeamId = newEntity.FirstPlaceTeamId;
+        updatedEntity.SecondPlaceTeamId = newEntity.SecondPlaceTeamId;
+        updatedEntity.ThirdPlaceTeamId = newEntity.ThirdPlaceTeamId;
+        updatedEntity.IsTeam = newEntity.IsTeam;
+        updatedEntity.IsModerated = newEntity.IsModerated;
+        updatedEntity.IsPublic = newEntity.IsPublic;
+        updatedEntity.DisableNotifications = newEntity.DisableNotifications;
+        updatedEntity.SeasonId = newEntity.SeasonId;
+        updatedEntity.MvpId = newEntity.MvpId;
+        updatedEntity.Category = newEntity.Category;
 
     }
 
@@ -86,29 +87,35 @@ public class BadmintonEventService(
 
     protected override async Task OnCreatedAsync(BadmintonEvent entity, CancellationToken cancellationToken)
     {
-        await _notificationService.SendNotificationToAllAsync(
+        if (!entity.DisableNotifications)
+        {
+            await _notificationService!.SendNotificationToAllAsync(
             "Нове змагання!",
             $"Створено нове змагання з бадмінтону: {entity.Name}",
             NotificationType.Tournament,
             $"/tournaments/{entity.Id}",
             true
         );
+        }
     }
 
-    protected override async Task OnUpdatedAsync(BadmintonEvent oldEntity, BadmintonEvent newEntity, CancellationToken cancellationToken)
+    protected override async Task OnUpdatedAsync(BadmintonEvent originalEntity, BadmintonEvent updatedEntity, CancellationToken cancellationToken)
     {
-        bool individualWinnersSet = oldEntity.FirstPlaceId != null && oldEntity.SecondPlaceId != null && oldEntity.ThirdPlaceId != null;
-        bool teamWinnersSet = oldEntity.FirstPlaceTeamId != null && oldEntity.SecondPlaceTeamId != null && oldEntity.ThirdPlaceTeamId != null;
+        bool individualWinnersSet = updatedEntity.FirstPlaceId != null && updatedEntity.SecondPlaceId != null && updatedEntity.ThirdPlaceId != null && (originalEntity.FirstPlaceId == null || originalEntity.SecondPlaceId == null || originalEntity.ThirdPlaceId == null);
+        bool teamWinnersSet = updatedEntity.FirstPlaceTeamId != null && updatedEntity.SecondPlaceTeamId != null && updatedEntity.ThirdPlaceTeamId != null && (originalEntity.FirstPlaceTeamId == null || originalEntity.SecondPlaceTeamId == null || originalEntity.ThirdPlaceTeamId == null);
         
-        if (individualWinnersSet || teamWinnersSet)
+        if ((individualWinnersSet || teamWinnersSet) && !updatedEntity.DisableNotifications)
         {
-            await _notificationService.SendNotificationToAllAsync(
+            if (!updatedEntity.DisableNotifications)
+        {
+            await _notificationService!.SendNotificationToAllAsync(
                 "Змагання завершено!",
-                $"Визначено переможців у змаганні з бадмінтону: {oldEntity.Name}",
+                $"Визначено переможців у змаганні з бадмінтону: {updatedEntity.Name}",
                 NotificationType.Tournament,
-                $"/tournaments/{oldEntity.Id}",
+                $"/tournaments/{updatedEntity.Id}",
                 true
             );
+        }
         }
     }
 

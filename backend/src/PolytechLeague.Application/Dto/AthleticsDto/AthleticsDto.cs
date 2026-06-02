@@ -31,6 +31,7 @@ public class AthleticsEventRequest
     public bool IsTeam { get; set; }
     public bool IsModerated { get; set; }
     public bool IsPublic { get; set; }
+    public bool DisableNotifications { get; set; }
     public long? SeasonId { get; set; }
     public long? MvpId { get; set; }
 }
@@ -67,6 +68,7 @@ public class AthleticsEventResponse
     public bool IsTeam { get; set; }
     public bool IsModerated { get; set; }
     public bool IsPublic { get; set; }
+    public bool DisableNotifications { get; set; }
     public long? SeasonId { get; set; }
     public long? MvpId { get; set; }
     public string? MvpName { get; set; }
@@ -115,6 +117,7 @@ public static class AthleticsDtoExtensions
             IsTeam = request.IsTeam,
             IsModerated = request.IsModerated,
             IsPublic = request.IsPublic,
+            DisableNotifications = request.DisableNotifications,
             SeasonId = request.SeasonId,
             MvpId = request.MvpId
         };
@@ -146,6 +149,7 @@ public static class AthleticsDtoExtensions
             IsTeam = entity.IsTeam,
             IsModerated = entity.IsModerated,
             IsPublic = entity.IsPublic,
+            DisableNotifications = entity.DisableNotifications,
             SeasonId = entity.SeasonId,
             MvpId = entity.MvpId,
             MvpName = entity.Mvp != null ? $"{entity.Mvp.FirstName} {entity.Mvp.LastName}" : null,

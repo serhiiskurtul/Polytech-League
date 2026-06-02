@@ -56,81 +56,88 @@ public class ArmwrestlingEventService :
         return entity;
     }
 
-    protected override void UpdateValues(ArmwrestlingEvent oldEntity, ArmwrestlingEvent newEntity)
+    protected override void UpdateValues(ArmwrestlingEvent updatedEntity, ArmwrestlingEvent newEntity)
     {
-        oldEntity.Name = newEntity.Name;
-        oldEntity.Date = newEntity.Date;
-        oldEntity.Location = newEntity.Location;
-        oldEntity.Description = newEntity.Description;
-        oldEntity.RegistrationStart = newEntity.RegistrationStart;
-        oldEntity.RegistrationEnd = newEntity.RegistrationEnd;
-        oldEntity.EndDate = newEntity.EndDate;
-        oldEntity.Level = newEntity.Level;
-        oldEntity.Hand = newEntity.Hand;
-        oldEntity.WeightClass = newEntity.WeightClass;
-        oldEntity.Category = newEntity.Category;
-        oldEntity.Rules = newEntity.Rules;
-        oldEntity.Prizes = newEntity.Prizes;
-        oldEntity.HeadRefereeName = newEntity.HeadRefereeName;
-        oldEntity.Referees = newEntity.Referees;
-        oldEntity.Schedule = newEntity.Schedule;
-        oldEntity.TimeControl = newEntity.TimeControl;
-        oldEntity.ParticipantsCount = newEntity.ParticipantsCount;
-        oldEntity.IsModerated = newEntity.IsModerated;
-        oldEntity.IsPublic = newEntity.IsPublic;
-        oldEntity.IsTeam = newEntity.IsTeam;
+        updatedEntity.Name = newEntity.Name;
+        updatedEntity.Date = newEntity.Date;
+        updatedEntity.Location = newEntity.Location;
+        updatedEntity.Description = newEntity.Description;
+        updatedEntity.RegistrationStart = newEntity.RegistrationStart;
+        updatedEntity.RegistrationEnd = newEntity.RegistrationEnd;
+        updatedEntity.EndDate = newEntity.EndDate;
+        updatedEntity.Level = newEntity.Level;
+        updatedEntity.Hand = newEntity.Hand;
+        updatedEntity.WeightClass = newEntity.WeightClass;
+        updatedEntity.Category = newEntity.Category;
+        updatedEntity.Rules = newEntity.Rules;
+        updatedEntity.Prizes = newEntity.Prizes;
+        updatedEntity.HeadRefereeName = newEntity.HeadRefereeName;
+        updatedEntity.Referees = newEntity.Referees;
+        updatedEntity.Schedule = newEntity.Schedule;
+        updatedEntity.TimeControl = newEntity.TimeControl;
+        updatedEntity.ParticipantsCount = newEntity.ParticipantsCount;
+        updatedEntity.IsModerated = newEntity.IsModerated;
+        updatedEntity.IsPublic = newEntity.IsPublic;
+        updatedEntity.DisableNotifications = newEntity.DisableNotifications;
+        updatedEntity.IsTeam = newEntity.IsTeam;
         
-        oldEntity.FirstPlaceId = newEntity.FirstPlaceId;
+        updatedEntity.FirstPlaceId = newEntity.FirstPlaceId;
 
-        oldEntity.SecondPlaceId = newEntity.SecondPlaceId;
-        oldEntity.ThirdPlaceId = newEntity.ThirdPlaceId;
-        oldEntity.SeasonId = newEntity.SeasonId;
-        oldEntity.MvpId = newEntity.MvpId;
+        updatedEntity.SecondPlaceId = newEntity.SecondPlaceId;
+        updatedEntity.ThirdPlaceId = newEntity.ThirdPlaceId;
+        updatedEntity.SeasonId = newEntity.SeasonId;
+        updatedEntity.MvpId = newEntity.MvpId;
     }
 
 
     protected override async Task OnCreatedAsync(ArmwrestlingEvent entity, CancellationToken cancellationToken)
     {
-        await _notificationService.SendNotificationToAllAsync(
+        if (!entity.DisableNotifications)
+        {
+            await _notificationService!.SendNotificationToAllAsync(
             "Нове змагання!",
             $"Створено нове змагання з армрестлінгу: {entity.Name}",
             NotificationType.Tournament,
             $"/tournaments/{entity.Id}",
             true
         );
+        }
     }
 
-    protected override async Task OnUpdatedAsync(ArmwrestlingEvent oldEntity, ArmwrestlingEvent newEntity, CancellationToken cancellationToken)
+    protected override async Task OnUpdatedAsync(ArmwrestlingEvent originalEntity, ArmwrestlingEvent updatedEntity, CancellationToken cancellationToken)
     {
         // Update ranks for participants based on winners
         var eventWithParticipants = await _dbcontext.ArmwrestlingEvents
             .Include(e => e.Players)
-            .FirstOrDefaultAsync(e => e.Id == oldEntity.Id, cancellationToken);
+            .FirstOrDefaultAsync(e => e.Id == updatedEntity.Id, cancellationToken);
 
         if (eventWithParticipants != null && eventWithParticipants.Players != null)
         {
             foreach (var participant in eventWithParticipants.Players)
             {
-                if (participant.PlayerId == oldEntity.FirstPlaceId) participant.Rank = 1;
-                else if (participant.PlayerId == oldEntity.SecondPlaceId) participant.Rank = 2;
-                else if (participant.PlayerId == oldEntity.ThirdPlaceId) participant.Rank = 3;
+                if (participant.PlayerId == updatedEntity.FirstPlaceId) participant.Rank = 1;
+                else if (participant.PlayerId == updatedEntity.SecondPlaceId) participant.Rank = 2;
+                else if (participant.PlayerId == updatedEntity.ThirdPlaceId) participant.Rank = 3;
                 else participant.Rank = 0;
             }
             await _dbcontext.SaveChangesAsync(cancellationToken);
         }
 
         // Перевірка чи були визначені призери (перехід від null до значення)
-        bool winnersSet = oldEntity.FirstPlaceId != null && oldEntity.SecondPlaceId != null && oldEntity.ThirdPlaceId != null;
+        bool winnersSet = updatedEntity.FirstPlaceId != null && updatedEntity.SecondPlaceId != null && updatedEntity.ThirdPlaceId != null && (originalEntity.FirstPlaceId == null || originalEntity.SecondPlaceId == null || originalEntity.ThirdPlaceId == null);
         
-        if (winnersSet)
+        if (winnersSet && !updatedEntity.DisableNotifications)
         {
-            await _notificationService.SendNotificationToAllAsync(
+            if (!updatedEntity.DisableNotifications)
+        {
+            await _notificationService!.SendNotificationToAllAsync(
                 "Змагання завершено!",
-                $"Визначено переможців у змаганні з армрестлінгу: {oldEntity.Name}",
+                $"Визначено переможців у змаганні з армрестлінгу: {updatedEntity.Name}",
                 NotificationType.Tournament,
-                $"/tournaments/{oldEntity.Id}",
+                $"/tournaments/{updatedEntity.Id}",
                 true
             );
+        }
         }
     }
 
