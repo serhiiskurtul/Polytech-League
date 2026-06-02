@@ -99,6 +99,7 @@ export interface PlayerDto {
     isExternal?: boolean;
     hasPendingMergeRequest?: boolean;
     userEmail?: string | null;
+    userRole?: number | string | null;
 }
 
 

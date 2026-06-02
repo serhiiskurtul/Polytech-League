@@ -73,6 +73,7 @@ public class PlayerDto
 
     public bool IsExternal { get; set; }
     public bool IsGuest { get; set; }
+    public UserRole? UserRole { get; set; }
 
     public List<AchievementDto> Achievements { get; set; } = new();
     public List<string> Sports { get; set; } = new();
@@ -167,6 +168,7 @@ public static class PlayerDtoExtensions
             PreviousNames = player.PreviousNames,
             IsFounder = player.IsFounder,
             UserEmail = player.User?.Email,
+            UserRole = player.User?.Role,
             ChessRating = player.ChessRating,
             ChessFideId = player.ChessFideId,
             ChessTitle = player.ChessTitle,

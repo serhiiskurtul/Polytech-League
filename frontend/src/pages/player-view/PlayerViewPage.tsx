@@ -93,7 +93,15 @@ const PlayerViewPage = () => {
     city: playerProfile.city || '—',
     joinDate: '—', // Could fetch from user data if needed
     bio: playerProfile.bio || 'Інформація відсутня',
-    badges: playerProfile.isExternal ? ['Гість'] : ['Гравець'],
+    badges: (() => {
+      const b = playerProfile.isExternal ? ['Гість'] : ['Гравець'];
+      if (playerProfile.userRole === 1 || playerProfile.userRole === '1' || playerProfile.userRole === 'Admin') {
+        b.unshift('Адміністратор');
+      } else if (playerProfile.userRole === 2 || playerProfile.userRole === '2' || String(playerProfile.userRole).toLowerCase() === 'fizorg') {
+        b.unshift('Фізорг');
+      }
+      return b;
+    })(),
     instagramUrl: playerProfile.instagramUrl,
     photoUrl: playerProfile.photoUrl,
     globalRank: playerProfile.globalRank,
