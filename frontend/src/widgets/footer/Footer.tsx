@@ -23,7 +23,8 @@ const Footer = () => {
     { name: 'Список змагань', path: '/tournaments' },
     { name: 'Студенти поза коледжем', path: '/student-news' },
     { name: 'Про проєкт', path: '/about' },
-    { name: 'Пропозиції та скарги', path: '/feedback' }
+    { name: 'Пропозиції та скарги', path: '/feedback' },
+    { name: 'Публічний API', path: '/api-docs' }
   ];
 
   const socialLinks = [
