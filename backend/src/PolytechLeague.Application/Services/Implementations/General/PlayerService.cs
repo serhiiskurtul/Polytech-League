@@ -370,7 +370,9 @@ public class PlayerService : IPlayerService
                 .Select(g => new {
                     g.PlayerId,
                     g.GoalsCount,
-                    Level = g.Match != null && g.Match.Event != null ? (CompetitionLevel?)g.Match.Event.Level : null
+                    g.MatchId,
+                    Level = g.Match != null && g.Match.Event != null ? (CompetitionLevel?)g.Match.Event.Level : null,
+                    Stage = g.Match != null ? g.Match.Stage : null
                 })
                 .ToListAsync(cancellationToken);
             
@@ -458,7 +460,12 @@ public class PlayerService : IPlayerService
                         Total = g.Sum(x => x.GoalsCount),
                         College = g.Where(x => x.Level == CompetitionLevel.CollegeGroup).Sum(x => x.GoalsCount),
                         Regional = g.Where(x => x.Level == CompetitionLevel.Regional).Sum(x => x.GoalsCount),
-                        National = g.Where(x => x.Level == CompetitionLevel.National).Sum(x => x.GoalsCount)
+                        National = g.Where(x => x.Level == CompetitionLevel.National).Sum(x => x.GoalsCount),
+                        HatTricks = g.GroupBy(x => x.MatchId).Count(m => m.Sum(x => x.GoalsCount) == 3),
+                        Pokers = g.GroupBy(x => x.MatchId).Count(m => m.Sum(x => x.GoalsCount) == 4),
+                        Pentatricks = g.GroupBy(x => x.MatchId).Count(m => m.Sum(x => x.GoalsCount) == 5),
+                        FinalGoals = g.Where(x => x.Stage != null && x.Stage.ToLower().Contains("фінал") && !x.Stage.ToLower().Contains("півфінал")).Sum(x => x.GoalsCount),
+                        SemifinalGoals = g.Where(x => x.Stage != null && x.Stage.ToLower().Contains("півфінал")).Sum(x => x.GoalsCount)
                     }
                 );
             var cardsLookup = cardsS.ToLookup(x => x.PlayerId);
@@ -596,8 +603,8 @@ public class PlayerService : IPlayerService
                     if (allEvents.TryGetValue(ach.TournamentId, out var lvl)) {
                         if (levelMultipliers.TryGetValue(lvl, out var m)) mult = m;
                         levelName = lvl switch { CompetitionLevel.Regional => "Обласні", CompetitionLevel.National => "Всеукраїнські", _ => "Міжгрупові" };
-                        pts = (lvl == CompetitionLevel.CollegeGroup) ? 10 : 0;
-                    } else pts = 0;
+                        pts = 10;
+                    } else pts = 10;
                     if (ach.Rank == 1) pts += 100; else if (ach.Rank == 2) pts += 50; else if (ach.Rank == 3) pts += 30;
                     if (allEvents.TryGetValue(ach.TournamentId, out var eventLvl) && eventLvl != CompetitionLevel.CollegeGroup) {
                         if (ach.BoardRank == 1) pts += 40; else if (ach.BoardRank == 2) pts += 25; else if (ach.BoardRank == 3) pts += 15;
@@ -665,6 +672,11 @@ public class PlayerService : IPlayerService
                     dto.FootballCollegeGroupGoals = pGoalsInfo.College;
                     dto.FootballRegionalGoals = pGoalsInfo.Regional;
                     dto.FootballNationalGoals = pGoalsInfo.National;
+                    dto.HatTricksCount = pGoalsInfo.HatTricks;
+                    dto.PokersCount = pGoalsInfo.Pokers;
+                    dto.PentatricksCount = pGoalsInfo.Pentatricks;
+                    dto.FinalGoalsCount = pGoalsInfo.FinalGoals;
+                    dto.SemifinalGoalsCount = pGoalsInfo.SemifinalGoals;
                 }
                 var pCards = cardsLookup[playerId].ToList();
                 int yellow = pCards.Count(x => x.Type == FootballCardType.Yellow);
@@ -757,8 +769,10 @@ public class PlayerService : IPlayerService
                     else if (p.Tournament.SecondPlaceId == playerId) rank = 2;
                     else if (p.Tournament.ThirdPlaceId == playerId) rank = 3;
                     else {
+                        var tId = p.TournamentId;
+                        var pts = p.Points;
                         rank = await _dbContext.ChessEventParticipants
-                            .Where(other => other.TournamentId == p.TournamentId && other.Points > p.Points)
+                            .Where(other => other.TournamentId == tId && other.Points > pts)
                             .CountAsync(cancellationToken) + 1;
                     }
                 }
@@ -802,8 +816,10 @@ public class PlayerService : IPlayerService
                     else if (p.Event.SecondPlaceId == playerId) rank = 2;
                     else if (p.Event.ThirdPlaceId == playerId) rank = 3;
                     else {
+                        var tId = p.TournamentId;
+                        var pts = p.Points;
                         rank = await _dbContext.CheckersEventParticipants
-                            .Where(other => other.TournamentId == p.TournamentId && other.Points > p.Points)
+                            .Where(other => other.TournamentId == tId && other.Points > pts)
                             .CountAsync(cancellationToken) + 1;
                     }
                 }
@@ -847,8 +863,10 @@ public class PlayerService : IPlayerService
                     else if (p.Tournament.SecondPlaceId == playerId) rank = 2;
                     else if (p.Tournament.ThirdPlaceId == playerId) rank = 3;
                     else {
+                        var tId = p.TournamentId;
+                        var pts = p.Points;
                         rank = await _dbContext.TableTennisEventParticipants
-                            .Where(other => other.TournamentId == p.TournamentId && other.Points > p.Points)
+                            .Where(other => other.TournamentId == tId && other.Points > pts)
                             .CountAsync(cancellationToken) + 1;
                     }
                 }
@@ -878,8 +896,10 @@ public class PlayerService : IPlayerService
                     else if (p.Event.SecondPlaceId == playerId) rank = 2;
                     else if (p.Event.ThirdPlaceId == playerId) rank = 3;
                     else {
+                        var eId = p.EventId;
+                        var pts = p.Points;
                         rank = await _dbContext.BadmintonEventParticipants
-                            .Where(other => other.EventId == p.EventId && other.Points > p.Points)
+                            .Where(other => other.EventId == eId && other.Points > pts)
                             .CountAsync(cancellationToken) + 1;
                     }
                 }
@@ -948,8 +968,10 @@ public class PlayerService : IPlayerService
                 if (team.Event == null) continue;
                 int rank = GetTeamRank(team.Event, team.Id);
                 if (rank == 0 && team.Points > 0) {
+                    var eId = team.EventId;
+                    var pts = team.Points;
                     rank = await _dbContext.FootballTeams
-                        .Where(others => others.EventId == team.EventId && others.Points > team.Points)
+                        .Where(others => others.EventId == eId && others.Points > pts)
                         .CountAsync(cancellationToken) + 1;
                 }
                 achievements.Add(new AchievementDto {
@@ -1092,9 +1114,10 @@ public class PlayerService : IPlayerService
             .Where(e => eventIds.Contains(e.Id))
             .Select(e => new { e.Id, e.Level })
             .ToDictionaryAsync(e => e.Id, e => e.Level, cancellationToken);
-        foreach (var ach in dto.Achievements) {
-            double basePts = (ach.Rank == 1) ? 100 : (ach.Rank == 2 ? 50 : (ach.Rank == 3 ? 30 : 0));
-            if (basePts <= 0) continue;
+        foreach (var ach in dto.Achievements.Where(a => a.Result != "MVP")) {
+            double basePts = 10;
+            if (ach.Rank == 1) basePts += 100; else if (ach.Rank == 2) basePts += 50; else if (ach.Rank == 3) basePts += 30;
+            
             double mult = 1.0;
             string levelName = "Міжгрупові";
             if (eventLevels.TryGetValue(ach.TournamentId, out var lvl)) {
@@ -1104,17 +1127,27 @@ public class PlayerService : IPlayerService
                     CompetitionLevel.National => "Всеукраїнські",
                     _ => "Міжгрупові"
                 };
+                
+                if (lvl != CompetitionLevel.CollegeGroup) {
+                    if (ach.BoardRank == 1) basePts += 40; else if (ach.BoardRank == 2) basePts += 25; else if (ach.BoardRank == 3) basePts += 15;
+                }
             }
             int finalPts = (int)Math.Round(basePts * mult);
             totalScore += finalPts;
+            
+            string desc = (ach.Rank > 0 ? $"{ach.Rank} місце: {ach.TournamentName} ({levelName})" : $"Участь: {ach.TournamentName} ({levelName})");
+            if (ach.BoardRank.HasValue && ach.BoardRank.Value > 0) {
+                desc += $", {ach.BoardRank.Value} місце на дошці";
+            }
+            
             pointsBreakdown.Add(new PointEntryDto {
-                Description = $"{ach.Rank} місце: {ach.TournamentName} ({levelName})",
+                Description = desc,
                 Points = finalPts,
                 Category = "Achievements"
             });
         }
         foreach (var ach in dto.Achievements.Where(a => a.Result == "MVP")) {
-            int mvpPts = 50;
+            int mvpPts = 15;
             totalScore += mvpPts;
             pointsBreakdown.Add(new PointEntryDto {
                 Description = $"MVP: {ach.TournamentName}",
@@ -2427,15 +2460,15 @@ public class PlayerService : IPlayerService
 
             dto.HatTricksCount = goalDetails
                 .GroupBy(g => g.MatchId)
-                .Count(g => g.Sum(x => x.GoalsCount) >= 3);
+                .Count(g => g.Sum(x => x.GoalsCount) == 3);
 
             dto.PokersCount = goalDetails
                 .GroupBy(g => g.MatchId)
-                .Count(g => g.Sum(x => x.GoalsCount) >= 4);
+                .Count(g => g.Sum(x => x.GoalsCount) == 4);
 
             dto.PentatricksCount = goalDetails
                 .GroupBy(g => g.MatchId)
-                .Count(g => g.Sum(x => x.GoalsCount) >= 5);
+                .Count(g => g.Sum(x => x.GoalsCount) == 5);
 
             dto.FinalGoalsCount = goalDetails
                 .Where(g => g.Match?.Stage?.ToLower().Contains("фінал") == true && !g.Match.Stage.ToLower().Contains("півфінал"))

@@ -1,11 +1,33 @@
 import axios, { AxiosError } from 'axios';
 
-export const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
-export const API_URL = `${BASE_URL}/api`;
+const getApiUrl = (): string => {
+  let url = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '';
+  if (!url) {
+    return '';
+  }
+  if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('//') && !url.startsWith('/')) {
+    url = `https://${url}`;
+  }
+  if (url.endsWith('/')) {
+    url = url.slice(0, -1);
+  }
+  if (!url.endsWith('/api')) {
+    url = `${url}/api`;
+  }
+  return url;
+};
+
+export const API_URL = getApiUrl();
+export const BASE_URL = API_URL.endsWith('/api') ? API_URL.slice(0, -4) : API_URL;
 
 const api = axios.create({
   baseURL: API_URL,
-  withCredentials: true
+  withCredentials: true,
+  headers: {
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    Pragma: 'no-cache',
+    Expires: '0'
+  }
 });
 
 api.interceptors.request.use(
@@ -48,7 +70,7 @@ api.interceptors.response.use(
 
     if (status === 401 && originalRequest && !originalRequest.url?.includes('/login') && !originalRequest.url?.includes('/refresh') && !(originalRequest as any)._retry) {
       if (isRefreshing) {
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
           failedQueue.push({ resolve, reject });
         })
           .then(() => {
@@ -68,7 +90,7 @@ api.interceptors.response.use(
         try {
           const refreshToken = localStorage.getItem('refreshToken');
           const response = await axios.post(`${API_URL}/refresh`, { refreshToken }, { withCredentials: true });
-          
+
           const { accessToken, refreshToken: newRefreshToken } = response.data;
           localStorage.setItem('token', accessToken);
           localStorage.setItem('refreshToken', newRefreshToken);
@@ -77,14 +99,14 @@ api.interceptors.response.use(
           return api(originalRequest);
         } catch (refreshError: any) {
           processQueue(refreshError, null);
-          
+
           const status = refreshError.response?.status;
           if (status === 401 || status === 403 || status === 400 || status === 404) {
             localStorage.removeItem('token');
             localStorage.removeItem('refreshToken');
             window.location.href = '/login';
           }
-          
+
           return Promise.reject(refreshError);
         } finally {
           isRefreshing = false;
@@ -92,16 +114,31 @@ api.interceptors.response.use(
       };
 
       if (navigator.locks) {
-        return navigator.locks.request('refresh_token_lock', async () => {
-          const tokenNow = localStorage.getItem('refreshToken');
-          if (tokenNow !== currentRefreshToken) {
-            // Another tab already refreshed the token
-            isRefreshing = false;
-            processQueue(null, localStorage.getItem('token'));
-            return api(originalRequest);
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+          return await navigator.locks.request('refresh_token_lock', { signal: controller.signal }, async () => {
+            clearTimeout(timeoutId);
+            const tokenNow = localStorage.getItem('refreshToken');
+            if (tokenNow !== currentRefreshToken) {
+              // Another tab already refreshed the token
+              isRefreshing = false;
+              processQueue(null, localStorage.getItem('token'));
+              return api(originalRequest);
+            }
+            return await performRefresh();
+          });
+        } catch (lockError: any) {
+          // If the lock times out (AbortError) or Web Locks API fails (SecurityError/NotSupportedError in PWA),
+          // or if performRefresh itself throws an error, we need to handle it.
+          if (lockError.name === 'AbortError' || lockError.name === 'SecurityError' || lockError.name === 'NotSupportedError') {
+            console.warn('Web Locks API timed out or failed in PWA context. Falling back to unprotected refresh.', lockError);
+            return await performRefresh();
           }
-          return await performRefresh();
-        });
+          // Otherwise, it's a real error from performRefresh (e.g. network error, 401), so throw it up
+          throw lockError;
+        }
       } else {
         return await performRefresh();
       }

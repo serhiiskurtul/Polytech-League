@@ -145,6 +145,12 @@ export default function Header() {
                       </Link>
                     </li>
                     <li>
+                      <Link to="/admin/analytics" className={styles.adminDropdownLink} onClick={closeMenu}>
+                        <i className="fas fa-chart-bar"></i>
+                        <span>Аналітика</span>
+                      </Link>
+                    </li>
+                    <li>
                       <Link to="/admin/feedback" className={styles.adminDropdownLink} onClick={closeMenu}>
                         <i className="fas fa-comment-alt"></i>
                         <span>Відгуки</span>
