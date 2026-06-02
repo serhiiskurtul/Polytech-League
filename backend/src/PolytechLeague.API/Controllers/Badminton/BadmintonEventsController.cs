@@ -1,3 +1,4 @@
+using PolytechLeague.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PolytechLeague.Application.Dto.BadmintonDto;
@@ -10,7 +11,7 @@ namespace PolytechLeague.API.Controllers.Badminton;
 [Route("api/badminton-events")]
 public class BadmintonEventsController(
     IBadmintonEventService badmintonEventService,
-    IRedisService redisService) : ControllerBase
+    IRedisService redisService, IPlayerService playerService) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
@@ -50,6 +51,8 @@ public class BadmintonEventsController(
 
         await redisService.RemoveGroupAsync("badminton_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
 
         return Created();
     }
@@ -66,6 +69,8 @@ public class BadmintonEventsController(
 
         await redisService.RemoveGroupAsync("badminton_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
 
         return NoContent();
@@ -79,6 +84,8 @@ public class BadmintonEventsController(
 
         await redisService.RemoveGroupAsync("badminton_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
 
         return NoContent();
@@ -90,6 +97,8 @@ public class BadmintonEventsController(
         await badmintonEventService.AddParticipantAsync(id, dto, cancellationToken);
         await redisService.RemoveGroupAsync("badminton_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
@@ -101,6 +110,8 @@ public class BadmintonEventsController(
         await badmintonEventService.UpdateParticipantAsync(id, playerId, dto, cancellationToken);
         await redisService.RemoveGroupAsync("badminton_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
@@ -112,6 +123,8 @@ public class BadmintonEventsController(
         await badmintonEventService.RemoveParticipantAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("badminton_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
@@ -123,6 +136,8 @@ public class BadmintonEventsController(
         await badmintonEventService.RegisterPlayerAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("badminton_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
@@ -134,6 +149,8 @@ public class BadmintonEventsController(
         await badmintonEventService.ApproveParticipantAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("badminton_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
@@ -145,7 +162,11 @@ public class BadmintonEventsController(
         await badmintonEventService.RejectParticipantAsync(id, playerId, cancellationToken);
         await redisService.RemoveGroupAsync("badminton_events_group");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
         return Ok();
     }
 }
+
+

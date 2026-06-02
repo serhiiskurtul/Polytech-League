@@ -208,7 +208,7 @@ public class PlayerService : IPlayerService
         if (dto.BasketballShirtNumber.HasValue) player.BasketballShirtNumber = dto.BasketballShirtNumber;
         if (dto.BasketballTeamId.HasValue) player.BasketballTeamId = dto.BasketballTeamId;
         if (dto.BeachVolleyballShirtNumber.HasValue) player.BeachVolleyballShirtNumber = dto.BeachVolleyballShirtNumber;
-        if (dto.BeachVolleyballTeamId.HasValue) player.BeachVolleyballTeamId = dto.BeachVolleyballTeamId;
+
         player.IsExternal = dto.IsExternal;
         try
         {
@@ -1545,9 +1545,8 @@ public class PlayerService : IPlayerService
             target.BasketballTeamId = source.BasketballTeamId;
             target.BasketballShirtNumber = source.BasketballShirtNumber;
         }
-        if (target.BeachVolleyballTeamId == null)
+        if (target.BeachVolleyballShirtNumber == null)
         {
-            target.BeachVolleyballTeamId = source.BeachVolleyballTeamId;
             target.BeachVolleyballShirtNumber = source.BeachVolleyballShirtNumber;
         }
 
@@ -1916,68 +1915,13 @@ public class PlayerService : IPlayerService
             t.Players!.Remove(t.Players.First(p => p.Id == sourceId));
             if (!t.Players.Any(p => p.Id == targetId)) t.Players.Add(targetPlayer);
         }
-
-        // Football Teams (many-to-many players)
-        var fbTeams = await _dbContext.FootballTeams
-            .Include(t => t.Players)
-            .Where(t => t.Players!.Any(p => p.Id == sourceId))
-            .ToListAsync(cancellationToken);
-        foreach (var t in fbTeams)
-        {
-            t.Players!.Remove(t.Players.First(p => p.Id == sourceId));
-            if (!t.Players.Any(p => p.Id == targetId)) t.Players.Add(targetPlayer);
-        }
-
-        // Volleyball Teams
-        var vbTeams = await _dbContext.VolleyballTeams
-            .Include(t => t.Players)
-            .Where(t => t.Players!.Any(p => p.Id == sourceId))
-            .ToListAsync(cancellationToken);
-        foreach (var t in vbTeams)
-        {
-            t.Players!.Remove(t.Players.First(p => p.Id == sourceId));
-            if (!t.Players.Any(p => p.Id == targetId)) t.Players.Add(targetPlayer);
-        }
-
-        // Basketball Teams
-        var bbTeams = await _dbContext.BasketballTeams
-            .Include(t => t.Players)
-            .Where(t => t.Players!.Any(p => p.Id == sourceId))
-            .ToListAsync(cancellationToken);
-        foreach (var t in bbTeams)
-        {
-            t.Players!.Remove(t.Players.First(p => p.Id == sourceId));
-            if (!t.Players.Any(p => p.Id == targetId)) t.Players.Add(targetPlayer);
-        }
-
-        // Beach Volleyball Teams
-        var bvbTeams = await _dbContext.BeachVolleyballTeams
+        
+        // Beach Volleyball Teams (many-to-many players)
+        var bvbTeams = await _dbContext.Set<PolytechLeague.Domain.Entities.BeachVolleyball.BeachVolleyballTeam>()
             .Include(t => t.Players)
             .Where(t => t.Players!.Any(p => p.Id == sourceId))
             .ToListAsync(cancellationToken);
         foreach (var t in bvbTeams)
-        {
-            t.Players!.Remove(t.Players.First(p => p.Id == sourceId));
-            if (!t.Players.Any(p => p.Id == targetId)) t.Players.Add(targetPlayer);
-        }
-
-        // Chess Teams
-        var chTeams = await _dbContext.Set<PolytechLeague.Domain.Entities.Chess.ChessTeam>()
-            .Include(t => t.Players)
-            .Where(t => t.Players!.Any(p => p.Id == sourceId))
-            .ToListAsync(cancellationToken);
-        foreach (var t in chTeams)
-        {
-            t.Players!.Remove(t.Players.First(p => p.Id == sourceId));
-            if (!t.Players.Any(p => p.Id == targetId)) t.Players.Add(targetPlayer);
-        }
-
-        // Checkers Teams
-        var chkTeams = await _dbContext.Set<PolytechLeague.Domain.Entities.Checkers.CheckersTeam>()
-            .Include(t => t.Players)
-            .Where(t => t.Players!.Any(p => p.Id == sourceId))
-            .ToListAsync(cancellationToken);
-        foreach (var t in chkTeams)
         {
             t.Players!.Remove(t.Players.First(p => p.Id == sourceId));
             if (!t.Players.Any(p => p.Id == targetId)) t.Players.Add(targetPlayer);
@@ -2602,5 +2546,10 @@ public class PlayerService : IPlayerService
         {
             _logger.LogError(ex, "Error populating football stats for player {PlayerId}", dto.Id);
         }
+    }
+
+    public void ClearRankingsCache()
+    {
+        _rankingsCache.Clear();
     }
 }

@@ -56,7 +56,10 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
 
         // Beach Volleyball
         builder.Property(x => x.BeachVolleyballShirtNumber).HasColumnName("beach_volleyball_shirt_number");
-        builder.Property(x => x.BeachVolleyballTeamId).HasColumnName("beach_volleyball_team_id");
+
+        builder.HasMany(x => x.BeachVolleyballTeams)
+            .WithMany(t => t.Players)
+            .UsingEntity(j => j.ToTable("beach_volleyball_team_players"));
 
         // Social & Bio
         builder.Property(x => x.Bio).HasColumnName("Bio");

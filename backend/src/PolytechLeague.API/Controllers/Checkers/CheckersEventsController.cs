@@ -11,7 +11,7 @@ namespace PolytechLeague.API.Controllers.Checkers;
 
 [ApiController]
 [Route("api/checkers-events")]
-public class CheckersEventsController(ICheckersEventService checkersEventService, IRedisService redisService, IFileService fileService) : Controller
+public class CheckersEventsController(ICheckersEventService checkersEventService, IRedisService redisService, IPlayerService playerService, IFileService fileService) : Controller
 {
     [AllowAnonymous]
     [HttpGet]
@@ -68,6 +68,8 @@ public class CheckersEventsController(ICheckersEventService checkersEventService
 
         await redisService.RemoveGroupAsync("checkers_events_all");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
 
         return Created();
     }
@@ -85,6 +87,8 @@ public class CheckersEventsController(ICheckersEventService checkersEventService
         await redisService.RemoveGroupAsync("checkers_events_all");
         await redisService.RemoveDataAsync($"checkers_event_{id}");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
         await redisService.RemoveGroupAsync("tournaments_byid_group");
 
         return NoContent();
@@ -99,6 +103,8 @@ public class CheckersEventsController(ICheckersEventService checkersEventService
         await redisService.RemoveGroupAsync("checkers_events_all");
         await redisService.RemoveDataAsync($"checkers_event_{id}");
         await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
 
         return NoContent();
     }
@@ -234,3 +240,4 @@ public class CheckersEventsController(ICheckersEventService checkersEventService
         return Ok();
     }
 }
+

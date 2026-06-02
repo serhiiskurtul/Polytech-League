@@ -65,22 +65,22 @@ public class BeachVolleyballTeamService(
             return;
         }
 
-        var playerIds = await _dbcontext.Players
-            .Where(p => p.BeachVolleyballTeamId == id)
-            .Select(p => p.Id)
-            .ToListAsync(cancellationToken);
+        var teamWithPlayers = await _dbcontext.BeachVolleyballTeams
+            .Include(t => t.Players)
+            .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
 
-        if (playerIds.Any())
+        if (teamWithPlayers?.Players != null && teamWithPlayers.Players.Any())
         {
+            var playerIds = teamWithPlayers.Players.Select(p => p.Id).ToList();
+            
             // 2. Bulk delete associated participants
             await _dbcontext.BeachVolleyballEventParticipants
                 .Where(p => p.EventId == eventId && playerIds.Contains(p.PlayerId))
                 .ExecuteDeleteAsync(cancellationToken);
-
-            // 3. Clear BeachVolleyballTeamId for all players in this team
-            await _dbcontext.Players
-                .Where(p => p.BeachVolleyballTeamId == id)
-                .ExecuteUpdateAsync(s => s.SetProperty(p => p.BeachVolleyballTeamId, (long?)null), cancellationToken);
+                
+            // 3. Clear team from players (EF Core will delete the join table rows)
+            teamWithPlayers.Players.Clear();
+            await _dbcontext.SaveChangesAsync(cancellationToken);
         }
 
         await base.DeleteAsync(id, cancellationToken);

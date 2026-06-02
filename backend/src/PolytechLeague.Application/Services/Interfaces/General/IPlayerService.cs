@@ -13,6 +13,7 @@ public interface IPlayerService
     Task DeleteAsync(long id, CancellationToken cancellationToken = default);
     Task<IEnumerable<PlayerDto>> SearchAsync(string query, CancellationToken cancellationToken = default);
     Task<IEnumerable<PlayerDto>> GetAllWithRankingsAsync(long? seasonId = null, CancellationToken cancellationToken = default);
+    void ClearRankingsCache();
     
     // Profile Merging
     Task<IEnumerable<PlayerDto>> FindPotentialArchivalMatchesAsync(long userId, string firstName, string lastName, string group, CancellationToken cancellationToken = default);

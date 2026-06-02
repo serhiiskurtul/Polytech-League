@@ -1149,7 +1149,7 @@ const TournamentViewPage = () => {
         profilePromise = getProfile().catch(() => null);
       }
       const data = await getTournamentById(id);
-      
+
       const profileData = await profilePromise;
       if (profileData) {
         setCurrentUserPlayer(profileData);
@@ -1926,9 +1926,9 @@ const TournamentViewPage = () => {
                     {(() => {
                       const cat = (details as any)?.category || tournament?.category;
                       if (!cat) return '';
-                      let catLabel = 'змішане';
-                      if (cat === 'Men' || cat === 'Чоловіки') catLabel = 'чоловіче';
-                      else if (cat === 'Women' || cat === 'Жінки') catLabel = 'жіноче';
+                      let catLabel = 'змішані';
+                      if (cat === 'Men' || cat === 'Чоловіки') catLabel = 'чоловіки';
+                      else if (cat === 'Women' || cat === 'Жінки') catLabel = 'жінки';
                       return ` (${catLabel})`;
                     })()}
                   </span>
@@ -3692,15 +3692,15 @@ const TournamentViewPage = () => {
                       </>
                     )}
                     {['football', 'badminton', 'basketball_3x3', 'basketball3x3', 'table_tennis', 'tabletennis'].includes(sportKey) && (
-                        <div className={styles.formGroup}>
-                          <label>Система проведення</label>
-                          <select value={(editTournamentData as any).tournamentType || 'RoundRobin'} onChange={(e) => setEditTournamentData({ ...editTournamentData, tournamentType: e.target.value } as any)}>
-                            <option value="RoundRobin">Кругова система</option>
-                            <option value="SingleElimination">Олімпійська система</option>
-                            <option value="DoubleElimination">Двоєступінчаста система</option>
-                            <option value="GroupsPlayoff">Груповий етап + плей-офф</option>
-                          </select>
-                        </div>
+                      <div className={styles.formGroup}>
+                        <label>Система проведення</label>
+                        <select value={(editTournamentData as any).tournamentType || 'RoundRobin'} onChange={(e) => setEditTournamentData({ ...editTournamentData, tournamentType: e.target.value } as any)}>
+                          <option value="RoundRobin">Кругова система</option>
+                          <option value="SingleElimination">Олімпійська система</option>
+                          <option value="DoubleElimination">Двоєступінчаста система</option>
+                          <option value="GroupsPlayoff">Груповий етап + плей-офф</option>
+                        </select>
+                      </div>
                     )}
                     {editTournamentData.level === 'CollegeGroup' && (
                       <div className={styles.formGroup} style={{ gridColumn: '1 / -1', display: 'flex', gap: '20px' }}>

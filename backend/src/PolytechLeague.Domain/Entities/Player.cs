@@ -3,6 +3,7 @@ using PolytechLeague.Domain.Entities.Armwrestling.Enums;
 using PolytechLeague.Domain.Entities.Football.Enums;
 using PolytechLeague.Domain.Entities.Volleyball.Enums;
 using PolytechLeague.Domain.Entities.Enums;
+using PolytechLeague.Domain.Entities.BeachVolleyball;
 
 namespace PolytechLeague.Domain.Entities;
 
@@ -48,7 +49,7 @@ public class Player : Person
     public long? BasketballTeamId { get; set; }
 
     public int? BeachVolleyballShirtNumber { get; set; }
-    public long? BeachVolleyballTeamId { get; set; }
+    public ICollection<BeachVolleyballTeam>? BeachVolleyballTeams { get; set; }
 
     public bool IsExternal { get; set; } = false;
     public string? PreviousNames { get; set; }
