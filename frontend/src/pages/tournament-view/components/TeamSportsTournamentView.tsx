@@ -148,7 +148,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     if (sport !== 'football' && sport !== 'футбол') return null;
 
     const matches = details.matches || details.games || [];
-    const playerGoals: Record<number, { player: any; goals: number }> = {};
+    const playerGoals: Record<number, { player: any; goals: number; teamName?: string }> = {};
     const teamGoals: Record<number, { name: string; goals: number }> = {};
     const teamYellowCards: Record<number, { name: string; cards: number }> = {};
 
@@ -172,7 +172,16 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         const playerId = goal.playerId;
         if (playerId) {
           if (!playerGoals[playerId]) {
-            playerGoals[playerId] = { player: goal.player, goals: 0 };
+            let teamName = '';
+            if (match.homeRoster?.some((p: any) => p.id === playerId)) {
+              teamName = details.teams?.find((t: any) => t.id === match.homeTeamId)?.name || '';
+            } else if (match.awayRoster?.some((p: any) => p.id === playerId)) {
+              teamName = details.teams?.find((t: any) => t.id === match.awayTeamId)?.name || '';
+            } else {
+              const team = details.teams?.find((t: any) => t.players?.some((p: any) => p.id === playerId));
+              if (team) teamName = team.name;
+            }
+            playerGoals[playerId] = { player: goal.player, goals: 0, teamName };
           }
           playerGoals[playerId].goals += (goal.goalsCount ?? 0);
         }
@@ -1816,6 +1825,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         <span className={styles.statsName}>
                           {item.player?.footballShirtNumber ? `№${item.player.footballShirtNumber} ` : ''}
                           {item.player?.lastName} {item.player?.firstName}
+                          {item.teamName ? ` (${item.teamName})` : ''}
                         </span>
                         <span className={styles.statsValue}>{item.goals} голів</span>
                       </div>
