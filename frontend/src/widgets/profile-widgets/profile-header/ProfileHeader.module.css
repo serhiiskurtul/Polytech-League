@@ -263,6 +263,11 @@
   color: var(--success);
 }
 
+.badgeFizorg {
+  background: rgba(139, 92, 246, 0.12);
+  color: #8b5cf6;
+}
+
 .badgeAccent {
   background: rgba(244, 63, 94, 0.12);
   color: var(--accent);

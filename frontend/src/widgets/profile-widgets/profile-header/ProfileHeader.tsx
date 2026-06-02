@@ -95,6 +95,7 @@ const ProfileHeader = ({ userData, isAdmin, onEdit, onAvatarUpload, onLogout, on
               {userData.badges.map((badge, index) => (
                 <span key={index} className={`${styles.badge} ${
                   badge === 'Адміністратор' ? styles.badgeAccent :
+                  badge === 'Фізорг' ? styles.badgeFizorg :
                   index === 0 ? styles.badgePrimary : 
                   index === 1 ? styles.badgeSuccess : 
                   styles.badgeAccent
