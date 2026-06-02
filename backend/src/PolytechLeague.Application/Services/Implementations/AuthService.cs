@@ -78,6 +78,12 @@ public class AuthService(
 
         var newAccessToken = jwtService.GenerateAccessToken(user);
 
+        Console.WriteLine($"Token: {oldRefreshToken.Token}");
+        Console.WriteLine($"IsExpired: {oldRefreshToken.IsExpired}");
+        Console.WriteLine($"IsRevoked: {oldRefreshToken.IsRevoked}");
+        Console.WriteLine($"ExpiresAt: {oldRefreshToken.ExpiresAt}");
+        Console.WriteLine($"Now: {DateTime.UtcNow}");
+
         return new AuthResponse
         {
             AccessToken = newAccessToken,

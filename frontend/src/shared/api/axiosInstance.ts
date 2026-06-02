@@ -70,7 +70,7 @@ api.interceptors.response.use(
 
     if (status === 401 && originalRequest && !originalRequest.url?.includes('/login') && !originalRequest.url?.includes('/refresh') && !(originalRequest as any)._retry) {
       if (isRefreshing) {
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
           failedQueue.push({ resolve, reject });
         })
           .then(() => {
@@ -90,7 +90,7 @@ api.interceptors.response.use(
         try {
           const refreshToken = localStorage.getItem('refreshToken');
           const response = await axios.post(`${API_URL}/refresh`, { refreshToken }, { withCredentials: true });
-          
+
           const { accessToken, refreshToken: newRefreshToken } = response.data;
           localStorage.setItem('token', accessToken);
           localStorage.setItem('refreshToken', newRefreshToken);
@@ -98,14 +98,15 @@ api.interceptors.response.use(
           processQueue(null, accessToken);
           return api(originalRequest);
         } catch (refreshError: any) {
-          if (refreshError.response && [400, 401, 403].includes(refreshError.response.status)) {
-            processQueue(refreshError, null);
+          processQueue(refreshError, null);
+
+          const status = refreshError.response?.status;
+          if (status === 401 || status === 403 || status === 400 || status === 404) {
             localStorage.removeItem('token');
             localStorage.removeItem('refreshToken');
             window.location.href = '/login';
-          } else {
-            processQueue(refreshError, null);
           }
+
           return Promise.reject(refreshError);
         } finally {
           isRefreshing = false;
@@ -116,7 +117,7 @@ api.interceptors.response.use(
         try {
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 5000);
-          
+
           return await navigator.locks.request('refresh_token_lock', { signal: controller.signal }, async () => {
             clearTimeout(timeoutId);
             const tokenNow = localStorage.getItem('refreshToken');
