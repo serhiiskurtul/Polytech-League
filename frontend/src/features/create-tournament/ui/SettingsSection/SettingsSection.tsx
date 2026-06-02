@@ -99,6 +99,25 @@ const SettingsSection = ({ formData, handleInputChange }: SettingsSectionProps) 
             </>
           )}
 
+          {/* Специфічні налаштування для настільного тенісу */}
+          {formData.sport === 'table_tennis' && (
+            <div className={shared.formGroup}>
+              <label className={shared.formLabel}>
+                <i className="fas fa-project-diagram"></i> Тип змагання *
+              </label>
+              <select
+                name="tournamentType"
+                value={formData.tournamentType || 'RoundRobin'}
+                onChange={handleInputChange}
+                className={shared.formSelect}
+                required
+              >
+                <option value="RoundRobin">Кругова система</option>
+                <option value="SingleElimination">Олімпійська система (Single Elimination)</option>
+                <option value="DoubleElimination">Double Elimination (з вибуванням після двох поразок)</option>
+              </select>
+            </div>
+          )}
 
           {/* Налаштування армрестлінгу */}
           {formData.sport === 'armwrestling' && (

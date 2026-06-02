@@ -180,7 +180,7 @@ public class AuthControllerTests : IntegrationTestBase
         // Arrange
         var authServiceMock = new Mock<IAuthService>();
         authServiceMock.Setup(s => s.RevokeAndRefreshJwtTokensAsync(It.IsAny<RefreshTokenRequest>(), It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new Exception("Invalid token"));
+            .ThrowsAsync(new System.Security.Authentication.AuthenticationException("Invalid token"));
 
         var client = Factory.WithWebHostBuilder(builder =>
         {

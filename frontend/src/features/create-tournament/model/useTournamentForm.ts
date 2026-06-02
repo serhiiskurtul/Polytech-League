@@ -258,7 +258,7 @@ export const useTournamentForm = () => {
           break;
 
         case 'table_tennis':
-          payload.tournamentType = formData.tournamentType || null;
+          payload.tournamentType = formData.tournamentType || 'RoundRobin';
           break;
 
         case 'armwrestling':
