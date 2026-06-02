@@ -347,7 +347,7 @@ const TournamentViewPage = () => {
         endDate: formatToISO(editTournamentData.endDate) || (details as any).endDate || null,
         isModerated: editTournamentData.level === 'CollegeGroup' ? !!editTournamentData.isModerated : !!(details as any).isModerated,
         isPublic: editTournamentData.isPublic !== undefined ? !!editTournamentData.isPublic : ((details as any).isPublic !== undefined ? !!(details as any).isPublic : true),
-        disableNotifications: (editTournamentData as any).disableNotifications || false,
+        disableNotifications: (editTournamentData as any).disableNotifications !== undefined ? !!(editTournamentData as any).disableNotifications : !!(details as any).disableNotifications,
         isTeam: isTeamSport,
         seasonId: editTournamentData.seasonId || (details as any).seasonId || null,
         category: editTournamentData.category || (details as any).category || (isVolleyball ? 'Men' : 'Mixed')
@@ -1236,6 +1236,7 @@ const TournamentViewPage = () => {
               endDate: formatDateForInput(data.endDate || d.endDate),
               isModerated: !!d.isModerated,
               isPublic: d.isPublic !== undefined ? !!d.isPublic : true,
+              disableNotifications: !!d.disableNotifications,
               seasonId: d.seasonId || null,
               category: d.category || (data.category === 'Чоловіки' ? 'Men' : data.category === 'Жінки' ? 'Women' : data.category === 'Змішаний' ? 'Mixed' : data.category) || (sportKey === 'volleyball' || sportKey === 'beach_volleyball' ? 'Men' : 'Mixed'),
               firstPlaceId: d.firstPlace?.id || null,
@@ -1565,6 +1566,28 @@ const TournamentViewPage = () => {
     if (variant === 'Russian') return 'Класичні (64)';
     return variant || 'Класичні';
   }
+
+  const getTournamentSystemLabel = () => {
+    const sport = tournament?.sport?.toLowerCase() || '';
+    if (sport === 'chess' || sport === 'checkers') {
+      const system = (details as any)?.system;
+      switch (system) {
+        case 'Swiss': return 'Швейцарська система';
+        case 'RoundRobin': return 'Кругова система';
+        case 'Knockout': return 'Олімпійська система';
+        default: return system ? getSystemLabel(system) : '';
+      }
+    } else {
+      const type = (details as any)?.tournamentType;
+      switch (type) {
+        case 'RoundRobin': return 'Кругова система';
+        case 'SingleElimination': return 'Олімпійська система (Single Elimination)';
+        case 'DoubleElimination': return 'Double Elimination (з вибуванням після двох поразок)';
+        case 'GroupsPlayoff': return 'Груповий етап + Плей-офф';
+        default: return type || '';
+      }
+    }
+  };
 
   const getImageUrl = (url: string) => {
     if (!url) return '';
@@ -1898,8 +1921,28 @@ const TournamentViewPage = () => {
                 </div>
                 <div className={styles.metaItem}>
                   <i className="fas fa-users"></i>
-                  <span>{actualParticipants} {participantLabel}</span>
+                  <span>
+                    {actualParticipants} {participantLabel}
+                    {(() => {
+                      const cat = (details as any)?.category || tournament?.category;
+                      if (!cat) return '';
+                      let catLabel = 'змішане';
+                      if (cat === 'Men' || cat === 'Чоловіки') catLabel = 'чоловіче';
+                      else if (cat === 'Women' || cat === 'Жінки') catLabel = 'жіноче';
+                      return ` (${catLabel})`;
+                    })()}
+                  </span>
                 </div>
+                {(() => {
+                  const systemLabel = getTournamentSystemLabel();
+                  if (!systemLabel) return null;
+                  return (
+                    <div className={styles.metaItem}>
+                      <i className="fas fa-project-diagram"></i>
+                      <span>Система проведення: {systemLabel}</span>
+                    </div>
+                  );
+                })()}
                 {details?.timeControl && tournament?.sport?.toLowerCase() !== 'armwrestling' && (
                   <div className={styles.metaItem}>
                     <i className="fas fa-clock"></i>
