@@ -122,7 +122,7 @@ if (string.IsNullOrEmpty(redisConnectionString))
     redisConnectionString = "localhost:6379";
 }
 var options = ConfigurationOptions.Parse(redisConnectionString);
-options.Ssl = !redisConnectionString.Contains("localhost");
+options.Ssl = redisConnectionString.Contains("upstash.io") || redisConnectionString.Contains("ssl=true", StringComparison.OrdinalIgnoreCase);
 options.AbortOnConnectFail = false;
 var multiplexer = ConnectionMultiplexer.Connect(options);
 builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
