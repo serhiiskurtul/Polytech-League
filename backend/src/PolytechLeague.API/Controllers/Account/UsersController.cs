@@ -122,6 +122,12 @@ public class UsersController(IUserService userService, IPlayerService playerServ
     public async Task<IActionResult> HardDelete(
         [FromRoute] long id, CancellationToken cancellationToken)
     {
+        var currentUserId = User.GetUserId();
+        if (id == currentUserId)
+        {
+            return StatusCode(403, "Ви не можете видалити власний акаунт.");
+        }
+
         await userService.DeleteAsync(id, cancellationToken);
 
         var cacheKey = $"user_account_{id}";
@@ -135,6 +141,12 @@ public class UsersController(IUserService userService, IPlayerService playerServ
     public async Task<IActionResult> Block(
         [FromRoute] long id, CancellationToken cancellationToken)
     {
+        var currentUserId = User.GetUserId();
+        if (id == currentUserId)
+        {
+            return StatusCode(403, "Ви не можете заблокувати власний акаунт.");
+        }
+
         await userService.BlockAsync(id, cancellationToken);
 
         var cacheKey = $"user_account_{id}";

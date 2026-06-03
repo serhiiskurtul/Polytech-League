@@ -112,6 +112,10 @@ export const AdminUsersPage = () => {
   };
 
   const handleBlock = async (id: number, isBlocked: boolean) => {
+    if (id === currentUser?.id) {
+      toast.error('Ви не можете змінити статус власного акаунту');
+      return;
+    }
     try {
       if (isBlocked) {
         await unblockUser(id);
@@ -122,19 +126,23 @@ export const AdminUsersPage = () => {
         toast.success('Користувача заблоковано');
       }
       fetchUsers();
-    } catch (error) {
-      toast.error('Помилка при зміні статусу користувача');
+    } catch (error: any) {
+      toast.error(error.response?.data || 'Помилка при зміні статусу користувача');
     }
   };
 
   const handleDelete = async (id: number) => {
+    if (id === currentUser?.id) {
+      toast.error('Ви не можете видалити власний акаунт');
+      return;
+    }
     if (!window.confirm('Ви впевнені, що хочете ПОВНІСТЮ видалити цей аккаунт? Цю дію неможливо скасувати.')) return;
     try {
       await deleteUser(id);
       toast.success('Аккаунт видалено');
       fetchUsers();
-    } catch (error) {
-      toast.error('Помилка при видаленні аккаунту');
+    } catch (error: any) {
+      toast.error(error.response?.data || 'Помилка при видаленні аккаунту');
     }
   };
 
@@ -349,14 +357,18 @@ export const AdminUsersPage = () => {
                           <button 
                             className={`${styles.actionBtn} ${user.isBlocked ? styles.unblockBtn : styles.blockBtn}`}
                             onClick={() => handleBlock(user.id, user.isBlocked)}
-                            title={user.isBlocked ? "Розблокувати" : "Заблокувати"}
+                            title={user.id === currentUser?.id ? "Ви не можете заблокувати свій акаунт" : (user.isBlocked ? "Розблокувати" : "Заблокувати")}
+                            disabled={user.id === currentUser?.id}
+                            style={user.id === currentUser?.id ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
                           >
                             <i className={`fas ${user.isBlocked ? 'fa-unlock' : 'fa-ban'}`}></i>
                           </button>
                           <button 
                             className={`${styles.actionBtn} ${styles.deleteBtn}`}
                             onClick={() => handleDelete(user.id)}
-                            title="Видалити назавжди"
+                            title={user.id === currentUser?.id ? "Ви не можете видалити свій акаунт" : "Видалити назавжди"}
+                            disabled={user.id === currentUser?.id}
+                            style={user.id === currentUser?.id ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
                           >
                             <i className="fas fa-trash-alt"></i>
                           </button>
