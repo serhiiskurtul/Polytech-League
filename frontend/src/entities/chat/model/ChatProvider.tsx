@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback, use
 import { HubConnection, HubConnectionBuilder, LogLevel, HubConnectionState } from '@microsoft/signalr';
 import { useAuth } from '@/entities/session';
 import { chatApi, ConversationDto, MessageDto } from '@/entities/chat/api/chat.api';
+import { BASE_URL } from '@/shared/api/axiosInstance';
 
 interface ChatContextType {
     conversations: ConversationDto[];
@@ -94,9 +95,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return;
         }
 
-        const baseUrl = (import.meta.env.VITE_API_URL || '').replace('/api', '');
         const newConnection = new HubConnectionBuilder()
-            .withUrl(`${baseUrl}/hubs/chat`, {
+            .withUrl(`${BASE_URL}/hubs/chat`, {
                 accessTokenFactory: () => localStorage.getItem('token') || ''
             })
             .withAutomaticReconnect()
