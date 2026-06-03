@@ -14,7 +14,7 @@ using PolytechLeague.API.Middlewares;
 using Microsoft.OpenApi.Models;
 using PolytechLeague.Application.Hubs;
 using Microsoft.EntityFrameworkCore;
-
+using Prometheus;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -194,9 +194,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseWebSockets();
+app.UseHttpMetrics();
 
 app.MapControllers();
 app.MapHealthChecks("/health");
+app.MapMetrics(); // Додає /metrics ендпоінт для Prometheus
 app.MapHub<ChatHub>("/hubs/chat");
 
 //Автоматичне застосування міграцій при старті
