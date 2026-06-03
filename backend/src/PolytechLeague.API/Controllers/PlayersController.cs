@@ -181,7 +181,14 @@ public class PlayersController : ControllerBase
         }
         
         var ranked = allWithRankings.FirstOrDefault(p => p.Id == id);
-        if (ranked == null) return NotFound();
+        if (ranked == null) 
+        {
+            return Ok(new PlayerRankResponse {
+                GlobalRank = 0,
+                PerformanceScore = 0,
+                SportStats = new()
+            });
+        }
         
         return Ok(new PlayerRankResponse {
             GlobalRank = ranked.GlobalRank,
