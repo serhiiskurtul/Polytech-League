@@ -54,6 +54,7 @@ public class PlayerService : IPlayerService
     {
         // O(1) Fast profile loading (without global rankings calculation)
         var player = await _dbContext.Players
+            .AsNoTracking()
             .Include(p => p.User)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
             
@@ -84,6 +85,7 @@ public class PlayerService : IPlayerService
     {
         // O(1) Fast profile loading (without global rankings calculation)
         var player = await _dbContext.Players
+            .AsNoTracking()
             .Include(p => p.User)
             .FirstOrDefaultAsync(p => p.UserId == userId, cancellationToken);
             

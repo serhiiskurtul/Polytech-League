@@ -28,7 +28,7 @@ public class NotificationService(
             usersQuery = usersQuery.Where(u => u.Role != UserRole.Admin);
         }
 
-        var users = await usersQuery.ToListAsync();
+        var users = await usersQuery.AsNoTracking().ToListAsync();
 
         foreach (var user in users)
         {
@@ -56,6 +56,7 @@ public class NotificationService(
     public async Task SendNotificationToAdminsAsync(string title, string message, NotificationType type, string? link = null, string? tag = null)
     {
         var admins = await _context.Users
+            .AsNoTracking()
             .Where(u => !u.IsDeleted && u.Role == UserRole.Admin)
             .ToListAsync();
 
@@ -115,6 +116,7 @@ public class NotificationService(
     public async Task<IEnumerable<NotificationDto>> GetUserNotificationsAsync(long userId)
     {
         var notifications = await _context.Notifications
+            .AsNoTracking()
             .Where(n => n.UserId == userId)
             .OrderByDescending(n => n.CreatedAt)
             .ToListAsync();
