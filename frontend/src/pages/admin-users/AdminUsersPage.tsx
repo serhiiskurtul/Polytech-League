@@ -354,24 +354,24 @@ export const AdminUsersPage = () => {
                       </td>
                       <td>
                         <div className={styles.actions}>
-                          <button 
-                            className={`${styles.actionBtn} ${user.isBlocked ? styles.unblockBtn : styles.blockBtn}`}
-                            onClick={() => handleBlock(user.id, user.isBlocked)}
-                            title={user.id === currentUser?.id ? "Ви не можете заблокувати свій акаунт" : (user.isBlocked ? "Розблокувати" : "Заблокувати")}
-                            disabled={user.id === currentUser?.id}
-                            style={user.id === currentUser?.id ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
-                          >
-                            <i className={`fas ${user.isBlocked ? 'fa-unlock' : 'fa-ban'}`}></i>
-                          </button>
-                          <button 
-                            className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                            onClick={() => handleDelete(user.id)}
-                            title={user.id === currentUser?.id ? "Ви не можете видалити свій акаунт" : "Видалити назавжди"}
-                            disabled={user.id === currentUser?.id}
-                            style={user.id === currentUser?.id ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
-                          >
-                            <i className="fas fa-trash-alt"></i>
-                          </button>
+                          {user.id !== currentUser?.id && (
+                            <>
+                              <button 
+                                className={`${styles.actionBtn} ${user.isBlocked ? styles.unblockBtn : styles.blockBtn}`}
+                                onClick={() => handleBlock(user.id, user.isBlocked)}
+                                title={user.isBlocked ? "Розблокувати" : "Заблокувати"}
+                              >
+                                <i className={`fas ${user.isBlocked ? 'fa-unlock' : 'fa-ban'}`}></i>
+                              </button>
+                              <button 
+                                className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                                onClick={() => handleDelete(user.id)}
+                                title="Видалити назавжди"
+                              >
+                                <i className="fas fa-trash-alt"></i>
+                              </button>
+                            </>
+                          )}
                         </div>
                       </td>
                     </tr>
