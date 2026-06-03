@@ -32,7 +32,7 @@ public class ChessTeamsController(
         return Ok(entity.ToResponse());
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpPost]
     public async Task<IActionResult> Create(
         [FromBody] ChessTeamRequest request,
@@ -49,7 +49,7 @@ public class ChessTeamsController(
         return Created();
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(
         long id,
@@ -68,7 +68,7 @@ public class ChessTeamsController(
         return NoContent();
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(long id, CancellationToken cancellationToken)
     {

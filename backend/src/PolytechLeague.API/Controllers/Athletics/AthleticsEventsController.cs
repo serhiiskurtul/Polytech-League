@@ -116,7 +116,7 @@ public class AthleticsEventsController(
         return NoContent();
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpPost("{id:long}/participants")]
     public async Task<IActionResult> AddParticipant([FromRoute] long id, [FromBody] AthleticsEventParticipantDto dto, CancellationToken cancellationToken)
     {
@@ -128,7 +128,7 @@ public class AthleticsEventsController(
         return Created();
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpDelete("{id:long}/participants/{playerId:long}")]
     public async Task<IActionResult> RemoveParticipant([FromRoute] long id, [FromRoute] long playerId, CancellationToken cancellationToken)
     {

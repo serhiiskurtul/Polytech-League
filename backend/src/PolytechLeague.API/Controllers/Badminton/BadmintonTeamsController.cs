@@ -32,7 +32,7 @@ public class BadmintonTeamsController(
         return Ok(entity.ToResponse());
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpPost]
     public async Task<IActionResult> Create(
         [FromBody] BadmintonTeamRequest request,
@@ -47,7 +47,7 @@ public class BadmintonTeamsController(
         return CreatedAtAction(nameof(GetById), new { id = entity.Id }, response);
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(
         long id,
@@ -62,7 +62,7 @@ public class BadmintonTeamsController(
         return NoContent();
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(long id, CancellationToken cancellationToken)
     {

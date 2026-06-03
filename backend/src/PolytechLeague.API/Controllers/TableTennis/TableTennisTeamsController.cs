@@ -35,7 +35,7 @@ public class TableTennisTeamsController(ITableTennisTeamService ttTeamService, I
         return Ok(entity.ToResponse());
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpPost]
     public async Task<IActionResult> Create(
         [FromBody] TableTennisTeam request,
@@ -49,7 +49,7 @@ public class TableTennisTeamsController(ITableTennisTeamService ttTeamService, I
         return Created();
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpPut("{id:long}")]
     public async Task<IActionResult> Update(
         [FromRoute] long id,
@@ -64,7 +64,7 @@ public class TableTennisTeamsController(ITableTennisTeamService ttTeamService, I
         return NoContent();
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpDelete("{id:long}")]
     public async Task<IActionResult> Delete([FromRoute] long id, CancellationToken cancellationToken)
     {

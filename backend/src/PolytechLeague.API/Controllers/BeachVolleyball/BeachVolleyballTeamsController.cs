@@ -32,7 +32,7 @@ public class BeachVolleyballTeamsController(
         return Ok(entity.ToResponse());
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpPost]
     public async Task<IActionResult> Create(
         [FromBody] BeachVolleyballTeamRequest request,
@@ -81,7 +81,7 @@ public class BeachVolleyballTeamsController(
         return NoContent();
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(long id, CancellationToken cancellationToken)
     {

@@ -90,7 +90,7 @@ public class BadmintonEventsController(
 
         return NoContent();
     }
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpPost("{id}/participants")]
     public async Task<IActionResult> AddParticipant(long id, [FromBody] BadmintonEventParticipantDto dto, CancellationToken cancellationToken)
     {
@@ -103,7 +103,7 @@ public class BadmintonEventsController(
         return Ok();
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpPut("{id}/participants/{playerId}")]
     public async Task<IActionResult> UpdateParticipant(long id, long playerId, [FromBody] BadmintonEventParticipantDto dto, CancellationToken cancellationToken)
     {
@@ -116,7 +116,7 @@ public class BadmintonEventsController(
         return Ok();
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpDelete("{id}/participants/{playerId}")]
     public async Task<IActionResult> RemoveParticipant(long id, long playerId, CancellationToken cancellationToken)
     {
@@ -142,7 +142,7 @@ public class BadmintonEventsController(
         return Ok();
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpPost("{id}/participants/{playerId}/approve")]
     public async Task<IActionResult> Approve(long id, long playerId, CancellationToken cancellationToken)
     {
@@ -155,7 +155,7 @@ public class BadmintonEventsController(
         return Ok();
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpPost("{id}/participants/{playerId}/reject")]
     public async Task<IActionResult> Reject(long id, long playerId, CancellationToken cancellationToken)
     {

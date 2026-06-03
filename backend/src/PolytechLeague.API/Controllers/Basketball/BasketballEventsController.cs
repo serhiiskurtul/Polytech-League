@@ -130,7 +130,7 @@ public class BasketballEventsController(
         return Ok();
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpDelete("{id}/participants/{playerId}")]
     public async Task<IActionResult> RemoveParticipant(long id, long playerId, CancellationToken cancellationToken)
     {

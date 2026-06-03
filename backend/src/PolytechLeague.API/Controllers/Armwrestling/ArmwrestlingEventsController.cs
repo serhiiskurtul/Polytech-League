@@ -91,7 +91,7 @@ public class ArmwrestlingEventsController(
         return NoContent();
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpPost("{id:long}/participants")]
     public async Task<IActionResult> AddParticipant(long id, [FromBody] ArmwrestlingEventParticipantDto dto, CancellationToken cancellationToken)
     {
@@ -104,7 +104,7 @@ public class ArmwrestlingEventsController(
         return Ok();
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpDelete("{id:long}/participants/{playerId:long}")]
     public async Task<IActionResult> RemoveParticipant(long id, long playerId, CancellationToken cancellationToken)
     {
@@ -130,7 +130,7 @@ public class ArmwrestlingEventsController(
         return Ok();
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpPost("{id}/participants/{playerId}/approve")]
     public async Task<IActionResult> Approve(long id, long playerId, CancellationToken cancellationToken)
     {
@@ -143,7 +143,7 @@ public class ArmwrestlingEventsController(
         return Ok();
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpPost("{id}/participants/{playerId}/reject")]
     public async Task<IActionResult> Reject(long id, long playerId, CancellationToken cancellationToken)
     {

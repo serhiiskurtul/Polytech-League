@@ -111,7 +111,7 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
 
         return NoContent();
     }
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpPost("{eventId:long}/participants")]
     public async Task<IActionResult> AddParticipant([FromRoute] long eventId, [FromBody] ChessEventParticipantDto request, CancellationToken cancellationToken)
     {
@@ -121,7 +121,7 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
         return Ok();
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpDelete("{eventId:long}/participants/{playerId:long}")]
     public async Task<IActionResult> RemoveParticipant([FromRoute] long eventId, [FromRoute] long playerId, CancellationToken cancellationToken)
     {
@@ -131,7 +131,7 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
         return NoContent();
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpPut("{eventId:long}/participants/{playerId:long}")]
     public async Task<IActionResult> UpdateParticipant([FromRoute] long eventId, [FromRoute] long playerId, [FromBody] ChessEventParticipantDto request, CancellationToken cancellationToken)
     {
@@ -211,7 +211,7 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
         return Ok();
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpPost("{id}/participants/{playerId}/approve")]
     public async Task<IActionResult> Approve(long id, long playerId, CancellationToken cancellationToken)
     {
@@ -221,7 +221,7 @@ public class ChessEventsController(IChessEventService chessEventService, IRedisS
         return Ok();
     }
 
-    [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "AdminOrFizorg")]
     [HttpPost("{id}/participants/{playerId}/reject")]
     public async Task<IActionResult> Reject(long id, long playerId, CancellationToken cancellationToken)
     {
