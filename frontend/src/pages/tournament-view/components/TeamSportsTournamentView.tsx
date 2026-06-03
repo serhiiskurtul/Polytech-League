@@ -87,7 +87,7 @@ import { Link } from 'react-router-dom';
 import api from '@/shared/api/axiosInstance';
 import toast from 'react-hot-toast';
 
-type Sport = 'volleyball' | 'волейбол' | 'beach_volleyball' | 'beach-volleyball' | 'пляжний_волейбол' | 'football' | 'футбол' | 'basketball_3x3' | 'basketball3x3' | 'basketball-3x3' | 'баскетбол_3х3' | 'badminton' | 'бадмінтон' | 'chess' | 'шахи' | 'checkers' | 'шашки' | 'tabletennis' | 'table_tennis' | 'table-tennis' | 'настільний_теніс';
+type Sport = 'volleyball' | 'волейбол' | 'beach_volleyball' | 'beach-volleyball' | 'пляжний_волейбол' | 'football' | 'футбол' | 'basketball_3x3' | 'basketball3x3' | 'basketball-3x3' | 'баскетбол_3х3' | 'badminton' | 'бадмінтон' | 'chess' | 'шахи' | 'checkers' | 'шашки' | 'tabletennis' | 'table_tennis' | 'table-tennis' | 'настільний_теніс' | 'armwrestling' | 'армрестлінг';
 
 const getCanonicalSport = (s: Sport): Sport => {
   if (['volleyball', 'волейбол'].includes(s)) return 'volleyball';
@@ -98,6 +98,7 @@ const getCanonicalSport = (s: Sport): Sport => {
   if (['chess', 'шахи'].includes(s)) return 'chess';
   if (['checkers', 'шашки'].includes(s)) return 'checkers';
   if (['tabletennis', 'table_tennis', 'table-tennis', 'настільний_теніс'].includes(s)) return 'tabletennis';
+  if (['armwrestling', 'армрестлінг'].includes(s)) return 'armwrestling';
   return s;
 };
 
@@ -1191,7 +1192,20 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
             </button>
           )}
           {(isAdmin || isFizorg) && activeTab === 'teams' && (
-            <button className={styles.addMatchGlobalBtn} onClick={() => setIsCreateTeamModalOpen(true)}>
+            <button 
+              className={styles.addMatchGlobalBtn} 
+              onClick={() => {
+                if (isFizorg && !isAdmin && userGroup) {
+                  setNewTeamForm({ name: userGroup, tournamentGroupName: '', isGeneralTableIncluded: false });
+                }
+                setIsCreateTeamModalOpen(true);
+              }}
+              disabled={isFizorg && !isAdmin && details.teams?.some((t: any) => t.name === userGroup)}
+              style={{ 
+                opacity: (isFizorg && !isAdmin && details.teams?.some((t: any) => t.name === userGroup)) ? 0.5 : 1, 
+                cursor: (isFizorg && !isAdmin && details.teams?.some((t: any) => t.name === userGroup)) ? 'not-allowed' : 'pointer' 
+              }}
+            >
               <i className="fas fa-users-cog"></i> <span>Створити команду</span>
             </button>
           )}
@@ -1724,7 +1738,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                     <h4>Команда {team.name}</h4>
                     <p>{team.players?.length || 0} гравців</p>
                   </div>
-                  {isAdmin && (
+                  {(isAdmin || (isFizorg && userGroup === team.name)) && (
                     <div className={styles.teamActions}>
                       <button className={styles.editTeamBtn} onClick={() => { setEditingTeamId(team.id); setIsTeamRosterModalOpen(true); }}>
                         <i className="fas fa-user-edit"></i> Склад
@@ -2042,6 +2056,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   value={newTeamForm.name} 
                   onChange={e => setNewTeamForm({...newTeamForm, name: e.target.value})}
                   placeholder="напр. 221"
+                  disabled={isFizorg && !isAdmin}
                 />
               </div>
 
