@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: polytech_db
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres_password}
+      POSTGRES_DB: ${DB_NAME:-polytech_league}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:alpine
+    container_name: polytech_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/src/PolytechLeague.API/Dockerfile
+    container_name: polytech_api
+    env_file:
+      - .env
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=${DB_NAME:-polytech_league};Username=${DB_USER:-postgres};Password=${DB_PASSWORD:-postgres_password};
+      - RedisSettings__Redis=redis:6379,abortConnect=false
+    ports:
+      - "80:8080"
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
