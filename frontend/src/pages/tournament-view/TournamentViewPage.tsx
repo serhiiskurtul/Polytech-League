@@ -2468,7 +2468,7 @@ const TournamentViewPage = () => {
                                   <th>Очки</th>
                                 )}
                                 <th style={{ textAlign: 'center' }}>Статус</th>
-                                {isAdmin && <th style={{ textAlign: 'center' }}>Дії</th>}
+                                {(isAdmin || isFizorg) && <th style={{ textAlign: 'center' }}>Дії</th>}
                               </tr>
                             </thead>
                             <tbody>
@@ -2593,7 +2593,7 @@ const TournamentViewPage = () => {
                                           </span>
                                         )}
                                       </td>
-                                      {isAdmin && (
+                                      {(isAdmin || isFizorg) && (
                                         <td style={{ textAlign: 'center' }}>
                                           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'center' }}>
                                             {p.status === RegistrationStatus.Pending && (

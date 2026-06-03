@@ -1167,7 +1167,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           {(sport === 'football' || sport === 'футбол') && (
             <button className={activeTab === 'stats' ? styles.activeTab : ''} onClick={() => setActiveTab('stats')}>Статистика</button>
           )}
-          {isAdmin && !isRegionalOrNational && (
+          {(isAdmin || isFizorg) && !isRegionalOrNational && (
             <button className={activeTab === 'participants' ? styles.activeTab : ''} onClick={() => setActiveTab('participants')}>
               Учасники {details.participants?.filter((p: any) => p.status === RegistrationStatus.Pending)?.length > 0 && (
                 <span style={{ 
@@ -1190,7 +1190,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
               <i className="fas fa-plus-circle"></i> <span>Додати матч</span>
             </button>
           )}
-          {isAdmin && activeTab === 'teams' && (
+          {(isAdmin || isFizorg) && activeTab === 'teams' && (
             <button className={styles.addMatchGlobalBtn} onClick={() => setIsCreateTeamModalOpen(true)}>
               <i className="fas fa-users-cog"></i> <span>Створити команду</span>
             </button>
@@ -1769,7 +1769,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                     <th>Учасник</th>
                     <th>Група</th>
                     <th style={{ textAlign: 'center' }}>Статус</th>
-                    {isAdmin && <th style={{ textAlign: 'center' }}>Дії</th>}
+                    {(isAdmin || isFizorg) && <th style={{ textAlign: 'center' }}>Дії</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -1798,7 +1798,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                            p.status === RegistrationStatus.Pending ? 'Очікує' : 'Відхилено'}
                         </span>
                       </td>
-                      {isAdmin && (
+                      {(isAdmin || isFizorg) && (
                         <td style={{ textAlign: 'center' }}>
                           <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
                             {p.status === RegistrationStatus.Pending && (
