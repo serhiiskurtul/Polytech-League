@@ -1,9 +1,9 @@
 #!/bin/bash
 
 CONTAINER_NAME="polytech_db"
-BACKUP_DIR="/root/backups/polytech_db"
+BACKUP_DIR="/home/deploy/backups/polytech_db"
 DATE=$(date +"%Y-%m-%d_%H-%M-%S")
-ENV_FILE="/root/polytech-league/.env"
+ENV_FILE="/home/deploy/Polytech-League/.env"
 if [ -f "$ENV_FILE" ]; then
     export $(grep -v '^#' "$ENV_FILE" | xargs)
 fi
