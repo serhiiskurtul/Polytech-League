@@ -69,7 +69,16 @@ import {
   removeBadmintonParticipant,
   approveTableTennisParticipant,
   rejectTableTennisParticipant,
-  removeTableTennisParticipant
+  removeTableTennisParticipant,
+  approveChessParticipant,
+  rejectChessParticipant,
+  removeParticipantFromEvent as removeChessParticipant,
+  approveCheckersParticipant,
+  rejectCheckersParticipant,
+  removeParticipantFromCheckersEvent as removeCheckersParticipant,
+  approveArmwrestlingParticipant,
+  rejectArmwrestlingParticipant,
+  removeParticipantFromArmwrestlingEvent as removeArmwrestlingParticipant
 } from '@/shared/api';
 import { RegistrationStatus } from '@/entities/tournament/model/tournament.types';
 import FootballBracket from './FootballBracket';
@@ -880,6 +889,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         case 'badminton': approveApi = approveBadmintonParticipant; break;
         case 'table_tennis':
         case 'tabletennis': approveApi = approveTableTennisParticipant; break;
+        case 'chess': approveApi = approveChessParticipant; break;
+        case 'checkers': approveApi = approveCheckersParticipant; break;
+        case 'armwrestling': approveApi = approveArmwrestlingParticipant; break;
         default: approveApi = approveFootballParticipant;
       }
       await approveApi(details.id, playerId);
@@ -901,6 +913,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         case 'badminton': rejectApi = rejectBadmintonParticipant; break;
         case 'table_tennis':
         case 'tabletennis': rejectApi = rejectTableTennisParticipant; break;
+        case 'chess': rejectApi = rejectChessParticipant; break;
+        case 'checkers': rejectApi = rejectCheckersParticipant; break;
+        case 'armwrestling': rejectApi = rejectArmwrestlingParticipant; break;
         default: rejectApi = rejectFootballParticipant;
       }
       await rejectApi(details.id, playerId);
@@ -923,6 +938,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         case 'badminton': removeApi = removeBadmintonParticipant; break;
         case 'table_tennis':
         case 'tabletennis': removeApi = removeTableTennisParticipant; break;
+        case 'chess': removeApi = removeChessParticipant; break;
+        case 'checkers': removeApi = removeCheckersParticipant; break;
+        case 'armwrestling': removeApi = removeArmwrestlingParticipant; break;
         default: removeApi = removeFootballParticipant;
       }
       await removeApi(details.id, playerId);
