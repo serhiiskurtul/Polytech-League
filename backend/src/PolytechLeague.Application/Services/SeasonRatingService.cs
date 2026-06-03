@@ -70,6 +70,7 @@ public class SeasonRatingService : ISeasonRatingService
 
         // 1. Chess
         var chessEvents = await _context.ChessEvents
+            .AsNoTracking()
             .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) 
                         && e.Level == CompetitionLevel.CollegeGroup)
             .Include(e => e.Players!)
@@ -97,6 +98,7 @@ public class SeasonRatingService : ISeasonRatingService
 
         // 2. Checkers
         var checkersEvents = await _context.CheckersEvents
+            .AsNoTracking()
             .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) 
                         && e.Level == CompetitionLevel.CollegeGroup)
             .Include(e => e.Players!)
@@ -124,6 +126,7 @@ public class SeasonRatingService : ISeasonRatingService
 
         // 3. Football
         var FootballEvents = await _context.FootballEvents
+            .AsNoTracking()
             .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) 
                         && e.Level == CompetitionLevel.CollegeGroup)
             .Include(e => e.Teams)
@@ -157,6 +160,7 @@ public class SeasonRatingService : ISeasonRatingService
 
         // 4. Armwrestling
         var armEvents = await _context.ArmwrestlingEvents
+            .AsNoTracking()
             .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) 
                         && e.Level == CompetitionLevel.CollegeGroup)
             .Include(e => e.Players!)
@@ -245,6 +249,7 @@ public class SeasonRatingService : ISeasonRatingService
 
         // 5. Table Tennis
         var ttEvents = await _context.TableTennisEvents
+            .AsNoTracking()
             .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) 
                         && e.Level == CompetitionLevel.CollegeGroup)
             .Include(e => e.Participants!)
@@ -272,6 +277,7 @@ public class SeasonRatingService : ISeasonRatingService
 
         // 6. Badminton
         var badEvents = await _context.BadmintonEvents
+            .AsNoTracking()
             .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) 
                         && e.Level == CompetitionLevel.CollegeGroup)
             .Include(e => e.Participants!)
@@ -299,6 +305,7 @@ public class SeasonRatingService : ISeasonRatingService
 
         // 7. Volleyball
         var volEvents = await _context.VolleyballEvents
+            .AsNoTracking()
             .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) 
                         && e.Level == CompetitionLevel.CollegeGroup)
             .Include(e => e.Teams)
@@ -332,6 +339,7 @@ public class SeasonRatingService : ISeasonRatingService
 
         // 8. Basketball 3x3
         var bballEvents = await _context.BasketballEvents
+            .AsNoTracking()
             .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) 
                         && e.Level == CompetitionLevel.CollegeGroup)
             .Include(e => e.Teams)
@@ -365,6 +373,7 @@ public class SeasonRatingService : ISeasonRatingService
 
         // 9. Beach Volleyball
         var bvolEvents = await _context.BeachVolleyballEvents
+            .AsNoTracking()
             .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) 
                         && e.Level == CompetitionLevel.CollegeGroup)
             .Include(e => e.Teams)
@@ -481,8 +490,9 @@ public class SeasonRatingService : ISeasonRatingService
             } catch { /* Use all sports if JSON is invalid */ }
         }
 
-        var colleges = await _context.Colleges.ToListAsync();
+        var colleges = await _context.Colleges.AsNoTracking().ToListAsync();
         var manualEntries = await _context.NationalRatingManualEntries
+            .AsNoTracking()
             .Where(e => e.SeasonId == seasonId)
             .ToListAsync();
 
@@ -614,8 +624,9 @@ public class SeasonRatingService : ISeasonRatingService
             } catch { /* Use all sports if JSON is invalid */ }
         }
 
-        var colleges = await _context.Colleges.ToListAsync();
+        var colleges = await _context.Colleges.AsNoTracking().ToListAsync();
         var manualEntries = await _context.RegionalRatingManualEntries
+            .AsNoTracking()
             .Where(e => e.SeasonId == seasonId)
             .ToListAsync();
 
@@ -734,7 +745,7 @@ public class SeasonRatingService : ISeasonRatingService
 
     public async Task<SeasonDto?> GetCurrentSeasonAsync()
     {
-        var season = await _context.Seasons.FirstOrDefaultAsync(s => s.IsCurrent);
+        var season = await _context.Seasons.AsNoTracking().FirstOrDefaultAsync(s => s.IsCurrent);
         if (season == null) return null;
         return new SeasonDto
         {

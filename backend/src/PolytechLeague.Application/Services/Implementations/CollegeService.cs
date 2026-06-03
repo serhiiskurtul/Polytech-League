@@ -16,12 +16,12 @@ public class CollegeService : ICollegeService
 
     public async Task<IEnumerable<College>> GetAllCollegesAsync()
     {
-        return await _context.Colleges.ToListAsync();
+        return await _context.Colleges.AsNoTracking().ToListAsync();
     }
 
     public async Task<College?> GetCollegeByIdAsync(long id)
     {
-        return await _context.Colleges.FindAsync(id);
+        return await _context.Colleges.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
     }
 
     public async Task<College> CreateCollegeAsync(College college)
