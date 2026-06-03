@@ -33,13 +33,29 @@ services:
     environment:
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=${DB_NAME:-polytech_league};Username=${DB_USER:-postgres};Password=${DB_PASSWORD:-postgres_password};
       - RedisSettings__Redis=redis:6379,abortConnect=false
-    ports:
-      - "80:8080"
+    expose:
+      - "8080"
     depends_on:
       - db
       - redis
     restart: unless-stopped
 
+  caddy:
+    image: caddy:alpine
+    container_name: polytech_caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    command: caddy reverse-proxy --from https://api.polytech-league.com --to http://api:8080
+    depends_on:
+      - api
+
 volumes:
   postgres_data:
   redis_data:
+  caddy_data:
+  caddy_config:
