@@ -775,6 +775,7 @@ public class PlayerService : IPlayerService
         // 1. Chess
         try {
             var chessPerformances = await _dbContext.ChessEventParticipants
+                .AsNoTracking()
                 .Include(p => p.Tournament)
                 .Where(p => p.PlayerId == playerId)
                 .ToListAsync(cancellationToken);
@@ -822,6 +823,7 @@ public class PlayerService : IPlayerService
         // 2. Checkers
         try {
             var checkersPerformances = await _dbContext.CheckersEventParticipants
+                .AsNoTracking()
                 .Include(p => p.Event)
                 .Where(p => p.PlayerId == playerId)
                 .ToListAsync(cancellationToken);
@@ -869,6 +871,7 @@ public class PlayerService : IPlayerService
         // 3. Table Tennis
         try {
             var ttPerformances = await _dbContext.TableTennisEventParticipants
+                .AsNoTracking()
                 .Include(p => p.Tournament)
                 .Where(p => p.PlayerId == playerId)
                 .ToListAsync(cancellationToken);
@@ -902,6 +905,7 @@ public class PlayerService : IPlayerService
         // 4. Badminton
         try {
             var badmintonPerformances = await _dbContext.BadmintonEventParticipants
+                .AsNoTracking()
                 .Include(p => p.Event)
                 .Where(p => p.PlayerId == playerId)
                 .ToListAsync(cancellationToken);
@@ -935,6 +939,7 @@ public class PlayerService : IPlayerService
         // 5. Armwrestling & Generic Individual Winners
         try {
             var armwPerformances = await _dbContext.ArmwrestlingEventParticipants
+                .AsNoTracking()
                 .Include(p => p.Tournament)
                 .Where(p => p.PlayerId == playerId)
                 .ToListAsync(cancellationToken);
@@ -956,6 +961,7 @@ public class PlayerService : IPlayerService
                 });
             }
             var genericWinners = await _dbContext.Set<Event>()
+                .AsNoTracking()
                 .Where(e => e.FirstPlaceId == playerId || e.SecondPlaceId == playerId || e.ThirdPlaceId == playerId)
                 .ToListAsync(cancellationToken);
             foreach (var e in genericWinners) {
@@ -978,6 +984,7 @@ public class PlayerService : IPlayerService
         // Football
         try {
             var teams = await _dbContext.FootballTeams
+                .AsNoTracking()
                 .Include(t => t.Event)
                 .Where(t => t.Players.Any(pl => pl.Id == playerId))
                 .ToListAsync(cancellationToken);
@@ -1008,6 +1015,7 @@ public class PlayerService : IPlayerService
         try {
             // Volleyball
             var vTeams = await _dbContext.VolleyballTeams
+                .AsNoTracking()
                 .Include(t => t.Event)
                 .Where(t => t.Players.Any(pl => pl.Id == playerId))
                 .ToListAsync(cancellationToken);
@@ -1018,6 +1026,7 @@ public class PlayerService : IPlayerService
             }
             // Basketball 3x3
             var bTeams = await _dbContext.BasketballTeams
+                .AsNoTracking()
                 .Include(t => t.Event)
                 .Where(t => t.Players.Any(pl => pl.Id == playerId))
                 .ToListAsync(cancellationToken);
@@ -1028,6 +1037,7 @@ public class PlayerService : IPlayerService
             }
             // Beach Volleyball
             var bvTeams = await _dbContext.BeachVolleyballTeams
+                .AsNoTracking()
                 .Include(t => t.Event)
                 .Where(t => t.Players.Any(pl => pl.Id == playerId))
                 .ToListAsync(cancellationToken);
@@ -1038,6 +1048,7 @@ public class PlayerService : IPlayerService
             }
             // Table Tennis Teams
             var ttTeams = await _dbContext.TableTennisTeams
+                .AsNoTracking()
                 .Include(t => t.Event)
                 .Where(t => t.Players.Any(pl => pl.Id == playerId))
                 .ToListAsync(cancellationToken);
@@ -1048,6 +1059,7 @@ public class PlayerService : IPlayerService
             }
             // Badminton Teams
             var badTeams = await _dbContext.BadmintonTeams
+                .AsNoTracking()
                 .Include(t => t.Event)
                 .Where(t => t.Player1Id == playerId || t.Player2Id == playerId)
                 .ToListAsync(cancellationToken);
@@ -1063,6 +1075,7 @@ public class PlayerService : IPlayerService
         // Athletics
         try {
             var athleticsResults = await _dbContext.AthleticsResults
+                .AsNoTracking()
                 .Include(r => r.AthleticsEvent)
                 .Where(r => r.PlayerId == playerId)
                 .ToListAsync(cancellationToken);
@@ -1084,6 +1097,7 @@ public class PlayerService : IPlayerService
         // 8. MVP Achievements
         try {
             var mvpEvents = await _dbContext.Set<Event>()
+                .AsNoTracking()
                 .Where(e => e.MvpId == playerId)
                 .ToListAsync(cancellationToken);
             foreach (var e in mvpEvents) {
@@ -2123,6 +2137,7 @@ public class PlayerService : IPlayerService
 
             // 1. Get all inter-group chess performances for badges
             var chessPerformances = await _dbContext.ChessEventParticipants
+                .AsNoTracking()
                 .Include(p => p.Tournament)
                 .Where(p => p.PlayerId == playerId && p.Tournament != null && p.Tournament.Level == CompetitionLevel.CollegeGroup)
                 .OrderByDescending(p => p.Tournament!.Date)
@@ -2169,9 +2184,11 @@ public class PlayerService : IPlayerService
             // 4. Undefeated in 4 seasons
             // Re-fetch games for this player to check for losses
             var games = await _dbContext.ChessGames
+                .AsNoTracking()
                 .Where(g => tournamentIds.Contains(g.TournamentId) && (g.WhitePlayerId == playerId || g.BlackPlayerId == playerId))
                 .ToListAsync(cancellationToken);
             var seasonsWithChess = await _dbContext.Seasons
+                .AsNoTracking()
                 .Where(s => _dbContext.ChessEvents.Any(e => e.SeasonId == s.Id && e.Level == CompetitionLevel.CollegeGroup &&
                     _dbContext.ChessEventParticipants.Any(p => p.TournamentId == e.Id && p.PlayerId == playerId)))
                 .ToListAsync(cancellationToken);
@@ -2211,6 +2228,7 @@ public class PlayerService : IPlayerService
 
         // 1. Chess
         var chessMatches = await _dbContext.ChessGames
+            .AsNoTracking()
             .Include(g => g.Tournament)
             .Where(g => (g.WhitePlayerId == player1Id && g.BlackPlayerId == player2Id) ||
                         (g.WhitePlayerId == player2Id && g.BlackPlayerId == player1Id))
@@ -2234,6 +2252,7 @@ public class PlayerService : IPlayerService
 
         // 2. Checkers
         var checkersMatches = await _dbContext.CheckersGames
+            .AsNoTracking()
             .Include(g => g.Event)
             .Include(g => g.WhitePlayer)
             .Include(g => g.BlackPlayer)
@@ -2259,6 +2278,7 @@ public class PlayerService : IPlayerService
 
         // 3. Table Tennis
         var ttMatches = await _dbContext.TableTennisMatches
+            .AsNoTracking()
             .Include(m => m.Tournament)
             .Where(m => (m.Player1Id == player1Id && m.Player2Id == player2Id) ||
                         (m.Player1Id == player2Id && m.Player2Id == player1Id))
@@ -2282,6 +2302,7 @@ public class PlayerService : IPlayerService
 
         // 4. Armwrestling
         var armMatches = await _dbContext.ArmwrestlingMatches
+            .AsNoTracking()
             .Include(m => m.Event)
             .Where(m => (m.Player1Id == player1Id && m.Player2Id == player2Id) ||
                         (m.Player1Id == player2Id && m.Player2Id == player1Id))
@@ -2305,6 +2326,7 @@ public class PlayerService : IPlayerService
         // 5. Team Sports (Football, Basketball, Volleyball)
         // Football
         var FootballMatches = await _dbContext.FootballMatches
+            .AsNoTracking()
             .Include(m => m.Event)
             .Include(m => m.HomeTeam).ThenInclude(t => t.Players)
             .Include(m => m.AwayTeam).ThenInclude(t => t.Players)
@@ -2335,6 +2357,7 @@ public class PlayerService : IPlayerService
 
         // Basketball 3x3
         var basketballMatches = await _dbContext.BasketballMatches
+            .AsNoTracking()
             .Include(m => m.Event)
             .Include(m => m.HomeTeam).ThenInclude(t => t.Players)
             .Include(m => m.AwayTeam).ThenInclude(t => t.Players)
@@ -2365,6 +2388,7 @@ public class PlayerService : IPlayerService
 
         // Volleyball
         var volleyballMatches = await _dbContext.VolleyballMatches
+            .AsNoTracking()
             .Include(m => m.Event)
             .Include(m => m.HomeTeam).ThenInclude(t => t.Players)
             .Include(m => m.AwayTeam).ThenInclude(t => t.Players)
@@ -2391,6 +2415,7 @@ public class PlayerService : IPlayerService
 
         // Beach Volleyball
         var beachVolleyballMatches = await _dbContext.BeachVolleyballMatches
+            .AsNoTracking()
             .Include(m => m.Event)
             .Include(m => m.HomeTeam).ThenInclude(t => t.Players)
             .Include(m => m.AwayTeam).ThenInclude(t => t.Players)
