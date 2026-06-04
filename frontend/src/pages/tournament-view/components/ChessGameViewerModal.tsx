@@ -86,7 +86,7 @@ const ChessGameViewerModal: React.FC<ChessGameViewerModalProps> = ({ pgn, whiteP
 
           <div className={styles.gameContainer}>
             <div className={styles.boardWrapper}>
-              <Chessboard options={{ position: fen }} />
+              <Chessboard position={fen} />
             </div>
             <div className={styles.controlsWrapper}>
               <div className={styles.moveHistory}>
