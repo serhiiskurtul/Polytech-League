@@ -198,7 +198,7 @@ app.UseHttpMetrics();
 
 app.MapControllers();
 app.MapHealthChecks("/health");
-app.MapMetrics(); // Додає /metrics ендпоінт для Prometheus
+app.MapMetrics();
 app.MapHub<ChatHub>("/hubs/chat");
 
 //Автоматичне застосування міграцій при старті
