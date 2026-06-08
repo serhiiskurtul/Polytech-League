@@ -716,9 +716,12 @@ const TournamentViewPage = () => {
 
     try {
       setIsUploading(true);
-      await uploadEventMedia(id!, files);
+      const response = await uploadEventMedia(id!, files);
       toast.success(files.length > 1 ? "Медіафайли завантажено" : "Медіафайл завантажено");
-      fetchTournament(true);
+      setDetails((prev: any) => ({
+        ...prev,
+        photos: [...(prev?.photos || []), ...(response.photos || [])]
+      }));
     } catch (err: any) {
       console.error(err);
       const errorMessage = err.response?.data?.error || err.response?.data?.message || "Помилка при завантаженні медіа";
@@ -733,7 +736,10 @@ const TournamentViewPage = () => {
     try {
       await deleteEventMedia(photoId);
       toast.success("Видалено");
-      fetchTournament(true);
+      setDetails((prev: any) => ({
+        ...prev,
+        photos: prev?.photos?.filter((p: any) => p.id !== photoId) || []
+      }));
     } catch (err) {
       console.error(err);
       toast.error("Помилка при видаленні");
@@ -3818,9 +3824,9 @@ const TournamentViewPage = () => {
                                     if (file) {
                                       try {
                                         setIsUploading(true);
-                                        await setMainPhoto(id!, file);
+                                        const response = await setMainPhoto(id!, file);
                                         toast.success("Головне фото оновлено");
-                                        fetchTournament(true);
+                                        setDetails((prev: any) => ({ ...prev, mainPhotoUrl: response.url }));
                                       } catch (err) {
                                         toast.error("Помилка при оновленні");
                                       } finally {
@@ -3842,7 +3848,7 @@ const TournamentViewPage = () => {
                                     // For now let's just use the markAsMain with null logic if supported or just add a simple setter
                                     await api.post(`/event-media/${id}/mark-as-main/0`); // 0 or null logic
                                     toast.success("Афішу видалено");
-                                    fetchTournament(true);
+                                    setDetails((prev: any) => ({ ...prev, mainPhotoUrl: null }));
                                   } catch (err) {
                                     toast.error("Помилка");
                                   }
@@ -3864,9 +3870,9 @@ const TournamentViewPage = () => {
                                 if (file) {
                                   try {
                                     setIsUploading(true);
-                                    await setMainPhoto(id!, file);
+                                    const response = await setMainPhoto(id!, file);
                                     toast.success("Головне фото встановлено");
-                                    fetchTournament(true);
+                                    setDetails((prev: any) => ({ ...prev, mainPhotoUrl: response.url }));
                                   } catch (err) {
                                     toast.error("Помилка при завантаженні");
                                   } finally {

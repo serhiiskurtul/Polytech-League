@@ -31,7 +31,7 @@ public class EventMediaController : ControllerBase
         var @event = await _dbContext.Events.FindAsync(new object[] { eventId }, cancellationToken);
         if (@event == null) return NotFound("Event not found");
 
-        var uploadedUrls = new List<string>();
+        var addedPhotos = new List<EventPhotos>();
 
         try
         {
@@ -50,12 +50,15 @@ public class EventMediaController : ControllerBase
                     };
 
                     _dbContext.EventPhotos.Add(eventPhoto);
-                    uploadedUrls.Add(url);
+                    addedPhotos.Add(eventPhoto);
                 }
             }
 
             await _dbContext.SaveChangesAsync(cancellationToken);
-            return Ok(new { urls = uploadedUrls });
+            
+            var resultPhotos = addedPhotos.Select(p => new { id = p.Id, url = p.Url }).ToList();
+            
+            return Ok(new { photos = resultPhotos });
         }
         catch (Exception ex)
         {
