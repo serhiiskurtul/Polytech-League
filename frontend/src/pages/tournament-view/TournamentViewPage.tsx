@@ -88,7 +88,15 @@ import {
   registerForBadmintonEvent,
   approveBadmintonParticipant,
   rejectBadmintonParticipant,
-  removeBadmintonParticipant
+  removeBadmintonParticipant,
+  // Athletics
+  getAthleticsEventById,
+  updateAthleticsEvent,
+  addParticipantToAthleticsEvent,
+  removeParticipantFromAthleticsEvent,
+  addAthleticsResult,
+  updateAthleticsResult,
+  deleteAthleticsResult
 } from '@/shared/api';
 import { PlayerDto, Gender } from '@/entities/player/model/player.types';
 import { RegistrationStatus, ModerationStatus } from '@/entities/tournament/model/tournament.types';
@@ -104,9 +112,10 @@ import {
 } from '@/entities/sport/api/tabletennis.api';
 import ArmwrestlingTournamentView from './components/ArmwrestlingTournamentView';
 import TeamSportsTournamentView from './components/TeamSportsTournamentView';
+import BadmintonTournamentView from './components/BadmintonTournamentView';
+import AthleticsTournamentView from './components/AthleticsTournamentView';
 import TournamentPodium from './components/TournamentPodium';
 import ChessGameViewerModal from './components/ChessGameViewerModal';
-import AthleticsTournamentView from './components/AthleticsTournamentView';
 import { Tournament } from '@/entities/tournament/model/tournament.types';
 import {
   ChessEventResponse,
@@ -1183,7 +1192,7 @@ const TournamentViewPage = () => {
             case 'badminton': detailsPromise = getBadmintonEventById(id); break;
             case 'table_tennis':
             case 'tabletennis': detailsPromise = getTableTennisEventById(id); break;
-            case 'athletics': detailsPromise = api.get(`/athletics-events/${id}`).then(res => res.data); break;
+            case 'athletics': detailsPromise = getAthleticsEventById(id); break;
             default: detailsPromise = getChessEventById(id);
           }
 
@@ -2348,6 +2357,8 @@ const TournamentViewPage = () => {
                 <AthleticsTournamentView
                   details={details as any}
                   isAdmin={isAdmin}
+                  isFizorg={isFizorg}
+                  userGroup={currentUserPlayer?.group}
                   onRefresh={() => fetchTournament(true)}
                 />
               );

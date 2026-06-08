@@ -1,37 +1,54 @@
-import { PlayerDto } from '@/entities/player/model/player.types';
-
 export interface AthleticsEventResponse {
-  id: number;
-  name: string;
-  date: string;
-  location: string;
-  description?: string;
-  mainPhotoUrl?: string;
-  level: string;
-  category: string;
-  isTeam: boolean;
-  isModerated: boolean;
-  isPublic: boolean;
-  seasonId?: number;
-  results: AthleticsResultResponse[];
-  participants: AthleticsParticipantResponse[];
-  rules?: string;
-  prizes?: string;
-  schedule?: string;
+    id: number;
+    title: string;
+    sport: string;
+    date: string;
+    location: string;
+    level: string;
+    category: string;
+    description?: string;
+    mainPhotoUrl?: string;
+    photos: any[];
+    results: AthleticsResultDto[];
+    participants: AthleticsEventParticipantDto[];
+    isTeam: boolean;
+    isModerated: boolean;
+    isPublic: boolean;
+    registrationStart?: string;
+    registrationEnd?: string;
+    endDate?: string;
 }
 
-export interface AthleticsResultResponse {
-  id: number;
-  disciplineName: string;
-  playerId?: number;
-  playerName?: string;
-  teamName?: string;
-  score?: string;
-  rank: number;
+export interface AthleticsEventRequest {
+    name: string;
+    date: string;
+    location: string;
+    level: string;
+    category: string;
+    description?: string;
+    isTeam: boolean;
+    isModerated: boolean;
+    isPublic: boolean;
+    registrationStart?: string;
+    registrationEnd?: string;
+    endDate?: string;
 }
 
-export interface AthleticsParticipantResponse {
-  playerId: number;
-  playerName: string;
-  groupName?: string;
+export interface AthleticsResultDto {
+    id?: number;
+    athleticsEventId?: number;
+    disciplineName: string;
+    playerId?: number;
+    playerName?: string;
+    teamName?: string;
+    score?: string;
+    rank: number;
+}
+
+export interface AthleticsEventParticipantDto {
+    playerId: number;
+    groupName?: string;
+    playerName?: string;
+    status?: string;
+    collegeId?: number;
 }
