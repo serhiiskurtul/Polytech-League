@@ -64,7 +64,7 @@ public abstract class AbstractEntityService<TEntity>(
     {
         _logger.LogDebug("Fetching entity of type {EntityType} with id {Id}", typeof(TEntity).Name, id);
 
-        var entity = await _dbcontext.Set<TEntity>().FindAsync(id, cancellationToken);
+        var entity = await _dbcontext.Set<TEntity>().FindAsync([id], cancellationToken);
         if (entity is null)
         {
             _logger.LogWarning("Entity of type {EntityType} with id {Id} not found", typeof(TEntity).Name, id);
@@ -114,7 +114,7 @@ public abstract class AbstractEntityService<TEntity>(
 
         var originalEntity = await _dbcontext.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(e => EF.Property<long>(e, "Id") == id, cancellationToken);
         
-        var oldEntity = await _dbcontext.Set<TEntity>().FindAsync(id, cancellationToken);
+        var oldEntity = await _dbcontext.Set<TEntity>().FindAsync([id], cancellationToken);
         if (oldEntity is null)
         {
             _logger.LogWarning("Entity of type {EntityType} with id {Id} not found for update", typeof(TEntity).Name, id);
@@ -134,7 +134,7 @@ public abstract class AbstractEntityService<TEntity>(
     {
         _logger.LogDebug("Deleting entity of type {EntityType} with id {Id}", typeof(TEntity).Name, id);
 
-        var entity = await _dbcontext.Set<TEntity>().FindAsync(id, cancellationToken);
+        var entity = await _dbcontext.Set<TEntity>().FindAsync([id], cancellationToken);
         if (entity is null)
         {
             _logger.LogWarning("Entity of type {EntityType} with id {Id} not found for delete", typeof(TEntity).Name, id);

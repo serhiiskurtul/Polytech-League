@@ -154,14 +154,6 @@ const Tournaments = () => {
   }, [location.pathname, location.search]);
 
 
-  const handleResetFilters = () => {
-    setActiveStatus('all');
-    setActiveSport('all');
-    setActiveLevel('all');
-    setSearchQuery('');
-
-    setPagination(prev => ({ ...prev, page: 1 }));
-  };
 
   // Обробка перемикання сторінок
   const handlePageChange = (newPage: number) => {
@@ -225,13 +217,7 @@ const Tournaments = () => {
         </div>
 
         <div className="controls-right">
-          {(activeStatus !== 'all' || activeSport !== 'all' || activeLevel !== 'all' || searchQuery !== '') && (
-            <button className="btn btn-outline reset-filters-btn" onClick={handleResetFilters}>
 
-              <i className="fas fa-times"></i> Скинути
-            </button>
-          )}
-          
 
 
           <div className="view-toggle">
@@ -269,9 +255,6 @@ const Tournaments = () => {
             <i className="fas fa-search"></i>
             <h3>Нічого не знайдено</h3>
             <p>Спробуйте змінити параметри пошуку або фільтри</p>
-            <button className="btn btn-primary" onClick={handleResetFilters}>
-              Скинути всі фільтри
-            </button>
           </div>
         )}
       </div>
