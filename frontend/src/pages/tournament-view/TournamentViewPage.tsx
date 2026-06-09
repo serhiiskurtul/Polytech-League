@@ -825,6 +825,8 @@ const TournamentViewPage = () => {
           ...payload,
           tournamentType: (editTournamentData as any).tournamentType || (details as any).tournamentType || 'RoundRobin'
         });
+      } else if (sportKey === 'athletics') {
+        await api.put(`/athletics-events/${id!}`, payload);
       } else {
         // Chess
         await updateChessEvent(id!, {
