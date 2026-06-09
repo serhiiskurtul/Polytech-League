@@ -6,13 +6,13 @@ import { ModerationStatus } from '@/entities/tournament/model/tournament.types';
  * @param eventId The ID of the event
  * @param files Array of files to upload
  */
-export const uploadEventMedia = async (eventId: number | string, files: File[]): Promise<{ urls: string[] }> => {
+export const uploadEventMedia = async (eventId: number | string, files: File[]): Promise<{ photos: { id: number, url: string }[] }> => {
     const formData = new FormData();
     files.forEach(file => {
         formData.append('files', file);
     });
 
-    const response = await api.post<{ urls: string[] }>(`/event-media/${eventId}/upload-multiple`, formData, {
+    const response = await api.post<{ photos: { id: number, url: string }[] }>(`/event-media/${eventId}/upload-multiple`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data'
         }

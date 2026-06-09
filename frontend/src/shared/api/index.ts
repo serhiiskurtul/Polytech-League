@@ -13,5 +13,6 @@ export * from '@/entities/sport/api/badminton.api';
 export * from '@/entities/sport/api/armwrestling.api';
 export * from '@/entities/sport/api/tabletennis.api';
 export * from '@/entities/tournament/api/events.api';
+export * from '@/entities/sport/api/athletics.api';
 export { axiosInstance };
 

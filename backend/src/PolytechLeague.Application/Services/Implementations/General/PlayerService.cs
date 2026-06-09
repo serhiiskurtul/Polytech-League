@@ -348,6 +348,7 @@ public class PlayerService : IPlayerService
             var ttAch = await _dbContext.TableTennisEventParticipants.AsNoTracking().Include(p => p.Tournament).Where(p => eligiblePlayerIdsList.Contains(p.PlayerId) && eligibleEventIdsList.Contains(p.TournamentId)).ToListAsync(cancellationToken);
             var badmintonAch = await _dbContext.BadmintonEventParticipants.AsNoTracking().Include(p => p.Event).Where(p => eligiblePlayerIdsList.Contains(p.PlayerId) && eligibleEventIdsList.Contains(p.EventId)).ToListAsync(cancellationToken);
             var armwAch = await _dbContext.ArmwrestlingEventParticipants.AsNoTracking().Include(p => p.Tournament).Where(p => eligiblePlayerIdsList.Contains(p.PlayerId) && eligibleEventIdsList.Contains(p.TournamentId)).ToListAsync(cancellationToken);
+            var athlAch = await _dbContext.AthleticsResults.AsNoTracking().Include(p => p.AthleticsEvent).Where(p => p.PlayerId.HasValue && eligiblePlayerIdsList.Contains(p.PlayerId.Value) && eligibleEventIdsList.Contains(p.AthleticsEventId)).ToListAsync(cancellationToken);
             var genericWinners = await _dbContext.Set<Event>().AsNoTracking()
                 .Where(e => eligibleEventIdsList.Contains(e.Id) &&
                             ((e.FirstPlaceId.HasValue && eligiblePlayerIdsList.Contains(e.FirstPlaceId.Value)) ||
@@ -439,6 +440,7 @@ public class PlayerService : IPlayerService
             var ttLookup = ttAch.ToLookup(a => a.PlayerId);
             var badmintonLookup = badmintonAch.ToLookup(a => a.PlayerId);
             var armwLookup = armwAch.ToLookup(a => a.PlayerId);
+            var athlLookup = athlAch.ToLookup(a => a.PlayerId!.Value);
             var winnersLookup = genericWinners
                 .SelectMany(e => new[] { 
                     new { Pid = e.FirstPlaceId, Ev = e }, 
@@ -542,6 +544,11 @@ public class PlayerService : IPlayerService
                     armwrestlingWeightClasses.Add(a.Tournament.WeightClass);
                     if (!dto.ArmwrestlingPreferredWeightClass.HasValue) dto.ArmwrestlingPreferredWeightClass = a.Tournament.WeightClass;
                 }
+                foreach (var a in athlLookup[playerId]) {
+                    if (a.AthleticsEvent == null) continue;
+                    achievements.Add(new AchievementDto { TournamentName = $"{a.AthleticsEvent.Name} ({a.DisciplineName})", SportType = "athletics", Date = a.AthleticsEvent.Date, Rank = a.Rank, TournamentId = a.AthleticsEventId, Result = GetResultLabel(a.Rank) });
+                    sportTypes.Add("athletics");
+                }
                 
                 // Generic Winners
                 foreach (var e in winnersLookup[playerId].Where(x => x.FirstPlaceId == playerId || x.SecondPlaceId == playerId || x.ThirdPlaceId == playerId)) {
@@ -616,19 +623,20 @@ public class PlayerService : IPlayerService
                 var pointsBreakdown = new List<PointEntryDto>();
                 foreach (var sport in sportTypes) sportStatsMap[sport] = new SportStatsDto { SportType = sport };
                 foreach (var ach in achievements) {
-                    double pts = 0; double mult = 1.0; string levelName = "Міжгрупові";
+                    double basePts = 0; double mult = 1.0; string levelName = "Міжгрупові";
                     if (allEvents.TryGetValue(ach.TournamentId, out var lvl)) {
                         if (levelMultipliers.TryGetValue(lvl, out var m)) mult = m;
                         levelName = lvl switch { CompetitionLevel.Regional => "Обласні", CompetitionLevel.National => "Всеукраїнські", _ => "Міжгрупові" };
-                        pts = 10;
-                    } else pts = 10;
-                    if (ach.Rank == 1) pts += 100; else if (ach.Rank == 2) pts += 50; else if (ach.Rank == 3) pts += 30;
-                    if (allEvents.TryGetValue(ach.TournamentId, out var eventLvl) && eventLvl != CompetitionLevel.CollegeGroup) {
-                        if (ach.BoardRank == 1) pts += 40; else if (ach.BoardRank == 2) pts += 25; else if (ach.BoardRank == 3) pts += 15;
                     }
-                    if (ach.Result == "MVP") pts += 15;
-                    if (pts <= 0) continue;
-                    var finalPts = (int)Math.Round(pts * mult);
+                    if (ach.Rank == 1) basePts += 100; else if (ach.Rank == 2) basePts += 50; else if (ach.Rank == 3) basePts += 30;
+                    if (allEvents.TryGetValue(ach.TournamentId, out var eventLvl) && eventLvl != CompetitionLevel.CollegeGroup) {
+                        if (ach.BoardRank == 1) basePts += 40; else if (ach.BoardRank == 2) basePts += 25; else if (ach.BoardRank == 3) basePts += 15;
+                    }
+                    if (ach.Result == "MVP") basePts += 15;
+                    
+                    int participationPts = 10;
+                    var finalPts = (int)Math.Round(basePts * mult) + participationPts;
+                    if (finalPts <= 0) continue;
                     totalScore += finalPts;
                     if (sportStatsMap.TryGetValue(ach.SportType, out var s)) s.PerformanceScore += finalPts;
 
@@ -660,6 +668,10 @@ public class PlayerService : IPlayerService
                 AddStats("table_tennis", (t1?.Count ?? 0) + (t2?.Count ?? 0), (t1?.Wins ?? 0) + (t2?.Wins ?? 0));
                 AddStats("armwrestling", (a1?.Count ?? 0) + (a2?.Count ?? 0), (a1?.Wins ?? 0) + (a2?.Wins ?? 0));
                 AddStats("badminton", (b1?.Count ?? 0) + (b2?.Count ?? 0), (b1?.Wins ?? 0) + (b2?.Wins ?? 0));
+                
+                var athlPlayed = athlLookup[playerId].Count();
+                var athlWins = athlLookup[playerId].Count(x => x.Rank == 1);
+                AddStats("athletics", athlPlayed, athlWins);
                 
                 var fPlayed = (fH.TryGetValue(playerId, out var fh) ? fh.Played : 0) + (fA.TryGetValue(playerId, out var fa) ? fa.Played : 0);
                 var fWins = (fH.TryGetValue(playerId, out var fhw) ? fhw.Wins : 0) + (fA.TryGetValue(playerId, out var faw) ? faw.Wins : 0);

@@ -88,7 +88,15 @@ import {
   registerForBadmintonEvent,
   approveBadmintonParticipant,
   rejectBadmintonParticipant,
-  removeBadmintonParticipant
+  removeBadmintonParticipant,
+  // Athletics
+  getAthleticsEventById,
+  updateAthleticsEvent,
+  addParticipantToAthleticsEvent,
+  removeParticipantFromAthleticsEvent,
+  addAthleticsResult,
+  updateAthleticsResult,
+  deleteAthleticsResult
 } from '@/shared/api';
 import { PlayerDto, Gender } from '@/entities/player/model/player.types';
 import { RegistrationStatus, ModerationStatus } from '@/entities/tournament/model/tournament.types';
@@ -104,9 +112,10 @@ import {
 } from '@/entities/sport/api/tabletennis.api';
 import ArmwrestlingTournamentView from './components/ArmwrestlingTournamentView';
 import TeamSportsTournamentView from './components/TeamSportsTournamentView';
+
+import AthleticsTournamentView from './components/AthleticsTournamentView';
 import TournamentPodium from './components/TournamentPodium';
 import ChessGameViewerModal from './components/ChessGameViewerModal';
-import AthleticsTournamentView from './components/AthleticsTournamentView';
 import { Tournament } from '@/entities/tournament/model/tournament.types';
 import {
   ChessEventResponse,
@@ -716,9 +725,12 @@ const TournamentViewPage = () => {
 
     try {
       setIsUploading(true);
-      await uploadEventMedia(id!, files);
+      const response = await uploadEventMedia(id!, files);
       toast.success(files.length > 1 ? "Медіафайли завантажено" : "Медіафайл завантажено");
-      fetchTournament(true);
+      setDetails((prev: any) => ({
+        ...prev,
+        photos: [...(prev?.photos || []), ...(response.photos || [])]
+      }));
     } catch (err: any) {
       console.error(err);
       const errorMessage = err.response?.data?.error || err.response?.data?.message || "Помилка при завантаженні медіа";
@@ -733,7 +745,10 @@ const TournamentViewPage = () => {
     try {
       await deleteEventMedia(photoId);
       toast.success("Видалено");
-      fetchTournament(true);
+      setDetails((prev: any) => ({
+        ...prev,
+        photos: prev?.photos?.filter((p: any) => p.id !== photoId) || []
+      }));
     } catch (err) {
       console.error(err);
       toast.error("Помилка при видаленні");
@@ -952,6 +967,10 @@ const TournamentViewPage = () => {
           lastName: editingParticipantData.lastName,
           groupName: editingParticipantData.groupName
         });
+      } else if (sportKey === 'athletics') {
+         toast.error("Редагування учасника недоступне для легкої атлетики");
+         setEditingParticipantId(null);
+         return;
       } else {
         const payload: ChessEventParticipantDto = {
           playerId,
@@ -1004,9 +1023,11 @@ const TournamentViewPage = () => {
           case 'football':
             await removeFootballParticipant(id!, playerId);
             break;
-          case 'basketball_3x3':
           case 'basketball3x3':
             await removeBasketball3x3Participant(id!, playerId);
+            break;
+          case 'athletics':
+            await removeParticipantFromAthleticsEvent(id!, playerId);
             break;
           default:
             await removeParticipantFromEvent(id!, playerId);
@@ -1033,8 +1054,10 @@ const TournamentViewPage = () => {
         case 'volleyball': await approveVolleyballParticipant(id!, playerId); break;
         case 'beach_volleyball': await approveBeachVolleyballParticipant(id!, playerId); break;
         case 'football': await approveFootballParticipant(id!, playerId); break;
-        case 'basketball_3x3':
         case 'basketball3x3': await approveBasketball3x3Participant(id!, playerId); break;
+        case 'athletics': 
+            toast.success('Легка атлетика не потребує підтвердження учасників');
+            return;
         default: await approveChessParticipant(id!, playerId);
       }
       toast.success(`Учасника ${playerName ? `"${playerName}" ` : ''}схвалено!`);
@@ -1058,8 +1081,12 @@ const TournamentViewPage = () => {
         case 'volleyball': await rejectVolleyballParticipant(id!, playerId); break;
         case 'beach_volleyball': await rejectBeachVolleyballParticipant(id!, playerId); break;
         case 'football': await rejectFootballParticipant(id!, playerId); break;
-        case 'basketball_3x3':
         case 'basketball3x3': await rejectBasketball3x3Participant(id!, playerId); break;
+        case 'athletics':
+            await removeParticipantFromAthleticsEvent(id!, playerId);
+            toast.success(`Учасника ${playerName ? `"${playerName}" ` : ''}видалено`);
+            fetchTournament(true);
+            return;
         default: await rejectChessParticipant(id!, playerId);
       }
       toast.success(`Учасника ${playerName ? `"${playerName}" ` : ''}відхилено`);
@@ -1177,7 +1204,7 @@ const TournamentViewPage = () => {
             case 'badminton': detailsPromise = getBadmintonEventById(id); break;
             case 'table_tennis':
             case 'tabletennis': detailsPromise = getTableTennisEventById(id); break;
-            case 'athletics': detailsPromise = api.get(`/athletics-events/${id}`).then(res => res.data); break;
+            case 'athletics': detailsPromise = getAthleticsEventById(id); break;
             default: detailsPromise = getChessEventById(id);
           }
 
@@ -1449,6 +1476,12 @@ const TournamentViewPage = () => {
             groupName: newPlayer.group
           });
           break;
+        case 'athletics':
+          await addParticipantToAthleticsEvent(id!, {
+            playerId: playerId,
+            groupName: newPlayer.group
+          });
+          break;
         default:
           await addParticipantToEvent(id!, {
             playerId: playerId,
@@ -1672,12 +1705,12 @@ const TournamentViewPage = () => {
           </button>
 
           <div className={styles.adminActions}>
-            {isAdmin && (
+            {isAdmin && sportKey !== 'athletics' && (
               <button
                 onClick={() => setShowWinnersAdmin(!showWinnersAdmin)}
                 className={`${styles.adminBtn} ${styles.winnersBtn}`}
               >
-                <i className="fas fa-medal"></i> <span>Призначити переможців</span>
+                <i className="fas fa-medal"></i> <span>Призначити призерів</span>
               </button>
             )}
             {isAdmin && (
@@ -1700,7 +1733,7 @@ const TournamentViewPage = () => {
         </div>
 
         <>
-          {isAdmin && showWinnersAdmin && (
+          {isAdmin && showWinnersAdmin && sportKey !== 'athletics' && (
             <div className={styles.adminSection} style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '24px', borderRadius: '16px', marginBottom: '24px' }}>
               <h3 style={{ marginTop: 0, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', color: '#166534' }}>
                 <i className="fas fa-trophy"></i> Призначити призерів змагань
@@ -2337,17 +2370,7 @@ const TournamentViewPage = () => {
               );
             }
 
-            if (sportKey === 'athletics' && details) {
-              return (
-                <AthleticsTournamentView
-                  details={details as any}
-                  isAdmin={isAdmin}
-                  onRefresh={() => fetchTournament(true)}
-                />
-              );
-            }
-
-            if (sportKey === 'chess' || sportKey === 'checkers' || sportKey === 'badminton' || sportKey === 'tabletennis' || sportKey === 'table_tennis') {
+            if (sportKey === 'athletics' || sportKey === 'chess' || sportKey === 'checkers' || sportKey === 'badminton' || sportKey === 'tabletennis' || sportKey === 'table_tennis') {
               return (
                 <>
 
@@ -2358,14 +2381,16 @@ const TournamentViewPage = () => {
                         className={`${styles.tabButton} ${activeTab === 'standings' ? styles.active : ''}`}
                         onClick={() => setActiveTab('standings')}
                       >
-                        <i className="fas fa-chart-simple"></i> Таблиця змагань
+                        <i className="fas fa-chart-simple"></i> {sportKey === 'athletics' ? 'Результати змагань' : 'Таблиця змагань'}
                       </button>
+                      {sportKey !== 'athletics' && (
                       <button
                         className={`${styles.tabButton} ${activeTab === 'games' ? styles.active : ''}`}
                         onClick={() => setActiveTab('games')}
                       >
                         <i className={tournament?.sport === 'badminton' ? "fas fa-table-tennis-paddle-ball" : tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? "fas fa-table-tennis" : "fas fa-chess-board"}></i> {tournament?.sport === 'badminton' || tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? 'Всі матчі' : 'Всі партії'}
                       </button>
+                      )}
                       <button
                         className={`${styles.tabButton} ${activeTab === 'participants' ? styles.active : ''}`}
                         onClick={() => setActiveTab('participants')}
@@ -2385,18 +2410,22 @@ const TournamentViewPage = () => {
                           </span>
                         )}
                       </button>
-                      <button
-                        className={`${styles.tabButton} ${activeTab === 'schedule' ? styles.active : ''}`}
-                        onClick={() => setActiveTab('schedule')}
-                      >
-                        <i className="fas fa-calendar-week"></i> Розклад турів
-                      </button>
-                      <button
-                        className={`${styles.tabButton} ${activeTab === 'voting' ? styles.active : ''}`}
-                        onClick={() => setActiveTab('voting')}
-                      >
-                        <i className="fas fa-poll"></i> Голосування
-                      </button>
+                      {sportKey !== 'athletics' && (
+                        <button
+                          className={`${styles.tabButton} ${activeTab === 'schedule' ? styles.active : ''}`}
+                          onClick={() => setActiveTab('schedule')}
+                        >
+                          <i className="fas fa-calendar-week"></i> Розклад турів
+                        </button>
+                      )}
+                      {sportKey !== 'athletics' && (
+                        <button
+                          className={`${styles.tabButton} ${activeTab === 'voting' ? styles.active : ''}`}
+                          onClick={() => setActiveTab('voting')}
+                        >
+                          <i className="fas fa-poll"></i> Голосування
+                        </button>
+                      )}
                     </div>
 
                     {activeTab === 'voting' && (
@@ -2449,6 +2478,15 @@ const TournamentViewPage = () => {
 
                     {activeTab === 'standings' && (
                       <div className={styles.tabContent}>
+                        {sportKey === 'athletics' ? (
+                          <AthleticsTournamentView
+                            details={details as any}
+                            isAdmin={isAdmin}
+                            isFizorg={isFizorg}
+                            userGroup={currentUserPlayer?.group ?? undefined}
+                            onRefresh={() => fetchTournament(true)}
+                          />
+                        ) : (
                         <div className={styles.tableWrapper}>
                           <table className={styles.dataTable}>
                             <thead>
@@ -2652,6 +2690,7 @@ const TournamentViewPage = () => {
                             </tbody>
                           </table>
                         </div>
+                        )}
                       </div>
                     )}
 
@@ -3818,9 +3857,9 @@ const TournamentViewPage = () => {
                                     if (file) {
                                       try {
                                         setIsUploading(true);
-                                        await setMainPhoto(id!, file);
+                                        const response = await setMainPhoto(id!, file);
                                         toast.success("Головне фото оновлено");
-                                        fetchTournament(true);
+                                        setDetails((prev: any) => ({ ...prev, mainPhotoUrl: response.url }));
                                       } catch (err) {
                                         toast.error("Помилка при оновленні");
                                       } finally {
@@ -3842,7 +3881,7 @@ const TournamentViewPage = () => {
                                     // For now let's just use the markAsMain with null logic if supported or just add a simple setter
                                     await api.post(`/event-media/${id}/mark-as-main/0`); // 0 or null logic
                                     toast.success("Афішу видалено");
-                                    fetchTournament(true);
+                                    setDetails((prev: any) => ({ ...prev, mainPhotoUrl: null }));
                                   } catch (err) {
                                     toast.error("Помилка");
                                   }
@@ -3864,9 +3903,9 @@ const TournamentViewPage = () => {
                                 if (file) {
                                   try {
                                     setIsUploading(true);
-                                    await setMainPhoto(id!, file);
+                                    const response = await setMainPhoto(id!, file);
                                     toast.success("Головне фото встановлено");
-                                    fetchTournament(true);
+                                    setDetails((prev: any) => ({ ...prev, mainPhotoUrl: response.url }));
                                   } catch (err) {
                                     toast.error("Помилка при завантаженні");
                                   } finally {

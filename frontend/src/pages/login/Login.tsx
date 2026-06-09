@@ -49,6 +49,18 @@ export default function Login() {
 
       const meResponse = await api.get("/users/me");
       login(meResponse.data);
+      
+      try {
+        let guestId = localStorage.getItem('guestId');
+        if (!guestId) {
+          guestId = crypto.randomUUID();
+          localStorage.setItem('guestId', guestId);
+        }
+        await api.post('/SiteVisits', { guestId });
+      } catch (e) {
+        console.error('Failed to record visit after login', e);
+      }
+      
       navigate("/");
     } catch (error: any) {
       console.error("Login error:", error);

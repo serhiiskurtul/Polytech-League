@@ -104,7 +104,8 @@ const PlayersRatingPage = () => {
     { id: 'basketball', name: 'Баскетбол', icon: 'fa-basketball-ball', key: 'basketball_3x3' },
     { id: 'beach', name: 'Пляжний волейбол', icon: 'fa-umbrella-beach', key: 'beach_volleyball' },
     { id: 'arm', name: 'Армрестлинг', icon: 'fa-fist-raised', key: 'armwrestling' },
-    { id: 'badm', name: 'Бадмінтон', icon: 'fa-feather-alt', key: 'badminton' }
+    { id: 'badm', name: 'Бадмінтон', icon: 'fa-feather-alt', key: 'badminton' },
+    { id: 'athletics', name: 'Легка атлетика', icon: 'fa-running', key: 'athletics' }
   ];
 
   const armwrestlingWeightClasses = [
@@ -263,6 +264,7 @@ const PlayersRatingPage = () => {
       case 'badminton': return { icon: '🏸', color: '#1abc9c', name: 'Бадмінтон' };
       case 'armwrestling': return { icon: '💪', color: '#7f8c8d', name: 'Армрестлинг' };
       case 'beach_volleyball': return { icon: '🏖️', color: '#3498db', name: 'Пляжний волейбол' };
+      case 'athletics': return { icon: '🏃', color: '#ff7f50', name: 'Легка атлетика' };
       default: return { icon: '🏅', color: '#9b59b6', name: sportKey };
     }
   };

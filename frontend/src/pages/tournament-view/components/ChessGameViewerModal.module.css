@@ -146,6 +146,9 @@
   border-radius: 8px;
   overflow: hidden;
   background: #ebecd0; /* Classic board edge color */
+  line-height: 0;
+  font-size: 0;
+  display: flex;
 }
 
 .controlsWrapper {

@@ -141,6 +141,10 @@ public class AthleticsEventService(
 
     public async Task AddParticipantAsync(long eventId, AthleticsEventParticipantDto dto, CancellationToken cancellationToken = default)
     {
+        var exists = await _dbcontext.AthleticsEventParticipants
+            .AnyAsync(p => p.AthleticsEventId == eventId && p.PlayerId == dto.PlayerId, cancellationToken);
+            
+        if (exists) return;
         var participant = new AthleticsEventParticipant
         {
             AthleticsEventId = eventId,
