@@ -1705,12 +1705,12 @@ const TournamentViewPage = () => {
           </button>
 
           <div className={styles.adminActions}>
-            {isAdmin && (
+            {isAdmin && sportKey !== 'athletics' && (
               <button
                 onClick={() => setShowWinnersAdmin(!showWinnersAdmin)}
                 className={`${styles.adminBtn} ${styles.winnersBtn}`}
               >
-                <i className="fas fa-medal"></i> <span>Призначити переможців</span>
+                <i className="fas fa-medal"></i> <span>Призначити призерів</span>
               </button>
             )}
             {isAdmin && (
@@ -1733,7 +1733,7 @@ const TournamentViewPage = () => {
         </div>
 
         <>
-          {isAdmin && showWinnersAdmin && (
+          {isAdmin && showWinnersAdmin && sportKey !== 'athletics' && (
             <div className={styles.adminSection} style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '24px', borderRadius: '16px', marginBottom: '24px' }}>
               <h3 style={{ marginTop: 0, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', color: '#166534' }}>
                 <i className="fas fa-trophy"></i> Призначити призерів змагань

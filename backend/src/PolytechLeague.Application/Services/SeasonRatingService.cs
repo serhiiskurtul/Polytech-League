@@ -24,7 +24,7 @@ public class SeasonRatingService : ISeasonRatingService
         { 
             "Шахи", "Шашки", "Футбол", "Армрестлінг", 
             "Настільний теніс", "Бадмінтон", "Волейбол", 
-            "Баскетбол", "Пляжний волейбол" 
+            "Баскетбол", "Пляжний волейбол", "Легка атлетика" 
         };
 
         // Fetch all possible groups
@@ -43,6 +43,7 @@ public class SeasonRatingService : ISeasonRatingService
         var armGroups = await _context.ArmwrestlingEventParticipants.Select(p => p.GroupName).Distinct().ToListAsync();
         var ttGroups = await _context.TableTennisEventParticipants.Select(p => p.GroupName).Distinct().ToListAsync();
         var badGroups = await _context.BadmintonEventParticipants.Select(p => p.GroupName).Distinct().ToListAsync();
+        var athleticsGroups = await _context.AthleticsEventParticipants.Select(p => p.GroupName).Distinct().ToListAsync();
 
         var allGroups = playerGroups
             .Union(FootballGroups)
@@ -54,6 +55,7 @@ public class SeasonRatingService : ISeasonRatingService
             .Union(armGroups)
             .Union(ttGroups)
             .Union(badGroups)
+            .Union(athleticsGroups)
             .Where(g => !string.IsNullOrEmpty(g) && g.Length >= 3 && char.IsDigit(g[0]) && char.IsDigit(g[1]) && char.IsDigit(g[2]))
             .Select(g => g.Substring(0, 3)) // Normalize to first 3 digits
             .Distinct()
@@ -406,6 +408,108 @@ public class SeasonRatingService : ISeasonRatingService
         }
 
         // Calculate Totals and use "sport participants + 2" penalty per sport for those who didn't participate
+        
+        // 10. Athletics
+        var athleticsEvents = await _context.AthleticsEvents
+            .AsNoTracking()
+            .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) 
+                        && e.Level == CompetitionLevel.CollegeGroup)
+            .Include(e => e.Results)
+            .Include(e => e.Participants)
+                .ThenInclude(p => p.Player)
+            .ToListAsync();
+
+        if (athleticsEvents.Any())
+        {
+            var groupAthleticsPoints = rows.ToDictionary(r => r.GroupName, r => 0);
+            var groupHasParticipated = rows.ToDictionary(r => r.GroupName, r => false);
+
+            foreach (var e in athleticsEvents)
+            {
+                var eventGroupPoints = new Dictionary<string, int>();
+
+                foreach (var r in e.Results)
+                {
+                    string? team = r.TeamName;
+                    if (string.IsNullOrEmpty(team) && r.PlayerId.HasValue)
+                    {
+                        var participant = e.Participants.FirstOrDefault(p => p.PlayerId == r.PlayerId.Value);
+                        if (participant != null)
+                        {
+                            team = participant.GroupName ?? participant.Player?.Group;
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(team))
+                    {
+                        var digits = new string(team.Where(char.IsDigit).ToArray());
+                        if (digits.Length >= 3) digits = digits.Substring(0, 3);
+                        if (!string.IsNullOrEmpty(digits))
+                        {
+                            int points = r.Rank switch
+                            {
+                                1 => 10,
+                                2 => 8,
+                                3 => 6,
+                                4 => 5,
+                                5 => 4,
+                                6 => 3,
+                                7 => 2,
+                                8 => 1,
+                                _ => 0
+                            };
+                            
+                            if (eventGroupPoints.ContainsKey(digits))
+                                eventGroupPoints[digits] += points;
+                            else
+                                eventGroupPoints[digits] = points;
+                        }
+                    }
+                }
+
+                foreach (var row in rows)
+                {
+                    var rowDigits = new string(row.GroupName.Where(char.IsDigit).ToArray());
+                    if (rowDigits.Length >= 3) rowDigits = rowDigits.Substring(0, 3);
+                    if (eventGroupPoints.TryGetValue(rowDigits, out int points))
+                    {
+                        groupAthleticsPoints[row.GroupName] += points;
+                        groupHasParticipated[row.GroupName] = true;
+                    }
+                }
+            }
+
+            var participatingRows = rows
+                .Where(r => groupHasParticipated[r.GroupName])
+                .OrderByDescending(r => groupAthleticsPoints[r.GroupName])
+                .ToList();
+
+            int idx = 0;
+            while (idx < participatingRows.Count)
+            {
+                int tieCount = 1;
+                while (idx + tieCount < participatingRows.Count && groupAthleticsPoints[participatingRows[idx + tieCount].GroupName] == groupAthleticsPoints[participatingRows[idx].GroupName])
+                {
+                    tieCount++;
+                }
+
+                string rankStr = tieCount > 1 
+                    ? $"{idx + 1}-{idx + tieCount}" 
+                    : (idx + 1).ToString();
+
+                for (int j = 0; j < tieCount; j++)
+                {
+                    var row = participatingRows[idx + j];
+                    row.SportResults["Легка атлетика"] = new SportResultDto 
+                    { 
+                        Rank = rankStr, 
+                        Points = idx + 1
+                    };
+                }
+                idx += tieCount;
+            }
+        }
+
         foreach (var sport in sports)
         {
             // Count how many teams actually participated in this sport
