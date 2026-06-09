@@ -219,7 +219,7 @@ const StudentNewsPage: React.FC = () => {
               
               <div className={styles.cardBody}>
                 <h2 className={styles.cardTitle}>{item.title}</h2>
-                <p className={styles.content}>{item.content}</p>
+                <p className={styles.content} style={{ whiteSpace: 'pre-line' }}>{item.content}</p>
                 
                 {item.externalLink && (
                   <a href={item.externalLink} target="_blank" rel="noopener noreferrer" className={styles.link}>
