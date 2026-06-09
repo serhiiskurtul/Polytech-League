@@ -118,11 +118,7 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  border-color: #d1d5db;
-}
+
 
 .cardHeader {
   padding: 1.25rem;
@@ -159,9 +155,7 @@
   transition: transform 0.5s ease;
 }
 
-.card:hover .photo {
-  transform: scale(1.05);
-}
+
 
 .mediaGallery {
   display: grid;
