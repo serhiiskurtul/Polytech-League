@@ -16,6 +16,7 @@ const AthleticsTournamentView: React.FC<AthleticsTournamentViewProps> = ({ detai
   const [activeTab, setActiveTab] = useState<'results' | 'team_standings'>('results');
   const [isAddingResult, setIsAddingResult] = useState(false);
   const [editingResultId, setEditingResultId] = useState<number | null>(null);
+  const [playerSearch, setPlayerSearch] = useState('');
   
   const [formData, setFormData] = useState<AthleticsResultDto>({
     disciplineName: '',
@@ -44,6 +45,7 @@ const AthleticsTournamentView: React.FC<AthleticsTournamentViewProps> = ({ detai
       setIsAddingResult(false);
       setEditingResultId(null);
       setFormData({ disciplineName: '', rank: 1, score: '', teamName: '', playerId: undefined });
+      setPlayerSearch('');
       onRefresh();
     } catch (error) {
       toast.error('Помилка збереження результату');
@@ -55,6 +57,13 @@ const AthleticsTournamentView: React.FC<AthleticsTournamentViewProps> = ({ detai
     setFormData(r);
     setEditingResultId(r.id!);
     setIsAddingResult(true);
+    
+    if (r.playerId) {
+      const p = details.participants?.find(x => x.playerId === r.playerId);
+      setPlayerSearch(p ? `${p.playerName} (${p.groupName})` : '');
+    } else {
+      setPlayerSearch('');
+    }
   };
 
   const handleDelete = async (resultId: number) => {
@@ -149,13 +158,28 @@ const AthleticsTournamentView: React.FC<AthleticsTournamentViewProps> = ({ detai
                   <input type="text" value={formData.teamName || ''} onChange={e => setFormData({...formData, teamName: e.target.value})} placeholder="Напр. 522 група" />
                 </div>
                 <div className={styles.formGroup}>
-                  <label>Учасник</label>
-                  <select value={formData.playerId || ''} onChange={e => setFormData({...formData, playerId: e.target.value ? parseInt(e.target.value) : undefined})}>
-                    <option value="">-- Виберіть учасника (для особистих) --</option>
+                  <label>Учасник (введіть ім'я або групу)</label>
+                  <input 
+                    list="athletics-participants" 
+                    value={playerSearch}
+                    onChange={e => {
+                       const val = e.target.value;
+                       setPlayerSearch(val);
+                       const match = details.participants?.find(p => `${p.playerName} (${p.groupName})` === val);
+                       if (match) {
+                          setFormData({...formData, playerId: match.playerId});
+                       } else {
+                          setFormData({...formData, playerId: undefined});
+                       }
+                    }}
+                    placeholder="Пошук учасника..." 
+                    autoComplete="off"
+                  />
+                  <datalist id="athletics-participants">
                     {details.participants?.map(p => (
-                      <option key={p.playerId} value={p.playerId}>{p.playerName} ({p.groupName})</option>
+                      <option key={p.playerId} value={`${p.playerName} (${p.groupName})`} />
                     ))}
-                  </select>
+                  </datalist>
                 </div>
               </div>
               <button onClick={handleSaveResult} className={styles.saveButton}>Зберегти</button>
