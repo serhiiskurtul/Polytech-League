@@ -2205,34 +2205,36 @@ const TournamentViewPage = () => {
                   {details?.prizes || 'Призи будуть оголошені пізніше.'}
                 </p>
               </div>
-              <div className={styles.infoSection}>
-                <h3><i className="fas fa-gavel"></i> Правила</h3>
-                <p style={{ whiteSpace: 'pre-line' }}>
-                  {details?.rules ? details.rules : (
-                    <>
-                      {tournament?.sport === 'armwrestling' ? (
-                        <>
-                          • Заборонено відрив ліктя від підлокітника<br />
-                          • Заборонено торкання головою чи плечем захвату<br />
-                          • Перемога при торканні руки суперника валику<br />
-                          • Рішення судді є остаточними
-                        </>
-                      ) : (
-                        <>
-                          {(tournament?.sport === 'chess' || tournament?.sport === 'checkers') && (details as any)?.system && (
-                            <>• {getSystemLabel((details as any).system)}<br /></>
-                          )}
-                          {tournament?.sport !== 'armwrestling' && (
-                            <>• Контроль часу: {details?.timeControl || 'Не вказано'}<br /></>
-                          )}
-                          • Заборонені підказки та мобільні телефони<br />
-                          • Рішення судді остаточні
-                        </>
-                      )}
-                    </>
-                  )}
-                </p>
-              </div>
+              {sportKey !== 'athletics' && (
+                <div className={styles.infoSection}>
+                  <h3><i className="fas fa-gavel"></i> Правила</h3>
+                  <p style={{ whiteSpace: 'pre-line' }}>
+                    {details?.rules ? details.rules : (
+                      <>
+                        {tournament?.sport === 'armwrestling' ? (
+                          <>
+                            • Заборонено відрив ліктя від підлокітника<br />
+                            • Заборонено торкання головою чи плечем захвату<br />
+                            • Перемога при торканні руки суперника валику<br />
+                            • Рішення судді є остаточними
+                          </>
+                        ) : (
+                          <>
+                            {(tournament?.sport === 'chess' || tournament?.sport === 'checkers') && (details as any)?.system && (
+                              <>• {getSystemLabel((details as any).system)}<br /></>
+                            )}
+                            {tournament?.sport !== 'armwrestling' && (
+                              <>• Контроль часу: {details?.timeControl || 'Не вказано'}<br /></>
+                            )}
+                            • Заборонені підказки та мобільні телефони<br />
+                            • Рішення судді остаточні
+                          </>
+                        )}
+                      </>
+                    )}
+                  </p>
+                </div>
+              )}
               <div className={styles.infoSection}>
                 <h3><i className="fas fa-users"></i> Судді</h3>
                 <div className={styles.refereeList}>
