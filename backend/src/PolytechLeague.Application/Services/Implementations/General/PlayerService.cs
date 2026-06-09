@@ -623,19 +623,20 @@ public class PlayerService : IPlayerService
                 var pointsBreakdown = new List<PointEntryDto>();
                 foreach (var sport in sportTypes) sportStatsMap[sport] = new SportStatsDto { SportType = sport };
                 foreach (var ach in achievements) {
-                    double pts = 0; double mult = 1.0; string levelName = "Міжгрупові";
+                    double basePts = 0; double mult = 1.0; string levelName = "Міжгрупові";
                     if (allEvents.TryGetValue(ach.TournamentId, out var lvl)) {
                         if (levelMultipliers.TryGetValue(lvl, out var m)) mult = m;
                         levelName = lvl switch { CompetitionLevel.Regional => "Обласні", CompetitionLevel.National => "Всеукраїнські", _ => "Міжгрупові" };
-                        pts = 10;
-                    } else pts = 10;
-                    if (ach.Rank == 1) pts += 100; else if (ach.Rank == 2) pts += 50; else if (ach.Rank == 3) pts += 30;
-                    if (allEvents.TryGetValue(ach.TournamentId, out var eventLvl) && eventLvl != CompetitionLevel.CollegeGroup) {
-                        if (ach.BoardRank == 1) pts += 40; else if (ach.BoardRank == 2) pts += 25; else if (ach.BoardRank == 3) pts += 15;
                     }
-                    if (ach.Result == "MVP") pts += 15;
-                    if (pts <= 0) continue;
-                    var finalPts = (int)Math.Round(pts * mult);
+                    if (ach.Rank == 1) basePts += 100; else if (ach.Rank == 2) basePts += 50; else if (ach.Rank == 3) basePts += 30;
+                    if (allEvents.TryGetValue(ach.TournamentId, out var eventLvl) && eventLvl != CompetitionLevel.CollegeGroup) {
+                        if (ach.BoardRank == 1) basePts += 40; else if (ach.BoardRank == 2) basePts += 25; else if (ach.BoardRank == 3) basePts += 15;
+                    }
+                    if (ach.Result == "MVP") basePts += 15;
+                    
+                    int participationPts = 10;
+                    var finalPts = (int)Math.Round(basePts * mult) + participationPts;
+                    if (finalPts <= 0) continue;
                     totalScore += finalPts;
                     if (sportStatsMap.TryGetValue(ach.SportType, out var s)) s.PerformanceScore += finalPts;
 
