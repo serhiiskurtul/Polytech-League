@@ -1957,20 +1957,22 @@ const TournamentViewPage = () => {
                   <i className="fas fa-map-marker-alt"></i>
                   <span>{tournament?.location}</span>
                 </div>
-                <div className={styles.metaItem}>
-                  <i className="fas fa-users"></i>
-                  <span>
-                    {actualParticipants} {participantLabel}
-                    {(() => {
-                      const cat = (details as any)?.category || tournament?.category;
-                      if (!cat) return '';
-                      let catLabel = 'змішані';
-                      if (cat === 'Men' || cat === 'Чоловіки') catLabel = 'чоловіки';
-                      else if (cat === 'Women' || cat === 'Жінки') catLabel = 'жінки';
-                      return ` (${catLabel})`;
-                    })()}
-                  </span>
-                </div>
+                {(details?.level !== 'Regional' && details?.level !== 'National' && tournament?.level !== 'Regional' && tournament?.level !== 'National') && (
+                  <div className={styles.metaItem}>
+                    <i className="fas fa-users"></i>
+                    <span>
+                      {actualParticipants} {participantLabel}
+                      {(() => {
+                        const cat = (details as any)?.category || tournament?.category;
+                        if (!cat) return '';
+                        let catLabel = 'змішані';
+                        if (cat === 'Men' || cat === 'Чоловіки') catLabel = 'чоловіки';
+                        else if (cat === 'Women' || cat === 'Жінки') catLabel = 'жінки';
+                        return ` (${catLabel})`;
+                      })()}
+                    </span>
+                  </div>
+                )}
                 {(() => {
                   const systemLabel = getTournamentSystemLabel();
                   if (!systemLabel) return null;
@@ -2128,7 +2130,7 @@ const TournamentViewPage = () => {
             <div className={styles.infoGrid}>
               <div className={styles.infoSection}>
                 <h3><i className="fas fa-align-left"></i> Опис</h3>
-                <p>{tournament?.description}</p>
+                <p style={{ whiteSpace: 'pre-line' }}>{tournament?.description}</p>
               </div>
 
               <div className={styles.infoSection}>
@@ -2422,7 +2424,7 @@ const TournamentViewPage = () => {
                           <i className="fas fa-calendar-week"></i> Розклад турів
                         </button>
                       )}
-                      {sportKey !== 'athletics' && (
+                      {sportKey !== 'athletics' && details?.level !== 'Regional' && details?.level !== 'National' && tournament?.level !== 'Regional' && tournament?.level !== 'National' && (
                         <button
                           className={`${styles.tabButton} ${activeTab === 'voting' ? styles.active : ''}`}
                           onClick={() => setActiveTab('voting')}
