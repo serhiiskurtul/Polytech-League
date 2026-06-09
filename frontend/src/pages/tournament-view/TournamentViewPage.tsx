@@ -1957,20 +1957,22 @@ const TournamentViewPage = () => {
                   <i className="fas fa-map-marker-alt"></i>
                   <span>{tournament?.location}</span>
                 </div>
-                <div className={styles.metaItem}>
-                  <i className="fas fa-users"></i>
-                  <span>
-                    {actualParticipants} {participantLabel}
-                    {(() => {
-                      const cat = (details as any)?.category || tournament?.category;
-                      if (!cat) return '';
-                      let catLabel = 'змішані';
-                      if (cat === 'Men' || cat === 'Чоловіки') catLabel = 'чоловіки';
-                      else if (cat === 'Women' || cat === 'Жінки') catLabel = 'жінки';
-                      return ` (${catLabel})`;
-                    })()}
-                  </span>
-                </div>
+                {(details?.level !== 'Regional' && details?.level !== 'National' && tournament?.level !== 'Regional' && tournament?.level !== 'National') && (
+                  <div className={styles.metaItem}>
+                    <i className="fas fa-users"></i>
+                    <span>
+                      {actualParticipants} {participantLabel}
+                      {(() => {
+                        const cat = (details as any)?.category || tournament?.category;
+                        if (!cat) return '';
+                        let catLabel = 'змішані';
+                        if (cat === 'Men' || cat === 'Чоловіки') catLabel = 'чоловіки';
+                        else if (cat === 'Women' || cat === 'Жінки') catLabel = 'жінки';
+                        return ` (${catLabel})`;
+                      })()}
+                    </span>
+                  </div>
+                )}
                 {(() => {
                   const systemLabel = getTournamentSystemLabel();
                   if (!systemLabel) return null;
