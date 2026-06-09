@@ -16,7 +16,7 @@
 .titleSection h1 {
   font-size: 32px;
   font-weight: 700;
-  color: var(--text-primary, #111827);
+  color: #000000;
   margin-bottom: 8px;
 }
 
