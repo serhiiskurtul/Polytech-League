@@ -52,6 +52,7 @@ const getSportIcon = (type: string) => {
     case 'volleyball': return 'fa-volleyball-ball';
     case 'basketball_3x3': return 'fa-basketball-ball';
     case 'beach_volleyball': return 'fa-umbrella-beach';
+    case 'athletics': return 'fa-running';
     default: return 'fa-medal';
   }
 };
@@ -67,6 +68,7 @@ const getSportName = (type: string) => {
     case 'volleyball': return 'Волейбол';
     case 'basketball_3x3': return 'Баскетбол';
     case 'beach_volleyball': return 'Пляжний волейбол';
+    case 'athletics': return 'Легка атлетика';
     default: return type;
   }
 };

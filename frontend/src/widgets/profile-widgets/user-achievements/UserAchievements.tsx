@@ -27,6 +27,7 @@ const UserAchievements = ({ achievements }: UserAchievementsProps) => {
       case 'badminton': return 'fas fa-shuttlecock';
       case 'table_tennis': return 'fas fa-table-tennis';
       case 'armwrestling': return 'fas fa-fist-raised';
+      case 'athletics': return 'fas fa-running';
       default: return 'fas fa-medal';
     }
   };
