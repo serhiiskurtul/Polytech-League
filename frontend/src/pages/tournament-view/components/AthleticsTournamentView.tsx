@@ -118,12 +118,14 @@ const AthleticsTournamentView: React.FC<AthleticsTournamentViewProps> = ({ detai
         >
           <i className="fas fa-running"></i> Результати за дисциплінами
         </button>
-        <button 
-          className={activeTab === 'team_standings' ? styles.activeTab : styles.tab}
-          onClick={() => setActiveTab('team_standings')}
-        >
-          <i className="fas fa-users"></i> Командний залік
-        </button>
+        {details.level === 'CollegeGroup' && (
+          <button 
+            className={activeTab === 'team_standings' ? styles.activeTab : styles.tab}
+            onClick={() => setActiveTab('team_standings')}
+          >
+            <i className="fas fa-users"></i> Командний залік
+          </button>
+        )}
       </div>
 
       {activeTab === 'results' && (
@@ -241,7 +243,7 @@ const AthleticsTournamentView: React.FC<AthleticsTournamentViewProps> = ({ detai
         </div>
       )}
 
-      {activeTab === 'team_standings' && (
+      {activeTab === 'team_standings' && details.level === 'CollegeGroup' && (
         <div className={styles.tabContent}>
           <div className={styles.standingsCard}>
             <h3>Командний рейтинг</h3>

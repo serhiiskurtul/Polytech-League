@@ -2418,12 +2418,14 @@ const TournamentViewPage = () => {
                           <i className="fas fa-calendar-week"></i> Розклад турів
                         </button>
                       )}
-                      <button
-                        className={`${styles.tabButton} ${activeTab === 'voting' ? styles.active : ''}`}
-                        onClick={() => setActiveTab('voting')}
-                      >
-                        <i className="fas fa-poll"></i> Голосування
-                      </button>
+                      {sportKey !== 'athletics' && (
+                        <button
+                          className={`${styles.tabButton} ${activeTab === 'voting' ? styles.active : ''}`}
+                          onClick={() => setActiveTab('voting')}
+                        >
+                          <i className="fas fa-poll"></i> Голосування
+                        </button>
+                      )}
                     </div>
 
                     {activeTab === 'voting' && (
