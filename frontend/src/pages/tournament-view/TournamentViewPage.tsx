@@ -2352,19 +2352,7 @@ const TournamentViewPage = () => {
               );
             }
 
-            if (sportKey === 'athletics' && details) {
-              return (
-                <AthleticsTournamentView
-                  details={details as any}
-                  isAdmin={isAdmin}
-                  isFizorg={isFizorg}
-                  userGroup={currentUserPlayer?.group}
-                  onRefresh={() => fetchTournament(true)}
-                />
-              );
-            }
-
-            if (sportKey === 'chess' || sportKey === 'checkers' || sportKey === 'badminton' || sportKey === 'tabletennis' || sportKey === 'table_tennis') {
+            if (sportKey === 'athletics' || sportKey === 'chess' || sportKey === 'checkers' || sportKey === 'badminton' || sportKey === 'tabletennis' || sportKey === 'table_tennis') {
               return (
                 <>
 
@@ -2375,14 +2363,16 @@ const TournamentViewPage = () => {
                         className={`${styles.tabButton} ${activeTab === 'standings' ? styles.active : ''}`}
                         onClick={() => setActiveTab('standings')}
                       >
-                        <i className="fas fa-chart-simple"></i> Таблиця змагань
+                        <i className="fas fa-chart-simple"></i> {sportKey === 'athletics' ? 'Результати змагань' : 'Таблиця змагань'}
                       </button>
+                      {sportKey !== 'athletics' && (
                       <button
                         className={`${styles.tabButton} ${activeTab === 'games' ? styles.active : ''}`}
                         onClick={() => setActiveTab('games')}
                       >
                         <i className={tournament?.sport === 'badminton' ? "fas fa-table-tennis-paddle-ball" : tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? "fas fa-table-tennis" : "fas fa-chess-board"}></i> {tournament?.sport === 'badminton' || tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? 'Всі матчі' : 'Всі партії'}
                       </button>
+                      )}
                       <button
                         className={`${styles.tabButton} ${activeTab === 'participants' ? styles.active : ''}`}
                         onClick={() => setActiveTab('participants')}
@@ -2402,12 +2392,14 @@ const TournamentViewPage = () => {
                           </span>
                         )}
                       </button>
-                      <button
-                        className={`${styles.tabButton} ${activeTab === 'schedule' ? styles.active : ''}`}
-                        onClick={() => setActiveTab('schedule')}
-                      >
-                        <i className="fas fa-calendar-week"></i> Розклад турів
-                      </button>
+                      {sportKey !== 'athletics' && (
+                        <button
+                          className={`${styles.tabButton} ${activeTab === 'schedule' ? styles.active : ''}`}
+                          onClick={() => setActiveTab('schedule')}
+                        >
+                          <i className="fas fa-calendar-week"></i> Розклад турів
+                        </button>
+                      )}
                       <button
                         className={`${styles.tabButton} ${activeTab === 'voting' ? styles.active : ''}`}
                         onClick={() => setActiveTab('voting')}
@@ -2466,6 +2458,15 @@ const TournamentViewPage = () => {
 
                     {activeTab === 'standings' && (
                       <div className={styles.tabContent}>
+                        {sportKey === 'athletics' ? (
+                          <AthleticsTournamentView
+                            details={details as any}
+                            isAdmin={isAdmin}
+                            isFizorg={isFizorg}
+                            userGroup={currentUserPlayer?.group}
+                            onRefresh={() => fetchTournament(true)}
+                          />
+                        ) : (
                         <div className={styles.tableWrapper}>
                           <table className={styles.dataTable}>
                             <thead>
@@ -2669,6 +2670,7 @@ const TournamentViewPage = () => {
                             </tbody>
                           </table>
                         </div>
+                        )}
                       </div>
                     )}
 
