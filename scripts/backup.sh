@@ -15,7 +15,11 @@ RETENTION_DAYS=7
 # Налаштування Cloudflare R2 (S3)
 UPLOAD_TO_R2=true
 R2_BUCKET_NAME=${R2_BUCKET_NAME:-"polytech-db-backups"}
-R2_ENDPOINT_URL=${R2_ENDPOINT_URL:-""} # Тепер береться з .env
+
+# Мапимо змінні з формату бекенду (.env) у формат AWS CLI
+export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-$CloudflareR2__AccessKey}
+export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-$CloudflareR2__SecretKey}
+R2_ENDPOINT_URL=${R2_ENDPOINT_URL:-$CloudflareR2__ServiceUrl}
 
 # Створення папки для бекапів, якщо вона не існує
 mkdir -p "$BACKUP_DIR"
