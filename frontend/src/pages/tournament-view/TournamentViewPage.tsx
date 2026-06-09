@@ -112,7 +112,7 @@ import {
 } from '@/entities/sport/api/tabletennis.api';
 import ArmwrestlingTournamentView from './components/ArmwrestlingTournamentView';
 import TeamSportsTournamentView from './components/TeamSportsTournamentView';
-import BadmintonTournamentView from './components/BadmintonTournamentView';
+
 import AthleticsTournamentView from './components/AthleticsTournamentView';
 import TournamentPodium from './components/TournamentPodium';
 import ChessGameViewerModal from './components/ChessGameViewerModal';
@@ -967,6 +967,10 @@ const TournamentViewPage = () => {
           lastName: editingParticipantData.lastName,
           groupName: editingParticipantData.groupName
         });
+      } else if (sportKey === 'athletics') {
+         toast.error("Редагування учасника недоступне для легкої атлетики");
+         setEditingParticipantId(null);
+         return;
       } else {
         const payload: ChessEventParticipantDto = {
           playerId,
@@ -1019,9 +1023,11 @@ const TournamentViewPage = () => {
           case 'football':
             await removeFootballParticipant(id!, playerId);
             break;
-          case 'basketball_3x3':
           case 'basketball3x3':
             await removeBasketball3x3Participant(id!, playerId);
+            break;
+          case 'athletics':
+            await removeParticipantFromAthleticsEvent(id!, playerId);
             break;
           default:
             await removeParticipantFromEvent(id!, playerId);
@@ -1048,8 +1054,10 @@ const TournamentViewPage = () => {
         case 'volleyball': await approveVolleyballParticipant(id!, playerId); break;
         case 'beach_volleyball': await approveBeachVolleyballParticipant(id!, playerId); break;
         case 'football': await approveFootballParticipant(id!, playerId); break;
-        case 'basketball_3x3':
         case 'basketball3x3': await approveBasketball3x3Participant(id!, playerId); break;
+        case 'athletics': 
+            toast.success('Легка атлетика не потребує підтвердження учасників');
+            return;
         default: await approveChessParticipant(id!, playerId);
       }
       toast.success(`Учасника ${playerName ? `"${playerName}" ` : ''}схвалено!`);
@@ -1073,8 +1081,12 @@ const TournamentViewPage = () => {
         case 'volleyball': await rejectVolleyballParticipant(id!, playerId); break;
         case 'beach_volleyball': await rejectBeachVolleyballParticipant(id!, playerId); break;
         case 'football': await rejectFootballParticipant(id!, playerId); break;
-        case 'basketball_3x3':
         case 'basketball3x3': await rejectBasketball3x3Participant(id!, playerId); break;
+        case 'athletics':
+            await removeParticipantFromAthleticsEvent(id!, playerId);
+            toast.success(`Учасника ${playerName ? `"${playerName}" ` : ''}видалено`);
+            fetchTournament(true);
+            return;
         default: await rejectChessParticipant(id!, playerId);
       }
       toast.success(`Учасника ${playerName ? `"${playerName}" ` : ''}відхилено`);
@@ -1461,6 +1473,12 @@ const TournamentViewPage = () => {
             status: RegistrationStatus.Approved,
             firstName: newPlayer.firstName,
             lastName: newPlayer.lastName,
+            groupName: newPlayer.group
+          });
+          break;
+        case 'athletics':
+          await addParticipantToAthleticsEvent(id!, {
+            playerId: playerId,
             groupName: newPlayer.group
           });
           break;
@@ -2463,7 +2481,7 @@ const TournamentViewPage = () => {
                             details={details as any}
                             isAdmin={isAdmin}
                             isFizorg={isFizorg}
-                            userGroup={currentUserPlayer?.group}
+                            userGroup={currentUserPlayer?.group ?? undefined}
                             onRefresh={() => fetchTournament(true)}
                           />
                         ) : (
