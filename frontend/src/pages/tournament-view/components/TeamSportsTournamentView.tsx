@@ -2,10 +2,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { PlayerDto, Gender } from '@/entities/player/model/player.types';
 import { ChessEventResponse, ChessEventParticipantDto, ChessGameDto, ChessEventRequest, GameResult } from '@/entities/sport/model/chess.types';
 import { searchPlayers } from '@/shared/api';
-import { 
-  updateVolleyballMatch, 
-  updateBeachVolleyballMatch, 
-  updateFootballMatch, 
+import {
+  updateVolleyballMatch,
+  updateBeachVolleyballMatch,
+  updateFootballMatch,
   updateBasketball3x3Match,
   updateBadmintonMatch,
   updateChessGame,
@@ -111,9 +111,9 @@ interface TeamSportsTournamentViewProps {
   onRefresh: () => void;
 }
 
-const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({ 
-  sport, 
-  details, 
+const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
+  sport,
+  details,
   isAdmin,
   isFizorg,
   userGroup,
@@ -127,7 +127,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const [voteStats, setVoteStats] = useState<any>(null);
   const [isVoting, setIsVoting] = useState(false);
   const isRegionalOrNational = details?.level === 'Regional' || details?.level === 'National';
-  
+
   // Create Match State
   const [isCreateMatchModalOpen, setIsCreateMatchModalOpen] = useState(false);
   const [newMatchForm, setNewMatchForm] = useState({
@@ -152,13 +152,13 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   // Match Scorers State
   const [isScorersModalOpen, setIsScorersModalOpen] = useState(false);
   const [selectedMatchForScorers, setSelectedMatchForScorers] = useState<any>(null);
-  const [tempScorers, setTempScorers] = useState<{[playerId: number]: number}>({});
-  const [tempYellowCards, setTempYellowCards] = useState<{[playerId: number]: number}>({});
-  const [tempRedCards, setTempRedCards] = useState<{[playerId: number]: number}>({});
-  const [matchGoalkeepers, setMatchGoalkeepers] = useState<{home: string, away: string}>({ home: '', away: '' });
-  const [matchCaptains, setMatchCaptains] = useState<{home: string, away: string}>({ home: '', away: '' });
-  const [matchScores, setMatchScores] = useState<{home: number, away: number}>({ home: 0, away: 0 });
-  const [matchPenaltyScores, setMatchPenaltyScores] = useState<{home: number | null, away: number | null}>({ home: null, away: null });
+  const [tempScorers, setTempScorers] = useState<{ [playerId: number]: number }>({});
+  const [tempYellowCards, setTempYellowCards] = useState<{ [playerId: number]: number }>({});
+  const [tempRedCards, setTempRedCards] = useState<{ [playerId: number]: number }>({});
+  const [matchGoalkeepers, setMatchGoalkeepers] = useState<{ home: string, away: string }>({ home: '', away: '' });
+  const [matchCaptains, setMatchCaptains] = useState<{ home: string, away: string }>({ home: '', away: '' });
+  const [matchScores, setMatchScores] = useState<{ home: number, away: number }>({ home: 0, away: 0 });
+  const [matchPenaltyScores, setMatchPenaltyScores] = useState<{ home: number | null, away: number | null }>({ home: null, away: null });
 
   // Quick Add Player State
   const [isQuickAddMode, setIsQuickAddMode] = useState(false);
@@ -241,7 +241,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
     const topTeamsByCards = Object.values(teamYellowCards)
       .sort((a, b) => b.cards - a.cards);
-    
+
     const teamMostCards = topTeamsByCards[0] || { name: '—', cards: 0 };
 
     return {
@@ -258,7 +258,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
   useEffect(() => {
     if (!(isAdmin || isFizorg)) return;
-    
+
     const delayDebounceFn = setTimeout(async () => {
       if (searchQuery.length >= 2) {
         setIsSearchingPlayers(true);
@@ -346,13 +346,13 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       const allMatches = details.matches || details.games || [];
       const match = allMatches.find((m: any) => m.id === matchId);
       if (!match) return;
-      
+
       const isChessLike = sport === 'chess' || sport === 'checkers';
       const maxScore = isChessLike ? 2 : 1000; // Arbitrary high default for other sports
-      
+
       const finalHomeScore = isChessLike ? Math.min(maxScore, Math.max(0, homeScore)) : Math.round(homeScore);
       const finalAwayScore = isChessLike ? Math.min(maxScore, Math.max(0, awayScore)) : Math.round(awayScore);
-      
+
       let payload: any;
 
       if (sport === 'volleyball' || sport === 'beach_volleyball' || sport === 'beach-volleyball') {
@@ -441,10 +441,10 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
   const handleOpenScorers = (match: any) => {
     setSelectedMatchForScorers(match);
-    const initialScorers: {[playerId: number]: number} = {};
-    const initialYellowCards: {[playerId: number]: number} = {};
-    const initialRedCards: {[playerId: number]: number} = {};
-    
+    const initialScorers: { [playerId: number]: number } = {};
+    const initialYellowCards: { [playerId: number]: number } = {};
+    const initialRedCards: { [playerId: number]: number } = {};
+
     match.goals?.forEach((g: any) => {
       initialScorers[g.playerId] = g.goalsCount;
     });
@@ -458,7 +458,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     setTempScorers(initialScorers);
     setTempYellowCards(initialYellowCards);
     setTempRedCards(initialRedCards);
-    
+
     // Default match goalkeepers to team defaults if not set for the match
     const homeTeam = details.teams?.find((t: any) => t.id === match.homeTeamId);
     const awayTeam = details.teams?.find((t: any) => t.id === match.awayTeamId);
@@ -497,7 +497,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         .filter(([_, count]) => count > 0)
         .map(([playerId, count]) => {
           const cards = [];
-          for(let i=0; i<count; i++) cards.push({ playerId: parseInt(playerId) });
+          for (let i = 0; i < count; i++) cards.push({ playerId: parseInt(playerId) });
           return cards;
         }).flat();
 
@@ -505,7 +505,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         .filter(([_, count]) => count > 0)
         .map(([playerId, count]) => {
           const cards = [];
-          for(let i=0; i<count; i++) cards.push({ playerId: parseInt(playerId) });
+          for (let i = 0; i < count; i++) cards.push({ playerId: parseInt(playerId) });
           return cards;
         }).flat();
 
@@ -516,12 +516,12 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         awayTeamId: selectedMatchForScorers.awayTeamId,
         stage: selectedMatchForScorers.stage,
         // Update rosters to match team players if they were empty
-        homeRosterIds: selectedMatchForScorers.homeRoster?.length > 0 
-            ? selectedMatchForScorers.homeRoster.map((p: any) => p.id) 
-            : details.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players?.map((p: any) => p.id) || [],
-        awayRosterIds: selectedMatchForScorers.awayRoster?.length > 0 
-            ? selectedMatchForScorers.awayRoster.map((p: any) => p.id) 
-            : details.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players?.map((p: any) => p.id) || [],
+        homeRosterIds: selectedMatchForScorers.homeRoster?.length > 0
+          ? selectedMatchForScorers.homeRoster.map((p: any) => p.id)
+          : details.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players?.map((p: any) => p.id) || [],
+        awayRosterIds: selectedMatchForScorers.awayRoster?.length > 0
+          ? selectedMatchForScorers.awayRoster.map((p: any) => p.id)
+          : details.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players?.map((p: any) => p.id) || [],
         homeGoalkeeperId: parseInt(matchGoalkeepers.home) || null,
         awayGoalkeeperId: parseInt(matchGoalkeepers.away) || null,
         homeCaptainId: parseInt(matchCaptains.home) || null,
@@ -609,14 +609,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const calculateStandings = (groupFilter?: string) => {
     let teams = details.teams || [];
     const matches = details.matches || details.games || [];
-    
+
     if (groupFilter === 'GENERAL_TABLE') {
       // General Table: teams with flag OR teams with no group at all
       teams = teams.filter((t: any) => t.isGeneralTableIncluded || !t.tournamentGroupName);
     } else if (groupFilter) {
       teams = teams.filter((t: any) => t.tournamentGroupName === groupFilter);
     }
-    
+
     if (teams.length === 0) return [];
 
     const standings = teams.map((team: any) => {
@@ -636,13 +636,13 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       matches.forEach((match: any) => {
         // For specific group tables, only include group stage matches
         if (groupFilter && groupFilter !== 'GENERAL_TABLE' && match.stage !== 'Груповий етап') return;
-        
+
         // For general table, we can include all matches if needed, or specific ones. 
         // Usually general table is for final ranking, so we include matches that affect it.
         // For simplicity, we filter matches by teams involved.
 
         const isChessLike = sport === 'chess' || sport === 'checkers';
-        
+
         let isHome = false;
         let isAway = false;
         let hScore = 0;
@@ -661,8 +661,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           const isVolleyball = sport.includes('volleyball') || sport === 'badminton';
           hScore = isVolleyball ? (match.homeSetsWon ?? match.homeScore ?? 0) : (match.homeTeamScore ?? 0);
           aScore = isVolleyball ? (match.awaySetsWon ?? match.awayScore ?? 0) : (match.awayTeamScore ?? 0);
-          isPlayed = isVolleyball 
-            ? (match.homeSetsWon != null || match.awaySetsWon != null || match.homeScore != null || match.awayScore != null) 
+          isPlayed = isVolleyball
+            ? (match.homeSetsWon != null || match.awaySetsWon != null || match.homeScore != null || match.awayScore != null)
             : (match.homeTeamScore != null || match.awayTeamScore != null);
         }
         if (isHome || isAway) {
@@ -683,11 +683,11 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
       // Traditional points calculation
       const autoPoints = stats.w * 3 + stats.d * 1;
-      
-      const finalPoints = (stats.manualPoints > 0 && stats.gp === 0) 
-        ? stats.manualPoints 
+
+      const finalPoints = (stats.manualPoints > 0 && stats.gp === 0)
+        ? stats.manualPoints
         : autoPoints;
-      
+
       return { ...stats, points: finalPoints };
     });
 
@@ -705,10 +705,10 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     let i = 0;
     while (i < sortedStandings.length) {
       let tieCount = 1;
-      while (i + tieCount < sortedStandings.length && 
-             sortedStandings[i + tieCount].points === sortedStandings[i].points &&
-             (sortedStandings[i + tieCount].gf - sortedStandings[i + tieCount].ga) === (sortedStandings[i].gf - sortedStandings[i].ga) &&
-             sortedStandings[i + tieCount].gf === sortedStandings[i].gf) {
+      while (i + tieCount < sortedStandings.length &&
+        sortedStandings[i + tieCount].points === sortedStandings[i].points &&
+        (sortedStandings[i + tieCount].gf - sortedStandings[i + tieCount].ga) === (sortedStandings[i].gf - sortedStandings[i].ga) &&
+        sortedStandings[i + tieCount].gf === sortedStandings[i].gf) {
         tieCount++;
       }
       const rankStr = tieCount > 1 ? `${i + 1}-${i + tieCount}` : (i + 1).toString();
@@ -723,10 +723,10 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const isGroupsPlayoff = details.tournamentType === 'GroupsPlayoff';
   const groupNames = Array.from(new Set((details.teams || []).map((t: any) => t.tournamentGroupName).filter(Boolean))) as string[];
   const sortedGroups = groupNames.sort();
-  
+
   const generalTableTeams = (details.teams || []).filter((t: any) => t.isGeneralTableIncluded || !t.tournamentGroupName);
   const hasGeneralTable = generalTableTeams.length > 0;
-  
+
   // For GroupsPlayoff, we show multiple tables. For others, just one.
   const standingsData = !isGroupsPlayoff ? calculateStandings() : [];
 
@@ -764,16 +764,16 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         case 'beach_volleyball': createApi = createBeachVolleyballMatch; break;
         case 'football': createApi = createFootballMatch; break;
         case 'basketball_3x3': createApi = createBasketball3x3Match; break;
-        case 'badminton': 
-          createApi = createBadmintonMatch; 
+        case 'badminton':
+          createApi = createBadmintonMatch;
           payload.eventId = details.id;
           payload.homeTeamId = parseInt(newMatchForm.homeTeamId);
           payload.awayTeamId = parseInt(newMatchForm.awayTeamId);
           payload.homeScore = 0;
           payload.awayScore = 0;
           break;
-        case 'chess': 
-          createApi = createChessGame; 
+        case 'chess':
+          createApi = createChessGame;
           payload = {
             tournamentId: details.id,
             whiteTeamId: parseInt(newMatchForm.homeTeamId),
@@ -782,8 +782,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
             result: 'NotPlayed'
           };
           break;
-        case 'checkers': 
-          createApi = createCheckersGame; 
+        case 'checkers':
+          createApi = createCheckersGame;
           payload = {
             tournamentId: details.id,
             whiteTeamId: parseInt(newMatchForm.homeTeamId),
@@ -867,7 +867,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       const playerIds = team.players?.map((p: any) => p.id) || [];
       const isAlreadyIn = playerIds.includes(playerId);
 
-      const newPlayerIds = isAlreadyIn 
+      const newPlayerIds = isAlreadyIn
         ? playerIds.filter((id: number) => id !== playerId)
         : [...playerIds, playerId];
 
@@ -957,7 +957,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       if (!team) return;
 
       const updateApi = getTeamUpdateApi();
-      
+
       const payload = {
         id: team.id,
         name: team.name,
@@ -983,7 +983,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       if (!team) return;
 
       const updateApi = getTeamUpdateApi();
-      
+
       const payload = {
         id: team.id,
         name: team.name,
@@ -1002,7 +1002,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       alert('Помилка при призначенні воротаря');
     }
   };
-  
+
   const handleToggleGeneralTable = async (teamId: number) => {
     try {
       const team = details.teams?.find((t: any) => t.id === teamId);
@@ -1035,7 +1035,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
       // Add to team
       await handleTogglePlayerInTeam(editingTeamId!, newPlayer.id!);
-      
+
       // Refresh players list
       // Reset form
       setQuickAddForm({ firstName: '', lastName: '', patronymic: '', group: '', gender: 'None' });
@@ -1086,29 +1086,29 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const getEligibleTeams = (stage: string) => {
     const allTeams = details.teams || [];
     if (!useStrictFiltering || sport !== 'football') return allTeams;
-    
+
     const currentStageIdx = STAGE_ORDER.indexOf(stage);
     if (currentStageIdx <= 0) return allTeams;
 
     const prevStage = STAGE_ORDER[currentStageIdx - 1];
     const matches = details.matches || details.games || [];
-    
+
     // For 3rd place match, we need losers of the previous stage (Semifinal)
     const isThirdPlaceMatch = stage === 'Матч за 3-те місце';
-    
+
     const winnersOfPrevStage = matches
       .filter((m: any) => m.stage === prevStage)
       .map((m: any) => {
         const hScore = m.homeTeamScore ?? 0;
         const aScore = m.awayTeamScore ?? 0;
         if (isThirdPlaceMatch) {
-            // Get Losers
-            if (hScore < aScore) return m.homeTeamId;
-            if (aScore < hScore) return m.awayTeamId;
+          // Get Losers
+          if (hScore < aScore) return m.homeTeamId;
+          if (aScore < hScore) return m.awayTeamId;
         } else {
-            // Get Winners
-            if (hScore > aScore) return m.homeTeamId;
-            if (aScore > hScore) return m.awayTeamId;
+          // Get Winners
+          if (hScore > aScore) return m.homeTeamId;
+          if (aScore > hScore) return m.awayTeamId;
         }
         return null;
       })
@@ -1164,19 +1164,21 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
             <button className={activeTab === 'bracket' ? styles.activeTab : ''} onClick={() => setActiveTab('bracket')}>Сітка</button>
           )}
           <button className={activeTab === 'teams' ? styles.activeTab : ''} onClick={() => setActiveTab('teams')}>Команди</button>
-          <button className={activeTab === 'voting' ? styles.activeTab : ''} onClick={() => setActiveTab('voting')}>Голосування</button>
+          {!isRegionalOrNational && (
+            <button className={activeTab === 'voting' ? styles.activeTab : ''} onClick={() => setActiveTab('voting')}>Голосування</button>
+          )}
           {(sport === 'football' || sport === 'футбол') && (
             <button className={activeTab === 'stats' ? styles.activeTab : ''} onClick={() => setActiveTab('stats')}>Статистика</button>
           )}
           {(isAdmin || isFizorg) && !isRegionalOrNational && (
             <button className={activeTab === 'participants' ? styles.activeTab : ''} onClick={() => setActiveTab('participants')}>
               Учасники {details.participants?.filter((p: any) => p.status === RegistrationStatus.Pending)?.length > 0 && (
-                <span style={{ 
-                  marginLeft: '6px', 
-                  background: '#ef4444', 
-                  color: '#fff', 
-                  padding: '1px 6px', 
-                  borderRadius: '10px', 
+                <span style={{
+                  marginLeft: '6px',
+                  background: '#ef4444',
+                  color: '#fff',
+                  padding: '1px 6px',
+                  borderRadius: '10px',
                   fontSize: '11px',
                   fontWeight: 'bold',
                   boxShadow: '0 2px 4px rgba(239,68,68,0.3)'
@@ -1192,8 +1194,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
             </button>
           )}
           {(isAdmin || isFizorg) && activeTab === 'teams' && (
-            <button 
-              className={styles.addMatchGlobalBtn} 
+            <button
+              className={styles.addMatchGlobalBtn}
               onClick={() => {
                 if (isFizorg && !isAdmin && userGroup) {
                   setNewTeamForm({ name: userGroup, tournamentGroupName: '', isGeneralTableIncluded: false });
@@ -1201,9 +1203,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                 setIsCreateTeamModalOpen(true);
               }}
               disabled={isFizorg && !isAdmin && details.teams?.some((t: any) => t.name === userGroup)}
-              style={{ 
-                opacity: (isFizorg && !isAdmin && details.teams?.some((t: any) => t.name === userGroup)) ? 0.5 : 1, 
-                cursor: (isFizorg && !isAdmin && details.teams?.some((t: any) => t.name === userGroup)) ? 'not-allowed' : 'pointer' 
+              style={{
+                opacity: (isFizorg && !isAdmin && details.teams?.some((t: any) => t.name === userGroup)) ? 0.5 : 1,
+                cursor: (isFizorg && !isAdmin && details.teams?.some((t: any) => t.name === userGroup)) ? 'not-allowed' : 'pointer'
               }}
             >
               <i className="fas fa-users-cog"></i> <span>Створити команду</span>
@@ -1224,7 +1226,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
               Голосування за переможця (Всього голосів: {voteStats?.totalVotes || 0})
               <i className="fas fa-info-circle" title="Голосування має суто розважальний характер і не впливає на офіційні результати змагань" style={{ marginLeft: '6px', color: '#64748b', cursor: 'help', fontSize: '14px' }}></i>
             </h3>
-            
+
             {voteStats?.hasVoted && (
               <p style={{ color: '#10b981', fontSize: '14px', marginBottom: '10px' }}>
                 <i className="fas fa-check-circle" style={{ marginRight: '4px' }}></i>
@@ -1249,7 +1251,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       {votes} ({percentage}%)
                     </div>
                     {!voteStats?.hasVoted && !isVoting && new Date(details.rawDate || details.date) > new Date() && (
-                      <button 
+                      <button
                         onClick={() => handleVote(details.isTeam ? team.id : undefined, !details.isTeam ? team.id : undefined)}
                         style={{ padding: '2px 8px', fontSize: '12px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
                       >
@@ -1264,105 +1266,105 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         )}
         {/* football Admin Panel (Horizontal) */}
         {isAdmin && activeTab === 'bracket' && hasBracket && (
-            <div className={styles.footballAdminPanel}>
-                <div className={styles.panelHeader}>
-                    <i className="fas fa-plus-circle"></i> Додати новий поєдинок
-                </div>
-                <div className={styles.panelForm}>
-                    <div className={styles.panelGroup}>
-                        <label>Команда 1</label>
-                        <select 
-                            value={newMatchForm.homeTeamId} 
-                            onChange={e => setNewMatchForm({...newMatchForm, homeTeamId: e.target.value})}
-                        >
-                            <option value="">Оберіть...</option>
-                            {eligibleTeams.map((t: any) => (
-                                <option key={t.id} value={t.id}>{t.name}</option>
-                            ))}
-                        </select>
-                    </div>
-                    
-                    <div className={styles.panelVs}>vs</div>
-
-                    <div className={styles.panelGroup}>
-                        <label>Команда 2</label>
-                        <select 
-                            value={newMatchForm.awayTeamId} 
-                            onChange={e => setNewMatchForm({...newMatchForm, awayTeamId: e.target.value})}
-                        >
-                            <option value="">Оберіть...</option>
-                            {eligibleTeams.map((t: any) => (
-                                <option key={t.id} value={t.id}>{t.name}</option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className={styles.panelGroup} style={{ width: '160px' }}>
-                        <label>Етап</label>
-                        <select 
-                            value={stageType} 
-                            onChange={e => {
-                                const val = e.target.value;
-                                setStageType(val);
-                                if (val === 'Раунд') {
-                                    setNewMatchForm({...newMatchForm, stage: `Раунд ${roundNumber}`});
-                                } else {
-                                    setNewMatchForm({...newMatchForm, stage: val});
-                                }
-                            }}
-                        >
-                            <option value="Груповий етап">Груповий етап</option>
-                            <option value="Раунд">Раунд...</option>
-                            <option value="1/16 Фіналу">1/16 Фіналу</option>
-                            <option value="1/8 Фіналу">1/8 Фіналу</option>
-                            <option value="Чвертьфінал">Чвертьфінал</option>
-                            <option value="Півфінал">Півфінал</option>
-                            <option value="Матч за 3-те місце">Матч за 3-те місце</option>
-                            <option value="Фінал">Фінал</option>
-                        </select>
-                    </div>
-
-                    {stageType === 'Раунд' && (
-                        <div className={styles.panelGroup} style={{ width: '80px' }}>
-                            <label>№</label>
-                            <input 
-                                type="number" 
-                                min="1"
-                                value={roundNumber}
-                                onFocus={(e) => e.target.select()}
-                                onChange={e => {
-                                    const num = parseInt(e.target.value) || 1;
-                                    setRoundNumber(num);
-                                    setNewMatchForm({...newMatchForm, stage: `Раунд ${num}`});
-                                }}
-                            />
-                        </div>
-                    )}
-
-                    <div className={styles.panelGroup} style={{ width: 'auto' }}>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            Фільтрація <i className="fas fa-question-circle" style={{ fontSize: '10px', color: '#94a3b8', cursor: 'help' }} title="Якщо увімкнено, при створенні матчу можна вибрати лише ті команди, які виграли на попередньому етапі (1/16 -> 1/8 -> Чвертьфінал і т.д.)"></i>
-                        </label>
-                        <div className={styles.panelFilterToggle}>
-                            <label className={styles.switchMini}>
-                                <input 
-                                    type="checkbox" 
-                                    checked={useStrictFiltering} 
-                                    onChange={(e) => setUseStrictFiltering(e.target.checked)}
-                                />
-                                <span className={styles.sliderMini}></span>
-                            </label>
-                            <span style={{ fontSize: '11px', fontWeight: 600, color: useStrictFiltering ? '#3b82f6' : '#94a3b8' }}>
-                                {useStrictFiltering ? 'Увімк' : 'Вимк'}
-                            </span>
-                        </div>
-                    </div>
-
-                    <button className={styles.panelCreateBtn} onClick={handleCreateMatch}>
-                        Створити
-                    </button>
-                </div>
+          <div className={styles.footballAdminPanel}>
+            <div className={styles.panelHeader}>
+              <i className="fas fa-plus-circle"></i> Додати новий поєдинок
             </div>
+            <div className={styles.panelForm}>
+              <div className={styles.panelGroup}>
+                <label>Команда 1</label>
+                <select
+                  value={newMatchForm.homeTeamId}
+                  onChange={e => setNewMatchForm({ ...newMatchForm, homeTeamId: e.target.value })}
+                >
+                  <option value="">Оберіть...</option>
+                  {eligibleTeams.map((t: any) => (
+                    <option key={t.id} value={t.id}>{t.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className={styles.panelVs}>vs</div>
+
+              <div className={styles.panelGroup}>
+                <label>Команда 2</label>
+                <select
+                  value={newMatchForm.awayTeamId}
+                  onChange={e => setNewMatchForm({ ...newMatchForm, awayTeamId: e.target.value })}
+                >
+                  <option value="">Оберіть...</option>
+                  {eligibleTeams.map((t: any) => (
+                    <option key={t.id} value={t.id}>{t.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className={styles.panelGroup} style={{ width: '160px' }}>
+                <label>Етап</label>
+                <select
+                  value={stageType}
+                  onChange={e => {
+                    const val = e.target.value;
+                    setStageType(val);
+                    if (val === 'Раунд') {
+                      setNewMatchForm({ ...newMatchForm, stage: `Раунд ${roundNumber}` });
+                    } else {
+                      setNewMatchForm({ ...newMatchForm, stage: val });
+                    }
+                  }}
+                >
+                  <option value="Груповий етап">Груповий етап</option>
+                  <option value="Раунд">Раунд...</option>
+                  <option value="1/16 Фіналу">1/16 Фіналу</option>
+                  <option value="1/8 Фіналу">1/8 Фіналу</option>
+                  <option value="Чвертьфінал">Чвертьфінал</option>
+                  <option value="Півфінал">Півфінал</option>
+                  <option value="Матч за 3-те місце">Матч за 3-те місце</option>
+                  <option value="Фінал">Фінал</option>
+                </select>
+              </div>
+
+              {stageType === 'Раунд' && (
+                <div className={styles.panelGroup} style={{ width: '80px' }}>
+                  <label>№</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={roundNumber}
+                    onFocus={(e) => e.target.select()}
+                    onChange={e => {
+                      const num = parseInt(e.target.value) || 1;
+                      setRoundNumber(num);
+                      setNewMatchForm({ ...newMatchForm, stage: `Раунд ${num}` });
+                    }}
+                  />
+                </div>
+              )}
+
+              <div className={styles.panelGroup} style={{ width: 'auto' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  Фільтрація <i className="fas fa-question-circle" style={{ fontSize: '10px', color: '#94a3b8', cursor: 'help' }} title="Якщо увімкнено, при створенні матчу можна вибрати лише ті команди, які виграли на попередньому етапі (1/16 -> 1/8 -> Чвертьфінал і т.д.)"></i>
+                </label>
+                <div className={styles.panelFilterToggle}>
+                  <label className={styles.switchMini}>
+                    <input
+                      type="checkbox"
+                      checked={useStrictFiltering}
+                      onChange={(e) => setUseStrictFiltering(e.target.checked)}
+                    />
+                    <span className={styles.sliderMini}></span>
+                  </label>
+                  <span style={{ fontSize: '11px', fontWeight: 600, color: useStrictFiltering ? '#3b82f6' : '#94a3b8' }}>
+                    {useStrictFiltering ? 'Увімк' : 'Вимк'}
+                  </span>
+                </div>
+              </div>
+
+              <button className={styles.panelCreateBtn} onClick={handleCreateMatch}>
+                Створити
+              </button>
+            </div>
+          </div>
         )}
 
         {activeTab === 'matches' && (
@@ -1370,15 +1372,15 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
             {(details.matches || details.games)?.map((match: any) => {
               const isVolleyball = sport.includes('volleyball') || sport === 'badminton';
               const isChessLike = sport === 'chess' || sport === 'checkers';
-              
+
               // Get scores based on sport type
-              const homeScore = isVolleyball ? (match.homeSetsWon ?? match.homeScore ?? 0) : 
-                               isChessLike ? (match.whiteTeamScore ?? match.whitePlayerPoints ?? 0) :
-                               (match.homeTeamScore ?? 0);
-              const awayScore = isVolleyball ? (match.awaySetsWon ?? match.awayScore ?? 0) : 
-                               isChessLike ? (match.blackTeamScore ?? match.blackPlayerPoints ?? 0) :
-                               (match.awayTeamScore ?? 0);
-              
+              const homeScore = isVolleyball ? (match.homeSetsWon ?? match.homeScore ?? 0) :
+                isChessLike ? (match.whiteTeamScore ?? match.whitePlayerPoints ?? 0) :
+                  (match.homeTeamScore ?? 0);
+              const awayScore = isVolleyball ? (match.awaySetsWon ?? match.awayScore ?? 0) :
+                isChessLike ? (match.blackTeamScore ?? match.blackPlayerPoints ?? 0) :
+                  (match.awayTeamScore ?? 0);
+
               const isHomeWinner = Number(homeScore) > Number(awayScore);
               const isAwayWinner = Number(awayScore) > Number(homeScore);
               const isDraw = Number(homeScore) === Number(awayScore) && Number(homeScore) > 0;
@@ -1388,13 +1390,13 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   <div className={styles.matchStage}>
                     {match.stage || (match.round === 100 ? 'Фінал' : `Раунд ${match.round}`)}
                   </div>
-                  
+
                   <div className={styles.matchTeams}>
                     <div className={`${styles.teamRow} ${isHomeWinner ? styles.winnerRow : ''} ${isDraw ? styles.drawRow : ''}`}>
                       <div className={`${styles.teamLogo} ${isHomeWinner ? styles.winnerLogo : ''}`}>
                         {(match.whiteTeam?.name || match.homeTeam?.name || match.whitePlayer?.lastName)?.[0] || 'T'}
                       </div>
-                      <div 
+                      <div
                         className={`${styles.teamName} ${isHomeWinner ? styles.winnerName : ''} ${isDraw ? styles.drawName : ''}`}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -1408,8 +1410,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         {isDraw && <i className={`fas fa-handshake ${styles.drawIcon}`}></i>}
                       </div>
                       <div className={styles.scoreInput} onClick={(e) => e.stopPropagation()}>
-                        <input 
-                          type="number" 
+                        <input
+                          type="number"
                           min="0"
                           max={isChessLike ? 2 : undefined}
                           step={isChessLike ? "0.5" : "1"}
@@ -1422,8 +1424,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       </div>
                       {homeScore === awayScore && (sport === 'football' || sport === 'футбол') && (
                         <div style={{ marginLeft: '8px' }} onClick={(e) => e.stopPropagation()}>
-                          <input 
-                            type="number" 
+                          <input
+                            type="number"
                             min="0"
                             placeholder="П"
                             style={{ width: '40px', padding: '4px', borderRadius: '4px', border: '1px solid #f59e0b', textAlign: 'center' }}
@@ -1449,7 +1451,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       <div className={`${styles.teamLogo} ${isAwayWinner ? styles.winnerLogo : ''}`}>
                         {(match.blackTeam?.name || match.awayTeam?.name || match.awayTeamName || match.blackPlayer?.lastName)?.[0] || 'T'}
                       </div>
-                      <div 
+                      <div
                         className={`${styles.teamName} ${isAwayWinner ? styles.winnerName : ''} ${isDraw ? styles.drawName : ''}`}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -1463,8 +1465,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         {isDraw && <i className={`fas fa-handshake ${styles.drawIcon}`}></i>}
                       </div>
                       <div className={styles.scoreInput} onClick={(e) => e.stopPropagation()}>
-                        <input 
-                          type="number" 
+                        <input
+                          type="number"
                           min="0"
                           step={isChessLike ? "0.5" : "1"}
                           key={`${match.id}-away-${awayScore}`}
@@ -1476,8 +1478,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       </div>
                       {homeScore === awayScore && (sport === 'football' || sport === 'футбол') && (
                         <div style={{ marginLeft: '8px' }} onClick={(e) => e.stopPropagation()}>
-                          <input 
-                            type="number" 
+                          <input
+                            type="number"
                             min="0"
                             placeholder="П"
                             style={{ width: '40px', padding: '4px', borderRadius: '4px', border: '1px solid #f59e0b', textAlign: 'center' }}
@@ -1494,7 +1496,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   {isAdmin && (
                     <div className={styles.matchActions} onClick={(e) => e.stopPropagation()}>
                       {(sport === 'football' || sport === 'футбол') && (
-                        <button 
+                        <button
                           className={styles.scorersBtn}
                           onClick={() => handleOpenScorers(match)}
                           title="Автори голів"
@@ -1502,8 +1504,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                           <i className="fas fa-futbol"></i>
                         </button>
                       )}
-                      <button 
-                        className={styles.deleteMatchBtn} 
+                      <button
+                        className={styles.deleteMatchBtn}
                         onClick={() => handleDeleteMatch(match.id)}
                         title="Видалити матч"
                       >
@@ -1511,46 +1513,46 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       </button>
                     </div>
                   )}
-                  
-                   {/* Goals summary for non-admins or small preview */}
-                   {(match.goals?.length > 0 || match.homeGoalkeeper || match.awayGoalkeeper || match.homeCaptain || match.awayCaptain) && (
-                     <div className={styles.scorersPreview}>
-                        <div className={styles.scorersColumn}>
-                           {match.homeCaptain && (
-                             <span className={styles.captainBadge} title="Капітан">
-                               <i className="fas fa-copyright"></i> {match.homeCaptain.lastName}
-                             </span>
-                           )}
-                           {match.homeGoalkeeper && (
-                             <span className={styles.goalkeeperBadge} title="Воротар">
-                               <i className="fas fa-hands"></i> {match.homeGoalkeeper.lastName}
-                             </span>
-                           )}
-                           {match.goals?.filter((g: any) => match.homeRoster?.some((p: any) => p.id === g.playerId)).map((g: any) => (
-                              <span key={g.id} className={styles.scorerItem}>
-                                {g.player?.footballShirtNumber ? `№${g.player.footballShirtNumber} ` : ''}{g.player?.lastName} ({g.goalsCount})
-                              </span>
-                           ))}
-                        </div>
-                        <div className={styles.scorersColumn}>
-                           {match.awayCaptain && (
-                             <span className={styles.captainBadge} title="Капітан">
-                               <i className="fas fa-copyright"></i> {match.awayCaptain.lastName}
-                             </span>
-                           )}
-                           {match.awayGoalkeeper && (
-                             <span className={styles.goalkeeperBadge} title="Воротар">
-                               <i className="fas fa-hands"></i> {match.awayGoalkeeper.lastName}
-                             </span>
-                           )}
-                           {match.goals?.filter((g: any) => match.awayRoster?.some((p: any) => p.id === g.playerId)).map((g: any) => (
-                              <span key={g.id} className={styles.scorerItem}>
-                                {g.player?.footballShirtNumber ? `№${g.player.footballShirtNumber} ` : ''}{g.player?.lastName} ({g.goalsCount})
-                              </span>
-                           ))}
-                        </div>
-                     </div>
-                   )}
+
+                  {/* Goals summary for non-admins or small preview */}
+                  {(match.goals?.length > 0 || match.homeGoalkeeper || match.awayGoalkeeper || match.homeCaptain || match.awayCaptain) && (
+                    <div className={styles.scorersPreview}>
+                      <div className={styles.scorersColumn}>
+                        {match.homeCaptain && (
+                          <span className={styles.captainBadge} title="Капітан">
+                            <i className="fas fa-copyright"></i> {match.homeCaptain.lastName}
+                          </span>
+                        )}
+                        {match.homeGoalkeeper && (
+                          <span className={styles.goalkeeperBadge} title="Воротар">
+                            <i className="fas fa-hands"></i> {match.homeGoalkeeper.lastName}
+                          </span>
+                        )}
+                        {match.goals?.filter((g: any) => match.homeRoster?.some((p: any) => p.id === g.playerId)).map((g: any) => (
+                          <span key={g.id} className={styles.scorerItem}>
+                            {g.player?.footballShirtNumber ? `№${g.player.footballShirtNumber} ` : ''}{g.player?.lastName} ({g.goalsCount})
+                          </span>
+                        ))}
+                      </div>
+                      <div className={styles.scorersColumn}>
+                        {match.awayCaptain && (
+                          <span className={styles.captainBadge} title="Капітан">
+                            <i className="fas fa-copyright"></i> {match.awayCaptain.lastName}
+                          </span>
+                        )}
+                        {match.awayGoalkeeper && (
+                          <span className={styles.goalkeeperBadge} title="Воротар">
+                            <i className="fas fa-hands"></i> {match.awayGoalkeeper.lastName}
+                          </span>
+                        )}
+                        {match.goals?.filter((g: any) => match.awayRoster?.some((p: any) => p.id === g.playerId)).map((g: any) => (
+                          <span key={g.id} className={styles.scorerItem}>
+                            {g.player?.footballShirtNumber ? `№${g.player.footballShirtNumber} ` : ''}{g.player?.lastName} ({g.goalsCount})
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                 </div>
               );
@@ -1564,56 +1566,56 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
             {isGroupsPlayoff ? (
               <>
                 {hasGeneralTable && (
-                   <div className={styles.groupStandings} style={{ marginBottom: '40px' }}>
-                      <h3 className={styles.groupTitle} style={{ color: '#3b82f6' }}>
-                        <i className="fas fa-star" style={{ marginRight: '8px' }}></i>
-                        Загальна таблиця (Фінальний етап)
-                      </h3>
-                      <div className={styles.standingsTable}>
-                        <table className={styles.leagueTable}>
-                          <thead>
-                            <tr>
-                              <th title="Місце">#</th>
-                              <th title="Назва команди">Команда</th>
-                              <th title="Ігри">І</th>
-                              <th title="Виграші">В</th>
-                              <th title="Поразки">П</th>
-                              <th title="Забиті - Пропущені">Сети (З-П)</th>
-                              <th title="Очки">Очки</th>
+                  <div className={styles.groupStandings} style={{ marginBottom: '40px' }}>
+                    <h3 className={styles.groupTitle} style={{ color: '#3b82f6' }}>
+                      <i className="fas fa-star" style={{ marginRight: '8px' }}></i>
+                      Загальна таблиця (Фінальний етап)
+                    </h3>
+                    <div className={styles.standingsTable}>
+                      <table className={styles.leagueTable}>
+                        <thead>
+                          <tr>
+                            <th title="Місце">#</th>
+                            <th title="Назва команди">Команда</th>
+                            <th title="Ігри">І</th>
+                            <th title="Виграші">В</th>
+                            <th title="Поразки">П</th>
+                            <th title="Забиті - Пропущені">Сети (З-П)</th>
+                            <th title="Очки">Очки</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {calculateStandings('GENERAL_TABLE').map((team: any) => (
+                            <tr key={team.id} style={team.isGeneralTableIncluded ? { backgroundColor: 'rgba(59, 130, 246, 0.05)' } : {}}>
+                              <td>{team.displayRank}</td>
+                              <td className={styles.tableName} onClick={() => { setEditingTeamId(team.id); setIsTeamRosterModalOpen(true); }} style={{ cursor: 'pointer' }}>
+                                {team.name}
+                                {team.isGeneralTableIncluded && <i className="fas fa-check-circle" style={{ marginLeft: '6px', color: '#3b82f6', fontSize: '12px' }} title="Додано вручну"></i>}
+                              </td>
+                              <td>{team.gp}</td>
+                              <td>{team.w}</td>
+                              <td>{team.l}</td>
+                              <td>{team.gf} - {team.ga}</td>
+                              <td className={team.points > 0 ? styles.tablePointsHighlight : styles.tablePoints}>
+                                {isAdmin ? (
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    className={styles.pointsInlineInput}
+                                    defaultValue={team.points}
+                                    onFocus={(e) => e.target.select()}
+                                    onBlur={(e) => handleUpdateTeamPoints(team.id, parseInt(e.target.value) || 0)}
+                                  />
+                                ) : (
+                                  team.points
+                                )}
+                              </td>
                             </tr>
-                          </thead>
-                          <tbody>
-                            {calculateStandings('GENERAL_TABLE').map((team: any) => (
-                              <tr key={team.id} style={team.isGeneralTableIncluded ? { backgroundColor: 'rgba(59, 130, 246, 0.05)' } : {}}>
-                                <td>{team.displayRank}</td>
-                                <td className={styles.tableName} onClick={() => { setEditingTeamId(team.id); setIsTeamRosterModalOpen(true); }} style={{ cursor: 'pointer' }}>
-                                  {team.name}
-                                  {team.isGeneralTableIncluded && <i className="fas fa-check-circle" style={{ marginLeft: '6px', color: '#3b82f6', fontSize: '12px' }} title="Додано вручну"></i>}
-                                </td>
-                                <td>{team.gp}</td>
-                                <td>{team.w}</td>
-                                <td>{team.l}</td>
-                                <td>{team.gf} - {team.ga}</td>
-                                <td className={team.points > 0 ? styles.tablePointsHighlight : styles.tablePoints}>
-                                  {isAdmin ? (
-                                    <input 
-                                      type="number" 
-                                      min="0"
-                                      className={styles.pointsInlineInput}
-                                      defaultValue={team.points}
-                                      onFocus={(e) => e.target.select()}
-                                      onBlur={(e) => handleUpdateTeamPoints(team.id, parseInt(e.target.value) || 0)}
-                                    />
-                                  ) : (
-                                    team.points
-                                  )}
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                   </div>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 )}
 
                 {sortedGroups.map(groupName => (
@@ -1643,8 +1645,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                               <td>{team.gf} - {team.ga}</td>
                               <td className={styles.tablePoints}>
                                 {isAdmin ? (
-                                  <input 
-                                    type="number" 
+                                  <input
+                                    type="number"
                                     min="0"
                                     className={styles.pointsInlineInput}
                                     defaultValue={team.points}
@@ -1694,8 +1696,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         <td>{team.gf} - {team.ga}</td>
                         <td className={team.points > 0 ? styles.tablePointsHighlight : styles.tablePoints}>
                           {isAdmin ? (
-                            <input 
-                              type="number" 
+                            <input
+                              type="number"
                               min="0"
                               className={styles.pointsInlineInput}
                               defaultValue={team.points}
@@ -1717,7 +1719,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         )}
 
         {activeTab === 'bracket' && hasBracket && (
-          <FootballBracket 
+          <FootballBracket
             matches={details.matches || details.games || []}
             isAdmin={isAdmin}
             onDeleteMatch={handleDeleteMatch}
@@ -1728,7 +1730,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           />
         )}
 
-         {activeTab === 'teams' && (
+        {activeTab === 'teams' && (
           <div className={styles.teamsGrid}>
             {details.teams?.map((team: any) => (
               <div key={team.id} className={styles.teamCard} onClick={() => { setEditingTeamId(team.id); setIsTeamRosterModalOpen(true); }} style={{ cursor: 'pointer' }}>
@@ -1743,12 +1745,12 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       <button className={styles.editTeamBtn} onClick={() => { setEditingTeamId(team.id); setIsTeamRosterModalOpen(true); }}>
                         <i className="fas fa-user-edit"></i> Склад
                       </button>
-                      <button 
-                        className={styles.deleteTeamBtn} 
+                      <button
+                        className={styles.deleteTeamBtn}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDeleteTeam(team.id, team.name);
-                        }} 
+                        }}
                         title="Видалити команду"
                       >
                         <i className="fas fa-trash"></i>
@@ -1759,8 +1761,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                 <div className={styles.teamPlayersPreview}>
                   {team?.players?.slice(0, 5).map((p: any) => (
                     <div key={p.id} className={`${styles.pMiniTag} ${team?.captainId === p.id ? styles.captainTag : ''} ${team?.goalkeeperId === p.id ? styles.goalkeeperTag : ''}`}>
-                      {team?.captainId === p.id && <i className="fas fa-copyright" style={{marginRight: '4px', fontSize: '10px'}} title="Капітан"></i>}
-                      {team?.goalkeeperId === p.id && <i className="fas fa-hands" style={{marginRight: '4px', fontSize: '10px'}} title="Воротар"></i>}
+                      {team?.captainId === p.id && <i className="fas fa-copyright" style={{ marginRight: '4px', fontSize: '10px' }} title="Капітан"></i>}
+                      {team?.goalkeeperId === p.id && <i className="fas fa-hands" style={{ marginRight: '4px', fontSize: '10px' }} title="Воротар"></i>}
                       {p.lastName} {p.firstName?.[0] || ''}.
                     </div>
                   ))}
@@ -1808,8 +1810,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                           display: 'inline-block',
                           boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
                         }}>
-                          {p.status === RegistrationStatus.Approved ? 'Підтверджено' : 
-                           p.status === RegistrationStatus.Pending ? 'Очікує' : 'Відхилено'}
+                          {p.status === RegistrationStatus.Approved ? 'Підтверджено' :
+                            p.status === RegistrationStatus.Pending ? 'Очікує' : 'Відхилено'}
                         </span>
                       </td>
                       {(isAdmin || isFizorg) && (
@@ -1817,18 +1819,18 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                           <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
                             {p.status === RegistrationStatus.Pending && (
                               <>
-                                <button 
-                                  onClick={() => handleApproveParticipant(p.playerId)} 
-                                  style={{ padding: '6px 10px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(16,185,129,0.2)' }} 
+                                <button
+                                  onClick={() => handleApproveParticipant(p.playerId)}
+                                  style={{ padding: '6px 10px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(16,185,129,0.2)' }}
                                   title="Підтвердити"
                                   onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
                                   onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                                 >
                                   <i className="fas fa-check"></i>
                                 </button>
-                                <button 
-                                  onClick={() => handleRejectParticipant(p.playerId)} 
-                                  style={{ padding: '6px 10px', background: '#f59e0b', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(245,158,11,0.2)' }} 
+                                <button
+                                  onClick={() => handleRejectParticipant(p.playerId)}
+                                  style={{ padding: '6px 10px', background: '#f59e0b', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(245,158,11,0.2)' }}
                                   title="Відхилити"
                                   onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
                                   onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
@@ -1837,9 +1839,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                                 </button>
                               </>
                             )}
-                            <button 
-                              onClick={() => handleRemoveParticipant(p.playerId)} 
-                              style={{ padding: '6px 10px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(239,68,68,0.2)' }} 
+                            <button
+                              onClick={() => handleRemoveParticipant(p.playerId)}
+                              style={{ padding: '6px 10px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(239,68,68,0.2)' }}
                               title="Видалити зовсім"
                               onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
                               onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
@@ -1862,7 +1864,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         {activeTab === 'stats' && (sport === 'football' || sport === 'футбол') && (
           <div className={styles.statsSection}>
             <div className={styles.statsGrid}>
-              
+
               {/* Top Scorers */}
               <div className={styles.statsCard}>
                 <div className={styles.statsCardHeader}>
@@ -1942,44 +1944,44 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
               <h3>Спланувати новий матч</h3>
               <button className={styles.closeButton} onClick={() => setIsCreateMatchModalOpen(false)}>&times;</button>
             </div>
-            
+
             <div className={styles.modalBody}>
               <div className={styles.createMatchForm}>
                 <div className={styles.formGroup}>
                   <label>Етап змагання</label>
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    <select 
-                        style={{ flex: 2, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
-                        value={stageType} 
-                        onChange={e => {
-                            const val = e.target.value;
-                            setStageType(val);
-                            if (val === 'Раунд') {
-                                setNewMatchForm({...newMatchForm, stage: `Раунд ${roundNumber}`});
-                            } else {
-                                setNewMatchForm({...newMatchForm, stage: val});
-                            }
-                        }}
+                    <select
+                      style={{ flex: 2, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                      value={stageType}
+                      onChange={e => {
+                        const val = e.target.value;
+                        setStageType(val);
+                        if (val === 'Раунд') {
+                          setNewMatchForm({ ...newMatchForm, stage: `Раунд ${roundNumber}` });
+                        } else {
+                          setNewMatchForm({ ...newMatchForm, stage: val });
+                        }
+                      }}
                     >
-                        <option value="Груповий етап">Груповий етап</option>
-                        <option value="Раунд">Раунд...</option>
-                        {STAGE_ORDER.map(s => (
-                          <option key={s} value={s}>{s}</option>
-                        ))}
+                      <option value="Груповий етап">Груповий етап</option>
+                      <option value="Раунд">Раунд...</option>
+                      {STAGE_ORDER.map(s => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
                     </select>
                     {stageType === 'Раунд' && (
-                        <input 
-                            type="number" 
-                            min="1" 
-                            style={{ flex: 1, width: '60px', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
-                            value={roundNumber}
-                            onFocus={(e) => e.target.select()}
-                            onChange={e => {
-                                const num = parseInt(e.target.value) || 1;
-                                setRoundNumber(num);
-                                setNewMatchForm({...newMatchForm, stage: `Раунд ${num}`});
-                            }}
-                        />
+                      <input
+                        type="number"
+                        min="1"
+                        style={{ flex: 1, width: '60px', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                        value={roundNumber}
+                        onFocus={(e) => e.target.select()}
+                        onChange={e => {
+                          const num = parseInt(e.target.value) || 1;
+                          setRoundNumber(num);
+                          setNewMatchForm({ ...newMatchForm, stage: `Раунд ${num}` });
+                        }}
+                      />
                     )}
                   </div>
                 </div>
@@ -1991,9 +1993,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                     </label>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '8px' }}>
                       <label className={styles.switch}>
-                        <input 
-                          type="checkbox" 
-                          checked={useStrictFiltering} 
+                        <input
+                          type="checkbox"
+                          checked={useStrictFiltering}
                           onChange={(e) => setUseStrictFiltering(e.target.checked)}
                         />
                         <span className={styles.slider}></span>
@@ -2006,10 +2008,10 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                 )}
 
                 <div className={styles.formGroup}>
-                  <label>Команда 1 (Господарі)</label>
-                  <select 
-                    value={newMatchForm.homeTeamId} 
-                    onChange={e => setNewMatchForm({...newMatchForm, homeTeamId: e.target.value})}
+                  <label>Команда 1</label>
+                  <select
+                    value={newMatchForm.homeTeamId}
+                    onChange={e => setNewMatchForm({ ...newMatchForm, homeTeamId: e.target.value })}
                   >
                     <option value="">-- Оберіть команду --</option>
                     {eligibleTeams.map((t: any) => (
@@ -2019,10 +2021,10 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label>Команда 2 (Гості)</label>
-                  <select 
-                    value={newMatchForm.awayTeamId} 
-                    onChange={e => setNewMatchForm({...newMatchForm, awayTeamId: e.target.value})}
+                  <label>Команда 2</label>
+                  <select
+                    value={newMatchForm.awayTeamId}
+                    onChange={e => setNewMatchForm({ ...newMatchForm, awayTeamId: e.target.value })}
                   >
                     <option value="">-- Оберіть команду --</option>
                     {eligibleTeams.map((t: any) => (
@@ -2047,14 +2049,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
               <h3>Створити нову команду (групу)</h3>
               <button className={styles.closeButton} onClick={() => setIsCreateTeamModalOpen(false)}>&times;</button>
             </div>
-            
+
             <div className={styles.modalBody}>
               <div className={styles.formGroup}>
                 <label>Назва команди / Номер групи</label>
-                <input 
-                  type="text" 
-                  value={newTeamForm.name} 
-                  onChange={e => setNewTeamForm({...newTeamForm, name: e.target.value})}
+                <input
+                  type="text"
+                  value={newTeamForm.name}
+                  onChange={e => setNewTeamForm({ ...newTeamForm, name: e.target.value })}
                   placeholder="напр. 221"
                   disabled={isFizorg && !isAdmin}
                 />
@@ -2063,10 +2065,10 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
               {isGroupsPlayoff && (
                 <div className={styles.formGroup} style={{ marginTop: '16px' }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                    <input 
-                      type="checkbox" 
-                      checked={newTeamForm.isGeneralTableIncluded} 
-                      onChange={e => setNewTeamForm({...newTeamForm, isGeneralTableIncluded: e.target.checked})}
+                    <input
+                      type="checkbox"
+                      checked={newTeamForm.isGeneralTableIncluded}
+                      onChange={e => setNewTeamForm({ ...newTeamForm, isGeneralTableIncluded: e.target.checked })}
                       style={{ width: '18px', height: '18px' }}
                     />
                     Включити в загальну таблицю
@@ -2077,7 +2079,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                 </div>
               )}
 
-              <div className={styles.modalFooter} style={{padding: '24px 0 0 0', background: 'transparent', borderTop: 'none'}}>
+              <div className={styles.modalFooter} style={{ padding: '24px 0 0 0', background: 'transparent', borderTop: 'none' }}>
                 <button className={styles.saveBtn} onClick={handleCreateTeam}>Створити команду</button>
               </div>
             </div>
@@ -2093,127 +2095,127 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
               <h3>Управління складом: {details.teams.find((t: any) => t.id === editingTeamId)?.name}</h3>
               <button className={styles.closeButton} onClick={() => { setIsTeamRosterModalOpen(false); setEditingTeamId(null); setIsQuickAddMode(false); }}>&times;</button>
             </div>
-            
-             {(isAdmin || isFizorg) && !isQuickAddMode && (
-                <div className={styles.searchBox} style={{padding: '20px 40px 0 40px', display: 'flex', gap: '10px'}}>
-                    <input 
-                        type="text" 
-                        placeholder="Пошук гравця..." 
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        style={{flex: 1, padding: '12px 18px', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.1)'}}
-                    />
-                    <button 
-                      className={styles.quickAddToggleBtn}
-                      onClick={() => {
-                        setIsQuickAddMode(true);
-                        // Try to parse search query if it looks like Name Surname
-                        const parts = searchQuery.trim().split(/\s+/);
-                        let form = { ...quickAddForm, group: (isFizorg && !isAdmin && userGroup) ? userGroup : quickAddForm.group };
-                        if (parts.length >= 2) {
-                          form = { ...form, lastName: parts[0], firstName: parts[1] };
-                        } else if (parts.length === 1) {
-                          form = { ...form, lastName: parts[0] };
-                        }
-                        setQuickAddForm(form);
-                      }}
-                      title="Додати нового гравця вручну"
-                    >
-                      <i className="fas fa-user-plus"></i>
-                    </button>
-                </div>
-             )}
-             
-             {!isQuickAddMode ? (
-               <>
-                <div className={styles.modalBody} style={{maxHeight: '400px'}}>
-                    <div className={styles.playersList}>
-                        {(isAdmin || isFizorg) ? filteredPlayers.map(player => {
-                            const team = details.teams?.find((t: any) => t.id === editingTeamId);
-                            const isSelected = team?.players?.some((p: any) => p.id === player.id);
-                            
-                            return (
-                                <div key={player.id} className={`${styles.playerPickItem} ${isSelected ? styles.selected : ''}`}>
-                                    <div className={styles.pickInfo} onClick={() => handleTogglePlayerInTeam(editingTeamId, player.id!)}>
-                                        <span className={styles.pName}>{player.lastName} {player.firstName}</span>
-                                        <span className={styles.pGroup}>{player.group}</span>
-                                    </div>
-                                    <div className={styles.pickStatus}>
-                                        {(isSelected && (sport === 'football' || sport === 'футбол')) && (
-                                          <div className={styles.roleToggles}>
-                                            <button 
-                                              className={`${styles.roleToggleBtn} ${team?.captainId === player.id ? styles.isCaptain : ''}`}
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleSetCaptain(editingTeamId, team?.captainId === player.id ? null : player.id!);
-                                              }}
-                                              title={team?.captainId === player.id ? "Прибрати капітана" : "Призначити капітаном"}
-                                            >
-                                              <i className="fas fa-copyright"></i>
-                                            </button>
-                                            <button 
-                                              className={`${styles.roleToggleBtn} ${team?.goalkeeperId === player.id ? styles.isGoalkeeper : ''}`}
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleSetGoalkeeper(editingTeamId, team?.goalkeeperId === player.id ? null : player.id!);
-                                              }}
-                                              title={team?.goalkeeperId === player.id ? "Прибрати воротаря" : "Призначити воротарем"}
-                                            >
-                                              <i className="fas fa-hands"></i>
-                                            </button>
-                                          </div>
-                                        )}
-                                        <div style={{display: 'inline-block', marginLeft: '10px'}} onClick={() => handleTogglePlayerInTeam(editingTeamId, player.id!)}>
-                                          {isSelected ? <i className="fas fa-check-circle"></i> : <i className="far fa-circle"></i>}
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        }) : (
-                          // Read-only view for regular users
-                          details?.teams?.find((t: any) => t.id === editingTeamId)?.players?.map((player: any) => (
-                            <div key={player.id} className={`${styles.playerPickItem} ${styles.selected}`}>
-                                <div className={styles.pickInfo}>
-                                    <span className={styles.pName}>{player.lastName} {player.firstName}</span>
-                                    <span className={styles.pGroup}>{player.group}</span>
-                                </div>
-                                <div className={styles.pickStatus}>
-                                   {((sport === 'football' || sport === 'футбол')) && (
-                                      <div className={styles.roleToggles}>
-                                        {details?.teams?.find((t: any) => t.id === editingTeamId)?.captainId === player.id && (
-                                          <span className={styles.isCaptain} title="Капітан"><i className="fas fa-copyright"></i></span>
-                                        )}
-                                        {details?.teams?.find((t: any) => t.id === editingTeamId)?.goalkeeperId === player.id && (
-                                          <span className={styles.isGoalkeeper} title="Воротар"><i className="fas fa-hands"></i></span>
-                                        )}
-                                      </div>
-                                   )}
-                                </div>
-                            </div>
-                          ))
-                        )}
-                        {isAdmin && filteredPlayers.length === 0 && (
-                          <div className={styles.noPlayersHint} style={{textAlign: 'center', padding: '20px'}}>
-                            Гравців не знайдено. 
-                            <button 
-                              className={styles.linkButton} 
-                              onClick={() => {
-                                setIsQuickAddMode(true);
-                                const parts = searchQuery.trim().split(/\s+/);
-                                let form = { ...quickAddForm, group: (isFizorg && !isAdmin && userGroup) ? userGroup : quickAddForm.group };
-                                if (parts.length >= 2) {
-                                  form = { ...form, lastName: parts[0], firstName: parts[1] };
-                                } else if (parts.length === 1) {
-                                  form = { ...form, lastName: parts[0] };
-                                }
-                                setQuickAddForm(form);
-                              }}
-                            >
-                              Додати {searchQuery} як нового гравця?
-                            </button>
+
+            {(isAdmin || isFizorg) && !isQuickAddMode && (
+              <div className={styles.searchBox} style={{ padding: '20px 40px 0 40px', display: 'flex', gap: '10px' }}>
+                <input
+                  type="text"
+                  placeholder="Пошук гравця..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ flex: 1, padding: '12px 18px', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.1)' }}
+                />
+                <button
+                  className={styles.quickAddToggleBtn}
+                  onClick={() => {
+                    setIsQuickAddMode(true);
+                    // Try to parse search query if it looks like Name Surname
+                    const parts = searchQuery.trim().split(/\s+/);
+                    let form = { ...quickAddForm, group: (isFizorg && !isAdmin && userGroup) ? userGroup : quickAddForm.group };
+                    if (parts.length >= 2) {
+                      form = { ...form, lastName: parts[0], firstName: parts[1] };
+                    } else if (parts.length === 1) {
+                      form = { ...form, lastName: parts[0] };
+                    }
+                    setQuickAddForm(form);
+                  }}
+                  title="Додати нового гравця вручну"
+                >
+                  <i className="fas fa-user-plus"></i>
+                </button>
+              </div>
+            )}
+
+            {!isQuickAddMode ? (
+              <>
+                <div className={styles.modalBody} style={{ maxHeight: '400px' }}>
+                  <div className={styles.playersList}>
+                    {(isAdmin || isFizorg) ? filteredPlayers.map(player => {
+                      const team = details.teams?.find((t: any) => t.id === editingTeamId);
+                      const isSelected = team?.players?.some((p: any) => p.id === player.id);
+
+                      return (
+                        <div key={player.id} className={`${styles.playerPickItem} ${isSelected ? styles.selected : ''}`}>
+                          <div className={styles.pickInfo} onClick={() => handleTogglePlayerInTeam(editingTeamId, player.id!)}>
+                            <span className={styles.pName}>{player.lastName} {player.firstName}</span>
+                            <span className={styles.pGroup}>{player.group}</span>
                           </div>
-                        )}
-                    </div>
+                          <div className={styles.pickStatus}>
+                            {(isSelected && (sport === 'football' || sport === 'футбол')) && (
+                              <div className={styles.roleToggles}>
+                                <button
+                                  className={`${styles.roleToggleBtn} ${team?.captainId === player.id ? styles.isCaptain : ''}`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleSetCaptain(editingTeamId, team?.captainId === player.id ? null : player.id!);
+                                  }}
+                                  title={team?.captainId === player.id ? "Прибрати капітана" : "Призначити капітаном"}
+                                >
+                                  <i className="fas fa-copyright"></i>
+                                </button>
+                                <button
+                                  className={`${styles.roleToggleBtn} ${team?.goalkeeperId === player.id ? styles.isGoalkeeper : ''}`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleSetGoalkeeper(editingTeamId, team?.goalkeeperId === player.id ? null : player.id!);
+                                  }}
+                                  title={team?.goalkeeperId === player.id ? "Прибрати воротаря" : "Призначити воротарем"}
+                                >
+                                  <i className="fas fa-hands"></i>
+                                </button>
+                              </div>
+                            )}
+                            <div style={{ display: 'inline-block', marginLeft: '10px' }} onClick={() => handleTogglePlayerInTeam(editingTeamId, player.id!)}>
+                              {isSelected ? <i className="fas fa-check-circle"></i> : <i className="far fa-circle"></i>}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }) : (
+                      // Read-only view for regular users
+                      details?.teams?.find((t: any) => t.id === editingTeamId)?.players?.map((player: any) => (
+                        <div key={player.id} className={`${styles.playerPickItem} ${styles.selected}`}>
+                          <div className={styles.pickInfo}>
+                            <span className={styles.pName}>{player.lastName} {player.firstName}</span>
+                            <span className={styles.pGroup}>{player.group}</span>
+                          </div>
+                          <div className={styles.pickStatus}>
+                            {((sport === 'football' || sport === 'футбол')) && (
+                              <div className={styles.roleToggles}>
+                                {details?.teams?.find((t: any) => t.id === editingTeamId)?.captainId === player.id && (
+                                  <span className={styles.isCaptain} title="Капітан"><i className="fas fa-copyright"></i></span>
+                                )}
+                                {details?.teams?.find((t: any) => t.id === editingTeamId)?.goalkeeperId === player.id && (
+                                  <span className={styles.isGoalkeeper} title="Воротар"><i className="fas fa-hands"></i></span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                    {isAdmin && filteredPlayers.length === 0 && (
+                      <div className={styles.noPlayersHint} style={{ textAlign: 'center', padding: '20px' }}>
+                        Гравців не знайдено.
+                        <button
+                          className={styles.linkButton}
+                          onClick={() => {
+                            setIsQuickAddMode(true);
+                            const parts = searchQuery.trim().split(/\s+/);
+                            let form = { ...quickAddForm, group: (isFizorg && !isAdmin && userGroup) ? userGroup : quickAddForm.group };
+                            if (parts.length >= 2) {
+                              form = { ...form, lastName: parts[0], firstName: parts[1] };
+                            } else if (parts.length === 1) {
+                              form = { ...form, lastName: parts[0] };
+                            }
+                            setQuickAddForm(form);
+                          }}
+                        >
+                          Додати {searchQuery} як нового гравця?
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </>
             ) : (
@@ -2222,38 +2224,38 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   <div className={styles.formRow}>
                     <div className={styles.formGroup}>
                       <label>Прізвище</label>
-                      <input 
-                        type="text" 
-                        value={quickAddForm.lastName} 
-                        onChange={e => setQuickAddForm({...quickAddForm, lastName: e.target.value})}
+                      <input
+                        type="text"
+                        value={quickAddForm.lastName}
+                        onChange={e => setQuickAddForm({ ...quickAddForm, lastName: e.target.value })}
                         placeholder="напр. Іванов"
                       />
                     </div>
                     <div className={styles.formGroup}>
                       <label>Ім'я</label>
-                      <input 
-                        type="text" 
-                        value={quickAddForm.firstName} 
-                        onChange={e => setQuickAddForm({...quickAddForm, firstName: e.target.value})}
+                      <input
+                        type="text"
+                        value={quickAddForm.firstName}
+                        onChange={e => setQuickAddForm({ ...quickAddForm, firstName: e.target.value })}
                         placeholder="напр. Іван"
                       />
                     </div>
                   </div>
                   <div className={styles.formGroup}>
                     <label>По батькові (необов'язково)</label>
-                    <input 
-                      type="text" 
-                      value={quickAddForm.patronymic} 
-                      onChange={e => setQuickAddForm({...quickAddForm, patronymic: e.target.value})}
+                    <input
+                      type="text"
+                      value={quickAddForm.patronymic}
+                      onChange={e => setQuickAddForm({ ...quickAddForm, patronymic: e.target.value })}
                       placeholder="напр. Миколайович"
                     />
                   </div>
                   <div className={styles.formGroup}>
                     <label>Група / Статус</label>
-                    <input 
-                      type="text" 
-                      value={quickAddForm.group} 
-                      onChange={e => setQuickAddForm({...quickAddForm, group: e.target.value})}
+                    <input
+                      type="text"
+                      value={quickAddForm.group}
+                      onChange={e => setQuickAddForm({ ...quickAddForm, group: e.target.value })}
                       placeholder="напр. 321 або Випускник"
                       disabled={isFizorg && !isAdmin}
                       style={{ opacity: (isFizorg && !isAdmin) ? 0.7 : 1 }}
@@ -2263,18 +2265,18 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                     <label>Стать</label>
                     <select
                       value={quickAddForm.gender}
-                      onChange={e => setQuickAddForm({...quickAddForm, gender: e.target.value as Gender})}
+                      onChange={e => setQuickAddForm({ ...quickAddForm, gender: e.target.value as Gender })}
                       className={styles.modalSelect}
-                      style={{width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0'}}
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
                     >
                       <option value="None">Оберіть стать...</option>
                       <option value="Male">Чоловік</option>
                       <option value="Female">Жінка</option>
                     </select>
                   </div>
-                  <div className={styles.modalFooter} style={{padding: '20px 0 0 0', display: 'flex', gap: '12px', background: 'transparent', borderTop: 'none'}}>
+                  <div className={styles.modalFooter} style={{ padding: '20px 0 0 0', display: 'flex', gap: '12px', background: 'transparent', borderTop: 'none' }}>
                     <button className={styles.cancelBtn} onClick={() => setIsQuickAddMode(false)}>Назад до пошуку</button>
-                    <button className={styles.saveBtn} onClick={handleQuickAddPlayer} style={{flex: 1}}>Створити та додати</button>
+                    <button className={styles.saveBtn} onClick={handleQuickAddPlayer} style={{ flex: 1 }}>Створити та додати</button>
                   </div>
                 </div>
               </div>
@@ -2282,7 +2284,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           </div>
         </div>
       )}
-      
+
       {/* Match Scorers Modal */}
       {isScorersModalOpen && selectedMatchForScorers && (
         <div className={styles.rosterModalOverlay} onClick={() => setIsScorersModalOpen(false)}>
@@ -2291,60 +2293,60 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
               <h3>Автори голів: {selectedMatchForScorers.homeTeam?.name} vs {selectedMatchForScorers.awayTeam?.name}</h3>
               <button className={styles.closeButton} onClick={() => setIsScorersModalOpen(false)}>&times;</button>
             </div>
-            
+
             <div className={styles.modalBody}>
               {/* Score Input Section */}
               <div className={styles.scoreEditSection} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '32px', marginBottom: '32px', padding: '24px', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-                 <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '8px', textTransform: 'uppercase' }}>{selectedMatchForScorers.homeTeam?.name}</div>
-                    <input 
-                      type="number" 
-                      min="0"
-                      style={{ width: '80px', height: '60px', fontSize: '32px', fontWeight: 800, textAlign: 'center', borderRadius: '12px', border: '2px solid #3b82f6', color: '#1e293b' }}
-                      value={matchScores.home}
-                      onFocus={(e) => e.target.select()}
-                      onChange={e => setMatchScores({...matchScores, home: parseInt(e.target.value) || 0})}
-                    />
-                 </div>
-                 <div style={{ fontSize: '24px', fontWeight: 800, color: '#cbd5e1', paddingTop: '20px' }}>:</div>
-                 <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '8px', textTransform: 'uppercase' }}>{selectedMatchForScorers.awayTeam?.name}</div>
-                    <input 
-                      type="number" 
-                      min="0"
-                      style={{ width: '80px', height: '60px', fontSize: '32px', fontWeight: 800, textAlign: 'center', borderRadius: '12px', border: '2px solid #3b82f6', color: '#1e293b' }}
-                      value={matchScores.away}
-                      onFocus={(e) => e.target.select()}
-                      onChange={e => setMatchScores({...matchScores, away: parseInt(e.target.value) || 0})}
-                    />
-                 </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '8px', textTransform: 'uppercase' }}>{selectedMatchForScorers.homeTeam?.name}</div>
+                  <input
+                    type="number"
+                    min="0"
+                    style={{ width: '80px', height: '60px', fontSize: '32px', fontWeight: 800, textAlign: 'center', borderRadius: '12px', border: '2px solid #3b82f6', color: '#1e293b' }}
+                    value={matchScores.home}
+                    onFocus={(e) => e.target.select()}
+                    onChange={e => setMatchScores({ ...matchScores, home: parseInt(e.target.value) || 0 })}
+                  />
+                </div>
+                <div style={{ fontSize: '24px', fontWeight: 800, color: '#cbd5e1', paddingTop: '20px' }}>:</div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '8px', textTransform: 'uppercase' }}>{selectedMatchForScorers.awayTeam?.name}</div>
+                  <input
+                    type="number"
+                    min="0"
+                    style={{ width: '80px', height: '60px', fontSize: '32px', fontWeight: 800, textAlign: 'center', borderRadius: '12px', border: '2px solid #3b82f6', color: '#1e293b' }}
+                    value={matchScores.away}
+                    onFocus={(e) => e.target.select()}
+                    onChange={e => setMatchScores({ ...matchScores, away: parseInt(e.target.value) || 0 })}
+                  />
+                </div>
               </div>
 
               {matchScores.home === matchScores.away && (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '32px', marginBottom: '32px', padding: '16px', background: '#fffbeb', borderRadius: '16px', border: '1px solid #fef3c7' }}>
-                   <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '11px', fontWeight: 700, color: '#b45309', marginBottom: '8px', textTransform: 'uppercase' }}>Пенальті</div>
-                      <input 
-                        type="number" 
-                        min="0"
-                        style={{ width: '60px', height: '45px', fontSize: '24px', fontWeight: 800, textAlign: 'center', borderRadius: '10px', border: '2px solid #f59e0b', color: '#78350f' }}
-                        value={matchPenaltyScores.home ?? ''}
-                        onFocus={(e) => e.target.select()}
-                        onChange={e => setMatchPenaltyScores({...matchPenaltyScores, home: e.target.value ? parseInt(e.target.value) : null})}
-                      />
-                   </div>
-                   <div style={{ fontSize: '20px', fontWeight: 800, color: '#fcd34d', paddingTop: '20px' }}>:</div>
-                   <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '11px', fontWeight: 700, color: '#b45309', marginBottom: '8px', textTransform: 'uppercase' }}>Пенальті</div>
-                      <input 
-                        type="number" 
-                        min="0"
-                        style={{ width: '60px', height: '45px', fontSize: '24px', fontWeight: 800, textAlign: 'center', borderRadius: '10px', border: '2px solid #f59e0b', color: '#78350f' }}
-                        value={matchPenaltyScores.away ?? ''}
-                        onFocus={(e) => e.target.select()}
-                        onChange={e => setMatchPenaltyScores({...matchPenaltyScores, away: e.target.value ? parseInt(e.target.value) : null})}
-                      />
-                   </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#b45309', marginBottom: '8px', textTransform: 'uppercase' }}>Пенальті</div>
+                    <input
+                      type="number"
+                      min="0"
+                      style={{ width: '60px', height: '45px', fontSize: '24px', fontWeight: 800, textAlign: 'center', borderRadius: '10px', border: '2px solid #f59e0b', color: '#78350f' }}
+                      value={matchPenaltyScores.home ?? ''}
+                      onFocus={(e) => e.target.select()}
+                      onChange={e => setMatchPenaltyScores({ ...matchPenaltyScores, home: e.target.value ? parseInt(e.target.value) : null })}
+                    />
+                  </div>
+                  <div style={{ fontSize: '20px', fontWeight: 800, color: '#fcd34d', paddingTop: '20px' }}>:</div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#b45309', marginBottom: '8px', textTransform: 'uppercase' }}>Пенальті</div>
+                    <input
+                      type="number"
+                      min="0"
+                      style={{ width: '60px', height: '45px', fontSize: '24px', fontWeight: 800, textAlign: 'center', borderRadius: '10px', border: '2px solid #f59e0b', color: '#78350f' }}
+                      value={matchPenaltyScores.away ?? ''}
+                      onFocus={(e) => e.target.select()}
+                      onChange={e => setMatchPenaltyScores({ ...matchPenaltyScores, away: e.target.value ? parseInt(e.target.value) : null })}
+                    />
+                  </div>
                 </div>
               )}
 
@@ -2355,14 +2357,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   <div className={styles.matchRoleSelects}>
                     <div className={styles.goalkeeperSelect}>
                       <label>Воротар</label>
-                      <select 
-                        value={matchGoalkeepers.home} 
-                        onChange={e => setMatchGoalkeepers({...matchGoalkeepers, home: e.target.value})}
+                      <select
+                        value={matchGoalkeepers.home}
+                        onChange={e => setMatchGoalkeepers({ ...matchGoalkeepers, home: e.target.value })}
                       >
                         <option value="">-- Оберіть воротаря --</option>
-                        {(selectedMatchForScorers.homeRoster?.length > 0 
-                            ? selectedMatchForScorers.homeRoster 
-                            : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players || []
+                        {(selectedMatchForScorers.homeRoster?.length > 0
+                          ? selectedMatchForScorers.homeRoster
+                          : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players || []
                         ).map((p: any) => (
                           <option key={p.id} value={p.id}>
                             {p.footballShirtNumber ? `№${p.footballShirtNumber} ` : ''}{p.lastName} {p.firstName}
@@ -2372,14 +2374,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                     </div>
                     <div className={styles.goalkeeperSelect}>
                       <label>Капітан</label>
-                      <select 
-                        value={matchCaptains.home} 
-                        onChange={e => setMatchCaptains({...matchCaptains, home: e.target.value})}
+                      <select
+                        value={matchCaptains.home}
+                        onChange={e => setMatchCaptains({ ...matchCaptains, home: e.target.value })}
                       >
                         <option value="">-- Оберіть капітана --</option>
-                        {(selectedMatchForScorers.homeRoster?.length > 0 
-                            ? selectedMatchForScorers.homeRoster 
-                            : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players || []
+                        {(selectedMatchForScorers.homeRoster?.length > 0
+                          ? selectedMatchForScorers.homeRoster
+                          : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players || []
                         ).map((p: any) => (
                           <option key={p.id} value={p.id}>
                             {p.footballShirtNumber ? `№${p.footballShirtNumber} ` : ''}{p.lastName} {p.firstName}
@@ -2389,9 +2391,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                     </div>
                   </div>
                   <div className={styles.scorersList}>
-                    {(selectedMatchForScorers.homeRoster?.length > 0 
-                        ? selectedMatchForScorers.homeRoster 
-                        : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players || []
+                    {(selectedMatchForScorers.homeRoster?.length > 0
+                      ? selectedMatchForScorers.homeRoster
+                      : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players || []
                     ).map((player: any) => (
                       <div key={player.id} className={styles.scorerInputItem} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 16px', background: '#fff', borderRadius: '10px', marginBottom: '8px', border: '1px solid #e2e8f0' }}>
                         <div style={{ flex: 1, minWidth: '150px', fontWeight: 600, color: '#1e293b' }}>
@@ -2401,8 +2403,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                           <div title="Голи" style={{ position: 'relative' }}>
                             <i className="fas fa-futbol" style={{ fontSize: '12px', position: 'absolute', left: '-14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }}></i>
-                            <input 
-                              type="number" 
+                            <input
+                              type="number"
                               min="0"
                               value={tempScorers[player.id] || 0}
                               onFocus={(e) => e.target.select()}
@@ -2413,11 +2415,11 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                               style={{ width: '50px', padding: '6px', borderRadius: '6px', border: '1px solid #cbd5e1', textAlign: 'center', fontWeight: 'bold' }}
                             />
                           </div>
-                          
+
                           <div title="Жовті картки" style={{ position: 'relative' }}>
                             <div style={{ width: '10px', height: '14px', background: '#fbbf24', borderRadius: '2px', position: 'absolute', left: '-14px', top: '50%', transform: 'translateY(-50%)' }}></div>
-                            <input 
-                              type="number" 
+                            <input
+                              type="number"
                               min="0"
                               max="2"
                               value={tempYellowCards[player.id] || 0}
@@ -2432,8 +2434,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
                           <div title="Червоні картки" style={{ position: 'relative' }}>
                             <div style={{ width: '10px', height: '14px', background: '#ef4444', borderRadius: '2px', position: 'absolute', left: '-14px', top: '50%', transform: 'translateY(-50%)' }}></div>
-                            <input 
-                              type="number" 
+                            <input
+                              type="number"
                               min="0"
                               max="1"
                               value={tempRedCards[player.id] || 0}
@@ -2450,7 +2452,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       </div>
                     ))}
                     {!(selectedMatchForScorers.homeRoster?.length > 0 || details?.teams?.find((t: any) => t.id === selectedMatchForScorers.homeTeamId)?.players?.length > 0) && (
-                        <p className={styles.noPlayersHint}>У цій команді ще немає гравців</p>
+                      <p className={styles.noPlayersHint}>У цій команді ще немає гравців</p>
                     )}
                   </div>
                 </div>
@@ -2463,14 +2465,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   <div className={styles.matchRoleSelects}>
                     <div className={styles.goalkeeperSelect}>
                       <label>Воротар</label>
-                      <select 
-                        value={matchGoalkeepers.away} 
-                        onChange={e => setMatchGoalkeepers({...matchGoalkeepers, away: e.target.value})}
+                      <select
+                        value={matchGoalkeepers.away}
+                        onChange={e => setMatchGoalkeepers({ ...matchGoalkeepers, away: e.target.value })}
                       >
                         <option value="">-- Оберіть воротаря --</option>
-                        {(selectedMatchForScorers.awayRoster?.length > 0 
-                            ? selectedMatchForScorers.awayRoster 
-                            : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players || []
+                        {(selectedMatchForScorers.awayRoster?.length > 0
+                          ? selectedMatchForScorers.awayRoster
+                          : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players || []
                         ).map((p: any) => (
                           <option key={p.id} value={p.id}>
                             {p.footballShirtNumber ? `№${p.footballShirtNumber} ` : ''}{p.lastName} {p.firstName}
@@ -2480,14 +2482,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                     </div>
                     <div className={styles.goalkeeperSelect}>
                       <label>Капітан</label>
-                      <select 
-                        value={matchCaptains.away} 
-                        onChange={e => setMatchCaptains({...matchCaptains, away: e.target.value})}
+                      <select
+                        value={matchCaptains.away}
+                        onChange={e => setMatchCaptains({ ...matchCaptains, away: e.target.value })}
                       >
                         <option value="">-- Оберіть капітана --</option>
-                        {(selectedMatchForScorers.awayRoster?.length > 0 
-                            ? selectedMatchForScorers.awayRoster 
-                            : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players || []
+                        {(selectedMatchForScorers.awayRoster?.length > 0
+                          ? selectedMatchForScorers.awayRoster
+                          : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players || []
                         ).map((p: any) => (
                           <option key={p.id} value={p.id}>
                             {p.footballShirtNumber ? `№${p.footballShirtNumber} ` : ''}{p.lastName} {p.firstName}
@@ -2497,9 +2499,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                     </div>
                   </div>
                   <div className={styles.scorersList}>
-                    {(selectedMatchForScorers.awayRoster?.length > 0 
-                        ? selectedMatchForScorers.awayRoster 
-                        : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players || []
+                    {(selectedMatchForScorers.awayRoster?.length > 0
+                      ? selectedMatchForScorers.awayRoster
+                      : details?.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players || []
                     ).map((player: any) => (
                       <div key={player.id} className={styles.scorerInputItem} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 16px', background: '#fff', borderRadius: '10px', marginBottom: '8px', border: '1px solid #e2e8f0' }}>
                         <div style={{ flex: 1, minWidth: '150px', fontWeight: 600, color: '#1e293b' }}>
@@ -2509,8 +2511,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                           <div title="Голи" style={{ position: 'relative' }}>
                             <i className="fas fa-futbol" style={{ fontSize: '12px', position: 'absolute', left: '-14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }}></i>
-                            <input 
-                              type="number" 
+                            <input
+                              type="number"
                               min="0"
                               value={tempScorers[player.id] || 0}
                               onFocus={(e) => e.target.select()}
@@ -2521,11 +2523,11 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                               style={{ width: '50px', padding: '6px', borderRadius: '6px', border: '1px solid #cbd5e1', textAlign: 'center', fontWeight: 'bold' }}
                             />
                           </div>
-                          
+
                           <div title="Жовті картки" style={{ position: 'relative' }}>
                             <div style={{ width: '10px', height: '14px', background: '#fbbf24', borderRadius: '2px', position: 'absolute', left: '-14px', top: '50%', transform: 'translateY(-50%)' }}></div>
-                            <input 
-                              type="number" 
+                            <input
+                              type="number"
                               min="0"
                               max="2"
                               value={tempYellowCards[player.id] || 0}
@@ -2540,8 +2542,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
                           <div title="Червоні картки" style={{ position: 'relative' }}>
                             <div style={{ width: '10px', height: '14px', background: '#ef4444', borderRadius: '2px', position: 'absolute', left: '-14px', top: '50%', transform: 'translateY(-50%)' }}></div>
-                            <input 
-                              type="number" 
+                            <input
+                              type="number"
                               min="0"
                               max="1"
                               value={tempRedCards[player.id] || 0}
@@ -2558,13 +2560,13 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                       </div>
                     ))}
                     {!(selectedMatchForScorers.awayRoster?.length > 0 || details?.teams?.find((t: any) => t.id === selectedMatchForScorers.awayTeamId)?.players?.length > 0) && (
-                        <p className={styles.noPlayersHint}>У цій команді ще немає гравців</p>
+                      <p className={styles.noPlayersHint}>У цій команді ще немає гравців</p>
                     )}
                   </div>
                 </div>
               </div>
 
-              <div className={styles.modalFooter} style={{padding: '24px 0 0 0', background: 'transparent', borderTop: 'none'}}>
+              <div className={styles.modalFooter} style={{ padding: '24px 0 0 0', background: 'transparent', borderTop: 'none' }}>
                 <button className={styles.saveBtn} onClick={handleSaveScorers}>Зберегти зміни</button>
               </div>
             </div>
@@ -2575,12 +2577,12 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       {/* Match Info Modal (View Only) */}
       {isMatchInfoModalOpen && selectedMatchForInfo && (
         <div className={styles.rosterModalOverlay} onClick={() => setIsMatchInfoModalOpen(false)}>
-          <div className={`${styles.rosterModal} ${styles.glassModal}`} style={{maxWidth: '1000px'}} onClick={e => e.stopPropagation()}>
+          <div className={`${styles.rosterModal} ${styles.glassModal}`} style={{ maxWidth: '1000px' }} onClick={e => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h3>Інформація про матч</h3>
               <button className={styles.closeButton} onClick={() => setIsMatchInfoModalOpen(false)}>&times;</button>
             </div>
-            
+
             <div className={styles.modalBody}>
               <div style={{ textAlign: 'center', marginBottom: '32px' }}>
                 <div style={{ fontSize: '14px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px' }}>{selectedMatchForInfo.stage}</div>
@@ -2634,12 +2636,12 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   )}
                   <h5 style={{ marginTop: '20px' }}>Склад команди</h5>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                    {(selectedMatchForInfo.homeRoster?.length > 0 
-                        ? selectedMatchForInfo.homeRoster 
-                        : details?.teams?.find((t: any) => t.id === selectedMatchForInfo.homeTeamId)?.players || []
+                    {(selectedMatchForInfo.homeRoster?.length > 0
+                      ? selectedMatchForInfo.homeRoster
+                      : details?.teams?.find((t: any) => t.id === selectedMatchForInfo.homeTeamId)?.players || []
                     ).map((p: any) => (
                       <span key={p.id} style={{ background: '#f1f5f9', padding: '4px 10px', borderRadius: '8px', fontSize: '12px', fontWeight: 600 }}>
-                        {p.lastName} {p.id === selectedMatchForInfo.homeCaptainId && <b style={{color: '#f59e0b'}}>(C)</b>} {p.id === selectedMatchForInfo.homeGoalkeeperId && <b style={{color: '#3b82f6'}}>(GK)</b>}
+                        {p.lastName} {p.id === selectedMatchForInfo.homeCaptainId && <b style={{ color: '#f59e0b' }}>(C)</b>} {p.id === selectedMatchForInfo.homeGoalkeeperId && <b style={{ color: '#3b82f6' }}>(GK)</b>}
                       </span>
                     ))}
                   </div>
@@ -2674,12 +2676,12 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   )}
                   <h5 style={{ marginTop: '20px' }}>Склад команди</h5>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                    {(selectedMatchForInfo.awayRoster?.length > 0 
-                        ? selectedMatchForInfo.awayRoster 
-                        : details.teams?.find((t: any) => t.id === selectedMatchForInfo.awayTeamId)?.players || []
+                    {(selectedMatchForInfo.awayRoster?.length > 0
+                      ? selectedMatchForInfo.awayRoster
+                      : details.teams?.find((t: any) => t.id === selectedMatchForInfo.awayTeamId)?.players || []
                     ).map((p: any) => (
                       <span key={p.id} style={{ background: '#f1f5f9', padding: '4px 10px', borderRadius: '8px', fontSize: '12px', fontWeight: 600 }}>
-                        {p.lastName} {p.id === selectedMatchForInfo.awayCaptainId && <b style={{color: '#f59e0b'}}>(C)</b>} {p.id === selectedMatchForInfo.awayGoalkeeperId && <b style={{color: '#3b82f6'}}>(GK)</b>}
+                        {p.lastName} {p.id === selectedMatchForInfo.awayCaptainId && <b style={{ color: '#f59e0b' }}>(C)</b>} {p.id === selectedMatchForInfo.awayGoalkeeperId && <b style={{ color: '#3b82f6' }}>(GK)</b>}
                       </span>
                     ))}
                   </div>

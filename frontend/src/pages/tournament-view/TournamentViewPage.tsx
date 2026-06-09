@@ -2130,7 +2130,7 @@ const TournamentViewPage = () => {
             <div className={styles.infoGrid}>
               <div className={styles.infoSection}>
                 <h3><i className="fas fa-align-left"></i> Опис</h3>
-                <p>{tournament?.description}</p>
+                <p style={{ whiteSpace: 'pre-line' }}>{tournament?.description}</p>
               </div>
 
               <div className={styles.infoSection}>
@@ -2424,7 +2424,7 @@ const TournamentViewPage = () => {
                           <i className="fas fa-calendar-week"></i> Розклад турів
                         </button>
                       )}
-                      {sportKey !== 'athletics' && (
+                      {sportKey !== 'athletics' && details?.level !== 'Regional' && details?.level !== 'National' && tournament?.level !== 'Regional' && tournament?.level !== 'National' && (
                         <button
                           className={`${styles.tabButton} ${activeTab === 'voting' ? styles.active : ''}`}
                           onClick={() => setActiveTab('voting')}
