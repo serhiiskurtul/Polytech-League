@@ -723,7 +723,8 @@ const translateSport = (sport: string) => {
     table_tennis: 'Настільний теніс',
     armwrestling: 'Армрестлінг',
     badminton: 'Бадмінтон',
-    beach_volleyball: 'Пляжний волейбол'
+    beach_volleyball: 'Пляжний волейбол',
+    athletics: 'Легка атлетика'
   };
   return translations[sport] || sport;
 };
