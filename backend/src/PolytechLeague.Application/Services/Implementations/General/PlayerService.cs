@@ -349,6 +349,7 @@ public class PlayerService : IPlayerService
             var badmintonAch = await _dbContext.BadmintonEventParticipants.AsNoTracking().Include(p => p.Event).Where(p => eligiblePlayerIdsList.Contains(p.PlayerId) && eligibleEventIdsList.Contains(p.EventId)).ToListAsync(cancellationToken);
             var armwAch = await _dbContext.ArmwrestlingEventParticipants.AsNoTracking().Include(p => p.Tournament).Where(p => eligiblePlayerIdsList.Contains(p.PlayerId) && eligibleEventIdsList.Contains(p.TournamentId)).ToListAsync(cancellationToken);
             var athlAch = await _dbContext.AthleticsResults.AsNoTracking().Include(p => p.AthleticsEvent).Where(p => p.PlayerId.HasValue && eligiblePlayerIdsList.Contains(p.PlayerId.Value) && eligibleEventIdsList.Contains(p.AthleticsEventId)).ToListAsync(cancellationToken);
+            var athlParticipants = await _dbContext.AthleticsEventParticipants.AsNoTracking().Include(p => p.AthleticsEvent).Where(p => eligiblePlayerIdsList.Contains(p.PlayerId) && eligibleEventIdsList.Contains(p.AthleticsEventId)).ToListAsync(cancellationToken);
             var genericWinners = await _dbContext.Set<Event>().AsNoTracking()
                 .Where(e => eligibleEventIdsList.Contains(e.Id) &&
                             ((e.FirstPlaceId.HasValue && eligiblePlayerIdsList.Contains(e.FirstPlaceId.Value)) ||
@@ -441,6 +442,7 @@ public class PlayerService : IPlayerService
             var badmintonLookup = badmintonAch.ToLookup(a => a.PlayerId);
             var armwLookup = armwAch.ToLookup(a => a.PlayerId);
             var athlLookup = athlAch.ToLookup(a => a.PlayerId!.Value);
+            var athlPartLookup = athlParticipants.ToLookup(a => a.PlayerId);
             var winnersLookup = genericWinners
                 .SelectMany(e => new[] { 
                     new { Pid = e.FirstPlaceId, Ev = e }, 
@@ -548,6 +550,13 @@ public class PlayerService : IPlayerService
                     if (a.AthleticsEvent == null) continue;
                     achievements.Add(new AchievementDto { TournamentName = $"{a.AthleticsEvent.Name} ({a.DisciplineName})", SportType = "athletics", Date = a.AthleticsEvent.Date, Rank = a.Rank, TournamentId = a.AthleticsEventId, Result = GetResultLabel(a.Rank) });
                     sportTypes.Add("athletics");
+                }
+                foreach (var a in athlPartLookup[playerId]) {
+                    if (a.AthleticsEvent == null) continue;
+                    if (!achievements.Any(ach => ach.TournamentId == a.AthleticsEventId && ach.SportType == "athletics")) {
+                        achievements.Add(new AchievementDto { TournamentName = a.AthleticsEvent.Name, SportType = "athletics", Date = a.AthleticsEvent.Date, Rank = 0, TournamentId = a.AthleticsEventId, Result = "Участь" });
+                        sportTypes.Add("athletics");
+                    }
                 }
                 
                 // Generic Winners
@@ -669,7 +678,7 @@ public class PlayerService : IPlayerService
                 AddStats("armwrestling", (a1?.Count ?? 0) + (a2?.Count ?? 0), (a1?.Wins ?? 0) + (a2?.Wins ?? 0));
                 AddStats("badminton", (b1?.Count ?? 0) + (b2?.Count ?? 0), (b1?.Wins ?? 0) + (b2?.Wins ?? 0));
                 
-                var athlPlayed = athlLookup[playerId].Count();
+                var athlPlayed = athlPartLookup[playerId].Count();
                 var athlWins = athlLookup[playerId].Count(x => x.Rank == 1);
                 AddStats("athletics", athlPlayed, athlWins);
                 
