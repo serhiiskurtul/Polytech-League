@@ -4,6 +4,7 @@ using PolytechLeague.Domain.Entities.Football.Enums;
 using PolytechLeague.Domain.Entities.Volleyball.Enums;
 using PolytechLeague.Domain.Entities.Enums;
 using PolytechLeague.Domain.Entities.BeachVolleyball;
+using PolytechLeague.Domain.Entities.Basketball;
 
 namespace PolytechLeague.Domain.Entities;
 
@@ -46,7 +47,7 @@ public class Player : Person
     public long? VolleyballTeamId { get; set; }
 
     public int? BasketballShirtNumber { get; set; }
-    public long? BasketballTeamId { get; set; }
+    public ICollection<BasketballTeam>? BasketballTeams { get; set; }
 
     public int? BeachVolleyballShirtNumber { get; set; }
     public ICollection<BeachVolleyballTeam>? BeachVolleyballTeams { get; set; }
