@@ -2290,7 +2290,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         <div className={styles.rosterModalOverlay} onClick={() => setIsScorersModalOpen(false)}>
           <div className={`${styles.rosterModal} ${styles.glassModal}`} style={{ width: '90%', maxWidth: '1200px' }} onClick={e => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <h3>Автори голів: {selectedMatchForScorers.homeTeam?.name} vs {selectedMatchForScorers.awayTeam?.name}</h3>
+              <h3>{(sport === 'football' || sport === 'футбол') ? 'Автори голів та дисципліна' : 'Результати матчу'}: {selectedMatchForScorers.homeTeam?.name} vs {selectedMatchForScorers.awayTeam?.name}</h3>
               <button className={styles.closeButton} onClick={() => setIsScorersModalOpen(false)}>&times;</button>
             </div>
 
@@ -2401,20 +2401,22 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                           {player.lastName} {player.firstName[0]}.
                         </div>
                         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                          <div title="Голи" style={{ position: 'relative' }}>
-                            <i className="fas fa-futbol" style={{ fontSize: '12px', position: 'absolute', left: '-14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }}></i>
-                            <input
-                              type="number"
-                              min="0"
-                              value={tempScorers[player.id] || 0}
-                              onFocus={(e) => e.target.select()}
-                              onChange={(e) => setTempScorers({
-                                ...tempScorers,
-                                [player.id]: Math.max(0, parseInt(e.target.value) || 0)
-                              })}
-                              style={{ width: '50px', padding: '6px', borderRadius: '6px', border: '1px solid #cbd5e1', textAlign: 'center', fontWeight: 'bold' }}
-                            />
-                          </div>
+                          {(sport === 'football' || sport === 'футбол') && (
+                            <div title="Голи" style={{ position: 'relative' }}>
+                              <i className="fas fa-futbol" style={{ fontSize: '12px', position: 'absolute', left: '-14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }}></i>
+                              <input
+                                type="number"
+                                min="0"
+                                value={tempScorers[player.id] || 0}
+                                onFocus={(e) => e.target.select()}
+                                onChange={(e) => setTempScorers({
+                                  ...tempScorers,
+                                  [player.id]: Math.max(0, parseInt(e.target.value) || 0)
+                                })}
+                                style={{ width: '50px', padding: '6px', borderRadius: '6px', border: '1px solid #cbd5e1', textAlign: 'center', fontWeight: 'bold' }}
+                              />
+                            </div>
+                          )}
 
                           <div title="Жовті картки" style={{ position: 'relative' }}>
                             <div style={{ width: '10px', height: '14px', background: '#fbbf24', borderRadius: '2px', position: 'absolute', left: '-14px', top: '50%', transform: 'translateY(-50%)' }}></div>
@@ -2509,20 +2511,22 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                           {player.lastName} {player.firstName[0]}.
                         </div>
                         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                          <div title="Голи" style={{ position: 'relative' }}>
-                            <i className="fas fa-futbol" style={{ fontSize: '12px', position: 'absolute', left: '-14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }}></i>
-                            <input
-                              type="number"
-                              min="0"
-                              value={tempScorers[player.id] || 0}
-                              onFocus={(e) => e.target.select()}
-                              onChange={(e) => setTempScorers({
-                                ...tempScorers,
-                                [player.id]: Math.max(0, parseInt(e.target.value) || 0)
-                              })}
-                              style={{ width: '50px', padding: '6px', borderRadius: '6px', border: '1px solid #cbd5e1', textAlign: 'center', fontWeight: 'bold' }}
-                            />
-                          </div>
+                          {(sport === 'football' || sport === 'футбол') && (
+                            <div title="Голи" style={{ position: 'relative' }}>
+                              <i className="fas fa-futbol" style={{ fontSize: '12px', position: 'absolute', left: '-14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }}></i>
+                              <input
+                                type="number"
+                                min="0"
+                                value={tempScorers[player.id] || 0}
+                                onFocus={(e) => e.target.select()}
+                                onChange={(e) => setTempScorers({
+                                  ...tempScorers,
+                                  [player.id]: Math.max(0, parseInt(e.target.value) || 0)
+                                })}
+                                style={{ width: '50px', padding: '6px', borderRadius: '6px', border: '1px solid #cbd5e1', textAlign: 'center', fontWeight: 'bold' }}
+                              />
+                            </div>
+                          )}
 
                           <div title="Жовті картки" style={{ position: 'relative' }}>
                             <div style={{ width: '10px', height: '14px', background: '#fbbf24', borderRadius: '2px', position: 'absolute', left: '-14px', top: '50%', transform: 'translateY(-50%)' }}></div>
@@ -2577,7 +2581,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       {/* Match Info Modal (View Only) */}
       {isMatchInfoModalOpen && selectedMatchForInfo && (
         <div className={styles.rosterModalOverlay} onClick={() => setIsMatchInfoModalOpen(false)}>
-          <div className={`${styles.rosterModal} ${styles.glassModal}`} style={{ maxWidth: '1000px' }} onClick={e => e.stopPropagation()}>
+          <div className={`${styles.rosterModal} ${styles.glassModal}`} style={{ width: '90%', maxWidth: '1200px' }} onClick={e => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h3>Інформація про матч</h3>
               <button className={styles.closeButton} onClick={() => setIsMatchInfoModalOpen(false)}>&times;</button>
@@ -2611,14 +2615,16 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
               <div className={styles.scorersGrid}>
                 {/* Home Info */}
                 <div className={styles.teamScorersSection}>
-                  <div style={{ marginBottom: '16px' }}>
-                    <h5 style={{ color: '#3b82f6' }}>Автори голів</h5>
-                    {selectedMatchForInfo.goals?.filter((g: any) => selectedMatchForInfo.homeRoster?.some((p: any) => p.id === g.playerId) || details?.teams?.find((t: any) => t.id === selectedMatchForInfo.homeTeamId)?.players?.some((p: any) => p.id === g.playerId)).map((g: any) => (
-                      <div key={g.id} style={{ fontSize: '14px', margin: '4px 0', fontWeight: 600 }}>
-                        ⚽ {g.player?.lastName || details?.teams?.find((t: any) => t.id === selectedMatchForInfo.homeTeamId)?.players?.find((p: any) => p.id === g.playerId)?.lastName} - {g.goalsCount}
-                      </div>
-                    ))}
-                  </div>
+                  {(sport === 'football' || sport === 'футбол') && (
+                    <div style={{ marginBottom: '16px' }}>
+                      <h5 style={{ color: '#3b82f6' }}>Автори голів</h5>
+                      {selectedMatchForInfo.goals?.filter((g: any) => selectedMatchForInfo.homeRoster?.some((p: any) => p.id === g.playerId) || details?.teams?.find((t: any) => t.id === selectedMatchForInfo.homeTeamId)?.players?.some((p: any) => p.id === g.playerId)).map((g: any) => (
+                        <div key={g.id} style={{ fontSize: '14px', margin: '4px 0', fontWeight: 600 }}>
+                          ⚽ {g.player?.lastName || details?.teams?.find((t: any) => t.id === selectedMatchForInfo.homeTeamId)?.players?.find((p: any) => p.id === g.playerId)?.lastName} - {g.goalsCount}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   {(selectedMatchForInfo.yellowCards?.length > 0 || selectedMatchForInfo.redCards?.length > 0) && (
                     <div style={{ marginBottom: '16px' }}>
                       <h5 style={{ color: '#eab308' }}>Дисциплінарні заходи</h5>
@@ -2651,14 +2657,16 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
                 {/* Away Info */}
                 <div className={styles.teamScorersSection}>
-                  <div style={{ marginBottom: '16px' }}>
-                    <h5 style={{ color: '#3b82f6' }}>Автори голів</h5>
-                    {selectedMatchForInfo.goals?.filter((g: any) => selectedMatchForInfo.awayRoster?.some((p: any) => p.id === g.playerId) || details?.teams?.find((t: any) => t.id === selectedMatchForInfo.awayTeamId)?.players?.some((p: any) => p.id === g.playerId)).map((g: any) => (
-                      <div key={g.id} style={{ fontSize: '14px', margin: '4px 0', fontWeight: 600 }}>
-                        ⚽ {g.player?.lastName || details?.teams?.find((t: any) => t.id === selectedMatchForInfo.awayTeamId)?.players?.find((p: any) => p.id === g.playerId)?.lastName} - {g.goalsCount}
-                      </div>
-                    ))}
-                  </div>
+                  {(sport === 'football' || sport === 'футбол') && (
+                    <div style={{ marginBottom: '16px' }}>
+                      <h5 style={{ color: '#3b82f6' }}>Автори голів</h5>
+                      {selectedMatchForInfo.goals?.filter((g: any) => selectedMatchForInfo.awayRoster?.some((p: any) => p.id === g.playerId) || details?.teams?.find((t: any) => t.id === selectedMatchForInfo.awayTeamId)?.players?.some((p: any) => p.id === g.playerId)).map((g: any) => (
+                        <div key={g.id} style={{ fontSize: '14px', margin: '4px 0', fontWeight: 600 }}>
+                          ⚽ {g.player?.lastName || details?.teams?.find((t: any) => t.id === selectedMatchForInfo.awayTeamId)?.players?.find((p: any) => p.id === g.playerId)?.lastName} - {g.goalsCount}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   {(selectedMatchForInfo.yellowCards?.length > 0 || selectedMatchForInfo.redCards?.length > 0) && (
                     <div style={{ marginBottom: '16px' }}>
                       <h5 style={{ color: '#eab308' }}>Дисциплінарні заходи</h5>
