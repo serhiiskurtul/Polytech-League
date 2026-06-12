@@ -218,7 +218,6 @@ public class PlayerService : IPlayerService
         if (dto.VolleyballShirtNumber.HasValue) player.VolleyballShirtNumber = dto.VolleyballShirtNumber;
         if (dto.VolleyballTeamId.HasValue) player.VolleyballTeamId = dto.VolleyballTeamId;
         if (dto.BasketballShirtNumber.HasValue) player.BasketballShirtNumber = dto.BasketballShirtNumber;
-        if (dto.BasketballTeamId.HasValue) player.BasketballTeamId = dto.BasketballTeamId;
         if (dto.BeachVolleyballShirtNumber.HasValue) player.BeachVolleyballShirtNumber = dto.BeachVolleyballShirtNumber;
 
         player.IsExternal = dto.IsExternal;
@@ -1592,11 +1591,6 @@ public class PlayerService : IPlayerService
             target.VolleyballTeamId = source.VolleyballTeamId;
             target.VolleyballPosition = source.VolleyballPosition;
             target.VolleyballShirtNumber = source.VolleyballShirtNumber;
-        }
-        if (target.BasketballTeamId == null)
-        {
-            target.BasketballTeamId = source.BasketballTeamId;
-            target.BasketballShirtNumber = source.BasketballShirtNumber;
         }
         if (target.BeachVolleyballShirtNumber == null)
         {
