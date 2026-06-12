@@ -31,6 +31,8 @@ const ChampionsPage: React.FC = () => {
       case 'football': return 'Футбол';
       case 'basketball-3x3': return 'Баскетбол 3x3';
       case 'volleyball': return 'Волейбол';
+      case 'beach-volleyball': return 'Пляжний волейбол';
+      case 'athletics': return 'Легка атлетика';
       default: return sportType || 'Спорт';
     }
   };
@@ -45,6 +47,8 @@ const ChampionsPage: React.FC = () => {
       case 'football': return 'fa-futbol';
       case 'basketball-3x3': return 'fa-basketball-ball';
       case 'volleyball': return 'fa-volleyball-ball';
+      case 'beach-volleyball': return 'fa-umbrella-beach';
+      case 'athletics': return 'fa-running';
       default: return 'fa-trophy';
     }
   };
