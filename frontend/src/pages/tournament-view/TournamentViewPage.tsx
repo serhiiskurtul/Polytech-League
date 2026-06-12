@@ -681,21 +681,31 @@ const TournamentViewPage = () => {
         mvpId: details.mvpId || null
       } as any);
 
-      const board1_participants = (details as any).participants?.filter((p: any) => p.boardRank === 1) || [];
-      const board2_participants = (details as any).participants?.filter((p: any) => p.boardRank === 2) || [];
-      const board3_participants = (details as any).participants?.filter((p: any) => p.boardRank === 3) || [];
+      const findBoardForPlayer = (playerId: number) => {
+        const team = (details as any).teams?.find((t: any) => t.players?.some((p: any) => p.id === playerId));
+        if (!team) return 1;
+        const playerIndex = team.players.findIndex((p: any) => p.id === playerId);
+        return playerIndex + 1;
+      };
+
+      const b1_1st = (details as any).participants?.find((p: any) => p.boardRank === 1 && findBoardForPlayer(p.playerId) === 1);
+      const b2_1st = (details as any).participants?.find((p: any) => p.boardRank === 1 && findBoardForPlayer(p.playerId) === 2);
+      const b1_2nd = (details as any).participants?.find((p: any) => p.boardRank === 2 && findBoardForPlayer(p.playerId) === 1);
+      const b2_2nd = (details as any).participants?.find((p: any) => p.boardRank === 2 && findBoardForPlayer(p.playerId) === 2);
+      const b1_3rd = (details as any).participants?.find((p: any) => p.boardRank === 3 && findBoardForPlayer(p.playerId) === 1);
+      const b2_3rd = (details as any).participants?.find((p: any) => p.boardRank === 3 && findBoardForPlayer(p.playerId) === 2);
 
       setWinners({
         firstPlaceId: details.isTeam ? (details.firstPlaceTeam?.id || 0) : (details.firstPlace?.id || 0),
         secondPlaceId: details.isTeam ? (details.secondPlaceTeam?.id || 0) : (details.secondPlace?.id || 0),
         thirdPlaceId: details.isTeam ? (details.thirdPlaceTeam?.id || 0) : (details.thirdPlace?.id || 0),
         mvpId: details.mvpId || 0,
-        board1_1st: board1_participants[0]?.playerId || 0,
-        board2_1st: board1_participants[1]?.playerId || 0,
-        board1_2nd: board2_participants[0]?.playerId || 0,
-        board2_2nd: board2_participants[1]?.playerId || 0,
-        board1_3rd: board3_participants[0]?.playerId || 0,
-        board2_3rd: board3_participants[1]?.playerId || 0
+        board1_1st: b1_1st?.playerId || 0,
+        board2_1st: b2_1st?.playerId || 0,
+        board1_2nd: b1_2nd?.playerId || 0,
+        board2_2nd: b2_2nd?.playerId || 0,
+        board1_3rd: b1_3rd?.playerId || 0,
+        board2_3rd: b2_3rd?.playerId || 0
       });
 
       setIsEditingTournament(true);
