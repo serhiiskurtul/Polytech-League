@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { getExternalAchievements, createExternalAchievement, updateExternalAchievement, deleteExternalAchievement, ExternalAchievement, ExternalAchievementMedia } from '@/entities/achievement/api/externalAchievements.api';
 import styles from './StudentNewsPage.module.css';
 import { useAuth } from '@/entities/session';
@@ -14,6 +14,8 @@ const StudentNewsPage: React.FC = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingArticleId, setEditingArticleId] = useState<number | null>(null);
   const [fullscreenMedia, setFullscreenMedia] = useState<ExternalAchievementMedia | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   
   const [newEntry, setNewEntry] = useState({
     studentName: '',
@@ -28,6 +30,11 @@ const StudentNewsPage: React.FC = () => {
   useEffect(() => {
     fetchAchievements();
   }, []);
+
+  const paginatedAchievements = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return achievements.slice(startIndex, startIndex + itemsPerPage);
+  }, [achievements, currentPage]);
 
   const fetchAchievements = async () => {
     try {
@@ -188,8 +195,9 @@ const StudentNewsPage: React.FC = () => {
       ) : achievements.length === 0 ? (
         <div className={styles.empty}>Поки немає жодної статті.</div>
       ) : (
-        <div className={styles.grid}>
-          {achievements.map((item) => (
+        <>
+          <div className={styles.grid}>
+            {paginatedAchievements.map((item) => (
             <div key={item.id} className={styles.card}>
               <div className={styles.cardHeader}>
                 <div className={styles.date}>{new Date(item.date).toLocaleDateString('uk-UA')}</div>
@@ -256,6 +264,31 @@ const StudentNewsPage: React.FC = () => {
             </div>
           ))}
         </div>
+
+        {achievements.length > itemsPerPage && (
+          <div className={styles.pagination}>
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className={styles.pageBtn}
+            >
+              <i className="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <span className={styles.pageInfo}>
+              Сторінка {currentPage} з {Math.ceil(achievements.length / itemsPerPage)}
+            </span>
+
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(achievements.length / itemsPerPage)))}
+              disabled={currentPage === Math.ceil(achievements.length / itemsPerPage)}
+              className={styles.pageBtn}
+            >
+              <i className="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+        )}
+      </>
       )}
 
       {fullscreenMedia && (
