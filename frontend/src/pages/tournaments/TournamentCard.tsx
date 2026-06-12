@@ -17,6 +17,7 @@ interface TournamentUI {
   rawDate?: string;
   level: string;
   category: string;
+  weightClass?: string;
   mainPhotoUrl?: string;
 }
 
@@ -84,6 +85,14 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
     'Mixed': 'Змішаний'
   };
 
+  const weightClassLabels: Record<string, string> = {
+    'Under60kg': 'До 60 кг',
+    'Under70kg': 'До 70 кг',
+    'Under80kg': 'До 80 кг',
+    'Under90kg': 'До 90 кг',
+    'Plus90kg': 'Понад 90 кг'
+  };
+
   const getImageUrl = (url?: string) => {
     if (!url) return '';
     if (url.startsWith('http')) return url;
@@ -147,6 +156,12 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
             <i className="fas fa-users"></i>
             <span>{categoryLabels[tournament.category] || tournament.category}</span>
           </div>
+          {tournament.sport === 'armwrestling' && tournament.weightClass && (
+            <div className="badge-item badge-category">
+              <i className="fas fa-weight-hanging"></i>
+              <span>{weightClassLabels[tournament.weightClass] || tournament.weightClass}</span>
+            </div>
+          )}
         </div>
 
         <p className="tournament-description">{tournament.description}</p>
@@ -209,6 +224,11 @@ const TournamentCard = ({ tournament, viewMode, onRegister, onDetails }: Tournam
               <span className="tournament-category-badge">
                  <i className="fas fa-users"></i> {categoryLabels[tournament.category] || tournament.category}
               </span>
+              {tournament.sport === 'armwrestling' && tournament.weightClass && (
+                <span className="tournament-category-badge">
+                   <i className="fas fa-weight-hanging"></i> {weightClassLabels[tournament.weightClass] || tournament.weightClass}
+                </span>
+              )}
             </div>
           </div>
           

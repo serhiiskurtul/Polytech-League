@@ -19,6 +19,7 @@ export interface Tournament {
   isModerated?: boolean;
   level: string;
   category: string;
+  weightClass?: string;
   mainPhotoUrl?: string;
 }
 

@@ -103,6 +103,7 @@ public class TournamentService : ITournamentService
             Description = e.Description ?? string.Empty,
             Level = GetLevelName(e.Level),
             Category = GetCategoryName(e.Category),
+            WeightClass = (e is ArmwrestlingEvent armEvent) ? armEvent.WeightClass.ToString() : null,
             Participants = 0,
             Teams = 0,
             Prize = "Призи та кубки",
@@ -157,6 +158,7 @@ public class TournamentService : ITournamentService
             Description = e.Description ?? string.Empty,
             Level = GetLevelName(e.Level),
             Category = GetCategoryName(e.Category),
+            WeightClass = (e is ArmwrestlingEvent armEvent) ? armEvent.WeightClass.ToString() : null,
             Participants = 0, // Need to implement counting
             Teams = 0, // Need to implement counting
             Prize = "Призи та кубки",
