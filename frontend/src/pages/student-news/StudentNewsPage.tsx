@@ -15,7 +15,7 @@ const StudentNewsPage: React.FC = () => {
   const [editingArticleId, setEditingArticleId] = useState<number | null>(null);
   const [fullscreenMedia, setFullscreenMedia] = useState<ExternalAchievementMedia | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 9;
   
   const [newEntry, setNewEntry] = useState({
     studentName: '',
@@ -145,10 +145,9 @@ const StudentNewsPage: React.FC = () => {
               required
             />
             <textarea 
-              placeholder="Опис досягнення / Текст статті" 
+              placeholder="Опис досягнення / Текст статті (необов'язково)" 
               value={newEntry.content}
               onChange={(e) => setNewEntry({ ...newEntry, content: e.target.value })}
-              required
               rows={5}
             />
             <input 
@@ -244,7 +243,7 @@ const StudentNewsPage: React.FC = () => {
                       setNewEntry({
                         studentName: item.studentName,
                         title: item.title,
-                        content: item.content,
+                        content: item.content || '',
                         date: new Date(item.date).toISOString().split('T')[0],
                         externalLink: item.externalLink || ''
                       });

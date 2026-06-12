@@ -210,7 +210,7 @@ const PlayersRatingPage = () => {
   const playerRanks = useMemo(() => {
     const ranks: string[] = [];
     let i = 0;
-    
+
     const getStats = (p: PlayerDto) => {
       if (activeTab === 'Загальний') {
         return { score: p.performanceScore || 0, activity: (p.matchesPlayed || 0) + (p.winsCount || 0) };
@@ -282,7 +282,7 @@ const PlayersRatingPage = () => {
               Рейтинги гравців
             </h1>
             <p className={styles.heroDescription}>
-              Система рейтингів на основі результатів змагань (призові місця та рівень змагань).
+              Система рейтингів на основі результатів змагань (призові місця та рівень змагань)
             </p>
           </div>
 
