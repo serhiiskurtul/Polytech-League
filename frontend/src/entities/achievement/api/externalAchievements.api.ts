@@ -10,7 +10,7 @@ export interface ExternalAchievement {
     id: number;
     studentName: string;
     title: string;
-    content: string;
+    content?: string;
     media: ExternalAchievementMedia[];
     externalLink?: string;
     date: string;
@@ -25,7 +25,7 @@ export const getExternalAchievements = async (): Promise<ExternalAchievement[]> 
 export const createExternalAchievement = async (data: { 
     studentName: string; 
     title: string; 
-    content: string; 
+    content?: string; 
     date: string; 
     externalLink?: string; 
     photos?: File[];
@@ -34,7 +34,7 @@ export const createExternalAchievement = async (data: {
     const formData = new FormData();
     formData.append('studentName', data.studentName);
     formData.append('title', data.title);
-    formData.append('content', data.content);
+    formData.append('content', data.content || '');
     formData.append('date', data.date);
     if (data.externalLink) formData.append('externalLink', data.externalLink);
     
@@ -56,7 +56,7 @@ export const createExternalAchievement = async (data: {
 export const updateExternalAchievement = async (id: number, data: { 
     studentName: string; 
     title: string; 
-    content: string; 
+    content?: string; 
     date: string; 
     externalLink?: string; 
     photos?: File[];
@@ -65,7 +65,7 @@ export const updateExternalAchievement = async (id: number, data: {
     const formData = new FormData();
     formData.append('studentName', data.studentName);
     formData.append('title', data.title);
-    formData.append('content', data.content);
+    formData.append('content', data.content || '');
     formData.append('date', data.date);
     if (data.externalLink) formData.append('externalLink', data.externalLink);
     

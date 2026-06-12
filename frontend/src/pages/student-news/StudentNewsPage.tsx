@@ -145,10 +145,9 @@ const StudentNewsPage: React.FC = () => {
               required
             />
             <textarea 
-              placeholder="Опис досягнення / Текст статті" 
+              placeholder="Опис досягнення / Текст статті (необов'язково)" 
               value={newEntry.content}
               onChange={(e) => setNewEntry({ ...newEntry, content: e.target.value })}
-              required
               rows={5}
             />
             <input 

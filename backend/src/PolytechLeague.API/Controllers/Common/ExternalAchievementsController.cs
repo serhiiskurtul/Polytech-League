@@ -39,7 +39,7 @@ namespace PolytechLeague.API.Controllers.Common
         public async Task<ActionResult<ExternalAchievement>> CreateEntry(
             [FromForm] string studentName,
             [FromForm] string title,
-            [FromForm] string content,
+            [FromForm] string? content,
             [FromForm] DateTime date,
             [FromForm] string? externalLink,
             List<IFormFile>? photos,
@@ -49,7 +49,7 @@ namespace PolytechLeague.API.Controllers.Common
             {
                 StudentName = studentName,
                 Title = title,
-                Content = content,
+                Content = content ?? "",
                 Date = DateTime.SpecifyKind(date, DateTimeKind.Utc),
                 ExternalLink = externalLink,
                 CreatedAt = DateTime.UtcNow
@@ -84,7 +84,7 @@ namespace PolytechLeague.API.Controllers.Common
             long id,
             [FromForm] string studentName,
             [FromForm] string title,
-            [FromForm] string content,
+            [FromForm] string? content,
             [FromForm] DateTime date,
             [FromForm] string? externalLink,
             List<IFormFile>? photos,
@@ -98,7 +98,7 @@ namespace PolytechLeague.API.Controllers.Common
 
             entry.StudentName = studentName;
             entry.Title = title;
-            entry.Content = content;
+            entry.Content = content ?? "";
             entry.Date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
             entry.ExternalLink = externalLink;
 
