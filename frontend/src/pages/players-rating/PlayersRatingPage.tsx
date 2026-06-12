@@ -575,7 +575,10 @@ const PlayersRatingPage = () => {
                 {filteredPlayers.length > itemsPerPage && (
                   <div className={styles.pagination}>
                     <button
-                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      onClick={() => {
+                        setCurrentPage(prev => Math.max(prev - 1, 1));
+                        window.scrollTo(0, 0);
+                      }}
                       disabled={currentPage === 1}
                       className={styles.pageBtn}
                     >
@@ -587,7 +590,10 @@ const PlayersRatingPage = () => {
                     </span>
 
                     <button
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(filteredPlayers.length / itemsPerPage)))}
+                      onClick={() => {
+                        setCurrentPage(prev => Math.min(prev + 1, Math.ceil(filteredPlayers.length / itemsPerPage)));
+                        window.scrollTo(0, 0);
+                      }}
                       disabled={currentPage === Math.ceil(filteredPlayers.length / itemsPerPage)}
                       className={styles.pageBtn}
                     >

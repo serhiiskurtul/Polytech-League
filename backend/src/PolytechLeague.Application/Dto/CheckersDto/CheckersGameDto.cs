@@ -58,10 +58,10 @@ public static class CheckersGameDtoExtensions
         {
             Id = game.Id,
             TournamentId = game.TournamentId,
-            WhitePlayerId = game.WhitePlayerId,
+            WhitePlayerId = game.WhitePlayer?.PlayerId ?? game.WhitePlayerId,
             WhitePlayerName = whiteName,
             WhiteUserId = game.WhitePlayer?.Player?.UserId,
-            BlackPlayerId = game.BlackPlayerId,
+            BlackPlayerId = game.BlackPlayer?.PlayerId ?? game.BlackPlayerId,
             BlackPlayerName = blackName,
             BlackUserId = game.BlackPlayer?.Player?.UserId,
             WhiteTeamId = game.WhiteTeamId,
