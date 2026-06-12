@@ -15,7 +15,7 @@ const StudentNewsPage: React.FC = () => {
   const [editingArticleId, setEditingArticleId] = useState<number | null>(null);
   const [fullscreenMedia, setFullscreenMedia] = useState<ExternalAchievementMedia | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 9;
   
   const [newEntry, setNewEntry] = useState({
     studentName: '',
