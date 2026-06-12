@@ -349,6 +349,7 @@ public class PlayerService : IPlayerService
             var armwAch = await _dbContext.ArmwrestlingEventParticipants.AsNoTracking().Include(p => p.Tournament).Where(p => eligiblePlayerIdsList.Contains(p.PlayerId) && eligibleEventIdsList.Contains(p.TournamentId)).ToListAsync(cancellationToken);
             var athlAch = await _dbContext.AthleticsResults.AsNoTracking().Include(p => p.AthleticsEvent).Where(p => p.PlayerId.HasValue && eligiblePlayerIdsList.Contains(p.PlayerId.Value) && eligibleEventIdsList.Contains(p.AthleticsEventId)).ToListAsync(cancellationToken);
             var athlParticipants = await _dbContext.AthleticsEventParticipants.AsNoTracking().Include(p => p.AthleticsEvent).Where(p => eligiblePlayerIdsList.Contains(p.PlayerId) && eligibleEventIdsList.Contains(p.AthleticsEventId)).ToListAsync(cancellationToken);
+            var bballParts = await _dbContext.BasketballEventParticipants.AsNoTracking().Include(p => p.Event).Where(p => eligiblePlayerIdsList.Contains(p.PlayerId) && eligibleEventIdsList.Contains(p.EventId)).ToListAsync(cancellationToken);
             var genericWinners = await _dbContext.Set<Event>().AsNoTracking()
                 .Where(e => eligibleEventIdsList.Contains(e.Id) &&
                             ((e.FirstPlaceId.HasValue && eligiblePlayerIdsList.Contains(e.FirstPlaceId.Value)) ||
@@ -442,6 +443,7 @@ public class PlayerService : IPlayerService
             var armwLookup = armwAch.ToLookup(a => a.PlayerId);
             var athlLookup = athlAch.ToLookup(a => a.PlayerId!.Value);
             var athlPartLookup = athlParticipants.ToLookup(a => a.PlayerId);
+            var bballPartLookup = bballParts.ToLookup(a => a.PlayerId);
             var winnersLookup = genericWinners
                 .SelectMany(e => new[] { 
                     new { Pid = e.FirstPlaceId, Ev = e }, 
@@ -602,6 +604,9 @@ public class PlayerService : IPlayerService
                     achievements.Add(new AchievementDto { TournamentName = x.Team.Event.Name, SportType = "basketball_3x3", Date = x.Team.Event.Date, Rank = r, TournamentId = x.Team.EventId, Result = GetResultLabel(r) });
                     sportTypes.Add("basketball_3x3");
                 }
+                foreach (var x in bballPartLookup[playerId]) {
+                    sportTypes.Add("basketball_3x3");
+                }
                 foreach (var x in beachVPlayerEvents[playerId]) {
                     int r = (x.Team.Id == x.Team.Event!.FirstPlaceTeamId) ? 1 : ((x.Team.Id == x.Team.Event.SecondPlaceTeamId) ? 2 : ((x.Team.Id == x.Team.Event.ThirdPlaceTeamId) ? 3 : 0));
                     achievements.Add(new AchievementDto { TournamentName = x.Team.Event.Name, SportType = "beach_volleyball", Date = x.Team.Event.Date, Rank = r, TournamentId = x.Team.EventId, Result = GetResultLabel(r) });
@@ -620,7 +625,6 @@ public class PlayerService : IPlayerService
                 }
 
                 dto.Achievements = achievements.OrderByDescending(a => a.Date).ToList();
-                dto.Sports = sportTypes.ToList();
                 dto.ArmwrestlingWeightClasses = armwrestlingWeightClasses.ToList();
                 dto.CompetitionsCount = achievements.Select(a => a.TournamentId).Distinct().Count();
                 
@@ -727,6 +731,7 @@ public class PlayerService : IPlayerService
                 dto.PerformanceScore = (int)Math.Round(totalScore);
                 dto.SportStats = sportStatsMap.Values.ToList();
                 dto.PointsBreakdown = pointsBreakdown.OrderByDescending(x => x.Points).ToList();
+                dto.Sports = sportTypes.Distinct().ToList();
                 
                 if (achievements.Count > 0 || played > 0 || dto.GoalsCount > 0 || yellow > 0 || red > 0) {
                     playerDtos.Add(dto);
