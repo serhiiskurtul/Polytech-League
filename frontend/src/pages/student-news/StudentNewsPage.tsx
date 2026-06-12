@@ -243,7 +243,7 @@ const StudentNewsPage: React.FC = () => {
                       setNewEntry({
                         studentName: item.studentName,
                         title: item.title,
-                        content: item.content,
+                        content: item.content || '',
                         date: new Date(item.date).toISOString().split('T')[0],
                         externalLink: item.externalLink || ''
                       });
