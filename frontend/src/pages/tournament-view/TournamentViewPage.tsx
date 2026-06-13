@@ -338,7 +338,7 @@ const TournamentViewPage = () => {
   const handleSaveWinners = async () => {
     if (!details || !id) return;
     try {
-      const isTeamSport = !!(details as any).isTeam || ['football', 'volleyball', 'beach_volleyball', 'basketball_3x3', 'badminton'].includes(sportKey);
+      const isTeamSport = !!(details as any).isTeam || ['football', 'volleyball', 'beach_volleyball', 'basketball_3x3'].includes(sportKey);
 
       // Build clean base payload with common fields to avoid "Extra fields" 400 error
       // Ensuring ALL required fields from the backend DTO are present
@@ -474,7 +474,10 @@ const TournamentViewPage = () => {
         case 'beach_volleyball': await updateBeachVolleyballEvent(id, payload as any); break;
         case 'basketball_3x3':
         case 'basketball3x3': await updateBasketball3x3Event(id, payload as any); break;
-        case 'badminton': await updateBadmintonEvent(id, payload as any); break;
+        case 'badminton': await updateBadmintonEvent(id, {
+          ...payload,
+          tournamentType: (details as any).tournamentType || 'RoundRobin'
+        } as any); break;
         case 'athletics': await api.put(`/athletics-events/${id}`, payload); break;
         case 'table_tennis': await updateTableTennisEvent(id, {
           ...payload,
