@@ -1604,28 +1604,6 @@ public class PlayerService : IPlayerService
         {
             target.BeachVolleyballShirtNumber = source.BeachVolleyballShirtNumber;
         }
-
-        var sourceChessTeamId = _dbContext.Entry(source).Property<long?>("ChessTeamId").CurrentValue;
-        if (sourceChessTeamId.HasValue)
-        {
-            var targetChessTeamId = _dbContext.Entry(target).Property<long?>("ChessTeamId").CurrentValue;
-            if (!targetChessTeamId.HasValue)
-            {
-                _dbContext.Entry(target).Property<long?>("ChessTeamId").CurrentValue = sourceChessTeamId;
-            }
-        }
-        var sourceCheckersTeamId = _dbContext.Entry(source).Property<long?>("CheckersTeamId").CurrentValue;
-        if (sourceCheckersTeamId.HasValue)
-        {
-            var targetCheckersTeamId = _dbContext.Entry(target).Property<long?>("CheckersTeamId").CurrentValue;
-            if (!targetCheckersTeamId.HasValue)
-            {
-                _dbContext.Entry(target).Property<long?>("CheckersTeamId").CurrentValue = sourceCheckersTeamId;
-            }
-        }
-
-        _dbContext.Entry(source).Property<long?>("ChessTeamId").CurrentValue = null;
-        _dbContext.Entry(source).Property<long?>("CheckersTeamId").CurrentValue = null;
     }
 
     private async Task MergePlayersDataAsync(long sourceId, long targetId, CancellationToken cancellationToken)
@@ -1999,6 +1977,28 @@ public class PlayerService : IPlayerService
             .Where(t => t.Players!.Any(p => p.Id == sourceId))
             .ToListAsync(cancellationToken);
         foreach (var t in bbTeams)
+        {
+            t.Players!.Remove(t.Players.First(p => p.Id == sourceId));
+            if (!t.Players.Any(p => p.Id == targetId)) t.Players.Add(targetPlayer);
+        }
+
+        // Chess Teams (many-to-many players)
+        var chessTeams = await _dbContext.Set<PolytechLeague.Domain.Entities.Chess.ChessTeam>()
+            .Include(t => t.Players)
+            .Where(t => t.Players!.Any(p => p.Id == sourceId))
+            .ToListAsync(cancellationToken);
+        foreach (var t in chessTeams)
+        {
+            t.Players!.Remove(t.Players.First(p => p.Id == sourceId));
+            if (!t.Players.Any(p => p.Id == targetId)) t.Players.Add(targetPlayer);
+        }
+
+        // Checkers Teams (many-to-many players)
+        var checkersTeams = await _dbContext.Set<PolytechLeague.Domain.Entities.Checkers.CheckersTeam>()
+            .Include(t => t.Players)
+            .Where(t => t.Players!.Any(p => p.Id == sourceId))
+            .ToListAsync(cancellationToken);
+        foreach (var t in checkersTeams)
         {
             t.Players!.Remove(t.Players.First(p => p.Id == sourceId));
             if (!t.Players.Any(p => p.Id == targetId)) t.Players.Add(targetPlayer);
