@@ -18,11 +18,18 @@ public class BadmintonTeamService(
     {
         _logger.LogDebug("Creating badminton team with player mapping.");
         
-        if (entity.PlayerIds != null && entity.PlayerIds.Count >= 2)
+        if (entity.PlayerIds != null)
         {
             var ids = entity.PlayerIds.ToList();
-            entity.Player1Id = ids[0];
-            entity.Player2Id = ids[1];
+            if (ids.Count == 1)
+            {
+                entity.Player1Id = ids[0];
+            }
+            else if (ids.Count >= 2)
+            {
+                entity.Player1Id = ids[0];
+                entity.Player2Id = ids[1];
+            }
         }
 
         _dbcontext.Set<BadmintonTeam>().Add(entity);
