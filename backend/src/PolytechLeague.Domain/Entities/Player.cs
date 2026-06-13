@@ -6,6 +6,8 @@ using PolytechLeague.Domain.Entities.Volleyball.Enums;
 using PolytechLeague.Domain.Entities.Enums;
 using PolytechLeague.Domain.Entities.BeachVolleyball;
 using PolytechLeague.Domain.Entities.Basketball;
+using PolytechLeague.Domain.Entities.Chess;
+using PolytechLeague.Domain.Entities.Checkers;
 
 namespace PolytechLeague.Domain.Entities;
 
@@ -26,9 +28,11 @@ public class Player : Person
     public int? ChessRating { get; set; }
     public string? ChessFideId { get; set; }
     public string? ChessTitle { get; set; }
+    public ICollection<ChessTeam>? ChessTeams { get; set; }
 
     // Checkers
     public int? CheckersRating { get; set; }
+    public ICollection<CheckersTeam>? CheckersTeams { get; set; }
 
     // Table Tennis
     public int? TableTennisRating { get; set; }

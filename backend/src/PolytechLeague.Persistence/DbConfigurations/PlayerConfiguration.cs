@@ -29,8 +29,16 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
         builder.Property(x => x.ChessFideId).HasColumnName("chess_fide_id");
         builder.Property(x => x.ChessTitle).HasColumnName("chess_title");
 
+        builder.HasMany(x => x.ChessTeams)
+            .WithMany(t => t.Players)
+            .UsingEntity(j => j.ToTable("chess_team_players"));
+
         // Checkers
         builder.Property(x => x.CheckersRating).HasColumnName("checkers_rating");
+
+        builder.HasMany(x => x.CheckersTeams)
+            .WithMany(t => t.Players)
+            .UsingEntity(j => j.ToTable("checkers_team_players"));
 
         // Table Tennis
         builder.Property(x => x.TableTennisRating).HasColumnName("table_tennis_rating");
