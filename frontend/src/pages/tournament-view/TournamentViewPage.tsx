@@ -1844,7 +1844,7 @@ const TournamentViewPage = () => {
                 </div>
               )}
 
-              {['chess', 'checkers'].includes(tournament?.sport?.toLowerCase() || '') && details?.level !== 'CollegeGroup' && (
+              {['chess', 'checkers'].includes(tournament?.sport?.toLowerCase() || '') && isTeamSport && details?.level !== 'CollegeGroup' && (
                 <>
                   <div style={{ marginTop: '24px' }}>
                     <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px', color: '#374151' }}>
@@ -2089,7 +2089,7 @@ const TournamentViewPage = () => {
             />
           )}
 
-          {['chess', 'checkers'].includes(tournament?.sport?.toLowerCase() || '') && details && (() => {
+          {['chess', 'checkers'].includes(tournament?.sport?.toLowerCase() || '') && isTeamSport && details && (() => {
             const findBoardForPlayer = (playerId: number) => {
               const team = (details as any).teams?.find((t: any) => t.players?.some((p: any) => p.id === playerId));
               if (!team) return 1;
