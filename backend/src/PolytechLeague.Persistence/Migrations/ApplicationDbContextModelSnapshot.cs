@@ -2637,7 +2637,7 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<long?>("SecondPlaceTeamId")
                         .HasColumnType("bigint");
 
-                    b.Property<int>("System")
+                    b.Property<int?>("System")
                         .HasColumnType("integer")
                         .HasColumnName("system");
 
@@ -2645,7 +2645,6 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("TimeControl")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("time_control");
 
@@ -2688,7 +2687,7 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<long?>("SecondPlaceTeamId")
                         .HasColumnType("bigint");
 
-                    b.Property<int>("System")
+                    b.Property<int?>("System")
                         .HasColumnType("integer")
                         .HasColumnName("system");
 
@@ -2696,7 +2695,6 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("TimeControl")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("time_control");
 
