@@ -115,6 +115,9 @@ export interface BadmintonEventRequest {
   referees?: string;
   schedule?: string;
   
+  firstPlaceId?: number | null;
+  secondPlaceId?: number | null;
+  thirdPlaceId?: number | null;
   firstPlaceTeamId?: number | null;
   secondPlaceTeamId?: number | null;
   thirdPlaceTeamId?: number | null;
