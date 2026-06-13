@@ -2070,6 +2070,27 @@ public class PlayerService : IPlayerService
                             Icon = "medal"
                         });
                     }
+
+                    // All-time best in specific sport
+                    foreach (var sport in meOverall.SportStats)
+                    {
+                        if (sport.Rank == 1 && sport.PerformanceScore > 0)
+                        {
+                            var tiedInSport = overallRankings
+                                .Where(p => p.SportStats.Any(s => s.SportType == sport.SportType && s.Rank == 1 && s.PerformanceScore > 0))
+                                .Count();
+                            if (tiedInSport == 1)
+                            {
+                                badges.Add(new AutomaticBadgeDto
+                                {
+                                    Type = "AllTimeBestAthleteSport",
+                                    Label = $"Найкращий {GetAllTimeBestSportNameUa(sport.SportType)} за весь час",
+                                    SeasonName = null,
+                                    Icon = "trophy"
+                                });
+                            }
+                        }
+                    }
                 }
             } catch (Exception ex) {
                 _logger.LogWarning(ex, "Error getting overall all-time rankings in badges population");
@@ -2136,6 +2157,24 @@ public class PlayerService : IPlayerService
             "beach_volleyball" => "Пляжний волейбол",
             "athletics" => "Легка атлетика",
             _ => type
+        };
+    }
+
+    private string GetAllTimeBestSportNameUa(string type)
+    {
+        return type.ToLower() switch
+        {
+            "chess" => "шахіст",
+            "checkers" => "шашкіст",
+            "table_tennis" => "тенісист",
+            "armwrestling" => "армрестлер",
+            "badminton" => "бадмінтоніст",
+            "football" => "футболіст",
+            "volleyball" => "волейболіст",
+            "basketball_3x3" => "баскетболіст",
+            "beach_volleyball" => "пляжний волейболіст",
+            "athletics" => "легкоатлет",
+            _ => "гравець"
         };
     }
 
