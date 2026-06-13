@@ -91,6 +91,7 @@ export interface PlayerDto {
         yellowCardsCount?: number;
         redCardsCount?: number;
         rank: number;
+        competitionsCount: number;
     }[];
     pointsBreakdown?: PointEntryDto[];
     footballGoalMatches?: FootballGoalMatchDto[];

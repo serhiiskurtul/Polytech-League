@@ -633,7 +633,12 @@ public class PlayerService : IPlayerService
                 double totalScore = 0;
                 var sportStatsMap = new Dictionary<string, SportStatsDto>(StringComparer.OrdinalIgnoreCase);
                 var pointsBreakdown = new List<PointEntryDto>();
-                foreach (var sport in sportTypes) sportStatsMap[sport] = new SportStatsDto { SportType = sport };
+                foreach (var sport in sportTypes) {
+                    sportStatsMap[sport] = new SportStatsDto { 
+                        SportType = sport,
+                        CompetitionsCount = achievements.Where(a => a.SportType == sport).Select(a => a.TournamentId).Distinct().Count()
+                    };
+                }
                 foreach (var ach in achievements) {
                     double rankPts = 0; double bonusPts = 0; double mult = 1.0; string levelName = "Міжгрупові";
                     if (allEvents.TryGetValue(ach.TournamentId, out var lvl)) {
