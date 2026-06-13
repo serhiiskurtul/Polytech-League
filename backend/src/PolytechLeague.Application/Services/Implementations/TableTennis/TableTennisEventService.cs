@@ -115,8 +115,6 @@ public class TableTennisEventService(
         
         if ((individualWinnersSet || teamWinnersSet) && !updatedEntity.DisableNotifications)
         {
-            if (!updatedEntity.DisableNotifications)
-        {
             await _notificationService!.SendNotificationToAllAsync(
                 "Змагання завершено!",
                 $"Визначено переможців у змаганні з настільного тенісу: {updatedEntity.Name}",
@@ -124,7 +122,6 @@ public class TableTennisEventService(
                 $"/tournaments/{updatedEntity.Id}",
                 true
             );
-        }
         }
     }
 

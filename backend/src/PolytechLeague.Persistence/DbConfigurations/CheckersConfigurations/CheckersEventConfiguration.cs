@@ -15,7 +15,7 @@ public class CheckersEventConfiguration : IEntityTypeConfiguration<CheckersEvent
 
         builder.Property(x => x.TimeControl)
             .HasColumnName("time_control")
-            .IsRequired();
+            .IsRequired(false);
 
         builder.Property(x => x.ParticipantsCount)
             .HasColumnName("participants_count")
@@ -23,7 +23,7 @@ public class CheckersEventConfiguration : IEntityTypeConfiguration<CheckersEvent
 
         builder.Property(x => x.System)
             .HasColumnName("system")
-            .IsRequired();
+            .IsRequired(false);
             
         builder.Property(x => x.Variant)
             .HasColumnName("variant")
