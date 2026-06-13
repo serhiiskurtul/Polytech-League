@@ -54,6 +54,17 @@ public class BadmintonTeamDto
     public PlayerDto? Player1 { get; set; }
     public long? Player2Id { get; set; }
     public PlayerDto? Player2 { get; set; }
+
+    public ICollection<PlayerDto> Players 
+    { 
+        get 
+        {
+            var players = new List<PlayerDto>();
+            if (Player1 != null) players.Add(Player1);
+            if (Player2 != null) players.Add(Player2);
+            return players;
+        } 
+    }
 }
 
 public class BadmintonTeamRequest
@@ -73,6 +84,17 @@ public class BadmintonTeamResponse
     public PlayerDto? Player1 { get; set; }
     public long? Player2Id { get; set; }
     public PlayerDto? Player2 { get; set; }
+
+    public ICollection<PlayerDto> Players 
+    { 
+        get 
+        {
+            var players = new List<PlayerDto>();
+            if (Player1 != null) players.Add(Player1);
+            if (Player2 != null) players.Add(Player2);
+            return players;
+        } 
+    }
 }
 
 public class BadmintonEventResponse

@@ -11,6 +11,7 @@ export interface BadmintonTeamDto {
   player1?: PlayerDto;
   player2Id: number;
   player2?: PlayerDto;
+  players?: PlayerDto[];
 }
 
 export interface BadmintonSetResponse {
