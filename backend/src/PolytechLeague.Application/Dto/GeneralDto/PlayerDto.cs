@@ -134,6 +134,7 @@ public class SportStatsDto
     public int YellowCardsCount { get; set; }
     public int RedCardsCount { get; set; }
     public int Rank { get; set; }
+    public int CompetitionsCount { get; set; }
 }
 
 public class AutomaticBadgeDto

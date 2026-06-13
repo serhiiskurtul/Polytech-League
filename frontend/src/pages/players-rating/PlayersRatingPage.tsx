@@ -529,6 +529,13 @@ const PlayersRatingPage = () => {
                             <div className={styles.statMiniItem}>
                               <span className={styles.statMiniVal}>
                                 {activeTab === 'Загальний'
+                                  ? player.competitionsCount || 0
+                                  : player.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase())?.competitionsCount || 0}
+                              </span> змагань
+                            </div>
+                            <div className={styles.statMiniItem}>
+                              <span className={styles.statMiniVal}>
+                                {activeTab === 'Загальний'
                                   ? player.matchesPlayed
                                   : player.sportStats?.find(s => s.sportType.toLowerCase() === activeTab.toLowerCase())?.matchesPlayed || 0}
                               </span> ігор
