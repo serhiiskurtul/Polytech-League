@@ -131,6 +131,8 @@ public class BadmintonEventResponse
     public string? Schedule { get; set; }
     public bool IsTeam { get; set; }
     public bool IsModerated { get; set; }
+    public bool IsPublic { get; set; }
+    public bool DisableNotifications { get; set; }
 
     public PlayerDto? FirstPlace { get; set; }
     public PlayerDto? SecondPlace { get; set; }
@@ -264,6 +266,8 @@ public static class BadmintonDtoExtensions
             Schedule = entity.Schedule,
             IsTeam = entity.IsTeam,
             IsModerated = entity.IsModerated,
+            IsPublic = entity.IsPublic,
+            DisableNotifications = entity.DisableNotifications,
             FirstPlace = entity.FirstPlace?.ToDto(),
             SecondPlace = entity.SecondPlace?.ToDto(),
             ThirdPlace = entity.ThirdPlace?.ToDto(),

@@ -101,6 +101,8 @@ public class TableTennisEventResponse
     public string? Schedule { get; set; }
     public bool IsTeam { get; set; }
     public bool IsModerated { get; set; }
+    public bool IsPublic { get; set; }
+    public bool DisableNotifications { get; set; }
     public long? MvpId { get; set; }
     public string? MvpName { get; set; }
     public long? SeasonId { get; set; }
@@ -174,6 +176,8 @@ public static class TableTennisEventDtoExtensions
             Schedule = entity.Schedule,
             IsTeam = entity.IsTeam,
             IsModerated = entity.IsModerated,
+            IsPublic = entity.IsPublic,
+            DisableNotifications = entity.DisableNotifications,
             MvpId = entity.MvpId,
             MvpName = entity.Mvp != null ? $"{entity.Mvp.FirstName} {entity.Mvp.LastName}" : null,
             SeasonId = entity.SeasonId

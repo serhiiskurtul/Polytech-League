@@ -106,8 +106,6 @@ public class BadmintonEventService(
         
         if ((individualWinnersSet || teamWinnersSet) && !updatedEntity.DisableNotifications)
         {
-            if (!updatedEntity.DisableNotifications)
-        {
             await _notificationService!.SendNotificationToAllAsync(
                 "Змагання завершено!",
                 $"Визначено переможців у змаганні з бадмінтону: {updatedEntity.Name}",
@@ -115,7 +113,6 @@ public class BadmintonEventService(
                 $"/tournaments/{updatedEntity.Id}",
                 true
             );
-        }
         }
     }
 
