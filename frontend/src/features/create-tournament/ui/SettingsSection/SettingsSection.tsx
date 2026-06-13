@@ -59,22 +59,7 @@ const SettingsSection = ({ formData, handleInputChange }: SettingsSectionProps) 
                 />
               </div>
 
-              <div className={shared.formGroup}>
-                <label className={shared.formLabel}>
-                  <i className="fas fa-project-diagram"></i> Система проведення *
-                </label>
-                <select
-                  name="system"
-                  value={formData.system || "Swiss"}
-                  onChange={handleInputChange}
-                  className={shared.formSelect}
-                  required
-                >
-                  <option value="Swiss">Швейцарська система</option>
-                  <option value="RoundRobin">Кругова система</option>
-                  <option value="Knockout">Олімпійська система (на вибування)</option>
-                </select>
-              </div>
+
 
               {formData.sport === 'checkers' && (
                 <div className={shared.formGroup}>
