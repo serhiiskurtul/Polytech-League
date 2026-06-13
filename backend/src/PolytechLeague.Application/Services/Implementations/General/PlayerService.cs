@@ -216,7 +216,6 @@ public class PlayerService : IPlayerService
         if (dto.FootballTeamId.HasValue) player.FootballTeamId = dto.FootballTeamId;
         if (dto.VolleyballPosition.HasValue) player.VolleyballPosition = dto.VolleyballPosition;
         if (dto.VolleyballShirtNumber.HasValue) player.VolleyballShirtNumber = dto.VolleyballShirtNumber;
-        if (dto.VolleyballTeamId.HasValue) player.VolleyballTeamId = dto.VolleyballTeamId;
         if (dto.BasketballShirtNumber.HasValue) player.BasketballShirtNumber = dto.BasketballShirtNumber;
         if (dto.BeachVolleyballShirtNumber.HasValue) player.BeachVolleyballShirtNumber = dto.BeachVolleyballShirtNumber;
 
@@ -1596,9 +1595,8 @@ public class PlayerService : IPlayerService
             target.FootballPosition = source.FootballPosition;
             target.FootballShirtNumber = source.FootballShirtNumber;
         }
-        if (target.VolleyballTeamId == null)
+        if (target.VolleyballPosition == null)
         {
-            target.VolleyballTeamId = source.VolleyballTeamId;
             target.VolleyballPosition = source.VolleyballPosition;
             target.VolleyballShirtNumber = source.VolleyballShirtNumber;
         }
@@ -1979,6 +1977,28 @@ public class PlayerService : IPlayerService
             .Where(t => t.Players!.Any(p => p.Id == sourceId))
             .ToListAsync(cancellationToken);
         foreach (var t in bvbTeams)
+        {
+            t.Players!.Remove(t.Players.First(p => p.Id == sourceId));
+            if (!t.Players.Any(p => p.Id == targetId)) t.Players.Add(targetPlayer);
+        }
+
+        // Volleyball Teams (many-to-many players)
+        var vbTeams = await _dbContext.Set<PolytechLeague.Domain.Entities.Volleyball.VolleyballTeam>()
+            .Include(t => t.Players)
+            .Where(t => t.Players!.Any(p => p.Id == sourceId))
+            .ToListAsync(cancellationToken);
+        foreach (var t in vbTeams)
+        {
+            t.Players!.Remove(t.Players.First(p => p.Id == sourceId));
+            if (!t.Players.Any(p => p.Id == targetId)) t.Players.Add(targetPlayer);
+        }
+
+        // Basketball Teams (many-to-many players)
+        var bbTeams = await _dbContext.Set<PolytechLeague.Domain.Entities.Basketball.BasketballTeam>()
+            .Include(t => t.Players)
+            .Where(t => t.Players!.Any(p => p.Id == sourceId))
+            .ToListAsync(cancellationToken);
+        foreach (var t in bbTeams)
         {
             t.Players!.Remove(t.Players.First(p => p.Id == sourceId));
             if (!t.Players.Any(p => p.Id == targetId)) t.Players.Add(targetPlayer);

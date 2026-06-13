@@ -48,7 +48,10 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
         // Volleyball
         builder.Property(x => x.VolleyballPosition).HasColumnName("volleyball_position");
         builder.Property(x => x.VolleyballShirtNumber).HasColumnName("volleyball_shirt_number");
-        builder.Property(x => x.VolleyballTeamId).HasColumnName("volleyball_team_id");
+
+        builder.HasMany(x => x.VolleyballTeams)
+            .WithMany(t => t.Players)
+            .UsingEntity(j => j.ToTable("volleyball_team_players"));
 
         // Basketball
         builder.Property(x => x.BasketballShirtNumber).HasColumnName("basketball_shirt_number");
