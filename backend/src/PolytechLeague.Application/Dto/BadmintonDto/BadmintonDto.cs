@@ -61,7 +61,7 @@ public class BadmintonTeamRequest
     public string? Name { get; set; }
     public long? Player1Id { get; set; }
     public long? Player2Id { get; set; }
-    public long EventId { get; set; }
+    public long? EventId { get; set; }
     public ICollection<long>? PlayerIds { get; set; } // For compatibility with TeamSportsTournamentView
 }
 
