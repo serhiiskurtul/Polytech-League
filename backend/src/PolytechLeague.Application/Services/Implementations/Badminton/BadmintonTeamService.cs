@@ -40,11 +40,24 @@ public class BadmintonTeamService(
 
         UpdateValues(oldEntity, newEntity);
 
-        if (newEntity.PlayerIds != null && newEntity.PlayerIds.Count >= 2)
+        if (newEntity.PlayerIds != null)
         {
             var ids = newEntity.PlayerIds.ToList();
-            oldEntity.Player1Id = ids[0];
-            oldEntity.Player2Id = ids[1];
+            if (ids.Count == 0)
+            {
+                oldEntity.Player1Id = null;
+                oldEntity.Player2Id = null;
+            }
+            else if (ids.Count == 1)
+            {
+                oldEntity.Player1Id = ids[0];
+                oldEntity.Player2Id = null;
+            }
+            else
+            {
+                oldEntity.Player1Id = ids[0];
+                oldEntity.Player2Id = ids[1];
+            }
         }
 
         await _dbcontext.SaveChangesAsync(cancellationToken);
