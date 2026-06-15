@@ -12,6 +12,8 @@ public class FootballTeamRequest
     public long? GoalkeeperId { get; set; }
     public int Points { get; set; }
     public int Rank { get; set; }
+    public string? TournamentGroupName { get; set; }
+    public bool IsGeneralTableIncluded { get; set; }
 }
 
 public class FootballTeamResponse
@@ -23,6 +25,8 @@ public class FootballTeamResponse
     public long? GoalkeeperId { get; set; }
     public int Points { get; set; }
     public int Rank { get; set; }
+    public string? TournamentGroupName { get; set; }
+    public bool IsGeneralTableIncluded { get; set; }
 }
 
 public static class FootballTeamDtoExtensions
@@ -37,7 +41,9 @@ public static class FootballTeamDtoExtensions
             CaptainId = request.CaptainId,
             GoalkeeperId = request.GoalkeeperId,
             Points = request.Points,
-            Rank = request.Rank
+            Rank = request.Rank,
+            TournamentGroupName = request.TournamentGroupName,
+            IsGeneralTableIncluded = request.IsGeneralTableIncluded
         };
     }
 
@@ -51,7 +57,9 @@ public static class FootballTeamDtoExtensions
             CaptainId = entity.CaptainId,
             GoalkeeperId = entity.GoalkeeperId,
             Points = entity.Points,
-            Rank = entity.Rank
+            Rank = entity.Rank,
+            TournamentGroupName = entity.TournamentGroupName,
+            IsGeneralTableIncluded = entity.IsGeneralTableIncluded
         };
     }
 }

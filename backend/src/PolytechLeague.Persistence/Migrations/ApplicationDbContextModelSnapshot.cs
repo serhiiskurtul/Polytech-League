@@ -1538,6 +1538,9 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<long?>("GoalkeeperId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("IsGeneralTableIncluded")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -1550,6 +1553,9 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<int>("Rank")
                         .HasColumnType("integer")
                         .HasColumnName("rank");
+
+                    b.Property<string>("TournamentGroupName")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
