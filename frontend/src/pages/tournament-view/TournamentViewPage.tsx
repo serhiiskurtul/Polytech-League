@@ -3740,7 +3740,7 @@ const TournamentViewPage = () => {
                     )}
                     {editTournamentData.level === 'CollegeGroup' && (
                       <div className={styles.formGroup} style={{ gridColumn: '1 / -1', display: 'flex', gap: '20px' }}>
-                        {!isMandatoryTeamSport && (
+                        {!isMandatoryTeamSport && sportKey !== 'athletics' && (
                           <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                             <input
                               type="checkbox"
@@ -3792,7 +3792,7 @@ const TournamentViewPage = () => {
                     )}
                     {editTournamentData.level !== 'CollegeGroup' && (
                       <div className={styles.formGroup} style={{ gridColumn: '1 / -1', display: 'flex', gap: '20px' }}>
-                        {!isMandatoryTeamSport && (
+                        {!isMandatoryTeamSport && sportKey !== 'athletics' && (
                           <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                             <input
                               type="checkbox"
