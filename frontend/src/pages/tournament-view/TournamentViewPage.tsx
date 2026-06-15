@@ -2065,7 +2065,8 @@ const TournamentViewPage = () => {
                           tournament?.sport === 'basketball_3x3' ? "fas fa-basketball-ball" :
                             tournament?.sport === 'badminton' ? "fas fa-feather-alt" :
                               tournament?.sport === 'table_tennis' || tournament?.sport === 'table-tennis' || tournament?.sport === 'tabletennis' ? "fas fa-table-tennis" :
-                                "fas fa-chess-queen"
+                                tournament?.sport === 'athletics' ? "fas fa-running" :
+                                  "fas fa-chess-queen"
                 }></i>
               )}
 
@@ -3740,7 +3741,7 @@ const TournamentViewPage = () => {
                     )}
                     {editTournamentData.level === 'CollegeGroup' && (
                       <div className={styles.formGroup} style={{ gridColumn: '1 / -1', display: 'flex', gap: '20px' }}>
-                        {!isMandatoryTeamSport && (
+                        {!isMandatoryTeamSport && sportKey !== 'athletics' && (
                           <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                             <input
                               type="checkbox"
@@ -3792,7 +3793,7 @@ const TournamentViewPage = () => {
                     )}
                     {editTournamentData.level !== 'CollegeGroup' && (
                       <div className={styles.formGroup} style={{ gridColumn: '1 / -1', display: 'flex', gap: '20px' }}>
-                        {!isMandatoryTeamSport && (
+                        {!isMandatoryTeamSport && sportKey !== 'athletics' && (
                           <label style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                             <input
                               type="checkbox"
