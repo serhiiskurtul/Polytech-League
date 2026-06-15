@@ -76,5 +76,9 @@ public class ChessTeamService(
     protected override void UpdateValues(ChessTeam oldEntity, ChessTeam newEntity)
     {
         oldEntity.Name = newEntity.Name;
+        oldEntity.Points = newEntity.Points;
+        oldEntity.Rank = newEntity.Rank;
+        oldEntity.TournamentGroupName = newEntity.TournamentGroupName;
+        oldEntity.IsGeneralTableIncluded = newEntity.IsGeneralTableIncluded;
     }
 }
