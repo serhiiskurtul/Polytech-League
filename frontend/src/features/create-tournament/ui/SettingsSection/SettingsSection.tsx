@@ -104,6 +104,26 @@ const SettingsSection = ({ formData, handleInputChange }: SettingsSectionProps) 
             </div>
           )}
 
+          {/* Система проведення для командних видів спорту */}
+          {['football', 'volleyball', 'basketball', 'beach_volleyball', 'badminton', 'basketball_3x3'].includes(formData.sport) && (
+            <div className={shared.formGroup}>
+              <label className={shared.formLabel}>
+                <i className="fas fa-project-diagram"></i> Тип змагання *
+              </label>
+              <select
+                name="tournamentType"
+                value={formData.tournamentType || 'SingleElimination'}
+                onChange={handleInputChange}
+                className={shared.formSelect}
+                required
+              >
+                <option value="SingleElimination">Олімпійська система (на вибування)</option>
+                <option value="RoundRobin">Кругова система (Група)</option>
+                <option value="GroupsPlayoff">Груповий етап + Плей-офф</option>
+              </select>
+            </div>
+          )}
+
           {/* Налаштування армрестлінгу */}
           {formData.sport === 'armwrestling' && (
             <>

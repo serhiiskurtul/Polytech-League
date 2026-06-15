@@ -17,6 +17,9 @@ public class FootballTeam
     public Player? Goalkeeper { get; set; }
     public int Points { get; set; }
     public int Rank { get; set; }
+    
+    public string? TournamentGroupName { get; set; }
+    public bool IsGeneralTableIncluded { get; set; }
 
     [System.ComponentModel.DataAnnotations.Schema.NotMapped]
     public ICollection<long>? PlayerIds { get; set; }

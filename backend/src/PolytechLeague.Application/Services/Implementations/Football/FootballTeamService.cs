@@ -103,5 +103,8 @@ public class FootballTeamService(
         oldEntity.Points = newEntity.Points;
         oldEntity.CaptainId = newEntity.CaptainId;
         oldEntity.GoalkeeperId = newEntity.GoalkeeperId;
+        oldEntity.Rank = newEntity.Rank;
+        oldEntity.TournamentGroupName = newEntity.TournamentGroupName;
+        oldEntity.IsGeneralTableIncluded = newEntity.IsGeneralTableIncluded;
     }
 }

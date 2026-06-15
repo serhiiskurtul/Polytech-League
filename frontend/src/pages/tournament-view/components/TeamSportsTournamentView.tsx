@@ -1824,6 +1824,31 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   <div className={styles.teamAvatar}>{team.name?.[0] || 'T'}</div>
                   <div className={styles.teamInfo}>
                     <h4>Команда {team.name}</h4>
+                    {isGroupsPlayoff && isAdmin ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
+                        <span style={{ fontSize: '12px', color: '#64748b' }}>Група:</span>
+                        <input 
+                          type="text" 
+                          defaultValue={team.tournamentGroupName || ''}
+                          onBlur={async (e) => {
+                            if (e.target.value !== (team.tournamentGroupName || '')) {
+                              try {
+                                const updateApi = getTeamUpdateApi();
+                                await updateApi(team.id, { ...team, tournamentGroupName: e.target.value || null });
+                                onRefresh();
+                              } catch(err) {
+                                alert('Помилка при оновленні групи');
+                              }
+                            }
+                          }}
+                          style={{ fontSize: '12px', padding: '2px 6px', width: '60px', borderRadius: '4px', border: '1px solid #cbd5e1' }}
+                          placeholder="—"
+                          title="Редагувати групу"
+                        />
+                      </div>
+                    ) : team.tournamentGroupName ? (
+                      <p style={{ fontSize: '13px', color: '#3b82f6', fontWeight: 500, margin: '2px 0 4px 0' }}>Група {team.tournamentGroupName}</p>
+                    ) : null}
                     <p>{team.players?.length || 0} гравців</p>
                   </div>
                   {(isAdmin || (isFizorg && userGroup === team.name)) && (
@@ -2147,6 +2172,18 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   disabled={isFizorg && !isAdmin}
                 />
               </div>
+
+              {isGroupsPlayoff && (
+                <div className={styles.formGroup} style={{ marginTop: '16px' }}>
+                  <label>Група (напр. А, Б, В)</label>
+                  <input
+                    type="text"
+                    value={newTeamForm.tournamentGroupName}
+                    onChange={e => setNewTeamForm({ ...newTeamForm, tournamentGroupName: e.target.value })}
+                    placeholder="Введіть літеру або назву групи"
+                  />
+                </div>
+              )}
 
               {isGroupsPlayoff && (
                 <div className={styles.formGroup} style={{ marginTop: '16px' }}>

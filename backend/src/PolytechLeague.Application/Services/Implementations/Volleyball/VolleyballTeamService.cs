@@ -89,5 +89,8 @@ public class VolleyballTeamService(
     protected override void UpdateValues(VolleyballTeam oldEntity, VolleyballTeam newEntity)
     {
         oldEntity.Name = newEntity.Name;
+        oldEntity.Rank = newEntity.Rank;
+        oldEntity.TournamentGroupName = newEntity.TournamentGroupName;
+        oldEntity.IsGeneralTableIncluded = newEntity.IsGeneralTableIncluded;
     }
 }
