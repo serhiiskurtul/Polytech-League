@@ -47,7 +47,7 @@ const getSportIcon = (type: string) => {
     case 'checkers': return 'fa-dice';
     case 'table_tennis': return 'fa-table-tennis';
     case 'armwrestling': return 'fa-hand-rock';
-    case 'badminton': return 'fa-shuttlecock';
+    case 'badminton': return 'fa-feather-alt';
     case 'football': return 'fa-futbol';
     case 'volleyball': return 'fa-volleyball-ball';
     case 'basketball_3x3': return 'fa-basketball-ball';
