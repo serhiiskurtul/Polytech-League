@@ -807,7 +807,7 @@ const getSportIcon = (sport: string) => {
     basketball_3x3: 'fa-basketball',
     table_tennis: 'fa-table-tennis-paddle-ball',
     armwrestling: 'fa-handshake',
-    badminton: 'fa-shuttlecock',
+    badminton: 'fa-feather-alt',
     beach_volleyball: 'fa-umbrella-beach'
   };
   return icons[sport] || 'fa-trophy';

@@ -24,7 +24,7 @@ const UserAchievements = ({ achievements }: UserAchievementsProps) => {
       case 'volleyball':
       case 'beach_volleyball': return 'fas fa-volleyball-ball';
       case 'basketball_3x3': return 'fas fa-basketball-ball';
-      case 'badminton': return 'fas fa-shuttlecock';
+      case 'badminton': return 'fas fa-feather-alt';
       case 'table_tennis': return 'fas fa-table-tennis';
       case 'armwrestling': return 'fas fa-fist-raised';
       case 'athletics': return 'fas fa-running';

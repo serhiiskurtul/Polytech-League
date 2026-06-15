@@ -2063,7 +2063,7 @@ const TournamentViewPage = () => {
                       tournament?.sport === 'football' ? "fas fa-futbol" :
                         tournament?.sport === 'volleyball' || tournament?.sport === 'beach_volleyball' ? "fas fa-volleyball-ball" :
                           tournament?.sport === 'basketball_3x3' ? "fas fa-basketball-ball" :
-                            tournament?.sport === 'badminton' ? "fas fa-shuttlecock" :
+                            tournament?.sport === 'badminton' ? "fas fa-feather-alt" :
                               tournament?.sport === 'table_tennis' || tournament?.sport === 'table-tennis' || tournament?.sport === 'tabletennis' ? "fas fa-table-tennis" :
                                 "fas fa-chess-queen"
                 }></i>
@@ -2307,7 +2307,7 @@ const TournamentViewPage = () => {
                   <div className={styles.statItemCombined}>
                     <div className={styles.statIcon}>
                       <i className={
-                        tournament?.sport === 'badminton' ? "fas fa-shuttlecock" :
+                        tournament?.sport === 'badminton' ? "fas fa-feather-alt" :
                           tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? "fas fa-table-tennis" :
                             tournament?.sport === 'armwrestling' ? "fas fa-hand-rock" :
                               "fas fa-venus-mars"

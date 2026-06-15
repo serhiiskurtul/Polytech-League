@@ -43,7 +43,7 @@ const ChampionsPage: React.FC = () => {
       case 'checkers': return 'fa-chess-board';
       case 'table-tennis': return 'fa-table-tennis-paddle-ball';
       case 'armwrestling': return 'fa-handshake-angle';
-      case 'badminton': return 'fa-shuttlecock';
+      case 'badminton': return 'fa-feather-alt';
       case 'football': return 'fa-futbol';
       case 'basketball-3x3': return 'fa-basketball-ball';
       case 'volleyball': return 'fa-volleyball-ball';
