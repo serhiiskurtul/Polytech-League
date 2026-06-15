@@ -316,8 +316,8 @@ public class PlayerService : IPlayerService
             // 1. Level multipliers
             var levelMultipliers = new Dictionary<CompetitionLevel, double> {
                 { CompetitionLevel.CollegeGroup, 1.0 },
-                { CompetitionLevel.Regional, 2.5 },
-                { CompetitionLevel.National, 5.0 }
+                { CompetitionLevel.Regional, 2.0 },
+                { CompetitionLevel.National, 7.0 }
             };
             var allEventsQuery = _dbContext.Set<Event>().AsNoTracking();
             if (seasonId.HasValue)
@@ -716,9 +716,8 @@ public class PlayerService : IPlayerService
 
                 if (fPlayed > 0) {
                     var s = sportStatsMap["football"];
-                    int winPts = fWins * 10; int playPts = fPlayed * 5;
-                    s.PerformanceScore += winPts + playPts; totalScore += winPts + playPts;
-                    pointsBreakdown.Add(new PointEntryDto { Description = $"Участь (Футбол): {fPlayed} ігор", Points = playPts, Category = "Participation", SportType = "football" });
+                    int winPts = fWins * 10;
+                    s.PerformanceScore += winPts; totalScore += winPts;
                     if (fWins > 0) pointsBreakdown.Add(new PointEntryDto { Description = $"Перемоги (Футбол): {fWins}", Points = winPts, Category = "Wins", SportType = "football" });
                 }
                 if (goalsDetailLookup.TryGetValue(playerId, out var pGoalsInfo)) {
@@ -1202,8 +1201,8 @@ public class PlayerService : IPlayerService
         // 1. Achievements Points (from previously populated Achievements list)
         var levelMultipliers = new Dictionary<CompetitionLevel, double> {
             { CompetitionLevel.CollegeGroup, 1.0 },
-            { CompetitionLevel.Regional, 2.5 },
-            { CompetitionLevel.National, 5.0 }
+            { CompetitionLevel.Regional, 2.0 },
+            { CompetitionLevel.National, 7.0 }
         };
         var eventIds = dto.Achievements.Select(a => a.TournamentId).Distinct().ToList();
         var eventLevels = await _dbContext.Set<Event>()
