@@ -622,6 +622,18 @@ public class PlayerService : IPlayerService
                     achievements.Add(new AchievementDto { TournamentName = x.Team.Event.Name, SportType = "badminton", Date = x.Team.Event.Date, Rank = r, TournamentId = x.Team.EventId.Value, Result = GetResultLabel(r) });
                     sportTypes.Add("badminton");
                 }
+                foreach (var x in chessPlayerEvents[playerId]) {
+                    if (achievements.Any(a => a.TournamentId == x.Team.EventId && a.SportType == "chess")) continue;
+                    int r = (x.Team.Id == x.Team.Event!.FirstPlaceTeamId) ? 1 : ((x.Team.Id == x.Team.Event.SecondPlaceTeamId) ? 2 : ((x.Team.Id == x.Team.Event.ThirdPlaceTeamId) ? 3 : 0));
+                    achievements.Add(new AchievementDto { TournamentName = x.Team.Event.Name, SportType = "chess", Date = x.Team.Event.Date, Rank = r, TournamentId = x.Team.EventId, Result = GetResultLabel(r) });
+                    sportTypes.Add("chess");
+                }
+                foreach (var x in checkersPlayerEvents[playerId]) {
+                    if (achievements.Any(a => a.TournamentId == x.Team.EventId && a.SportType == "checkers")) continue;
+                    int r = (x.Team.Id == x.Team.Event!.FirstPlaceTeamId) ? 1 : ((x.Team.Id == x.Team.Event.SecondPlaceTeamId) ? 2 : ((x.Team.Id == x.Team.Event.ThirdPlaceTeamId) ? 3 : 0));
+                    achievements.Add(new AchievementDto { TournamentName = x.Team.Event.Name, SportType = "checkers", Date = x.Team.Event.Date, Rank = r, TournamentId = x.Team.EventId, Result = GetResultLabel(r) });
+                    sportTypes.Add("checkers");
+                }
 
                 dto.Achievements = achievements.OrderByDescending(a => a.Date).ToList();
                 dto.ArmwrestlingWeightClasses = armwrestlingWeightClasses.ToList();
@@ -1096,6 +1108,30 @@ public class PlayerService : IPlayerService
                 if (t.Event == null || !t.EventId.HasValue) continue;
                 int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
                 achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "badminton", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId.Value, Result = rank > 0 ? $"{rank} місце ({t.Name})" : $"Учасник ({t.Name})" });
+            }
+            // Chess Teams
+            var chessTeams = await _dbContext.Set<ChessTeam>()
+                .AsNoTracking()
+                .Include(t => t.Event)
+                .Where(t => t.Players.Any(pl => pl.Id == playerId))
+                .ToListAsync(cancellationToken);
+            foreach (var t in chessTeams) {
+                if (t.Event == null) continue;
+                if (achievements.Any(a => a.TournamentId == t.EventId && a.SportType == "chess")) continue;
+                int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
+                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "chess", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId, Result = rank > 0 ? $"{rank} місце ({t.Name})" : $"Учасник ({t.Name})" });
+            }
+            // Checkers Teams
+            var checkersTeams = await _dbContext.Set<CheckersTeam>()
+                .AsNoTracking()
+                .Include(t => t.Event)
+                .Where(t => t.Players.Any(pl => pl.Id == playerId))
+                .ToListAsync(cancellationToken);
+            foreach (var t in checkersTeams) {
+                if (t.Event == null) continue;
+                if (achievements.Any(a => a.TournamentId == t.EventId && a.SportType == "checkers")) continue;
+                int rank = (t.Id == t.Event.FirstPlaceTeamId) ? 1 : ((t.Id == t.Event.SecondPlaceTeamId) ? 2 : ((t.Id == t.Event.ThirdPlaceTeamId) ? 3 : 0));
+                achievements.Add(new AchievementDto { TournamentName = t.Event.Name, SportType = "checkers", Date = t.Event.Date, Rank = rank, TournamentId = t.EventId, Result = rank > 0 ? $"{rank} місце ({t.Name})" : $"Учасник ({t.Name})" });
             }
         } catch (Exception ex) {
             _logger.LogError(ex, "Error populating other team achievements for player {PlayerId}", playerId);
