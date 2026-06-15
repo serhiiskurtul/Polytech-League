@@ -51,7 +51,7 @@ const FootballBracket: React.FC<FootballBracketProps> = ({
   }, {} as Record<string, footballMatchResponse[]>);
 
   const otherStages = Object.keys(groupedMatches)
-    .filter(s => s !== 'Матч за 3-те місце')
+    .filter(s => s !== 'Матч за 3-те місце' && s !== 'Груповий етап')
     .sort((a, b) => getStageRank(a) - getStageRank(b));
 
   const mappedRounds: BracketRound[] = otherStages.map(stageName => {
@@ -172,7 +172,7 @@ const FootballBracket: React.FC<FootballBracketProps> = ({
 
   return (
     <div className={styles.footballBracketWrapper}>
-      {matches.length > 0 ? (
+      {otherStages.length > 0 ? (
         <UniversalBracket 
           rounds={mappedRounds} 
           isAdmin={isAdmin}
@@ -182,7 +182,6 @@ const FootballBracket: React.FC<FootballBracketProps> = ({
           cardHeight={160}
         />
       ) : (
-
         <div className={styles.emptyBracket}>
           <i className="fas fa-sitemap"></i>
           <p>Турнірна сітка порожня.</p>
