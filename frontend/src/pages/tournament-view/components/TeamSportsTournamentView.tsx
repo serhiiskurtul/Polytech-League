@@ -170,6 +170,26 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
   const [useStrictFiltering, setUseStrictFiltering] = useState(true);
   const [selectedMatchForInfo, setSelectedMatchForInfo] = useState<any>(null);
 
+  const [editedPoints, setEditedPoints] = useState<Record<number, number>>({});
+
+  const handleSaveEditedPoints = async () => {
+    try {
+      const updateApi = getTeamUpdateApi();
+      const promises = Object.entries(editedPoints).map(([teamIdStr, points]) => {
+        const teamId = parseInt(teamIdStr);
+        const team = details.teams.find((t: any) => t.id === teamId);
+        if (!team) return Promise.resolve();
+        return updateApi(teamId, { ...team, points: Math.max(0, points) });
+      });
+      await Promise.all(promises);
+      setEditedPoints({});
+      onRefresh();
+    } catch (err) {
+      console.error(err);
+      alert('Помилка при збереженні результатів');
+    }
+  };
+
   const footballStats = useMemo(() => {
     if (sport !== 'football' && sport !== 'футбол') return null;
 
@@ -1645,10 +1665,11 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                                   <input
                                     type="number"
                                     min="0"
+                                    step="0.5"
                                     className={styles.pointsInlineInput}
-                                    defaultValue={team.points}
+                                    value={editedPoints[team.id] !== undefined ? editedPoints[team.id] : team.points}
                                     onFocus={(e) => e.target.select()}
-                                    onBlur={(e) => handleUpdateTeamPoints(team.id, parseFloat(e.target.value) || 0)}
+                                    onChange={(e) => setEditedPoints(prev => ({ ...prev, [team.id]: parseFloat(e.target.value) || 0 }))}
                                   />
                                 ) : (
                                   team.points
@@ -1713,10 +1734,11 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                                   <input
                                     type="number"
                                     min="0"
+                                    step="0.5"
                                     className={styles.pointsInlineInput}
-                                    defaultValue={team.points}
+                                    value={editedPoints[team.id] !== undefined ? editedPoints[team.id] : team.points}
                                     onFocus={(e) => e.target.select()}
-                                    onBlur={(e) => handleUpdateTeamPoints(team.id, parseFloat(e.target.value) || 0)}
+                                    onChange={(e) => setEditedPoints(prev => ({ ...prev, [team.id]: parseFloat(e.target.value) || 0 }))}
                                   />
                                 ) : (
                                   team.points
@@ -1788,9 +1810,9 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                               min="0"
                               step="0.5"
                               className={styles.pointsInlineInput}
-                              defaultValue={team.points}
+                              value={editedPoints[team.id] !== undefined ? editedPoints[team.id] : team.points}
                               onFocus={(e) => e.target.select()}
-                              onBlur={(e) => handleUpdateTeamPoints(team.id, parseFloat(e.target.value) || 0)}
+                              onChange={(e) => setEditedPoints(prev => ({ ...prev, [team.id]: parseFloat(e.target.value) || 0 }))}
                             />
                           ) : (
                             team.points
@@ -1800,6 +1822,18 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                     ))}
                   </tbody>
                 </table>
+              </div>
+            )}
+
+            {Object.keys(editedPoints).length > 0 && (
+              <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', padding: '10px 0', position: 'sticky', bottom: '20px', zIndex: 100 }}>
+                <button 
+                  onClick={handleSaveEditedPoints}
+                  className="admin-action-btn primary"
+                  style={{ padding: '12px 24px', borderRadius: '12px', cursor: 'pointer', background: '#10b981', color: 'white', border: 'none', fontWeight: 'bold', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '10px', boxShadow: '0 10px 15px -3px rgba(16, 185, 129, 0.4), 0 4px 6px -2px rgba(16, 185, 129, 0.2)', transition: 'all 0.2s ease' }}
+                >
+                  <i className="fas fa-save"></i> Зберегти результати ({Object.keys(editedPoints).length})
+                </button>
               </div>
             )}
 
