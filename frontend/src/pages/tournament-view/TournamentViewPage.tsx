@@ -2065,7 +2065,8 @@ const TournamentViewPage = () => {
                           tournament?.sport === 'basketball_3x3' ? "fas fa-basketball-ball" :
                             tournament?.sport === 'badminton' ? "fas fa-feather-alt" :
                               tournament?.sport === 'table_tennis' || tournament?.sport === 'table-tennis' || tournament?.sport === 'tabletennis' ? "fas fa-table-tennis" :
-                                "fas fa-chess-queen"
+                                tournament?.sport === 'athletics' ? "fas fa-running" :
+                                  "fas fa-chess-queen"
                 }></i>
               )}
 
