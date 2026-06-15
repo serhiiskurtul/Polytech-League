@@ -316,8 +316,8 @@ public class PlayerService : IPlayerService
             // 1. Level multipliers
             var levelMultipliers = new Dictionary<CompetitionLevel, double> {
                 { CompetitionLevel.CollegeGroup, 1.0 },
-                { CompetitionLevel.Regional, 2.5 },
-                { CompetitionLevel.National, 5.0 }
+                { CompetitionLevel.Regional, 2.0 },
+                { CompetitionLevel.National, 7.0 }
             };
             var allEventsQuery = _dbContext.Set<Event>().AsNoTracking();
             if (seasonId.HasValue)
@@ -1202,8 +1202,8 @@ public class PlayerService : IPlayerService
         // 1. Achievements Points (from previously populated Achievements list)
         var levelMultipliers = new Dictionary<CompetitionLevel, double> {
             { CompetitionLevel.CollegeGroup, 1.0 },
-            { CompetitionLevel.Regional, 2.5 },
-            { CompetitionLevel.National, 5.0 }
+            { CompetitionLevel.Regional, 2.0 },
+            { CompetitionLevel.National, 7.0 }
         };
         var eventIds = dto.Achievements.Select(a => a.TournamentId).Distinct().ToList();
         var eventLevels = await _dbContext.Set<Event>()

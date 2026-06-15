@@ -655,8 +655,8 @@ const PlayersRatingPage = () => {
                 <p>Бали за призові місця множаться на статус змагань:</p>
                 <ul>
                   <li><span>Міжгрупові:</span> x1.0</li>
-                  <li><span>Обласні:</span> x2.5</li>
-                  <li><span>Всеукраїнські:</span> x5.0</li>
+                  <li><span>Обласні:</span> x2.0</li>
+                  <li><span>Всеукраїнські:</span> x7.0</li>
                 </ul>
               </div>
 
