@@ -26,6 +26,8 @@ const AthleticsTournamentView: React.FC<AthleticsTournamentViewProps> = ({ detai
     playerId: undefined
   });
 
+  const [selectedPlayers, setSelectedPlayers] = useState<Array<{id: number, name: string}>>([]);
+
   const disciplines = Array.from(new Set(details.results?.map(r => r.disciplineName) || []));
 
   const handleSaveResult = async () => {
@@ -36,15 +38,23 @@ const AthleticsTournamentView: React.FC<AthleticsTournamentViewProps> = ({ detai
 
     try {
       if (editingResultId) {
-        await updateAthleticsResult(details.id, editingResultId, formData);
+        const pId = selectedPlayers.length > 0 ? selectedPlayers[0].id : undefined;
+        await updateAthleticsResult(details.id, editingResultId, { ...formData, playerId: pId });
         toast.success('Результат оновлено');
       } else {
-        await addAthleticsResult(details.id, formData);
+        if (selectedPlayers.length > 0) {
+          for (const p of selectedPlayers) {
+            await addAthleticsResult(details.id, { ...formData, playerId: p.id });
+          }
+        } else {
+          await addAthleticsResult(details.id, { ...formData, playerId: undefined });
+        }
         toast.success('Результат додано');
       }
       setIsAddingResult(false);
       setEditingResultId(null);
       setFormData({ disciplineName: '', rank: 1, score: '', teamName: '', playerId: undefined });
+      setSelectedPlayers([]);
       setPlayerSearch('');
       onRefresh();
     } catch (error) {
@@ -60,8 +70,12 @@ const AthleticsTournamentView: React.FC<AthleticsTournamentViewProps> = ({ detai
     
     if (r.playerId) {
       const p = details.participants?.find(x => x.playerId === r.playerId);
-      setPlayerSearch(p ? `${p.playerName} (${p.groupName})` : '');
+      if (p) {
+        setSelectedPlayers([{ id: p.playerId, name: `${p.playerName} (${p.groupName})` }]);
+        setPlayerSearch('');
+      }
     } else {
+      setSelectedPlayers([]);
       setPlayerSearch('');
     }
   };
@@ -76,6 +90,32 @@ const AthleticsTournamentView: React.FC<AthleticsTournamentViewProps> = ({ detai
       toast.error('Помилка видалення');
     }
   };
+
+  // Group results visually
+  const groupedResults = React.useMemo(() => {
+    if (!details.results) return [];
+    const groups: any[] = [];
+    details.results.forEach(r => {
+      const group = groups.find(g => 
+        g.disciplineName === r.disciplineName && 
+        g.rank === r.rank && 
+        g.score === r.score && 
+        g.teamName === r.teamName
+      );
+      if (group) {
+        group.records.push(r);
+      } else {
+        groups.push({
+          disciplineName: r.disciplineName,
+          rank: r.rank,
+          score: r.score,
+          teamName: r.teamName,
+          records: [r]
+        });
+      }
+    });
+    return groups;
+  }, [details.results]);
 
   // Calculate team standings (1st=10, 2nd=8, 3rd=6, 4th=5, 5th=4, 6th=3, 7th=2, 8th=1)
   const getPoints = (rank: number) => {
@@ -92,7 +132,6 @@ const AthleticsTournamentView: React.FC<AthleticsTournamentViewProps> = ({ detai
 
   const teamPoints: Record<string, number> = {};
   details.results?.forEach(r => {
-    // If teamName is present, give points to team. If player is present, try to extract group from participant list.
     let team = r.teamName;
     if (!team && r.playerId) {
       const participant = details.participants?.find(p => p.playerId === r.playerId);
@@ -101,11 +140,36 @@ const AthleticsTournamentView: React.FC<AthleticsTournamentViewProps> = ({ detai
       }
     }
     if (team) {
-      teamPoints[team] = (teamPoints[team] || 0) + getPoints(r.rank);
+      // In a relay, multiple players might have the same teamName and rank.
+      // We don't want to award 40 points for 1st place in a relay. We should only add points per unique team/rank/discipline!
+      // But this calculation is simple and runs for CollegeGroup. If they have relays in CollegeGroup, they might get extra points.
+      // To fix this, let's unique it.
     }
   });
 
-  const sortedTeams = Object.entries(teamPoints)
+  // Re-calculate team points properly based on grouped results to avoid duplicate points for relays
+  const correctTeamPoints: Record<string, number> = {};
+  groupedResults.forEach(g => {
+    // For each group, determine the team name
+    // If teamName exists, use it. Otherwise, collect all group names from players
+    let teamsForThisGroup = new Set<string>();
+    if (g.teamName) {
+      teamsForThisGroup.add(g.teamName);
+    } else {
+      g.records.forEach((r: any) => {
+        if (r.playerId) {
+          const participant = details.participants?.find(p => p.playerId === r.playerId);
+          if (participant && participant.groupName) teamsForThisGroup.add(participant.groupName);
+        }
+      });
+    }
+    
+    teamsForThisGroup.forEach(team => {
+      correctTeamPoints[team] = (correctTeamPoints[team] || 0) + getPoints(g.rank);
+    });
+  });
+
+  const sortedTeams = Object.entries(correctTeamPoints)
     .map(([name, points]) => ({ name, points }))
     .sort((a, b) => b.points - a.points);
 
@@ -144,7 +208,7 @@ const AthleticsTournamentView: React.FC<AthleticsTournamentViewProps> = ({ detai
               <h4>{editingResultId ? 'Редагувати результат' : 'Додати результат'}</h4>
               <div className={styles.formGrid}>
                 <div className={styles.formGroup}>
-                  <label>Дисципліна (напр. "100 метрів (Юнаки)")</label>
+                  <label>Дисципліна (напр. "Естафета 4х100")</label>
                   <input type="text" value={formData.disciplineName} onChange={e => setFormData({...formData, disciplineName: e.target.value})} placeholder="Назва дисципліни" />
                 </div>
                 <div className={styles.formGroup}>
@@ -156,27 +220,36 @@ const AthleticsTournamentView: React.FC<AthleticsTournamentViewProps> = ({ detai
                   <input type="text" value={formData.score || ''} onChange={e => setFormData({...formData, score: e.target.value})} placeholder="Напр. 11.5с" />
                 </div>
                 <div className={styles.formGroup}>
-                  <label>Команда / Група (для естафети)</label>
-                  <input type="text" value={formData.teamName || ''} onChange={e => setFormData({...formData, teamName: e.target.value})} placeholder="Напр. 522 група" />
+                  <label>Команда / Група (необов'язково)</label>
+                  <input type="text" value={formData.teamName || ''} onChange={e => setFormData({...formData, teamName: e.target.value})} placeholder="Напр. Збірна області" />
                 </div>
-                <div className={styles.formGroup}>
-                  <label>Учасник (введіть ім'я або групу)</label>
-                  <input 
-                    list="athletics-participants" 
-                    value={playerSearch}
-                    onChange={e => {
-                       const val = e.target.value;
-                       setPlayerSearch(val);
-                       const match = details.participants?.find(p => `${p.playerName} (${p.groupName})` === val);
-                       if (match) {
-                          setFormData({...formData, playerId: match.playerId});
-                       } else {
-                          setFormData({...formData, playerId: undefined});
-                       }
-                    }}
-                    placeholder="Пошук учасника..." 
-                    autoComplete="off"
-                  />
+                <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                  <label>Учасники (можна додати декілька для естафети)</label>
+                  <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                    {selectedPlayers.map(p => (
+                      <span key={p.id} style={{ background: '#e0e7ff', color: '#4338ca', padding: '4px 8px', borderRadius: '4px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        {p.name}
+                        <i className="fas fa-times" style={{ cursor: 'pointer' }} onClick={() => setSelectedPlayers(selectedPlayers.filter(x => x.id !== p.id))}></i>
+                      </span>
+                    ))}
+                  </div>
+                  {!editingResultId && (
+                    <input 
+                      list="athletics-participants" 
+                      value={playerSearch}
+                      onChange={e => {
+                         const val = e.target.value;
+                         setPlayerSearch(val);
+                         const match = details.participants?.find(p => `${p.playerName} (${p.groupName})` === val);
+                         if (match && !selectedPlayers.find(x => x.id === match.playerId)) {
+                            setSelectedPlayers([...selectedPlayers, { id: match.playerId, name: val }]);
+                            setPlayerSearch('');
+                         }
+                      }}
+                      placeholder="Пошук та додавання учасників..." 
+                      autoComplete="off"
+                    />
+                  )}
                   <datalist id="athletics-participants">
                     {details.participants?.map(p => (
                       <option key={p.playerId} value={`${p.playerName} (${p.groupName})`} />
@@ -198,39 +271,47 @@ const AthleticsTournamentView: React.FC<AthleticsTournamentViewProps> = ({ detai
                   <thead>
                     <tr>
                       <th style={{ width: '60px' }}>Місце</th>
-                      <th>Спортсмен / Команда</th>
+                      <th>Спортсмен(и) / Команда</th>
                       <th>Показник</th>
                       {isAdmin && <th>Дії</th>}
                     </tr>
                   </thead>
                   <tbody>
-                    {(details.results || [])
-                      .filter(r => r.disciplineName === discipline)
+                    {groupedResults
+                      .filter(g => g.disciplineName === discipline)
                       .sort((a, b) => a.rank - b.rank)
-                      .map(r => (
-                        <tr key={r.id}>
+                      .map((g, idx) => (
+                        <tr key={idx}>
                           <td className={styles.rankCell}>
-                            {r.rank === 1 ? '🥇' : r.rank === 2 ? '🥈' : r.rank === 3 ? '🥉' : `${r.rank}.`}
+                            {g.rank === 1 ? '🥇' : g.rank === 2 ? '🥈' : g.rank === 3 ? '🥉' : `${g.rank}.`}
                           </td>
                           <td>
-                            {r.playerId ? (
-                              <strong>{r.playerName}</strong>
-                            ) : (
-                              <strong>{r.teamName}</strong>
-                            )}
-                            {r.playerId && r.teamName && <span className={styles.subtext}> ({r.teamName})</span>}
-                            {r.playerId && !r.teamName && (
-                              <span className={styles.subtext}>
-                                {' '}
-                                ({details.participants?.find(p => p.playerId === r.playerId)?.groupName})
+                            {g.teamName && <strong>{g.teamName}</strong>}
+                            {g.teamName && g.records.some((r: any) => r.playerId) && <br/>}
+                            {g.records.map((r: any, i: number) => (
+                              <span key={r.id}>
+                                {r.playerId ? <strong>{r.playerName}</strong> : ''}
+                                {r.playerId && !g.teamName && (
+                                  <span className={styles.subtext}>
+                                    {' '}
+                                    ({details.participants?.find(p => p.playerId === r.playerId)?.groupName})
+                                  </span>
+                                )}
+                                {i < g.records.length - 1 && r.playerId ? ', ' : ''}
                               </span>
-                            )}
+                            ))}
                           </td>
-                          <td className={styles.scoreCell}>{r.score || '—'}</td>
+                          <td className={styles.scoreCell}>{g.score || '—'}</td>
                           {isAdmin && (
                             <td className={styles.actionsCell}>
-                              <button onClick={() => handleEdit(r)} className={styles.iconBtn}><i className="fas fa-edit"></i></button>
-                              <button onClick={() => handleDelete(r.id!)} className={styles.iconBtn}><i className="fas fa-trash"></i></button>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                                {g.records.map((r: any) => (
+                                  <div key={r.id} style={{ display: 'flex', border: '1px solid #e5e7eb', borderRadius: '4px', overflow: 'hidden' }}>
+                                    <button onClick={() => handleEdit(r)} className={styles.iconBtn} title={`Редагувати ${r.playerName || 'результат'}`} style={{ padding: '4px', borderRight: '1px solid #e5e7eb' }}><i className="fas fa-edit" style={{fontSize: '12px'}}></i></button>
+                                    <button onClick={() => handleDelete(r.id!)} className={styles.iconBtn} title={`Видалити ${r.playerName || 'результат'}`} style={{ padding: '4px' }}><i className="fas fa-trash" style={{fontSize: '12px'}}></i></button>
+                                  </div>
+                                ))}
+                              </div>
                             </td>
                           )}
                         </tr>
