@@ -716,9 +716,8 @@ public class PlayerService : IPlayerService
 
                 if (fPlayed > 0) {
                     var s = sportStatsMap["football"];
-                    int winPts = fWins * 10; int playPts = fPlayed * 5;
-                    s.PerformanceScore += winPts + playPts; totalScore += winPts + playPts;
-                    pointsBreakdown.Add(new PointEntryDto { Description = $"Участь (Футбол): {fPlayed} ігор", Points = playPts, Category = "Participation", SportType = "football" });
+                    int winPts = fWins * 10;
+                    s.PerformanceScore += winPts; totalScore += winPts;
                     if (fWins > 0) pointsBreakdown.Add(new PointEntryDto { Description = $"Перемоги (Футбол): {fWins}", Points = winPts, Category = "Wins", SportType = "football" });
                 }
                 if (goalsDetailLookup.TryGetValue(playerId, out var pGoalsInfo)) {
