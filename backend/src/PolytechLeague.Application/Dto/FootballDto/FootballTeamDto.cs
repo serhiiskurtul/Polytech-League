@@ -11,6 +11,7 @@ public class FootballTeamRequest
     public long? CaptainId { get; set; }
     public long? GoalkeeperId { get; set; }
     public int Points { get; set; }
+    public int Rank { get; set; }
 }
 
 public class FootballTeamResponse
@@ -21,6 +22,7 @@ public class FootballTeamResponse
     public long? CaptainId { get; set; }
     public long? GoalkeeperId { get; set; }
     public int Points { get; set; }
+    public int Rank { get; set; }
 }
 
 public static class FootballTeamDtoExtensions
@@ -34,7 +36,8 @@ public static class FootballTeamDtoExtensions
             PlayerIds = request.PlayerIds,
             CaptainId = request.CaptainId,
             GoalkeeperId = request.GoalkeeperId,
-            Points = request.Points
+            Points = request.Points,
+            Rank = request.Rank
         };
     }
 
@@ -47,7 +50,8 @@ public static class FootballTeamDtoExtensions
             Players = entity.Players?.Select(p => p.ToDto()).ToList(),
             CaptainId = entity.CaptainId,
             GoalkeeperId = entity.GoalkeeperId,
-            Points = entity.Points
+            Points = entity.Points,
+            Rank = entity.Rank
         };
     }
 }

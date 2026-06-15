@@ -26,6 +26,7 @@ const PlayersRatingPage = () => {
 
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [selectedSeasonId, setSelectedSeasonId] = useState<string>('all');
+  const [seasonsLoaded, setSeasonsLoaded] = useState(false);
   const [selectedGender, setSelectedGender] = useState<'all' | 'male' | 'female'>('all');
   const [lockedTooltipId, setLockedTooltipId] = useState<number | null>(null);
 
@@ -71,28 +72,43 @@ const PlayersRatingPage = () => {
         if (current) setSelectedSeasonId(current.id.toString());
       } catch (err) {
         console.error('Error fetching seasons:', err);
+      } finally {
+        setSeasonsLoaded(true);
       }
     };
     fetchSeasons();
   }, []);
 
   useEffect(() => {
+    if (!seasonsLoaded) return;
+
+    let isMounted = true;
     const fetchRankings = async () => {
       setLoading(true);
       setError(null);
       try {
         const sid = selectedSeasonId === 'all' ? undefined : selectedSeasonId;
         const data = await getPlayersRankings(sid);
-        setPlayers(data);
+        if (isMounted) {
+          setPlayers(data);
+        }
       } catch (err: any) {
-        console.error('Error fetching rankings:', err);
-        setError('Не вдалося завантажити рейтинги. Будь ласка, спробуйте пізніше.');
+        if (isMounted) {
+          console.error('Error fetching rankings:', err);
+          setError('Не вдалося завантажити рейтинги. Будь ласка, спробуйте пізніше.');
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
     fetchRankings();
-  }, [selectedSeasonId]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedSeasonId, seasonsLoaded]);
 
   const sportsTabs = [
     { id: 'all', name: 'Загальний', icon: 'fa-globe', key: 'Загальний' },

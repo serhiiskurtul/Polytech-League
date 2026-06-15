@@ -606,6 +606,18 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     }
   };
 
+  const handleUpdateTeamRank = async (teamId: number, rank: number) => {
+    try {
+      const updateApi = getTeamUpdateApi();
+      const team = details.teams.find((t: any) => t.id === teamId);
+      await updateApi(teamId, { ...team, rank: Math.max(0, rank) });
+      onRefresh();
+    } catch (err) {
+      console.error(err);
+      alert('Помилка при оновленні місця');
+    }
+  };
+
   const calculateStandings = (groupFilter?: string) => {
     let teams = details.teams || [];
     const matches = details.matches || details.games || [];
@@ -630,7 +642,8 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         l: 0,  // Losses
         gf: 0, // Goals For
         ga: 0, // Goals Against
-        manualPoints: team.points
+        manualPoints: team.points,
+        rank: team.rank || 0
       };
 
       matches.forEach((match: any) => {
@@ -688,10 +701,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         ? stats.manualPoints
         : autoPoints;
 
-      return { ...stats, points: finalPoints };
+      return { ...stats, points: finalPoints, rank: team.rank || 0 };
     });
 
     const sortedStandings = standings.sort((a: any, b: any) => {
+      if (a.rank > 0 && b.rank > 0) return a.rank - b.rank;
+      if (a.rank > 0) return -1;
+      if (b.rank > 0) return 1;
+
       const aP = a.points;
       const bP = b.points;
       if (bP !== aP) return bP - aP;
@@ -704,8 +721,14 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
     const standingsWithRanks = [];
     let i = 0;
     while (i < sortedStandings.length) {
+      if (sortedStandings[i].rank > 0) {
+        standingsWithRanks.push({ ...sortedStandings[i], displayRank: sortedStandings[i].rank.toString() });
+        i++;
+        continue;
+      }
       let tieCount = 1;
       while (i + tieCount < sortedStandings.length &&
+        sortedStandings[i + tieCount].rank === 0 &&
         sortedStandings[i + tieCount].points === sortedStandings[i].points &&
         (sortedStandings[i + tieCount].gf - sortedStandings[i + tieCount].ga) === (sortedStandings[i].gf - sortedStandings[i].ga) &&
         sortedStandings[i + tieCount].gf === sortedStandings[i].gf) {
@@ -1587,7 +1610,28 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         <tbody>
                           {calculateStandings('GENERAL_TABLE').map((team: any) => (
                             <tr key={team.id} style={team.isGeneralTableIncluded ? { backgroundColor: 'rgba(59, 130, 246, 0.05)' } : {}}>
-                              <td>{team.displayRank}</td>
+                              <td>
+                                {isAdmin && (sport === 'football' || sport === 'футбол') ? (
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    className={styles.pointsInlineInput}
+                                    style={{ width: '45px', textAlign: 'center', padding: '4px' }}
+                                    placeholder={team.displayRank}
+                                    defaultValue={team.rank || ''}
+                                    onFocus={(e) => e.target.select()}
+                                    onBlur={(e) => {
+                                      const val = e.target.value === '' ? 0 : parseInt(e.target.value);
+                                      if (val !== (team.rank || 0)) {
+                                        handleUpdateTeamRank(team.id, val);
+                                      }
+                                    }}
+                                    title="Місце вручну (порожньо для авто)"
+                                  />
+                                ) : (
+                                  team.displayRank
+                                )}
+                              </td>
                               <td className={styles.tableName} onClick={() => { setEditingTeamId(team.id); setIsTeamRosterModalOpen(true); }} style={{ cursor: 'pointer' }}>
                                 {team.name}
                                 {team.isGeneralTableIncluded && <i className="fas fa-check-circle" style={{ marginLeft: '6px', color: '#3b82f6', fontSize: '12px' }} title="Додано вручну"></i>}
@@ -1637,7 +1681,28 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                         <tbody>
                           {calculateStandings(groupName).map((team: any) => (
                             <tr key={team.id}>
-                              <td>{team.displayRank}</td>
+                              <td>
+                                {isAdmin && (sport === 'football' || sport === 'футбол') ? (
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    className={styles.pointsInlineInput}
+                                    style={{ width: '45px', textAlign: 'center', padding: '4px' }}
+                                    placeholder={team.displayRank}
+                                    defaultValue={team.rank || ''}
+                                    onFocus={(e) => e.target.select()}
+                                    onBlur={(e) => {
+                                      const val = e.target.value === '' ? 0 : parseInt(e.target.value);
+                                      if (val !== (team.rank || 0)) {
+                                        handleUpdateTeamRank(team.id, val);
+                                      }
+                                    }}
+                                    title="Місце вручну (порожньо для авто)"
+                                  />
+                                ) : (
+                                  team.displayRank
+                                )}
+                              </td>
                               <td className={styles.tableName} onClick={() => { setEditingTeamId(team.id); setIsTeamRosterModalOpen(true); }} style={{ cursor: 'pointer' }}>{team.name}</td>
                               <td>{team.gp}</td>
                               <td>{team.w}</td>
@@ -1686,7 +1751,28 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                   <tbody>
                     {(standingsData || []).map((team: any) => (
                       <tr key={team.id}>
-                        <td>{team.displayRank}</td>
+                        <td>
+                          {isAdmin && (sport === 'football' || sport === 'футбол') ? (
+                            <input
+                              type="number"
+                              min="0"
+                              className={styles.pointsInlineInput}
+                              style={{ width: '45px', textAlign: 'center', padding: '4px' }}
+                              placeholder={team.displayRank}
+                              defaultValue={team.rank || ''}
+                              onFocus={(e) => e.target.select()}
+                              onBlur={(e) => {
+                                const val = e.target.value === '' ? 0 : parseInt(e.target.value);
+                                if (val !== (team.rank || 0)) {
+                                  handleUpdateTeamRank(team.id, val);
+                                }
+                              }}
+                              title="Місце вручну (порожньо для авто)"
+                            />
+                          ) : (
+                            team.displayRank
+                          )}
+                        </td>
                         <td className={styles.tableName} onClick={() => { setEditingTeamId(team.id); setIsTeamRosterModalOpen(true); }} style={{ cursor: 'pointer' }}>
                           {team.name}
                         </td>
