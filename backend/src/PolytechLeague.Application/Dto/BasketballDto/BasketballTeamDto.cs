@@ -8,6 +8,10 @@ public class BasketballTeamRequest
     public required string Name { get; set; }
     public long EventId { get; set; }
     public ICollection<long>? PlayerIds { get; set; }
+    public double Points { get; set; }
+    public int Rank { get; set; }
+    public string? TournamentGroupName { get; set; }
+    public bool IsGeneralTableIncluded { get; set; }
 }
 
 public class BasketballTeamResponse
@@ -15,6 +19,10 @@ public class BasketballTeamResponse
     public long Id { get; set; }
     public required string Name { get; set; }
     public ICollection<PlayerDto>? Players { get; set; }
+    public double Points { get; set; }
+    public int Rank { get; set; }
+    public string? TournamentGroupName { get; set; }
+    public bool IsGeneralTableIncluded { get; set; }
 }
 
 public static class BasketballTeamDtoExtensions
@@ -25,7 +33,11 @@ public static class BasketballTeamDtoExtensions
         {
             Name = request.Name,
             EventId = request.EventId,
-            PlayerIds = request.PlayerIds
+            PlayerIds = request.PlayerIds,
+            Points = request.Points,
+            Rank = request.Rank,
+            TournamentGroupName = request.TournamentGroupName,
+            IsGeneralTableIncluded = request.IsGeneralTableIncluded
         };
     }
 
@@ -35,7 +47,11 @@ public static class BasketballTeamDtoExtensions
         {
             Id = entity.Id,
             Name = entity.Name,
-            Players = entity.Players?.Select(p => p.ToDto()).ToList()
+            Players = entity.Players?.Select(p => p.ToDto()).ToList(),
+            Points = entity.Points,
+            Rank = entity.Rank,
+            TournamentGroupName = entity.TournamentGroupName,
+            IsGeneralTableIncluded = entity.IsGeneralTableIncluded
         };
     }
 }

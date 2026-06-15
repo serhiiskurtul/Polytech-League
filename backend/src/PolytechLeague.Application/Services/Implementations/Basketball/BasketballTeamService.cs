@@ -89,6 +89,9 @@ public class BasketballTeamService(
     protected override void UpdateValues(BasketballTeam oldEntity, BasketballTeam newEntity)
     {
         oldEntity.Name = newEntity.Name;
+        oldEntity.Points = newEntity.Points;
         oldEntity.Rank = newEntity.Rank;
+        oldEntity.TournamentGroupName = newEntity.TournamentGroupName;
+        oldEntity.IsGeneralTableIncluded = newEntity.IsGeneralTableIncluded;
     }
 }
