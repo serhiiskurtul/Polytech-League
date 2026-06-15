@@ -1648,7 +1648,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                                     className={styles.pointsInlineInput}
                                     defaultValue={team.points}
                                     onFocus={(e) => e.target.select()}
-                                    onBlur={(e) => handleUpdateTeamPoints(team.id, parseInt(e.target.value) || 0)}
+                                    onBlur={(e) => handleUpdateTeamPoints(team.id, parseFloat(e.target.value) || 0)}
                                   />
                                 ) : (
                                   team.points
@@ -1716,7 +1716,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                                     className={styles.pointsInlineInput}
                                     defaultValue={team.points}
                                     onFocus={(e) => e.target.select()}
-                                    onBlur={(e) => handleUpdateTeamPoints(team.id, parseInt(e.target.value) || 0)}
+                                    onBlur={(e) => handleUpdateTeamPoints(team.id, parseFloat(e.target.value) || 0)}
                                   />
                                 ) : (
                                   team.points
@@ -1756,6 +1756,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                             <input
                               type="number"
                               min="0"
+                              step="0.5"
                               className={styles.pointsInlineInput}
                               style={{ width: '45px', textAlign: 'center', padding: '4px' }}
                               placeholder={team.displayRank}
@@ -1785,10 +1786,11 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                             <input
                               type="number"
                               min="0"
+                              step="0.5"
                               className={styles.pointsInlineInput}
                               defaultValue={team.points}
                               onFocus={(e) => e.target.select()}
-                              onBlur={(e) => handleUpdateTeamPoints(team.id, parseInt(e.target.value) || 0)}
+                              onBlur={(e) => handleUpdateTeamPoints(team.id, parseFloat(e.target.value) || 0)}
                             />
                           ) : (
                             team.points
