@@ -444,6 +444,9 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<long?>("EventId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("IsGeneralTableIncluded")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
@@ -453,6 +456,15 @@ namespace PolytechLeague.Persistence.Migrations
 
                     b.Property<long?>("Player2Id")
                         .HasColumnType("bigint");
+
+                    b.Property<double>("Points")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("Rank")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TournamentGroupName")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -545,14 +557,23 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<long>("EventId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("IsGeneralTableIncluded")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<double>("Points")
+                        .HasColumnType("double precision");
+
                     b.Property<int>("Rank")
                         .HasColumnType("integer")
                         .HasColumnName("rank");
+
+                    b.Property<string>("TournamentGroupName")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -677,14 +698,23 @@ namespace PolytechLeague.Persistence.Migrations
                     b.Property<long>("EventId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("IsGeneralTableIncluded")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<double>("Points")
+                        .HasColumnType("double precision");
+
                     b.Property<int>("Rank")
                         .HasColumnType("integer")
                         .HasColumnName("rank");
+
+                    b.Property<string>("TournamentGroupName")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -2164,15 +2194,18 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("event_id");
 
+                    b.Property<bool>("IsGeneralTableIncluded")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("name");
 
-                    b.Property<int>("Points")
+                    b.Property<double>("Points")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0)
+                        .HasColumnType("double precision")
+                        .HasDefaultValue(0.0)
                         .HasColumnName("points");
 
                     b.Property<int>("Rank")
@@ -2180,6 +2213,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .HasColumnType("integer")
                         .HasDefaultValue(0)
                         .HasColumnName("rank");
+
+                    b.Property<string>("TournamentGroupName")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -2431,6 +2467,9 @@ namespace PolytechLeague.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
+
+                    b.Property<double>("Points")
+                        .HasColumnType("double precision");
 
                     b.Property<int>("Rank")
                         .HasColumnType("integer")

@@ -20,6 +20,11 @@ public class BadmintonTeam
     [System.ComponentModel.DataAnnotations.Schema.NotMapped]
     public ICollection<long>? PlayerIds { get; set; }
 
+    public double Points { get; set; }
+    public int Rank { get; set; }
+    public string? TournamentGroupName { get; set; }
+    public bool IsGeneralTableIncluded { get; set; }
+
     public long? CollegeId { get; set; }
     public College? College { get; set; }
 }

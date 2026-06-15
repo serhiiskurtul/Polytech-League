@@ -56,8 +56,10 @@ public class TableTennisTeamResponse
     public required string Name { get; set; }
     public long EventId { get; set; }
     public ICollection<PlayerDto>? Players { get; set; }
-    public int Points { get; set; }
+    public double Points { get; set; }
     public int Rank { get; set; }
+    public string? TournamentGroupName { get; set; }
+    public bool IsGeneralTableIncluded { get; set; }
 }
 
 public class TableTennisEventResponse
@@ -236,7 +238,9 @@ public static class TableTennisEventDtoExtensions
             EventId = entity.EventId,
             Players = entity.Players?.Select(p => p.ToDto()).ToList(),
             Points = entity.Points,
-            Rank = entity.Rank
+            Rank = entity.Rank,
+            TournamentGroupName = entity.TournamentGroupName,
+            IsGeneralTableIncluded = entity.IsGeneralTableIncluded
         };
     }
 }
