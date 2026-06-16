@@ -715,9 +715,12 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
       });
 
       // Traditional points calculation
-      const autoPoints = stats.w * 3 + stats.d * 1;
+      let autoPoints = stats.w * 3 + stats.d * 1;
+      if (sport === 'chess' || sport === 'checkers') {
+        autoPoints = stats.w * 2 + stats.d * 1;
+      }
 
-      const finalPoints = (stats.manualPoints > 0 && stats.gp === 0)
+      const finalPoints = stats.manualPoints > 0
         ? stats.manualPoints
         : autoPoints;
 
