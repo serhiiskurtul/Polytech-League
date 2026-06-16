@@ -815,7 +815,13 @@ const TournamentViewPage = () => {
       console.log("Updating tournament with payload:", payload);
 
       if (sportKey === 'checkers') {
-        await updateCheckersEvent(id!, { ...payload, variant: (details as any).variant || 'Russian' } as any);
+        await updateCheckersEvent(id!, { 
+          ...payload, 
+          variant: (editTournamentData as any).variant || (details as any).variant || 'Russian',
+          system: editTournamentData.system,
+          timeControl: editTournamentData.timeControl,
+          participantsCount: editTournamentData.participantsCount
+        } as any);
       } else if (sportKey === 'armwrestling') {
         await updateArmwrestlingEvent(id!, {
           ...payload,

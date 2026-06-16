@@ -370,6 +370,20 @@ public class PlayerService : IPlayerService
             var cbS = await _dbContext.ChessGames.AsNoTracking().Where(g => eligibleEventIdsList.Contains(g.TournamentId) && g.BlackPlayerId.HasValue && eligiblePlayerIdsList.Contains(g.BlackPlayerId.Value)).GroupBy(g => g.BlackPlayerId!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.BlackWin) }).ToListAsync(cancellationToken);
             var chwS = await _dbContext.CheckersGames.AsNoTracking().Where(g => eligibleEventIdsList.Contains(g.TournamentId) && g.WhitePlayerId.HasValue && eligiblePlayerIdsList.Contains(g.WhitePlayer.PlayerId)).GroupBy(g => g.WhitePlayer.PlayerId).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.WhiteWin) }).ToListAsync(cancellationToken);
             var chbS = await _dbContext.CheckersGames.AsNoTracking().Where(g => eligibleEventIdsList.Contains(g.TournamentId) && g.BlackPlayerId.HasValue && eligiblePlayerIdsList.Contains(g.BlackPlayer.PlayerId)).GroupBy(g => g.BlackPlayer.PlayerId).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.Result == GameResult.BlackWin) }).ToListAsync(cancellationToken);
+            
+            var cwtS = await _dbContext.ChessGames.AsNoTracking().Where(g => eligibleEventIdsList.Contains(g.TournamentId) && g.WhiteTeamId.HasValue)
+                .SelectMany(g => g.WhiteTeam!.Players!.Where(p => eligiblePlayerIdsList.Contains(p.Id)).Select(p => new { PlayerId = p.Id, IsWinner = g.Result == GameResult.WhiteWin || (g.WhiteTeamScore > g.BlackTeamScore) }))
+                .GroupBy(x => x.PlayerId).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.IsWinner) }).ToListAsync(cancellationToken);
+            var cbtS = await _dbContext.ChessGames.AsNoTracking().Where(g => eligibleEventIdsList.Contains(g.TournamentId) && g.BlackTeamId.HasValue)
+                .SelectMany(g => g.BlackTeam!.Players!.Where(p => eligiblePlayerIdsList.Contains(p.Id)).Select(p => new { PlayerId = p.Id, IsWinner = g.Result == GameResult.BlackWin || (g.BlackTeamScore > g.WhiteTeamScore) }))
+                .GroupBy(x => x.PlayerId).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.IsWinner) }).ToListAsync(cancellationToken);
+            var chwtS = await _dbContext.CheckersGames.AsNoTracking().Where(g => eligibleEventIdsList.Contains(g.TournamentId) && g.WhiteTeamId.HasValue)
+                .SelectMany(g => g.WhiteTeam!.Players!.Where(p => eligiblePlayerIdsList.Contains(p.Id)).Select(p => new { PlayerId = p.Id, IsWinner = g.Result == GameResult.WhiteWin || (g.WhiteTeamScore > g.BlackTeamScore) }))
+                .GroupBy(x => x.PlayerId).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.IsWinner) }).ToListAsync(cancellationToken);
+            var chbtS = await _dbContext.CheckersGames.AsNoTracking().Where(g => eligibleEventIdsList.Contains(g.TournamentId) && g.BlackTeamId.HasValue)
+                .SelectMany(g => g.BlackTeam!.Players!.Where(p => eligiblePlayerIdsList.Contains(p.Id)).Select(p => new { PlayerId = p.Id, IsWinner = g.Result == GameResult.BlackWin || (g.BlackTeamScore > g.WhiteTeamScore) }))
+                .GroupBy(x => x.PlayerId).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.IsWinner) }).ToListAsync(cancellationToken);
+
             var tt1S = await _dbContext.TableTennisMatches.AsNoTracking().Where(g => eligibleEventIdsList.Contains(g.TournamentId) && g.Player1Id.HasValue && eligiblePlayerIdsList.Contains(g.Player1Id.Value)).GroupBy(g => g.Player1Id!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
             var tt2S = await _dbContext.TableTennisMatches.AsNoTracking().Where(g => eligibleEventIdsList.Contains(g.TournamentId) && g.Player2Id.HasValue && eligiblePlayerIdsList.Contains(g.Player2Id.Value)).GroupBy(g => g.Player2Id!.Value).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
             var arm1S = await _dbContext.ArmwrestlingMatches.AsNoTracking().Where(g => eligibleEventIdsList.Contains(g.EventId) && eligiblePlayerIdsList.Contains(g.Player1Id)).GroupBy(g => g.Player1Id).Select(g => new { Id = g.Key, Count = g.Count(), Wins = g.Count(x => x.WinnerId == g.Key) }).ToListAsync(cancellationToken);
@@ -686,13 +700,15 @@ public class PlayerService : IPlayerService
                 }
 
                 var cw = cwS.FirstOrDefault(x => x.Id == playerId); var cb = cbS.FirstOrDefault(x => x.Id == playerId);
+                var cwt = cwtS.FirstOrDefault(x => x.Id == playerId); var cbt = cbtS.FirstOrDefault(x => x.Id == playerId);
                 var chw = chwS.FirstOrDefault(x => x.Id == playerId); var chb = chbS.FirstOrDefault(x => x.Id == playerId);
+                var chwt = chwtS.FirstOrDefault(x => x.Id == playerId); var chbt = chbtS.FirstOrDefault(x => x.Id == playerId);
                 var t1 = tt1S.FirstOrDefault(x => x.Id == playerId); var t2 = tt2S.FirstOrDefault(x => x.Id == playerId);
                 var a1 = arm1S.FirstOrDefault(x => x.Id == playerId); var a2 = arm2S.FirstOrDefault(x => x.Id == playerId);
                 var b1 = bad1S.FirstOrDefault(x => x.Id == playerId); var b2 = bad2S.FirstOrDefault(x => x.Id == playerId);
                 
-                AddStats("chess", (cw?.Count ?? 0) + (cb?.Count ?? 0), (cw?.Wins ?? 0) + (cb?.Wins ?? 0));
-                AddStats("checkers", (chw?.Count ?? 0) + (chb?.Count ?? 0), (chw?.Wins ?? 0) + (chb?.Wins ?? 0));
+                AddStats("chess", (cw?.Count ?? 0) + (cb?.Count ?? 0) + (cwt?.Count ?? 0) + (cbt?.Count ?? 0), (cw?.Wins ?? 0) + (cb?.Wins ?? 0) + (cwt?.Wins ?? 0) + (cbt?.Wins ?? 0));
+                AddStats("checkers", (chw?.Count ?? 0) + (chb?.Count ?? 0) + (chwt?.Count ?? 0) + (chbt?.Count ?? 0), (chw?.Wins ?? 0) + (chb?.Wins ?? 0) + (chwt?.Wins ?? 0) + (chbt?.Wins ?? 0));
                 AddStats("table_tennis", (t1?.Count ?? 0) + (t2?.Count ?? 0), (t1?.Wins ?? 0) + (t2?.Wins ?? 0));
                 AddStats("armwrestling", (a1?.Count ?? 0) + (a2?.Count ?? 0), (a1?.Wins ?? 0) + (a2?.Wins ?? 0));
                 AddStats("badminton", (b1?.Count ?? 0) + (b2?.Count ?? 0), (b1?.Wins ?? 0) + (b2?.Wins ?? 0));
@@ -1256,6 +1272,27 @@ public class PlayerService : IPlayerService
         int chessWins = await _dbContext.ChessGames.CountAsync(g => (g.WhitePlayerId == playerId && g.Result == GameResult.WhiteWin) || (g.BlackPlayerId == playerId && g.Result == GameResult.BlackWin), cancellationToken);
         int checkersMatches = await _dbContext.CheckersGames.CountAsync(g => g.WhitePlayer.PlayerId == playerId || g.BlackPlayer.PlayerId == playerId, cancellationToken);
         int checkersWins = await _dbContext.CheckersGames.CountAsync(g => (g.WhitePlayer.PlayerId == playerId && g.Result == GameResult.WhiteWin) || (g.BlackPlayer.PlayerId == playerId && g.Result == GameResult.BlackWin), cancellationToken);
+
+        int chessTeamMatches = await _dbContext.ChessGames.CountAsync(g => 
+            (g.WhiteTeamId.HasValue && g.WhiteTeam!.Players!.Any(p => p.Id == playerId)) ||
+            (g.BlackTeamId.HasValue && g.BlackTeam!.Players!.Any(p => p.Id == playerId)), cancellationToken);
+
+        int chessTeamWins = await _dbContext.ChessGames.CountAsync(g => 
+            (g.WhiteTeamId.HasValue && g.WhiteTeam!.Players!.Any(p => p.Id == playerId) && (g.Result == GameResult.WhiteWin || g.WhiteTeamScore > g.BlackTeamScore)) ||
+            (g.BlackTeamId.HasValue && g.BlackTeam!.Players!.Any(p => p.Id == playerId) && (g.Result == GameResult.BlackWin || g.BlackTeamScore > g.WhiteTeamScore)), cancellationToken);
+
+        int checkersTeamMatches = await _dbContext.CheckersGames.CountAsync(g => 
+            (g.WhiteTeamId.HasValue && g.WhiteTeam!.Players!.Any(p => p.Id == playerId)) ||
+            (g.BlackTeamId.HasValue && g.BlackTeam!.Players!.Any(p => p.Id == playerId)), cancellationToken);
+
+        int checkersTeamWins = await _dbContext.CheckersGames.CountAsync(g => 
+            (g.WhiteTeamId.HasValue && g.WhiteTeam!.Players!.Any(p => p.Id == playerId) && (g.Result == GameResult.WhiteWin || g.WhiteTeamScore > g.BlackTeamScore)) ||
+            (g.BlackTeamId.HasValue && g.BlackTeam!.Players!.Any(p => p.Id == playerId) && (g.Result == GameResult.BlackWin || g.BlackTeamScore > g.WhiteTeamScore)), cancellationToken);
+
+        chessMatches += chessTeamMatches;
+        chessWins += chessTeamWins;
+        checkersMatches += checkersTeamMatches;
+        checkersWins += checkersTeamWins;
         int ttMatches = await _dbContext.TableTennisMatches.CountAsync(g => g.Player1Id == playerId || g.Player2Id == playerId, cancellationToken);
         int ttWins = await _dbContext.TableTennisMatches.CountAsync(g => g.WinnerId == playerId, cancellationToken);
         int armMatches = await _dbContext.ArmwrestlingMatches.CountAsync(g => g.Player1Id == playerId || g.Player2Id == playerId, cancellationToken);
