@@ -1631,7 +1631,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                           {calculateStandings('GENERAL_TABLE').map((team: any) => (
                             <tr key={team.id} style={team.isGeneralTableIncluded ? { backgroundColor: 'rgba(59, 130, 246, 0.05)' } : {}}>
                               <td>
-                                {isAdmin && (sport === 'football' || sport === 'футбол') ? (
+                                {isAdmin && ['football', 'футбол', 'volleyball', 'beach_volleyball', 'волейбол', 'пляжний_волейбол'].includes(sport) ? (
                                   <input
                                     type="number"
                                     min="0"
@@ -1703,7 +1703,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                           {calculateStandings(groupName).map((team: any) => (
                             <tr key={team.id}>
                               <td>
-                                {isAdmin && (sport === 'football' || sport === 'футбол') ? (
+                                {isAdmin && ['football', 'футбол', 'volleyball', 'beach_volleyball', 'волейбол', 'пляжний_волейбол'].includes(sport) ? (
                                   <input
                                     type="number"
                                     min="0"
@@ -1774,7 +1774,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
                     {(standingsData || []).map((team: any) => (
                       <tr key={team.id}>
                         <td>
-                          {isAdmin && (sport === 'football' || sport === 'футбол') ? (
+                          {isAdmin && ['football', 'футбол', 'volleyball', 'beach_volleyball', 'волейбол', 'пляжний_волейбол'].includes(sport) ? (
                             <input
                               type="number"
                               min="0"
