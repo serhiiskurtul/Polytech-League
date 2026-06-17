@@ -1202,9 +1202,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
           <i className="fas fa-trophy"></i> {getSportLabel()}
         </div>
         <div className={styles.tabsNav}>
-          {!hasBracket && (
-            <button className={activeTab === 'matches' ? styles.activeTab : ''} onClick={() => setActiveTab('matches')}>Матчі</button>
-          )}
+          <button className={activeTab === 'matches' ? styles.activeTab : ''} onClick={() => setActiveTab('matches')}>Матчі</button>
           <button className={activeTab === 'standings' ? styles.activeTab : ''} onClick={() => setActiveTab('standings')}>Таблиця</button>
           {hasBracket && (
             <button className={activeTab === 'bracket' ? styles.activeTab : ''} onClick={() => setActiveTab('bracket')}>Сітка</button>
