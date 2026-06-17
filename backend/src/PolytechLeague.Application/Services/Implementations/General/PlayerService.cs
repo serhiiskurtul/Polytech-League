@@ -2234,14 +2234,28 @@ public class PlayerService : IPlayerService
             }
 
             // 5. National Champion (Overall College Winner)
-            var playerCollegeId = await _dbContext.Players
+            var playerInfo = await _dbContext.Players
                 .Where(p => p.Id == playerId)
-                .Select(p => p.CollegeId)
+                .Select(p => new { p.CollegeId, p.IsExternal })
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (playerCollegeId.HasValue)
+            long? myCollegeId = playerInfo?.CollegeId;
+
+            if (playerInfo != null && myCollegeId == null && !playerInfo.IsExternal)
             {
-                var myCollegeId = playerCollegeId.Value;
+                var chpfk = await _dbContext.Colleges
+                    .Where(c => c.ShortName == "ЧПФК" || c.Name.Contains("Чернівецький політехнічний"))
+                    .Select(c => c.Id)
+                    .FirstOrDefaultAsync(cancellationToken);
+                
+                if (chpfk > 0)
+                {
+                    myCollegeId = chpfk;
+                }
+            }
+
+            if (myCollegeId.HasValue)
+            {
                 var nationalEventIds = dto.Achievements.Select(a => a.TournamentId).ToList();
                 if (nationalEventIds.Any())
                 {
