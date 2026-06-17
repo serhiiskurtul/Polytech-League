@@ -121,6 +121,7 @@ const ProfileHeader = ({ userData, isAdmin, onEdit, onAvatarUpload, onLogout, on
                     badge.type === 'BestAthlete3' ? styles.badgeBestAthlete3 :
                     badge.type === 'BestAthleteSport' ? styles.badgeBestAthleteSport :
                     badge.type === 'BestAthleteSportTied' ? styles.badgeBestAthleteSportTied :
+                    badge.type === 'NationalChampionOverall' ? styles.badgeNationalChampion :
                     styles.badgeSeasonTopScorer
                   }
                   title={badge.seasonName ? `Сезон: ${badge.seasonName}` : undefined}

@@ -11,6 +11,7 @@ export interface Season {
 export interface SportResult {
   points: number;
   rank: string | number;
+  tournamentId?: number;
 }
 
 export interface GroupRatingRow {

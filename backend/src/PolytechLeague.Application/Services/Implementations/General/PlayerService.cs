@@ -2232,6 +2232,53 @@ public class PlayerService : IPlayerService
                     _logger.LogWarning(ex, "Error getting rankings for season {SeasonId} in badges population", season.Id);
                 }
             }
+
+            // 5. National Champion (Overall College Winner)
+            var playerCollegeId = await _dbContext.Players
+                .Where(p => p.Id == playerId)
+                .Select(p => p.CollegeId)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (playerCollegeId.HasValue)
+            {
+                var myCollegeId = playerCollegeId.Value;
+                var nationalEventIds = dto.Achievements.Select(a => a.TournamentId).ToList();
+                if (nationalEventIds.Any())
+                {
+                    var nationalSeasonsParticipated = await _dbContext.Set<Event>()
+                        .AsNoTracking()
+                        .Include(e => e.Season)
+                        .Where(e => nationalEventIds.Contains(e.Id) && e.Level == CompetitionLevel.National && e.SeasonId != null)
+                        .Select(e => e.Season)
+                        .Distinct()
+                        .ToListAsync(cancellationToken);
+
+                    foreach (var season in nationalSeasonsParticipated)
+                    {
+                        if (season == null) continue;
+                        
+                        var entry = await _dbContext.NationalRatingManualEntries
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(e => e.SeasonId == season.Id && e.CollegeId == myCollegeId, cancellationToken);
+                            
+                        if (entry != null && !string.IsNullOrWhiteSpace(entry.Rank))
+                        {
+                            var rankParts = entry.Rank.Split('-');
+                            if (rankParts.Length > 0 && rankParts[0].Trim() == "1")
+                            {
+                                badges.Add(new AutomaticBadgeDto
+                                {
+                                    Type = "NationalChampionOverall",
+                                    Label = "Чемпіон всеукраїнського загального заліку",
+                                    SeasonName = season.Name,
+                                    Icon = "trophy"
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
         } catch (Exception ex) {
             _logger.LogError(ex, "Error populating automatic badges for player {PlayerId}", playerId);
         }

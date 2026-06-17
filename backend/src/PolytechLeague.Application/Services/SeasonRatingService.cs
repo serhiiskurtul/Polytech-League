@@ -3,6 +3,16 @@ using PolytechLeague.Application.Dto;
 using PolytechLeague.Application.Services.Interfaces;
 using PolytechLeague.Domain.Entities;
 using PolytechLeague.Persistence.Database;
+using PolytechLeague.Domain.Entities.Chess;
+using PolytechLeague.Domain.Entities.Checkers;
+using PolytechLeague.Domain.Entities.TableTennis;
+using PolytechLeague.Domain.Entities.Armwrestling;
+using PolytechLeague.Domain.Entities.Badminton;
+using PolytechLeague.Domain.Entities.Football;
+using PolytechLeague.Domain.Entities.Volleyball;
+using PolytechLeague.Domain.Entities.Basketball;
+using PolytechLeague.Domain.Entities.BeachVolleyball;
+using PolytechLeague.Domain.Entities.Athletics;
 
 namespace PolytechLeague.Application.Services;
 
@@ -600,6 +610,34 @@ public class SeasonRatingService : ISeasonRatingService
             .Where(e => e.SeasonId == seasonId)
             .ToListAsync();
 
+        var nationalEvents = await _context.Set<Event>()
+            .AsNoTracking()
+            .Where(e => e.SeasonId == seasonId && e.Level == CompetitionLevel.National)
+            .ToListAsync();
+
+        var sportToEventId = new Dictionary<string, long>();
+        foreach (var e in nationalEvents)
+        {
+            string sportKey = e switch
+            {
+                ChessEvent => "Шахи",
+                CheckersEvent => "Шашки",
+                TableTennisEvent => "Настільний теніс",
+                ArmwrestlingEvent => "Армрестлінг",
+                BadmintonEvent => "Бадмінтон",
+                FootballEvent => "Футбол",
+                VolleyballEvent => "Волейбол",
+                BasketballEvent => "Баскетбол",
+                BeachVolleyballEvent => "Пляжний волейбол",
+                AthleticsEvent => "Легка атлетика",
+                _ => ""
+            };
+            if (!string.IsNullOrEmpty(sportKey) && !sportToEventId.ContainsKey(sportKey))
+            {
+                sportToEventId[sportKey] = e.Id;
+            }
+        }
+
         var rows = colleges
             .Where(c => manualEntries.Any(e => e.CollegeId == c.Id))
             .Select(c => {
@@ -621,7 +659,9 @@ public class SeasonRatingService : ISeasonRatingService
                                 key = (key == "Баскетбол 3x3" || key == "Баскетбол 3х3") ? "Баскетбол" : key;
                                 if (sports.Contains(key))
                                 {
-                                    sportResults[key] = new SportResultDto { Rank = kvp.Value, Points = 0 };
+                                    long? tId = null;
+                                    if (sportToEventId.TryGetValue(key, out var id)) tId = id;
+                                    sportResults[key] = new SportResultDto { Rank = kvp.Value, Points = 0, TournamentId = tId };
                                 }
                             }
                         }
@@ -634,7 +674,9 @@ public class SeasonRatingService : ISeasonRatingService
                 {
                     if (!sportResults.ContainsKey(s))
                     {
-                        sportResults[s] = new SportResultDto { Rank = "-", Points = 0 };
+                        long? tId = null;
+                        if (sportToEventId.TryGetValue(s, out var id)) tId = id;
+                        sportResults[s] = new SportResultDto { Rank = "-", Points = 0, TournamentId = tId };
                     }
                 }
 
