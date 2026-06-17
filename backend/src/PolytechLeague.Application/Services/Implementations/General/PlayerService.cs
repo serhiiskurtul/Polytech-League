@@ -2261,14 +2261,15 @@ public class PlayerService : IPlayerService
                 {
                     var nationalEvents = await _dbContext.Set<Event>()
                         .AsNoTracking()
-                        .Where(e => nationalEventIds.Contains(e.Id) && e.Level == CompetitionLevel.National)
-                        .Select(e => new { e.SeasonId, e.Date })
+                        .Where(e => nationalEventIds.Contains(e.Id))
+                        .Select(e => new { e.SeasonId, e.Date, e.Level })
                         .ToListAsync(cancellationToken);
 
                     var allSeasonsList = await _dbContext.Seasons.AsNoTracking().ToListAsync(cancellationToken);
                     
+                    // We require the player to have participated in at least one National or Regional event in that season to get the badge
                     var participatedSeasonsIds = new HashSet<long>();
-                    foreach (var e in nationalEvents)
+                    foreach (var e in nationalEvents.Where(ev => ev.Level == CompetitionLevel.National || ev.Level == CompetitionLevel.Regional))
                     {
                         if (e.SeasonId != null)
                         {
@@ -2293,8 +2294,10 @@ public class PlayerService : IPlayerService
                             
                         if (entry != null && !string.IsNullOrWhiteSpace(entry.Rank))
                         {
-                            var rankParts = entry.Rank.Split('-');
-                            if (rankParts.Length > 0 && rankParts[0].Trim() == "1")
+                            var rankStr = entry.Rank.Trim().ToLower();
+                            bool isFirstPlace = rankStr.StartsWith("1") || rankStr == "i" || rankStr.StartsWith("i ") || rankStr.StartsWith("і ") || rankStr.Contains("1 місце") || rankStr.StartsWith("1-");
+                            
+                            if (isFirstPlace)
                             {
                                 badges.Add(new AutomaticBadgeDto
                                 {
