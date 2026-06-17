@@ -583,7 +583,7 @@ public class SeasonRatingService : ISeasonRatingService
         var allSports = new List<string> 
         { 
             "Шахи", "Шашки", "Футбол", "Армрестлінг", 
-            "Настільний теніс", "Бадмінтон", "Волейбол", 
+            "Настільний теніс", "Бадмінтон", "Волейбол (Дівчата)", "Волейбол (Юнаки)", 
             "Баскетбол", "Пляжний волейбол", "Легка атлетика"
         };
 
@@ -626,7 +626,7 @@ public class SeasonRatingService : ISeasonRatingService
                 ArmwrestlingEvent => "Армрестлінг",
                 BadmintonEvent => "Бадмінтон",
                 FootballEvent => "Футбол",
-                VolleyballEvent => "Волейбол",
+                VolleyballEvent => e.Category == EventCategory.Women ? "Волейбол (Дівчата)" : "Волейбол (Юнаки)",
                 BasketballEvent => "Баскетбол",
                 BeachVolleyballEvent => "Пляжний волейбол",
                 AthleticsEvent => "Легка атлетика",
@@ -749,7 +749,7 @@ public class SeasonRatingService : ISeasonRatingService
         var allSports = new List<string> 
         { 
             "Шахи", "Шашки", "Футбол", "Армрестлінг", 
-            "Настільний теніс", "Бадмінтон", "Волейбол", 
+            "Настільний теніс", "Бадмінтон", "Волейбол (Дівчата)", "Волейбол (Юнаки)", 
             "Баскетбол", "Пляжний волейбол", "Легка атлетика"
         };
 
