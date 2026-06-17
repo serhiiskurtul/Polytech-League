@@ -14,7 +14,7 @@ using PolytechLeague.Domain.Entities.Basketball;
 using PolytechLeague.Domain.Entities.BeachVolleyball;
 using PolytechLeague.Domain.Entities.Athletics;
 
-namespace PolytechLeague.Application.Services;
+namespace PolytechLeague.Application.Services.Implementations;
 
 public class SeasonRatingService : ISeasonRatingService
 {

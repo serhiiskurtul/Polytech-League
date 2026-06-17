@@ -1591,11 +1591,24 @@ const TournamentViewPage = () => {
       ? rawParticipants
       : rawParticipants.filter((p: any) => p.status === RegistrationStatus.Approved || !p.status);
 
-    if (tournament?.sport === 'chess' || tournament?.sport === 'checkers') {
+    const sportKey = tournament?.sport?.toLowerCase() || '';
+    if (['chess', 'checkers', 'badminton', 'table_tennis', 'tabletennis', 'armwrestling'].includes(sportKey)) {
       return [...filtered].sort((a: any, b: any) => {
-        if ((b.points || 0) !== (a.points || 0)) return (b.points || 0) - (a.points || 0);
-        if (a.rank || b.rank) return (a.rank || 999) - (b.rank || 999);
-        return 0;
+        const rankA = a.rank && a.rank > 0 ? a.rank : 999;
+        const rankB = b.rank && b.rank > 0 ? b.rank : 999;
+        
+        // If both have explicit ranks, sort by rank
+        if (rankA !== 999 && rankB !== 999 && rankA !== rankB) {
+          return rankA - rankB;
+        }
+        
+        // Otherwise sort by points descending
+        if ((b.points || 0) !== (a.points || 0)) {
+          return (b.points || 0) - (a.points || 0);
+        }
+        
+        // If points are equal, put the one with an explicit rank higher
+        return rankA - rankB;
       });
     }
     return filtered;
@@ -2385,7 +2398,7 @@ const TournamentViewPage = () => {
                         className={`${styles.tabButton} ${activeTab === 'games' ? styles.active : ''}`}
                         onClick={() => setActiveTab('games')}
                       >
-                        <i className={tournament?.sport === 'badminton' ? "fas fa-table-tennis-paddle-ball" : tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? "fas fa-table-tennis" : "fas fa-chess-board"}></i> {tournament?.sport === 'badminton' || tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? 'Всі матчі' : 'Всі партії'}
+                        <i className={tournament?.sport === 'badminton' ? "fas fa-list" : tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? "fas fa-table-tennis" : "fas fa-chess-board"}></i> {tournament?.sport === 'badminton' || tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? 'Всі матчі' : 'Всі партії'}
                       </button>
                       )}
                       <button
