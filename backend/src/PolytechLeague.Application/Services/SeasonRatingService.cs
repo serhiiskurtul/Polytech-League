@@ -598,6 +598,8 @@ public class SeasonRatingService : ISeasonRatingService
                         .Select(s => s == "Армреслінг" ? "Армрестлінг" : s)
                         .Select(s => s == "Футзал" ? "Футбол" : s)
                         .Select(s => (s == "Баскетбол 3x3" || s == "Баскетбол 3х3") ? "Баскетбол" : s)
+                        .Select(s => s == "Волейбол" ? "Волейбол (Юнаки)" : s)
+                        .Where(s => allSports.Contains(s))
                         .Distinct()
                         .ToList();
                 }
@@ -657,6 +659,7 @@ public class SeasonRatingService : ISeasonRatingService
                                 string key = kvp.Key == "Армреслінг" ? "Армрестлінг" : kvp.Key;
                                 key = key == "Футзал" ? "Футбол" : key;
                                 key = (key == "Баскетбол 3x3" || key == "Баскетбол 3х3") ? "Баскетбол" : key;
+                                key = key == "Волейбол" ? "Волейбол (Юнаки)" : key;
                                 if (sports.Contains(key))
                                 {
                                     long? tId = null;
@@ -764,6 +767,8 @@ public class SeasonRatingService : ISeasonRatingService
                         .Select(s => s == "Армреслінг" ? "Армрестлінг" : s)
                         .Select(s => s == "Футзал" ? "Футбол" : s)
                         .Select(s => (s == "Баскетбол 3x3" || s == "Баскетбол 3х3") ? "Баскетбол" : s)
+                        .Select(s => s == "Волейбол" ? "Волейбол (Юнаки)" : s)
+                        .Where(s => allSports.Contains(s))
                         .Distinct()
                         .ToList();
                 }
@@ -794,6 +799,7 @@ public class SeasonRatingService : ISeasonRatingService
                                 string key = kvp.Key == "Армреслінг" ? "Армрестлінг" : kvp.Key;
                                 key = key == "Футзал" ? "Футбол" : key;
                                 key = (key == "Баскетбол 3x3" || key == "Баскетбол 3х3") ? "Баскетбол" : key;
+                                key = key == "Волейбол" ? "Волейбол (Юнаки)" : key;
                                 if (sports.Contains(key))
                                 {
                                     sportResults[key] = new SportResultDto { Rank = kvp.Value, Points = 0 };

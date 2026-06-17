@@ -86,6 +86,20 @@ public abstract class AbstractEntityService<TEntity>(
         // Ensure the ID is populated (sometimes EF Core doesn't update it immediately in memory for TPT)
         await _dbcontext.Entry(entity).ReloadAsync(cancellationToken);
 
+        // Auto-assign Season based on Date if not set
+        if (entity is Event eventEntity && eventEntity.SeasonId == null)
+        {
+            var season = await _dbcontext.Seasons
+                .Where(s => s.StartDate <= eventEntity.Date && s.EndDate >= eventEntity.Date)
+                .FirstOrDefaultAsync(cancellationToken);
+            
+            if (season != null)
+            {
+                eventEntity.SeasonId = season.Id;
+                await _dbcontext.SaveChangesAsync(cancellationToken);
+            }
+        }
+
         // Fallback if ID is still 0 and it's an Event
         if (entity is Event ev && ev.Id == 0)
         {
@@ -122,6 +136,18 @@ public abstract class AbstractEntityService<TEntity>(
         }
 
         UpdateValues(oldEntity, newEntity);
+
+        if (oldEntity is Event eventEntity && eventEntity.SeasonId == null)
+        {
+            var season = await _dbcontext.Seasons
+                .Where(s => s.StartDate <= eventEntity.Date && s.EndDate >= eventEntity.Date)
+                .FirstOrDefaultAsync(cancellationToken);
+            
+            if (season != null)
+            {
+                eventEntity.SeasonId = season.Id;
+            }
+        }
 
         await _dbcontext.SaveChangesAsync(cancellationToken);
 
