@@ -614,7 +614,7 @@ public class SeasonRatingService : ISeasonRatingService
 
         var nationalEvents = await _context.Set<Event>()
             .AsNoTracking()
-            .Where(e => e.SeasonId == seasonId && e.Level == CompetitionLevel.National)
+            .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) && e.Level == CompetitionLevel.National)
             .ToListAsync();
 
         var sportToEventId = new Dictionary<string, long>();
@@ -781,6 +781,34 @@ public class SeasonRatingService : ISeasonRatingService
             .Where(e => e.SeasonId == seasonId)
             .ToListAsync();
 
+        var regionalEvents = await _context.Set<Event>()
+            .AsNoTracking()
+            .Where(e => (e.SeasonId == seasonId || (e.SeasonId == null && e.Date >= season.StartDate && e.Date <= season.EndDate)) && e.Level == CompetitionLevel.Regional)
+            .ToListAsync();
+
+        var sportToEventId = new Dictionary<string, long>();
+        foreach (var e in regionalEvents)
+        {
+            string sportKey = e switch
+            {
+                ChessEvent => "Шахи",
+                CheckersEvent => "Шашки",
+                TableTennisEvent => "Настільний теніс",
+                ArmwrestlingEvent => "Армрестлінг",
+                BadmintonEvent => "Бадмінтон",
+                FootballEvent => "Футбол",
+                VolleyballEvent => e.Category == EventCategory.Women ? "Волейбол (Дівчата)" : "Волейбол (Юнаки)",
+                BasketballEvent => "Баскетбол",
+                BeachVolleyballEvent => "Пляжний волейбол",
+                AthleticsEvent => "Легка атлетика",
+                _ => ""
+            };
+            if (!string.IsNullOrEmpty(sportKey) && !sportToEventId.ContainsKey(sportKey))
+            {
+                sportToEventId[sportKey] = e.Id;
+            }
+        }
+
         var rows = colleges
             .Where(c => manualEntries.Any(e => e.CollegeId == c.Id))
             .Select(c => {
@@ -802,7 +830,9 @@ public class SeasonRatingService : ISeasonRatingService
                                 key = key == "Волейбол" ? "Волейбол (Юнаки)" : key;
                                 if (sports.Contains(key))
                                 {
-                                    sportResults[key] = new SportResultDto { Rank = kvp.Value, Points = 0 };
+                                    long? tId = null;
+                                    if (sportToEventId.TryGetValue(key, out var id)) tId = id;
+                                    sportResults[key] = new SportResultDto { Rank = kvp.Value, Points = 0, TournamentId = tId };
                                 }
                             }
                         }
@@ -815,7 +845,9 @@ public class SeasonRatingService : ISeasonRatingService
                 {
                     if (!sportResults.ContainsKey(s))
                     {
-                        sportResults[s] = new SportResultDto { Rank = "-", Points = 0 };
+                        long? tId = null;
+                        if (sportToEventId.TryGetValue(s, out var id)) tId = id;
+                        sportResults[s] = new SportResultDto { Rank = "-", Points = 0, TournamentId = tId };
                     }
                 }
 
