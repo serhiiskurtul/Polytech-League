@@ -2259,13 +2259,29 @@ public class PlayerService : IPlayerService
                 var nationalEventIds = dto.Achievements.Select(a => a.TournamentId).ToList();
                 if (nationalEventIds.Any())
                 {
-                    var nationalSeasonsParticipated = await _dbContext.Set<Event>()
+                    var nationalEvents = await _dbContext.Set<Event>()
                         .AsNoTracking()
-                        .Include(e => e.Season)
-                        .Where(e => nationalEventIds.Contains(e.Id) && e.Level == CompetitionLevel.National && e.SeasonId != null)
-                        .Select(e => e.Season)
-                        .Distinct()
+                        .Where(e => nationalEventIds.Contains(e.Id) && e.Level == CompetitionLevel.National)
+                        .Select(e => new { e.SeasonId, e.Date })
                         .ToListAsync(cancellationToken);
+
+                    var allSeasonsList = await _dbContext.Seasons.AsNoTracking().ToListAsync(cancellationToken);
+                    
+                    var participatedSeasonsIds = new HashSet<long>();
+                    foreach (var e in nationalEvents)
+                    {
+                        if (e.SeasonId != null)
+                        {
+                            participatedSeasonsIds.Add(e.SeasonId.Value);
+                        }
+                        else
+                        {
+                            var season = allSeasonsList.FirstOrDefault(s => s.StartDate <= e.Date && s.EndDate >= e.Date);
+                            if (season != null) participatedSeasonsIds.Add(season.Id);
+                        }
+                    }
+
+                    var nationalSeasonsParticipated = allSeasonsList.Where(s => participatedSeasonsIds.Contains(s.Id)).ToList();
 
                     foreach (var season in nationalSeasonsParticipated)
                     {
