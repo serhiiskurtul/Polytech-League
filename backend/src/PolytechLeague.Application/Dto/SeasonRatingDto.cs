@@ -23,6 +23,7 @@ public class SportResultDto
 {
     public int Points { get; set; } // Очки (usually same as rank)
     public string? Rank { get; set; }   // Місце
+    public long? TournamentId { get; set; }
 }
 
 public class ManualRatingEntryDto

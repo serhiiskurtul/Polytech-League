@@ -292,6 +292,19 @@
   font-size: 0.95rem;
 }
 
+.tournamentLink {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.tournamentLink:hover {
+  color: var(--primary-hover, #2563eb);
+  text-decoration: underline;
+}
+
 .inactiveRow {
   opacity: 0.6;
   filter: grayscale(0.5);

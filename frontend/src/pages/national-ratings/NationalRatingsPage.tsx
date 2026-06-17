@@ -386,11 +386,21 @@ const NationalRatingsPage: React.FC = () => {
                       <td className={styles.regionCell}>
                         {college?.region || '—'}
                       </td>
-                      {ratingData?.sports.map(sport => (
-                        <td key={sport} className={styles.sportRankCell}>
-                          {isCHPFK ? (row.sportResults?.[sport]?.rank || '-') : '—'}
-                        </td>
-                      ))}
+                      {ratingData?.sports.map(sport => {
+                        const sportResult = row.sportResults?.[sport];
+                        const rankVal = isCHPFK ? (sportResult?.rank || '-') : '—';
+                        return (
+                          <td key={sport} className={styles.sportRankCell}>
+                            {sportResult?.tournamentId && rankVal !== '—' && rankVal !== '-' ? (
+                              <Link to={`/tournaments/${sportResult.tournamentId}`} className={styles.tournamentLink}>
+                                {rankVal}
+                              </Link>
+                            ) : (
+                              rankVal
+                            )}
+                          </td>
+                        );
+                      })}
                       <td className={styles.totalPointsCell}>{row.totalPoints}</td>
                       <td className={styles.totalRankCell}>{row.totalRank || '-'}</td>
                     </tr>
