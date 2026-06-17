@@ -78,7 +78,16 @@ public class FootballMatchService :
         }
 
         _dbcontext.FootballMatches.Add(entity);
-        await _dbcontext.SaveChangesAsync(cancellationToken);
+        try 
+        {
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation("Successfully created FootballMatch with Id {Id}", entity.Id);
+        } 
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Silent failure occurred while saving a new FootballMatch.");
+            throw;
+        }
         return entity;
     }
 
