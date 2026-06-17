@@ -2398,7 +2398,7 @@ const TournamentViewPage = () => {
                         className={`${styles.tabButton} ${activeTab === 'games' ? styles.active : ''}`}
                         onClick={() => setActiveTab('games')}
                       >
-                        <i className={tournament?.sport === 'badminton' ? "fas fa-table-tennis-paddle-ball" : tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? "fas fa-table-tennis" : "fas fa-chess-board"}></i> {tournament?.sport === 'badminton' || tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? 'Всі матчі' : 'Всі партії'}
+                        <i className={tournament?.sport === 'badminton' ? "fas fa-list" : tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? "fas fa-table-tennis" : "fas fa-chess-board"}></i> {tournament?.sport === 'badminton' || tournament?.sport === 'table_tennis' || tournament?.sport === 'tabletennis' ? 'Всі матчі' : 'Всі партії'}
                       </button>
                       )}
                       <button
