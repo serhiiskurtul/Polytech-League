@@ -87,22 +87,62 @@ public class SeasonRatingService : ISeasonRatingService
                         && e.Level == CompetitionLevel.CollegeGroup)
             .Include(e => e.Players!)
                 .ThenInclude(p => p.Player)
+            .Include(e => e.Teams)
             .ToListAsync();
+            
         foreach (var e in chessEvents)
         {
-            foreach (var p in e.Players ?? new List<Domain.Entities.Chess.ChessEventParticipant>())
+            if (e.IsTeam && e.Teams != null && e.Teams.Any())
             {
-                var groupName = p.GroupName ?? p.Player?.Group;
-                if (string.IsNullOrEmpty(groupName)) continue;
-                var normalizedPGroup = groupName.Length >= 3 ? groupName.Substring(0, 3) : groupName;
-                
-                var row = rows.FirstOrDefault(r => r.GroupName.Equals(normalizedPGroup, StringComparison.OrdinalIgnoreCase));
-                if (row != null)
+                foreach (var t in e.Teams)
                 {
-                    int rank = p.Rank > 0 ? p.Rank : 4;
-                    if (row.SportResults["Шахи"].Rank == "-" || rank < int.Parse(row.SportResults["Шахи"].Rank!))
+                    if (string.IsNullOrEmpty(t.Name)) continue;
+                    var normalizedTGroup = t.Name.Length >= 3 ? t.Name.Substring(0, 3) : t.Name;
+                    var row = rows.FirstOrDefault(r => r.GroupName.Equals(normalizedTGroup, StringComparison.OrdinalIgnoreCase));
+                    if (row != null)
                     {
-                        row.SportResults["Шахи"] = new SportResultDto { Rank = rank.ToString(), Points = rank };
+                        int rank = t.Rank;
+                        if (rank <= 0)
+                        {
+                            if (t.Id == e.FirstPlaceTeamId) rank = 1;
+                            else if (t.Id == e.SecondPlaceTeamId) rank = 2;
+                            else if (t.Id == e.ThirdPlaceTeamId) rank = 3;
+                            else if (e.FirstPlaceTeamId != null) rank = 4;
+                            else rank = 4;
+                        }
+                        
+                        if (row.SportResults["Шахи"].Rank == "-" || rank < int.Parse(row.SportResults["Шахи"].Rank!))
+                        {
+                            row.SportResults["Шахи"] = new SportResultDto { Rank = rank.ToString(), Points = rank };
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (var p in e.Players ?? new List<Domain.Entities.Chess.ChessEventParticipant>())
+                {
+                    var groupName = p.GroupName ?? p.Player?.Group;
+                    if (string.IsNullOrEmpty(groupName)) continue;
+                    var normalizedPGroup = groupName.Length >= 3 ? groupName.Substring(0, 3) : groupName;
+                    
+                    var row = rows.FirstOrDefault(r => r.GroupName.Equals(normalizedPGroup, StringComparison.OrdinalIgnoreCase));
+                    if (row != null)
+                    {
+                        int rank = p.Rank;
+                        if (rank <= 0)
+                        {
+                            if (e.FirstPlaceId != null && p.PlayerId == e.FirstPlaceId) rank = 1;
+                            else if (e.SecondPlaceId != null && p.PlayerId == e.SecondPlaceId) rank = 2;
+                            else if (e.ThirdPlaceId != null && p.PlayerId == e.ThirdPlaceId) rank = 3;
+                            else if (e.FirstPlaceId != null) rank = 4;
+                            else rank = 4;
+                        }
+                        
+                        if (row.SportResults["Шахи"].Rank == "-" || rank < int.Parse(row.SportResults["Шахи"].Rank!))
+                        {
+                            row.SportResults["Шахи"] = new SportResultDto { Rank = rank.ToString(), Points = rank };
+                        }
                     }
                 }
             }
@@ -115,22 +155,62 @@ public class SeasonRatingService : ISeasonRatingService
                         && e.Level == CompetitionLevel.CollegeGroup)
             .Include(e => e.Players!)
                 .ThenInclude(p => p.Player)
+            .Include(e => e.Teams)
             .ToListAsync();
+            
         foreach (var e in checkersEvents)
         {
-            foreach (var p in e.Players ?? new List<Domain.Entities.Checkers.CheckersEventParticipant>())
+            if (e.IsTeam && e.Teams != null && e.Teams.Any())
             {
-                var groupName = p.GroupName ?? p.Player?.Group;
-                if (string.IsNullOrEmpty(groupName)) continue;
-                var normalizedPGroup = groupName.Length >= 3 ? groupName.Substring(0, 3) : groupName;
-                
-                var row = rows.FirstOrDefault(r => r.GroupName.Equals(normalizedPGroup, StringComparison.OrdinalIgnoreCase));
-                if (row != null)
+                foreach (var t in e.Teams)
                 {
-                    int rank = p.Rank > 0 ? p.Rank : 4;
-                    if (row.SportResults["Шашки"].Rank == "-" || rank < int.Parse(row.SportResults["Шашки"].Rank!))
+                    if (string.IsNullOrEmpty(t.Name)) continue;
+                    var normalizedTGroup = t.Name.Length >= 3 ? t.Name.Substring(0, 3) : t.Name;
+                    var row = rows.FirstOrDefault(r => r.GroupName.Equals(normalizedTGroup, StringComparison.OrdinalIgnoreCase));
+                    if (row != null)
                     {
-                        row.SportResults["Шашки"] = new SportResultDto { Rank = rank.ToString(), Points = rank };
+                        int rank = t.Rank;
+                        if (rank <= 0)
+                        {
+                            if (t.Id == e.FirstPlaceTeamId) rank = 1;
+                            else if (t.Id == e.SecondPlaceTeamId) rank = 2;
+                            else if (t.Id == e.ThirdPlaceTeamId) rank = 3;
+                            else if (e.FirstPlaceTeamId != null) rank = 4;
+                            else rank = 4;
+                        }
+                        
+                        if (row.SportResults["Шашки"].Rank == "-" || rank < int.Parse(row.SportResults["Шашки"].Rank!))
+                        {
+                            row.SportResults["Шашки"] = new SportResultDto { Rank = rank.ToString(), Points = rank };
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (var p in e.Players ?? new List<Domain.Entities.Checkers.CheckersEventParticipant>())
+                {
+                    var groupName = p.GroupName ?? p.Player?.Group;
+                    if (string.IsNullOrEmpty(groupName)) continue;
+                    var normalizedPGroup = groupName.Length >= 3 ? groupName.Substring(0, 3) : groupName;
+                    
+                    var row = rows.FirstOrDefault(r => r.GroupName.Equals(normalizedPGroup, StringComparison.OrdinalIgnoreCase));
+                    if (row != null)
+                    {
+                        int rank = p.Rank;
+                        if (rank <= 0)
+                        {
+                            if (e.FirstPlaceId != null && p.PlayerId == e.FirstPlaceId) rank = 1;
+                            else if (e.SecondPlaceId != null && p.PlayerId == e.SecondPlaceId) rank = 2;
+                            else if (e.ThirdPlaceId != null && p.PlayerId == e.ThirdPlaceId) rank = 3;
+                            else if (e.FirstPlaceId != null) rank = 4;
+                            else rank = 4;
+                        }
+                        
+                        if (row.SportResults["Шашки"].Rank == "-" || rank < int.Parse(row.SportResults["Шашки"].Rank!))
+                        {
+                            row.SportResults["Шашки"] = new SportResultDto { Rank = rank.ToString(), Points = rank };
+                        }
                     }
                 }
             }
@@ -266,22 +346,62 @@ public class SeasonRatingService : ISeasonRatingService
                         && e.Level == CompetitionLevel.CollegeGroup)
             .Include(e => e.Participants!)
                 .ThenInclude(p => p.Player)
+            .Include(e => e.Teams)
             .ToListAsync();
+            
         foreach (var e in ttEvents)
         {
-            foreach (var p in e.Participants ?? new List<Domain.Entities.TableTennis.TableTennisEventParticipant>())
+            if (e.IsTeam && e.Teams != null && e.Teams.Any())
             {
-                var groupName = p.GroupName ?? p.Player?.Group;
-                if (string.IsNullOrEmpty(groupName)) continue;
-                var normalizedPGroup = groupName.Length >= 3 ? groupName.Substring(0, 3) : groupName;
-                
-                var row = rows.FirstOrDefault(r => r.GroupName.Equals(normalizedPGroup, StringComparison.OrdinalIgnoreCase));
-                if (row != null)
+                foreach (var t in e.Teams)
                 {
-                    int rank = p.Rank > 0 ? p.Rank : 4;
-                    if (row.SportResults["Настільний теніс"].Rank == "-" || rank < int.Parse(row.SportResults["Настільний теніс"].Rank!))
+                    if (string.IsNullOrEmpty(t.Name)) continue;
+                    var normalizedTGroup = t.Name.Length >= 3 ? t.Name.Substring(0, 3) : t.Name;
+                    var row = rows.FirstOrDefault(r => r.GroupName.Equals(normalizedTGroup, StringComparison.OrdinalIgnoreCase));
+                    if (row != null)
                     {
-                        row.SportResults["Настільний теніс"] = new SportResultDto { Rank = rank.ToString(), Points = rank };
+                        int rank = t.Rank;
+                        if (rank <= 0)
+                        {
+                            if (t.Id == e.FirstPlaceTeamId) rank = 1;
+                            else if (t.Id == e.SecondPlaceTeamId) rank = 2;
+                            else if (t.Id == e.ThirdPlaceTeamId) rank = 3;
+                            else if (e.FirstPlaceTeamId != null) rank = 4;
+                            else rank = 4;
+                        }
+                        
+                        if (row.SportResults["Настільний теніс"].Rank == "-" || rank < int.Parse(row.SportResults["Настільний теніс"].Rank!))
+                        {
+                            row.SportResults["Настільний теніс"] = new SportResultDto { Rank = rank.ToString(), Points = rank };
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (var p in e.Participants ?? new List<Domain.Entities.TableTennis.TableTennisEventParticipant>())
+                {
+                    var groupName = p.GroupName ?? p.Player?.Group;
+                    if (string.IsNullOrEmpty(groupName)) continue;
+                    var normalizedPGroup = groupName.Length >= 3 ? groupName.Substring(0, 3) : groupName;
+                    
+                    var row = rows.FirstOrDefault(r => r.GroupName.Equals(normalizedPGroup, StringComparison.OrdinalIgnoreCase));
+                    if (row != null)
+                    {
+                        int rank = p.Rank;
+                        if (rank <= 0)
+                        {
+                            if (e.FirstPlaceId != null && p.PlayerId == e.FirstPlaceId) rank = 1;
+                            else if (e.SecondPlaceId != null && p.PlayerId == e.SecondPlaceId) rank = 2;
+                            else if (e.ThirdPlaceId != null && p.PlayerId == e.ThirdPlaceId) rank = 3;
+                            else if (e.FirstPlaceId != null) rank = 4;
+                            else rank = 4;
+                        }
+                        
+                        if (row.SportResults["Настільний теніс"].Rank == "-" || rank < int.Parse(row.SportResults["Настільний теніс"].Rank!))
+                        {
+                            row.SportResults["Настільний теніс"] = new SportResultDto { Rank = rank.ToString(), Points = rank };
+                        }
                     }
                 }
             }
@@ -294,22 +414,62 @@ public class SeasonRatingService : ISeasonRatingService
                         && e.Level == CompetitionLevel.CollegeGroup)
             .Include(e => e.Participants!)
                 .ThenInclude(p => p.Player)
+            .Include(e => e.Teams)
             .ToListAsync();
+            
         foreach (var e in badEvents)
         {
-            foreach (var p in e.Participants ?? new List<Domain.Entities.Badminton.BadmintonEventParticipant>())
+            if (e.IsTeam && e.Teams != null && e.Teams.Any())
             {
-                var groupName = p.GroupName ?? p.Player?.Group;
-                if (string.IsNullOrEmpty(groupName)) continue;
-                var normalizedPGroup = groupName.Length >= 3 ? groupName.Substring(0, 3) : groupName;
-                
-                var row = rows.FirstOrDefault(r => r.GroupName.Equals(normalizedPGroup, StringComparison.OrdinalIgnoreCase));
-                if (row != null)
+                foreach (var t in e.Teams)
                 {
-                    int rank = p.Rank > 0 ? p.Rank : 4;
-                    if (row.SportResults["Бадмінтон"].Rank == "-" || rank < int.Parse(row.SportResults["Бадмінтон"].Rank!))
+                    if (string.IsNullOrEmpty(t.Name)) continue;
+                    var normalizedTGroup = t.Name.Length >= 3 ? t.Name.Substring(0, 3) : t.Name;
+                    var row = rows.FirstOrDefault(r => r.GroupName.Equals(normalizedTGroup, StringComparison.OrdinalIgnoreCase));
+                    if (row != null)
                     {
-                        row.SportResults["Бадмінтон"] = new SportResultDto { Rank = rank.ToString(), Points = rank };
+                        int rank = t.Rank;
+                        if (rank <= 0)
+                        {
+                            if (t.Id == e.FirstPlaceTeamId) rank = 1;
+                            else if (t.Id == e.SecondPlaceTeamId) rank = 2;
+                            else if (t.Id == e.ThirdPlaceTeamId) rank = 3;
+                            else if (e.FirstPlaceTeamId != null) rank = 4;
+                            else rank = 4;
+                        }
+                        
+                        if (row.SportResults["Бадмінтон"].Rank == "-" || rank < int.Parse(row.SportResults["Бадмінтон"].Rank!))
+                        {
+                            row.SportResults["Бадмінтон"] = new SportResultDto { Rank = rank.ToString(), Points = rank };
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (var p in e.Participants ?? new List<Domain.Entities.Badminton.BadmintonEventParticipant>())
+                {
+                    var groupName = p.GroupName ?? p.Player?.Group;
+                    if (string.IsNullOrEmpty(groupName)) continue;
+                    var normalizedPGroup = groupName.Length >= 3 ? groupName.Substring(0, 3) : groupName;
+                    
+                    var row = rows.FirstOrDefault(r => r.GroupName.Equals(normalizedPGroup, StringComparison.OrdinalIgnoreCase));
+                    if (row != null)
+                    {
+                        int rank = p.Rank;
+                        if (rank <= 0)
+                        {
+                            if (e.FirstPlaceId != null && p.PlayerId == e.FirstPlaceId) rank = 1;
+                            else if (e.SecondPlaceId != null && p.PlayerId == e.SecondPlaceId) rank = 2;
+                            else if (e.ThirdPlaceId != null && p.PlayerId == e.ThirdPlaceId) rank = 3;
+                            else if (e.FirstPlaceId != null) rank = 4;
+                            else rank = 4;
+                        }
+                        
+                        if (row.SportResults["Бадмінтон"].Rank == "-" || rank < int.Parse(row.SportResults["Бадмінтон"].Rank!))
+                        {
+                            row.SportResults["Бадмінтон"] = new SportResultDto { Rank = rank.ToString(), Points = rank };
+                        }
                     }
                 }
             }
