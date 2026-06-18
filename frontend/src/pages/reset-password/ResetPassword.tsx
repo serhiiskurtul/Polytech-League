@@ -82,7 +82,7 @@ export default function ResetPassword() {
         </div>
 
         {step === 1 ? (
-          <form onSubmit={handleSubmitCode(onVerifyCode)} noValidate>
+          <form key="form-step-1" onSubmit={handleSubmitCode(onVerifyCode)} noValidate>
             {codeErrors.root && <div className={styles.errorMessage}>{codeErrors.root.message}</div>}
 
             <InputSign
@@ -98,7 +98,7 @@ export default function ResetPassword() {
             </ButtonSign>
           </form>
         ) : (
-          <form onSubmit={handleSubmitPassword(onResetPassword)} noValidate>
+          <form key="form-step-2" onSubmit={handleSubmitPassword(onResetPassword)} noValidate>
             {passwordErrors.root && <div className={styles.errorMessage}>{passwordErrors.root.message}</div>}
 
             <InputSign
