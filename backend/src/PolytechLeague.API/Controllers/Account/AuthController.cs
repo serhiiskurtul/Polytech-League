@@ -5,12 +5,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Authentication;
 using PolytechLeague.Domain.Exceptions;
+using PolytechLeague.Infrastructure.Redis;
+using PolytechLeague.Infrastructure.Email;
 
 namespace PolytechLeague.API.Controllers.Account;
 
 [ApiController]
 [Route("api")]
-public class AuthController(IAuthService authService) : Controller
+public class AuthController(
+    IAuthService authService,
+    IUserService userService,
+    IRedisService redisService,
+    IEmailSender emailSender) : Controller
 {
     [EnableRateLimiting("fixed")]
     [AllowAnonymous]
@@ -84,12 +90,23 @@ public class AuthController(IAuthService authService) : Controller
     {
         try
         {
-            await authService.SendPasswordResetEmailAsync(request.Email, cancellationToken);
+            var user = await userService.GetByEmailAsync(request.Email, cancellationToken);
+        
+            var code = new Random().Next(100000, 999999).ToString();
+            var key = "password_reset_code_" + request.Email.ToLower();
+            
+            await redisService.SetDataAsync(key, code, TimeSpan.FromMinutes(15));
+            
+            await emailSender.SendEmailAsync(
+                request.Email, 
+                "Polytech League - Відновлення пароля", 
+                $"Ваш код для відновлення пароля: {code}. Код дійсний 15 хвилин.", 
+                cancellationToken);
+                
             return Ok();
         }
         catch (EntityNotFoundException)
         {
-            // Do not leak information about whether the email exists
             return Ok();
         }
     }
@@ -100,7 +117,19 @@ public class AuthController(IAuthService authService) : Controller
     {
         try
         {
-            await authService.ResetPasswordAsync(request.Email, request.Code, request.NewPassword, cancellationToken);
+            var key = "password_reset_code_" + request.Email.ToLower();
+            var redisCode = await redisService.GetDataAsync<string>(key);
+            
+            if (string.IsNullOrEmpty(redisCode) || redisCode != request.Code)
+            {
+                throw new AuthenticationException("Невірний або протермінований код відновлення");
+            }
+            
+            var user = await userService.GetByEmailAsync(request.Email, cancellationToken);
+            await userService.UpdatePasswordAsync(user.Id, request.NewPassword, cancellationToken);
+            
+            await redisService.RemoveDataAsync(key);
+
             return Ok();
         }
         catch (AuthenticationException ex)
