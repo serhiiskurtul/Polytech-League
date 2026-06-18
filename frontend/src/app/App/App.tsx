@@ -10,6 +10,8 @@ import { TournamentsPage } from '@/pages/tournaments';
 import { TournamentViewPage } from '@/pages/tournament-view';
 import { HomePage } from '@/pages/home';
 import { EmailVerificationPage } from '@/pages/email-verification';
+import { ForgotPasswordPage } from '@/pages/forgot-password';
+import { ResetPasswordPage } from '@/pages/reset-password';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { PlayersRatingPage } from '@/pages/players-rating';
 import { ProfilePage } from '@/pages/profile';
@@ -88,6 +90,8 @@ export default function App() {
 
   const hideLayout = location.pathname === "/login" ||
     location.pathname === "/signup" ||
+    location.pathname === "/forgot-password" ||
+    location.pathname === "/reset-password" ||
     location.pathname === "/email-verification";
 
   return (
@@ -292,6 +296,8 @@ export default function App() {
 
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/email-verification" element={<EmailVerificationPage />} />
         <Route path="/student-news" element={<StudentNewsPage />} />
 

@@ -5,12 +5,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Authentication;
 using PolytechLeague.Domain.Exceptions;
+using PolytechLeague.Infrastructure.Redis;
+using PolytechLeague.Infrastructure.Email;
 
 namespace PolytechLeague.API.Controllers.Account;
 
 [ApiController]
 [Route("api")]
-public class AuthController(IAuthService authService) : Controller
+public class AuthController(
+    IAuthService authService,
+    IUserService userService,
+    IRedisService redisService,
+    IEmailSender emailSender) : Controller
 {
     [EnableRateLimiting("fixed")]
     [AllowAnonymous]
@@ -76,6 +82,75 @@ public class AuthController(IAuthService authService) : Controller
         Response.Cookies.Delete("refresh_token");
 
         return NoContent();
+    }
+
+    [AllowAnonymous]
+    [HttpPost("auth/forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var user = await userService.GetByEmailAsync(request.Email, cancellationToken);
+        
+            var code = new Random().Next(100000, 999999).ToString();
+            var key = "password_reset_code_" + request.Email.ToLower();
+            
+            await redisService.SetDataAsync(key, code, TimeSpan.FromMinutes(15));
+            
+            await emailSender.SendEmailAsync(
+                request.Email, 
+                "Polytech League - Відновлення пароля", 
+                $"Ваш код для відновлення пароля: {code}. Код дійсний 15 хвилин.", 
+                cancellationToken);
+                
+            return Ok();
+        }
+        catch (EntityNotFoundException)
+        {
+            return Ok();
+        }
+    }
+
+    [AllowAnonymous]
+    [HttpPost("auth/verify-reset-code")]
+    public async Task<IActionResult> VerifyResetCode([FromBody] VerifyResetCodeRequest request)
+    {
+        var key = "password_reset_code_" + request.Email.ToLower();
+        var redisCode = await redisService.GetDataAsync<string>(key);
+        
+        if (string.IsNullOrEmpty(redisCode) || redisCode != request.Code)
+        {
+            return BadRequest(new { detail = "Невірний або протермінований код" });
+        }
+        
+        return Ok();
+    }
+
+    [AllowAnonymous]
+    [HttpPost("auth/reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var key = "password_reset_code_" + request.Email.ToLower();
+            var redisCode = await redisService.GetDataAsync<string>(key);
+            
+            if (string.IsNullOrEmpty(redisCode) || redisCode != request.Code)
+            {
+                throw new AuthenticationException("Невірний або протермінований код відновлення");
+            }
+            
+            var user = await userService.GetByEmailAsync(request.Email, cancellationToken);
+            await userService.UpdatePasswordAsync(user.Id, request.NewPassword, cancellationToken);
+            
+            await redisService.RemoveDataAsync(key);
+
+            return Ok();
+        }
+        catch (AuthenticationException ex)
+        {
+            return BadRequest(new { detail = ex.Message });
+        }
     }
 
     private void SetAuthCookies(AuthResponse tokens)

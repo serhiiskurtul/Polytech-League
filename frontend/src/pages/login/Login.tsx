@@ -109,6 +109,8 @@ export default function Login() {
             error={errors.password?.message}
           />
 
+
+
           <ButtonSign type="submit" disabled={isSubmitting}>
             {isSubmitting ? 'Вхід...' : 'Увійти'}
           </ButtonSign>
@@ -116,6 +118,7 @@ export default function Login() {
 
         <div className={styles.links}>
           <Link to="/signup">Немає акаунту? Зареєструватись</Link>
+          <Link to="/forgot-password">Забули пароль?</Link>
         </div>
       </div>
     </main>
