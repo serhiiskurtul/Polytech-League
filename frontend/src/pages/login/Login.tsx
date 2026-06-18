@@ -109,11 +109,7 @@ export default function Login() {
             error={errors.password?.message}
           />
 
-          <div style={{ textAlign: 'right', marginBottom: '15px' }}>
-            <Link to="/forgot-password" style={{ fontSize: '14px', color: 'var(--accent-color)' }}>
-              Забули пароль?
-            </Link>
-          </div>
+
 
           <ButtonSign type="submit" disabled={isSubmitting}>
             {isSubmitting ? 'Вхід...' : 'Увійти'}
@@ -122,6 +118,7 @@ export default function Login() {
 
         <div className={styles.links}>
           <Link to="/signup">Немає акаунту? Зареєструватись</Link>
+          <Link to="/forgot-password">Забули пароль?</Link>
         </div>
       </div>
     </main>
