@@ -78,6 +78,37 @@ public class AuthController(IAuthService authService) : Controller
         return NoContent();
     }
 
+    [AllowAnonymous]
+    [HttpPost("auth/forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await authService.SendPasswordResetEmailAsync(request.Email, cancellationToken);
+            return Ok();
+        }
+        catch (EntityNotFoundException)
+        {
+            // Do not leak information about whether the email exists
+            return Ok();
+        }
+    }
+
+    [AllowAnonymous]
+    [HttpPost("auth/reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await authService.ResetPasswordAsync(request.Email, request.Code, request.NewPassword, cancellationToken);
+            return Ok();
+        }
+        catch (AuthenticationException ex)
+        {
+            return BadRequest(new { detail = ex.Message });
+        }
+    }
+
     private void SetAuthCookies(AuthResponse tokens)
     {
         var isProd = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production";

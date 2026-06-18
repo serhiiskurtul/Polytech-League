@@ -7,6 +7,9 @@ using PolytechLeague.Domain.Entities;
 using PolytechLeague.Persistence.Database;
 using Microsoft.EntityFrameworkCore;
 
+using PolytechLeague.Infrastructure.Redis;
+using PolytechLeague.Infrastructure.Email;
+
 namespace PolytechLeague.Application.Services.Implementations;
 
 public class AuthService(
@@ -14,7 +17,9 @@ public class AuthService(
     IPasswordEncoder passwordService,
     IJwtService jwtService,
     IRefreshTokenService refreshTokenService,
-    IUserService userService) : IAuthService
+    IUserService userService,
+    IRedisService redisService,
+    IEmailSender emailSender) : IAuthService
 {
     public async Task<AuthResponse> AuthenticateAsync(AuthRequest authRequest)
     {
@@ -89,5 +94,38 @@ public class AuthService(
             AccessToken = newAccessToken,
             RefreshToken = oldRefreshToken.Token
         };
+    }
+
+    public async Task SendPasswordResetEmailAsync(string email, CancellationToken cancellationToken = default)
+    {
+        var user = await userService.GetByEmailAsync(email, cancellationToken);
+        
+        // Generate a 6-digit code
+        var code = new Random().Next(100000, 999999).ToString();
+        var key = "password_reset_code_" + email.ToLower();
+        
+        await redisService.SetDataAsync(key, code, TimeSpan.FromMinutes(15));
+        
+        await emailSender.SendEmailAsync(
+            email, 
+            "Polytech League - Відновлення пароля", 
+            $"Ваш код для відновлення пароля: {code}. Код дійсний 15 хвилин.", 
+            cancellationToken);
+    }
+
+    public async Task ResetPasswordAsync(string email, string code, string newPassword, CancellationToken cancellationToken = default)
+    {
+        var key = "password_reset_code_" + email.ToLower();
+        var redisCode = await redisService.GetDataAsync<string>(key);
+        
+        if (string.IsNullOrEmpty(redisCode) || redisCode != code)
+        {
+            throw new AuthenticationException("Невірний або протермінований код відновлення");
+        }
+        
+        var user = await userService.GetByEmailAsync(email, cancellationToken);
+        await userService.UpdatePasswordAsync(user.Id, newPassword, cancellationToken);
+        
+        await redisService.RemoveDataAsync(key);
     }
 }

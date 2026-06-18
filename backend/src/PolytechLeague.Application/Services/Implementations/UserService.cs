@@ -304,6 +304,25 @@ public class UserService : AbstractEntityService<User>, IUserService
         _logger.LogInformation("User {Id} role changed to {Role}", id, role);
     }
 
+    public async Task UpdatePasswordAsync(long id, string newPassword, CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("Updating password for user {Id}", id);
+
+        var user = await _dbcontext.Set<User>()
+            .FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted, cancellationToken);
+
+        if (user is null)
+        {
+            _logger.LogWarning("User {Id} not found", id);
+            throw new EntityNotFoundException(nameof(User), id);
+        }
+
+        user.Password = _passwordEncoder.Encode(newPassword);
+        await _dbcontext.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Password updated for user {Id}", id);
+    }
+
     protected override void UpdateValues(User updatedEntity, User newEntity)
     {
         _logger.LogDebug("Updating user {Id} values", updatedEntity.Id);

@@ -15,4 +15,5 @@ public interface IUserService : IAbstractEntityService<User>
     Task UnblockAsync(long id, CancellationToken cancellationToken = default);
     Task ConfirmEmailAsync(string email, CancellationToken cancellationToken = default);
     Task ChangeRoleAsync(long id, UserRole role, CancellationToken cancellationToken = default);
+    Task UpdatePasswordAsync(long id, string newPassword, CancellationToken cancellationToken = default);
 }

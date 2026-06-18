@@ -11,4 +11,8 @@ public interface IAuthService
 
     Task<AuthResponse> RevokeAndRefreshJwtTokensAsync(
         RefreshTokenRequest refreshTokenRequest, CancellationToken cancellationToken = default);
+
+    Task SendPasswordResetEmailAsync(string email, CancellationToken cancellationToken = default);
+    
+    Task ResetPasswordAsync(string email, string code, string newPassword, CancellationToken cancellationToken = default);
 }
