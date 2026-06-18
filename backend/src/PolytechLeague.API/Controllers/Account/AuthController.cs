@@ -112,6 +112,21 @@ public class AuthController(
     }
 
     [AllowAnonymous]
+    [HttpPost("auth/verify-reset-code")]
+    public async Task<IActionResult> VerifyResetCode([FromBody] VerifyResetCodeRequest request)
+    {
+        var key = "password_reset_code_" + request.Email.ToLower();
+        var redisCode = await redisService.GetDataAsync<string>(key);
+        
+        if (string.IsNullOrEmpty(redisCode) || redisCode != request.Code)
+        {
+            return BadRequest(new { detail = "Невірний або протермінований код" });
+        }
+        
+        return Ok();
+    }
+
+    [AllowAnonymous]
     [HttpPost("auth/reset-password")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request, CancellationToken cancellationToken)
     {
