@@ -383,9 +383,7 @@ public class FootballEventService :
             .Select(t => t.Id)
             .ToListAsync(cancellationToken);
 
-        await _dbcontext.Players
-            .Where(p => p.FootballTeamId != null && teamIds.Contains(p.FootballTeamId.Value))
-            .ExecuteUpdateAsync(s => s.SetProperty(p => p.FootballTeamId, (long?)null), cancellationToken);
+
 
         // 1. Fetch event with matches to handle Restrict constraints
         var entity = await _dbcontext.FootballEvents

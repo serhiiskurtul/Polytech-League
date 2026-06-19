@@ -213,7 +213,6 @@ public class PlayerService : IPlayerService
         // Update team stats
         if (dto.FootballPosition.HasValue) player.FootballPosition = dto.FootballPosition;
         if (dto.FootballShirtNumber.HasValue) player.FootballShirtNumber = dto.FootballShirtNumber;
-        if (dto.FootballTeamId.HasValue) player.FootballTeamId = dto.FootballTeamId;
         if (dto.VolleyballPosition.HasValue) player.VolleyballPosition = dto.VolleyballPosition;
         if (dto.VolleyballShirtNumber.HasValue) player.VolleyballShirtNumber = dto.VolleyballShirtNumber;
         if (dto.BasketballShirtNumber.HasValue) player.BasketballShirtNumber = dto.BasketballShirtNumber;
@@ -1661,9 +1660,8 @@ public class PlayerService : IPlayerService
         if (target.CollegeId == null) target.CollegeId = source.CollegeId;
         if (target.Gender == Gender.None) target.Gender = source.Gender;
 
-        if (target.FootballTeamId == null)
+        if (target.FootballPosition == null)
         {
-            target.FootballTeamId = source.FootballTeamId;
             target.FootballPosition = source.FootballPosition;
             target.FootballShirtNumber = source.FootballShirtNumber;
         }

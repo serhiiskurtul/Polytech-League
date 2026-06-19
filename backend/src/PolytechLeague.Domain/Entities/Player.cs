@@ -1,6 +1,7 @@
 using PolytechLeague.Domain.Entities.TableTennis.Enums;
 using PolytechLeague.Domain.Entities.Armwrestling.Enums;
 using PolytechLeague.Domain.Entities.Football.Enums;
+using PolytechLeague.Domain.Entities.Football;
 using PolytechLeague.Domain.Entities.Volleyball;
 using PolytechLeague.Domain.Entities.Volleyball.Enums;
 using PolytechLeague.Domain.Entities.Enums;
@@ -45,7 +46,7 @@ public class Player : Person
     // Team Sports Metadata 
     public FootballPosition? FootballPosition { get; set; }
     public int? FootballShirtNumber { get; set; }
-    public long? FootballTeamId { get; set; }
+    public ICollection<FootballTeam>? FootballTeams { get; set; }
 
     public VolleyballPosition? VolleyballPosition { get; set; }
     public int? VolleyballShirtNumber { get; set; }
