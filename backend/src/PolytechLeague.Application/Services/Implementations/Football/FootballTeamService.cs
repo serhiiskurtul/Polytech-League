@@ -78,20 +78,16 @@ public class FootballTeamService(
                 cancellationToken);
 
         // 4. Clean up Players and Participants
-        var playerIds = await _dbcontext.Players
-            .Where(p => p.FootballTeamId == id)
-            .Select(p => p.Id)
-            .ToListAsync(cancellationToken);
-
-        if (playerIds.Any())
+        var teamWithPlayers = await _dbcontext.FootballTeams
+            .Include(t => t.Players)
+            .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
+            
+        if (teamWithPlayers?.Players?.Any() == true)
         {
+            var playerIds = teamWithPlayers.Players.Select(p => p.Id).ToList();
             await _dbcontext.FootballEventParticipants
                 .Where(p => p.EventId == eventId && playerIds.Contains(p.PlayerId))
                 .ExecuteDeleteAsync(cancellationToken);
-
-            await _dbcontext.Players
-                .Where(p => p.FootballTeamId == id)
-                .ExecuteUpdateAsync(s => s.SetProperty(p => p.FootballTeamId, (long?)null), cancellationToken);
         }
 
         await base.DeleteAsync(id, cancellationToken);
