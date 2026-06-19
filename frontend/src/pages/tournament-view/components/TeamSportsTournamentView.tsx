@@ -162,6 +162,7 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
 
   // Quick Add Player State
   const [isQuickAddMode, setIsQuickAddMode] = useState(false);
+  const [, setRenderTrigger] = useState(0);
   const [quickAddForm, setQuickAddForm] = useState({ firstName: '', lastName: '', patronymic: '', group: '', gender: 'None' as Gender });
 
   // Olympic Filtering State
@@ -917,8 +918,25 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         ? playerIds.filter((id: number) => id !== playerId)
         : [...playerIds, playerId];
 
-      await updateApi(teamId, { ...team, playerIds: newPlayerIds });
-      onRefresh();
+      // Optimistic UI update
+      if (isAlreadyIn) {
+        team.players = team.players.filter((p: any) => p.id !== playerId);
+      } else {
+        const playerToAdd = filteredPlayers.find((p: any) => p.id === playerId) 
+                         || details.participants?.find((p: any) => p.player?.id === playerId)?.player;
+        if (playerToAdd) {
+          team.players = [...(team.players || []), playerToAdd];
+        }
+      }
+      setRenderTrigger(prev => prev + 1);
+
+      updateApi(teamId, { ...team, playerIds: newPlayerIds })
+        .then(() => onRefresh())
+        .catch((err: any) => {
+          console.error(err);
+          toast.error(err.response?.data || 'Помилка при зміні складу команди');
+          onRefresh(); // Revert on error
+        });
     } catch (err: any) {
       console.error(err);
       toast.error(err.response?.data || 'Помилка при зміні складу команди');
@@ -1015,8 +1033,17 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         playerIds: team.players?.map((p: any) => p.id) || []
       };
 
-      await updateApi(teamId, payload);
-      onRefresh();
+      // Optimistic update
+      team.captainId = playerId;
+      setRenderTrigger(prev => prev + 1);
+
+      updateApi(teamId, payload)
+        .then(() => onRefresh())
+        .catch((err: any) => {
+          console.error(err);
+          toast.error('Помилка при призначенні капітана');
+          onRefresh();
+        });
     } catch (err) {
       console.error(err);
       alert('Помилка при призначенні капітана');
@@ -1041,8 +1068,17 @@ const TeamSportsTournamentView: React.FC<TeamSportsTournamentViewProps> = ({
         playerIds: team.players?.map((p: any) => p.id) || []
       };
 
-      await updateApi(teamId, payload);
-      onRefresh();
+      // Optimistic update
+      team.goalkeeperId = playerId;
+      setRenderTrigger(prev => prev + 1);
+
+      updateApi(teamId, payload)
+        .then(() => onRefresh())
+        .catch((err: any) => {
+          console.error(err);
+          toast.error('Помилка при призначенні воротаря');
+          onRefresh();
+        });
     } catch (err) {
       console.error(err);
       alert('Помилка при призначенні воротаря');
