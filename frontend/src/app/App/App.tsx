@@ -40,6 +40,7 @@ import { ApiDocsPage } from '@/pages/api-docs';
 import ProtectedRoute from '../providers/ProtectedRoute';
 import ScrollToTop from '../providers/ScrollToTop';
 import { Toaster } from 'react-hot-toast';
+import VerifyEmailBanner from '@/features/verify-email-banner/VerifyEmailBanner';
 import { NotificationBanner } from '@/features/notifications/NotificationBanner';
 import api from '@/shared/api/axiosInstance';
 
@@ -117,6 +118,7 @@ export default function App() {
         }}
       />
       <NotificationBanner />
+      {!hideLayout && <VerifyEmailBanner />}
 
       {!hideLayout && <Header />}
 

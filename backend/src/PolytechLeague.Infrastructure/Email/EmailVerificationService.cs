@@ -33,6 +33,10 @@ public class EmailVerificationService(
 
         // Підтверджуємо email у базі
         await userService.ConfirmEmailAsync(email, cancellationToken);
+
+        // Скидаємо кеш акаунта, інакше /users/me віддаватиме старий isEmailConfirmed
+        var user = await userService.GetByEmailAsync(email, cancellationToken);
+        await redisService.RemoveDataAsync($"user_account_{user.Id}");
         return true;
     }
 }

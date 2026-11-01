@@ -14,5 +14,6 @@ export interface AuthResponse {
     role: number | string;
     photoUrl?: string;
     createdAt: string;
+    isEmailConfirmed?: boolean;
   };
 }

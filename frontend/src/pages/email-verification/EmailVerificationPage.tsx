@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { CodeInput, VerificationButton, CountdownTimer } from "@/shared/ui";
 import { showToast } from '@/shared/lib/toast';
 import styles from './EmailVerificationPage.module.css';
 import axiosInstance from '@/shared/api/axiosInstance';
+import { useAuth } from '@/entities/session';
 
 const EmailVerification = () => {
   const [code, setCode] = useState<string[]>(['', '', '', '', '', '']);
@@ -14,15 +15,27 @@ const EmailVerification = () => {
   const [isResending, setIsResending] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, refreshUser } = useAuth();
+  const autoSentRef = useRef(false);
 
   const emailFromStorage = localStorage.getItem('emailToVerify');
-  const displayEmail: string = location.state?.email || emailFromStorage || "user@example.com";
+  const displayEmail: string = location.state?.email || user?.email || emailFromStorage || "user@example.com";
 
   useEffect(() => {
     if (!displayEmail || displayEmail === "user@example.com") {
       navigate('/signup');
     }
   }, [displayEmail, navigate]);
+
+  // Прийшли з банера для непідтверджених — одразу надсилаємо код
+  useEffect(() => {
+    if (!location.state?.sendOnOpen || autoSentRef.current) return;
+    autoSentRef.current = true;
+
+    axiosInstance.post('/email/send-verification-email', { email: displayEmail })
+      .then(() => showToast.success('Код надіслано на вашу пошту'))
+      .catch(() => showToast.error('Помилка відправки коду. Спробуйте пізніше.'));
+  }, [displayEmail, location.state]);
 
   const handleCodeChange = (newCode: string[]) => {
     setCode(newCode);
@@ -69,11 +82,15 @@ const EmailVerification = () => {
       localStorage.removeItem('emailToVerify');
       sessionStorage.removeItem('pendingEmailVerification');
       sessionStorage.removeItem('userFirstName');
-      
+
       showToast.success('Email успішно підтверджено!');
-      
+
+      if (user) {
+        await refreshUser();
+      }
+
       setTimeout(() => {
-        navigate('/login');
+        navigate(user ? '/' : '/login');
       }, 2000);
     } catch (error) {
       setHasError(true);
@@ -154,8 +171,8 @@ const EmailVerification = () => {
         </div>
 
         <div className={styles.footer}>
-          <button className={styles.backButton} onClick={() => navigate('/signup')}>
-            <i className="fas fa-arrow-left"></i> Повернутися до реєстрації
+          <button className={styles.backButton} onClick={() => navigate(user ? '/' : '/signup')}>
+            <i className="fas fa-arrow-left"></i> {user ? 'Повернутися на головну' : 'Повернутися до реєстрації'}
           </button>
         </div>
       </div>
