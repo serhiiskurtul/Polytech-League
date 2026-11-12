@@ -319,14 +319,16 @@ public class TournamentService : ITournamentService
         if (today.Month < 9) calendarStart = new DateTime(today.Year - 1, 9, 1);
 
         var startOfSeason = currentSeason?.StartDate.Date ?? calendarStart;
+        var endOfSeason = currentSeason?.EndDate.Date ?? startOfSeason.AddMonths(10);
+        var endOfSeasonExclusive = endOfSeason.AddDays(1);
 
-        var activeTournamentsCount = await _context.Set<PolytechLeague.Domain.Entities.Event>()
-            .CountAsync(e => e.Date >= startOfSeason);
-
+        // Змагання поточного сезону; від них рахуються і змагання, і гравці, і матчі
         var eligibleEventIds = await _context.Set<PolytechLeague.Domain.Entities.Event>()
-            .Where(e => e.Date >= startOfSeason)
+            .Where(e => e.Date >= startOfSeason && e.Date < endOfSeasonExclusive)
             .Select(e => e.Id)
             .ToListAsync();
+
+        var activeTournamentsCount = eligibleEventIds.Count;
 
         // Count only players who are in the ranking (have at least one achievement or participation in the current season)
         var rankedPlayersCount = await _context.Players
@@ -346,25 +348,22 @@ public class TournamentService : ITournamentService
 
         var registeredPlayersCount = rankedPlayersCount;
 
-        // Count total matches across all sport tables
+        // Матчі тільки зі змагань поточного сезону
         int totalMatches = 0;
-        totalMatches += await _context.FootballMatches.CountAsync();
-        totalMatches += await _context.VolleyballMatches.CountAsync();
-        totalMatches += await _context.BasketballMatches.CountAsync();
-        totalMatches += await _context.ChessGames.CountAsync();
-        totalMatches += await _context.CheckersGames.CountAsync();
-        totalMatches += await _context.BeachVolleyballMatches.CountAsync();
-        totalMatches += await _context.TableTennisMatches.CountAsync();
-        totalMatches += await _context.BadmintonMatches.CountAsync();
-        totalMatches += await _context.ArmwrestlingMatches.CountAsync();
+        totalMatches += await _context.FootballMatches.CountAsync(m => eligibleEventIds.Contains(m.EventId));
+        totalMatches += await _context.VolleyballMatches.CountAsync(m => eligibleEventIds.Contains(m.EventId));
+        totalMatches += await _context.BasketballMatches.CountAsync(m => eligibleEventIds.Contains(m.EventId));
+        totalMatches += await _context.ChessGames.CountAsync(m => eligibleEventIds.Contains(m.TournamentId));
+        totalMatches += await _context.CheckersGames.CountAsync(m => eligibleEventIds.Contains(m.TournamentId));
+        totalMatches += await _context.BeachVolleyballMatches.CountAsync(m => eligibleEventIds.Contains(m.EventId));
+        totalMatches += await _context.TableTennisMatches.CountAsync(m => eligibleEventIds.Contains(m.TournamentId));
+        totalMatches += await _context.BadmintonMatches.CountAsync(m => eligibleEventIds.Contains(m.EventId));
+        totalMatches += await _context.ArmwrestlingMatches.CountAsync(m => eligibleEventIds.Contains(m.EventId));
 
         // Прогрес поточного сезону: з дат сезону з бази, інакше календарний сезон (1 вересня — 30 червня)
         int progress = 0;
-        var start = currentSeason?.StartDate.Date ?? calendarStart;
-        var end = currentSeason?.EndDate.Date ?? start.AddMonths(10);
-        
-        var totalDays = (end - start).TotalDays;
-        var elapsedDays = (today - start).TotalDays;
+        var totalDays = (endOfSeason - startOfSeason).TotalDays;
+        var elapsedDays = (today - startOfSeason).TotalDays;
         
         if (elapsedDays > 0 && totalDays > 0)
         {
