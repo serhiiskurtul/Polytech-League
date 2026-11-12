@@ -29,6 +29,7 @@ public class CollegesController : ControllerBase
         return Ok(college);
     }
 
+    [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
     [HttpPost]
     public async Task<ActionResult<College>> Create(College college)
     {
@@ -36,6 +37,7 @@ public class CollegesController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
+    [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
     [HttpPut("{id}")]
     public async Task<ActionResult<College>> Update(long id, College college)
     {
@@ -49,6 +51,7 @@ public class CollegesController : ControllerBase
         }
     }
 
+    [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(long id)
     {

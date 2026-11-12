@@ -70,13 +70,13 @@ public class EmailSender(IOptions<EmailSettings> emailSettings, ILogger<EmailSen
             else
             {
                 var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
-                logger.LogError("SendGrid API returned error: {StatusCode}. Details: {Error}. [DEBUG] Verification code: {Code}", 
-                    response.StatusCode, errorContent, message);
+                logger.LogError("SendGrid API returned error: {StatusCode}. Details: {Error}",
+                    response.StatusCode, errorContent);
             }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to send email to {Email} via SendGrid. [DEBUG] Verification code: {Code}", email, message);
+            logger.LogError(ex, "Failed to send email to {Email} via SendGrid", email);
         }
     }
 
@@ -84,7 +84,7 @@ public class EmailSender(IOptions<EmailSettings> emailSettings, ILogger<EmailSen
     {
         if (string.IsNullOrEmpty(emailSettings.Value.Email) || string.IsNullOrEmpty(emailSettings.Value.Password))
         {
-            logger.LogWarning("Email settings missing (SMTP fallback). [DEBUG] Verification email to {Email}: {Message}", email, message);
+            logger.LogWarning("Email settings missing (SMTP fallback). Email to {Email} was not sent", email);
             return;
         }
 
@@ -110,7 +110,7 @@ public class EmailSender(IOptions<EmailSettings> emailSettings, ILogger<EmailSen
         }
         catch (Exception ex)
         {
-            logger.LogError("SMTP Failed: {Error}. [DEBUG] Verification code: {Code}", ex.Message, message);
+            logger.LogError("SMTP Failed for {Email}: {Error}", email, ex.Message);
         }
     }
 }

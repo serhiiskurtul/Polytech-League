@@ -58,6 +58,7 @@ public class EmailController(
 
         await redisService.SetDataAsync<string>(
             "email_verification_code_" + request.Email, code, TimeSpan.FromMinutes(10));
+        await redisService.RemoveDataAsync("email_verification_attempts_" + request.Email);
 
         return Ok();
     }

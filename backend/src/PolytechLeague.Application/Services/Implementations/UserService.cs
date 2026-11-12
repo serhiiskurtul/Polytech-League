@@ -331,6 +331,7 @@ public class UserService : AbstractEntityService<User>, IUserService
         updatedEntity.LastName = newEntity.LastName;
         updatedEntity.Role = newEntity.Role;
         updatedEntity.Email = newEntity.Email;
+        updatedEntity.isEmailConfirmed = newEntity.isEmailConfirmed;
         updatedEntity.PhotoUrl = newEntity.PhotoUrl;
         updatedEntity.IsBlocked = newEntity.IsBlocked;
     }

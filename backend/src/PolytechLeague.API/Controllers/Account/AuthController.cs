@@ -92,10 +92,11 @@ public class AuthController(
         {
             var user = await userService.GetByEmailAsync(request.Email, cancellationToken);
         
-            var code = new Random().Next(100000, 999999).ToString();
+            var code = System.Security.Cryptography.RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
             var key = "password_reset_code_" + request.Email.ToLower();
-            
+
             await redisService.SetDataAsync(key, code, TimeSpan.FromMinutes(15));
+            await redisService.RemoveDataAsync("password_reset_attempts_" + request.Email.ToLower());
             
             await emailSender.SendEmailAsync(
                 request.Email, 
@@ -115,14 +116,11 @@ public class AuthController(
     [HttpPost("auth/verify-reset-code")]
     public async Task<IActionResult> VerifyResetCode([FromBody] VerifyResetCodeRequest request)
     {
-        var key = "password_reset_code_" + request.Email.ToLower();
-        var redisCode = await redisService.GetDataAsync<string>(key);
-        
-        if (string.IsNullOrEmpty(redisCode) || redisCode != request.Code)
+        if (!await IsResetCodeValidAsync(request.Email, request.Code))
         {
             return BadRequest(new { detail = "Невірний або протермінований код" });
         }
-        
+
         return Ok();
     }
 
@@ -133,17 +131,17 @@ public class AuthController(
         try
         {
             var key = "password_reset_code_" + request.Email.ToLower();
-            var redisCode = await redisService.GetDataAsync<string>(key);
-            
-            if (string.IsNullOrEmpty(redisCode) || redisCode != request.Code)
+
+            if (!await IsResetCodeValidAsync(request.Email, request.Code))
             {
                 throw new AuthenticationException("Невірний або протермінований код відновлення");
             }
-            
+
             var user = await userService.GetByEmailAsync(request.Email, cancellationToken);
             await userService.UpdatePasswordAsync(user.Id, request.NewPassword, cancellationToken);
-            
+
             await redisService.RemoveDataAsync(key);
+            await redisService.RemoveDataAsync("password_reset_attempts_" + request.Email.ToLower());
 
             return Ok();
         }
@@ -151,6 +149,32 @@ public class AuthController(
         {
             return BadRequest(new { detail = ex.Message });
         }
+    }
+
+    private const int MaxResetCodeAttempts = 5;
+
+    // Після кількох невдалих спроб код анулюється, щоб його не можна було підібрати перебором
+    private async Task<bool> IsResetCodeValidAsync(string email, string code)
+    {
+        var key = "password_reset_code_" + email.ToLower();
+        var attemptsKey = "password_reset_attempts_" + email.ToLower();
+
+        var redisCode = await redisService.GetDataAsync<string>(key);
+        if (string.IsNullOrEmpty(redisCode)) return false;
+        if (redisCode == code) return true;
+
+        var attempts = await redisService.GetDataAsync<int>(attemptsKey) + 1;
+        if (attempts >= MaxResetCodeAttempts)
+        {
+            await redisService.RemoveDataAsync(key);
+            await redisService.RemoveDataAsync(attemptsKey);
+        }
+        else
+        {
+            await redisService.SetDataAsync(attemptsKey, attempts, TimeSpan.FromMinutes(15));
+        }
+
+        return false;
     }
 
     private void SetAuthCookies(AuthResponse tokens)

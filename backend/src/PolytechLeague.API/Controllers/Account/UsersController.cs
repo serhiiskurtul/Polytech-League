@@ -95,7 +95,23 @@ public class UsersController(IUserService userService, IPlayerService playerServ
     public async Task<IActionResult> Update(
         [FromRoute] long id, [FromBody] UserRequest userRequest, CancellationToken cancellationToken)
     {
-        var user = userRequest.FromRequest();
+        if (id != User.GetUserId())
+        {
+            return StatusCode(403, "Ви можете змінювати лише власний профіль.");
+        }
+
+        // Змінюємо тільки ім'я та пошту; роль, блокування і фото лишаються як були
+        var user = await userService.GetByIdAsync(id, cancellationToken);
+        user.FirstName = userRequest.FirstName;
+        user.LastName = userRequest.LastName;
+
+        var newEmail = string.IsNullOrWhiteSpace(userRequest.Email) ? user.Email : userRequest.Email.Trim();
+        if (!string.Equals(newEmail, user.Email, StringComparison.OrdinalIgnoreCase))
+        {
+            user.Email = newEmail;
+            user.isEmailConfirmed = false;
+        }
+
         await userService.UpdateAsync(id, user, cancellationToken);
 
         var cacheKey = $"user_account_{id}";
@@ -104,7 +120,7 @@ public class UsersController(IUserService userService, IPlayerService playerServ
         return NoContent();
     }
 
-    [Authorize(Policy = "CustomerOrAdmin")]
+    [Authorize(Policy = "Admin")]
     [HttpDelete("soft-delete/{id}")]
     public async Task<IActionResult> SoftDelete(
         [FromRoute] long id, CancellationToken cancellationToken)
