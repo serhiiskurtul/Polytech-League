@@ -174,9 +174,6 @@ const EmailVerification = () => {
           <button className={styles.backButton} onClick={() => navigate(user ? '/' : '/login')}>
             <i className="fas fa-clock"></i> Підтвердити пізніше
           </button>
-          <button className={styles.backButton} onClick={() => navigate(user ? '/' : '/signup')}>
-            <i className="fas fa-arrow-left"></i> {user ? 'Повернутися на головну' : 'Повернутися до реєстрації'}
-          </button>
         </div>
       </div>
     </div>
