@@ -67,6 +67,7 @@ public class SeasonRatingController : ControllerBase
         return Ok(season);
     }
 
+    [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
     [HttpPost("seasons")]
     public async Task<ActionResult<SeasonDto>> CreateSeason(SeasonDto dto)
     {
@@ -74,6 +75,7 @@ public class SeasonRatingController : ControllerBase
         return Ok(result);
     }
 
+    [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
     [HttpPut("seasons/{id}")]
     public async Task<ActionResult<SeasonDto>> UpdateSeason(long id, SeasonDto dto)
     {
@@ -81,6 +83,7 @@ public class SeasonRatingController : ControllerBase
         return Ok(result);
     }
 
+    [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
     [HttpDelete("seasons/{id}")]
     public async Task<ActionResult> DeleteSeason(long id)
     {
