@@ -312,9 +312,14 @@ public class TournamentService : ITournamentService
     public async Task<GeneralStatsDto> GetGeneralStatsAsync()
     {
         var today = DateTime.UtcNow.Date;
-        var startOfSeason = new DateTime(today.Year, 9, 1);
-        if (today.Month < 9) startOfSeason = new DateTime(today.Year - 1, 9, 1);
-        
+        var currentSeason = await _context.Seasons.AsNoTracking().FirstOrDefaultAsync(s => s.IsCurrent);
+
+        // Календарний початок сезону (1 вересня) використовується, якщо поточний сезон не заданий
+        var calendarStart = new DateTime(today.Year, 9, 1);
+        if (today.Month < 9) calendarStart = new DateTime(today.Year - 1, 9, 1);
+
+        var startOfSeason = currentSeason?.StartDate.Date ?? calendarStart;
+
         var activeTournamentsCount = await _context.Set<PolytechLeague.Domain.Entities.Event>()
             .CountAsync(e => e.Date >= startOfSeason);
 
@@ -353,11 +358,10 @@ public class TournamentService : ITournamentService
         totalMatches += await _context.BadmintonMatches.CountAsync();
         totalMatches += await _context.ArmwrestlingMatches.CountAsync();
 
-        // Calculate Season Progress (Sept 1st to June 30th)
+        // Прогрес поточного сезону: з дат сезону з бази, інакше календарний сезон (1 вересня — 30 червня)
         int progress = 0;
-        var start = new DateTime(today.Year, 9, 1);
-        if (today.Month < 9) start = new DateTime(today.Year - 1, 9, 1);
-        var end = start.AddMonths(10); // Ends end of June next year
+        var start = currentSeason?.StartDate.Date ?? calendarStart;
+        var end = currentSeason?.EndDate.Date ?? start.AddMonths(10);
         
         var totalDays = (end - start).TotalDays;
         var elapsedDays = (today - start).TotalDays;
@@ -372,8 +376,7 @@ public class TournamentService : ITournamentService
             ActiveTournamentsCount = activeTournamentsCount,
             RegisteredPlayersCount = registeredPlayersCount,
             TotalMatchesCount = totalMatches,
-            SeasonProgress = progress,
-            TopSport = "Футбол" // Could be dynamic based on match counts
+            SeasonProgress = progress
         };
     }
 

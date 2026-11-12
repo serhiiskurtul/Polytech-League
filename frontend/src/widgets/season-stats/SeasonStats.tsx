@@ -1,30 +1,34 @@
 import { useState, useEffect } from 'react';
 import styles from './SeasonStats.module.css';
 import { getTournamentsStats } from '@/entities/tournament/api/tournaments.api';
+import { getCurrentSeason } from '@/entities/rating/api/seasonRating.api';
 
 interface Stats {
   totalMatches: number;
   activeTournaments: number;
   registeredPlayers: number;
   progress: number;
-  topSport: string;
 }
 
 const SeasonStats= () => {
   const [stats, setStats] = useState<Stats | null>(null);
+  const [seasonName, setSeasonName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         setLoading(true);
-        const data = await getTournamentsStats();
+        const [data, season] = await Promise.all([
+          getTournamentsStats(),
+          getCurrentSeason().catch(() => null),
+        ]);
+        setSeasonName(season?.name ?? null);
         setStats({
           totalMatches: data.totalMatchesCount,
           activeTournaments: data.activeTournamentsCount,
           registeredPlayers: data.registeredPlayersCount,
           progress: data.seasonProgress,
-          topSport: data.topSport === 'Футбол' ? '⚽' : '🏆'
         });
       } catch (error) {
         console.error('Помилка при завантаженні статистики:', error);
@@ -51,7 +55,7 @@ const SeasonStats= () => {
       <div className={styles.header}>
         <h4 className={styles.title}>
           <i className="fas fa-chart-pie"></i>
-          Сезон 2025/2026
+          {seasonName ? `Сезон ${seasonName}` : 'Сезон'}
         </h4>
       </div>
 

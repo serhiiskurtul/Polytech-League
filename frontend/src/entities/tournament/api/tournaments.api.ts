@@ -53,7 +53,6 @@ export interface TournamentStats {
     registeredPlayersCount: number;
     totalMatchesCount: number;
     seasonProgress: number;
-    topSport: string;
 }
 
 export const getTournamentsStats = async (): Promise<TournamentStats> => {
