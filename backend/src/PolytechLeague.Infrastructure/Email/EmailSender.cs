@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using System.Text.RegularExpressions;
 
 namespace PolytechLeague.Infrastructure.Email;
 
@@ -45,7 +46,7 @@ public class EmailSender(IOptions<EmailSettings> emailSettings, ILogger<EmailSen
                 subject = subject,
                 content = new[]
                 {
-                    new { type = "text/plain", value = message },
+                    new { type = "text/plain", value = ToPlainText(message) },
                     new { type = "text/html", value = message.Contains("<html>") || message.Contains("</div>") || message.Contains("<p>") 
                         ? message 
                         : $@"
@@ -112,5 +113,16 @@ public class EmailSender(IOptions<EmailSettings> emailSettings, ILogger<EmailSen
         {
             logger.LogError("SMTP Failed for {Email}: {Error}", email, ex.Message);
         }
+    }
+
+    // Текстова версія листа без HTML-тегів: сирий HTML у text/plain спам-фільтри вважають ознакою спаму
+    private static string ToPlainText(string message)
+    {
+        var text = Regex.Replace(message, @"<(br|/p|/div|/h[1-6])\s*/?>", "\n", RegexOptions.IgnoreCase);
+        text = Regex.Replace(text, "<[^>]+>", string.Empty);
+        text = WebUtility.HtmlDecode(text);
+        text = Regex.Replace(text, @"[ \t]+", " ");
+        text = Regex.Replace(text, @"\s*\n\s*", "\n");
+        return text.Trim();
     }
 }
