@@ -15,7 +15,7 @@ public class EmailSender(IOptions<EmailSettings> emailSettings, ILogger<EmailSen
     public async Task SendEmailAsync(
         string email, string subject, string message, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(emailSettings.Value.ApiKey))
+        if (!string.IsNullOrEmpty(emailSettings.Value.SmtpHost) || string.IsNullOrEmpty(emailSettings.Value.ApiKey))
         {
             await SendViaSmtpFallback(email, subject, message, cancellationToken);
             return;
@@ -89,20 +89,31 @@ public class EmailSender(IOptions<EmailSettings> emailSettings, ILogger<EmailSen
             return;
         }
 
-        var client = new SmtpClient("smtp.gmail.com", 587)
+        var settings = emailSettings.Value;
+        var host = string.IsNullOrEmpty(settings.SmtpHost) ? "smtp.gmail.com" : settings.SmtpHost;
+        var user = string.IsNullOrEmpty(settings.SmtpUser) ? settings.Email : settings.SmtpUser;
+
+        using var client = new SmtpClient(host, settings.SmtpPort)
         {
             EnableSsl = true,
-            Credentials = new NetworkCredential(emailSettings.Value.Email, emailSettings.Value.Password)
+            Credentials = new NetworkCredential(user, settings.Password)
         };
 
-        var mailMessage = new MailMessage(from: emailSettings.Value.Email, to: email, subject, message)
+        using var mailMessage = new MailMessage(
+            new MailAddress(settings.Email, settings.FromName ?? "Polytech League"),
+            new MailAddress(email))
         {
-            IsBodyHtml = true
+            Subject = subject
         };
+        // Дві версії листа: чистий текст і HTML, пошта сама показує HTML
+        mailMessage.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(
+            ToPlainText(message), System.Text.Encoding.UTF8, "text/plain"));
+        mailMessage.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(
+            message, System.Text.Encoding.UTF8, "text/html"));
 
         try
         {
-            logger.LogInformation("Attempting SMTP fallback to {Email} (Timeout 10s)...", email);
+            logger.LogInformation("Attempting SMTP via {Host} to {Email} (Timeout 10s)...", host, email);
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             cts.CancelAfter(TimeSpan.FromSeconds(10));
 
