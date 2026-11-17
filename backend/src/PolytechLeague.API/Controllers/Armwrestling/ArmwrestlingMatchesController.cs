@@ -2,13 +2,26 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PolytechLeague.Application.Dto.ArmwrestlingDto;
 using PolytechLeague.Application.Services.Interfaces.Armwrestling;
+using PolytechLeague.Application.Services.Interfaces;
+using PolytechLeague.Infrastructure.Redis;
 
 namespace PolytechLeague.API.Controllers.Armwrestling;
 
 [ApiController]
 [Route("api/armwrestling-matches")]
-public class ArmwrestlingMatchesController(IArmwrestlingMatchService matchService) : ControllerBase
+public class ArmwrestlingMatchesController(
+    IArmwrestlingMatchService matchService, IRedisService redisService, IPlayerService playerService) : ControllerBase
 {
+    // Деталі турніру кешуються, тому після зміни поєдинків кеш треба скинути, інакше сторінка показує старі дані
+    private async Task InvalidateCacheAsync()
+    {
+        await redisService.RemoveGroupAsync("arm_events_group");
+        await redisService.RemoveGroupAsync("tournaments_group");
+        await redisService.RemoveGroupAsync("tournaments_byid_group");
+        await redisService.RemoveGroupAsync("rankings_group");
+        playerService.ClearRankingsCache();
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
@@ -29,6 +42,7 @@ public class ArmwrestlingMatchesController(IArmwrestlingMatchService matchServic
     {
         var entity = request.FromRequest();
         await matchService.CreateAsync(entity, cancellationToken);
+        await InvalidateCacheAsync();
         return CreatedAtAction(nameof(GetById), new { id = entity.Id }, entity.ToResponse());
     }
 
@@ -38,6 +52,7 @@ public class ArmwrestlingMatchesController(IArmwrestlingMatchService matchServic
     {
         var entity = request.FromRequest();
         await matchService.UpdateAsync(id, entity, cancellationToken);
+        await InvalidateCacheAsync();
         return NoContent();
     }
 
@@ -46,6 +61,7 @@ public class ArmwrestlingMatchesController(IArmwrestlingMatchService matchServic
     public async Task<IActionResult> Delete(long id, CancellationToken cancellationToken)
     {
         await matchService.DeleteAsync(id, cancellationToken);
+        await InvalidateCacheAsync();
         return NoContent();
     }
 }
