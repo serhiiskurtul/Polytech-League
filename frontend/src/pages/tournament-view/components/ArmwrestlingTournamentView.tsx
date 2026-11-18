@@ -72,6 +72,15 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
     gender: 'None' as Gender
   });
 
+  // Новий гравець зі швидкого додавання в поєдинок, для якого ще треба вказати групу
+  const [quickAdd, setQuickAdd] = useState<{
+    firstName: string;
+    lastName: string;
+    patronymic: string;
+    group: string;
+    playerNum: 1 | 2;
+  } | null>(null);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -179,36 +188,56 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
       p.lastName.toLowerCase() === lastName.toLowerCase()
     );
 
+    if (existing) {
+      await addQuickPlayerToEvent(existing.id!, existing.group || '', playerNum);
+      return;
+    }
+
+    // Нового гравця без групи не створюємо: інакше він потрапляє в рейтинг під групою «Гість»
+    setQuickAdd({ firstName, lastName, patronymic, group: '', playerNum });
+  };
+
+  const addQuickPlayerToEvent = async (playerId: number, group: string, playerNum: 1 | 2) => {
     try {
-      let playerId: number;
-      if (existing) {
-        playerId = existing.id!;
-      } else {
-        let gender: Gender = 'None';
-        if (details.category === 'Men') gender = 'Male';
-        else if (details.category === 'Women') gender = 'Female';
-
-        const created = await createPlayer({
-          firstName,
-          lastName,
-          patronymic,
-          group: 'Гість',
-          city: 'Київ',
-          gender
-        });
-        playerId = created.id!;
-      }
-
-      // 2. Add to event if not already there
       const isAlreadyInEvent = details.participants?.some((p: any) => (p.playerId || p.id) === playerId);
       if (!isAlreadyInEvent) {
-        await addParticipantToArmwrestlingEvent(details.id, { playerId, weight: 0, rank: 0, status: RegistrationStatus.Approved, groupName: 'Гість' });
+        await addParticipantToArmwrestlingEvent(details.id, { playerId, weight: 0, rank: 0, status: RegistrationStatus.Approved, groupName: group });
       }
 
       await loadPlayers(playerNum === 1 ? { p1: playerId } : { p2: playerId });
       onRefresh();
     } catch (err) {
       console.error(err);
+      toast.error('Помилка при додаванні гравця');
+    }
+  };
+
+  const handleConfirmQuickAdd = async () => {
+    if (!quickAdd) return;
+    const group = quickAdd.group.trim();
+    if (!quickAdd.firstName.trim() || !quickAdd.lastName.trim() || !group) {
+      toast.error("Вкажіть прізвище, ім'я та групу!");
+      return;
+    }
+
+    let gender: Gender = 'None';
+    if (details.category === 'Men') gender = 'Male';
+    else if (details.category === 'Women') gender = 'Female';
+
+    try {
+      const created = await createPlayer({
+        firstName: quickAdd.firstName.trim(),
+        lastName: quickAdd.lastName.trim(),
+        patronymic: quickAdd.patronymic.trim() || null,
+        group,
+        city: 'Київ',
+        gender
+      });
+      await addQuickPlayerToEvent(created.id!, group, quickAdd.playerNum);
+      setQuickAdd(null);
+    } catch (err) {
+      console.error(err);
+      toast.error('Помилка при створенні гравця');
     }
   };
 
@@ -655,6 +684,50 @@ const ArmwrestlingTournamentView: React.FC<ArmwrestlingTournamentViewProps> = ({
                   Створити
                 </button>
               </div>
+
+              {quickAdd && (
+                <div style={{ marginTop: '20px', padding: '16px', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '12px' }}>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#1e293b', marginBottom: '12px' }}>
+                    Новий гравець для «Гравець {quickAdd.playerNum}»: вкажіть групу
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '8px', marginBottom: '12px' }}>
+                    <input
+                      placeholder="Прізвище"
+                      value={quickAdd.lastName}
+                      onChange={(e) => setQuickAdd({ ...quickAdd, lastName: e.target.value })}
+                      style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}
+                    />
+                    <input
+                      placeholder="Ім'я"
+                      value={quickAdd.firstName}
+                      onChange={(e) => setQuickAdd({ ...quickAdd, firstName: e.target.value })}
+                      style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}
+                    />
+                    <input
+                      placeholder="По батькові"
+                      value={quickAdd.patronymic}
+                      onChange={(e) => setQuickAdd({ ...quickAdd, patronymic: e.target.value })}
+                      style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}
+                    />
+                    <input
+                      autoFocus
+                      placeholder="Група (напр. 211)"
+                      value={quickAdd.group}
+                      onChange={(e) => setQuickAdd({ ...quickAdd, group: e.target.value })}
+                      onKeyDown={(e) => { if (e.key === 'Enter') handleConfirmQuickAdd(); }}
+                      style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button type="button" className={styles.saveBtn} onClick={handleConfirmQuickAdd}>
+                      Створити та додати
+                    </button>
+                    <button type="button" className={styles.cancelBtn} onClick={() => setQuickAdd(null)}>
+                      Скасувати
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
